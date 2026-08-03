@@ -1,4 +1,4 @@
-import { getCardPosition } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/utils";
+import { getCardPosition } from "@brc/views/HomeView/components/SectionHero/components/Carousel/common/utils";
 import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Fragment, type JSX } from "react";
