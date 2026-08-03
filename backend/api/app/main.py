@@ -65,6 +65,14 @@ def create_app() -> FastAPI:
 
             await init_db()
 
+            # A live assistant with no durable log is the failure mode #1294
+            # exists to prevent, and it's silent -- say so at boot.
+            if settings.ASSISTANT_TURN_LOGGING_ENABLED and not settings.DATABASE_URL:
+                logger.warning(
+                    "Assistant turn logging is enabled but DATABASE_URL is unset; "
+                    "conversations will not be recorded beyond the Redis session TTL"
+                )
+
             yield
 
             auth_service = get_auth_service()

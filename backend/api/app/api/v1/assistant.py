@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -9,18 +10,21 @@ from pydantic_ai.exceptions import (
     UsageLimitExceeded,
 )
 
-from app.core.config import SESSION_COOKIE_NAME
+from app.core.config import SESSION_COOKIE_NAME, get_settings
 from app.core.dependencies import (
     check_rate_limit,
     get_assistant_agent,
     get_optional_current_user,
 )
 from app.core.session_signing import require_session_cookie, set_session_cookie
+from app.db.crud import create_assistant_turn_log, get_user_by_keycloak_sub
+from app.db.session import get_session_factory
 from app.models.assistant import (
     AssistantInfoResponse,
     ChatRequest,
     ChatResponse,
     SessionRestoreResponse,
+    TurnTelemetry,
 )
 from app.models.user_data import UserMeResponse
 from app.services.assistant_agent import (
@@ -31,6 +35,66 @@ from app.services.assistant_agent import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+async def _log_turn(agent, telemetry: TurnTelemetry) -> None:
+    """Persist one turn for beta review (#1294). Never raises.
+
+    Not a FastAPI dependency on purpose: get_db_session() raises when
+    DATABASE_URL is unset, and dependencies resolve before the handler body --
+    so wiring it that way would take the assistant down entirely wherever the
+    DB is disabled (the default docker-compose stack, for one).
+    """
+    settings = get_settings()
+    if not settings.ASSISTANT_TURN_LOGGING_ENABLED or not settings.DATABASE_URL:
+        return
+
+    try:
+        await asyncio.wait_for(
+            _write_turn_log(agent, telemetry, settings),
+            timeout=settings.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS,
+        )
+    except asyncio.TimeoutError:
+        logger.warning(
+            "Assistant turn log write timed out (session=%s turn=%s)",
+            telemetry.session_id,
+            telemetry.turn_index,
+        )
+    except Exception:
+        logger.exception(
+            "Assistant turn log write failed (session=%s turn=%s)",
+            telemetry.session_id,
+            telemetry.turn_index,
+        )
+
+
+async def _write_turn_log(agent, telemetry: TurnTelemetry, settings) -> None:
+    session_factory = get_session_factory()
+    async with session_factory() as db:
+        user_id = None
+        if telemetry.owner_keycloak_sub:
+            user = await get_user_by_keycloak_sub(db, telemetry.owner_keycloak_sub)
+            user_id = user.id if user is not None else None
+
+        usage = telemetry.token_usage
+        await create_assistant_turn_log(
+            db,
+            session_id=telemetry.session_id,
+            turn_index=telemetry.turn_index,
+            user_id=user_id,
+            user_message=telemetry.user_message,
+            assistant_reply=telemetry.assistant_reply,
+            transcript=telemetry.transcript,
+            schema_state=telemetry.schema_state,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+            total_tokens=usage.total_tokens,
+            requests=usage.requests,
+            tool_calls=usage.tool_calls,
+            latency_ms=telemetry.latency_ms,
+            model=settings.AI_PRIMARY_MODEL or None,
+            provider=agent.get_provider(),
+        )
 
 
 @router.get("/info", response_model=AssistantInfoResponse)
@@ -92,7 +156,7 @@ async def assistant_chat(
             ) from e
 
     try:
-        chat_response = await agent.chat(
+        chat_response, telemetry = await agent.chat_with_telemetry(
             request.message,
             request.session_id,
             current_user.sub if current_user else None,
@@ -147,6 +211,8 @@ async def assistant_chat(
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
+
+    await _log_turn(agent, telemetry)
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response

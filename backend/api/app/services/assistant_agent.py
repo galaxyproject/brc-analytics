@@ -34,6 +34,7 @@ from app.models.assistant import (
     SessionState,
     SuggestionChip,
     TokenUsage,
+    TurnTelemetry,
 )
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
@@ -983,6 +984,22 @@ class AssistantAgent:
 
         Creates a new session if session_id is None or not found.
         """
+        response, _telemetry = await self.chat_with_telemetry(
+            message, session_id, owner_keycloak_sub
+        )
+        return response
+
+    async def chat_with_telemetry(
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        owner_keycloak_sub: Optional[str] = None,
+    ) -> tuple[ChatResponse, TurnTelemetry]:
+        """Same as chat(), plus the per-turn record the API layer logs.
+
+        Split out so the agent stays DB-agnostic: it hands back what happened
+        and the endpoint decides whether to persist it.
+        """
         if not self.is_available():
             raise AssistantUnavailableError(
                 "Assistant agent is not available (check AI_API_KEY)"
@@ -1004,6 +1021,12 @@ class AssistantAgent:
             state = await self.session_service.create_session(
                 owner_keycloak_sub=owner_keycloak_sub
             )
+
+        # Monotonic per-session turn counter. Derived from metadata rather than
+        # len(state.messages) because the user-facing list is capped at 100 and
+        # would silently restart the numbering on a long conversation.
+        turn_index = int(state.metadata.get("turn_count", 0) or 0)
+        state.metadata["turn_count"] = turn_index + 1
 
         # Record user message
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
@@ -1099,7 +1122,7 @@ class AssistantAgent:
             schema_state, session_id=state.session_id
         )
 
-        return ChatResponse(
+        response = ChatResponse(
             session_id=state.session_id,
             reply=reply_text,
             schema_state=schema_state,
@@ -1108,6 +1131,28 @@ class AssistantAgent:
             handoff_url=handoff_url,
             token_usage=token_usage,
         )
+
+        # new_messages() is this turn's exchange only -- logging all_messages()
+        # would re-store the entire rehydrated history on every row.
+        try:
+            transcript = to_jsonable_python(result.new_messages())
+        except Exception:
+            logger.warning("Failed to serialize turn transcript", exc_info=True)
+            transcript = []
+
+        telemetry = TurnTelemetry(
+            session_id=state.session_id,
+            turn_index=turn_index,
+            owner_keycloak_sub=owner_keycloak_sub,
+            user_message=message,
+            assistant_reply=reply_text,
+            transcript=transcript,
+            schema_state=schema_state.model_dump(mode="json"),
+            token_usage=token_usage,
+            latency_ms=int((time.time() - turn_start) * 1000),
+        )
+
+        return response, telemetry
 
     async def restore_saved_session(
         self,

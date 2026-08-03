@@ -102,6 +102,42 @@ CORS_ORIGINS=http://localhost:3000,http://localhost
 LOG_LEVEL=INFO
 ```
 
+## Assistant conversation logging
+
+Assistant sessions live in Redis with a 2 hour TTL, so without a durable sink
+there is no record of what users asked or how the assistant answered. When
+`DATABASE_URL` is set, each turn is also written to the `assistant_turn_log`
+table: the user's message, the reply, this turn's tool calls and their returns,
+the analysis-tracker snapshot, token counts, latency, and the model that
+produced it.
+
+```bash
+ASSISTANT_TURN_LOGGING_ENABLED=true   # set false to stop recording turns
+ASSISTANT_TURN_LOG_RETENTION_DAYS=90  # window the purge script enforces
+ASSISTANT_TURN_LOG_TIMEOUT_SECONDS=5  # cap on how long a write may delay a reply
+```
+
+The write is fail-open by design -- a missing, slow, or broken database is
+logged and the user still gets their reply. With no `DATABASE_URL` nothing is
+recorded and the app warns once at startup.
+
+**Retention.** Rows are not expired automatically. Run the purge on a schedule:
+
+```bash
+python -m scripts.purge_assistant_turn_logs --dry-run   # count what would go
+python -m scripts.purge_assistant_turn_logs             # delete past the window
+```
+
+**Privacy.** Messages are free text and may contain whatever a user typed, so
+the table is treated as user data: it lives in the app database under the same
+access controls as `saved_analyses`, is not exposed through any API endpoint,
+and is readable only by maintainers with direct database access. Authenticated
+turns carry a `user_id`; anonymous turns are grouped by `session_id` only, with
+no IP or other network identifier stored. Deleting a user nulls the `user_id`
+rather than deleting the rows, matching `workflow_runs`. Users are told
+conversations may be logged during the beta on the assistant page and in
+`/learn/assistant`.
+
 ## Testing
 
 ```bash
