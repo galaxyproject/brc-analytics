@@ -2,20 +2,20 @@ import { CardAction as DXCardAction } from "@databiosphere/findable-ui/lib/compo
 import { CardSecondaryText as DXCardSecondaryText } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardSecondaryText/cardSecondaryText";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CardMedia } from "@repo/shared/views/HomeView/components/Card/components/CardMedia/cardMedia";
-import { useInteractiveAnalytics } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/hooks/UseInteractiveAnalytics/hook";
 import { type JSX, useRef } from "react";
 import {
   CardContent,
   CardSection,
   CardTitle,
-  Grid,
   StyledBullets,
   StyledCard,
   StyledCardActions,
+  StyledGrid,
 } from "./analyticsTools.styles";
-import { ANALYTICS_TOOLS } from "./common/constants";
+import { useInteractiveAnalytics } from "./hooks/UseInteractiveAnalytics/hook";
+import { type Props } from "./types";
 
-export const AnalyticsTools = (): JSX.Element => {
+export const AnalyticsTools = ({ cards }: Props): JSX.Element => {
   const toolsRef = useRef<HTMLDivElement>(null);
   const {
     activeIndex,
@@ -24,10 +24,10 @@ export const AnalyticsTools = (): JSX.Element => {
     interactiveCards,
     interactiveIndexes,
     onSetActiveIndex,
-  } = useInteractiveAnalytics(toolsRef, ANALYTICS_TOOLS);
+  } = useInteractiveAnalytics(toolsRef, cards);
   return (
     <div>
-      <Grid
+      <StyledGrid
         ref={toolsRef}
         interactionEnabled={interactionEnabled}
         {...interactiveAction}
@@ -55,7 +55,7 @@ export const AnalyticsTools = (): JSX.Element => {
             </CardSection>
           </StyledCard>
         ))}
-      </Grid>
+      </StyledGrid>
       <StyledBullets
         activeBullet={activeIndex}
         bullets={interactiveIndexes}

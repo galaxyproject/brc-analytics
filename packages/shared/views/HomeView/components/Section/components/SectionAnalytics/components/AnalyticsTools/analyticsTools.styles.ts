@@ -3,13 +3,12 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Card as MCard } from "@mui/material";
 import { Bullets } from "@repo/shared/views/HomeView/components/Bullets/bullets";
-import { BULLETS_CLASSES } from "@repo/shared/views/HomeView/components/Bullets/constants";
 
 interface Props {
   interactionEnabled: boolean;
 }
 
-export const Grid = styled("div")<Props>`
+export const StyledGrid = styled("div")<Props>`
   display: grid;
   gap: 16px;
   grid-column: 1 / -1;
@@ -60,8 +59,4 @@ export const StyledCardActions = styled.div`
 
 export const StyledBullets = styled(Bullets)`
   margin-top: 24px;
-
-  .${BULLETS_CLASSES.BULLET_ACTIVE} {
-    --bullet-active-color: #fc5e60;
-  }
 `;
