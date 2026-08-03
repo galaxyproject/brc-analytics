@@ -1,4 +1,3 @@
-import { type Props } from "@/views/AnalyzeView/types";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
@@ -15,6 +14,7 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { type JSX } from "react";
 import { StyledCard } from "./main.styles";
+import { type Props } from "./types";
 
 export const Main = ({ entityId }: Props): JSX.Element => {
   return (

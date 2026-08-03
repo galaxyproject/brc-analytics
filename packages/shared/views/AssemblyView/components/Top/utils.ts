@@ -3,7 +3,7 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import { type Props } from "./types";
 
 /**
- * Returns breadcrumbs for the AnalyzeView component.
+ * Returns breadcrumbs for the assembly detail view.
  * @param props - Component props.
  * @param props.assembly - Assembly.
  * @returns Breadcrumbs.
