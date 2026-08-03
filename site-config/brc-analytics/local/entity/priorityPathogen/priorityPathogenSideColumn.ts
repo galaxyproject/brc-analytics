@@ -1,7 +1,7 @@
 import { type Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { Sections } from "@/components/Entity/components/Sections/sections";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
+import { Sections } from "@brc/views/PriorityPathogenView/ui/Sections/sections";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import {
   type ComponentConfig,
