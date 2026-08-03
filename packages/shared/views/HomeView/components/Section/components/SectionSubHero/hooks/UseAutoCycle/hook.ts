@@ -31,7 +31,7 @@ export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
 
   useEffect(() => {
     startAutoCycle();
-    return clearAutoCycle();
+    return clearAutoCycle;
   }, [clearAutoCycle, startAutoCycle]);
 
   return { activeIndex, onSelectIndex };
