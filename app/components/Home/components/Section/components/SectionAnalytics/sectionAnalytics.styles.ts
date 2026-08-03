@@ -2,6 +2,7 @@ import { SectionHeadline } from "@/components/Home/components/Section/section.st
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 import { sectionLayout } from "@repo/shared/components/layout/Section/section.styles";
+import { BULLETS_CLASSES } from "@repo/shared/views/HomeView/components/Bullets/constants";
 
 export const Section = styled.section`
   background-color: ${PALETTE.SMOKE_LIGHTEST};
@@ -16,6 +17,10 @@ export const SectionLayout = styled.div`
   flex-direction: column;
   gap: 48px 16px;
   padding: 64px 16px;
+
+  .${BULLETS_CLASSES.BULLET_ACTIVE} {
+    --bullet-active-color: #fc5e60;
+  }
 `;
 
 export const Headline = styled(SectionHeadline)`
