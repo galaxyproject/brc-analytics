@@ -1,4 +1,4 @@
-import { SWIPE_ACTION } from "@/hooks/useSwipeInteraction/common/entities";
+import { SWIPE_ACTION } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/types";
 import { type JSX } from "react";
 import {
   Carousel as CarouselCards,
