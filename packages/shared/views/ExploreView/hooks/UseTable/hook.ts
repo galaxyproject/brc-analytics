@@ -1,14 +1,15 @@
-import type { Props } from "@/views/ExploreView/types";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { arrIncludesSome } from "@databiosphere/findable-ui/lib/components/Table/columnDef/columnFilters/filterFn";
 import { getFacetedUniqueValuesWithArrayValues } from "@databiosphere/findable-ui/lib/components/Table/common/utils";
 import { getFacetedMinMaxValues } from "@databiosphere/findable-ui/lib/components/Table/featureOptions/facetedColumn/getFacetedMinMaxValues";
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import type { Props } from "@repo/shared/views/ExploreView/types";
 import {
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  type RowData,
   type Table,
   useReactTable,
 } from "@tanstack/react-table";
@@ -18,7 +19,7 @@ import {
  * @param props - Props.
  * @returns Table.
  */
-export const useTable = <T>(
+export const useTable = <T extends RowData>(
   props: Omit<Props<T>, "Component">
 ): { table: Table<T> } => {
   const { data } = props;

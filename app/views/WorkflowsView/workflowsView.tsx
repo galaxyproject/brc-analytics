@@ -1,4 +1,3 @@
-import { ExploreView } from "@/views/ExploreView/exploreView";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
 import {
@@ -6,6 +5,7 @@ import {
   getWorkflows as getWorkflowCategories,
 } from "@repo/shared/services/workflows/entities";
 import { API } from "@repo/shared/services/workflows/routes";
+import { ExploreView } from "@repo/shared/views/ExploreView/exploreView";
 import { type JSX, useEffect, useMemo, useState } from "react";
 import { Workflows } from "./components/Workflows/workflows";
 import { type Organism } from "./types";
