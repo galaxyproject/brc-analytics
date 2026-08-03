@@ -10,14 +10,16 @@ import {
 
 export const Section = styled.section`
   background-color: ${PALETTE.COMMON_WHITE};
+  border-top: var(--subhero-border-top, none);
   width: 100%;
 `;
 
 export const SectionLayout = styled.div`
+  align-items: var(--subhero-align-items, stretch);
   display: grid;
   gap: 48px 16px;
   grid-template-columns: 1fr 1fr;
-  padding: 80px 0 104px;
+  padding: var(--subhero-padding, 80px 0 104px);
 
   ${bpDownSm} {
     grid-template-columns: repeat(12, 1fr);
@@ -156,6 +158,7 @@ export const StyledBox = styled(Box)`
 `;
 
 export const TransparentBox = styled.div`
+  align-self: var(--subhero-transparent-align, auto);
   display: grid;
   grid-column: 1;
   grid-row: 1;

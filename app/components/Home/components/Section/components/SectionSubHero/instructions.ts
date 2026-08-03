@@ -1,49 +1,44 @@
-import { BUTTON_PROPS as MUI_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { type ButtonProps } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { type Props as SectionSubHeroProps } from "@repo/shared/views/HomeView/components/Section/components/SectionSubHero/types";
 
-export const ACCORDION: Record<string, { details?: string; title: string }> = {
-  "0": {
+export const STEPS: SectionSubHeroProps["steps"] = [
+  {
     details: "Select from pathogen, vector or host organisms.",
     title: "Select an Organism",
   },
-  "1": {
+  {
     details:
       "Select a reference assembly from NCBI and view on the UCSC Genome Browser.",
     title: "Choose a Genome Assembly",
   },
-  "2": {
+  {
     details: "Choose from curated Galaxy workflows for your assembly.",
     title: "Select an Analysis Workflow",
   },
-  "3": {
+  {
     details: "Run your analysis workflow in Galaxy on TACC with free compute.",
     title: "Continue in Galaxy",
   },
-};
+];
 
-const BUTTON_PROPS: Partial<ButtonProps> = {
-  color: MUI_BUTTON_PROPS.COLOR.SECONDARY,
-  size: MUI_BUTTON_PROPS.SIZE.LARGE,
-  variant: MUI_BUTTON_PROPS.VARIANT.CONTAINED,
-};
-
-export const BUTTON: Record<string, ButtonProps> = {
-  "0": {
-    ...BUTTON_PROPS,
+export const CTAS: ButtonProps[] = [
+  {
+    ...BUTTON_PROPS.SECONDARY_LARGE_CONTAINED,
     children: "Discover Organisms",
     href: ROUTES.ORGANISMS,
   },
-  "1": {
-    ...BUTTON_PROPS,
+  {
+    ...BUTTON_PROPS.SECONDARY_LARGE_CONTAINED,
     children: "Discover Assemblies",
     href: ROUTES.GENOMES,
   },
-};
+];
 
-export const IMAGE: Record<string, string> = {
-  "0": "/main/select-an-organism.png",
-  "1": "/main/chose-genome-assembly.png",
-  "2": "/main/select-analysis-workflow.png",
-  "3": "/main/continue-in-galaxy.png",
-};
+export const IMAGES: string[] = [
+  "/main/select-an-organism.png",
+  "/main/chose-genome-assembly.png",
+  "/main/select-analysis-workflow.png",
+  "/main/continue-in-galaxy.png",
+];

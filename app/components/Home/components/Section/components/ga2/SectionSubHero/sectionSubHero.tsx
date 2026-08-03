@@ -1,68 +1,13 @@
-import {
-  ACCORDION_PROPS,
-  FADE_PROPS,
-  SLIDE_PROPS,
-} from "@/components/Home/components/Section/components/SectionSubHero/constants";
 import { SubHeroContent } from "@/components/Home/content/ga2";
-import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
-import { useAutoCycle } from "@repo/shared/views/HomeView/components/Section/components/SectionSubHero/hooks/UseAutoCycle/hook";
 import { type JSX } from "react";
-import { ACCORDION, BUTTON, IMAGE } from "./instructions";
-import {
-  AccordionBox,
-  Section,
-  SectionLayout,
-  SectionSubLayout,
-  SmokeLightestBox,
-  StyledAccordion,
-  StyledBox,
-  StyledButton,
-  StyledGrid,
-  Subhead,
-  TransparentBox,
-} from "./sectionSubHero.styles";
+import { CTAS, IMAGES, STEPS } from "./instructions";
+import { StyledSectionSubHero } from "./sectionSubHero.styles";
 
-export const SectionSubHero = (): JSX.Element => {
-  const accordionKeys = Object.keys(ACCORDION);
-  const { activeIndex, onSelectIndex } = useAutoCycle(accordionKeys);
-  return (
-    <Section>
-      <SectionLayout>
-        <SectionSubLayout>
-          <Subhead>
-            <SubHeroContent />
-          </Subhead>
-          <AccordionBox>
-            {Object.entries(ACCORDION).map(([value, { details, title }]) => (
-              <StyledAccordion
-                {...ACCORDION_PROPS}
-                key={value}
-                expanded={activeIndex === value}
-                onClick={() => onSelectIndex(value)}
-              >
-                <AccordionSummary>{title}</AccordionSummary>
-                {details && <AccordionDetails>{details}</AccordionDetails>}
-              </StyledAccordion>
-            ))}
-          </AccordionBox>
-        </SectionSubLayout>
-        <StyledGrid>
-          <SmokeLightestBox>
-            {Object.entries(IMAGE).map(([value, src]) => (
-              <Slide {...SLIDE_PROPS} key={value} in={activeIndex === value}>
-                <StyledBox sx={{ background: `url(${src})` }} />
-              </Slide>
-            ))}
-          </SmokeLightestBox>
-          <TransparentBox>
-            {Object.entries(BUTTON).map(([value, buttonProps]) => (
-              <Fade {...FADE_PROPS} key={value} in={activeIndex === value}>
-                <StyledButton {...buttonProps} />
-              </Fade>
-            ))}
-          </TransparentBox>
-        </StyledGrid>
-      </SectionLayout>
-    </Section>
-  );
-};
+export const SectionSubHero = (): JSX.Element => (
+  <StyledSectionSubHero
+    content={<SubHeroContent />}
+    ctas={CTAS}
+    images={IMAGES}
+    steps={STEPS}
+  />
+);
