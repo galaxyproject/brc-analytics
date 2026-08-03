@@ -1,10 +1,10 @@
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Button } from "@mui/material";
 import { calculateGridSize } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
+import { Hero } from "@repo/shared/components/layout/SectionHero/components/Hero/hero";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { Fragment, type JSX } from "react";
 import { Carousel } from "./components/Carousel/carousel";
-import { Hero } from "./components/Hero/hero";
-import { BUTTON_PROPS } from "./constants";
 import {
   Head,
   Headline,
@@ -36,7 +36,10 @@ export const SectionHero = (): JSX.Element => {
                   interpreting genomic annotations and functional insights into
                   disease-causing organisms and their carriers
                 </Subhead>
-                <Button {...BUTTON_PROPS} href={ROUTES.ORGANISMS}>
+                <Button
+                  {...BUTTON_PROPS.PRIMARY_LARGE_CONTAINED}
+                  href={ROUTES.ORGANISMS}
+                >
                   Get started
                 </Button>
               </SubHeadline>

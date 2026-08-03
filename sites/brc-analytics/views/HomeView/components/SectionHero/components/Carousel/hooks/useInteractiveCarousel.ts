@@ -1,17 +1,8 @@
-import { CAROUSEL_CARDS } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/cards/constants";
+import { CAROUSEL_CARDS } from "@brc/views/HomeView/components/SectionHero/components/Carousel/cards/constants";
 import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { useSwipeInteraction } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/hook";
-import { type UseSwipeInteraction } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/types";
 import { useMemo } from "react";
-
-export interface UseInteractiveCarousel {
-  activeIndex: UseSwipeInteraction["activeIndex"];
-  interactiveAction?: UseSwipeInteraction["interactiveAction"];
-  interactiveCards: CardProps[];
-  interactiveIndexes: number[];
-  onSetActiveIndex: UseSwipeInteraction["onSetActiveIndex"];
-  onSetSwipeAction: UseSwipeInteraction["onSetSwipeAction"];
-}
+import { type UseInteractiveCarousel } from "./types";
 
 /**
  * Facilitates interaction capabilities for the carousel.

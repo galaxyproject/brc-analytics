@@ -1,3 +1,4 @@
+import { CardActions } from "@brc/views/HomeView/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 import {
   AlertTitle,
   AccordionDetails as MAccordionDetails,
@@ -14,7 +15,6 @@ import {
 } from "@repo/shared/views/docs/content.styles";
 import { type MDXComponents } from "mdx/types";
 import * as C from "./app/components";
-import { CardActions } from "./app/components/Home/components/Section/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
