@@ -4,7 +4,7 @@ import {
   SectionTitle,
 } from "@repo/shared/views/HomeView/components/Section/section.styles";
 import { type JSX } from "react";
-import { ANALYTICS_TOOLS } from "./components/AnalyticsToolsAndData/common/constants";
+import { ANALYTICS_TOOLS } from "./constants";
 import {
   Headline,
   Section,
