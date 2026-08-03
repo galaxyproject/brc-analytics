@@ -1,9 +1,13 @@
-import { AnalyzeWorkflowsView } from "@/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { config } from "@/config/config";
+import { Side as BRCSide } from "@/views/EntityView/assembly/components/Side/brc/side";
+import { Side as GA2Side } from "@/views/EntityView/assembly/components/Side/ga2/side";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { APP_KEYS } from "@site-config/common/constants";
 import Router, { useRouter } from "next/router";
 import { type JSX, useEffect } from "react";
 import type { Props } from "./types";
@@ -39,7 +43,12 @@ export const AnalyzeWorkflowsRouteView = ({
 
   if (shouldRedirect) return <></>;
 
-  if (!trsId) return <AnalyzeWorkflowsView entityId={entityId} />;
+  if (!trsId)
+    return config().appKey === APP_KEYS.GA2 ? (
+      <AnalyzeWorkflowsView SideComponent={GA2Side} entityId={entityId} />
+    ) : (
+      <AnalyzeWorkflowsView SideComponent={BRCSide} entityId={entityId} />
+    );
 
   if (isOrganism)
     return <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />;

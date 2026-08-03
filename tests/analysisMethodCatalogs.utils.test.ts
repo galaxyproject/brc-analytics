@@ -4,9 +4,9 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
 
 describe("buildAssemblyWorkflows", () => {

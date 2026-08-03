@@ -1,4 +1,3 @@
-import { Accordion } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { EmptyState } from "@/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
@@ -7,6 +6,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Stack } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
+import { Accordion } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { type JSX } from "react";
 import { type Props } from "./types";
 
