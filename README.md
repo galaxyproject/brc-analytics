@@ -4,6 +4,10 @@
 
 Using Node.js version `22.12.0`, run `npm install` in the root directory of the repository to install dependencies.
 
+### Typechecking
+
+The app is written with TypeScript and Next.js. Because Next generates local-only type definitions under `.next` in order to check page routes, erroneous type errors may appear when those types become out-of-sync with new code changes. To avoid this, any typechecking should be done by running `npm run typecheck`, which will first update Next's generated types. Additionally, if type errors are reported in `.next` by another program such as an editor, it may be possible to resolve them by running the same script, or by running `npx next typegen` to only generate types.
+
 ## Using the development server
 
 The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`.
