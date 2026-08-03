@@ -1,8 +1,8 @@
 import { SubHeroContent } from "@/components/Home/content";
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
+import { useAutoCycle } from "@repo/shared/views/HomeView/components/Section/components/SectionSubHero/hooks/UseAutoCycle/hook";
 import { type JSX } from "react";
 import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
-import { useAutoCycle } from "./hooks";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import {
   AccordionBox,
