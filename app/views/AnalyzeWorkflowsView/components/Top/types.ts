@@ -1,6 +1,0 @@
-import { type Assembly } from "@/views/WorkflowInputsView/types";
-
-export interface Props {
-  assembly: Assembly;
-  entityId: string;
-}

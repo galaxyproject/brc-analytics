@@ -4,6 +4,7 @@
  */
 export {
   OrganismPloidy as ORGANISM_PLOIDY,
+  WorkflowCategoryId as WORKFLOW_CATEGORY_ID,
   WorkflowParameterVariable as WORKFLOW_PARAMETER_VARIABLE,
   WorkflowPloidy as WORKFLOW_PLOIDY,
   WorkflowScope as WORKFLOW_SCOPE,

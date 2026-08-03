@@ -1,7 +1,6 @@
-import WORKFLOW_CATEGORIES from "@catalog/output/workflows.json";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import { getWorkflows } from "@repo/shared/services/workflows/entities";
 import { type JSX } from "react";
 import { Accordion } from "./components/Accordion/accordion";
 import { type Props } from "./types";
@@ -18,7 +17,7 @@ export const Main = ({ assembly, entityId }: Props): JSX.Element => {
   const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
-    WORKFLOW_CATEGORIES as unknown as WorkflowCategory[], // Cast the schema-validated catalog JSON to its typed shape.
+    getWorkflows(),
     isAssemblyWorkflowsEnabled
   );
   return (

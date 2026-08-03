@@ -1,12 +1,14 @@
-import { workflowPloidyMatchesOrganismPloidy } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
 import {
-  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_CATEGORY_ID,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import {
+  workflowPloidyMatchesOrganismPloidy,
+  workflowRequiresAssemblyId,
+} from "@repo/shared/workflow/utils";
 
 /**
  * Builds workflow categories for the given assembly.
@@ -25,7 +27,7 @@ export function buildAssemblyWorkflows(
 
   for (const workflowCategory of allWorkflowCategories) {
     if (
-      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      workflowCategory.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
       !isAssemblyWorkflowsEnabled
     )
       continue;
@@ -40,7 +42,7 @@ export function buildAssemblyWorkflows(
         workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );
 
-    if (workflowCategory.category === WorkflowCategoryId.TRANSCRIPTOMICS) {
+    if (workflowCategory.category === WORKFLOW_CATEGORY_ID.TRANSCRIPTOMICS) {
       compatibleWorkflows.unshift(DIFFERENTIAL_EXPRESSION_ANALYSIS);
     }
 
@@ -72,18 +74,6 @@ function sortWorkflowCategories(
   if (a.workflows.length === 0 && b.workflows.length > 0) return 1;
   if (a.workflows.length > 0 && b.workflows.length === 0) return -1;
   return 0;
-}
-
-/**
- * Checks if a workflow requires the ASSEMBLY_ID parameter.
- * Workflows with ASSEMBLY_ID depend on Galaxy having pre-built indexes (dbkey) for the assembly.
- * @param workflow - The workflow to check.
- * @returns True if the workflow has a parameter with ASSEMBLY_ID variable, false otherwise.
- */
-export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
-  return workflow.parameters.some(
-    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
-  );
 }
 
 /**
