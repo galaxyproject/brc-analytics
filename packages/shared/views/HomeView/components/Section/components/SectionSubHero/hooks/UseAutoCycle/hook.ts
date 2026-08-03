@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type UseAutoCycle } from "./types";
+import { getNextIndex } from "./utils";
 
 export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
   const cycleRef = useRef<NodeJS.Timeout | null>(null);
@@ -34,18 +35,4 @@ export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
   }, [clearAutoCycle, startAutoCycle]);
 
   return { activeIndex, onSelectIndex };
-}
-
-/**
- * Returns the next index key in a cyclic order.
- * @param indexKeys - Index keys.
- * @param prevIndex - Previous index.
- * @returns next index key.
- */
-function getNextIndex(indexKeys: string[], prevIndex: string): string {
-  const currentIndex = indexKeys.findIndex(
-    (indexKey) => indexKey === prevIndex
-  );
-  const nextIndex = (currentIndex + 1) % indexKeys.length;
-  return indexKeys[nextIndex];
 }

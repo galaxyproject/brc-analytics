@@ -3,9 +3,9 @@ import {
   FADE_PROPS,
   SLIDE_PROPS,
 } from "@/components/Home/components/Section/components/SectionSubHero/constants";
-import { useAutoCycle } from "@/components/Home/components/Section/components/SectionSubHero/hooks";
 import { SubHeroContent } from "@/components/Home/content/ga2";
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
+import { useAutoCycle } from "@repo/shared/views/HomeView/components/Section/components/SectionSubHero/hooks/UseAutoCycle/hook";
 import { type JSX } from "react";
 import { ACCORDION, BUTTON, IMAGE } from "./instructions";
 import {
