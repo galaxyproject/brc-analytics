@@ -2,8 +2,9 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from "@/components/Home/components/Section/section.styles";
+import { AnalyticsTools } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/analyticsTools";
 import { type JSX } from "react";
-import { AnalyticsToolsAndData } from "./components/AnalyticsToolsAndData/analyticsToolsAndData";
+import { ANALYTICS_TOOLS } from "./components/AnalyticsToolsAndData/common/constants";
 import {
   Headline,
   Section,
@@ -23,7 +24,7 @@ export const SectionAnalyticsAndData = (): JSX.Element => {
             Advanced Computing Center (TACC) and Jetstream2.
           </SectionSubtitle>
         </Headline>
-        <AnalyticsToolsAndData />
+        <AnalyticsTools cards={ANALYTICS_TOOLS} />
       </SectionLayout>
     </Section>
   );
