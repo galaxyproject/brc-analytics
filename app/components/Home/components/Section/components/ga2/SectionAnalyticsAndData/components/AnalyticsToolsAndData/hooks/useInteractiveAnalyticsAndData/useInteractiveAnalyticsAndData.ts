@@ -1,7 +1,7 @@
 import { ANALYTICS_TOOLS } from "@/components/Home/components/Section/components/ga2/SectionAnalyticsAndData/components/AnalyticsToolsAndData/common/constants";
 import { useIntersectionObserver } from "@/components/Home/components/Section/components/ga2/SectionAnalyticsAndData/components/AnalyticsToolsAndData/hooks/useIntersectionObserver/useIntersectionObserver";
-import { useSwipeInteraction } from "@/hooks/useSwipeInteraction/useSwipeInteraction";
 import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { useSwipeInteraction } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/hook";
 import { type RefObject, useEffect, useMemo } from "react";
 import { ROWS } from "./common/constants";
 import { type UseInteractiveAnalyticsAndData } from "./common/entities";

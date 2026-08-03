@@ -1,15 +1,15 @@
 import { MAX_DECK_SIZE } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/constants";
 import { getArrowTransform } from "@/components/Home/components/Section/components/SectionHero/components/Carousel/common/utils";
-import {
-  SWIPE_ACTION,
-  type SwipeAction,
-} from "@/hooks/useSwipeInteraction/common/entities";
 import { COLOR_MIXES } from "@databiosphere/findable-ui/lib/styles/common/constants/colorMixes";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { IconButton as MIconButton } from "@mui/material";
+import {
+  SWIPE_ACTION,
+  type SwipeAction,
+} from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/types";
 
 interface Props {
   swipeAction: SwipeAction;

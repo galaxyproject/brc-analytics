@@ -1,4 +1,4 @@
-import { SWIPE_ACTION } from "@/hooks/useSwipeInteraction/common/entities";
+import { SWIPE_ACTION } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/types";
 import {
   ARROW_OFFSET_Y,
   CARD_OFFSET_Y,
