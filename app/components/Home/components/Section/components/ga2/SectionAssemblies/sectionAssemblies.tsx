@@ -2,7 +2,7 @@ import { SectionViz as Sunburst } from "@/components/Home/components/Section/com
 import {
   SectionSubtitle,
   SectionTitle,
-} from "@/components/Home/components/Section/section.styles";
+} from "@repo/shared/views/HomeView/components/Section/section.styles";
 import { type JSX } from "react";
 import { Headline, Section, SectionLayout } from "./sectionAssemblies.styles";
 
