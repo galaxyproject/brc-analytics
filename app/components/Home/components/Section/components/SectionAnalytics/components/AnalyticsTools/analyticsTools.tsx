@@ -2,6 +2,7 @@ import { CardAction as DXCardAction } from "@databiosphere/findable-ui/lib/compo
 import { CardSecondaryText as DXCardSecondaryText } from "@databiosphere/findable-ui/lib/components/common/Card/components/CardSecondaryText/cardSecondaryText";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CardMedia } from "@repo/shared/views/HomeView/components/Card/components/CardMedia/cardMedia";
+import { useInteractiveAnalytics } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/hooks/UseInteractiveAnalytics/hook";
 import { type JSX, useRef } from "react";
 import {
   CardContent,
@@ -12,7 +13,7 @@ import {
   StyledCard,
   StyledCardActions,
 } from "./analyticsTools.styles";
-import { useInteractiveAnalytics } from "./hooks/useInteractiveAnalytics/useInteractiveAnalytics";
+import { ANALYTICS_TOOLS } from "./common/constants";
 
 export const AnalyticsTools = (): JSX.Element => {
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ export const AnalyticsTools = (): JSX.Element => {
     interactiveCards,
     interactiveIndexes,
     onSetActiveIndex,
-  } = useInteractiveAnalytics(toolsRef);
+  } = useInteractiveAnalytics(toolsRef, ANALYTICS_TOOLS);
   return (
     <div>
       <Grid
