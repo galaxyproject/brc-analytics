@@ -1,4 +1,3 @@
-import { getCategoryViews } from "@/views/ExploreView/utils";
 import { ColumnFiltersAdapter } from "@databiosphere/findable-ui/lib/components/Filter/components/adapters/tanstack/ColumnFiltersAdapter/columnFiltersAdapter";
 import { Controls } from "@databiosphere/findable-ui/lib/components/Filter/components/controls/Controls/controls";
 import { Filters as DXFilters } from "@databiosphere/findable-ui/lib/components/Filter/components/Filters/filters";
@@ -8,6 +7,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Filter/components/surfaces/types";
 import { Sidebar } from "@databiosphere/findable-ui/lib/components/Layout/components/Sidebar/sidebar";
 import { useBreakpoint } from "@databiosphere/findable-ui/lib/hooks/useBreakpoint";
+import { getCategoryViews } from "@repo/shared/views/ExploreView/utils";
 import { type RowData } from "@tanstack/react-table";
 import { type JSX } from "react";
 import { StyledBox, StyledSearchAllFilters } from "./filters.styles";
