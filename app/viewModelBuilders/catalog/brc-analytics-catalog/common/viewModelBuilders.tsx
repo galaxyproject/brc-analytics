@@ -10,8 +10,6 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { type KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
-import { type MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
@@ -21,6 +19,8 @@ import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import type { Organism } from "@/views/OrganismView/types";
 import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { type KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
+import { type MDXSection } from "@brc/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
 import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import { KeyElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/KeyElType/keyElType";
 import { ValueElType } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/components/ValueElType/valueElType";

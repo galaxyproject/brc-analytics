@@ -1,7 +1,7 @@
 import { type Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { MDXSection } from "@brc/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import {
   type ComponentConfig,
