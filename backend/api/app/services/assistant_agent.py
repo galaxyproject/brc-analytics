@@ -109,6 +109,15 @@ class AssistantTimeoutError(RuntimeError):
     """Raised when the assistant run exceeds the server-side timeout."""
 
 
+class AssistantUnavailableError(RuntimeError):
+    """Raised when the agent isn't configured -- no API key, so no assistant.
+
+    Distinct from a run that failed: this is the one case where telling the user
+    the assistant is unavailable is true, so it's the only thing that should
+    reach a 503. An unrelated RuntimeError is a bug, not an outage.
+    """
+
+
 def _should_retry_agent_error(exc: BaseException) -> bool:
     return not isinstance(exc, AssistantTimeoutError)
 
@@ -975,7 +984,9 @@ class AssistantAgent:
         Creates a new session if session_id is None or not found.
         """
         if not self.is_available():
-            raise RuntimeError("Assistant agent is not available (check AI_API_KEY)")
+            raise AssistantUnavailableError(
+                "Assistant agent is not available (check AI_API_KEY)"
+            )
 
         # Get or create session
         state = None

@@ -2,6 +2,12 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from pydantic_ai.exceptions import (
+    AgentRunError,
+    ConcurrencyLimitExceeded,
+    ModelHTTPError,
+    UsageLimitExceeded,
+)
 
 from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import (
@@ -17,7 +23,10 @@ from app.models.assistant import (
     SessionRestoreResponse,
 )
 from app.models.user_data import UserMeResponse
-from app.services.assistant_agent import AssistantTimeoutError
+from app.services.assistant_agent import (
+    AssistantTimeoutError,
+    AssistantUnavailableError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -96,9 +105,45 @@ async def assistant_chat(
             status_code=403,
             detail="Assistant session belongs to another user",
         ) from e
-    except RuntimeError as e:
-        logger.exception("Assistant chat unavailable (RuntimeError)")
-        raise HTTPException(status_code=503, detail=str(e)) from e
+    except AssistantUnavailableError as e:
+        # The one case where "unavailable" is the truth. Narrowed from a bare
+        # RuntimeError catch, which also swallowed unrelated runtime bugs and
+        # returned their messages to the client.
+        logger.exception("Assistant chat unavailable (not configured)")
+        raise HTTPException(
+            status_code=503, detail="The analysis assistant is not configured"
+        ) from e
+    except ModelHTTPError as e:
+        # Upstream said no. Keep its meaning: throttling stays throttling and an
+        # upstream outage stays an outage, both of which are worth retrying and
+        # both of which the client already has distinct messaging for. Only a
+        # provider 4xx we can't act on falls through to a generic failure.
+        logger.exception("Assistant model call failed upstream (%s)", e.status_code)
+        if e.status_code == 429:
+            raise HTTPException(
+                status_code=429, detail="The assistant is rate limited right now"
+            ) from e
+        if e.status_code >= 500:
+            raise HTTPException(
+                status_code=503, detail="The assistant's model provider is unavailable"
+            ) from e
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
+    except (UsageLimitExceeded, ConcurrencyLimitExceeded) as e:
+        # A cap we set, not a broken run: retrying later is the right advice.
+        logger.exception("Assistant chat hit a usage or concurrency limit")
+        raise HTTPException(
+            status_code=429, detail="The assistant is at capacity right now"
+        ) from e
+    except AgentRunError as e:
+        # What's left is the run itself going wrong -- a tool exhausting its
+        # retries, unparseable model output. One broken turn, not an outage, and
+        # not worth retrying: the same question fails the same way.
+        logger.exception("Assistant chat run failed")
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
