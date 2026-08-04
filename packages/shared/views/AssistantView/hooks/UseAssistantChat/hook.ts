@@ -1,10 +1,10 @@
-import { assistantAPIClient } from "@/services/assistant-api-client";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
+import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 

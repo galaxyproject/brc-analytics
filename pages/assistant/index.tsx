@@ -1,7 +1,7 @@
 import { BRC_PAGE_META } from "@/common/meta/brc/constants";
 import { config } from "@/config/config";
-import { AssistantView } from "@/views/AssistantView/assistantView";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import { AssistantView } from "@repo/shared/views/AssistantView/assistantView";
 import { ROUTES } from "@routes/constants";
 import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
