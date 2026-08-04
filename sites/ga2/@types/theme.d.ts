@@ -1,4 +1,4 @@
-import { type PaletteColorOptions } from "@mui/material/styles";
+export {};
 
 /**
  * Palette definitions.
@@ -14,22 +14,9 @@ declare module "@mui/material/styles" {
 
   interface Palette {
     brand: BrandColors;
-    caution: PaletteColor;
   }
 
   interface PaletteOptions {
     brand?: Partial<BrandColors>;
-    caution?: PaletteColorOptions;
-  }
-}
-
-/**
- * Chip prop options.
- */
-declare module "@mui/material/Chip" {
-  interface ChipPropsColorOverrides {
-    alert: true;
-    caution: true;
-    none: true;
   }
 }
