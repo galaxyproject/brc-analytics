@@ -120,7 +120,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           provider to generate a response, so avoid sharing sensitive or
           identifying information. Responses can be inaccurate; verify anything
           important before relying on it. During the beta, conversations are
-          logged for 90 days so we can improve the assistant.
+          logged so we can improve the assistant, then deleted after 90 days.
         </AssistantDisclaimer>
       </SectionContent>
     </StyledSection>
