@@ -28,7 +28,7 @@ export const ChatMessage = ({
         <Box
           alt="BRC Analytics"
           component="img"
-          src="/logo/brc.svg"
+          src="/logo/assistant.svg"
           sx={{
             flexShrink: 0,
             height: 20,

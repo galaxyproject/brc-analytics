@@ -1,8 +1,8 @@
+import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
+import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { useAssistantChat } from "../../app/hooks/useAssistantChat";
-import { assistantAPIClient } from "../../app/services/assistant-api-client";
 
-jest.mock("../../app/services/assistant-api-client", () => ({
+jest.mock("@repo/shared/services/assistant-api-client", () => ({
   assistantAPIClient: {
     assistantChat: jest.fn(),
     assistantDeleteSession: jest.fn().mockResolvedValue(undefined),

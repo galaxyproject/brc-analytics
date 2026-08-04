@@ -1,11 +1,10 @@
-import { ChatPanel, SchemaPanel } from "@/components/Assistant";
-import { config } from "@/config/config";
-import { useAssistantChat } from "@/hooks/useAssistantChat";
-import { assistantAPIClient } from "@/services/assistant-api-client";
+import { getConfig } from "@databiosphere/findable-ui/lib/config/config";
 import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { Button } from "@mui/material";
 import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
+import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
+import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
 import { type JSX, useEffect, useState } from "react";
 import {
   ActionsRow,
@@ -16,7 +15,9 @@ import {
   StyledSection,
   TwoPanelLayout,
 } from "./assistantView.styles";
+import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Headline } from "./components/Headline/headline";
+import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
 interface Props {
   initialSessionId?: string;
@@ -41,9 +42,10 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     initialSessionId,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
-  // Read per-site rather than importing one site's config, so the button can
-  // never point at another tenant's form.
-  const { supportUrl } = config();
+  // Read per-site via findable-ui's getConfig rather than importing one site's
+  // config, so the button can never point at another tenant's form. supportUrl
+  // is an app-level field absent from the base SiteConfig type.
+  const { supportUrl } = getConfig() as { supportUrl?: string };
 
   useEffect(() => {
     let cancelled = false;
