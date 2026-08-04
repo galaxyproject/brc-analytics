@@ -1,8 +1,8 @@
+import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import {
   buildIsRef,
   formatNumber,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type CellContext } from "@tanstack/react-table";
 import { type JSX } from "react";
 import { type Assembly } from "./types";

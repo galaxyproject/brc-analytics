@@ -1,8 +1,8 @@
 import { BasicCell } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { type ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
-import { formatNumber } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
 import { LinkCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/LinkCell/linkCell";
+import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   type ColumnDef,
   type ColumnMeta,

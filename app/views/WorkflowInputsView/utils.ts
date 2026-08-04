@@ -1,12 +1,12 @@
-import {
-  getGenomeIsolateText,
-  getGenomeSerotypeText,
-  getGenomeStrainText,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import type {
   AssemblyContract,
   OrganismContract,
 } from "@repo/shared/apis/types";
+import {
+  getGenomeIsolateText,
+  getGenomeSerotypeText,
+  getGenomeStrainText,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 
 /**
  * Maps an assembly to the shared organism shape consumed by the side panel, so the

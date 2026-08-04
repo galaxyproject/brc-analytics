@@ -1,7 +1,6 @@
-import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
-import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
+import { type AssemblyContract } from "@repo/shared/apis/types";
 
-export type Assembly = BRCDataCatalogGenome | GA2AssemblyEntity;
+export type Assembly = AssemblyContract;
 
 export interface Props {
   entityId: string;

@@ -1,18 +1,17 @@
 import { useAssembly } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/Assembly/hook";
-import {
-  buildAssemblyDetails,
-  buildOrganismDetails,
-  buildWorkflowConfiguration,
-  buildWorkflowDetails,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { KeyValuePairs } from "@databiosphere/findable-ui/lib/components/common/KeyValuePairs/keyValuePairs";
 import {
   FluidPaper,
   GridPaper,
 } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
+import {
+  buildAssemblyDetails,
+  buildOrganismDetails,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type JSX } from "react";
 import { type Props } from "./types";
+import { buildWorkflowConfiguration, buildWorkflowDetails } from "./utils";
 
 export const SideColumn = ({
   configuredInput,
