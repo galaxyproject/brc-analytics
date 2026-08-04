@@ -10,13 +10,9 @@ import {
 } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import {
-  COLUMN_PRESET_KEY,
-  COLUMN_PRESET_LABEL,
-} from "@/views/OrganismView/components/Main/constants";
-import { type Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
-import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
 import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
+import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { type KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
 import { type MDXSection } from "@brc/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
@@ -70,6 +66,10 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import {
+  COLUMN_PRESET_KEY,
+  COLUMN_PRESET_LABEL,
+} from "@repo/shared/views/OrganismView/components/Main/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,

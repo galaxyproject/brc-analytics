@@ -1,15 +1,13 @@
 import { Stack } from "@mui/material";
+import { AssembliesSection } from "@repo/shared/views/OrganismView/components/Main/components/AssembliesSection/assembliesSection";
+import { WorkflowsSection } from "@repo/shared/views/OrganismView/components/Main/components/WorkflowsSection/workflowsSection";
+import { type Props } from "@repo/shared/views/OrganismView/components/Main/types";
 import { type RowData } from "@tanstack/react-table";
 import { type JSX } from "react";
-import { AssembliesSection } from "./components/AssembliesSection/assembliesSection";
-import { PangenomeSection } from "./components/PangenomeSection/pangenomeSection";
-import { WorkflowsSection } from "./components/WorkflowsSection/workflowsSection";
-import type { Props } from "./types";
 
 /**
  * Main column for the organism detail page: composes the organism-scoped
- * workflows section, the assemblies section, and (when enabled and available)
- * the pangenome section.
+ * workflows section and the assemblies section.
  * @param props - Component props.
  * @param props.assembly - Assemblies section props (column presets + table options).
  * @param props.entityId - Organism entity ID.
@@ -25,7 +23,6 @@ export const Main = <T extends RowData>({
     <Stack spacing={8} useFlexGap>
       <WorkflowsSection entityId={entityId} organism={organism} />
       <AssembliesSection {...assembly} />
-      <PangenomeSection organism={organism} />
     </Stack>
   );
 };

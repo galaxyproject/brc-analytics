@@ -1,5 +1,5 @@
-import type { ColumnPreset } from "@/views/OrganismView/components/Main/types";
 import { useToggleButtonGroup } from "@databiosphere/findable-ui/lib/components/common/ToggleButtonGroup/hooks/UseToggleButtonGroup/hook";
+import type { ColumnPreset } from "@repo/shared/views/OrganismView/components/Main/types";
 import type { RowData, Table } from "@tanstack/react-table";
 import { type MouseEvent, useCallback } from "react";
 import type { UseColumnPresets } from "./types";
