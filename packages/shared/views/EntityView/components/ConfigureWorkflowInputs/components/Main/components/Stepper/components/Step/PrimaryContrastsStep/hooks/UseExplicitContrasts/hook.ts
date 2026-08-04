@@ -1,0 +1,64 @@
+import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { useCallback, useMemo, useState } from "react";
+import { type ContrastPairs, type UseExplicitContrasts } from "./types";
+import {
+  addPairUpdater,
+  buildExplicitContrasts,
+  createInitialPairs,
+  getNextId,
+  removePairUpdater,
+  updatePairUpdater,
+  validatePairs,
+} from "./utils";
+
+/**
+ * Hook for managing explicit contrast pairs selection.
+ * Resets pairs when primaryFactor changes.
+ * @param primaryFactor - Primary factor column name from the previous step.
+ * @returns Explicit contrasts state and handlers.
+ */
+export function useExplicitContrasts(
+  primaryFactor: ConfiguredInput["primaryFactor"]
+): UseExplicitContrasts {
+  const [pairs, setPairs] = useState<ContrastPairs>(createInitialPairs);
+
+  // Reset pairs when primaryFactor changes. Adjusting state during render
+  // (tracking the previous value) is React's recommended alternative to a
+  // reset-in-effect — it avoids the extra commit + re-render.
+  const [prevPrimaryFactor, setPrevPrimaryFactor] = useState(primaryFactor);
+  if (primaryFactor !== prevPrimaryFactor) {
+    setPrevPrimaryFactor(primaryFactor);
+    setPairs(createInitialPairs());
+  }
+
+  const primaryContrasts = useMemo(
+    () => buildExplicitContrasts(pairs),
+    [pairs]
+  );
+
+  const valid = useMemo(() => validatePairs(pairs), [pairs]);
+
+  const onAddPair = useCallback((): void => {
+    setPairs((prev) => addPairUpdater(getNextId(prev))(prev));
+  }, []);
+
+  const onRemovePair = useCallback((id: string): void => {
+    setPairs(removePairUpdater(id));
+  }, []);
+
+  const onUpdatePair = useCallback(
+    (id: string, position: 0 | 1, value: string): void => {
+      setPairs(updatePairUpdater(id, position, value));
+    },
+    []
+  );
+
+  return {
+    onAddPair,
+    onRemovePair,
+    onUpdatePair,
+    pairs,
+    primaryContrasts,
+    valid,
+  };
+}

@@ -1,6 +1,6 @@
 // Mock STEP import to avoid pulling in unneeded UI step modules.
 jest.mock(
-  "../../../app/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants",
+  "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants",
   (): Record<string, unknown> => ({
     STEP: {
       ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
@@ -16,13 +16,13 @@ jest.mock(
   })
 );
 
-import { buildSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { buildSteps } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/utils";
 
 describe("buildSteps - scope handling", () => {
   const BASE_WORKFLOW: Workflow = {

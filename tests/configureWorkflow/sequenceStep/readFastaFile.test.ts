@@ -3,11 +3,11 @@ import {
   MAX_SEQUENCE_LENGTH,
   MIN_SEQUENCE_LENGTH,
   VALIDATION_ERROR,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/constants";
+} from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/constants";
 import {
   readFastaFile,
   validateFastaContent,
-} from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/utils";
+} from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequenceStep/hooks/UseFilePicker/utils";
 
 /**
  * Creates a mock File with the given content and name.

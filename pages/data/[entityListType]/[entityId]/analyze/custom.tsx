@@ -2,8 +2,8 @@ import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { getEntities } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
-import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import {
   type GetStaticPaths,
