@@ -1,4 +1,4 @@
-import type { EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
 import { getEntities } from "@repo/shared/services/workflows/query";
 import type { EntityRoute } from "@repo/shared/services/workflows/types";
 

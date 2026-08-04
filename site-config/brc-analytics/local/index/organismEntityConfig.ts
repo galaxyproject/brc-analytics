@@ -12,13 +12,13 @@ import {
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { Chip } from "@mui/material";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import { type AppEntityConfig } from "@repo/shared/config/types";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
 import { organismMainColumn } from "@site-config/brc-analytics/local/entity/organism/organismMainColumn";
 import { organismTop } from "@site-config/brc-analytics/local/entity/organism/organismTop";
-import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 

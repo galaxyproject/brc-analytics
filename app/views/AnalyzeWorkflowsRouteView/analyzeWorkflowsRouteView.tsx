@@ -1,9 +1,9 @@
 import { config } from "@/config/config";
-import { Side as BRCSide } from "@/views/EntityView/assembly/components/Side/brc/side";
-import { Side as GA2Side } from "@/views/EntityView/assembly/components/Side/ga2/side";
 import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
+import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";

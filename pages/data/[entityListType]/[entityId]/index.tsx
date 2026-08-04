@@ -1,19 +1,17 @@
-import {
-  type BRCCatalog,
-  type EntitiesResponse,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { type BRCCatalog } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { type GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
-import { Side as BRCSide } from "@/views/EntityView/assembly/components/Side/brc/side";
-import { Side as GA2Side } from "@/views/EntityView/assembly/components/Side/ga2/side";
-import { EntityDetailView } from "@/views/EntityView/entityView";
+import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
+import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { type EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
 import { AssemblyView } from "@repo/shared/views/AssemblyView/assemblyView";
+import { EntityDetailView } from "@repo/shared/views/EntityView/entityView";
 import { APP_KEYS } from "@site-config/common/constants";
 import {
   type GetStaticPaths,
