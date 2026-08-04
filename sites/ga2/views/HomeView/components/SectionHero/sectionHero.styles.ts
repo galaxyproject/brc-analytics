@@ -1,10 +1,10 @@
-import { PALETTE_BRAND } from "@/styles/common/constants/palette";
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import {
   bpUpLg,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
+import { PALETTE_BRAND } from "@ga2/styles/constants/palette";
 import { bpUp1024 } from "@ga2/styles/mixins/breakpoints";
 import {
   section,

@@ -1,7 +1,8 @@
-import { CHIP_PROPS as APP_CHIP_PROPS } from "@/styles/common/mui/chip";
 import { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
+import { CHIP_PROPS as BRC_CHIP_PROPS } from "@brc/styles/mui/muiChip";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { type ChipProps } from "@mui/material";
+import { CHIP_PROPS as SHARED_CHIP_PROPS } from "@repo/shared/styles/mui/muiChip";
 
 /**
  * Returns the color for the priority of the outbreak.
@@ -15,15 +16,15 @@ export function getPriorityColor(
     case OUTBREAK_PRIORITY.CRITICAL:
       return CHIP_PROPS.COLOR.WARNING;
     case OUTBREAK_PRIORITY.HIGH:
-      return APP_CHIP_PROPS.COLOR.CAUTION;
+      return BRC_CHIP_PROPS.COLOR.CAUTION;
     case OUTBREAK_PRIORITY.HIGHEST:
-      return APP_CHIP_PROPS.COLOR.ALERT;
+      return SHARED_CHIP_PROPS.COLOR.ALERT;
     case OUTBREAK_PRIORITY.MODERATE:
       return CHIP_PROPS.COLOR.DEFAULT;
     case OUTBREAK_PRIORITY.MODERATE_HIGH:
       return CHIP_PROPS.COLOR.DEFAULT;
     default:
-      return APP_CHIP_PROPS.COLOR.NONE;
+      return SHARED_CHIP_PROPS.COLOR.NONE;
   }
 }
 

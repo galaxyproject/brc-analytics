@@ -1,27 +1,27 @@
 import { type PaletteColorOptions, type ThemeOptions } from "@mui/material";
 
-/**
- * Palette "Primary"
- */
+const CAUTION = {
+  LIGHT: "#FFEB78",
+  MAIN: "#956F00",
+};
+
 const PRIMARY = {
   DARK: "#1F1F47",
   MAIN: "#28285B",
 };
 
-/**
- * Palette Option "Primary"
- */
+const caution: PaletteColorOptions = {
+  light: CAUTION.LIGHT,
+  main: CAUTION.MAIN,
+};
+
 const primary: PaletteColorOptions = {
   contrastText: "#FFFFFF",
   dark: PRIMARY.DARK,
   main: PRIMARY.MAIN,
 };
 
-/**
- * Theme Options
- */
-export const THEME_OPTIONS: ThemeOptions = {
-  palette: {
-    primary,
-  },
+export const palette: ThemeOptions["palette"] = {
+  caution,
+  primary,
 };
