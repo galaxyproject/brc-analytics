@@ -1,8 +1,8 @@
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
 import { type JSX } from "react";
-import { Accordion } from "./components/Accordion/accordion";
 import { type Props } from "./types";
 import { buildAssemblyWorkflows } from "./utils";
 
@@ -24,7 +24,7 @@ export const Main = ({ assembly, entityId }: Props): JSX.Element => {
     <BackPageContentMainColumn>
       {workflowCategories.map((workflowCategory) => {
         return (
-          <Accordion
+          <WorkflowCategory
             disabled={workflowCategory.workflows.length === 0}
             entityId={entityId as string}
             key={workflowCategory.category}

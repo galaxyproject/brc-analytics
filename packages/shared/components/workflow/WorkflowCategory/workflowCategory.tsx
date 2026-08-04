@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Fragment, type JSX } from "react";
-import { StyledAccordion } from "./accordion.styles";
 import { Workflow } from "./components/Workflow/workflow";
 import {
   CHIP_PROPS,
@@ -17,9 +16,10 @@ import {
   SVG_ICON_PROPS,
 } from "./constants";
 import { type Props } from "./types";
+import { StyledAccordion } from "./workflowCategory.styles";
 
 /**
- * Accordion component that displays a category of workflows and its compatible workflows.
+ * Displays a category of workflows and its compatible workflows as an accordion.
  * @param props - Component props.
  * @param props.configureRoute - Route template for the configure workflow page.
  * @param props.disabled - Whether the accordion is disabled.
@@ -28,7 +28,7 @@ import { type Props } from "./types";
  * @param props.workflows - Compatible workflows.
  * @returns A JSX element representing an accordion for a workflow category.
  */
-export const Accordion = ({
+export const WorkflowCategory = ({
   configureRoute,
   disabled,
   entityId,
