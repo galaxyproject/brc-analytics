@@ -4,8 +4,8 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/b
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Button, Grid, Typography } from "@mui/material";
+import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@repo/shared/components/workflow/WorkflowCategory/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import Link from "next/link";
 import { Fragment, type JSX } from "react";

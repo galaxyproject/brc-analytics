@@ -16,8 +16,8 @@ import {
   Typography,
 } from "@mui/material";
 import { TruncatedText } from "@repo/shared/components/TruncatedText/truncatedText";
+import { CHIP_PROPS } from "@repo/shared/components/workflow/WorkflowCategory/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { CHIP_PROPS } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/components/Accordion/constants";
 import Link from "next/link";
 import { type JSX } from "react";
 import { StyledCard } from "./card.styles";
