@@ -3,8 +3,10 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import type { Organism } from "@/views/OrganismView/types";
-import type { AssemblyContract } from "@repo/shared/apis/types";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
 
 /**
  * Maps an assembly to the shared organism shape consumed by the side panel, so the
@@ -14,7 +16,9 @@ import type { AssemblyContract } from "@repo/shared/apis/types";
  * @param assembly - Assembly to derive organism-level details from.
  * @returns Organism shape for the side panel.
  */
-export function mapAssemblyToOrganism(assembly: AssemblyContract): Organism {
+export function mapAssemblyToOrganism(
+  assembly: AssemblyContract
+): OrganismContract {
   return {
     // Organism-level link target: the species taxon, not the assembly's own
     // (possibly strain-level) ncbiTaxonomyId.

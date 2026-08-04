@@ -1,4 +1,4 @@
-import type { Organism } from "@/views/OrganismView/types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type {
   RowData,
   TableOptions,
@@ -17,5 +17,5 @@ export interface Props<T extends RowData> {
     tableOptions: Pick<TableOptions<T>, "columns" | "data" | "initialState">;
   };
   entityId: string;
-  organism: Organism;
+  organism: OrganismContract;
 }

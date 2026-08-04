@@ -1,6 +1,6 @@
-import type { Organism } from "@/views/OrganismView/types";
 import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
 import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 
 /**
@@ -12,7 +12,7 @@ import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
  * @returns Workflow categories compatible with the given organism.
  */
 export function buildOrganismWorkflows(
-  organism: Organism,
+  organism: OrganismContract,
   allWorkflowCategories: WorkflowCategory[],
   isAssemblyWorkflowsEnabled = false
 ): WorkflowCategory[] {
@@ -53,7 +53,7 @@ export function buildOrganismWorkflows(
  */
 function workflowIsCompatibleWithOrganism(
   workflow: Workflow,
-  organism: Organism
+  organism: OrganismContract
 ): boolean {
   if (workflow.taxonomyId === null) return true;
   return (organism.genomes ?? []).some((genome) =>

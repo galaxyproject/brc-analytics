@@ -1,5 +1,5 @@
-import { type Organism } from "@/views/OrganismView/types";
+import { type OrganismContract } from "@repo/shared/apis/types";
 
 export interface Props {
-  organism: Organism;
+  organism: OrganismContract;
 }

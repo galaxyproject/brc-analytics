@@ -1,8 +1,8 @@
-import type { Organism } from "@/views/OrganismView/types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 
 export interface Props {
   entityId: string;
-  organism: Organism;
+  organism: OrganismContract;
   workflow: Workflow;
 }
