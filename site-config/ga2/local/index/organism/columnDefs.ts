@@ -1,3 +1,13 @@
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
+import {
+  type ColumnConfig,
+  type ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
+import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
+import * as V from "@ga2/viewModelBuilders/viewModelBuilders";
 import {
   buildAssemblyCount,
   buildOrganismAssemblyTaxonomyIds,
@@ -9,17 +19,7 @@ import {
   buildTaxonomicLevelKingdom,
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
-} from "@brc/viewModelBuilders/viewModelBuilders";
-import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
-import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
-import {
-  type ColumnConfig,
-  type ComponentConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
-import { type GA2OrganismEntity } from "@ga2/apis/organism";
-import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
-import * as V from "@ga2/viewModelBuilders/viewModelBuilders";
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,

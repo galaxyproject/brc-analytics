@@ -1,24 +1,3 @@
-import {
-  buildAccession,
-  buildAnnotationStatus,
-  buildAssemblyTaxonomicGroup,
-  buildChromosomes,
-  buildCoverage,
-  buildGcPercent,
-  buildGenomeTaxonomicLevelStrain,
-  buildLength,
-  buildScaffoldCount,
-  buildScaffoldL50,
-  buildScaffoldN50,
-  buildTaxonomicLevelClass,
-  buildTaxonomicLevelDomain,
-  buildTaxonomicLevelFamily,
-  buildTaxonomicLevelGenus,
-  buildTaxonomicLevelKingdom,
-  buildTaxonomicLevelOrder,
-  buildTaxonomicLevelPhylum,
-  buildTaxonomyId,
-} from "@brc/viewModelBuilders/viewModelBuilders";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
@@ -34,11 +13,30 @@ import { LevelCell } from "@repo/shared/components/Table/components/TableCell/co
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import {
+  buildAccession,
   buildAnalyzeGenome,
+  buildAnnotationStatus,
+  buildAssemblyTaxonomicGroup,
+  buildChromosomes,
+  buildCoverage,
+  buildGcPercent,
+  buildGenomeTaxonomicLevelStrain,
   buildIsRef,
+  buildLength,
   buildLevel,
   buildReleaseDate,
   buildReleaseDateTooltip,
+  buildScaffoldCount,
+  buildScaffoldL50,
+  buildScaffoldN50,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelFamily,
+  buildTaxonomicLevelGenus,
+  buildTaxonomicLevelKingdom,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
+  buildTaxonomyId,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   GA2_CATEGORY_KEY,

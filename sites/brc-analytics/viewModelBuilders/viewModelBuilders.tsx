@@ -23,10 +23,7 @@ import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/compon
 import { type NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { Chip } from "@mui/material";
-import type {
-  AssemblyContract,
-  OrganismContract,
-} from "@repo/shared/apis/types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
@@ -41,13 +38,20 @@ import {
 } from "@repo/shared/viewModelBuilders/constants";
 import {
   buildAnalyzeGenome,
+  buildAnnotationStatus,
+  buildChromosomes,
+  buildCoverage,
+  buildGcPercent,
   buildGroupTag,
   buildIsRef,
+  buildLength,
   buildLevel,
   buildOrganismDetails as buildOrganismDetailsBase,
   buildReleaseDate,
   buildReleaseDateTooltip,
-  formatNumber,
+  buildScaffoldCount,
+  buildScaffoldL50,
+  buildScaffoldN50,
   getGenomeIsolateText,
   getGenomeSerotypeText,
   getGenomeStrainText,
@@ -73,60 +77,6 @@ import slugify from "slugify";
 import { getPriorityColor, getPriorityLabel } from "./priority";
 
 /**
- * Build props for the accession cell.
- * @param entity - Entity with an accession.
- * @returns Props to be used for the cell.
- */
-export const buildAccession = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.accession,
-  };
-};
-
-/**
- * Build props for the annotation status cell.
- * @param entity - Entity with an annotationStatus property.
- * @returns Props for the BasicCell component.
- */
-export const buildAnnotationStatus = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.annotationStatus,
-  };
-};
-
-/**
- * Build props for the assemblies cell.
- * @param entity - Entity with a required assemblyCount property.
- * @returns Props for the BasicCell component.
- */
-export const buildAssemblyCount = (
-  // `assemblyCount` is optional on OrganismContract; require it here so callers
-  // can't pass a projection without it and silently render an empty value.
-  entity: OrganismContract & { assemblyCount: number }
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.assemblyCount),
-  };
-};
-
-/**
- * Build props for the chromosomes cell.
- * @param entity - Entity with a chromosomes property.
- * @returns Props for the BasicCell component.
- */
-export const buildChromosomes = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.chromosomes),
-  };
-};
-
-/**
  * Build props for the common names cell.
  * @param entity - Organism or genome entity.
  * @returns Props for the NTagCell component.
@@ -137,32 +87,6 @@ export const buildCommonNames = (
   return {
     label: "common names",
     values: entity.commonNames,
-  };
-};
-
-/**
- * Build props for the coverage cell.
- * @param entity - Entity with a coverage property.
- * @returns Props for the BasicCell component.
- */
-export const buildCoverage = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.coverage,
-  };
-};
-
-/**
- * Build props for the GC% cell.
- * @param entity - Entity with a gcPercent property.
- * @returns Props for the BasicCell component.
- */
-export const buildGcPercent = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.gcPercent,
   };
 };
 
@@ -247,19 +171,6 @@ export const buildOrganismGenomeSpecies = (
 };
 
 /**
- * Build props for the strain cell.
- * @param entity - Entity with a strainName and taxonomicLevelStrain property.
- * @returns Props to be used for the BasicCell component.
- */
-export const buildGenomeTaxonomicLevelStrain = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: getGenomeStrainText(entity),
-  };
-};
-
-/**
  * Build props for the serotype cell.
  * @param genome - Genome entity.
  * @returns Props to be used for the cell.
@@ -282,33 +193,6 @@ export const buildGenomeTaxonomicLevelIsolate = (
 ): ComponentProps<typeof BasicCell> => {
   return {
     value: getGenomeIsolateText(genome),
-  };
-};
-
-/**
- * Build props for the length cell.
- * @param entity - Entity with a length property.
- * @returns Props for the BasicCell component.
- */
-export const buildLength = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.length),
-  };
-};
-
-/**
- * Build props for the assembly taxonomy IDs cell.
- * @param entity - Entity with a assemblyTaxonomyIds property.
- * @returns Props for the NTagCell component.
- */
-export const buildOrganismAssemblyTaxonomyIds = (
-  entity: OrganismContract
-): ComponentProps<typeof NTagCell> => {
-  return {
-    label: "taxonomy IDs",
-    values: entity.assemblyTaxonomyIds ?? [],
   };
 };
 
@@ -542,132 +426,6 @@ export const buildPriorityPathogenResources = (
 };
 
 /**
- * Build props for the taxonomic group cell of an assembly.
- * @param entity - Assembly with a taxonomicGroup property.
- * @returns Props for the NTagCell component.
- */
-export const buildAssemblyTaxonomicGroup = (
-  entity: AssemblyContract
-): ComponentProps<typeof NTagCell> => {
-  return {
-    label: "taxonomic groups",
-    values: entity.taxonomicGroup,
-  };
-};
-
-/**
- * Build props for the taxonomic group cell of an organism.
- * @param entity - Organism with an optional taxonomicGroup property.
- * @returns Props for the NTagCell component.
- */
-export const buildOrganismTaxonomicGroup = (
-  entity: OrganismContract
-): ComponentProps<typeof NTagCell> => {
-  return {
-    label: "taxonomic groups",
-    values: entity.taxonomicGroup ?? [],
-  };
-};
-
-/**
- * Build props for the class cell.
- * @param entity - Entity with a taxonomicLevelClass property.
- * @param entity.taxonomicLevelClass - Taxonomic class.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelClass = (entity: {
-  taxonomicLevelClass: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelClass,
-  };
-};
-
-/**
- * Build props for the domain cell.
- * @param entity - Entity with a taxonomicLevelDomain property.
- * @param entity.taxonomicLevelDomain - Taxonomic domain.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelDomain = (entity: {
-  taxonomicLevelDomain: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelDomain,
-  };
-};
-
-/**
- * Build props for the family cell.
- * @param entity - Entity with a taxonomicLevelFamily property.
- * @param entity.taxonomicLevelFamily - Taxonomic family.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelFamily = (entity: {
-  taxonomicLevelFamily: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelFamily,
-  };
-};
-
-/**
- * Build props for the genus cell.
- * @param entity - Entity with a taxonomicLevelGenus property.
- * @param entity.taxonomicLevelGenus - Taxonomic genus.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelGenus = (entity: {
-  taxonomicLevelGenus: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelGenus,
-  };
-};
-
-/**
- * Build props for the kingdom cell.
- * @param entity - Entity with a taxonomicLevelKingdom property.
- * @param entity.taxonomicLevelKingdom - Taxonomic kingdom.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelKingdom = (entity: {
-  taxonomicLevelKingdom: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelKingdom,
-  };
-};
-
-/**
- * Build props for the order cell.
- * @param entity - Entity with a taxonomicLevelOrder property.
- * @param entity.taxonomicLevelOrder - Taxonomic order.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelOrder = (entity: {
-  taxonomicLevelOrder: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelOrder,
-  };
-};
-
-/**
- * Build props for the phylum cell.
- * @param entity - Entity with a taxonomicLevelPhylum property.
- * @param entity.taxonomicLevelPhylum - Taxonomic phylum.
- * @returns Props to be used for the cell.
- */
-export const buildTaxonomicLevelPhylum = (entity: {
-  taxonomicLevelPhylum: string;
-}): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.taxonomicLevelPhylum,
-  };
-};
-
-/**
  * Build props for the realm cell.
  * @param entity - Entity with a taxonomicLevelRealm property.
  * @param entity.taxonomicLevelRealm - Taxonomic realm.
@@ -678,58 +436,6 @@ export const buildTaxonomicLevelRealm = (entity: {
 }): ComponentProps<typeof BasicCell> => {
   return {
     value: entity.taxonomicLevelRealm,
-  };
-};
-
-/**
- * Build props for the scaffold count cell.
- * @param entity - Entity with a scaffoldCount property.
- * @returns Props for the BasicCell component.
- */
-export const buildScaffoldCount = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.scaffoldCount),
-  };
-};
-
-/**
- * Build props for the scaffold L50 cell.
- * @param entity - Entity with a scaffoldL50 property.
- * @returns Props for the BasicCell component.
- */
-export const buildScaffoldL50 = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.scaffoldL50),
-  };
-};
-
-/**
- * Build props for the scaffold N50 cell.
- * @param entity - Entity with a scaffoldN50 property.
- * @returns Props for the BasicCell component.
- */
-export const buildScaffoldN50 = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: formatNumber(entity.scaffoldN50),
-  };
-};
-
-/**
- * Build props for the taxonomy ID cell.
- * @param entity - Entity with a ncbiTaxonomyId property.
- * @returns Props for the BasicCell component.
- */
-export const buildTaxonomyId = (
-  entity: AssemblyContract
-): ComponentProps<typeof BasicCell> => {
-  return {
-    value: entity.ncbiTaxonomyId,
   };
 };
 

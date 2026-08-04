@@ -14,6 +14,18 @@ import { Chip } from "@mui/material";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { type AppEntityConfig } from "@repo/shared/config/types";
 import {
+  buildAssemblyCount,
+  buildOrganismAssemblyTaxonomyIds,
+  buildOrganismTaxonomicGroup,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelFamily,
+  buildTaxonomicLevelGenus,
+  buildTaxonomicLevelKingdom,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
@@ -105,7 +117,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelDomain,
+          viewBuilder: buildTaxonomicLevelDomain,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
@@ -123,7 +135,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelKingdom,
+          viewBuilder: buildTaxonomicLevelKingdom,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
@@ -132,7 +144,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelPhylum,
+          viewBuilder: buildTaxonomicLevelPhylum,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
@@ -141,7 +153,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelClass,
+          viewBuilder: buildTaxonomicLevelClass,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
@@ -150,7 +162,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelOrder,
+          viewBuilder: buildTaxonomicLevelOrder,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
@@ -159,7 +171,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelFamily,
+          viewBuilder: buildTaxonomicLevelFamily,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
@@ -168,7 +180,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelGenus,
+          viewBuilder: buildTaxonomicLevelGenus,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
@@ -223,7 +235,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildOrganismAssemblyTaxonomyIds,
+          viewBuilder: buildOrganismAssemblyTaxonomyIds,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
@@ -232,7 +244,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildOrganismTaxonomicGroup,
+          viewBuilder: buildOrganismTaxonomicGroup,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
@@ -256,7 +268,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildAssemblyCount,
+          viewBuilder: buildAssemblyCount,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
