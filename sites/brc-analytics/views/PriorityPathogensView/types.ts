@@ -1,4 +1,4 @@
-import { type Outbreak } from "@brc/apis/types";
+import { type Outbreak } from "@brc/apis/outbreak";
 import { type EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
 
 export interface Props {

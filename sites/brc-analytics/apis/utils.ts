@@ -1,10 +1,8 @@
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import { type WorkflowEntity } from "@site-config/brc-analytics/local/index/workflow/types";
-import {
-  type BRCDataCatalogGenome,
-  type BRCDataCatalogOrganism,
-} from "./types";
+import { type BRCDataCatalogGenome } from "./assembly";
+import { type BRCDataCatalogOrganism } from "./organism";
 
 export function getGenomeId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.accession);

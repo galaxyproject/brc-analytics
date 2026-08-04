@@ -1,4 +1,4 @@
-import type { BRCDataCatalogGenome } from "@brc/apis/types";
+import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,

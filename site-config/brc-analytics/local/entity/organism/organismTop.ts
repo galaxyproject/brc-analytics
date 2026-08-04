@@ -1,5 +1,5 @@
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import { type BRCDataCatalogOrganism } from "@brc/apis/types";
+import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import {
   type ComponentConfig,

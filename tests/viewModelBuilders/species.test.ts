@@ -10,8 +10,8 @@ import {
   buildAssemblySpecies,
   buildOrganismAssemblySpecies,
 } from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import type { BRCDataCatalogGenome } from "@brc/apis/types";
-import type { GA2AssemblyEntity } from "@ga2/apis/types";
+import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
+import type { GA2AssemblyEntity } from "@ga2/apis/assembly";
 
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {

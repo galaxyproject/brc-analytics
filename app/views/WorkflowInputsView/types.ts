@@ -1,5 +1,5 @@
-import { type BRCDataCatalogGenome } from "@brc/apis/types";
-import { type GA2AssemblyEntity } from "@ga2/apis/types";
+import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 
 export type Assembly = BRCDataCatalogGenome | GA2AssemblyEntity;
 

@@ -1,0 +1,42 @@
+import { type ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
+import { type OUTBREAK_PRIORITY } from "./schema-types";
+
+export interface BRCDataCatalogGenome {
+  accession: string;
+  annotationStatus: string | null;
+  chromosomes: number | null;
+  commonNames: string[];
+  coverage: string | null;
+  galaxyDatacacheUrl: string | null;
+  gcPercent: number | null;
+  geneModelUrl: string | null;
+  isRef: string;
+  length: number;
+  level: string;
+  lineageTaxonomyIds: string[];
+  ncbiTaxonomyId: string;
+  otherTaxa: string[] | null;
+  ploidy: ORGANISM_PLOIDY[];
+  priority: OUTBREAK_PRIORITY | null;
+  priorityPathogenName: string | null;
+  releaseDate: string;
+  scaffoldCount: number | null;
+  scaffoldL50: number | null;
+  scaffoldN50: number | null;
+  speciesTaxonomyId: string;
+  strainName: string | null;
+  taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelIsolate: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
+  taxonomicLevelRealm: string;
+  taxonomicLevelSerotype: string;
+  taxonomicLevelSpecies: string;
+  taxonomicLevelStrain: string;
+  ucscBrowserUrl: string | null;
+}

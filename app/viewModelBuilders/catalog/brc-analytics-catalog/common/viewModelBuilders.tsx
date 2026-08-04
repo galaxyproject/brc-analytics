@@ -1,12 +1,10 @@
 import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
+import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
+import { type Outbreak } from "@brc/apis/outbreak";
 import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
-import {
-  type BRCDataCatalogGenome,
-  type BRCDataCatalogOrganism,
-  type Outbreak,
-} from "@brc/apis/types";
 import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
