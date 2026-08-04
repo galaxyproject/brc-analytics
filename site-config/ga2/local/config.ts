@@ -1,10 +1,8 @@
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import {
-  type GA2AssemblyEntity,
-  type GA2OrganismEntity,
-} from "@ga2/apis/types";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { Branding } from "@ga2/components/layout/Branding/branding";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";

@@ -1,4 +1,4 @@
-import { type Outbreak } from "@brc/apis/types";
+import { type Outbreak } from "@brc/apis/outbreak";
 
 export interface Props {
   priorityPathogens: Outbreak[];

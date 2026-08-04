@@ -3,7 +3,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { type GA2AssemblyEntity } from "@ga2/apis/types";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 import { getAssemblyId, getAssemblyTitle } from "@ga2/apis/utils";
 import { type AppEntityConfig } from "@repo/shared/config/types";
 import { GA2_CATEGORY_KEY } from "@site-config/ga2/category";

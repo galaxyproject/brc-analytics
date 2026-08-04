@@ -1,4 +1,4 @@
-import { type Outbreak } from "@brc/apis/types";
+import { type Outbreak } from "@brc/apis/outbreak";
 import { COLLATOR_CASE_INSENSITIVE } from "@databiosphere/findable-ui/lib/common/constants";
 import { PRIORITY } from "./constants";
 

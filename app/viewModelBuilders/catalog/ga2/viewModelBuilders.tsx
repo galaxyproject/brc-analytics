@@ -3,10 +3,8 @@ import { type Link } from "@databiosphere/findable-ui/lib/components/Links/compo
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
-import {
-  type GA2AssemblyEntity,
-  type GA2OrganismEntity,
-} from "@ga2/apis/types";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { type OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
 import { type Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";

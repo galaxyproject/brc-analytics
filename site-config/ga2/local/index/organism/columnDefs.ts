@@ -18,7 +18,7 @@ import {
   type ColumnConfig,
   type ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { type GA2OrganismEntity } from "@ga2/apis/types";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
 import {
   GA2_CATEGORY_KEY,

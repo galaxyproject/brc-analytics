@@ -1,0 +1,61 @@
+import type { ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
+
+export interface GA2AssemblyEntity {
+  accession: string;
+  annotationStatus: string | null;
+  chromosomes: number | null;
+  coverage: string | null;
+  galaxyDatacacheUrl: string | null;
+  gcPercent: number | null;
+  geneModelUrl: string | null;
+  image: ImageData;
+  isRef: "No" | "Yes";
+  length: number;
+  level: string;
+  lineageTaxonomyIds: string[];
+  ncbiTaxonomyId: string;
+  ploidy: ORGANISM_PLOIDY[];
+  releaseDate: string;
+  scaffoldCount: number | null;
+  scaffoldL50: number | null;
+  scaffoldN50: number | null;
+  speciesTaxonomyId: string;
+  sra_data: SRAData[];
+  strainName: string | null;
+  taxonomicGroup: string[];
+  taxonomicLevelClass: string;
+  taxonomicLevelDomain: string;
+  taxonomicLevelFamily: string;
+  taxonomicLevelGenus: string;
+  taxonomicLevelKingdom: string;
+  taxonomicLevelOrder: string;
+  taxonomicLevelPhylum: string;
+  taxonomicLevelSpecies: string;
+  taxonomicLevelStrain: string;
+  thumbnailUrl: string;
+  tolId: string;
+  ucscBrowserUrl: string | null;
+}
+
+export interface ImageData {
+  credit: string | null;
+  license: string | null;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  url: string;
+}
+
+export interface SRAData {
+  accession: string;
+  biosample: string;
+  instrument: string;
+  library_layout: string;
+  library_source: string;
+  library_strategy: string;
+  platform: string;
+  run_total_bases: number | null;
+  sra_run_acc: string;
+  sra_sample_acc: string;
+  sra_study_acc: string;
+  total_bases: number | null;
+}

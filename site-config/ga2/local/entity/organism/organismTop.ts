@@ -4,7 +4,7 @@ import {
   type ComponentConfig,
   type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { type GA2OrganismEntity } from "@ga2/apis/types";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
 
 export const organismTop: ComponentsConfig = [
   {

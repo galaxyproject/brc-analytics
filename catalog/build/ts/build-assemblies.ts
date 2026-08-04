@@ -1,7 +1,5 @@
-import {
-  BRCDataCatalogGenome,
-  Outbreak,
-} from "../../../sites/brc-analytics/apis/types";
+import { BRCDataCatalogGenome } from "../../../sites/brc-analytics/apis/assembly";
+import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
 import { getGenomeId } from "../../../sites/brc-analytics/apis/utils";
 import { SOURCE_GENOME_KEYS } from "./constants";
 import { SourceGenome } from "./entities";
