@@ -1,6 +1,6 @@
-import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { getOrganismId } from "@brc/apis/utils";
+import * as V from "@brc/viewModelBuilders/viewModelBuilders";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";

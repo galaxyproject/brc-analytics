@@ -2,7 +2,7 @@ import { SLUGIFY_OPTIONS } from "@/common/constants";
 import {
   getPriorityColor,
   getPriorityLabel,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/priority";
+} from "@brc/viewModelBuilders/priority";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import {
   Section,
