@@ -4,7 +4,6 @@ import {
   type Outbreak,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as C from "@/components";
-import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
 import { Branding } from "@brc/components/layout/Branding/branding";
 import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";
@@ -15,7 +14,6 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
-import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
@@ -40,7 +38,6 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
- * @param taxTreeData - Taxonomy tree data.
  * @param loginEnabled - Whether to show the login button.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
@@ -56,7 +53,6 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
-  taxTreeData = data as TaxonomyNode,
   loginEnabled = LOGIN_ENABLED
 ): AppSiteConfig {
   return {
@@ -124,16 +120,10 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     supportUrl: SUPPORT_URL,
-    taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
   };
 }
 
-const config: AppSiteConfig = makeConfig(
-  BROWSER_URL,
-  GIT_HUB_REPO_URL,
-  data as TaxonomyNode,
-  true
-);
+const config: AppSiteConfig = makeConfig(BROWSER_URL, GIT_HUB_REPO_URL, true);
 
 export default config;

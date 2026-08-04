@@ -3,7 +3,6 @@ import {
   type GA2OrganismEntity,
 } from "@/apis/catalog/ga2/entities";
 import * as C from "@/components";
-import { type TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { Branding } from "@ga2/components/layout/Branding/branding";
@@ -11,7 +10,6 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
-import data from "catalog/ga2/output/ncbi-taxa-tree.json";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
@@ -38,7 +36,6 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
- * @param taxTreeData - Taxonomy tree data.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<GA2AssemblyEntity>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -52,8 +49,7 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/ga2";
  */
 export function makeConfig(
   browserUrl: string,
-  gitHubUrl = GIT_HUB_REPO_URL,
-  taxTreeData = data as TaxonomyNode
+  gitHubUrl = GIT_HUB_REPO_URL
 ): AppSiteConfig {
   return {
     allowedPaths: ALLOWED_PATHS,
@@ -105,7 +101,6 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     supportUrl: SUPPORT_URL,
-    taxTree: taxTreeData,
     themeOptions: THEME_OPTIONS,
   };
 }
