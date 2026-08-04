@@ -7,7 +7,7 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
-import { workflowMeetsAssemblyMinimum } from "../../../app/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 
 // Type constraint: both BRC and GA2 assemblies have these fields
 type AssemblyForCompatibility = {

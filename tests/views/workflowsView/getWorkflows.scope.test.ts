@@ -1,13 +1,13 @@
-import type { Organism } from "@/views/WorkflowsView/types";
-import { getWorkflows } from "@/views/WorkflowsView/utils";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
+import { getWorkflows } from "@repo/shared/views/WorkflowsView/utils";
 
 jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
   DIFFERENTIAL_EXPRESSION_ANALYSIS: {
@@ -25,7 +25,7 @@ jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
 }));
 
 describe("getWorkflows - scope handling", () => {
-  const ORGANISMS: Organism[] = [];
+  const ORGANISMS: OrganismContract[] = [];
   const MAPPINGS: WorkflowAssemblyMapping[] = [
     {
       compatibleAssemblyCount: 1,
