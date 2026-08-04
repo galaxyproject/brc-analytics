@@ -1,7 +1,6 @@
 import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
-import "@/styles/fonts/fonts.css";
 import { mergeAppTheme } from "@/theme/theme";
 import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
@@ -19,6 +18,7 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import "@ga2/styles/fonts/fonts.css";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
