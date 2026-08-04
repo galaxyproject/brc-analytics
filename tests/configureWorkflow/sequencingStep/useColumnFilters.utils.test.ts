@@ -1,7 +1,7 @@
-import { preSelectColumnFilters } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/utils";
-import { SEQUENCING_DATA_TYPE } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { preSelectColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/CollectionSelector/hooks/UseColumnFilters/utils";
+import { SEQUENCING_DATA_TYPE } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/types";
 
 const PARAMETERS: Record<string, Pick<Workflow, "parameters">> = {
   EMPTY: { parameters: [] },

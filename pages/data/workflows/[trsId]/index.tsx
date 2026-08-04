@@ -1,8 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { WorkflowView } from "@/views/WorkflowView/workflowView";
 import workflowCategories from "@catalog/output/workflows.json";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { WorkflowView } from "@repo/shared/views/WorkflowView/workflowView";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";

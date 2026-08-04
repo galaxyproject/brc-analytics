@@ -203,7 +203,7 @@ export const buildLevel = (
 /**
  * Build props for the organism details KeyValuePairs component. Shared core
  * covering the taxonomic levels common to every site; site-specific additions
- * (e.g. the BRC priority-pathogen chip) are composed on top by each site.
+ * (e.g. a priority-pathogen chip) are composed on top by each site.
  * @param organism - Organism details (mapped from an assembly or organism source).
  * @returns Props to be used for the KeyValuePairs component.
  */

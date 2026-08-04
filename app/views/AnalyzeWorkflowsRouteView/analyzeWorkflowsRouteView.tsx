@@ -1,12 +1,12 @@
 import { config } from "@/config/config";
-import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { OrganismWorkflowInputsView } from "@repo/shared/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
+import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
 import { APP_KEYS } from "@site-config/common/constants";
 import Router, { useRouter } from "next/router";
 import { type JSX, useEffect } from "react";
