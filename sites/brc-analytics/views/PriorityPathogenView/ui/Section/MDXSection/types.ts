@@ -1,4 +1,4 @@
-import { type SectionProps } from "@/components/Entity/components/Section/types";
+import { type SectionProps } from "@brc/views/PriorityPathogenView/ui/Section/types";
 import {
   type MDXRemoteProps,
   type MDXRemoteSerializeResult,
