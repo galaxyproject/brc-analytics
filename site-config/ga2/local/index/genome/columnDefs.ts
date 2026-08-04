@@ -1,17 +1,12 @@
 import {
   buildAccession,
-  buildAnalyzeGenome,
   buildAnnotationStatus,
   buildAssemblyTaxonomicGroup,
   buildChromosomes,
   buildCoverage,
   buildGcPercent,
   buildGenomeTaxonomicLevelStrain,
-  buildIsRef,
   buildLength,
-  buildLevel,
-  buildReleaseDate,
-  buildReleaseDateTooltip,
   buildScaffoldCount,
   buildScaffoldL50,
   buildScaffoldN50,
@@ -38,6 +33,13 @@ import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCel
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import {
+  buildAnalyzeGenome,
+  buildIsRef,
+  buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,

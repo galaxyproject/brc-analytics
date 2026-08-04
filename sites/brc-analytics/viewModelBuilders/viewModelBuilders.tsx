@@ -41,8 +41,6 @@ import {
 } from "@repo/shared/viewModelBuilders/constants";
 import {
   buildAnalyzeGenome,
-  buildAssemblyDetails,
-  buildAssemblyResources,
   buildGroupTag,
   buildIsRef,
   buildLevel,
@@ -73,26 +71,6 @@ import Router from "next/router";
 import { type ComponentProps } from "react";
 import slugify from "slugify";
 import { getPriorityColor, getPriorityLabel } from "./priority";
-
-// Transitional shim for the GA2/BRC split (monorepo-split): shared builders
-// moved to the site-neutral common home. Re-export them from this BRC path so
-// existing BRC importers keep resolving; repoint importers at
-// @repo/shared/viewModelBuilders/viewModelBuilders (and /constants) and drop these
-// re-exports, then remove.
-export {
-  buildAnalyzeGenome,
-  buildAssemblyDetails,
-  buildAssemblyResources,
-  buildGroupTag,
-  buildIsRef,
-  buildLevel,
-  buildReleaseDate,
-  buildReleaseDateTooltip,
-  formatNumber,
-  getGenomeIsolateText,
-  getGenomeSerotypeText,
-  getGenomeStrainText,
-};
 
 /**
  * Build props for the accession cell.

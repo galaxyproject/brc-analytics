@@ -17,6 +17,13 @@ import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { type AppEntityConfig } from "@repo/shared/config/types";
 import {
+  buildAnalyzeGenome,
+  buildIsRef,
+  buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
@@ -138,7 +145,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: AnalyzeGenome,
-          viewBuilder: V.buildAnalyzeGenome,
+          viewBuilder: buildAnalyzeGenome,
         } as ComponentConfig<typeof AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
         enableTableDownload: false,
@@ -242,11 +249,11 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           children: [
             {
               component: BasicCell,
-              viewBuilder: V.buildReleaseDate,
+              viewBuilder: buildReleaseDate,
             } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
           ],
           component: Tooltip,
-          viewBuilder: V.buildReleaseDateTooltip,
+          viewBuilder: buildReleaseDateTooltip,
           // The shared release-date builders take the site-neutral
           // AssemblyContract, which TS can't reconcile with this cast:
           // ComponentConfig's data type is invariant and the Tooltip viewBuilder
@@ -334,7 +341,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: ChipCell,
-          viewBuilder: V.buildIsRef,
+          viewBuilder: buildIsRef,
         } as ComponentConfig<typeof ChipCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
@@ -343,7 +350,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: LevelCell,
-          viewBuilder: V.buildLevel,
+          viewBuilder: buildLevel,
         } as ComponentConfig<typeof LevelCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
