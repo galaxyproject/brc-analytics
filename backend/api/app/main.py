@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 import sentry_sdk
 from fastapi import FastAPI
@@ -29,6 +30,7 @@ from app.core.dependencies import (
 )
 from app.db.session import close_db, init_db
 from app.services.mcp_server import create_mcp_server
+from app.services.turn_log_retention import start_turn_log_purge_task
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +75,14 @@ def create_app() -> FastAPI:
                     "conversations will not be recorded beyond the Redis session TTL"
                 )
 
+            purge_task = start_turn_log_purge_task()
+
             yield
+
+            if purge_task is not None:
+                purge_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await purge_task
 
             auth_service = get_auth_service()
             await auth_service.close()

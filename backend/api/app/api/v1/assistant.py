@@ -1,7 +1,10 @@
 import asyncio
 import logging
+import time
 from typing import Optional
+from uuid import uuid4
 
+import sentry_sdk
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from pydantic_ai.exceptions import (
     AgentRunError,
@@ -24,6 +27,7 @@ from app.models.assistant import (
     ChatRequest,
     ChatResponse,
     SessionRestoreResponse,
+    TurnOutcome,
     TurnTelemetry,
 )
 from app.models.user_data import UserMeResponse
@@ -37,35 +41,59 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def _log_turn(agent, telemetry: TurnTelemetry) -> None:
-    """Persist one turn for beta review (#1294). Never raises.
+# Detached log writes need a strong reference or the event loop may collect
+# them mid-flight. Discarded on completion.
+_pending_log_writes: set[asyncio.Task] = set()
 
-    Not a FastAPI dependency on purpose: get_db_session() raises when
-    DATABASE_URL is unset, and dependencies resolve before the handler body --
-    so wiring it that way would take the assistant down entirely wherever the
-    DB is disabled (the default docker-compose stack, for one).
+
+def _schedule_turn_log(agent, telemetry: TurnTelemetry) -> None:
+    """Fire the turn-log write off the response path (#1294).
+
+    Not awaited inline: a sick database would otherwise add its whole timeout
+    to every successful reply. Not a FastAPI BackgroundTask either, because
+    those are attached to a returned response and would be skipped on exactly
+    the error paths we most want recorded.
     """
     settings = get_settings()
     if not settings.ASSISTANT_TURN_LOGGING_ENABLED or not settings.DATABASE_URL:
         return
 
+    task = asyncio.create_task(_log_turn(agent, telemetry, settings))
+    _pending_log_writes.add(task)
+    task.add_done_callback(_pending_log_writes.discard)
+
+
+async def _log_turn(agent, telemetry: TurnTelemetry, settings) -> None:
+    """Persist one turn for beta review. Never raises -- it runs detached.
+
+    The DB session is acquired here rather than injected: get_db_session()
+    raises when DATABASE_URL is unset, and dependencies resolve before the
+    handler body, so wiring it that way would take the assistant down entirely
+    wherever the DB is disabled (the default docker-compose stack, for one).
+    """
     try:
         await asyncio.wait_for(
             _write_turn_log(agent, telemetry, settings),
             timeout=settings.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
+        # Report to Sentry as well as the log: a silently incomplete corpus
+        # looks exactly like a quiet beta.
         logger.warning(
-            "Assistant turn log write timed out (session=%s turn=%s)",
+            "Assistant turn log write timed out (turn_id=%s session=%s)",
+            telemetry.turn_id,
             telemetry.session_id,
-            telemetry.turn_index,
+        )
+        sentry_sdk.capture_message(
+            "Assistant turn log write timed out", level="warning"
         )
     except Exception:
         logger.exception(
-            "Assistant turn log write failed (session=%s turn=%s)",
+            "Assistant turn log write failed (turn_id=%s session=%s)",
+            telemetry.turn_id,
             telemetry.session_id,
-            telemetry.turn_index,
         )
+        sentry_sdk.capture_exception()
 
 
 async def _write_turn_log(agent, telemetry: TurnTelemetry, settings) -> None:
@@ -79,12 +107,16 @@ async def _write_turn_log(agent, telemetry: TurnTelemetry, settings) -> None:
         usage = telemetry.token_usage
         await create_assistant_turn_log(
             db,
+            turn_id=telemetry.turn_id,
             session_id=telemetry.session_id,
             turn_index=telemetry.turn_index,
             user_id=user_id,
             user_message=telemetry.user_message,
             assistant_reply=telemetry.assistant_reply,
+            outcome=telemetry.outcome.value,
+            error_kind=telemetry.error_kind,
             transcript=telemetry.transcript,
+            transcript_truncated=telemetry.transcript_truncated,
             schema_state=telemetry.schema_state,
             input_tokens=usage.input_tokens,
             output_tokens=usage.output_tokens,
@@ -155,12 +187,37 @@ async def assistant_chat(
                 detail="Assistant session belongs to another user",
             ) from e
 
+    # Minted here so a Sentry event raised inside the run carries the same id
+    # as the row we write for it, and the two can actually be joined.
+    turn_id = uuid4()
+    sentry_sdk.set_tag("assistant.turn_id", str(turn_id))
+    turn_started = time.monotonic()
+
     try:
-        chat_response, telemetry = await agent.chat_with_telemetry(
-            request.message,
-            request.session_id,
-            current_user.sub if current_user else None,
-        )
+        try:
+            chat_response, telemetry = await agent.chat_with_telemetry(
+                request.message,
+                request.session_id,
+                current_user.sub if current_user else None,
+                turn_id=turn_id,
+            )
+        except Exception as exc:
+            # Record the failure before the mapping below turns it into an
+            # HTTP status. Without this the corpus only contains the turns that
+            # worked, which is the opposite of what a beta needs.
+            _schedule_turn_log(
+                agent,
+                TurnTelemetry(
+                    turn_id=turn_id,
+                    session_id=request.session_id,
+                    owner_keycloak_sub=current_user.sub if current_user else None,
+                    user_message=request.message,
+                    outcome=TurnOutcome.ERROR,
+                    error_kind=type(exc).__name__,
+                    latency_ms=int((time.monotonic() - turn_started) * 1000),
+                ),
+            )
+            raise
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
@@ -212,7 +269,7 @@ async def assistant_chat(
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
-    await _log_turn(agent, telemetry)
+    _schedule_turn_log(agent, telemetry)
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response
