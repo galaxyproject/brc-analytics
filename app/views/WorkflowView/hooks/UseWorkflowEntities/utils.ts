@@ -1,8 +1,6 @@
 import { mapOrganismEntityToOrganism } from "@/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
-import type { BRCDataCatalogOrganism } from "@brc/apis/organism";
-import type { GA2OrganismEntity } from "@ga2/apis/organism";
 import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
@@ -32,7 +30,7 @@ export function getWorkflowGenome(
  * @returns The side-panel organism, or undefined when neither is available.
  */
 export function getWorkflowOrganism(
-  organismEntity: BRCDataCatalogOrganism | GA2OrganismEntity | undefined,
+  organismEntity: OrganismContract | undefined,
   genome: Assembly | undefined
 ): OrganismContract | undefined {
   if (organismEntity) return mapOrganismEntityToOrganism(organismEntity);
@@ -51,11 +49,9 @@ export function getWorkflowOrganism(
  */
 export function getWorkflowOrganismEntity(
   workflow: Workflow
-): BRCDataCatalogOrganism | GA2OrganismEntity | undefined {
+): OrganismContract | undefined {
   if (workflow.scope !== WORKFLOW_SCOPE.ORGANISM || !workflow.taxonomyId) {
     return undefined;
   }
-  return findOrganism<BRCDataCatalogOrganism | GA2OrganismEntity>(
-    sanitizeEntityId(workflow.taxonomyId)
-  );
+  return findOrganism<OrganismContract>(sanitizeEntityId(workflow.taxonomyId));
 }

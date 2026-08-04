@@ -8,14 +8,13 @@ import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureW
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { useConfigureInputs } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { StyledBackPageContentMainColumn } from "@/views/WorkflowInputsView/workflowInputsView.styles";
-import type { BRCDataCatalogOrganism } from "@brc/apis/organism";
 import {
   BackPageContent,
   BackPageContentSideColumn,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import type { GA2OrganismEntity } from "@ga2/apis/organism";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import { type JSX, useMemo } from "react";
@@ -34,10 +33,7 @@ export const OrganismWorkflowInputsView = ({
   entityId,
   trsId,
 }: Props): JSX.Element => {
-  const organism = getEntity<BRCDataCatalogOrganism | GA2OrganismEntity>(
-    "organisms",
-    entityId
-  );
+  const organism = getEntity<OrganismContract>("organisms", entityId);
   const workflow = getWorkflow(trsId);
 
   const { configuredInput, onConfigure } = useConfigureInputs();
