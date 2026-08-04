@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 """Delete assistant turn logs past the retention window (#1294).
 
-Retention defaults to ASSISTANT_TURN_LOG_RETENTION_DAYS (90). Run it on a
-schedule -- cron, a systemd timer, whatever the host already uses:
+The app already runs this sweep on a timer (see
+app/services/turn_log_retention.py) -- retention does not depend on this
+script. It exists for manual use: verifying the window, forcing an immediate
+purge after a config change, or running a one-off with a shorter window.
 
-    python -m scripts.purge_assistant_turn_logs
+    python -m scripts.purge_assistant_turn_logs --dry-run
+    python -m scripts.purge_assistant_turn_logs --days 30
 
-Use --dry-run to see the count without deleting, and --days to override the
-configured window for a one-off purge.
+Retention defaults to ASSISTANT_TURN_LOG_RETENTION_DAYS (90).
 """
 
 from __future__ import annotations

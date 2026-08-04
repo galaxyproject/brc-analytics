@@ -8,6 +8,7 @@ import re
 import time
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlencode
+from uuid import UUID, uuid4
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -34,6 +35,7 @@ from app.models.assistant import (
     SessionState,
     SuggestionChip,
     TokenUsage,
+    TurnOutcome,
     TurnTelemetry,
 )
 from app.services.session_service import SessionService
@@ -994,12 +996,15 @@ class AssistantAgent:
         message: str,
         session_id: Optional[str] = None,
         owner_keycloak_sub: Optional[str] = None,
+        turn_id: Optional[UUID] = None,
     ) -> tuple[ChatResponse, TurnTelemetry]:
         """Same as chat(), plus the per-turn record the API layer logs.
 
         Split out so the agent stays DB-agnostic: it hands back what happened
-        and the endpoint decides whether to persist it.
+        and the endpoint decides whether to persist it. The caller passes
+        turn_id so the same id can tag a Sentry event if this raises.
         """
+        turn_id = turn_id or uuid4()
         if not self.is_available():
             raise AssistantUnavailableError(
                 "Assistant agent is not available (check AI_API_KEY)"
@@ -1022,9 +1027,12 @@ class AssistantAgent:
                 owner_keycloak_sub=owner_keycloak_sub
             )
 
-        # Monotonic per-session turn counter. Derived from metadata rather than
-        # len(state.messages) because the user-facing list is capped at 100 and
-        # would silently restart the numbering on a long conversation.
+        # Best-effort per-session turn counter. Derived from metadata rather
+        # than len(state.messages) because the user-facing list is capped at
+        # 100 and would silently restart the numbering on a long conversation.
+        # Not a unique sequence -- two concurrent requests on one session read
+        # the same value before either saves. It's an ordering hint; created_at
+        # is authoritative, and turn_id is the unique handle.
         turn_index = int(state.metadata.get("turn_count", 0) or 0)
         state.metadata["turn_count"] = turn_index + 1
 
@@ -1132,27 +1140,64 @@ class AssistantAgent:
             token_usage=token_usage,
         )
 
-        # new_messages() is this turn's exchange only -- logging all_messages()
-        # would re-store the entire rehydrated history on every row.
-        try:
-            transcript = to_jsonable_python(result.new_messages())
-        except Exception:
-            logger.warning("Failed to serialize turn transcript", exc_info=True)
-            transcript = []
+        transcript, truncated = self._build_transcript(result)
 
         telemetry = TurnTelemetry(
+            turn_id=turn_id,
             session_id=state.session_id,
             turn_index=turn_index,
             owner_keycloak_sub=owner_keycloak_sub,
             user_message=message,
             assistant_reply=reply_text,
+            outcome=TurnOutcome.SUCCESS,
             transcript=transcript,
+            transcript_truncated=truncated,
             schema_state=schema_state.model_dump(mode="json"),
             token_usage=token_usage,
             latency_ms=int((time.time() - turn_start) * 1000),
         )
 
         return response, telemetry
+
+    def _build_transcript(self, result: Any) -> tuple[list, bool]:
+        """Serialize this turn's messages, bounded by a byte budget.
+
+        new_messages() is this turn's exchange only -- all_messages() would
+        re-store the entire rehydrated history on every row. Tool returns are
+        unbounded (a broad catalog query serializes to a lot of JSON), so
+        messages are kept in order until the budget runs out. Keeping the
+        front means the prompt and the first tool calls always survive, which
+        is the part you need to understand what the turn was doing.
+        """
+        try:
+            messages = to_jsonable_python(result.new_messages())
+        except Exception:
+            logger.warning("Failed to serialize turn transcript", exc_info=True)
+            return [], False
+
+        if not isinstance(messages, list):
+            return [], False
+
+        budget = get_settings().ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES
+        kept: list = []
+        used = 0
+        for message in messages:
+            try:
+                size = len(json.dumps(message, default=str))
+            except Exception:
+                size = budget + 1
+            if used + size > budget:
+                logger.info(
+                    "Turn transcript hit the %d byte cap; kept %d of %d messages",
+                    budget,
+                    len(kept),
+                    len(messages),
+                )
+                return kept, True
+            kept.append(message)
+            used += size
+
+        return kept, False
 
     async def restore_saved_session(
         self,
