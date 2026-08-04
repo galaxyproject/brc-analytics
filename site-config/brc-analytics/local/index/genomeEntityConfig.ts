@@ -18,11 +18,11 @@ import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCel
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import { type AppEntityConfig } from "@repo/shared/config/types";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
-import { type AppEntityConfig } from "@site-config/common/entities";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 

@@ -1,9 +1,9 @@
 import { getEntityListMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { EntitiesView } from "@/views/EntitiesView/entitiesView";
-import type { Props as EntitiesPageProps } from "@/views/EntitiesView/types";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { EntitiesView } from "@repo/shared/views/EntitiesView/entitiesView";
+import type { Props as EntitiesPageProps } from "@repo/shared/views/EntitiesView/types";
 import {
   type GetStaticPaths,
   type GetStaticProps,
