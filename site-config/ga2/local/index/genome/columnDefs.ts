@@ -1,4 +1,3 @@
-import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import {
   buildAccession,
   buildAnalyzeGenome,
@@ -34,6 +33,7 @@ import {
   type ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { type GA2AssemblyEntity } from "@ga2/apis/types";
+import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";

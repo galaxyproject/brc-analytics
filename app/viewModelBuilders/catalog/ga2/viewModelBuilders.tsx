@@ -1,4 +1,3 @@
-import { type OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import { type BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { type Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { COLUMN_IDENTIFIER } from "@databiosphere/findable-ui/lib/components/Table/common/columnIdentifier";
@@ -8,6 +7,7 @@ import {
   type GA2AssemblyEntity,
   type GA2OrganismEntity,
 } from "@ga2/apis/types";
+import { type OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
 import { type Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
