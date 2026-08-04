@@ -1,4 +1,4 @@
-import { useShowPangenome } from "@/views/OrganismView/hooks/UseShowPangenome/hook";
+import { useShowPangenome } from "@brc/views/OrganismView/hooks/UseShowPangenome/hook";
 import { TabScrollFuzz } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs.styles";
 import { BackPageTabs } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { useHash } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/hooks/UseHash/hook";

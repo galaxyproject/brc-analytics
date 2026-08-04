@@ -1,13 +1,13 @@
-import { EmptyState } from "@/views/OrganismView/components/Main/components/EmptyState/emptyState";
-import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
-import { Toolbar } from "@/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
-import { useTable } from "@/views/OrganismView/components/Main/table/hooks/UseTable/hook";
-import { StyledFluidPaper } from "@/views/OrganismView/components/Main/table/table.styles";
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Alert, Stack } from "@mui/material";
 import { Table } from "@repo/shared/components/Table/table";
+import { EmptyState } from "@repo/shared/views/OrganismView/components/Main/components/EmptyState/emptyState";
+import { StyledSectionTitle } from "@repo/shared/views/OrganismView/components/Main/main.styles";
+import { Toolbar } from "@repo/shared/views/OrganismView/components/Main/table/components/Toolbar/toolbar";
+import { useTable } from "@repo/shared/views/OrganismView/components/Main/table/hooks/UseTable/hook";
+import { StyledFluidPaper } from "@repo/shared/views/OrganismView/components/Main/table/table.styles";
 import type { RowData } from "@tanstack/react-table";
 import { type JSX } from "react";
 import { type Props } from "./types";

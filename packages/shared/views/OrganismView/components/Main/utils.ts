@@ -1,5 +1,7 @@
-import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
-import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import {
+  WORKFLOW_CATEGORY_ID,
+  WORKFLOW_SCOPE,
+} from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 
@@ -20,7 +22,7 @@ export function buildOrganismWorkflows(
 
   for (const workflowCategory of allWorkflowCategories) {
     if (
-      workflowCategory.category === WorkflowCategoryId.ASSEMBLY &&
+      workflowCategory.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
       !isAssemblyWorkflowsEnabled
     )
       continue;

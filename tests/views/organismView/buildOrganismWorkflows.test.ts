@@ -1,10 +1,10 @@
-import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import { buildOrganismWorkflows } from "@repo/shared/views/OrganismView/components/Main/utils";
 
 describe("buildOrganismWorkflows", () => {
   const ORGANISM: OrganismContract = {
