@@ -1,7 +1,8 @@
 import { type Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "@/components";
 import { KeyValueSection } from "@/components/Entity/components/Section/KeyValueSection/keyValueSection";
+import { Sections } from "@/components/Entity/components/Sections/sections";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import {
   type ComponentConfig,
   type ComponentsConfig,
@@ -18,10 +19,10 @@ export const priorityPathogenSideColumn: ComponentsConfig = [
             viewBuilder: V.buildPriorityPathogenDetails,
           } as ComponentConfig<typeof KeyValueSection, Outbreak>,
         ],
-        component: C.Sections,
+        component: Sections,
         props: { Paper: FluidPaper },
-      } as ComponentConfig<typeof C.Sections, Outbreak>,
+      } as ComponentConfig<typeof Sections, Outbreak>,
     ],
-    component: C.BackPageContentSideColumn,
+    component: BackPageContentSideColumn,
   },
 ];

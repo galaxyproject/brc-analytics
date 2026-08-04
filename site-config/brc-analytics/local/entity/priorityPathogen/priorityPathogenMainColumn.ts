@@ -1,7 +1,8 @@
 import { type Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "@/components";
+import { MDXSection } from "@/components/Entity/components/Section/MDXSection/mdxSection";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
+import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import {
   type ComponentConfig,
   type ComponentsConfig,
@@ -11,14 +12,14 @@ export const priorityPathogenMainColumn: ComponentsConfig = [
   {
     children: [
       {
-        component: C.MDXSection,
+        component: MDXSection,
         viewBuilder: V.buildPriorityPathogenDescription,
-      } as ComponentConfig<typeof C.MDXSection, Outbreak>,
+      } as ComponentConfig<typeof MDXSection, Outbreak>,
       {
         component: ResourcesSection,
         viewBuilder: V.buildPriorityPathogenResources,
       } as ComponentConfig<typeof ResourcesSection, Outbreak>,
     ],
-    component: C.BackPageContentMainColumn,
+    component: BackPageContentMainColumn,
   },
 ];

@@ -2,8 +2,8 @@ import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
 } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "@/components";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { type ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
@@ -13,7 +13,7 @@ import {
 export const PRIORITY: ColumnConfig<
   BRCDataCatalogGenome | BRCDataCatalogOrganism
 > = {
-  componentConfig: { component: C.BasicCell, viewBuilder: V.buildPriority },
+  componentConfig: { component: BasicCell, viewBuilder: V.buildPriority },
   enableHiding: true,
   header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY,
   id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY,

@@ -1,4 +1,8 @@
 import { CardActions } from "@brc/views/HomeView/components/SectionHero/components/Carousel/components/Cards/cards.styles";
+import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
+import { Grid } from "@databiosphere/findable-ui/lib/components/common/Grid/grid";
+import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import {
   AlertTitle,
   AccordionDetails as MAccordionDetails,
@@ -14,7 +18,6 @@ import {
   SubHeadline,
 } from "@repo/shared/views/docs/content.styles";
 import { type MDXComponents } from "mdx/types";
-import * as C from "./app/components";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -22,18 +25,18 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     Accordion,
     AccordionDetails: MAccordionDetails,
     AccordionSummary,
-    Alert: C.Alert,
+    Alert,
     AlertTitle,
     CardActions,
     Figure,
-    Grid: C.Grid,
-    Link: C.Link,
-    RoundedPaper: C.RoundedPaper,
+    Grid,
+    Link,
+    RoundedPaper,
     Section,
     SectionContent,
     SectionHeadline,
     SectionLayout,
     SubHeadline,
-    a: ({ children, href }) => C.Link({ label: children, url: href ?? "" }),
+    a: ({ children, href }) => Link({ label: children, url: href ?? "" }),
   };
 }
