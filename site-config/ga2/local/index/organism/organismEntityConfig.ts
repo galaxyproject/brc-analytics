@@ -1,10 +1,10 @@
-import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
-import { getOrganismId } from "@/apis/catalog/ga2/utils";
 import {
   type ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { type GA2OrganismEntity } from "@ga2/apis/types";
+import { getOrganismId } from "@ga2/apis/utils";
 import { type AppEntityConfig } from "@repo/shared/config/types";
 import { GA2_CATEGORY_KEY } from "@site-config/ga2/category";
 import { organismMainColumn } from "@site-config/ga2/local/entity/organism/organismMainColumn";

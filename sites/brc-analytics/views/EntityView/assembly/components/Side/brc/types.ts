@@ -1,4 +1,4 @@
-import { type BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import { type BRCDataCatalogGenome } from "@brc/apis/types";
 
 export interface Props {
   assembly: BRCDataCatalogGenome;

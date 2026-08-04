@@ -2,7 +2,7 @@ import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
   type Outbreak,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@brc/apis/types";
 import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
 import { Branding } from "@brc/components/layout/Branding/branding";
 import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";

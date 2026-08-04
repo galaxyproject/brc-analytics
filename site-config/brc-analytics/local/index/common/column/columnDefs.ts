@@ -1,8 +1,8 @@
+import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+} from "@brc/apis/types";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { type ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {

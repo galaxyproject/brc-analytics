@@ -1,4 +1,3 @@
-import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import { OrganismAvatar } from "@/components/Entity/components/OrganismAvatar/organismAvatar";
 import {
   buildAssemblyCount,
@@ -20,6 +19,7 @@ import {
   type ColumnConfig,
   type ComponentConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
+import { type GA2OrganismEntity } from "@ga2/apis/types";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,

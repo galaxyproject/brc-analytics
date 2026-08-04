@@ -4,7 +4,7 @@ import { type WorkflowEntity } from "@site-config/brc-analytics/local/index/work
 import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
-} from "./entities";
+} from "./types";
 
 export function getGenomeId(genome: BRCDataCatalogGenome): string {
   return sanitizeEntityId(genome.accession);

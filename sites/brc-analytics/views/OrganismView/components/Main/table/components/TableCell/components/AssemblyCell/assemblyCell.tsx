@@ -1,4 +1,4 @@
-import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "@brc/apis/pangenome";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";

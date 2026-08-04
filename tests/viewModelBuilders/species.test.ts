@@ -2,8 +2,6 @@
 // component barrel so importing it doesn't pull untransformable MDX modules.
 jest.mock("app/components", () => ({}));
 
-import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
 import {
   buildGenomeSpecies,
   buildOrganismGenomeSpecies,
@@ -12,6 +10,8 @@ import {
   buildAssemblySpecies,
   buildOrganismAssemblySpecies,
 } from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import type { BRCDataCatalogGenome } from "@brc/apis/types";
+import type { GA2AssemblyEntity } from "@ga2/apis/types";
 
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {

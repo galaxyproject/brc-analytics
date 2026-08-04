@@ -1,7 +1,7 @@
-import type { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getEntityListMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { seedDatabase } from "@/utils/seedDatabase";
+import type { Outbreak } from "@brc/apis/types";
 import { PriorityPathogensView } from "@brc/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";

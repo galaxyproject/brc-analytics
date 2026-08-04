@@ -1,6 +1,6 @@
-import { type BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { getOrganismId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { type BRCDataCatalogOrganism } from "@brc/apis/types";
+import { getOrganismId } from "@brc/apis/utils";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";

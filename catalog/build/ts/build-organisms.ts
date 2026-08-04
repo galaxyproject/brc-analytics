@@ -1,8 +1,8 @@
 import {
   BRCDataCatalogGenome,
   BRCDataCatalogOrganism,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { getOrganismId } from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
+} from "../../../sites/brc-analytics/apis/types";
+import { getOrganismId } from "../../../sites/brc-analytics/apis/utils";
 import {
   accumulateArrayOrNullValues,
   accumulateArrayValue,

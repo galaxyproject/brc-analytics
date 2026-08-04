@@ -1,5 +1,5 @@
-import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
 import { API as BRC_API } from "@/services/workflows/brc/routes";
+import type { Pangenome } from "@brc/apis/pangenome";
 import { fetchEntities } from "@repo/shared/services/workflows/loader";
 import {
   getEntitiesById,
