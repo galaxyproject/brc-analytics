@@ -1,4 +1,4 @@
-import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "@brc/apis/pangenome";
 import { AssemblyCell } from "@brc/views/OrganismView/components/Main/table/components/TableCell/components/AssemblyCell/assemblyCell";
 import { SelectionTracksCell } from "@brc/views/OrganismView/components/Main/table/components/TableCell/components/SelectionTracksCell/selectionTracksCell";
 import { ViewCell } from "@brc/views/OrganismView/components/Main/table/components/TableCell/components/ViewCell/viewCell";

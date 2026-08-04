@@ -1,16 +1,13 @@
+import { SLUGIFY_OPTIONS } from "@/common/constants";
+import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
   type Outbreak,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
-import {
-  getGenomeOrganismId,
-  getOrganismId,
-} from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import { SLUGIFY_OPTIONS } from "@/common/constants";
-import { type StepConfig } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
-import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+} from "@brc/apis/types";
+import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";

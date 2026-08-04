@@ -1,7 +1,7 @@
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
 import { formatTrsId } from "@repo/shared/workflow/utils";
-import { type WorkflowEntity } from "@site-config/ga2/local/index/workflow/types";
-import { type GA2AssemblyEntity, type GA2OrganismEntity } from "./entities";
+import { type GA2AssemblyEntity, type GA2OrganismEntity } from "./types";
 
 /**
  * Get the ID of the given assembly entity.

@@ -1,9 +1,6 @@
-import { type BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import {
-  getGenomeId,
-  getGenomeTitle,
-} from "@/apis/catalog/brc-analytics-catalog/common/utils";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { type BRCDataCatalogGenome } from "@brc/apis/types";
+import { getGenomeId, getGenomeTitle } from "@brc/apis/utils";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";

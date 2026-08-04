@@ -1,5 +1,5 @@
-import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
 import { getPangenome } from "@/services/workflows/brc/entities";
+import type { Pangenome } from "@brc/apis/pangenome";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 
 /**

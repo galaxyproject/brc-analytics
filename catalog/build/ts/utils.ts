@@ -3,7 +3,7 @@ import fsp from "fs/promises";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
-import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { Outbreak } from "../../../sites/brc-analytics/apis/types";
 import {
   OrganismPloidy,
   Organism as SourceOrganism,

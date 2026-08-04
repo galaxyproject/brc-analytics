@@ -1,4 +1,4 @@
-import type { PangenomeMember } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { PangenomeMember } from "@brc/apis/pangenome";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,

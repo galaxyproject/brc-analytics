@@ -3,7 +3,7 @@ import { type MDXRemoteSerializeResult } from "next-mdx-remote";
 import {
   type OUTBREAK_PRIORITY,
   type OUTBREAK_RESOURCE_TYPE,
-} from "./schema-entities";
+} from "./schema-types";
 
 export type BRCCatalog =
   | BRCDataCatalogGenome

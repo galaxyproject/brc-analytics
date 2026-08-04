@@ -1,7 +1,7 @@
 import {
   type BRCDataCatalogGenome,
   type BRCDataCatalogOrganism,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+} from "@brc/apis/types";
 import { type ColumnConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import * as COLUMN_DEFS from "./columnDefs";
 

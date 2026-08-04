@@ -1,12 +1,13 @@
-import {
-  type GA2AssemblyEntity,
-  type GA2OrganismEntity,
-} from "@/apis/catalog/ga2/entities";
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  type GA2AssemblyEntity,
+  type GA2OrganismEntity,
+} from "@ga2/apis/types";
 import { Branding } from "@ga2/components/layout/Branding/branding";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { APP_KEYS } from "@site-config/common/constants";
 import { type AppSiteConfig } from "@site-config/common/entities";
@@ -14,7 +15,6 @@ import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
-import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 import { THEME_OPTIONS } from "./theme/constants";

@@ -1,4 +1,4 @@
-import type { OutbreakResource } from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { OutbreakResource } from "@brc/apis/types";
 import type { SectionProps } from "@brc/views/PriorityPathogenView/ui/Section/types";
 
 export interface Props extends Omit<SectionProps, "children"> {
