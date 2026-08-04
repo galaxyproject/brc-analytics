@@ -1,10 +1,8 @@
-import { type BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { type GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
-import { type Assembly } from "@/views/WorkflowInputsView/types";
+import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 
 export type BaseWorkflowAssembly = Pick<
-  Assembly,
+  AssemblyContract,
   | "taxonomicLevelClass"
   | "taxonomicLevelDomain"
   | "taxonomicLevelFamily"
@@ -23,8 +21,6 @@ export type WorkflowAssembly = BaseWorkflowAssembly & {
   commonNames: string[];
   taxonomicLevelRealm: string;
 };
-
-export type Organism = BRCDataCatalogOrganism | GA2OrganismEntity;
 
 export type WorkflowEntity = Workflow &
   Pick<WorkflowCategory, "category"> & {

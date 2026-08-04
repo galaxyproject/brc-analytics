@@ -1,7 +1,8 @@
-import { workflowMeetsAssemblyMinimum } from "@/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
-import type { Assembly } from "@/views/WorkflowInputsView/types";
-import { WorkflowCategoryId } from "@catalog/schema/generated/schema";
-import type { AssemblyContract } from "@repo/shared/apis/types";
+import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
 import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
@@ -9,7 +10,8 @@ import type {
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
-import type { Organism, WorkflowAssembly, WorkflowEntity } from "./types";
+import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
+import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
 /**
  * Finds the first assembly matching the given taxonomy ID from a pre-built index.
@@ -18,9 +20,9 @@ import type { Organism, WorkflowAssembly, WorkflowEntity } from "./types";
  * @returns Assembly matching the taxonomy ID, or undefined.
  */
 function findAssemblyByTaxonomyId(
-  assemblyByTaxonomyId: Map<string, Assembly>,
+  assemblyByTaxonomyId: Map<string, AssemblyContract>,
   taxonomyId: string | null
-): Assembly | undefined {
+): AssemblyContract | undefined {
   if (!taxonomyId) return undefined;
   return assemblyByTaxonomyId.get(taxonomyId);
 }
@@ -89,7 +91,7 @@ function shouldIncludeWorkflow(
 export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
-  organisms: Organism[],
+  organisms: OrganismContract[],
   isAssemblyWorkflowsEnabled = false,
   isLmlsEnabled = false,
   isHyphyEnabled = false
@@ -106,7 +108,7 @@ export function getWorkflows(
   for (const category of workflowCategories) {
     if (!category.workflows) continue;
     if (
-      category.category === WorkflowCategoryId.ASSEMBLY &&
+      category.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
       !isAssemblyWorkflowsEnabled
     )
       continue;
@@ -172,11 +174,11 @@ export function getWorkflows(
  * @returns Map of lineage taxonomy ID to assembly.
  */
 function indexAssemblyByTaxonomyId(
-  organisms: Organism[]
-): Map<string, Assembly> {
-  const assemblyByTaxonomyId = new Map<string, Assembly>();
+  organisms: OrganismContract[]
+): Map<string, AssemblyContract> {
+  const assemblyByTaxonomyId = new Map<string, AssemblyContract>();
   for (const organism of organisms) {
-    for (const genome of (organism.genomes || []) as Assembly[]) {
+    for (const genome of (organism.genomes || []) as AssemblyContract[]) {
       for (const taxId of genome.lineageTaxonomyIds) {
         if (!assemblyByTaxonomyId.has(taxId)) {
           assemblyByTaxonomyId.set(taxId, genome);
@@ -195,7 +197,7 @@ function indexAssemblyByTaxonomyId(
  * @param assembly - The assembly to map.
  * @returns Assembly object for the WorkflowEntity.
  */
-function mapAssembly(assembly: Assembly | undefined): WorkflowAssembly {
+function mapAssembly(assembly: AssemblyContract | undefined): WorkflowAssembly {
   return {
     commonNames: getCommonNames(assembly),
     taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Any",
