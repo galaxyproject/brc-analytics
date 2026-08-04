@@ -1,13 +1,13 @@
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
-import type { Organism } from "@/views/OrganismView/types";
 import {
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 
 describe("buildOrganismWorkflows", () => {
-  const ORGANISM: Organism = {
+  const ORGANISM: OrganismContract = {
     genomes: [
       { lineageTaxonomyIds: ["1", "10239", "11320", "130760"] },
       { lineageTaxonomyIds: ["1", "10239", "11320", "93838"] },
@@ -238,7 +238,7 @@ describe("buildOrganismWorkflows", () => {
   });
 
   test("returns empty array for organism with no genomes", () => {
-    const emptyOrganism: Organism = {
+    const emptyOrganism: OrganismContract = {
       genomes: [],
       ncbiTaxonomyId: "0",
       taxonomicLevelSpecies: "Empty Organism",

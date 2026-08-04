@@ -16,7 +16,6 @@ import {
 } from "@/views/OrganismView/components/Main/constants";
 import { type Main as OrganismViewMain } from "@/views/OrganismView/components/Main/main";
 import { Tabs } from "@/views/OrganismView/components/Tabs/tabs";
-import type { Organism } from "@/views/OrganismView/types";
 import { type ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
 import { type KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
@@ -355,7 +354,7 @@ export const buildOrganismAssemblyTaxonomyIds = (
  * @returns Props to be used for the KeyValuePairs component.
  */
 export const buildOrganismDetails = (
-  organism: Organism
+  organism: OrganismContract
 ): ComponentProps<typeof KeyValuePairs> => {
   const details = buildOrganismDetailsBase(organism);
   if (organism.priorityPathogenName) {
