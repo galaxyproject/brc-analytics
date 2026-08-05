@@ -1,3 +1,17 @@
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
+import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
+import {
+  type ColumnConfig,
+  type ComponentConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
+import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
+import * as V from "@ga2/viewModelBuilders/viewModelBuilders";
+import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
+import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
+import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import {
   buildAccession,
   buildAnalyzeGenome,
@@ -23,21 +37,7 @@ import {
   buildTaxonomicLevelOrder,
   buildTaxonomicLevelPhylum,
   buildTaxonomyId,
-} from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
-import * as V from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
-import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
-import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
-import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
-import {
-  type ColumnConfig,
-  type ComponentConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
-import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
-import { OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
-import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
-import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
-import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
-import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   GA2_CATEGORY_KEY,
   GA2_CATEGORY_LABEL,

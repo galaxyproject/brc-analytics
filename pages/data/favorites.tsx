@@ -1,4 +1,3 @@
-import { type Assembly } from "@/views/WorkflowInputsView/types";
 import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
   Alert,
@@ -14,6 +13,7 @@ import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { getEntity } from "@repo/shared/services/workflows/query";
+import { type Assembly } from "@repo/shared/views/WorkflowInputsView/types";
 import Link from "next/link";
 import { type JSX } from "react";
 

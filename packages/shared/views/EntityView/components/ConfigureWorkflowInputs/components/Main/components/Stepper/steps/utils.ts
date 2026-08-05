@@ -1,0 +1,146 @@
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_SCOPE,
+} from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import { type StepConfig } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
+import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import { STEP } from "./constants";
+
+/**
+ * Augment the configured steps with sequencing steps: READ_RUNS_PAIRED, READ_RUNS_SINGLE,
+ * READ_RUNS_PAIRED_FILE, and READ_RUNS_SINGLE_FILE.
+ * Allows the user to configure both single and paired end reads and render those values in the summary.
+ * @param configuredSteps - Configured steps.
+ * @param configuredInput - Configured input.
+ * @param sequencingSteps - Sequencing steps.
+ * @returns Augmented steps.
+ */
+export function augmentConfiguredSteps(
+  configuredSteps: StepConfig[],
+  configuredInput: ConfiguredInput,
+  sequencingSteps: Record<string, StepConfig>
+): StepConfig[] {
+  const steps = [...configuredSteps];
+  const stepKeys: Set<string> = new Set(configuredSteps.map((s) => s.key));
+  for (const [key, step] of Object.entries(sequencingSteps)) {
+    if (stepKeys.has(key)) continue;
+    if (configuredInput[key as keyof ConfiguredInput]) {
+      steps.push(step);
+    }
+  }
+  return steps;
+}
+
+/**
+ * Builds the steps for the stepper based on the workflow and workflow parameters.
+ * Scope-aware: Different workflow scopes determine the steps:
+ * - ASSEMBLY: Includes assembly selection, GTF, and sequencing steps
+ * - ORGANISM: Includes sequencing steps based on workflow parameters
+ * - SEQUENCE: Includes sequence FASTA upload and accession count
+ * @param workflow - Workflow.
+ * @returns Steps.
+ */
+export function buildSteps(workflow: Workflow): StepConfig[] {
+  // Return steps for custom workflow
+  if (workflow.trsId === CUSTOM_WORKFLOW.trsId) {
+    return [STEP.ASSEMBLY_ID, STEP.RELATED_TRACKS, STEP.READ_RUN_ANY].filter(
+      isStepConfigured
+    );
+  }
+
+  // Return steps for differential expression analysis
+  if (workflow.trsId === DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId) {
+    return [
+      STEP.ASSEMBLY_ID,
+      STEP.GENE_MODEL_URL,
+      STEP.SAMPLE_SHEET,
+      STEP.STRANDEDNESS,
+      STEP.SAMPLE_SHEET_CLASSIFICATION,
+      STEP.DESEQ2_FORMULA,
+      STEP.PRIMARY_CONTRASTS,
+    ].filter(isStepConfigured);
+  }
+
+  // Get workflow variables from the workflow.
+  const variables = workflow.parameters
+    .map((param) => param.variable)
+    .filter((param) => !!param);
+
+  // Scope-aware step building:
+  const workflowScope = workflow.scope;
+
+  // Handle different workflow scopes
+  switch (workflowScope) {
+    case WORKFLOW_SCOPE.ASSEMBLY:
+      // ASSEMBLY scope: Include assembly selection as first step
+      return deduplicateSteps(
+        [
+          WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID,
+          WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+        ]
+          .filter(
+            (variable) =>
+              // ASSEMBLY_ID is always included for ASSEMBLY scope
+              variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID ||
+              // Include other variables that the workflow has
+              variables.includes(variable)
+          )
+          .map((variable) => STEP[variable])
+          .filter(isStepConfigured)
+      );
+
+    case WORKFLOW_SCOPE.ORGANISM:
+      return deduplicateSteps(
+        [
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE,
+          WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_SINGLE_FILE,
+        ]
+          .filter((variable) => variables.includes(variable))
+          .map((variable) => STEP[variable])
+          .filter(isStepConfigured)
+      );
+
+    case WORKFLOW_SCOPE.SEQUENCE:
+      return [STEP.SEQUENCE, STEP.ACCESSION_COUNT].filter(isStepConfigured);
+
+    default:
+      console.error(`Unknown workflow scope: ${workflowScope}`);
+      return [];
+  }
+}
+
+/**
+ * Removes duplicate steps by key, keeping only the first occurrence.
+ * Needed when a workflow has both SANGER_READ_RUN_FORWARD_FILE and
+ * SANGER_READ_RUN_REVERSE_FILE, which both map to PAIRED_FILE_STEP.
+ * @param steps - Steps to deduplicate.
+ * @returns Deduplicated steps.
+ */
+function deduplicateSteps(steps: StepConfig[]): StepConfig[] {
+  const seen = new Set<string>();
+  return steps.filter((step) => {
+    if (seen.has(step.key)) return false;
+    seen.add(step.key);
+    return true;
+  });
+}
+
+/**
+ * Checks if a step is configured.
+ * @param step - Step.
+ * @returns True if the step is configured, false otherwise.
+ */
+function isStepConfigured(step: StepConfig | null): step is StepConfig {
+  return step !== null;
+}

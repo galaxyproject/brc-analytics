@@ -1,4 +1,3 @@
-import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { AssemblyDetails } from "@ga2/views/EntityView/assembly/components/Side/ga2/components/AssemblyDetails/AssemblyDetails";
 import { AssemblyFavoriteButton } from "@repo/shared/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
@@ -9,6 +8,7 @@ import {
 import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
 import { StyledFluidPaper } from "@repo/shared/views/EntityView/assembly/components/Side/side.styles";
 import { KeyValueSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection";
+import { mapAssemblyToOrganism } from "@repo/shared/views/WorkflowInputsView/utils";
 import { type JSX } from "react";
 import { StyledSection } from "./side.styles";
 import { type Props } from "./types";

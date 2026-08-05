@@ -1,4 +1,4 @@
-import { getPriorityLabel } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/priority";
+import { getPriorityLabel } from "@brc/viewModelBuilders/priority";
 import { isOutbreakPriority } from "./typeGuards";
 
 /**

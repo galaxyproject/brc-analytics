@@ -1,6 +1,6 @@
-import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { getGenomeId, getGenomeTitle } from "@brc/apis/utils";
+import * as V from "@brc/viewModelBuilders/viewModelBuilders";
 import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/ChipCell/chipCell";
 import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
@@ -16,6 +16,32 @@ import { LevelCell } from "@repo/shared/components/Table/components/TableCell/co
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { type AppEntityConfig } from "@repo/shared/config/types";
+import {
+  buildAccession,
+  buildAnalyzeGenome,
+  buildAnnotationStatus,
+  buildAssemblyTaxonomicGroup,
+  buildChromosomes,
+  buildCoverage,
+  buildGcPercent,
+  buildGenomeTaxonomicLevelStrain,
+  buildIsRef,
+  buildLength,
+  buildLevel,
+  buildReleaseDate,
+  buildReleaseDateTooltip,
+  buildScaffoldCount,
+  buildScaffoldL50,
+  buildScaffoldN50,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelFamily,
+  buildTaxonomicLevelGenus,
+  buildTaxonomicLevelKingdom,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
+  buildTaxonomyId,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -138,7 +164,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: AnalyzeGenome,
-          viewBuilder: V.buildAnalyzeGenome,
+          viewBuilder: buildAnalyzeGenome,
         } as ComponentConfig<typeof AnalyzeGenome, BRCDataCatalogGenome>,
         enableSorting: false,
         enableTableDownload: false,
@@ -149,7 +175,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelDomain,
+          viewBuilder: buildTaxonomicLevelDomain,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
@@ -167,7 +193,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelKingdom,
+          viewBuilder: buildTaxonomicLevelKingdom,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
@@ -176,7 +202,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelPhylum,
+          viewBuilder: buildTaxonomicLevelPhylum,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
@@ -185,7 +211,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelClass,
+          viewBuilder: buildTaxonomicLevelClass,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
@@ -194,7 +220,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelOrder,
+          viewBuilder: buildTaxonomicLevelOrder,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
@@ -203,7 +229,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelFamily,
+          viewBuilder: buildTaxonomicLevelFamily,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
@@ -212,7 +238,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomicLevelGenus,
+          viewBuilder: buildTaxonomicLevelGenus,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
@@ -231,7 +257,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildAccession,
+          viewBuilder: buildAccession,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ACCESSION,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ACCESSION,
@@ -242,11 +268,11 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           children: [
             {
               component: BasicCell,
-              viewBuilder: V.buildReleaseDate,
+              viewBuilder: buildReleaseDate,
             } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
           ],
           component: Tooltip,
-          viewBuilder: V.buildReleaseDateTooltip,
+          viewBuilder: buildReleaseDateTooltip,
           // The shared release-date builders take the site-neutral
           // AssemblyContract, which TS can't reconcile with this cast:
           // ComponentConfig's data type is invariant and the Tooltip viewBuilder
@@ -260,7 +286,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildGenomeTaxonomicLevelStrain,
+          viewBuilder: buildGenomeTaxonomicLevelStrain,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
@@ -299,7 +325,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildTaxonomyId,
+          viewBuilder: buildTaxonomyId,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMY_ID,
@@ -309,7 +335,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildAssemblyTaxonomicGroup,
+          viewBuilder: buildAssemblyTaxonomicGroup,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogGenome>,
         enableHiding: false,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
@@ -334,7 +360,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: ChipCell,
-          viewBuilder: V.buildIsRef,
+          viewBuilder: buildIsRef,
         } as ComponentConfig<typeof ChipCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.IS_REF,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.IS_REF,
@@ -343,7 +369,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: LevelCell,
-          viewBuilder: V.buildLevel,
+          viewBuilder: buildLevel,
         } as ComponentConfig<typeof LevelCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LEVEL,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LEVEL,
@@ -352,7 +378,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildChromosomes,
+          viewBuilder: buildChromosomes,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.CHROMOSOMES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.CHROMOSOMES,
@@ -361,7 +387,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildLength,
+          viewBuilder: buildLength,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.LENGTH,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.LENGTH,
@@ -370,7 +396,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildScaffoldCount,
+          viewBuilder: buildScaffoldCount,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_COUNT,
@@ -379,7 +405,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildScaffoldN50,
+          viewBuilder: buildScaffoldN50,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_N50,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_N50,
@@ -388,7 +414,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildScaffoldL50,
+          viewBuilder: buildScaffoldL50,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.SCAFFOLD_L50,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.SCAFFOLD_L50,
@@ -397,7 +423,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildCoverage,
+          viewBuilder: buildCoverage,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COVERAGE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COVERAGE,
@@ -406,7 +432,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildGcPercent,
+          viewBuilder: buildGcPercent,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.GC_PERCENT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.GC_PERCENT,
@@ -415,7 +441,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: BasicCell,
-          viewBuilder: V.buildAnnotationStatus,
+          viewBuilder: buildAnnotationStatus,
         } as ComponentConfig<typeof BasicCell, BRCDataCatalogGenome>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ANNOTATION_STATUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ANNOTATION_STATUS,

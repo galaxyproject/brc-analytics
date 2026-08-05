@@ -1,12 +1,13 @@
 import { config } from "@/config/config";
-import { OrganismWorkflowInputsView } from "@/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { WorkflowInputsView } from "@/views/WorkflowInputsView/workflowInputsView";
+import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
+import { OrganismWorkflowInputsView } from "@repo/shared/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
+import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
 import { APP_KEYS } from "@site-config/common/constants";
 import Router, { useRouter } from "next/router";
 import { type JSX, useEffect } from "react";
@@ -43,15 +44,33 @@ export const AnalyzeWorkflowsRouteView = ({
 
   if (shouldRedirect) return <></>;
 
+  const isGA2 = config().appKey === APP_KEYS.GA2;
+
   if (!trsId)
-    return config().appKey === APP_KEYS.GA2 ? (
+    return isGA2 ? (
       <AnalyzeWorkflowsView SideComponent={GA2Side} entityId={entityId} />
     ) : (
       <AnalyzeWorkflowsView SideComponent={BRCSide} entityId={entityId} />
     );
 
-  if (isOrganism)
-    return <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />;
+  // GA2 has no priority pathogens, so it uses the shared organism-details builder
+  // (the SideColumn default); the priority-pathogen builder renders the chip.
+  const organismBuilder = isGA2 ? undefined : buildBRCOrganismDetails;
 
-  return <WorkflowInputsView entityId={entityId} trsId={trsId} />;
+  if (isOrganism)
+    return (
+      <OrganismWorkflowInputsView
+        entityId={entityId}
+        organismBuilder={organismBuilder}
+        trsId={trsId}
+      />
+    );
+
+  return (
+    <WorkflowInputsView
+      entityId={entityId}
+      organismBuilder={organismBuilder}
+      trsId={trsId}
+    />
+  );
 };

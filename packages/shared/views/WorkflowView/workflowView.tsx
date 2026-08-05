@@ -1,0 +1,77 @@
+import {
+  BackPageContent,
+  BackPageContentSideColumn,
+  BackPageHero,
+  BackPageView,
+} from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { getWorkflow } from "@repo/shared/services/workflows/entities";
+import { useStepper } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
+import { Main } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/main";
+import { SideColumn } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/SideColumn/sideColumn";
+import { AssemblyContext } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/Assembly/context";
+import { WorkflowEntityContext } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/WorkflowEntity/context";
+import { useConfigureInputs } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
+import { type JSX } from "react";
+import { Top } from "./components/Top/top";
+import { useWorkflowEntities } from "./hooks/UseWorkflowEntities/hook";
+import { useConfiguredSteps } from "./steps/hook";
+import { type Props } from "./types";
+import { StyledBackPageContentMainColumn } from "./workflowView.styles";
+
+/**
+ * WorkflowView renders the main view for configuring a workflow.
+ * @param props - Props.
+ * @param props.trsId - Workflow TRS ID.
+ * @returns Workflow view.
+ */
+export const WorkflowView = ({ trsId }: Props): JSX.Element => {
+  const workflow = getWorkflow(trsId);
+
+  const { configuredInput, onConfigure } = useConfigureInputs();
+  const { configuredSteps } = useConfiguredSteps(workflow);
+  const { activeStep, onContinue, onEdit } = useStepper(configuredSteps);
+  const { hasSidePanel } = configuredSteps[activeStep] || {};
+
+  // Resolve the assembly/organism that anchors the workflow config (and the ENA
+  // picker + side panel) — by reference assembly, or by the workflow's taxonomy
+  // for organism-scoped workflows.
+  const { genome, organism, workflowEntityValue } = useWorkflowEntities(
+    workflow,
+    configuredInput.referenceAssembly
+  );
+
+  return (
+    <WorkflowEntityContext.Provider value={workflowEntityValue}>
+      <AssemblyContext.Provider value={genome ?? null}>
+        <BackPageView>
+          <BackPageHero>
+            <Top workflow={workflow} />
+          </BackPageHero>
+          <BackPageContent>
+            <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>
+              <Main
+                activeStep={activeStep}
+                configuredInput={configuredInput}
+                configuredSteps={configuredSteps}
+                onConfigure={onConfigure}
+                onContinue={onContinue}
+                onEdit={onEdit}
+                workflow={workflow}
+              />
+            </StyledBackPageContentMainColumn>
+            {!hasSidePanel && (
+              <BackPageContentSideColumn>
+                <SideColumn
+                  configuredInput={configuredInput}
+                  configuredSteps={configuredSteps}
+                  organism={organism}
+                  workflow={workflow}
+                />
+              </BackPageContentSideColumn>
+            )}
+          </BackPageContent>
+        </BackPageView>
+      </AssemblyContext.Provider>
+    </WorkflowEntityContext.Provider>
+  );
+};

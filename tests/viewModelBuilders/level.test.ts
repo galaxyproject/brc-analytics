@@ -1,5 +1,5 @@
-import { buildLevel } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
 import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
+import { buildLevel } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 
 describe("buildLevel", () => {
   test.each([

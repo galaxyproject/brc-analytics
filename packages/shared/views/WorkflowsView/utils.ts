@@ -29,22 +29,22 @@ function findAssemblyByTaxonomyId(
 
 /**
  * Returns the common names of the assembly, or ["Any"] if the assembly is undefined.
- * `commonNames` is only present on BRC assemblies; GA2 assemblies will return ["Any"].
+ * `commonNames` is only present on some assemblies; those without it return ["Any"].
  * Returns ["None"] when the assembly exists but has no common names.
  * Each name becomes its own filter facet bucket.
  * @param assembly - Assembly.
  * @returns The list of common names, ["None"], or ["Any"].
  */
 function getCommonNames(assembly: AssemblyContract | undefined): string[] {
-  // A missing commonNames field (GA2 assemblies) reads as ["Any"]; a present-but-
-  // empty commonNames (BRC) reads as ["None"].
+  // A missing commonNames field reads as ["Any"]; a present-but-empty
+  // commonNames reads as ["None"].
   if (!assembly || assembly.commonNames === undefined) return ["Any"];
   return assembly.commonNames.length ? assembly.commonNames : ["None"];
 }
 
 /**
  * Returns the taxonomic level realm of the assembly, or "Any" if the assembly is undefined.
- * `taxonomicLevelRealm` is only present on BRC assemblies; GA2 assemblies will return "Any".
+ * `taxonomicLevelRealm` is only present on some assemblies; those without it return "Any".
  * @param assembly - Assembly.
  * @returns The taxonomic level realm, or "Any".
  */
