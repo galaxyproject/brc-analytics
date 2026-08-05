@@ -1059,7 +1059,10 @@ class AssistantAgent:
 
         # 1) Conversational reply -- plain text, so it can't fail on structured
         # grounds. This is the only thing the user waits on for their answer.
-        turn_start = time.time()
+        # Monotonic, not wall clock: this drives the extractor's remaining
+        # budget as well as the logged latency, so an NTP or VM clock jump
+        # could otherwise skip extraction or blow the frontend timeout.
+        turn_start = time.monotonic()
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
@@ -1081,7 +1084,7 @@ class AssistantAgent:
         # failure (or when the budget's spent) the updates are empty -> the prior
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
-        remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.time() - turn_start)
+        remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
         if remaining < EXTRACT_MIN_BUDGET_SECONDS:
             logger.warning(
                 "Reply used the turn budget (%.1fs left); skipping extraction, "
@@ -1154,7 +1157,7 @@ class AssistantAgent:
             transcript_truncated=truncated,
             schema_state=schema_state.model_dump(mode="json"),
             token_usage=token_usage,
-            latency_ms=int((time.time() - turn_start) * 1000),
+            latency_ms=int((time.monotonic() - turn_start) * 1000),
         )
 
         return response, telemetry
