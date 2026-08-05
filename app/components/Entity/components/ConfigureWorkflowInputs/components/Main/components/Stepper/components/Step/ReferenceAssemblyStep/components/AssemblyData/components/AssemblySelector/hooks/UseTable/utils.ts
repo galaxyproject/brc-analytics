@@ -1,6 +1,6 @@
-import { workflowRequiresAssemblyId } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
 import { WORKFLOW_PLOIDY } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { workflowRequiresAssemblyId } from "@repo/shared/workflow/utils";
 import { type ColumnFiltersState, type Table } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
 import { type Assembly } from "./types";

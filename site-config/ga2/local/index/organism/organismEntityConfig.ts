@@ -5,7 +5,7 @@ import {
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { type AppEntityConfig } from "@site-config/common/entities";
+import { type AppEntityConfig } from "@repo/shared/config/types";
 import { GA2_CATEGORY_KEY } from "@site-config/ga2/category";
 import { organismMainColumn } from "@site-config/ga2/local/entity/organism/organismMainColumn";
 import { organismTop } from "@site-config/ga2/local/entity/organism/organismTop";

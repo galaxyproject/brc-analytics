@@ -1,6 +1,6 @@
-import { type EntitiesResponse } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
+import { type EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
 
 /**
  * Fetches entities response for the given entity config.

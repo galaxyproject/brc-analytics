@@ -1,10 +1,10 @@
-import { Accordion } from "@/views/AnalyzeWorkflowsView/components/Main/components/Accordion/accordion";
 import { EmptyState } from "@/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@/views/OrganismView/components/Main/main.styles";
 import { buildOrganismWorkflows } from "@/views/OrganismView/components/Main/utils";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
+import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
 import { type JSX } from "react";
@@ -43,7 +43,7 @@ export const WorkflowsSection = ({
         </EmptyState>
       ) : (
         workflowCategories.map((workflowCategory) => (
-          <Accordion
+          <WorkflowCategory
             configureRoute={ROUTES.CONFIGURE_ORGANISM_WORKFLOW}
             disabled={workflowCategory.workflows.length === 0}
             entityId={entityId}

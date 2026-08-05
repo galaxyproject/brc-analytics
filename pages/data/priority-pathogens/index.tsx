@@ -1,13 +1,11 @@
-import type {
-  EntitiesResponse,
-  Outbreak,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
+import type { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import { getEntityListMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { seedDatabase } from "@/utils/seedDatabase";
 import { PriorityPathogensView } from "@brc/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
+import type { EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
