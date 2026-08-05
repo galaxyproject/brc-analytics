@@ -280,7 +280,9 @@ async def create_assistant_turn_log(
     )
     session.add(turn_log)
     await session.commit()
-    await session.refresh(turn_log)
+    # No refresh: unlike the user-facing writes above, nothing reads this row
+    # back and the factory sets expire_on_commit=False, so a re-SELECT on every
+    # turn buys nothing. Every column is either passed in or Python-side default.
     return turn_log
 
 
