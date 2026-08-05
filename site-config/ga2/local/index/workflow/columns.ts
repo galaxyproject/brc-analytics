@@ -1,6 +1,6 @@
+import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
 import { type ColumnDef } from "@tanstack/react-table";
 import { CATEGORY_CONFIG } from "./categoryGroupConfig";
-import { type WorkflowEntity } from "./types";
 
 const CATEGORY: ColumnDef<WorkflowEntity> = {
   accessorKey: CATEGORY_CONFIG.CATEGORY.key,

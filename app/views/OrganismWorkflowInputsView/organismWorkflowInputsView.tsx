@@ -1,5 +1,3 @@
-import type { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
 import { useStepper } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
@@ -10,12 +8,14 @@ import { WorkflowEntityContext } from "@/components/Entity/components/ConfigureW
 import { buildWorkflowEntityValue } from "@/components/Entity/components/ConfigureWorkflowInputs/providers/WorkflowEntity/utils";
 import { useConfigureInputs } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/useConfigureInputs";
 import { StyledBackPageContentMainColumn } from "@/views/WorkflowInputsView/workflowInputsView.styles";
+import type { BRCDataCatalogOrganism } from "@brc/apis/organism";
 import {
   BackPageContent,
   BackPageContentSideColumn,
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import type { GA2OrganismEntity } from "@ga2/apis/organism";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import { type JSX, useMemo } from "react";

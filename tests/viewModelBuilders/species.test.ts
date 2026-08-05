@@ -1,5 +1,3 @@
-import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
 import {
   buildGenomeSpecies,
   buildOrganismGenomeSpecies,
@@ -8,6 +6,8 @@ import {
   buildAssemblySpecies,
   buildOrganismAssemblySpecies,
 } from "@/viewModelBuilders/catalog/ga2/viewModelBuilders";
+import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
+import type { GA2AssemblyEntity } from "@ga2/apis/assembly";
 
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {

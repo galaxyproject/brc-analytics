@@ -1,4 +1,4 @@
-import type { Pangenome } from "@/apis/catalog/brc-analytics-catalog/common/pangenome";
+import type { Pangenome } from "@brc/apis/pangenome";
 import { findEntity } from "@repo/shared/services/workflows/query";
 
 /**

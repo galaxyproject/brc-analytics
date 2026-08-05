@@ -1,0 +1,29 @@
+import type { PangenomeMember } from "@brc/apis/pangenome";
+import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
+import { Chip } from "@mui/material";
+import { type CellContext } from "@tanstack/react-table";
+import { type JSX } from "react";
+
+/**
+ * Selection tracks cell for the pangenome members table: a chip indicating
+ * whether the member has selection tracks.
+ * @param props - Component props.
+ * @param props.row - Row context.
+ * @returns The selection tracks cell.
+ */
+export const SelectionTracksCell = ({
+  row,
+}: CellContext<PangenomeMember, unknown>): JSX.Element => {
+  const {
+    original: { hasSelectionTracks },
+  } = row;
+  return (
+    <Chip
+      color={
+        hasSelectionTracks ? CHIP_PROPS.COLOR.SUCCESS : CHIP_PROPS.COLOR.DEFAULT
+      }
+      label={hasSelectionTracks ? "Yes" : "No"}
+      variant={CHIP_PROPS.VARIANT.STATUS}
+    />
+  );
+};

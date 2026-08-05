@@ -1,10 +1,10 @@
-import type { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import type { GA2OrganismEntity } from "@/apis/catalog/ga2/entities";
-import type { Organism } from "@/views/OrganismView/types";
 import { mapOrganismEntityToOrganism } from "@/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@/views/WorkflowInputsView/utils";
+import type { BRCDataCatalogOrganism } from "@brc/apis/organism";
+import type { GA2OrganismEntity } from "@ga2/apis/organism";
 import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import type { OrganismContract } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {
@@ -34,7 +34,7 @@ export function getWorkflowGenome(
 export function getWorkflowOrganism(
   organismEntity: BRCDataCatalogOrganism | GA2OrganismEntity | undefined,
   genome: Assembly | undefined
-): Organism | undefined {
+): OrganismContract | undefined {
   if (organismEntity) return mapOrganismEntityToOrganism(organismEntity);
   return genome ? mapAssemblyToOrganism(genome) : undefined;
 }

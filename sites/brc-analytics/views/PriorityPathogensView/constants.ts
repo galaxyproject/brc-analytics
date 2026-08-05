@@ -1,4 +1,4 @@
-import { type OUTBREAK_PRIORITY } from "@/apis/catalog/brc-analytics-catalog/common/schema-entities";
+import { type OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 
 export const PRIORITY: Record<OUTBREAK_PRIORITY, number> = {
   CRITICAL: 2,

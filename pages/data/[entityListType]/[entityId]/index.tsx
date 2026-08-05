@@ -1,12 +1,12 @@
-import { type BRCCatalog } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { type GA2Catalog } from "@/apis/catalog/ga2/entities";
 import { getEntityDetailMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { getEntities, getEntity } from "@/utils/entityUtils";
 import { seedDatabase } from "@/utils/seedDatabase";
+import { type BRCCatalog } from "@brc/apis/types";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { getEntityConfig } from "@databiosphere/findable-ui/lib/config/utils";
+import { type GA2Catalog } from "@ga2/apis/types";
 import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { type EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";

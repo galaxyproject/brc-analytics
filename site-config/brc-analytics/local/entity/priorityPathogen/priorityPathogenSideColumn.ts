@@ -1,5 +1,5 @@
-import { type Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
 import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { type Outbreak } from "@brc/apis/outbreak";
 import { KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
 import { Sections } from "@brc/views/PriorityPathogenView/ui/Sections/sections";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";

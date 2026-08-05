@@ -1,4 +1,4 @@
-import { getWorkflowId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
+import { getWorkflowId } from "@brc/apis/utils";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { type AppEntityConfig } from "@repo/shared/config/types";

@@ -1,4 +1,3 @@
-import type { Organism } from "@/views/OrganismView/types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 
 /**
@@ -15,7 +14,7 @@ import type { OrganismContract } from "@repo/shared/apis/types";
  */
 export function mapOrganismEntityToOrganism(
   organism: OrganismContract
-): Organism {
+): OrganismContract {
   return {
     genomes: organism.genomes,
     ncbiTaxonomyId: organism.ncbiTaxonomyId,

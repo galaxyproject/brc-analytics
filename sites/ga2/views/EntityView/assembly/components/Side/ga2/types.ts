@@ -1,4 +1,4 @@
-import { type GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 
 export interface Props {
   assembly: GA2AssemblyEntity;

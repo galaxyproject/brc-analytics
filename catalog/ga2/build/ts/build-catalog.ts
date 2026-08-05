@@ -2,13 +2,10 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
 import {
   GA2AssemblyEntity,
-  GA2OrganismEntity,
   SRAData,
-} from "../../../../app/apis/catalog/ga2/entities";
-import {
-  getAssemblyId,
-  getOrganismId,
-} from "../../../../app/apis/catalog/ga2/utils";
+} from "../../../../sites/ga2/apis/assembly";
+import { GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
+import { getAssemblyId, getOrganismId } from "../../../../sites/ga2/apis/utils";
 import {
   buildWorkflowAssemblyMappings,
   generateWorkflowMappingsQC,
