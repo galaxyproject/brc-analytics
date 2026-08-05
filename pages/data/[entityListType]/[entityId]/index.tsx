@@ -1,7 +1,5 @@
 import { getEntityDetailMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { getEntities, getEntity } from "@/utils/entityUtils";
-import { seedDatabase } from "@/utils/seedDatabase";
 import { type BRCCatalog } from "@brc/apis/types";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
@@ -10,6 +8,12 @@ import { type GA2Catalog } from "@ga2/apis/types";
 import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { type EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
+import {
+  getEntities,
+  getEntity,
+} from "@repo/shared/services/staticGeneration/entities/utils";
+import type { EntityPageProps } from "@repo/shared/services/staticGeneration/entity/types";
+import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
 import { AssemblyView } from "@repo/shared/views/AssemblyView/assemblyView";
 import { EntityDetailView } from "@repo/shared/views/EntityView/entityView";
 import { APP_KEYS } from "@site-config/common/constants";
@@ -28,14 +32,6 @@ interface StaticPath {
 interface PageUrl extends ParsedUrlQuery {
   entityId: string;
   entityListType: string;
-}
-
-export interface EntityPageProps<R> {
-  data?: R;
-  entityId: string;
-  entityListType: string;
-  pageDescription?: string;
-  pageTitle?: string;
 }
 
 /**

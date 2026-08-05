@@ -1,11 +1,11 @@
 import { getEntityListMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { seedDatabase } from "@/utils/seedDatabase";
 import type { Outbreak } from "@brc/apis/outbreak";
 import { PriorityPathogensView } from "@brc/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
 import type { EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
+import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
