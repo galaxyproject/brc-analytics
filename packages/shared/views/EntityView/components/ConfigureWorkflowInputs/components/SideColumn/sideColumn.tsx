@@ -6,7 +6,7 @@ import {
 import { CollapsableSection } from "@databiosphere/findable-ui/lib/components/common/Section/components/CollapsableSection/collapsableSection";
 import {
   buildAssemblyDetails,
-  buildOrganismDetails,
+  buildOrganismDetails as defaultOrganismBuilder,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { useAssembly } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { type JSX } from "react";
@@ -17,6 +17,7 @@ export const SideColumn = ({
   configuredInput,
   configuredSteps,
   organism,
+  organismBuilder = defaultOrganismBuilder,
   workflow,
 }: Props): JSX.Element => {
   const assembly = useAssembly();
@@ -28,7 +29,7 @@ export const SideColumn = ({
         </CollapsableSection>
         {organism && (
           <CollapsableSection key="organism-details" title="Organism Details">
-            <KeyValuePairs {...buildOrganismDetails(organism)} />
+            <KeyValuePairs {...organismBuilder(organism)} />
           </CollapsableSection>
         )}
         {assembly && (

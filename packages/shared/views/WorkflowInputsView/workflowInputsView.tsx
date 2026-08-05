@@ -37,7 +37,11 @@ function findFirstDataStep(steps: StepConfig[]): number | undefined {
   return idx >= 0 ? idx : undefined;
 }
 
-export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
+export const WorkflowInputsView = ({
+  entityId,
+  organismBuilder,
+  trsId,
+}: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
 
@@ -103,6 +107,7 @@ export const WorkflowInputsView = ({ entityId, trsId }: Props): JSX.Element => {
                       SEQUENCING_STEPS
                     )}
                     organism={organism}
+                    organismBuilder={organismBuilder}
                     workflow={workflow}
                   />
                 </BackPageContentSideColumn>

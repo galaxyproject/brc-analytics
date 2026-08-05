@@ -26,11 +26,13 @@ import { mapOrganismEntityToOrganism } from "./utils";
  * OrganismWorkflowInputsView displays the workflow configure inputs stepper for organism-scoped workflows.
  * @param props - Component props.
  * @param props.entityId - Organism Entity ID.
+ * @param props.organismBuilder - Optional builder for the organism details; defaults to the shared builder.
  * @param props.trsId - Workflow TRS ID.
  * @returns A JSX element representing the OrganismWorkflowInputsView.
  */
 export const OrganismWorkflowInputsView = ({
   entityId,
+  organismBuilder,
   trsId,
 }: Props): JSX.Element => {
   const organism = getEntity<OrganismContract>("organisms", entityId);
@@ -79,6 +81,7 @@ export const OrganismWorkflowInputsView = ({
                   SEQUENCING_STEPS
                 )}
                 organism={organismDetails}
+                organismBuilder={organismBuilder}
                 workflow={workflow}
               />
             </BackPageContentSideColumn>

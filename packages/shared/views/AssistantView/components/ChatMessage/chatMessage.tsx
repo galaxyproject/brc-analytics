@@ -26,7 +26,7 @@ export const ChatMessage = ({
     <MessageRow isUser={isUser}>
       {!isUser && (
         <Box
-          alt="BRC Analytics"
+          alt="Assistant"
           component="img"
           src="/logo/assistant.svg"
           sx={{

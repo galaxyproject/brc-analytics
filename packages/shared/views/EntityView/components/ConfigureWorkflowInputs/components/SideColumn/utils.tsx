@@ -12,6 +12,12 @@ import { type StepConfig } from "@repo/shared/views/EntityView/components/Config
 import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { type ComponentProps } from "react";
 
+/**
+ * Build props for the workflow configuration KeyValuePairs component.
+ * @param configuredInput - Configured inputs.
+ * @param configuredSteps - Configured steps.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
 export const buildWorkflowConfiguration = (
   configuredInput: ConfiguredInput,
   configuredSteps: StepConfig[]
@@ -38,6 +44,11 @@ export const buildWorkflowConfiguration = (
   };
 };
 
+/**
+ * Build props for the workflow details KeyValuePairs component.
+ * @param workflow - Workflow.
+ * @returns Props to be used for the KeyValuePairs component.
+ */
 export const buildWorkflowDetails = (
   workflow: Workflow
 ): ComponentProps<typeof KeyValuePairs> => {
