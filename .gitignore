@@ -1,5 +1,6 @@
 # images
-/public/organism_image/
+/public/organism_image/*
+!/public/organism_image/missing_image_*
 
 # dependencies
 /node_modules
