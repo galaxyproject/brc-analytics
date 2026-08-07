@@ -1,6 +1,5 @@
-import { getPageMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
 import workflowCategories from "@catalog/output/workflows.json";
+import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { makeWorkflowStaticPaths } from "@repo/shared/services/staticGeneration/workflow/staticPaths";
 import type {
@@ -29,7 +28,7 @@ export const getStaticProps: GetStaticProps<
 
   return {
     props: {
-      ...getPageMeta(config().appKey).WORKFLOW,
+      ...GA2_PAGE_META.WORKFLOW,
       trsId: params.trsId,
     },
   };
