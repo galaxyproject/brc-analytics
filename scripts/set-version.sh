@@ -6,6 +6,10 @@ if [ "$1" == "dev" ]; then
   TARGET_ENV_FILE=".env.development"
 fi
 
+# Per-site apps keep their env file under sites/<site>; default to repo root.
+PROJECT_DIR="${2:-.}"
+TARGET_ENV_FILE="$PROJECT_DIR/$TARGET_ENV_FILE"
+
 # Get the current git hash
 GIT_HASH=$(git rev-parse HEAD)
 

@@ -24,6 +24,7 @@ npm-debug.log*
 /.env*.local
 /.env.development
 /.env.production
+/sites/*/.env*
 backend/**/.env
 
 # typescript
