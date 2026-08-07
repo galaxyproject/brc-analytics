@@ -1,8 +1,7 @@
 import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
 import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
-import "@/styles/fonts/fonts.css";
-import { mergeAppTheme } from "@/theme/theme";
+import { createBrcTheme } from "@brc/theme/theme";
 import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
@@ -19,6 +18,8 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import "@ga2/styles/fonts/fonts.css";
+import { createGa2Theme } from "@ga2/theme/theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
@@ -26,6 +27,7 @@ import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
+import { APP_KEYS } from "@site-config/common/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -59,11 +61,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
   // Kick off entity cache load and distribute the boolean via context so
   // per-page EntityDataGate consumers share a single source of truth.
   const isEntitiesLoaded = useEntities();
-  const {
-    layout,
-    redirectRootToPath,
-    themeOptions: baseThemeOptions,
-  } = appConfig;
+  const { layout, redirectRootToPath } = appConfig;
   const { floating, footer, header } = layout || {};
   const {
     entityListType = DEFAULT_ENTITY_LIST_TYPE,
@@ -71,7 +69,11 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
     pageTitle,
     themeOptions,
   } = pageProps;
-  const appTheme = mergeAppTheme(baseThemeOptions, themeOptions);
+  // Each site owns its theme; a page may override options (e.g. background) on top.
+  const appTheme =
+    appConfig.appKey === APP_KEYS.GA2
+      ? createGa2Theme(themeOptions)
+      : createBrcTheme(themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
 

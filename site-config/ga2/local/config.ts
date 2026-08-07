@@ -15,7 +15,6 @@ import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
-import { THEME_OPTIONS } from "./theme/constants";
 
 const ALLOWED_PATHS = [
   SITE_ROUTES.ABOUT,
@@ -99,7 +98,6 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     supportUrl: SUPPORT_URL,
-    themeOptions: THEME_OPTIONS,
   };
 }
 

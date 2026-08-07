@@ -21,7 +21,6 @@ import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityCo
 import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
-import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -118,7 +117,6 @@ export function makeConfig(
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     supportUrl: SUPPORT_URL,
-    themeOptions: THEME_OPTIONS,
   };
 }
 

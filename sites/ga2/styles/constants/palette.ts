@@ -1,8 +1,3 @@
-export const PALETTE = {
-  CAUTION_LIGHT: `var(--palette-caution-light)`,
-  CAUTION_MAIN: `var(--palette-caution-main)`,
-} as const;
-
 export const PALETTE_BRAND = {
   ACCENT: `var(--palette-brand-accent)`,
   BURNT_SIENNA: `var(--palette-brand-burntSienna)`,
