@@ -8,7 +8,7 @@ from botocore.client import Config
 ENDPOINT_URL = "https://js2.jetstream-cloud.org:8001"
 BUCKET_NAME = "genomeark"
 FOLDER_PREFIX = "images/"  # The S3-key prefix for the folder you want to download
-LOCAL_DOWNLOAD_DIR = "./public/organism_image"  # The local folder to save files to
+LOCAL_DOWNLOAD_DIR = "./sites/ga2/public/organism_image"  # The local folder to save files to
 
 
 def download_s3_folder_public(endpoint, bucket, prefix, local_dir):
