@@ -1,11 +1,10 @@
 import { ROUTES } from "@repo/shared/routes/constants";
-import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
-import { expect, test } from "../utils/fixtures";
+import { expect, test } from "./utils/fixtures";
 
 const PAGES = [
-  { name: "About", url: SITE_ROUTES.ABOUT },
-  { name: "Partner Resources", url: SITE_ROUTES.ABOUT_PARTNER_RESOURCES },
-  { name: "Roadmap", url: SITE_ROUTES.ABOUT_ROADMAP },
+  { name: "About", url: "/about" },
+  { name: "Partner Resources", url: "/about/partner-resources" },
+  { name: "Roadmap", url: "/about/roadmap" },
   { name: "Organisms", url: ROUTES.ORGANISMS },
   { name: "Assemblies", url: ROUTES.GENOMES },
   { name: "Workflows", url: ROUTES.WORKFLOWS },

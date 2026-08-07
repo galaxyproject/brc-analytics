@@ -1,6 +1,6 @@
 import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { useEntities } from "@/services/workflows/hooks/UseEntities/hook";
+import { ensureEntitiesLoaded } from "@/services/workflows/hooks/UseEntities/utils";
 import { createBrcTheme } from "@brc/theme/theme";
 import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
@@ -27,6 +27,7 @@ import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
+import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
 import { APP_KEYS } from "@site-config/common/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
@@ -60,7 +61,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();
   // Kick off entity cache load and distribute the boolean via context so
   // per-page EntityDataGate consumers share a single source of truth.
-  const isEntitiesLoaded = useEntities();
+  const isEntitiesLoaded = useEntities(ensureEntitiesLoaded);
   const { layout, redirectRootToPath } = appConfig;
   const { floating, footer, header } = layout || {};
   const {

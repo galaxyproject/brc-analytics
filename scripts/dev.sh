@@ -1,23 +1,31 @@
 #!/bin/bash
 
-DIR="./site-config/$1/images/favicons/"
-PUBLIC_DIR="./public/favicons/"
+SITE="$1"
+
+# Per-site apps run from sites/<site>; brc-analytics still runs at repo root.
+case "$SITE" in
+	ga2) PROJECT_DIR="sites/ga2" ;;
+	*) PROJECT_DIR="." ;;
+esac
+
+DIR="./site-config/$SITE/images/favicons/"
+PUBLIC_DIR="$PROJECT_DIR/public/favicons/"
 # init
 
-cp ./site-config/$1/local/.env .env.development
+cp ./site-config/$SITE/local/.env "$PROJECT_DIR/.env.development"
 
 # check if PUBLIC_DIR does not exists
 if [ ! -d "$PUBLIC_DIR" ]; then
-	mkdir -p $PUBLIC_DIR
+	mkdir -p "$PUBLIC_DIR"
 fi
 
 # look for empty directory
 if [ -d "$DIR" ]
 then
 	if [ "$(ls $DIR)" ]; then
-     cp ./site-config/$1/images/favicons/* ./public/favicons/
-	 cp ./scripts/browserconfig.xml ./public/favicons/
-	 cp ./scripts/site.webmanifest ./public/favicons/
+     cp ./site-config/$SITE/images/favicons/* "$PUBLIC_DIR"
+	 cp ./scripts/browserconfig.xml "$PUBLIC_DIR"
+	 cp ./scripts/site.webmanifest "$PUBLIC_DIR"
 	fi
 else
 	echo "Directory $DIR not found."

@@ -59,7 +59,7 @@ jobs:
         if: failure()
         with:
           name: playwright-report-ga2
-          path: playwright-report/
+          path: sites/ga2/playwright-report/
           retention-days: 7
 
   run-checks:
