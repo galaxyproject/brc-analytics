@@ -33,6 +33,7 @@ export const GA2_PAGE_META = {
   },
   HOME: {
     pageDescription: GA2_DEFAULT_DESCRIPTION,
+    pageTitle: "Genome Ark 2",
   },
   ORGANISMS: {
     pageDescription:
