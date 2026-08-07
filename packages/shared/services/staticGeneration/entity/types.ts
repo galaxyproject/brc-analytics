@@ -1,3 +1,4 @@
+import type { PageMeta } from "@repo/shared/meta/types";
 import type { ParsedUrlQuery } from "querystring";
 
 /**
@@ -12,10 +13,8 @@ export interface EntityPageParams extends ParsedUrlQuery {
  * Props for an entity page. `data` carries the build-time entity record for
  * static-loading detail pages; pages that render the entity client-side omit it.
  */
-export interface EntityPageProps<R> {
+export interface EntityPageProps<R> extends Partial<PageMeta> {
   data?: R;
   entityId: string;
   entityListType: string;
-  pageDescription?: string;
-  pageTitle?: string;
 }

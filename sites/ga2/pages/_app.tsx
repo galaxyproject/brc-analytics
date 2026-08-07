@@ -1,5 +1,4 @@
 import { config } from "@/config/config";
-import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -19,10 +18,11 @@ import { GA2_DEFAULT_DESCRIPTION } from "@ga2/meta/constants";
 import { ensureEntitiesLoaded } from "@ga2/services/workflows/hooks/UseEntities/utils";
 import "@ga2/styles/fonts/fonts.css";
 import { createGa2Theme } from "@ga2/theme/theme";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider, type ThemeOptions } from "@mui/material";
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
 import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
+import type { PageMeta } from "@repo/shared/meta/types";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
@@ -34,10 +34,10 @@ import { type JSX } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
-export interface PageProps extends AzulEntitiesStaticResponse {
-  pageDescription?: string;
-  pageTitle?: string;
-}
+type PageProps = Partial<PageMeta> & {
+  entityListType?: string;
+  themeOptions?: ThemeOptions;
+};
 
 export type NextPageWithComponent = NextPage & {
   AppLayout?: typeof DXAppLayout;
