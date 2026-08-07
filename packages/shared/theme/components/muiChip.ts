@@ -3,7 +3,7 @@ import { CHIP_PROPS as DX_CHIP_PROPS } from "@databiosphere/findable-ui/lib/styl
 import { type Components } from "@mui/material";
 import { CHIP_PROPS } from "@repo/shared/styles/mui/muiChip";
 
-const VARIANT_COLOR_ALERT = {
+export const VARIANT_COLOR_ALERT = {
   props: { color: CHIP_PROPS.COLOR.ALERT },
   style: {
     backgroundColor: PALETTE.ALERT_LIGHT,
@@ -13,14 +13,14 @@ const VARIANT_COLOR_ALERT = {
   },
 };
 
-const VARIANT_COLOR_DEFAULT = {
+export const VARIANT_COLOR_DEFAULT = {
   props: { color: DX_CHIP_PROPS.COLOR.DEFAULT },
   style: {
     "&:hover": { backgroundColor: PALETTE.SMOKE_MAIN },
   },
 };
 
-const VARIANT_COLOR_NONE = {
+export const VARIANT_COLOR_NONE = {
   props: { color: CHIP_PROPS.COLOR.NONE },
   style: {
     backgroundColor: "transparent",
@@ -30,7 +30,7 @@ const VARIANT_COLOR_NONE = {
   },
 };
 
-const VARIANT_COLOR_WARNING = {
+export const VARIANT_COLOR_WARNING = {
   props: { color: DX_CHIP_PROPS.COLOR.WARNING },
   style: {
     "&:hover": { backgroundColor: PALETTE.WARNING_LIGHT },

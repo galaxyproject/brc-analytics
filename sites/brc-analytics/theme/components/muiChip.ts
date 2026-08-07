@@ -1,16 +1,12 @@
 import { PALETTE } from "@brc/styles/constants/palette";
 import { CHIP_PROPS } from "@brc/styles/mui/muiChip";
 import { type Components } from "@mui/material";
-import { MuiChip as MuiChipBase } from "@repo/shared/theme/components/muiChip";
 import {
-  extractRoot,
-  extractStyleOverrides,
-  extractVariants,
-} from "@repo/shared/theme/components/utils";
-
-const baseRoot = extractRoot<"MuiChip">(MuiChipBase);
-const baseStyleOverrides = extractStyleOverrides<"MuiChip">(MuiChipBase);
-const baseVariants = extractVariants<"MuiChip">(MuiChipBase);
+  VARIANT_COLOR_ALERT,
+  VARIANT_COLOR_DEFAULT,
+  VARIANT_COLOR_NONE,
+  VARIANT_COLOR_WARNING,
+} from "@repo/shared/theme/components/muiChip";
 
 const VARIANT_COLOR_CAUTION = {
   props: { color: CHIP_PROPS.COLOR.CAUTION },
@@ -24,10 +20,14 @@ const VARIANT_COLOR_CAUTION = {
 
 export const MuiChip: Components["MuiChip"] = {
   styleOverrides: {
-    ...baseStyleOverrides,
     root: {
-      ...baseRoot,
-      variants: [...baseVariants, VARIANT_COLOR_CAUTION],
+      variants: [
+        VARIANT_COLOR_ALERT,
+        VARIANT_COLOR_DEFAULT,
+        VARIANT_COLOR_NONE,
+        VARIANT_COLOR_WARNING,
+        VARIANT_COLOR_CAUTION,
+      ],
     },
   },
 };
