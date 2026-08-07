@@ -1,8 +1,8 @@
 import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { getEntities } from "@/utils/entityUtils";
-import { seedDatabase } from "@/utils/seedDatabase";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { getEntities } from "@repo/shared/services/staticGeneration/entities/utils";
+import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
 import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import {

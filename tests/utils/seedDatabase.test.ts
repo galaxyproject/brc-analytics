@@ -1,6 +1,6 @@
-import { seedDatabase } from "@/utils/seedDatabase";
 import type { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { database } from "@databiosphere/findable-ui/lib/utils/database";
+import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
 import fsp from "fs/promises";
 
 const seed = jest.fn();
