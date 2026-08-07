@@ -13,7 +13,7 @@ DIR="./site-config/$SITE/images/favicons/"
 PUBLIC_DIR="$PROJECT_DIR/public/favicons/"
 # init
 
-cp ./site-config/$SITE/${ENV-${dev}}/.env "$PROJECT_DIR/.env.production"
+cp "./site-config/$SITE/${ENV:-dev}/.env" "$PROJECT_DIR/.env.production"
 
 # check if PUBLIC_DIR does not exists
 if [ ! -d "$PUBLIC_DIR" ]; then
