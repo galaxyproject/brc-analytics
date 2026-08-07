@@ -1,6 +1,8 @@
 # images
 /public/organism_image/*
 !/public/organism_image/missing_image_*
+/sites/ga2/public/organism_image/*
+!/sites/ga2/public/organism_image/missing_image_*
 
 # dependencies
 /node_modules
@@ -34,6 +36,7 @@ backend/**/.env
 
 # favicons
 /public/favicons/*
+/sites/ga2/public/favicons/*
 
 # catalog build
 /catalog/build/temp
@@ -58,6 +61,7 @@ playwright-report/
 
 # public api
 /public/api
+/sites/ga2/public/api
 
 # Sentry Config File
 .env.sentry-build-plugin
