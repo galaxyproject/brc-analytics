@@ -1,5 +1,5 @@
-import { config } from "@/config/config";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
+import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { EntitiesView } from "@repo/shared/views/EntitiesView/entitiesView";

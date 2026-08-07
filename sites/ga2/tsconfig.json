@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@catalog/*": ["../../catalog/*"],
+      "@ga2/*": ["../../sites/ga2/*"],
+      "@pages/*": ["../../pages/*"],
+      "@repo/shared": ["../../packages/shared/index.ts"],
+      "@repo/shared/*": ["../../packages/shared/*"],
+      "@routes/*": ["../../routes/*"],
+      "@site-config/*": ["../../site-config/*"],
+      "images/*": ["../../images/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../@types/findable-ui.d.ts",
+    "../../packages/shared/@types/theme.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}

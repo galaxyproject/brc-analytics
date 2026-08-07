@@ -1,5 +1,5 @@
-import { config } from "@/config/config";
 import type { GA2OrganismEntity } from "@ga2/apis/organism";
+import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";

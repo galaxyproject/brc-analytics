@@ -1,4 +1,3 @@
-import { config } from "@/config/config";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
@@ -14,6 +13,7 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import { config } from "@ga2/config/config";
 import { GA2_DEFAULT_DESCRIPTION } from "@ga2/meta/constants";
 import { ensureEntitiesLoaded } from "@ga2/services/workflows/hooks/UseEntities/utils";
 import "@ga2/styles/fonts/fonts.css";

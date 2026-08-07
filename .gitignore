@@ -9,7 +9,9 @@
 
 # next.js
 /.next/
-/next-env.d.ts
+.next/
+/next-env.d.ts 
+/sites/*/next-env.d.ts
 
 # misc
 .DS_Store
@@ -44,6 +46,7 @@ backend/**/.env
 
 # Build Dir
 /out
+out/
 
 # Playwright test artifacts
 /test-results
