@@ -2,94 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-from fastapi.testclient import TestClient
-
 from app.core.session_signing import sign_session_id
-from app.models.assistant import (
-    AnalysisSchema,
-    ChatResponse,
-    SessionState,
-)
+from app.models.assistant import SessionState
 from app.models.user_data import UserMeResponse
-from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
-
-SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
-
-
-@pytest.fixture()
-def app_with_stubbed_agent(tmp_path, monkeypatch):
-    (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
-    (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
-    monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
-    monkeypatch.setenv("SESSION_COOKIE_SECRET", SECRET)
-    monkeypatch.setenv("AI_API_KEY", "stub")
-
-    fake_cache = MagicMock()
-    fake_cache.clear_caches = AsyncMock(return_value=0)
-    fake_cache.close = AsyncMock()
-    fake_auth = MagicMock()
-    fake_auth.close = AsyncMock()
-
-    from app.core import dependencies
-    from app.core.config import get_settings
-
-    get_settings.cache_clear()
-    dependencies.reset_all_services()
-
-    monkeypatch.setattr(
-        dependencies, "get_cache_service", MagicMock(return_value=fake_cache)
-    )
-    monkeypatch.setattr(
-        dependencies, "get_auth_service", MagicMock(return_value=fake_auth)
-    )
-
-    fake_agent = MagicMock()
-    fake_agent.is_available.return_value = True
-    fake_agent.settings = get_settings()
-    fake_agent.get_provider.return_value = "anthropic"
-    fake_agent.chat = AsyncMock(
-        return_value=ChatResponse(
-            session_id="sess-abc",
-            reply="hi",
-            schema_state=AnalysisSchema(),
-        )
-    )
-    fake_agent.session_service = MagicMock()
-    fake_agent.session_service.get_session = AsyncMock(
-        return_value=SessionState(session_id="sess-abc")
-    )
-    fake_agent.session_service.delete_session = AsyncMock(return_value=True)
-    fake_agent.compute_handoff = MagicMock(return_value=(False, None))
-    # restore_session reconciles persisted state before handoff and re-derives
-    # suggestions from it; stub both so the endpoint returns the real schema and a
-    # concrete suggestions list, not MagicMocks.
-    fake_agent.reconcile_schema = MagicMock(side_effect=lambda schema: schema)
-    fake_agent._derive_suggestions = MagicMock(return_value=[])
-
-    from app.main import create_app
-
-    app = create_app()
-
-    # FastAPI binds Depends() to the original function reference at import
-    # time, so we override via app.dependency_overrides rather than monkeypatching.
-    from app.core.dependencies import check_rate_limit, get_assistant_agent
-
-    async def _no_rate_limit():
-        return {"limit": 100, "remaining": 100, "reset": 60}
-
-    app.dependency_overrides[get_assistant_agent] = lambda: fake_agent
-    app.dependency_overrides[check_rate_limit] = _no_rate_limit
-
-    yield app
-
-
-@pytest.fixture()
-def client(app_with_stubbed_agent):
-    return TestClient(app_with_stubbed_agent)
+from tests.conftest import SECRET
 
 
 class TestSessionCookieBinding:
@@ -256,7 +174,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import UnexpectedModelBehavior
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=UnexpectedModelBehavior(
                 "Tool 'query_catalog' exceeded max retries count of 1"
             )
@@ -275,7 +193,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import ModelHTTPError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=ModelHTTPError(status_code=429, model_name="m", body=None)
         )
 
@@ -287,7 +205,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import ModelHTTPError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(
+        agent.chat_with_telemetry = AsyncMock(
             side_effect=ModelHTTPError(status_code=529, model_name="m", body=None)
         )
 
@@ -299,7 +217,7 @@ class TestAnonymousSessionClaim:
         from pydantic_ai.exceptions import UsageLimitExceeded
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(side_effect=UsageLimitExceeded("cap"))
+        agent.chat_with_telemetry = AsyncMock(side_effect=UsageLimitExceeded("cap"))
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
@@ -312,7 +230,9 @@ class TestAnonymousSessionClaim:
         from app.services.assistant_agent import AssistantUnavailableError
 
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(side_effect=AssistantUnavailableError("no key"))
+        agent.chat_with_telemetry = AsyncMock(
+            side_effect=AssistantUnavailableError("no key")
+        )
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
@@ -324,7 +244,9 @@ class TestAnonymousSessionClaim:
         # A bare RuntimeError is a bug, not an outage, and its message can name
         # internal config. It must not reach the client as a 503 with details.
         agent = self._agent(app_with_stubbed_agent)
-        agent.chat = AsyncMock(side_effect=RuntimeError("REDIS_URL=redis://secret"))
+        agent.chat_with_telemetry = AsyncMock(
+            side_effect=RuntimeError("REDIS_URL=redis://secret")
+        )
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
@@ -341,7 +263,7 @@ class TestAnonymousSessionClaim:
                 "app.core.dependencies", fromlist=["get_assistant_agent"]
             ).get_assistant_agent
         ]()
-        agent.chat = AsyncMock(side_effect=PermissionError("sess-abc"))
+        agent.chat_with_telemetry = AsyncMock(side_effect=PermissionError("sess-abc"))
         client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
 
         resp = client.post(

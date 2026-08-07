@@ -66,6 +66,36 @@ class Settings:
             os.getenv("RUN_MIGRATIONS_ON_STARTUP", "false").lower() == "true"
         )
 
+        # Durable per-turn assistant logging (#1294). Requires DATABASE_URL --
+        # without it there is no sink and the write is skipped.
+        self.ASSISTANT_TURN_LOGGING_ENABLED: bool = os.getenv(
+            "ASSISTANT_TURN_LOGGING_ENABLED", "true"
+        ).lower() in ("1", "true", "yes")
+        self.ASSISTANT_TURN_LOG_RETENTION_DAYS: int = int(
+            os.getenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "90")
+        )
+        # The retention sweep runs inside the app so the published 90-day
+        # promise doesn't depend on someone remembering to install a cron job.
+        # The purge is an idempotent DELETE by age, so running it in every
+        # worker is harmless. The standalone script stays for manual use.
+        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = os.getenv(
+            "ASSISTANT_TURN_LOG_PURGE_ENABLED", "true"
+        ).lower() in ("1", "true", "yes")
+        self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
+        )
+        # The write runs off the response path, so this is a hygiene bound on a
+        # detached task rather than a cap on user-visible latency.
+        self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "2.0")
+        )
+        # Tool returns are unbounded -- a broad query_catalog call can serialize
+        # to a lot of JSON. Cap the stored transcript so one row can't bloat the
+        # table, WAL, and backups; transcript_truncated records when it bit.
+        self.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES: int = int(
+            os.getenv("ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES", "65536")
+        )
+
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(
             "ENA_API_BASE", "https://www.ebi.ac.uk/ena/portal/api"

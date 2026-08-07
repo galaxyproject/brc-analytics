@@ -119,7 +119,8 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           AI assistant — {modelLabel}. Your messages are sent to the model
           provider to generate a response, so avoid sharing sensitive or
           identifying information. Responses can be inaccurate; verify anything
-          important before relying on it.
+          important before relying on it. During the beta, conversations are
+          logged so we can improve the assistant, then deleted after 90 days.
         </AssistantDisclaimer>
       </SectionContent>
     </StyledSection>

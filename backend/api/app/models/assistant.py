@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
@@ -160,6 +161,40 @@ class ChatResponse(BaseModel):
         description="URL to the workflow stepper, set when is_complete is True",
     )
     token_usage: Optional[TokenUsage] = None
+
+
+class TurnOutcome(str, Enum):
+    """Whether a turn produced a reply or blew up."""
+
+    ERROR = "error"
+    SUCCESS = "success"
+
+
+class TurnTelemetry(BaseModel):
+    """Per-turn observability payload for durable logging (#1294).
+
+    Deliberately kept off ChatResponse: the transcript carries raw tool calls
+    and returns, which the browser has no business receiving.
+
+    Also built for failed turns, where there is no reply, no usage, and
+    possibly no session yet -- hence the optional fields.
+    """
+
+    # Minted before the agent runs so a Sentry event and this row share an id.
+    turn_id: UUID = Field(default_factory=uuid4)
+    session_id: Optional[str] = None
+    turn_index: Optional[int] = None
+    owner_keycloak_sub: Optional[str] = None
+    user_message: str
+    assistant_reply: Optional[str] = None
+    outcome: TurnOutcome = TurnOutcome.SUCCESS
+    error_kind: Optional[str] = None
+    # This turn's new pydantic-ai messages only, not the rehydrated history.
+    transcript: List[Dict[str, Any]] = Field(default_factory=list)
+    transcript_truncated: bool = False
+    schema_state: Dict[str, Any] = Field(default_factory=dict)
+    token_usage: TokenUsage = Field(default_factory=TokenUsage)
+    latency_ms: int = 0
 
 
 class SessionState(BaseModel):

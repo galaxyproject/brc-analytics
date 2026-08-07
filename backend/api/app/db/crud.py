@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Favorite, SavedAnalysis, User, WorkflowRun
+from app.db.models import (
+    AssistantTurnLog,
+    Favorite,
+    SavedAnalysis,
+    User,
+    WorkflowRun,
+)
 
 
 async def get_user_by_keycloak_sub(
@@ -225,3 +232,66 @@ async def list_workflow_runs_for_user(
         .order_by(WorkflowRun.created_at.desc())
     )
     return list(result.scalars().all())
+
+
+async def create_assistant_turn_log(
+    session: AsyncSession,
+    *,
+    turn_id: uuid.UUID,
+    session_id: str | None,
+    turn_index: int | None,
+    user_id: uuid.UUID | None,
+    user_message: str,
+    assistant_reply: str | None,
+    outcome: str,
+    error_kind: str | None,
+    transcript: list[Any],
+    transcript_truncated: bool,
+    schema_state: dict[str, Any],
+    input_tokens: int,
+    output_tokens: int,
+    total_tokens: int,
+    requests: int,
+    tool_calls: int,
+    latency_ms: int,
+    model: str | None,
+    provider: str | None,
+) -> AssistantTurnLog:
+    turn_log = AssistantTurnLog(
+        turn_id=turn_id,
+        session_id=session_id,
+        turn_index=turn_index,
+        user_id=user_id,
+        user_message=user_message,
+        assistant_reply=assistant_reply,
+        outcome=outcome,
+        error_kind=error_kind,
+        transcript=transcript,
+        transcript_truncated=transcript_truncated,
+        schema_state=schema_state,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        total_tokens=total_tokens,
+        requests=requests,
+        tool_calls=tool_calls,
+        latency_ms=latency_ms,
+        model=model,
+        provider=provider,
+    )
+    session.add(turn_log)
+    await session.commit()
+    # No refresh: unlike the user-facing writes above, nothing reads this row
+    # back and the factory sets expire_on_commit=False, so a re-SELECT on every
+    # turn buys nothing. Every column is either passed in or Python-side default.
+    return turn_log
+
+
+async def purge_assistant_turn_logs_before(
+    session: AsyncSession, cutoff: datetime
+) -> int:
+    """Delete turn logs older than `cutoff`. Returns the number of rows removed."""
+    result = await session.execute(
+        delete(AssistantTurnLog).where(AssistantTurnLog.created_at < cutoff)
+    )
+    await session.commit()
+    return result.rowcount or 0
