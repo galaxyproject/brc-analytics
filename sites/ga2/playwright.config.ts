@@ -26,7 +26,11 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  reporter: "html",
+  // Explicit output folder: the HTML reporter otherwise writes to the process
+  // cwd (repo root), but the suite runs from here and CI uploads it from here.
+  reporter: [
+    ["html", { outputFolder: path.resolve(__dirname, "playwright-report") }],
+  ],
   retries: process.env.CI ? 2 : 0,
   testDir: "./tests/e2e",
   use: {
