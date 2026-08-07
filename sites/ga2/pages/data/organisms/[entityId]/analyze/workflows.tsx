@@ -1,6 +1,5 @@
-import { getPageMeta } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
+import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import type {
@@ -9,37 +8,19 @@ import type {
 } from "@repo/shared/services/staticGeneration/entity/types";
 import { useWorkflowRedirect } from "@repo/shared/views/OrganismWorkflowInputsView/hooks/UseWorkflowRedirect/hook";
 import { OrganismWorkflowInputsView } from "@repo/shared/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { APP_KEYS } from "@site-config/common/constants";
 import type { GetStaticProps } from "next";
 import { type JSX } from "react";
 
 const ENTITY_LIST_TYPE = "organisms";
 
-/**
- * Organism analyze workflows page. A workflow is always selected via the `trsId`
- * query param; a bare URL (no `trsId`) redirects to the organism detail page,
- * where organism workflows are listed.
- * @param props - Page props.
- * @param props.entityId - Organism entity ID.
- * @returns Organism analyze workflows page.
- */
 const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   const trsId = useWorkflowRedirect(entityId);
 
   if (!trsId) return <></>;
 
-  // GA2 has no priority pathogens, so it uses the shared organism-details builder
-  // (the SideColumn default); the priority-pathogen builder renders the chip.
-  const organismBuilder =
-    config().appKey === APP_KEYS.GA2 ? undefined : buildBRCOrganismDetails;
-
   return (
     <EntityDataGate>
-      <OrganismWorkflowInputsView
-        entityId={entityId}
-        organismBuilder={organismBuilder}
-        trsId={trsId}
-      />
+      <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />
     </EntityDataGate>
   );
 };
@@ -56,7 +37,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       entityId: params.entityId,
       entityListType: ENTITY_LIST_TYPE,
-      ...getPageMeta(config().appKey).ANALYZE_WORKFLOWS,
+      ...GA2_PAGE_META.ANALYZE_WORKFLOWS,
     },
   };
 };
