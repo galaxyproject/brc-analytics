@@ -26,6 +26,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SectionHeadline,
     SectionLayout,
     SubHeadline,
-    a: ({ children, href }) => Link({ label: children, url: href ?? "" }),
+    a: ({ children, href }) => <Link label={children} url={href ?? ""} />,
   };
 }

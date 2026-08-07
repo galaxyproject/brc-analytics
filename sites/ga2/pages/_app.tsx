@@ -1,7 +1,4 @@
-import { getDefaultDescription } from "@/common/meta/utils";
 import { config } from "@/config/config";
-import { ensureEntitiesLoaded } from "@/services/workflows/hooks/UseEntities/utils";
-import { createBrcTheme } from "@brc/theme/theme";
 import { type AzulEntitiesStaticResponse } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
@@ -18,6 +15,8 @@ import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/servi
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import { GA2_DEFAULT_DESCRIPTION } from "@ga2/meta/constants";
+import { ensureEntitiesLoaded } from "@ga2/services/workflows/hooks/UseEntities/utils";
 import "@ga2/styles/fonts/fonts.css";
 import { createGa2Theme } from "@ga2/theme/theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -28,7 +27,6 @@ import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
 import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
-import { APP_KEYS } from "@site-config/common/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -51,7 +49,7 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: PageProps;
 };
 
-setFeatureFlags(["assembly-workflows", "hyphy", "lmls", "pangenome"]);
+setFeatureFlags(["assembly-workflows", "hyphy", "lmls"]);
 
 const queryClient = new QueryClient();
 
@@ -70,11 +68,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
     pageTitle,
     themeOptions,
   } = pageProps;
-  // Each site owns its theme; a page may override options (e.g. background) on top.
-  const appTheme =
-    appConfig.appKey === APP_KEYS.GA2
-      ? createGa2Theme(themeOptions)
-      : createBrcTheme(themeOptions);
+  const appTheme = createGa2Theme(themeOptions);
   const AppLayout = Component.AppLayout || DXAppLayout;
   const Main = Component.Main || DXMain;
 
@@ -87,7 +81,7 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
             <OgMeta
               appTitle={appConfig.appTitle}
               browserURL={appConfig.browserURL}
-              defaultDescription={getDefaultDescription(appConfig.appKey)}
+              defaultDescription={GA2_DEFAULT_DESCRIPTION}
               pageDescription={pageDescription}
               pageTitle={pageTitle}
             />
