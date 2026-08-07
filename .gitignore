@@ -51,6 +51,7 @@ out/
 
 # Playwright test artifacts
 /test-results
+test-results/
 /tests/screenshots
 /playwright-report
 /playwright/.cache

@@ -1,20 +1,21 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "node:path";
+
+// Site build/serve scripts (build-local:ga2, start:ga2) and the static export
+// paths they use are relative to the repo root, so the webServer runs there.
+const REPO_ROOT = path.resolve(__dirname, "../..");
 
 /**
- * Playwright configuration for GA2 (Genome Ark 2) UI smoke tests (no backend
+ * Playwright configuration for the Genome Ark 2 UI smoke tests (no backend
  * required).
  *
- * The default playwright.config.ts builds and tests the BRC Analytics site.
- * This config runs the GA2-only smoke suite in tests/e2e/ga2 against a served
- * GA2 build. Locally the webServer builds GA2 first (`build-local:ga2 &&
- * start:ga2`); in CI it only runs `npm run start:ga2`, relying on the
- * ga2-smoke-tests workflow job to build GA2 beforehand. It is kept separate so
- * the default
- * `npx playwright test` (BRC) is unaffected — the two sites are exercised by
- * independent jobs.
+ * The suite lives beside the site under sites/ga2/tests/e2e and runs against a
+ * served production export. Locally the webServer builds the site first
+ * (`build-local:ga2 && start:ga2`); in CI it only runs `npm run start:ga2`,
+ * relying on the smoke-tests workflow job to build the site beforehand.
  *
  * Run with:
- *   npx playwright test --config=playwright.ga2.config.ts
+ *   npm run test:e2e:ga2
  */
 export default defineConfig({
   forbidOnly: !!process.env.CI,
@@ -27,7 +28,7 @@ export default defineConfig({
   ],
   reporter: "html",
   retries: process.env.CI ? 2 : 0,
-  testDir: "./tests/e2e/ga2",
+  testDir: "./tests/e2e",
   use: {
     baseURL: "http://localhost:3000",
     screenshot: "only-on-failure",
@@ -38,6 +39,7 @@ export default defineConfig({
     command: process.env.CI
       ? "npm run start:ga2"
       : "npm run build-local:ga2 && npm run start:ga2",
+    cwd: REPO_ROOT,
     reuseExistingServer: !process.env.CI,
     timeout: process.env.CI ? 120 * 1000 : 600 * 1000,
     url: "http://localhost:3000",
