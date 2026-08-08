@@ -1772,7 +1772,10 @@ def build_files(
     )
 
     # Single merge with the combined mapping
-    genomes_df = genomes_with_species_df.merge(ucsc_mapping, how="left", on="accession")
+    # The dataframe is sorted by accession for consistent output; any changes done after the sorting should preserve order
+    genomes_df = genomes_with_species_df.merge(
+        ucsc_mapping, how="left", on="accession"
+    ).sort_values("accession")
 
     qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1804,6 +1807,12 @@ def build_files(
         )
         genomes_df["galaxyDatacacheUrl"] = ""
         qc_report_params["missing_datacache_urls"] = []
+
+    # Find outdated accessions (where accession != currentAccession)
+    if qc_report_path:
+        qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
+        qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
+        qc_report_params["paired_accessions"] = find_gca_with_paired_gcf(genomes_df)
 
     # Drop any duplicate rows based on accession before writing to file
     genomes_df = genomes_df.drop_duplicates(subset=["accession"])
@@ -1885,16 +1894,6 @@ def build_files(
                 print(
                     "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
                 )
-
-    # Sort by accession for consistent output
-    genomes_df = genomes_df.sort_values("accession")
-
-    # Find outdated accessions (where accession != currentAccession). These checks run
-    # after the sort above so that they inherit its consistent ordering.
-    if qc_report_path:
-        qc_report_params["outdated_accessions"] = find_outdated_accessions(genomes_df)
-        qc_report_params["suppressed_genomes"] = find_suppressed_genomes(genomes_df)
-        qc_report_params["paired_accessions"] = find_gca_with_paired_gcf(genomes_df)
 
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
