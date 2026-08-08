@@ -69,15 +69,19 @@ def _test_status_is_success(status: str) -> bool:
 def _get_test_results_from_runner(
     runner_results: Sequence[DBTNodeResult],
 ) -> list[DBTTestResult]:
-    return [
-        DBTTestResult(
-            test_name=runner_result.model_name,
-            success=_test_status_is_success(runner_result.status),
-            status=runner_result.status,
-            message=runner_result.message,
-        )
-        for runner_result in runner_results
-    ]
+    # Sorted by name, since dbt reports the tests in the order they finished
+    return sorted(
+        (
+            DBTTestResult(
+                test_name=runner_result.model_name,
+                success=_test_status_is_success(runner_result.status),
+                status=runner_result.status,
+                message=runner_result.message,
+            )
+            for runner_result in runner_results
+        ),
+        key=lambda result: result.test_name,
+    )
 
 
 def _get_detailed_test_results(temp_folder_path: Path) -> list[DBTTestResult]:
@@ -122,6 +126,9 @@ def _get_detailed_test_results(temp_folder_path: Path) -> list[DBTTestResult]:
                     failure_sample=failure_sample,
                 )
             )
+    # Sorted by name, since dbt runs the tests across several threads and records them
+    # in the order they finished
+    results.sort(key=lambda result: result.test_name)
     return results
 
 
