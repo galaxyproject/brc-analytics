@@ -12940,7 +12940,7 @@
           "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/2020-06-24_-_Rothaubenturako_%28Tauraco_erythrolophus%29_Tierpark_Gettorf_%281%29.jpg",
           "url": "/organism_image/Tauraco_erythrolophus_1024x1024.jpg"
         },
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 1252271553,
         "level": "Chromosome",
         "lineageTaxonomyIds": [
@@ -34892,7 +34892,7 @@
           "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Chlamydotis_macqueenii.jpg",
           "url": "/organism_image/Chlamydotis_macqueenii_1024x1024.jpg"
         },
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 1273916401,
         "level": "Chromosome",
         "lineageTaxonomyIds": [
@@ -35726,7 +35726,7 @@
           "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/07/Leptosomus-discolor--Weltvogelpark_Walsrode2008.jpg",
           "url": "/organism_image/Leptosomus_discolor_1024x1024.jpg"
         },
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 1332028070,
         "level": "Chromosome",
         "lineageTaxonomyIds": [
@@ -96073,7 +96073,7 @@
   {
     "assemblyCount": 3,
     "assemblyTaxonomyIds": [
-      "10013"
+      "3774380"
     ],
     "genomes": [
       {
@@ -96125,7 +96125,7 @@
           "3774376",
           "3774380"
         ],
-        "ncbiTaxonomyId": "10013",
+        "ncbiTaxonomyId": "3774380",
         "ploidy": [
           "DIPLOID"
         ],
@@ -96244,7 +96244,7 @@
           "3774376",
           "3774380"
         ],
-        "ncbiTaxonomyId": "10013",
+        "ncbiTaxonomyId": "3774380",
         "ploidy": [
           "DIPLOID"
         ],
@@ -96671,7 +96671,7 @@
           "3774376",
           "3774380"
         ],
-        "ncbiTaxonomyId": "10013",
+        "ncbiTaxonomyId": "3774380",
         "ploidy": [
           "DIPLOID"
         ],
