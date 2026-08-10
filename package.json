@@ -15,6 +15,7 @@
     "build-dev:ga2": "./scripts/build.sh ga2 dev && ./scripts/set-version.sh \"\" sites/ga2 && ./scripts/sync-api-ga2.sh && next build sites/ga2 --webpack",
     "build-prod:ga2": "./scripts/build.sh ga2 prod && ./scripts/set-version.sh \"\" sites/ga2 && ./scripts/sync-api-ga2.sh && next build sites/ga2 --webpack",
     "start:brc": "npx serve sites/brc-analytics/out",
+    "clean": "./scripts/clean.sh",
     "start:ga2": "npx serve sites/ga2/out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

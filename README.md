@@ -20,6 +20,8 @@ The app can be run for development using `npm run dev:brc` (BRC) or `npm run dev
 
 Build with `npm run build-local:brc` (BRC) or `npm run build-local:ga2` (GA2), then serve the built app with `npm run start:brc` / `npm run start:ga2`, accessed at `http://localhost:3000`.
 
+Run `npm run clean` to remove build artifacts (Next output, static exports, generated env/API/favicons, TS build info, Playwright results). It leaves `node_modules`, local `.env*.local` secrets, and fetched organism images untouched.
+
 ## Running the full stack with Docker
 
 To run the complete application stack (frontend, backend API, and Redis):
