@@ -11,7 +11,12 @@ import {
 } from "@mui/material";
 import { JSX, useMemo, useState } from "react";
 import { useKmindexSearch } from "../../../hooks/useKmindexSearch";
-import { ControlRow, FieldRow, SearchContainer } from "../loganSearch.styles";
+import {
+  ControlRow,
+  FieldRow,
+  FormColumn,
+  FormGrid,
+} from "../loganSearch.styles";
 import { countBases, groupIndexes, toIndexName } from "../utils";
 
 interface LoganSearchFormProps {
@@ -90,108 +95,117 @@ export const LoganSearchForm = ({
   return (
     <Card>
       <CardContent>
-        <SearchContainer>
-          <Typography variant="h6">Query sequence</Typography>
-          <TextField
-            error={tooLong}
-            fullWidth
-            helperText={
-              tooLong
-                ? `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`
-                : `${bases} bases. FASTA; headers are ignored.`
-            }
-            maxRows={14}
-            minRows={6}
-            multiline
-            onChange={(e): void => setSequence(e.target.value)}
-            slotProps={{ input: { sx: { fontFamily: "monospace" } } }}
-            value={sequence}
-          />
-
-          <Typography variant="h6">Index</Typography>
-          {search.isLoadingIndexes ? (
-            <ControlRow>
-              <CircularProgress size={20} />
-              <Typography color="textSecondary" variant="body2">
-                Loading available indexes...
-              </Typography>
-            </ControlRow>
-          ) : (
-            <FieldRow>
-              <TextField
-                fullWidth
-                helperText="Library strategy"
-                label="Strategy"
-                onChange={(e): void => handleStrategyChange(e.target.value)}
-                select
-                value={strategy}
-              >
-                {strategies.map((s) => (
-                  <MenuItem key={s} value={s}>
-                    {s}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                fullWidth
-                helperText="Taxonomic division"
-                label="Division"
-                onChange={(e): void => setDivision(e.target.value)}
-                select
-                value={division}
-              >
-                {divisions.map((d) => (
-                  <MenuItem key={d} value={d}>
-                    {d}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FieldRow>
-          )}
-
-          <div>
-            <Typography gutterBottom variant="body2">
-              Minimum shared k-mer fraction: {threshold.toFixed(2)}
-            </Typography>
-            <Slider
-              max={1}
-              min={0}
-              onChange={(_, value): void => setThreshold(value as number)}
-              step={0.05}
-              sx={{ maxWidth: 400 }}
-              value={threshold}
-              valueLabelDisplay="auto"
-            />
-            <Typography color="textSecondary" variant="caption">
-              Lower values return more accessions and take longer to aggregate.
-            </Typography>
-          </div>
-
-          <ControlRow>
-            <Button
-              disabled={!canSubmit}
-              onClick={async (): Promise<void> => {
-                await search.submit({ index, sequence, threshold, zvalue: 6 });
-              }}
-              startIcon={
-                isRunning ? <CircularProgress size={18} /> : <Search />
+        <FormGrid>
+          <FormColumn>
+            <Typography variant="h6">Query sequence</Typography>
+            <TextField
+              error={tooLong}
+              fullWidth
+              helperText={
+                tooLong
+                  ? `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`
+                  : `${bases} bases. FASTA; headers are ignored.`
               }
-              variant="contained"
-            >
-              {isRunning ? "Searching..." : "Search Logan"}
-            </Button>
-            {/* Never disabled -- Reset is the escape hatch when a search is
-                wedged, which is exactly when it would be disabled otherwise. */}
-            <Button onClick={search.reset} variant="outlined">
-              Reset
-            </Button>
+              maxRows={20}
+              minRows={8}
+              multiline
+              onChange={(e): void => setSequence(e.target.value)}
+              slotProps={{ input: { sx: { fontFamily: "monospace" } } }}
+              value={sequence}
+            />
+          </FormColumn>
+
+          <FormColumn>
+            <Typography variant="h6">Index</Typography>
+            {search.isLoadingIndexes ? (
+              <ControlRow>
+                <CircularProgress size={20} />
+                <Typography color="textSecondary" variant="body2">
+                  Loading available indexes...
+                </Typography>
+              </ControlRow>
+            ) : (
+              <FieldRow>
+                <TextField
+                  fullWidth
+                  helperText="Library strategy"
+                  label="Strategy"
+                  onChange={(e): void => handleStrategyChange(e.target.value)}
+                  select
+                  value={strategy}
+                >
+                  {strategies.map((s) => (
+                    <MenuItem key={s} value={s}>
+                      {s}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  fullWidth
+                  helperText="Taxonomic division"
+                  label="Division"
+                  onChange={(e): void => setDivision(e.target.value)}
+                  select
+                  value={division}
+                >
+                  {divisions.map((d) => (
+                    <MenuItem key={d} value={d}>
+                      {d}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </FieldRow>
+            )}
+
+            <div>
+              <Typography gutterBottom variant="body2">
+                Minimum shared k-mer fraction: {threshold.toFixed(2)}
+              </Typography>
+              <Slider
+                max={1}
+                min={0}
+                onChange={(_, value): void => setThreshold(value as number)}
+                step={0.05}
+                value={threshold}
+                valueLabelDisplay="auto"
+              />
+              <Typography color="textSecondary" variant="caption">
+                Lower values return more accessions and take longer to
+                aggregate.
+              </Typography>
+            </div>
+
+            <ControlRow>
+              <Button
+                disabled={!canSubmit}
+                onClick={async (): Promise<void> => {
+                  await search.submit({
+                    index,
+                    sequence,
+                    threshold,
+                    zvalue: 6,
+                  });
+                }}
+                startIcon={
+                  isRunning ? <CircularProgress size={18} /> : <Search />
+                }
+                variant="contained"
+              >
+                {isRunning ? "Searching..." : "Search Logan"}
+              </Button>
+              {/* Never disabled -- Reset is the escape hatch when a search is
+                  wedged, which is exactly when it would be disabled otherwise. */}
+              <Button onClick={search.reset} variant="outlined">
+                Reset
+              </Button>
+            </ControlRow>
             {index && (
               <Typography color="textSecondary" variant="body2">
                 Searching {index}
               </Typography>
             )}
-          </ControlRow>
-        </SearchContainer>
+          </FormColumn>
+        </FormGrid>
       </CardContent>
     </Card>
   );
