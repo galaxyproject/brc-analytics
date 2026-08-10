@@ -1,8 +1,7 @@
-import { getPageMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
+import { config } from "@brc/config/config";
+import { BRC_PAGE_META } from "@brc/meta/constants";
 import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
-import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import type {
@@ -12,7 +11,6 @@ import type {
 import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
 import { getTrsId } from "@repo/shared/workflow/utils";
-import { APP_KEYS } from "@site-config/common/constants";
 import type { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
@@ -33,29 +31,16 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
 
   if (!isReady) return <></>;
 
-  const isGA2 = config().appKey === APP_KEYS.GA2;
-
-  // The Side is passed per-site so each branch keeps its concrete component type.
-  const workflowsList = isGA2 ? (
-    <AnalyzeWorkflowsView SideComponent={GA2Side} entityId={entityId} />
-  ) : (
-    <AnalyzeWorkflowsView SideComponent={BRCSide} entityId={entityId} />
-  );
-
-  // GA2 has no priority pathogens, so it uses the shared organism-details builder
-  // (the SideColumn default); the priority-pathogen builder renders the chip.
-  const organismBuilder = isGA2 ? undefined : buildBRCOrganismDetails;
-
   return (
     <EntityDataGate>
       {trsId ? (
         <WorkflowInputsView
           entityId={entityId}
-          organismBuilder={organismBuilder}
+          organismBuilder={buildBRCOrganismDetails}
           trsId={trsId}
         />
       ) : (
-        workflowsList
+        <AnalyzeWorkflowsView SideComponent={BRCSide} entityId={entityId} />
       )}
     </EntityDataGate>
   );
@@ -73,7 +58,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       entityId: params.entityId,
       entityListType: ENTITY_LIST_TYPE,
-      ...getPageMeta(config().appKey).ANALYZE_WORKFLOWS,
+      ...BRC_PAGE_META.ANALYZE_WORKFLOWS,
     },
   };
 };

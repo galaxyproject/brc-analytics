@@ -1,5 +1,5 @@
-import { getPageMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
+import { config } from "@brc/config/config";
+import { BRC_PAGE_META } from "@brc/meta/constants";
 import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
@@ -9,7 +9,6 @@ import type {
 } from "@repo/shared/services/staticGeneration/entity/types";
 import { useWorkflowRedirect } from "@repo/shared/views/OrganismWorkflowInputsView/hooks/UseWorkflowRedirect/hook";
 import { OrganismWorkflowInputsView } from "@repo/shared/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
-import { APP_KEYS } from "@site-config/common/constants";
 import type { GetStaticProps } from "next";
 import { type JSX } from "react";
 
@@ -28,16 +27,11 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
 
   if (!trsId) return <></>;
 
-  // GA2 has no priority pathogens, so it uses the shared organism-details builder
-  // (the SideColumn default); the priority-pathogen builder renders the chip.
-  const organismBuilder =
-    config().appKey === APP_KEYS.GA2 ? undefined : buildBRCOrganismDetails;
-
   return (
     <EntityDataGate>
       <OrganismWorkflowInputsView
         entityId={entityId}
-        organismBuilder={organismBuilder}
+        organismBuilder={buildBRCOrganismDetails}
         trsId={trsId}
       />
     </EntityDataGate>
@@ -56,7 +50,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       entityId: params.entityId,
       entityListType: ENTITY_LIST_TYPE,
-      ...getPageMeta(config().appKey).ANALYZE_WORKFLOWS,
+      ...BRC_PAGE_META.ANALYZE_WORKFLOWS,
     },
   };
 };
