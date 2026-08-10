@@ -71,13 +71,12 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.UniqueConstraint("turn_id", name="uq_assistant_turn_log_turn_id"),
     )
-    # Reading a whole conversation back in order is the main review query.
-    # Deliberately non-unique: turn_index comes from Redis session metadata and
-    # concurrent requests on one session can collide. created_at orders rows.
+    # Reading a whole conversation back in time order is the main review
+    # query. Non-unique by design -- see the turn_index column comment.
     op.create_index(
-        "ix_assistant_turn_log_session_turn",
+        "ix_assistant_turn_log_session_created",
         "assistant_turn_log",
-        ["session_id", "turn_index"],
+        ["session_id", "created_at"],
         unique=False,
     )
     # Retention purges delete by age, and review browses newest-first.
@@ -87,17 +86,21 @@ def upgrade() -> None:
         ["created_at"],
         unique=False,
     )
-    # "show me the failures" is the query that justifies logging errors at all.
+    # "show me the failures". Partial, so the success path that dominates
+    # inserts doesn't pay for an index it would never use.
     op.create_index(
-        "ix_assistant_turn_log_outcome",
+        "ix_assistant_turn_log_failures",
         "assistant_turn_log",
-        ["outcome"],
+        ["created_at"],
         unique=False,
+        postgresql_where=sa.text("outcome <> 'success'"),
     )
 
 
 def downgrade() -> None:
-    op.drop_index("ix_assistant_turn_log_outcome", table_name="assistant_turn_log")
+    op.drop_index("ix_assistant_turn_log_failures", table_name="assistant_turn_log")
     op.drop_index("ix_assistant_turn_log_created_at", table_name="assistant_turn_log")
-    op.drop_index("ix_assistant_turn_log_session_turn", table_name="assistant_turn_log")
+    op.drop_index(
+        "ix_assistant_turn_log_session_created", table_name="assistant_turn_log"
+    )
     op.drop_table("assistant_turn_log")

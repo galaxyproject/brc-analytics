@@ -143,9 +143,9 @@ metadata, not a unique sequence -- concurrent requests on one session can share
 a value. Order by `created_at`; use `turn_id` as the unique handle.
 
 **Retention.** The app runs the sweep itself every
-`ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS` (see
-`app/services/turn_log_retention.py`), so the 90-day deletion the UI promises
-doesn't depend on anyone installing a cron job. The purge is an idempotent
+`ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS` (see `app/services/turn_log.py`), so
+the 90-day deletion the UI promises doesn't depend on anyone installing a cron
+job. The purge is an idempotent
 `DELETE ... WHERE created_at < cutoff`, so running it in several workers is
 harmless. The script is for manual use:
 

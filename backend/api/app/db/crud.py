@@ -26,6 +26,16 @@ async def get_user_by_keycloak_sub(
     return result.scalar_one_or_none()
 
 
+async def get_user_id_by_keycloak_sub(
+    session: AsyncSession, keycloak_sub: str
+) -> uuid.UUID | None:
+    """Just the id -- avoids materializing a whole User for a foreign key."""
+    result = await session.execute(
+        select(User.id).where(User.keycloak_sub == keycloak_sub)
+    )
+    return result.scalar_one_or_none()
+
+
 async def upsert_user_from_claims(
     session: AsyncSession, claims: dict[str, Any]
 ) -> User:
@@ -235,54 +245,19 @@ async def list_workflow_runs_for_user(
 
 
 async def create_assistant_turn_log(
-    session: AsyncSession,
-    *,
-    turn_id: uuid.UUID,
-    session_id: str | None,
-    turn_index: int | None,
-    user_id: uuid.UUID | None,
-    user_message: str,
-    assistant_reply: str | None,
-    outcome: str,
-    error_kind: str | None,
-    transcript: list[Any],
-    transcript_truncated: bool,
-    schema_state: dict[str, Any],
-    input_tokens: int,
-    output_tokens: int,
-    total_tokens: int,
-    requests: int,
-    tool_calls: int,
-    latency_ms: int,
-    model: str | None,
-    provider: str | None,
+    session: AsyncSession, **fields: Any
 ) -> AssistantTurnLog:
-    turn_log = AssistantTurnLog(
-        turn_id=turn_id,
-        session_id=session_id,
-        turn_index=turn_index,
-        user_id=user_id,
-        user_message=user_message,
-        assistant_reply=assistant_reply,
-        outcome=outcome,
-        error_kind=error_kind,
-        transcript=transcript,
-        transcript_truncated=transcript_truncated,
-        schema_state=schema_state,
-        input_tokens=input_tokens,
-        output_tokens=output_tokens,
-        total_tokens=total_tokens,
-        requests=requests,
-        tool_calls=tool_calls,
-        latency_ms=latency_ms,
-        model=model,
-        provider=provider,
-    )
+    """Insert one turn-log row. Fields mirror AssistantTurnLog's columns.
+
+    Kept generic rather than spelling out ~19 keyword params, which were a
+    transcription of the column list and had to be edited in lockstep with it.
+    """
+    turn_log = AssistantTurnLog(**fields)
     session.add(turn_log)
     await session.commit()
     # No refresh: unlike the user-facing writes above, nothing reads this row
     # back and the factory sets expire_on_commit=False, so a re-SELECT on every
-    # turn buys nothing. Every column is either passed in or Python-side default.
+    # turn buys nothing.
     return turn_log
 
 

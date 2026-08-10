@@ -1001,8 +1001,8 @@ class AssistantAgent:
         """Same as chat(), plus the per-turn record the API layer logs.
 
         Split out so the agent stays DB-agnostic: it hands back what happened
-        and the endpoint decides whether to persist it. The caller passes
-        turn_id so the same id can tag a Sentry event if this raises.
+        and the endpoint decides whether to persist it. turn_id is passed in
+        so the returned record carries the id already tagged on Sentry.
         """
         turn_id = turn_id or uuid4()
         if not self.is_available():
@@ -1027,12 +1027,9 @@ class AssistantAgent:
                 owner_keycloak_sub=owner_keycloak_sub
             )
 
-        # Best-effort per-session turn counter. Derived from metadata rather
-        # than len(state.messages) because the user-facing list is capped at
-        # 100 and would silently restart the numbering on a long conversation.
-        # Not a unique sequence -- two concurrent requests on one session read
-        # the same value before either saves. It's an ordering hint; created_at
-        # is authoritative, and turn_id is the unique handle.
+        # From metadata, not len(state.messages), which is capped at 100 and
+        # would silently restart the numbering. Ordering hint only -- see the
+        # turn_index column comment.
         turn_index = int(state.metadata.get("turn_count", 0) or 0)
         state.metadata["turn_count"] = turn_index + 1
 
@@ -1143,7 +1140,9 @@ class AssistantAgent:
             token_usage=token_usage,
         )
 
-        transcript, truncated = self._build_transcript(result)
+        transcript, truncated = self._build_transcript(
+            result, state.agent_message_history
+        )
 
         telemetry = TurnTelemetry(
             turn_id=turn_id,
@@ -1158,49 +1157,51 @@ class AssistantAgent:
             schema_state=schema_state.model_dump(mode="json"),
             token_usage=token_usage,
             latency_ms=int((time.monotonic() - turn_start) * 1000),
+            model=self.settings.AI_PRIMARY_MODEL or None,
+            provider=self.get_provider(),
         )
 
         return response, telemetry
 
-    def _build_transcript(self, result: Any) -> tuple[list, bool]:
-        """Serialize this turn's messages, bounded by a byte budget.
+    def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:
+        """Take this turn's messages off the already-serialized history.
 
-        new_messages() is this turn's exchange only -- all_messages() would
-        re-store the entire rehydrated history on every row. Tool returns are
-        unbounded (a broad catalog query serializes to a lot of JSON), so
-        messages are kept in order until the budget runs out. Keeping the
-        front means the prompt and the first tool calls always survive, which
-        is the part you need to understand what the turn was doing.
+        `serialized` is to_jsonable_python(all_messages()), which we just built
+        for Redis; new_messages() is its tail. Slicing avoids serializing the
+        same tool returns twice on the response path. Bounded by a byte budget
+        because tool returns are unbounded -- one broad catalog query would
+        otherwise bloat the row, the WAL, and every backup.
         """
         try:
-            messages = to_jsonable_python(result.new_messages())
+            count = len(result.new_messages())
         except Exception:
-            logger.warning("Failed to serialize turn transcript", exc_info=True)
+            logger.warning("Failed to read turn messages", exc_info=True)
+            return [], False
+        if not count:
             return [], False
 
-        if not isinstance(messages, list):
-            return [], False
+        messages = serialized[-count:]
+        budget = self.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES
 
-        budget = get_settings().ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES
+        # Fast path: most turns fit, so one encode beats one per message.
+        if len(json.dumps(messages, default=str)) <= budget:
+            return messages, False
+
         kept: list = []
         used = 0
         for message in messages:
-            try:
-                size = len(json.dumps(message, default=str))
-            except Exception:
-                size = budget + 1
+            size = len(json.dumps(message, default=str))
             if used + size > budget:
-                logger.info(
-                    "Turn transcript hit the %d byte cap; kept %d of %d messages",
-                    budget,
-                    len(kept),
-                    len(messages),
-                )
-                return kept, True
+                break
             kept.append(message)
             used += size
-
-        return kept, False
+        logger.info(
+            "Turn transcript hit the %d byte cap; kept %d of %d messages",
+            budget,
+            len(kept),
+            count,
+        )
+        return kept, True
 
     async def restore_saved_session(
         self,

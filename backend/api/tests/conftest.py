@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.config import get_settings
 from app.models.assistant import (
     AnalysisSchema,
     ChatResponse,
@@ -21,6 +22,14 @@ from app.models.assistant import (
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
+
+
+@pytest.fixture(autouse=True)
+def _fresh_settings():
+    """Settings are lru_cached, so monkeypatched env leaks between tests."""
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 @pytest.fixture()

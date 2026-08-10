@@ -68,24 +68,32 @@ class Settings:
 
         # Durable per-turn assistant logging (#1294). Requires DATABASE_URL --
         # without it there is no sink and the write is skipped.
-        self.ASSISTANT_TURN_LOGGING_ENABLED: bool = os.getenv(
-            "ASSISTANT_TURN_LOGGING_ENABLED", "true"
-        ).lower() in ("1", "true", "yes")
+        self.ASSISTANT_TURN_LOGGING_ENABLED: bool = (
+            os.getenv("ASSISTANT_TURN_LOGGING_ENABLED", "true").lower() == "true"
+        )
         self.ASSISTANT_TURN_LOG_RETENTION_DAYS: int = int(
             os.getenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "90")
         )
-        # The retention sweep runs inside the app so the published 90-day
-        # promise doesn't depend on someone remembering to install a cron job.
-        # The purge is an idempotent DELETE by age, so running it in every
-        # worker is harmless. The standalone script stays for manual use.
-        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = os.getenv(
-            "ASSISTANT_TURN_LOG_PURGE_ENABLED", "true"
-        ).lower() in ("1", "true", "yes")
+        # The sweep runs in-app so the 90-day deletion the UI promises doesn't
+        # depend on someone installing a cron job. Disabling it is an explicit
+        # choice to stop honouring that notice, and it warns when you do.
+        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = (
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_ENABLED", "true").lower() == "true"
+        )
         self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
             os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
         )
-        # The write runs off the response path, so this is a hygiene bound on a
-        # detached task rather than a cap on user-visible latency.
+        # The sweep runs in-app so the 90-day deletion the UI promises doesn't
+        # depend on someone installing a cron job. The purge is an idempotent
+        # DELETE by age, so running it in every worker is harmless.
+        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = (
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_ENABLED", "true").lower() == "true"
+        )
+        self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
+        )
+        # The write runs off the response path, so this bounds a detached task
+        # rather than user-visible latency.
         self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(
             os.getenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "2.0")
         )

@@ -27,6 +27,7 @@ from app.models.assistant import (
     SessionState,
     SuggestionChip,
 )
+from app.core.config import get_settings
 from app.services.assistant_agent import (
     MAX_HISTORY_MESSAGES,
     AssistantAgent,
@@ -42,6 +43,7 @@ def agent():
     instance.catalog.workflows_by_category = []
     instance.sra_mirror = None
     instance.query_con = None  # query_catalog degrades to "unavailable"
+    instance.settings = get_settings()
     return instance
 
 
@@ -1576,9 +1578,13 @@ def _build_agent_via_init(sra_available):
     instance.settings.AI_API_KEY = "test-key"
     instance.settings.AI_PRIMARY_MODEL = "test"
     instance.settings.AI_API_BASE_URL = None
+    # Real int: _build_transcript compares a serialized size against it.
+    instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     # tool-output mode so the offline TestModel/FunctionModel can produce the
     # AssistantResponse (native/json_schema output isn't supported by them).
     instance.settings.ASSISTANT_OUTPUT_MODE = "tool"
+    # Real int: _build_transcript compares a serialized size against it.
+    instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     if sra_available is None:
         instance.sra_mirror = None
     else:
@@ -1969,6 +1975,8 @@ def _extraction_agent(reply, state, catalog=None):
     instance.settings.AI_PRIMARY_MODEL = "test"
     instance.settings.AI_API_BASE_URL = None
     instance.settings.ASSISTANT_OUTPUT_MODE = "tool"
+    # Real int: _build_transcript compares a serialized size against it.
+    instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     instance.sra_mirror = None
     instance.query_con = None
     instance.catalog = catalog if catalog is not None else MagicMock()

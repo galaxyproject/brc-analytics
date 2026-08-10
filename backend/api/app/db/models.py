@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -193,7 +194,6 @@ class AssistantTurnLog(Base):
         UUID(as_uuid=True),
         nullable=False,
         unique=True,
-        default=uuid.uuid4,
     )
     # Null when the turn failed before a session could be created.
     session_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -242,7 +242,15 @@ class AssistantTurnLog(Base):
     user: Mapped[User | None] = relationship(back_populates="assistant_turns")
 
     __table_args__ = (
-        Index("ix_assistant_turn_log_session_turn", "session_id", "turn_index"),
+        # created_at, not turn_index: reading a conversation back orders by
+        # time, so this serves it without a sort node.
+        Index("ix_assistant_turn_log_session_created", "session_id", "created_at"),
         Index("ix_assistant_turn_log_created_at", "created_at"),
-        Index("ix_assistant_turn_log_outcome", "outcome"),
+        # Partial: 'success' dominates and would never use an index, but it
+        # would still cost an index insert on every turn.
+        Index(
+            "ix_assistant_turn_log_failures",
+            "created_at",
+            postgresql_where=text("outcome <> 'success'"),
+        ),
     )

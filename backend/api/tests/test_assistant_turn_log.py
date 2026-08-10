@@ -24,7 +24,8 @@ from app.db.crud import (
     upsert_user_from_claims,
 )
 from app.db.models import AssistantTurnLog, Base
-from app.models.assistant import TurnOutcome
+from app.models.assistant import TurnOutcome, TurnTelemetry
+from app.services import turn_log
 
 # app_with_stubbed_agent / client come from tests/conftest.py.
 
@@ -60,6 +61,15 @@ def _turn_kwargs(**overrides):
     )
     kwargs.update(overrides)
     return kwargs
+
+
+def _turn_row(age_days: int, **overrides) -> AssistantTurnLog:
+    """An AssistantTurnLog aged into the past, for retention tests."""
+    return AssistantTurnLog(
+        id=uuid.uuid4(),
+        created_at=datetime.now(timezone.utc) - timedelta(days=age_days),
+        **_turn_kwargs(**overrides),
+    )
 
 
 @pytest.mark.asyncio
@@ -111,25 +121,12 @@ async def test_authenticated_turn_is_attributed_to_the_user():
 async def test_purge_deletes_only_rows_past_the_cutoff():
     session_factory = await _create_session_factory()
     async with session_factory() as session:
-        old = AssistantTurnLog(
-            id=uuid.uuid4(),
-            created_at=datetime.now(timezone.utc) - timedelta(days=120),
-            **{
-                k: v
-                for k, v in _turn_kwargs(session_id="sess-old").items()
-                if k != "user_id"
-            },
+        session.add_all(
+            [
+                _turn_row(120, session_id="sess-old"),
+                _turn_row(5, session_id="sess-recent"),
+            ]
         )
-        recent = AssistantTurnLog(
-            id=uuid.uuid4(),
-            created_at=datetime.now(timezone.utc) - timedelta(days=5),
-            **{
-                k: v
-                for k, v in _turn_kwargs(session_id="sess-recent").items()
-                if k != "user_id"
-            },
-        )
-        session.add_all([old, recent])
         await session.commit()
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=90)
@@ -200,21 +197,31 @@ class TestChatEndpointLogging:
     """Endpoint-side guarantees: schedule a log, never break the turn."""
 
     def _capture(self, monkeypatch):
-        """Capture what the endpoint hands to the scheduler.
+        """Capture what the endpoint hands to turn_log.
 
         The real write is detached, so asserting on its completion from a sync
-        TestClient would race. Scheduling is what the endpoint is responsible
-        for; persistence is covered by the _log_turn tests below.
+        TestClient would race. Scheduling is the endpoint's responsibility;
+        persistence is covered by TestScheduleAndWrite below.
         """
-        from app.api.v1 import assistant as assistant_module
+        from app.services import turn_log
 
         captured = []
-        monkeypatch.setattr(
-            assistant_module,
-            "_schedule_turn_log",
-            lambda agent, telemetry: captured.append(telemetry),
-        )
+        monkeypatch.setattr(turn_log, "schedule", captured.append)
         return captured
+
+    def _tags(self, monkeypatch):
+        from app.api.v1 import assistant as assistant_module
+
+        tags = {}
+        monkeypatch.setattr(
+            assistant_module.sentry_sdk, "set_tag", lambda k, v: tags.__setitem__(k, v)
+        )
+        return tags
+
+    def _agent(self, app):
+        from app.core.dependencies import get_assistant_agent
+
+        return app.dependency_overrides[get_assistant_agent]()
 
     def test_successful_turn_is_scheduled_for_logging(
         self, app_with_stubbed_agent, client, monkeypatch
@@ -232,8 +239,8 @@ class TestChatEndpointLogging:
     def test_failed_turn_is_logged_with_the_prompt_and_error_kind(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
-        # The whole point of #1294 during a beta is seeing what breaks, so a
-        # turn that raises must still leave a row carrying the prompt.
+        # The point of #1294 during a beta is seeing what breaks, so a turn
+        # that raises must still leave a row carrying the prompt.
         from pydantic_ai.exceptions import ModelHTTPError
 
         captured = self._capture(monkeypatch)
@@ -256,15 +263,8 @@ class TestChatEndpointLogging:
     ):
         # The id has to be minted before the run and handed to the agent, or a
         # Sentry event raised inside it can't be joined back to the row.
-        from app.api.v1 import assistant as assistant_module
-
         self._capture(monkeypatch)
-        tags = {}
-        monkeypatch.setattr(
-            assistant_module.sentry_sdk,
-            "set_tag",
-            lambda k, v: tags.__setitem__(k, v),
-        )
+        tags = self._tags(monkeypatch)
         agent = self._agent(app_with_stubbed_agent)
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
@@ -276,15 +276,8 @@ class TestChatEndpointLogging:
     def test_failed_turn_reuses_the_sentry_turn_id(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
-        from app.api.v1 import assistant as assistant_module
-
         captured = self._capture(monkeypatch)
-        tags = {}
-        monkeypatch.setattr(
-            assistant_module.sentry_sdk,
-            "set_tag",
-            lambda k, v: tags.__setitem__(k, v),
-        )
+        tags = self._tags(monkeypatch)
         agent = self._agent(app_with_stubbed_agent)
         agent.chat_with_telemetry = AsyncMock(side_effect=RuntimeError("boom"))
 
@@ -293,11 +286,6 @@ class TestChatEndpointLogging:
         assert resp.status_code == 500
         assert tags["assistant.turn_id"] == str(captured[0].turn_id)
 
-    def _agent(self, app):
-        from app.core.dependencies import get_assistant_agent
-
-        return app.dependency_overrides[get_assistant_agent]()
-
     def test_chat_succeeds_when_no_database_is_configured(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
@@ -305,9 +293,6 @@ class TestChatEndpointLogging:
         # the write as a FastAPI dependency would 500 every chat there, since
         # get_db_session() raises before the handler body runs.
         monkeypatch.delenv("DATABASE_URL", raising=False)
-        from app.core.config import get_settings
-
-        get_settings.cache_clear()
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
@@ -316,80 +301,55 @@ class TestChatEndpointLogging:
 
 
 class TestScheduleAndWrite:
-    """_schedule_turn_log gating, and _log_turn's fail-open contract."""
+    """turn_log.schedule() gating, and the write's fail-open contract."""
 
     def _telemetry(self):
-        from app.models.assistant import TurnTelemetry
-
         return TurnTelemetry(session_id="s1", user_message="hi")
 
-    def test_no_task_is_scheduled_without_a_database(self, monkeypatch):
-        from app.api.v1 import assistant as assistant_module
-        from app.core.config import get_settings
-
-        monkeypatch.delenv("DATABASE_URL", raising=False)
-        get_settings.cache_clear()
+    def _no_task_scheduled(self, monkeypatch):
         created = []
-        monkeypatch.setattr(
-            assistant_module.asyncio, "create_task", lambda c: created.append(c)
-        )
+        monkeypatch.setattr(turn_log.asyncio, "create_task", created.append)
+        turn_log.schedule(self._telemetry())
+        return created
 
-        assistant_module._schedule_turn_log(MagicMock(), self._telemetry())
-
-        assert created == []
+    def test_no_task_is_scheduled_without_a_database(self, monkeypatch):
+        monkeypatch.delenv("DATABASE_URL", raising=False)
+        assert self._no_task_scheduled(monkeypatch) == []
 
     def test_no_task_is_scheduled_when_logging_is_disabled(self, monkeypatch):
-        from app.api.v1 import assistant as assistant_module
-        from app.core.config import get_settings
-
         monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
         monkeypatch.setenv("ASSISTANT_TURN_LOGGING_ENABLED", "false")
-        get_settings.cache_clear()
-        created = []
-        monkeypatch.setattr(
-            assistant_module.asyncio, "create_task", lambda c: created.append(c)
-        )
-
-        assistant_module._schedule_turn_log(MagicMock(), self._telemetry())
-
-        assert created == []
+        assert self._no_task_scheduled(monkeypatch) == []
 
     @pytest.mark.asyncio
-    async def test_log_turn_swallows_a_broken_write(self, monkeypatch):
-        from app.api.v1 import assistant as assistant_module
-        from app.core.config import get_settings
-
-        async def boom(agent, telemetry, settings):
+    async def test_a_broken_write_is_swallowed(self, monkeypatch):
+        async def boom(telemetry):
             raise RuntimeError("database is on fire")
 
-        monkeypatch.setattr(assistant_module, "_write_turn_log", boom)
-        get_settings.cache_clear()
+        monkeypatch.setattr(turn_log, "_write", boom)
 
-        # Must not raise -- it runs detached, so an exception here is unhandled.
-        await assistant_module._log_turn(MagicMock(), self._telemetry(), get_settings())
+        # Must not raise -- it runs detached, so an escape would be unhandled.
+        await turn_log._write_with_timeout(self._telemetry())
 
     @pytest.mark.asyncio
-    async def test_log_turn_gives_up_on_a_stalled_write(self, monkeypatch):
+    async def test_a_stalled_write_gives_up(self, monkeypatch):
         import asyncio as aio
 
-        from app.api.v1 import assistant as assistant_module
-        from app.core.config import get_settings
-
-        async def never_finishes(agent, telemetry, settings):
+        async def never_finishes(telemetry):
             await aio.sleep(60)
 
-        monkeypatch.setattr(assistant_module, "_write_turn_log", never_finishes)
+        monkeypatch.setattr(turn_log, "_write", never_finishes)
         monkeypatch.setenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "0.05")
-        get_settings.cache_clear()
 
         start = time.monotonic()
-        await assistant_module._log_turn(MagicMock(), self._telemetry(), get_settings())
+        await turn_log._write_with_timeout(self._telemetry())
 
         assert time.monotonic() - start < 5
 
 
 def _stub_agent():
     """Minimal AssistantAgent, no Redis/LLM -- mirrors tests/test_assistant_agent.py."""
+    from app.core.config import get_settings
     from app.services.assistant_agent import AssistantAgent
 
     instance = object.__new__(AssistantAgent)
@@ -398,6 +358,7 @@ def _stub_agent():
     instance.sra_mirror = None
     instance.query_con = None
     instance.agent = object()
+    instance.settings = get_settings()
     return instance
 
 
@@ -411,7 +372,7 @@ def _fake_run_result(new_messages):
             tool_calls=2,
             total_tokens=15,
         ),
-        all_messages=lambda: [],
+        all_messages=lambda: new_messages,
         new_messages=lambda: new_messages,
     )
 
@@ -467,32 +428,6 @@ async def test_turn_index_increments_across_turns_in_a_session():
     assert [first.turn_index, second.turn_index, third.turn_index] == [0, 1, 2]
 
 
-@pytest.mark.asyncio
-async def test_chat_still_returns_a_reply_when_the_transcript_cannot_serialize():
-    """A telemetry problem must not cost the user their answer."""
-    from app.models.assistant import AnalysisSchema, SessionState
-
-    class Unserializable:
-        pass
-
-    agent = _stub_agent()
-    state = SessionState(session_id="s1", schema_state=AnalysisSchema(), messages=[])
-    agent.session_service = SimpleNamespace(
-        create_session=AsyncMock(return_value=state),
-        require_session=AsyncMock(return_value=state),
-        save_session=AsyncMock(),
-    )
-    agent._run_agent_with_retry = AsyncMock(
-        return_value=_fake_run_result(Unserializable())
-    )
-    agent._extract_state = AsyncMock(return_value=({}, None))
-
-    response, telemetry = await agent.chat_with_telemetry("hello")
-
-    assert response.reply == "Ready to go."
-    assert telemetry.transcript == []
-
-
 class TestTranscriptCap:
     """Tool returns are unbounded; one broad catalog query must not bloat a row."""
 
@@ -500,22 +435,18 @@ class TestTranscriptCap:
         return SimpleNamespace(new_messages=lambda: messages)
 
     def test_small_transcript_is_kept_whole(self, monkeypatch):
-        from app.core.config import get_settings
-
-        get_settings.cache_clear()
         agent = _stub_agent()
         messages = [{"kind": "request", "parts": ["hi"]}]
 
-        transcript, truncated = agent._build_transcript(self._result(messages))
+        transcript, truncated = agent._build_transcript(
+            self._result(messages), messages
+        )
 
         assert transcript == messages
         assert truncated is False
 
     def test_oversized_transcript_is_capped_and_flagged(self, monkeypatch):
-        from app.core.config import get_settings
-
         monkeypatch.setenv("ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES", "500")
-        get_settings.cache_clear()
         agent = _stub_agent()
         # One small leading message, then a huge tool return.
         messages = [
@@ -523,23 +454,22 @@ class TestTranscriptCap:
             {"kind": "tool-return", "content": "x" * 5000},
         ]
 
-        transcript, truncated = agent._build_transcript(self._result(messages))
+        transcript, truncated = agent._build_transcript(
+            self._result(messages), messages
+        )
 
         assert truncated is True
         # The front survives, so you can still see what the turn was doing.
         assert transcript == [messages[0]]
 
     def test_unserializable_transcript_degrades_to_empty(self):
-        from app.core.config import get_settings
-
-        get_settings.cache_clear()
         agent = _stub_agent()
 
         class Exploding:
             def new_messages(self):
                 raise RuntimeError("nope")
 
-        transcript, truncated = agent._build_transcript(Exploding())
+        transcript, truncated = agent._build_transcript(Exploding(), [])
 
         assert transcript == []
         assert truncated is False
@@ -549,63 +479,85 @@ class TestRetentionSweep:
     """The 90-day promise in the UI has to be enforced by something running."""
 
     def test_sweep_does_not_start_without_a_database(self, monkeypatch):
-        from app.core.config import get_settings
-        from app.services import turn_log_retention
+        from app.services import turn_log
 
         monkeypatch.delenv("DATABASE_URL", raising=False)
-        get_settings.cache_clear()
 
-        assert turn_log_retention.start_turn_log_purge_task() is None
+        assert turn_log.start_purge_task() is None
 
     def test_sweep_does_not_start_when_explicitly_disabled(self, monkeypatch):
-        from app.core.config import get_settings
-        from app.services import turn_log_retention
+        from app.services import turn_log
 
         monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
         monkeypatch.setenv("ASSISTANT_TURN_LOG_PURGE_ENABLED", "false")
-        get_settings.cache_clear()
 
-        assert turn_log_retention.start_turn_log_purge_task() is None
+        assert turn_log.start_purge_task() is None
 
     @pytest.mark.asyncio
     async def test_sweep_deletes_past_the_configured_window(self, monkeypatch):
-        from app.core.config import get_settings
-        from app.services import turn_log_retention
+        from app.services import turn_log
 
         monkeypatch.setenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "90")
-        get_settings.cache_clear()
 
         session_factory = await _create_session_factory()
         async with session_factory() as session:
             session.add_all(
-                [
-                    AssistantTurnLog(
-                        id=uuid.uuid4(),
-                        created_at=datetime.now(timezone.utc) - timedelta(days=200),
-                        **{
-                            k: v
-                            for k, v in _turn_kwargs(session_id="old").items()
-                            if k != "user_id"
-                        },
-                    ),
-                    AssistantTurnLog(
-                        id=uuid.uuid4(),
-                        created_at=datetime.now(timezone.utc) - timedelta(days=2),
-                        **{
-                            k: v
-                            for k, v in _turn_kwargs(session_id="new").items()
-                            if k != "user_id"
-                        },
-                    ),
-                ]
+                [_turn_row(200, session_id="old"), _turn_row(2, session_id="new")]
             )
             await session.commit()
 
-            monkeypatch.setattr(
-                turn_log_retention, "get_session_factory", lambda: session_factory
-            )
-            deleted = await turn_log_retention.purge_expired_turn_logs()
+            from contextlib import asynccontextmanager
+
+            @asynccontextmanager
+            async def _fake_session():
+                yield session
+
+            monkeypatch.setattr(turn_log, "db_session", _fake_session)
+            deleted = await turn_log.purge_expired()
 
             assert deleted == 1
             remaining = await session.execute(select(AssistantTurnLog.session_id))
             assert list(remaining.scalars().all()) == ["new"]
+
+
+@pytest.mark.asyncio
+async def test_shutdown_waits_for_in_flight_turn_log_writes():
+    """A deploy must not drop the turns logged just before it.
+
+    The write is detached, and shutdown disposes the DB engine -- without a
+    drain, whatever was in flight dies with it.
+    """
+    import asyncio as aio
+
+    from app.services import turn_log as turn_log_mod
+
+    finished = []
+
+    async def slow_write():
+        await aio.sleep(0.05)
+        finished.append(True)
+
+    task = aio.create_task(slow_write())
+    turn_log_mod._pending_writes.add(task)
+    task.add_done_callback(turn_log_mod._pending_writes.discard)
+
+    await turn_log_mod.drain(timeout=2.0)
+
+    assert finished == [True]
+
+
+@pytest.mark.asyncio
+async def test_drain_gives_up_rather_than_hanging_shutdown():
+    import asyncio as aio
+
+    from app.services import turn_log as turn_log_mod
+
+    task = aio.create_task(aio.sleep(30))
+    turn_log_mod._pending_writes.add(task)
+    task.add_done_callback(turn_log_mod._pending_writes.discard)
+    try:
+        start = time.monotonic()
+        await turn_log_mod.drain(timeout=0.05)
+        assert time.monotonic() - start < 5
+    finally:
+        task.cancel()

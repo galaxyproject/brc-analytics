@@ -23,19 +23,18 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import func, select
 
 from app.core.config import get_settings
-from app.db.crud import purge_assistant_turn_logs_before
 from app.db.models import AssistantTurnLog
-from app.db.session import close_db, get_session_factory
+from app.db.session import close_db, db_session
+from app.services.turn_log import purge_expired
 
 logger = logging.getLogger("purge_assistant_turn_logs")
 
 
 async def _run(days: int, dry_run: bool) -> int:
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-    session_factory = get_session_factory()
 
-    async with session_factory() as session:
-        if dry_run:
+    if dry_run:
+        async with db_session() as session:
             result = await session.execute(
                 select(func.count())
                 .select_from(AssistantTurnLog)
@@ -49,10 +48,9 @@ async def _run(days: int, dry_run: bool) -> int:
             )
             return 0
 
-        deleted = await purge_assistant_turn_logs_before(session, cutoff)
-        logger.info(
-            "Deleted %d turn log rows older than %s", deleted, cutoff.isoformat()
-        )
+    # Delegate the delete so the retention window has one definition.
+    deleted = await purge_expired(days=days)
+    logger.info("Deleted %d turn log rows older than %s", deleted, cutoff.isoformat())
     return 0
 
 

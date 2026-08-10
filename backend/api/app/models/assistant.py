@@ -195,6 +195,13 @@ class TurnTelemetry(BaseModel):
     schema_state: Dict[str, Any] = Field(default_factory=dict)
     token_usage: TokenUsage = Field(default_factory=TokenUsage)
     latency_ms: int = 0
+    model: Optional[str] = None
+    provider: Optional[str] = None
+
+    @classmethod
+    def for_error(cls, exc: Exception, **fields: Any) -> "TurnTelemetry":
+        """Build the record for a turn that raised, so both call sites agree."""
+        return cls(outcome=TurnOutcome.ERROR, error_kind=type(exc).__name__, **fields)
 
 
 class SessionState(BaseModel):
