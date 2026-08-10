@@ -83,15 +83,6 @@ class Settings:
         self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
             os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
         )
-        # The sweep runs in-app so the 90-day deletion the UI promises doesn't
-        # depend on someone installing a cron job. The purge is an idempotent
-        # DELETE by age, so running it in every worker is harmless.
-        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = (
-            os.getenv("ASSISTANT_TURN_LOG_PURGE_ENABLED", "true").lower() == "true"
-        )
-        self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
-            os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
-        )
         # The write runs off the response path, so this bounds a detached task
         # rather than user-visible latency.
         self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(

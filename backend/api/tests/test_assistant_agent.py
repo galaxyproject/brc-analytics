@@ -1582,8 +1582,6 @@ def _build_agent_via_init(sra_available):
     # tool-output mode so the offline TestModel/FunctionModel can produce the
     # AssistantResponse (native/json_schema output isn't supported by them).
     instance.settings.ASSISTANT_OUTPUT_MODE = "tool"
-    # Real int: _build_transcript compares a serialized size against it.
-    instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     if sra_available is None:
         instance.sra_mirror = None
     else:

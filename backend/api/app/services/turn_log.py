@@ -20,7 +20,7 @@ import sentry_sdk
 from app.core.config import get_settings
 from app.db.crud import (
     create_assistant_turn_log,
-    get_user_by_keycloak_sub,
+    get_user_id_by_keycloak_sub,
     purge_assistant_turn_logs_before,
 )
 from app.db.session import db_session
@@ -94,8 +94,9 @@ async def _write(telemetry: TurnTelemetry) -> None:
     async with db_session() as session:
         user_id = None
         if telemetry.owner_keycloak_sub:
-            user = await get_user_by_keycloak_sub(session, telemetry.owner_keycloak_sub)
-            user_id = user.id if user is not None else None
+            user_id = await get_user_id_by_keycloak_sub(
+                session, telemetry.owner_keycloak_sub
+            )
 
         usage = telemetry.token_usage
         await create_assistant_turn_log(
