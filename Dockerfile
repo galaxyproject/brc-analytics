@@ -22,11 +22,12 @@ RUN ./scripts/build.sh brc-analytics docker
 # Set version info (appended to the site env)
 RUN ./scripts/set-version.sh "" sites/brc-analytics
 
-# Sync API config into the site's public dir
-RUN ./scripts/sync-api-brc-analytics.sh
-
 # Build the catalog data
 RUN npm run build-brc-db
+
+# Sync API config into the site's public dir. Runs after the catalog build so
+# the static export ships the freshly built JSON, not the committed output.
+RUN ./scripts/sync-api-brc-analytics.sh
 
 # Build Next.js static export (outputs to /app/sites/brc-analytics/out)
 # Next 16 removed the `--no-lint` flag and no longer runs ESLint during build.
