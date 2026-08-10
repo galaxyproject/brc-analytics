@@ -16,7 +16,6 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["app/*"],
       "@brc/*": ["sites/brc-analytics/*"],
       "@catalog/*": ["catalog/*"],
       "@ga2/*": ["sites/ga2/*"],
