@@ -1,4 +1,4 @@
-import { loadPangenomes } from "@/services/workflows/brc/loader";
+import { loadPangenomes } from "@brc/services/workflows/loader";
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   loadEntities,
