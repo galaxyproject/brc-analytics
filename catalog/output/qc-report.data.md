@@ -10,20 +10,20 @@ None
 
 ## Assemblies with gene model URLs not found
 
-- GCF_002986195.1
-- GCF_002986165.1
 - GCA_902369275.1
+- GCF_002986165.1
+- GCF_002986195.1
 
 ## Assemblies with datacache URLs not found
 
-- GCF_000018225.1
-- GCF_000017685.1
-- GCF_000008445.1
-- GCF_000018225.1
-- GCA_006535965.1
-- GCA_051144965.1
-- GCA_051144935.1
 - GCA_004302925.2
+- GCA_006535965.1
+- GCA_051144935.1
+- GCA_051144965.1
+- GCF_000008445.1
+- GCF_000017685.1
+- GCF_000018225.1
+- GCF_000018225.1
 
 ## Species and strain combinations with multiple taxonomy IDs
 
