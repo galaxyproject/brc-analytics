@@ -781,3 +781,72 @@ async def test_drain_cancels_stragglers_so_none_outlive_close_db():
     await turn_log.drain(timeout=0.05)
 
     assert task.cancelled() or task.done()
+
+
+class TestInfoRetentionWindow:
+    """/info must only advertise a window the deployment will actually enforce."""
+
+    def _days(self, client, app, monkeypatch, **env):
+        """Set env, then repoint the stub agent at the fresh Settings.
+
+        /info reads agent.settings, which conftest captured at fixture time,
+        so clearing the lru_cache alone would leave the endpoint on the stale
+        object and these assertions would pass for the wrong reason.
+        """
+        from app.core.config import get_settings
+        from app.core.dependencies import get_assistant_agent
+
+        for key, value in env.items():
+            if value is None:
+                monkeypatch.delenv(key, raising=False)
+            else:
+                monkeypatch.setenv(key, value)
+        get_settings.cache_clear()
+        app.dependency_overrides[get_assistant_agent]().settings = get_settings()
+        return client.get("/api/v1/assistant/info").json()["turn_log_retention_days"]
+
+    def test_window_is_advertised_when_the_sweep_will_run(
+        self, app_with_stubbed_agent, client, monkeypatch
+    ):
+        days = self._days(
+            client,
+            app_with_stubbed_agent,
+            monkeypatch,
+            DATABASE_URL="sqlite+aiosqlite:///:memory:",
+            ASSISTANT_TURN_LOG_RETENTION_DAYS="90",
+        )
+        assert days == 90
+
+    def test_no_window_when_there_is_no_database(
+        self, app_with_stubbed_agent, client, monkeypatch
+    ):
+        days = self._days(
+            client, app_with_stubbed_agent, monkeypatch, DATABASE_URL=None
+        )
+        assert days is None
+
+    def test_no_window_when_retention_is_nonpositive(
+        self, app_with_stubbed_agent, client, monkeypatch
+    ):
+        # purge_expired refuses days < 1, so advertising it would promise a
+        # deletion that never happens.
+        days = self._days(
+            client,
+            app_with_stubbed_agent,
+            monkeypatch,
+            DATABASE_URL="sqlite+aiosqlite:///:memory:",
+            ASSISTANT_TURN_LOG_RETENTION_DAYS="0",
+        )
+        assert days is None
+
+    def test_no_window_when_the_sweep_is_disabled(
+        self, app_with_stubbed_agent, client, monkeypatch
+    ):
+        days = self._days(
+            client,
+            app_with_stubbed_agent,
+            monkeypatch,
+            DATABASE_URL="sqlite+aiosqlite:///:memory:",
+            ASSISTANT_TURN_LOG_PURGE_ENABLED="false",
+        )
+        assert days is None

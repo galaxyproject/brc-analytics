@@ -45,10 +45,14 @@ async def assistant_info(
     settings = agent.settings
     # Only advertise a window the deployment actually enforces -- logging on,
     # a sink to write to, and a sweep that will delete.
+    # The >= 1 mirrors purge_expired's guard: a non-positive window means the
+    # sweep refuses to run, so advertising it would promise a deletion that
+    # never happens.
     logging_on = (
         settings.ASSISTANT_TURN_LOGGING_ENABLED
         and bool(settings.DATABASE_URL)
         and settings.ASSISTANT_TURN_LOG_PURGE_ENABLED
+        and settings.ASSISTANT_TURN_LOG_RETENTION_DAYS >= 1
     )
     return AssistantInfoResponse(
         available=available,
