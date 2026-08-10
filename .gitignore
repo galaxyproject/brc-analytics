@@ -1,6 +1,4 @@
 # images
-/public/organism_image/*
-!/public/organism_image/missing_image_*
 /sites/ga2/public/organism_image/*
 !/sites/ga2/public/organism_image/missing_image_*
 
@@ -8,10 +6,8 @@
 /node_modules
 
 # next.js
-/.next/
 .next/
-/next-env.d.ts 
-/sites/*/next-env.d.ts
+next-env.d.ts
 
 # misc
 .DS_Store
@@ -21,9 +17,7 @@
 npm-debug.log*
 
 # env files
-/.env*.local
-/.env.development
-/.env.production
+.env*.local
 /sites/*/.env*
 backend/**/.env
 
@@ -41,7 +35,6 @@ backend/**/.env
 .nvmrc
 
 # favicons
-/public/favicons/*
 /sites/ga2/public/favicons/*
 /sites/brc-analytics/public/favicons/*
 
@@ -50,15 +43,13 @@ backend/**/.env
 /catalog/ga2/build/temp
 
 # Build Dir
-/out
 out/
 
 # Playwright test artifacts
-/test-results
 test-results/
 /tests/screenshots
-/playwright-report
 /playwright/.cache
+playwright-report/
 
 # Playwright MCP server debug output
 /.playwright-mcp/
@@ -66,10 +57,8 @@ test-results/
 # python
 venv
 __pycache__
-playwright-report/
 
 # public api
-/public/api
 /sites/ga2/public/api
 /sites/brc-analytics/public/api
 
