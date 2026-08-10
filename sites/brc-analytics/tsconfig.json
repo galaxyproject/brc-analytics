@@ -20,7 +20,7 @@
     ".next/types/**/*.ts",
     "../../@types/findable-ui.d.ts",
     "../../packages/shared/@types/theme.d.ts",
-    "../../vega-embed.d.ts"
+    "../../@types/vega-embed.d.ts"
   ],
   "exclude": ["node_modules"]
 }
