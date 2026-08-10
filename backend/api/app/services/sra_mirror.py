@@ -35,10 +35,11 @@ _CACHE_TTL_SECONDS = 300
 # bound -- the search key is a 7-tuple, so the keyspace is effectively open.
 _CACHE_MAX_ENTRIES = 512
 
-# Ceiling on a single accession-batch lookup. Callers annotate one page of
-# search hits at a time, so this is generous; it exists to keep a caller from
-# passing a whole result set and building an enormous IN list.
-_MAX_ACCESSION_LOOKUP = 500
+# Batch size for accession lookups. Callers annotate one page of search hits
+# at a time; this keeps any single IN list bounded. It is a chunk size, not a
+# ceiling on how many accessions a caller may ask about -- see
+# runs_by_accession, which loops rather than truncating.
+_ACCESSION_BATCH_SIZE = 500
 
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
@@ -682,8 +683,9 @@ class SRAMirrorService:
 
         Built for annotating a page of sequence-search hits, so it takes the
         accessions as they come and returns only the ones the mirror knows --
-        a caller should expect misses. The mirror is filtered to BRC-relevant
-        organisms, and a Logan query can match anything in SRA.
+        a caller should expect misses. How many depends on how the mirror was
+        built: a taxid-filtered mirror misses most of what a Logan query
+        matches, since Logan indexes all of SRA.
         """
         if not self._con or not accessions:
             return {}
@@ -691,21 +693,29 @@ class SRAMirrorService:
         wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
         if not wanted:
             return {}
-        wanted = wanted[:_MAX_ACCESSION_LOOKUP]
 
         cache_key = ("runs_by_accession", tuple(wanted))
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
 
-        rows = self._con.execute(
-            """
-            SELECT acc, sra_study, bioproject, organism, assay_type, platform,
-                   instrument, librarylayout, releasedate,
-                   geo_loc_name_country_calc, mbases
-            FROM runs WHERE acc IN (SELECT UNNEST(?))
-            """,
-            [wanted],
-        ).fetchall()
+        # Batch rather than truncate. Slicing to the batch size here silently
+        # dropped annotations from any page larger than it -- and because
+        # `wanted` is sorted, it dropped them by accession rather than by
+        # score, so the rows that survived weren't even the ranked ones.
+        rows: List[Any] = []
+        for start in range(0, len(wanted), _ACCESSION_BATCH_SIZE):
+            batch = wanted[start : start + _ACCESSION_BATCH_SIZE]
+            rows.extend(
+                self._con.execute(
+                    """
+                    SELECT acc, sra_study, bioproject, organism, assay_type,
+                           platform, instrument, librarylayout, releasedate,
+                           geo_loc_name_country_calc, mbases
+                    FROM runs WHERE acc IN (SELECT UNNEST(?))
+                    """,
+                    [batch],
+                ).fetchall()
+            )
 
         result = {
             r[0]: {

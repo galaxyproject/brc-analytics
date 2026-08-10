@@ -390,3 +390,56 @@ class TestConcurrentAccess:
             list(pool.map(hammer, range(n_iter)))
 
         assert not errors, errors[:5]
+
+
+class TestAccessionBatching:
+    """A page larger than the batch size must not lose annotations.
+
+    The lookup used to slice to the batch size, which dropped rows silently --
+    and since the accession list is sorted before slicing, it dropped them by
+    accession rather than by score, so what survived wasn't the ranked subset
+    either.
+    """
+
+    @staticmethod
+    def _mirror_with(n: int, tmp_path):
+        """Build a mirror holding `n` synthetic runs.
+
+        @param n: how many runs to insert.
+        @param tmp_path: pytest tmp dir.
+        @returns: (service, list of every accession inserted).
+        """
+        path = str(tmp_path / f"batch-{n}.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        accs = [f"SRRB{i:06d}" for i in range(n)]
+        con.executemany(
+            "INSERT INTO runs VALUES (?,'SRPX','PRJNAX','Batch organism','WGS',"
+            "'ILLUMINA','X','PAIRED', DATE '2023-01-01','Kenya', 1)",
+            [(a,) for a in accs],
+        )
+        con.close()
+        svc = SRAMirrorService(path)
+        assert svc.is_available()
+        return svc, accs
+
+    def test_page_larger_than_batch_size_annotates_every_row(self, tmp_path):
+        from app.services.sra_mirror import _ACCESSION_BATCH_SIZE
+
+        n = _ACCESSION_BATCH_SIZE * 2 + 37  # spans three batches, last partial
+        svc, accs = self._mirror_with(n, tmp_path)
+        found = svc.runs_by_accession(accs)
+        assert len(found) == n
+        assert set(found) == set(accs)
+
+    def test_exact_batch_multiple_has_no_off_by_one(self, tmp_path):
+        from app.services.sra_mirror import _ACCESSION_BATCH_SIZE
+
+        svc, accs = self._mirror_with(_ACCESSION_BATCH_SIZE * 2, tmp_path)
+        assert len(svc.runs_by_accession(accs)) == _ACCESSION_BATCH_SIZE * 2
+
+    def test_unknown_accessions_are_simply_absent(self, tmp_path):
+        svc, accs = self._mirror_with(10, tmp_path)
+        found = svc.runs_by_accession(accs + ["SRR_NOT_IN_MIRROR"])
+        assert len(found) == 10
+        assert "SRR_NOT_IN_MIRROR" not in found
