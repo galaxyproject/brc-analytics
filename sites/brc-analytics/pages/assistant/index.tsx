@@ -1,13 +1,12 @@
-import { BRC_PAGE_META } from "@/common/meta/brc/constants";
-import { config } from "@/config/config";
+import { BRC_PAGE_META } from "@brc/meta/constants";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import type { PageMeta } from "@repo/shared/meta/types";
 import { AssistantView } from "@repo/shared/views/AssistantView/assistantView";
-import { ROUTES } from "@routes/constants";
 import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
 
-export const Assistant = (): JSX.Element => {
+const Page = (): JSX.Element => {
   const { query } = useRouter();
   const initialSessionId =
     typeof query.sessionId === "string" ? query.sessionId : undefined;
@@ -15,14 +14,11 @@ export const Assistant = (): JSX.Element => {
   return <AssistantView initialSessionId={initialSessionId} />;
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const { allowedPaths } = config();
-
-  // Only build on sites where /assistant is an allowed path.
-  if (allowedPaths && !allowedPaths.includes(ROUTES.ASSISTANT)) {
-    return { notFound: true };
+export const getStaticProps: GetStaticProps<
+  PageMeta & {
+    themeOptions: object;
   }
-
+> = async () => {
   return {
     props: {
       ...BRC_PAGE_META.ASSISTANT,
@@ -33,6 +29,6 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 };
 
-export default Assistant;
+export default Page;
 
-Assistant.Main = StyledPagesMain;
+Page.Main = StyledPagesMain;
