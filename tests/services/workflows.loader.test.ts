@@ -1,5 +1,5 @@
-import { loadPangenomes } from "@/services/workflows/brc/loader";
-import { API as BRC_API } from "@/services/workflows/brc/routes";
+import { loadPangenomes } from "@brc/services/workflows/loader";
+import { API as BRC_API } from "@brc/services/workflows/routes";
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {

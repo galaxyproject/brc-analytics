@@ -17,7 +17,7 @@
     "start:brc": "npx serve sites/brc-analytics/out",
     "start:ga2": "npx serve sites/ga2/out",
     "lint": "eslint .",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
     "format:python": "./scripts/format-python.sh",
