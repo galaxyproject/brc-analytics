@@ -4,6 +4,7 @@ import {
   WORKFLOW_PLOIDY,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { type ParsedUrlQuery } from "querystring";
 
 /**
  * Formats a trsId for use in URLs by removing the hash character if it begins with one
@@ -13,6 +14,18 @@ import type { Workflow } from "@repo/shared/apis/workflow";
  */
 export function formatTrsId(trsId: string): string {
   return trsId.replace(/^#/, "").replace(/[^a-zA-Z0-9]/g, "-");
+}
+
+/**
+ * Resolves the selected workflow TRS ID from a router query, treating an empty
+ * value as absent.
+ * @param query - Router query.
+ * @returns TRS ID, or undefined when absent or empty.
+ */
+export function getTrsId(query: ParsedUrlQuery): string | undefined {
+  return typeof query.trsId === "string" && query.trsId
+    ? query.trsId
+    : undefined;
 }
 
 /**

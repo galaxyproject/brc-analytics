@@ -4,17 +4,21 @@
 
 Using Node.js version `22.12.0`, run `npm install` in the root directory of the repository to install dependencies.
 
+### Sites
+
+The repository hosts two sites. **BRC Analytics** builds from the repo root (`pages/`), and the commands below target it by default. **Genome Ark 2 (GA2)** is a standalone app under [`sites/ga2/`](sites/ga2/README.md) with its own `:ga2` scripts. Each GA2 command is the counterpart of the BRC command noted alongside it.
+
 ### Typechecking
 
 The app is written with TypeScript and Next.js. Because Next generates local-only type definitions under `.next` in order to check page routes, erroneous type errors may appear when those types become out-of-sync with new code changes. To avoid this, any typechecking should be done by running `npm run typecheck`, which will first update Next's generated types. Additionally, if type errors are reported in `.next` by another program such as an editor, it may be possible to resolve them by running the same script, or by running `npx next typegen` to only generate types.
 
 ## Using the development server
 
-The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`.
+The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`. For GA2, use `npm run dev:ga2`.
 
 ## Building the app locally
 
-Run `npm run build:local` to build. The built app can be run using `npm start`, and accessed at `http://localhost:3000`.
+Run `npm run build:local` to build. The built app can be run using `npm start`, and accessed at `http://localhost:3000`. For GA2, build with `npm run build-local:ga2` and serve with `npm run start:ga2`.
 
 ## Running the full stack with Docker
 
@@ -188,4 +192,10 @@ To run BE E2E tests:
 
 ```
 npm run test:e2e:api
+```
+
+To run the GA2 smoke tests:
+
+```
+npm run test:e2e:ga2
 ```

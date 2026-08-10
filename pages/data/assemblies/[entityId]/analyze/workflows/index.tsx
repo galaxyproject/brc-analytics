@@ -11,6 +11,7 @@ import type {
 } from "@repo/shared/services/staticGeneration/entity/types";
 import { AnalyzeWorkflowsView } from "@repo/shared/views/AnalyzeWorkflowsView/analyzeWorkflowsView";
 import { WorkflowInputsView } from "@repo/shared/views/WorkflowInputsView/workflowInputsView";
+import { getTrsId } from "@repo/shared/workflow/utils";
 import { APP_KEYS } from "@site-config/common/constants";
 import type { GetStaticProps } from "next";
 import { useRouter } from "next/router";
@@ -28,9 +29,7 @@ const ENTITY_LIST_TYPE = "assemblies";
  */
 const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   const { isReady, query } = useRouter();
-  // An empty `?trsId=` is treated as missing (falls back to the list).
-  const trsId =
-    typeof query.trsId === "string" && query.trsId ? query.trsId : undefined;
+  const trsId = getTrsId(query);
 
   if (!isReady) return <></>;
 
