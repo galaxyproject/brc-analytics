@@ -25,7 +25,7 @@ The catalog build runs in two phases:
    npm run build-brc-db
    ```
 
-The output JSON files in `catalog/output/` are checked into the repo. They are not rebuilt automatically during `npm run build:prod` or `next build` — you must run the above commands manually when source data changes.
+The output JSON files in `catalog/output/` are checked into the repo. They are not rebuilt automatically during `npm run build-prod:brc` or `next build` — you must run the above commands manually when source data changes.
 
 ### NODE_ENV=production
 
