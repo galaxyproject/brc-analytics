@@ -8,10 +8,9 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
-import { APP_KEYS } from "@site-config/common/constants";
-import { type AppSiteConfig } from "@site-config/common/entities";
 import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
@@ -53,7 +52,6 @@ export function makeConfig(
   loginEnabled = LOGIN_ENABLED
 ): AppSiteConfig {
   return {
-    appKey: APP_KEYS.BRC_ANALYTICS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {

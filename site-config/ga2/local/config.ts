@@ -4,11 +4,10 @@ import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entitie
 import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { Branding } from "@ga2/components/layout/Branding/branding";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
 import { ROUTES as SITE_ROUTES } from "@routes/constants";
-import { APP_KEYS } from "@site-config/common/constants";
-import { type AppSiteConfig } from "@site-config/common/entities";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
@@ -16,14 +15,6 @@ import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
 
-const ALLOWED_PATHS = [
-  SITE_ROUTES.ABOUT,
-  SITE_ROUTES.ABOUT_PARTNER_RESOURCES,
-  SITE_ROUTES.ABOUT_ROADMAP,
-  ROUTES.ORGANISMS,
-  ROUTES.GENOMES,
-  ROUTES.WORKFLOWS,
-];
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "Genome Ark 2";
 const BROWSER_URL = LOCALHOST;
@@ -49,8 +40,6 @@ export function makeConfig(
   gitHubUrl = GIT_HUB_REPO_URL
 ): AppSiteConfig {
   return {
-    allowedPaths: ALLOWED_PATHS,
-    appKey: APP_KEYS.GA2,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
