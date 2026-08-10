@@ -1,4 +1,3 @@
-import { config } from "@/config/config";
 import { LearnContentView } from "@brc/views/LearnContentView/learnContentView";
 import { buildStaticPaths } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticPaths";
 import { buildStaticProps } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/staticProps";
@@ -10,7 +9,6 @@ import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles
 import { sanitizeFrontmatter } from "@repo/shared/views/docs/common/frontmatter/utils";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@repo/shared/views/docs/common/staticGeneration/utils";
-import { ROUTES } from "@routes/constants";
 import {
   type GetStaticPaths,
   type GetStaticProps,
@@ -28,13 +26,6 @@ const Page = (props: StaticProps): JSX.Element => {
 export const getStaticProps: GetStaticProps<StaticProps> = async (
   props: GetStaticPropsContext
 ) => {
-  const { allowedPaths } = config();
-
-  // Only build on sites where /learn is an allowed path.
-  if (allowedPaths && !allowedPaths.includes(ROUTES.LEARN)) {
-    return { notFound: true };
-  }
-
   // Build the slug.
   const slug = buildMDXSlug(props, LEARN_DIR);
 
@@ -55,13 +46,6 @@ export const getStaticProps: GetStaticProps<StaticProps> = async (
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { allowedPaths } = config();
-
-  // Generate no paths on sites where /learn is not an allowed path.
-  if (allowedPaths && !allowedPaths.includes(ROUTES.LEARN)) {
-    return { fallback: false, paths: [] };
-  }
-
   return {
     fallback: false,
     paths: buildStaticPaths([...DOCS_DIRS, LEARN_DIR]),
