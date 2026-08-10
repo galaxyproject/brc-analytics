@@ -33,10 +33,20 @@ class GalaxyJobSubmission(BaseModel):
     )
 
 
+MAX_QUERY_BASES = 2500
+
+
 class KmindexQuerySubmission(BaseModel):
     """Request model for a Logan/kmindex sequence search."""
 
-    sequence: str = Field(..., description="Query sequence in FASTA format")
+    # max_length is a cheap guard on the raw payload so a multi-megabyte body
+    # is rejected before it is parsed; single_record/max_bases below enforce
+    # the real limit on base count.
+    sequence: str = Field(
+        ...,
+        max_length=MAX_QUERY_BASES * 4,
+        description="Query sequence in FASTA format",
+    )
     index: str = Field(
         ..., description="kmindex index name, e.g. 'METAGENOMIC_ENV' or 'GENOMIC_BCT'"
     )
@@ -65,6 +75,23 @@ class KmindexQuerySubmission(BaseModel):
             raise ValueError(
                 "Submit one sequence per query; multi-record FASTA is not supported"
             )
+        return value
+
+    @field_validator("sequence")
+    @classmethod
+    def within_base_limit(cls, value: str) -> str:
+        """
+        Cap the query at MAX_QUERY_BASES actual bases.
+
+        The UI enforces the same ceiling, but the UI is not the only caller --
+        without this the limit is advisory and a direct API request can hand
+        an arbitrarily long query to a 96-core node.
+        """
+        bases = sum(
+            len(line.strip()) for line in value.splitlines() if not line.startswith(">")
+        )
+        if bases > MAX_QUERY_BASES:
+            raise ValueError(f"Query is {bases} bases; the limit is {MAX_QUERY_BASES}")
         return value
 
 

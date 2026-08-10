@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError
 
-from app.models.galaxy import KmindexQuerySubmission
+from app.models.galaxy import MAX_QUERY_BASES, KmindexQuerySubmission
 from app.services.galaxy_service import GalaxyService
 
 
@@ -148,3 +148,30 @@ class TestQueryValidation:
 
     def test_headerless_sequence_accepted(self):
         assert KmindexQuerySubmission(sequence="ACGT", index="GENOMIC_BCT")
+
+
+class TestQueryLengthCap:
+    """The UI enforces the same ceiling, but the UI is not the only caller."""
+
+    def test_over_limit_rejected(self):
+        with pytest.raises(ValidationError, match="the limit is 2500"):
+            KmindexQuerySubmission(
+                sequence=">q\n" + "A" * (MAX_QUERY_BASES + 1), index="GENOMIC_BCT"
+            )
+
+    def test_at_limit_accepted(self):
+        assert KmindexQuerySubmission(
+            sequence=">q\n" + "A" * MAX_QUERY_BASES, index="GENOMIC_BCT"
+        )
+
+    def test_header_and_newlines_do_not_count_toward_the_limit(self):
+        """A long header shouldn't push an otherwise-legal query over."""
+        wrapped = "\n".join("A" * 60 for _ in range(MAX_QUERY_BASES // 60))
+        assert KmindexQuerySubmission(
+            sequence=">" + "n" * 200 + "\n" + wrapped, index="GENOMIC_BCT"
+        )
+
+    def test_oversized_payload_rejected_before_parsing(self):
+        """max_length guards against a multi-megabyte body reaching the validators."""
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(sequence="A" * 100_000, index="GENOMIC_BCT")
