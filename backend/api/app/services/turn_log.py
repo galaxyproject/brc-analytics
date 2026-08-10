@@ -28,6 +28,23 @@ from app.models.assistant import TurnTelemetry
 
 logger = logging.getLogger(__name__)
 
+
+def _strip_nuls(value):
+    """Remove NUL characters, which Postgres rejects in text and jsonb.
+
+    A NUL is legal in a Python str and in JSON, so a user can paste one into
+    the chat box and -- because this writer is fail-open -- silently keep the
+    whole turn out of the corpus. Scrubbing beats losing the row.
+    """
+    if isinstance(value, str):
+        return value.replace("\x00", "")
+    if isinstance(value, dict):
+        return {k: _strip_nuls(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_strip_nuls(v) for v in value]
+    return value
+
+
 # Detached writes need a strong reference or the loop may collect them
 # mid-flight. Discarded on completion.
 _pending_writes: set[asyncio.Task] = set()
@@ -56,20 +73,38 @@ async def drain(timeout: float = 5.0) -> None:
     """
     if not _pending_writes:
         return
-    pending = list(_pending_writes)
-    logger.info("Waiting on %d in-flight turn log writes", len(pending))
-    await asyncio.wait(pending, timeout=timeout)
+    tasks = list(_pending_writes)
+    logger.info("Waiting on %d in-flight turn log writes", len(tasks))
+    _, still_running = await asyncio.wait(tasks, timeout=timeout)
+    if still_running:
+        # Cancel rather than abandon: close_db() is next and nulls the engine,
+        # so a straggler reaching db_session() would build a fresh engine and
+        # connection pool that nothing will ever dispose.
+        logger.warning(
+            "Giving up on %d turn log writes still running at shutdown",
+            len(still_running),
+        )
+        for task in still_running:
+            task.cancel()
+        await asyncio.gather(*still_running, return_exceptions=True)
 
 
 async def _write_with_timeout(telemetry: TurnTelemetry) -> None:
     """Never raises -- this runs detached, so an escape would be unhandled."""
     settings = get_settings()
-    try:
+
+    async def _acquire_and_write() -> None:
+        # Inside the timeout: with only a couple of slots, queueing for one is
+        # exactly where a write stalls, and a bound that excluded the wait
+        # would let a backlog outlive the drain and die at close_db().
         async with _write_slots:
-            await asyncio.wait_for(
-                _write(telemetry),
-                timeout=settings.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS,
-            )
+            await _write(telemetry)
+
+    try:
+        await asyncio.wait_for(
+            _acquire_and_write(),
+            timeout=settings.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS,
+        )
     except asyncio.TimeoutError:
         # Reported, not just logged: a silently incomplete corpus looks
         # exactly like a quiet beta.
@@ -105,13 +140,13 @@ async def _write(telemetry: TurnTelemetry) -> None:
             session_id=telemetry.session_id,
             turn_index=telemetry.turn_index,
             user_id=user_id,
-            user_message=telemetry.user_message,
-            assistant_reply=telemetry.assistant_reply,
+            user_message=_strip_nuls(telemetry.user_message),
+            assistant_reply=_strip_nuls(telemetry.assistant_reply),
             outcome=telemetry.outcome.value,
             error_kind=telemetry.error_kind,
-            transcript=telemetry.transcript,
+            transcript=_strip_nuls(telemetry.transcript),
             transcript_truncated=telemetry.transcript_truncated,
-            schema_state=telemetry.schema_state,
+            schema_state=_strip_nuls(telemetry.schema_state),
             input_tokens=usage.input_tokens,
             output_tokens=usage.output_tokens,
             total_tokens=usage.total_tokens,
@@ -128,6 +163,16 @@ async def purge_expired(days: int | None = None) -> int:
     settings = get_settings()
     if days is None:
         days = settings.ASSISTANT_TURN_LOG_RETENTION_DAYS
+    if days < 1:
+        # 0 reads like "no expiry" but computes a cutoff of now, which deletes
+        # the whole table on the next sweep. The CLI already rejects this.
+        logger.error(
+            "Refusing to purge: ASSISTANT_TURN_LOG_RETENTION_DAYS=%s is not a "
+            "positive number of days. Use ASSISTANT_TURN_LOG_PURGE_ENABLED to "
+            "turn the sweep off.",
+            days,
+        )
+        return 0
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     async with db_session() as session:
         return await purge_assistant_turn_logs_before(session, cutoff)

@@ -2,7 +2,7 @@
 """Delete assistant turn logs past the retention window (#1294).
 
 The app already runs this sweep on a timer (see
-app/services/turn_log_retention.py) -- retention does not depend on this
+app/services/turn_log.py) -- retention does not depend on this
 script. It exists for manual use: verifying the window, forcing an immediate
 purge after a config change, or running a one-off with a shorter window.
 
@@ -79,10 +79,16 @@ def main() -> int:
         logger.error("--days must be at least 1")
         return 1
 
-    try:
-        return asyncio.run(_run(args.days, args.dry_run))
-    finally:
-        asyncio.run(close_db())
+    async def _main() -> int:
+        # One loop for both: close_db() disposes asyncpg connections bound to
+        # the loop that created them, so a second asyncio.run() would try to
+        # close sockets on a dead loop and log "Event loop is closed".
+        try:
+            return await _run(args.days, args.dry_run)
+        finally:
+            await close_db()
+
+    return asyncio.run(_main())
 
 
 if __name__ == "__main__":

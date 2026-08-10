@@ -66,6 +66,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
   // exactly when it's the only way to clear a bad session id.
   const showReset = messages.length > 0 || schema !== null || error !== null;
   const modelLabel = formatModelLabel(info);
+  const retentionNotice = formatRetentionNotice(info);
 
   return (
     <StyledSection>
@@ -119,13 +120,20 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           AI assistant — {modelLabel}. Your messages are sent to the model
           provider to generate a response, so avoid sharing sensitive or
           identifying information. Responses can be inaccurate; verify anything
-          important before relying on it. During the beta, conversations are
-          logged so we can improve the assistant, then deleted after 90 days.
+          important before relying on it.{retentionNotice}
         </AssistantDisclaimer>
       </SectionContent>
     </StyledSection>
   );
 };
+
+function formatRetentionNotice(info: AssistantInfoResponse | null): string {
+  // Served by /info rather than hardcoded: the window is configurable and the
+  // sweep can be off, and a stale privacy promise is worse than a vague one.
+  const days = info?.turn_log_retention_days;
+  if (!days) return "";
+  return ` During the beta, conversations are logged so we can improve the assistant, then deleted after ${days} days.`;
+}
 
 function formatModelLabel(info: AssistantInfoResponse | null): string {
   if (info === null) return "powered by AI";

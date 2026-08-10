@@ -241,3 +241,11 @@ class AssistantInfoResponse(BaseModel):
     provider: Optional[str] = Field(
         None, description="Provider hosting the model (e.g. 'anthropic', 'openai')"
     )
+    turn_log_retention_days: Optional[int] = Field(
+        None,
+        description=(
+            "Days conversations are kept before deletion, or null when turn "
+            "logging is off. Served so the UI notice can't promise a window "
+            "the deployment isn't enforcing."
+        ),
+    )

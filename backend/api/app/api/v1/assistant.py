@@ -42,10 +42,21 @@ async def assistant_info(
 ):
     """Surface assistant configuration for UI attribution (model + provider)."""
     available = agent.is_available()
+    settings = agent.settings
+    # Only advertise a window the deployment actually enforces -- logging on,
+    # a sink to write to, and a sweep that will delete.
+    logging_on = (
+        settings.ASSISTANT_TURN_LOGGING_ENABLED
+        and bool(settings.DATABASE_URL)
+        and settings.ASSISTANT_TURN_LOG_PURGE_ENABLED
+    )
     return AssistantInfoResponse(
         available=available,
-        model=agent.settings.AI_PRIMARY_MODEL if available else None,
+        model=settings.AI_PRIMARY_MODEL if available else None,
         provider=agent.get_provider() if available else None,
+        turn_log_retention_days=(
+            settings.ASSISTANT_TURN_LOG_RETENTION_DAYS if logging_on else None
+        ),
     )
 
 

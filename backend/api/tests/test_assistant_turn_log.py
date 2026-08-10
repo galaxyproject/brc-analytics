@@ -24,7 +24,7 @@ from app.db.crud import (
     upsert_user_from_claims,
 )
 from app.db.models import AssistantTurnLog, Base
-from app.models.assistant import TurnOutcome, TurnTelemetry
+from app.models.assistant import TokenUsage, TurnOutcome, TurnTelemetry
 from app.services import turn_log
 
 # app_with_stubbed_agent / client come from tests/conftest.py.
@@ -257,11 +257,22 @@ class TestChatEndpointLogging:
         # The default docker-compose stack runs without DATABASE_URL. Wiring
         # the write as a FastAPI dependency would 500 every chat there, since
         # get_db_session() raises before the handler body runs.
+        from app.core.config import get_settings
+
         monkeypatch.delenv("DATABASE_URL", raising=False)
+        # The fixture already built a Settings, so without this the delenv
+        # above changes nothing and the test passes on a machine that has a
+        # DATABASE_URL exported -- i.e. it proves the opposite of its name.
+        get_settings.cache_clear()
+        assert not get_settings().DATABASE_URL
+
+        scheduled = []
+        monkeypatch.setattr(turn_log, "_write_with_timeout", scheduled.append)
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
         assert resp.status_code == 200
+        assert scheduled == []
         assert resp.json()["reply"] == "hi"
 
 
@@ -592,3 +603,181 @@ class TestAgentRecordsFailures:
 
         assert len(recorded) == 1
         assert recorded[0].outcome == TurnOutcome.SUCCESS
+
+
+@pytest.mark.asyncio
+async def test_write_maps_every_telemetry_field_onto_a_column(monkeypatch):
+    """Exercise the real TurnTelemetry -> column mapping.
+
+    crud takes **fields, so a renamed column or a typo'd key is a TypeError
+    raised inside a fail-open handler: chats keep returning 200 while the
+    table stays empty. Every other test either builds its own kwargs dict or
+    monkeypatches _write out, so nothing else runs this mapping.
+    """
+    from contextlib import asynccontextmanager
+
+    session_factory = await _create_session_factory()
+
+    async with session_factory() as session:
+
+        @asynccontextmanager
+        async def _fake_session():
+            yield session
+
+        monkeypatch.setattr(turn_log, "db_session", _fake_session)
+
+        telemetry = TurnTelemetry(
+            turn_id=uuid.uuid4(),
+            session_id="sess-map",
+            turn_index=4,
+            user_message="what assemblies exist?",
+            assistant_reply="these ones",
+            transcript=[{"kind": "response"}],
+            transcript_truncated=True,
+            schema_state={"organism": {"value": "yeast"}},
+            token_usage=TokenUsage(
+                input_tokens=1,
+                output_tokens=2,
+                total_tokens=3,
+                requests=1,
+                tool_calls=2,
+            ),
+            latency_ms=99,
+            model="m",
+            provider="p",
+        )
+
+        await turn_log._write(telemetry)
+
+        row = (
+            await session.execute(
+                select(AssistantTurnLog).where(
+                    AssistantTurnLog.session_id == "sess-map"
+                )
+            )
+        ).scalar_one()
+
+        assert row.turn_id == telemetry.turn_id
+        assert row.turn_index == 4
+        assert row.user_message == "what assemblies exist?"
+        assert row.assistant_reply == "these ones"
+        assert row.outcome == "success"
+        assert row.transcript == [{"kind": "response"}]
+        assert row.transcript_truncated is True
+        assert row.schema_state == {"organism": {"value": "yeast"}}
+        assert (row.input_tokens, row.output_tokens, row.total_tokens) == (1, 2, 3)
+        assert (row.requests, row.tool_calls) == (1, 2)
+        assert row.latency_ms == 99
+        assert (row.model, row.provider) == ("m", "p")
+
+
+@pytest.mark.asyncio
+async def test_nul_bytes_are_scrubbed_so_postgres_accepts_the_row(monkeypatch):
+    """A NUL is legal in a str and in JSON but Postgres rejects it.
+
+    The writer is fail-open, so without scrubbing a user could keep their whole
+    conversation out of the corpus by pasting one character.
+    """
+    from contextlib import asynccontextmanager
+
+    session_factory = await _create_session_factory()
+
+    async with session_factory() as session:
+
+        @asynccontextmanager
+        async def _fake_session():
+            yield session
+
+        monkeypatch.setattr(turn_log, "db_session", _fake_session)
+
+        await turn_log._write(
+            TurnTelemetry(
+                session_id="sess-nul",
+                user_message="before\x00after",
+                assistant_reply="reply\x00here",
+                transcript=[{"content": "tool\x00return"}],
+                schema_state={"organism": {"value": "yeast\x00"}},
+            )
+        )
+
+        row = (
+            await session.execute(
+                select(AssistantTurnLog).where(
+                    AssistantTurnLog.session_id == "sess-nul"
+                )
+            )
+        ).scalar_one()
+
+        assert "\x00" not in row.user_message
+        assert "\x00" not in row.assistant_reply
+        assert row.user_message == "beforeafter"
+        assert row.transcript == [{"content": "toolreturn"}]
+        assert row.schema_state == {"organism": {"value": "yeast"}}
+
+
+@pytest.mark.asyncio
+async def test_a_rejected_session_is_never_recorded():
+    """A 403 must not file the caller's text under the owner's session.
+
+    Session ids travel in URLs, and the review queries don't filter on
+    outcome -- so a recorded PermissionError would put a stranger's message
+    inside someone else's conversation.
+    """
+    from app.models.assistant import AnalysisSchema, SessionState
+
+    agent = _stub_agent()
+    state = SessionState(session_id="victim", schema_state=AnalysisSchema())
+    agent.session_service = SimpleNamespace(
+        create_session=AsyncMock(return_value=state),
+        require_session=AsyncMock(side_effect=PermissionError("victim")),
+        save_session=AsyncMock(),
+    )
+    recorded = []
+
+    with pytest.raises(PermissionError):
+        await agent.chat_with_telemetry(
+            "let me see someone else's chat",
+            session_id="victim",
+            on_turn=recorded.append,
+        )
+
+    assert recorded == []
+
+
+@pytest.mark.asyncio
+async def test_a_nonpositive_retention_window_refuses_to_purge(monkeypatch):
+    """0 reads like "no expiry" but computes a cutoff of now."""
+    from contextlib import asynccontextmanager
+
+    session_factory = await _create_session_factory()
+    async with session_factory() as session:
+        session.add_all([_turn_row(1, session_id="fresh")])
+        await session.commit()
+
+        @asynccontextmanager
+        async def _fake_session():
+            yield session
+
+        monkeypatch.setattr(turn_log, "db_session", _fake_session)
+        monkeypatch.setenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "0")
+        from app.core.config import get_settings
+
+        get_settings.cache_clear()
+
+        assert await turn_log.purge_expired() == 0
+        remaining = await session.execute(select(AssistantTurnLog.session_id))
+        assert list(remaining.scalars().all()) == ["fresh"]
+
+
+@pytest.mark.asyncio
+async def test_drain_cancels_stragglers_so_none_outlive_close_db():
+    """A leftover write would rebuild the engine that close_db just disposed."""
+    import asyncio as aio
+
+    task = aio.create_task(aio.sleep(30))
+    turn_log._pending_writes.add(task)
+    task.add_done_callback(turn_log._pending_writes.discard)
+
+    await turn_log.drain(timeout=0.05)
+
+    assert task.cancelled() or task.done()

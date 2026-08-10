@@ -1710,6 +1710,7 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
                 total_tokens=2,
             ),
             all_messages=lambda: [],
+            new_messages=lambda: [],
         )
     )
     agent._extract_state = AsyncMock(

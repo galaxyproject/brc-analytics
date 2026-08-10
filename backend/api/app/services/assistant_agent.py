@@ -1021,6 +1021,13 @@ class AssistantAgent:
                 on_turn,
                 progress,
             )
+        except PermissionError:
+            # Session belongs to someone else. Recording it would file this
+            # caller's message text under the owner's session_id, and the
+            # review queries don't filter on outcome -- so a maintainer
+            # reading that conversation would see a stranger's message in it.
+            # A rejected request isn't a turn.
+            raise
         except Exception as exc:
             if on_turn is not None:
                 on_turn(
