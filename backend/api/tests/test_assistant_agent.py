@@ -17,6 +17,7 @@ from pydantic_ai.messages import (
     UserPromptPart,
 )
 
+from app.core.config import get_settings
 from app.models.assistant import (
     AnalysisSchema,
     AnalysisStateUpdate,
@@ -25,9 +26,7 @@ from app.models.assistant import (
     MessageRole,
     SchemaField,
     SessionState,
-    SuggestionChip,
 )
-from app.core.config import get_settings
 from app.services.assistant_agent import (
     MAX_HISTORY_MESSAGES,
     AssistantAgent,
