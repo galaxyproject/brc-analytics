@@ -608,7 +608,8 @@ def report_inconsistent_taxonomy_ids(df):
     inconsistent_ids_strings = [
         (
             f"{species} strain {strain}" if strain else species,
-            ", ".join([str(id) for id in ids]),
+            # Sort the IDs, since set iteration order isn't consistent between runs
+            ", ".join([str(id) for id in sorted(ids, key=int)]),
         )
         for (species, strain), ids in inconsistent_ids_series.items()
     ]
@@ -661,7 +662,10 @@ def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
         ),
         "leaves_missing_species": leaves_missing_species,
         "zero_assemblies_taxa": zero_assemblies_taxa,
-        "missing_ranks": set(taxonomic_levels) - present_ranks,
+        # Filter rather than taking a set difference, to report the ranks in the order given
+        "missing_ranks": [
+            level for level in taxonomic_levels if level not in present_ranks
+        ],
     }
 
 
@@ -1157,6 +1161,15 @@ def make_qc_report(
     organisms_not_species_rank=None,
     organisms_without_assemblies=None,
 ):
+    """
+    Render the catalog data QC report as markdown.
+
+    The report is committed to the repo, so its contents should be consistent between
+    runs on unchanged data. This function renders each list in the order given rather
+    than sorting it, so the callers are responsible for passing consistently-ordered
+    values. In particular, anything derived from a set needs sorting first, since set
+    iteration order isn't consistent between runs.
+    """
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
         list(missing_ncbi_assemblies) if len(missing_ncbi_assemblies) > 0 else []
@@ -1351,8 +1364,9 @@ def get_outbreak_taxonomy_ids(
     if source_outbreaks_df is None:
         return []
 
-    # Return list of unique taxonomy IDs, converted to strings
-    return list(
+    # Return list of unique taxonomy IDs, converted to strings and sorted for
+    # consistency between runs, since set iteration order isn't consistent
+    return sorted(
         {
             # Add primary taxonomy IDs
             *(
@@ -1371,7 +1385,8 @@ def get_outbreak_taxonomy_ids(
                 and "highlight_descendant_taxonomy_ids" in source_outbreaks_df.columns
                 else ()
             ),
-        }
+        },
+        key=int,
     )
 
 
@@ -1757,7 +1772,10 @@ def build_files(
     )
 
     # Single merge with the combined mapping
-    genomes_df = genomes_with_species_df.merge(ucsc_mapping, how="left", on="accession")
+    # The dataframe is sorted by accession for consistent output; any changes done after the sorting should preserve order
+    genomes_df = genomes_with_species_df.merge(
+        ucsc_mapping, how="left", on="accession"
+    ).sort_values("accession", kind="stable")
 
     qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1877,14 +1895,12 @@ def build_files(
                     "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
                 )
 
-    # Sort by accession for consistent output
-    genomes_df = genomes_df.sort_values("accession")
-
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
     print(f"Wrote to {genomes_output_path}")
 
     if extract_primary_data:
+        primarydata_df = primarydata_df.sort_values("accession", kind="stable")
         primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
         print(f"Wrote to {primary_output_path}")
 
