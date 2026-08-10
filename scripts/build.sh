@@ -3,8 +3,9 @@
 SITE="$1"
 ENV="$2"
 
-# Per-site apps build from sites/<site>; brc-analytics still builds at repo root.
+# Each site builds from its own sites/<site> app directory.
 case "$SITE" in
+	brc-analytics) PROJECT_DIR="sites/brc-analytics" ;;
 	ga2) PROJECT_DIR="sites/ga2" ;;
 	*) PROJECT_DIR="." ;;
 esac

@@ -43,6 +43,7 @@ backend/**/.env
 # favicons
 /public/favicons/*
 /sites/ga2/public/favicons/*
+/sites/brc-analytics/public/favicons/*
 
 # catalog build
 /catalog/build/temp
@@ -70,6 +71,7 @@ playwright-report/
 # public api
 /public/api
 /sites/ga2/public/api
+/sites/brc-analytics/public/api
 
 # Sentry Config File
 .env.sentry-build-plugin

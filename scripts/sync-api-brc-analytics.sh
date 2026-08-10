@@ -4,7 +4,7 @@ set -euo pipefail
 # JSON source root
 SRC_ROOT="catalog/output"
 
-API_DIR="public/api"
+API_DIR="sites/brc-analytics/public/api"
 mkdir -p "$API_DIR"
 
 PER_APP_JSONS=("assemblies" "organisms" "workflows" "workflow-assembly-mappings")

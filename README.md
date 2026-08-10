@@ -14,11 +14,11 @@ The app is written with TypeScript and Next.js. Because Next generates local-onl
 
 ## Using the development server
 
-The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`. For GA2, use `npm run dev:ga2`.
+The app can be run for development using `npm run dev:brc` (BRC) or `npm run dev:ga2` (GA2), and accessed at `http://localhost:3000`.
 
 ## Building the app locally
 
-Run `npm run build:local` to build. The built app can be run using `npm start`, and accessed at `http://localhost:3000`. For GA2, build with `npm run build-local:ga2` and serve with `npm run start:ga2`.
+Build with `npm run build-local:brc` (BRC) or `npm run build-local:ga2` (GA2), then serve the built app with `npm run start:brc` / `npm run start:ga2`, accessed at `http://localhost:3000`.
 
 ## Running the full stack with Docker
 
