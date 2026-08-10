@@ -6,8 +6,8 @@ import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
 
-// localStorage key for the assistant session id. Kept as-is to preserve
-// existing users' sessions across this refactor.
+// localStorage key for the assistant session id. Must stay stable so existing
+// users' saved sessions keep resolving.
 const SESSION_KEY = "brc-assistant-session-id";
 
 const INTRO_TEXT =

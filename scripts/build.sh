@@ -7,7 +7,7 @@ ENV="$2"
 case "$SITE" in
 	brc-analytics) PROJECT_DIR="sites/brc-analytics" ;;
 	ga2) PROJECT_DIR="sites/ga2" ;;
-	*) PROJECT_DIR="." ;;
+	*) echo "Unknown site: '$SITE' (expected brc-analytics or ga2)" >&2; exit 1 ;;
 esac
 
 DIR="./site-config/$SITE/images/favicons/"
