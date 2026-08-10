@@ -89,8 +89,35 @@ def get_rate_limiter() -> RateLimiter:
     return limiter
 
 
+@lru_cache(maxsize=1)
+def get_submit_rate_limiter() -> RateLimiter:
+    cache = get_cache_service()
+    settings = get_settings()
+    limiter = RateLimiter(
+        cache=cache,
+        requests=settings.SUBMIT_RATE_LIMIT_REQUESTS,
+        window=settings.SUBMIT_RATE_LIMIT_WINDOW,
+        namespace="ratelimit:submit",
+    )
+    logger.info(
+        f"Submit rate limiter initialized: {settings.SUBMIT_RATE_LIMIT_REQUESTS} "
+        f"submissions per {settings.SUBMIT_RATE_LIMIT_WINDOW}s"
+    )
+    return limiter
+
+
 async def check_rate_limit(request: Request) -> dict:
     rate_limiter = get_rate_limiter()
+    return await rate_limiter.check(request)
+
+
+async def check_submit_rate_limit(request: Request) -> dict:
+    """Rate limit for endpoints that launch Galaxy jobs.
+
+    Applied on top of check_rate_limit, not instead of it -- the general
+    budget still bounds request volume, this one bounds compute.
+    """
+    rate_limiter = get_submit_rate_limiter()
     return await rate_limiter.check(request)
 
 
@@ -149,3 +176,4 @@ def reset_all_services() -> None:
     get_sra_mirror_service.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()
+    get_submit_rate_limiter.cache_clear()

@@ -6,7 +6,12 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.cache import CacheService
-from app.core.dependencies import get_cache_service, get_sra_mirror_service
+from app.core.dependencies import (
+    check_rate_limit,
+    check_submit_rate_limit,
+    get_cache_service,
+    get_sra_mirror_service,
+)
 from app.models.galaxy import (
     GalaxyJobResponse,
     GalaxyJobResult,
@@ -46,6 +51,8 @@ async def galaxy_health(galaxy_service: GalaxyService = Depends(get_galaxy_servi
 async def submit_galaxy_job(
     submission: GalaxyJobSubmission,
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+    _submit_limit=Depends(check_submit_rate_limit),
 ):
     """
     Submit a job to Galaxy: upload tabular data and run random lines tool.
@@ -102,6 +109,7 @@ async def submit_galaxy_job(
 @router.get("/kmindex/indexes")
 async def list_kmindex_indexes(
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """List the Logan/kmindex indexes available on the Galaxy instance."""
     if not galaxy_service.is_available():
@@ -121,6 +129,8 @@ async def list_kmindex_indexes(
 async def submit_kmindex_query(
     submission: KmindexQuerySubmission,
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+    _submit_limit=Depends(check_submit_rate_limit),
 ):
     """Submit a Logan/kmindex sequence search. Poll the returned job_id for status."""
     try:
@@ -154,6 +164,7 @@ async def get_kmindex_results(
     limit: int = Query(default=100, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """
     Get merged, score-ranked hits from a completed kmindex query.
@@ -184,7 +195,9 @@ async def get_kmindex_results(
 
 @router.get("/jobs/{job_id}/status", response_model=GalaxyJobStatus)
 async def get_job_status(
-    job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
+    job_id: str,
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """Get the current status of a Galaxy job."""
     try:
@@ -209,7 +222,9 @@ async def get_job_status(
 
 @router.get("/jobs/{job_id}/results", response_model=GalaxyJobResult)
 async def get_job_results(
-    job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
+    job_id: str,
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """Get the complete results from a finished Galaxy job."""
     try:
@@ -249,6 +264,7 @@ async def get_job_details(
     job_id: str,
     include_results: bool = False,
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """
     Get comprehensive job information including status and optionally results.
@@ -300,6 +316,7 @@ async def cancel_job(
 @router.post("/test-connection")
 async def test_galaxy_connection(
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """Test connection to Galaxy API (admin/debug endpoint)."""
     try:

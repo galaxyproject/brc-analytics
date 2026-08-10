@@ -132,6 +132,16 @@ class Settings:
         self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
         self.RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
 
+        # Job submission is rate limited far more tightly than ordinary reads.
+        # One kmindex query takes a 96-core node for up to 48h, so the general
+        # budget (100/min) is no protection at all on those endpoints.
+        self.SUBMIT_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_REQUESTS", "5")
+        )
+        self.SUBMIT_RATE_LIMIT_WINDOW: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_WINDOW", "3600")
+        )
+
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
         # header itself -- otherwise clients can spoof IPs.
