@@ -1,4 +1,4 @@
-import { SLUGIFY_OPTIONS } from "@/common/constants";
+import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
 import {
   getPriorityColor,
   getPriorityLabel,

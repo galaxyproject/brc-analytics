@@ -1,5 +1,5 @@
-import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type Outbreak } from "@brc/apis/outbreak";
+import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { type AppEntityConfig } from "@repo/shared/config/types";
 import { priorityPathogenMainColumn } from "@site-config/brc-analytics/local/entity/priorityPathogen/priorityPathogenMainColumn";

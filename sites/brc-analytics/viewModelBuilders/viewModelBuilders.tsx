@@ -1,9 +1,9 @@
-import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { type Outbreak } from "@brc/apis/outbreak";
 import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
+import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
