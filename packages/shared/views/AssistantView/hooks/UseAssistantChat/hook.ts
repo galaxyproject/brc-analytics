@@ -8,8 +8,6 @@ import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const SESSION_KEY = "brc-assistant-session-id";
-
 interface ChatMessageDisplay {
   content: string;
   role: "user" | "assistant";
@@ -34,6 +32,7 @@ interface UseAssistantChatReturn {
 
 interface UseAssistantChatOptions {
   initialSessionId?: string;
+  sessionKey: string;
 }
 
 /**
@@ -42,11 +41,13 @@ interface UseAssistantChatOptions {
  * `initialSessionId` from URL params takes precedence over the stored value.
  * @param root0 - Hook options.
  * @param root0.initialSessionId - Existing assistant session to continue.
+ * @param root0.sessionKey - localStorage key under which the session id is stored.
  * @returns Chat state, sendMessage, save/reset/retry functions.
  */
 export const useAssistantChat = ({
   initialSessionId,
-}: UseAssistantChatOptions = {}): UseAssistantChatReturn => {
+  sessionKey,
+}: UseAssistantChatOptions): UseAssistantChatReturn => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
@@ -69,7 +70,7 @@ export const useAssistantChat = ({
   // Either way we call the restore endpoint so we get computed handoff state
   // (handoff_url, is_complete, suggestions), not just messages + schema.
   useEffect(() => {
-    const sourceId = initialSessionId ?? localStorage.getItem(SESSION_KEY);
+    const sourceId = initialSessionId ?? localStorage.getItem(sessionKey);
     if (!sourceId) return;
 
     let cancelled = false;
@@ -84,7 +85,7 @@ export const useAssistantChat = ({
       .then((restored) => {
         if (cancelled) return;
         sessionIdRef.current = restored.session_id;
-        localStorage.setItem(SESSION_KEY, restored.session_id);
+        localStorage.setItem(sessionKey, restored.session_id);
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
@@ -112,8 +113,8 @@ export const useAssistantChat = ({
         sessionIdRef.current = null;
         // Only clear the pointer if it's still the one that failed -- a newer
         // session may have replaced it while this request was in flight.
-        if (localStorage.getItem(SESSION_KEY) === sourceId) {
-          localStorage.removeItem(SESSION_KEY);
+        if (localStorage.getItem(sessionKey) === sourceId) {
+          localStorage.removeItem(sessionKey);
         }
         // Only worth mentioning if the id came from the URL; a stale
         // localStorage pointer going bad is routine.
@@ -128,49 +129,52 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-  }, [initialSessionId]);
+  }, [initialSessionId, sessionKey]);
 
-  const sendMessage = useCallback(async (message: string): Promise<void> => {
-    if (!message.trim() || sendingRef.current) return;
-    sendingRef.current = true;
+  const sendMessage = useCallback(
+    async (message: string): Promise<void> => {
+      if (!message.trim() || sendingRef.current) return;
+      sendingRef.current = true;
 
-    setLoading(true);
-    setError(null);
-    setLastFailedMessage(null);
-    setSaveMessage(null);
+      setLoading(true);
+      setError(null);
+      setLastFailedMessage(null);
+      setSaveMessage(null);
 
-    // Add user message immediately for responsiveness
-    setMessages((prev) => [...prev, { content: message, role: "user" }]);
+      // Add user message immediately for responsiveness
+      setMessages((prev) => [...prev, { content: message, role: "user" }]);
 
-    try {
-      const response: AssistantChatResponse =
-        await assistantAPIClient.assistantChat({
-          message,
-          session_id: sessionIdRef.current ?? undefined,
-        });
+      try {
+        const response: AssistantChatResponse =
+          await assistantAPIClient.assistantChat({
+            message,
+            session_id: sessionIdRef.current ?? undefined,
+          });
 
-      sessionIdRef.current = response.session_id;
-      localStorage.setItem(SESSION_KEY, response.session_id);
+        sessionIdRef.current = response.session_id;
+        localStorage.setItem(sessionKey, response.session_id);
 
-      // Add assistant reply
-      setMessages((prev) => [
-        ...prev,
-        { content: response.reply, role: "assistant" },
-      ]);
+        // Add assistant reply
+        setMessages((prev) => [
+          ...prev,
+          { content: response.reply, role: "assistant" },
+        ]);
 
-      setSchema(response.schema_state);
-      setSuggestions(response.suggestions);
-      setIsComplete(response.is_complete);
-      setHandoffUrl(response.handoff_url);
-    } catch (err) {
-      const errorMessage = handleChatError(err);
-      setError(errorMessage);
-      setLastFailedMessage(message);
-    } finally {
-      setLoading(false);
-      sendingRef.current = false;
-    }
-  }, []);
+        setSchema(response.schema_state);
+        setSuggestions(response.suggestions);
+        setIsComplete(response.is_complete);
+        setHandoffUrl(response.handoff_url);
+      } catch (err) {
+        const errorMessage = handleChatError(err);
+        setError(errorMessage);
+        setLastFailedMessage(message);
+      } finally {
+        setLoading(false);
+        sendingRef.current = false;
+      }
+    },
+    [sessionKey]
+  );
 
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
@@ -187,7 +191,7 @@ export const useAssistantChat = ({
       assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
     sessionIdRef.current = null;
-    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(sessionKey);
     // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
     // means a reload restores the conversation we just walked away from and
     // orphans whatever replaced it.
@@ -210,7 +214,7 @@ export const useAssistantChat = ({
     setError(null);
     setLastFailedMessage(null);
     setSaveMessage(null);
-  }, [router]);
+  }, [router, sessionKey]);
 
   const saveAnalysis = useCallback(async (): Promise<void> => {
     if (!sessionIdRef.current) {

@@ -19,11 +19,22 @@ import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Headline } from "./components/Headline/headline";
 import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
+// Generic fallback intro shown before any messages; a site may override it via
+// the introText prop.
+const DEFAULT_INTRO_TEXT =
+  "Welcome! I can help you explore the catalog -- organisms, assemblies, and workflows -- and set up an analysis to run in Galaxy. Try naming an organism or an analysis type to get started.";
+
 interface Props {
   initialSessionId?: string;
+  introText?: string;
+  sessionKey: string;
 }
 
-export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
+export const AssistantView = ({
+  initialSessionId,
+  introText = DEFAULT_INTRO_TEXT,
+  sessionKey,
+}: Props): JSX.Element => {
   const {
     error,
     handoffUrl,
@@ -40,6 +51,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     suggestions,
   } = useAssistantChat({
     initialSessionId,
+    sessionKey,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
   // Read per-site via findable-ui's getConfig rather than importing one site's
@@ -100,6 +112,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           <ChatColumn>
             <ChatPanel
               error={error}
+              introText={introText}
               isRestoring={isRestoring}
               loading={loading}
               messages={messages}
