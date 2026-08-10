@@ -3,6 +3,6 @@ export const ROUTES = {
   ASSISTANT: "/assistant",
   CALENDAR: "/calendar",
   LEARN: "/learn",
-  PRIORITY_PATHOGEN: "/data/[entityListType]/[entityId]",
+  PRIORITY_PATHOGEN: "/data/priority-pathogens/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
 };

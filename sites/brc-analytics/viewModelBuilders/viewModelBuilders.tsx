@@ -306,7 +306,6 @@ export const buildPriorityPathogen = (entity: {
             pathname: SITE_ROUTES.PRIORITY_PATHOGEN,
             query: {
               entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
-              entityListType: "priority-pathogens",
             },
           });
         }
