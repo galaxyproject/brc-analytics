@@ -1184,13 +1184,13 @@ class AssistantAgent:
         budget = self.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES
 
         # Fast path: most turns fit, so one encode beats one per message.
-        if len(json.dumps(messages, default=str)) <= budget:
+        if len(json.dumps(messages, default=str).encode()) <= budget:
             return messages, False
 
         kept: list = []
         used = 0
         for message in messages:
-            size = len(json.dumps(message, default=str))
+            size = len(json.dumps(message, default=str).encode())
             if used + size > budget:
                 break
             kept.append(message)

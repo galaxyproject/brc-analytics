@@ -28,8 +28,8 @@ from app.core.dependencies import (
     reset_all_services,
 )
 from app.db.session import close_db, init_db
-from app.services.mcp_server import create_mcp_server
 from app.services import turn_log
+from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
 
