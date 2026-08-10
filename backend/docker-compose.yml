@@ -32,6 +32,12 @@ services:
       - "8000:8000"
     volumes:
       - ../catalog:/catalog:ro
+      # The SRA metadata mirror is a DuckDB file on the host, so it has to be
+      # mounted in as well as configured. Set SRA_MIRROR_HOST_PATH to the
+      # .duckdb file and SRA_MIRROR_PATH=/data/sra-mirror.duckdb in api/.env.
+      # Both are needed: with only the variable set the path does not exist in
+      # the container, and with only the mount the service stays disabled.
+      - ${SRA_MIRROR_HOST_PATH:-/dev/null}:/data/sra-mirror.duckdb:ro
     depends_on:
       redis:
         condition: service_healthy
