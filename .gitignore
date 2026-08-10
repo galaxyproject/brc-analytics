@@ -30,6 +30,9 @@ backend/**/.env
 # typescript
 *.tsbuildinfo
 
+# swc plugin cache
+.swc/
+
 # editors
 /.vscode
 .idea
