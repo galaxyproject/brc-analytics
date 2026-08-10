@@ -14,7 +14,13 @@ logger = logging.getLogger(__name__)
 class RateLimiter:
     """Redis-based rate limiter using sliding window counter"""
 
-    def __init__(self, cache: CacheService, requests: int, window: int):
+    def __init__(
+        self,
+        cache: CacheService,
+        requests: int,
+        window: int,
+        namespace: str = "ratelimit",
+    ):
         """
         Initialize rate limiter.
 
@@ -22,10 +28,14 @@ class RateLimiter:
             cache: Redis cache service
             requests: Maximum requests allowed in window
             window: Time window in seconds
+            namespace: Redis key prefix. Limiters with different budgets must
+                use different namespaces, or they share one counter and the
+                strictest budget is spent by traffic meant for the loosest.
         """
         self.cache = cache
         self.requests = requests
         self.window = window
+        self.namespace = namespace
 
     def _get_client_key(self, request: Request) -> str:
         """Generate rate limit key for a client based on IP address.
@@ -45,7 +55,7 @@ class RateLimiter:
                     if candidate:
                         client_ip = candidate
                         break
-        return f"ratelimit:{client_ip}"
+        return f"{self.namespace}:{client_ip}"
 
     async def check(self, request: Request) -> dict:
         """
