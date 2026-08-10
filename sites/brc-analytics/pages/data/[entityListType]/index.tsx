@@ -1,14 +1,10 @@
-import { getEntityListMeta } from "@/common/meta/utils";
-import { config } from "@/config/config";
+import { config } from "@brc/config/config";
+import { BRC_PAGE_META } from "@brc/meta/constants";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { EntitiesView } from "@repo/shared/views/EntitiesView/entitiesView";
 import type { Props as EntitiesPageProps } from "@repo/shared/views/EntitiesView/types";
-import {
-  type GetStaticPaths,
-  type GetStaticProps,
-  type GetStaticPropsContext,
-} from "next";
+import { type GetStaticPaths, type GetStaticProps } from "next";
 import { type ParsedUrlQuery } from "querystring";
 import { type JSX } from "react";
 
@@ -16,12 +12,14 @@ interface Params extends ParsedUrlQuery {
   entityListType: string;
 }
 
-/**
- * Explore view page for client-side loaded entity lists (assemblies, organisms).
- * @param props - Page props.
- * @param props.entityListType - Entity list type.
- * @returns EntitiesView component.
- */
+const ENTITY_LIST_META: Record<
+  string,
+  { pageDescription: string; pageTitle: string }
+> = {
+  assemblies: BRC_PAGE_META.ASSEMBLIES,
+  organisms: BRC_PAGE_META.ORGANISMS,
+};
+
 const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
   if (!entityListType) return <></>;
 
@@ -32,51 +30,37 @@ const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
   );
 };
 
-/**
- * Build the list of paths to be built statically.
- * @returns static paths.
- */
 export const getStaticPaths: GetStaticPaths = async () => {
-  const appConfig = config();
-  const entities = appConfig.entities;
-  const paths = entities
+  const paths = config()
     // Workflows has no explore list page; priority-pathogens has its own page.
-    .filter(
+    .entities.filter(
       (entity) =>
         entity.route !== "workflows" && entity.route !== "priority-pathogens"
     )
-    .map((entity) => ({
-      params: {
-        entityListType: entity.route,
-      },
-    }));
+    .map((entity) => ({ params: { entityListType: entity.route } }));
   return {
     fallback: false,
     paths,
   };
 };
 
-/**
- * Build the set of props for pre-rendering of page.
- * @param context - Object containing values related to the current context.
- * @returns static props.
- */
-export const getStaticProps: GetStaticProps<EntitiesPageProps> = async (
-  context: GetStaticPropsContext
-) => {
-  const appConfig = config();
-  const { entityListType } = context.params as Params;
-  const entityMeta = getEntityListMeta(appConfig.appKey)[entityListType];
+export const getStaticProps: GetStaticProps<
+  EntitiesPageProps,
+  Params
+> = async ({ params }) => {
+  if (!params?.entityListType) return { notFound: true };
+
+  const entityMeta = ENTITY_LIST_META[params.entityListType];
 
   return {
     props: {
-      entityListType,
+      entityListType: params.entityListType,
       pageDescription: entityMeta?.pageDescription,
       pageTitle: entityMeta?.pageTitle,
     },
   };
 };
 
-Page.Main = DXMain;
-
 export default Page;
+
+Page.Main = DXMain;
