@@ -1775,7 +1775,7 @@ def build_files(
     # The dataframe is sorted by accession for consistent output; any changes done after the sorting should preserve order
     genomes_df = genomes_with_species_df.merge(
         ucsc_mapping, how="left", on="accession"
-    ).sort_values("accession")
+    ).sort_values("accession", kind="stable")
 
     qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1900,7 +1900,7 @@ def build_files(
     print(f"Wrote to {genomes_output_path}")
 
     if extract_primary_data:
-        primarydata_df = primarydata_df.sort_values("accession")
+        primarydata_df = primarydata_df.sort_values("accession", kind="stable")
         primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
         print(f"Wrote to {primary_output_path}")
 
