@@ -4,7 +4,7 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { type Locator, type Page } from "@playwright/test";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { expect, test } from "../utils/fixtures";
+import { expect, test } from "./utils/fixtures";
 
 /**
  * Test URLs using real catalog data.
