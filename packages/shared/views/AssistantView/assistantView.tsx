@@ -19,20 +19,15 @@ import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Headline } from "./components/Headline/headline";
 import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
-// Generic fallback intro shown before any messages; a site may override it via
-// the introText prop.
-const DEFAULT_INTRO_TEXT =
-  "Welcome! I can help you explore the catalog -- organisms, assemblies, and workflows -- and set up an analysis to run in Galaxy. Try naming an organism or an analysis type to get started.";
-
 interface Props {
   initialSessionId?: string;
-  introText?: string;
+  introText: string;
   sessionKey: string;
 }
 
 export const AssistantView = ({
   initialSessionId,
-  introText = DEFAULT_INTRO_TEXT,
+  introText,
   sessionKey,
 }: Props): JSX.Element => {
   const {

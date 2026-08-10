@@ -10,6 +10,9 @@ import { type JSX } from "react";
 // existing users' sessions across this refactor.
 const SESSION_KEY = "brc-assistant-session-id";
 
+const INTRO_TEXT =
+  "Welcome! I can help you explore the BRC catalog -- organisms, assemblies, and workflows -- and set up an analysis to run in Galaxy. Try naming an organism or an analysis type to get started.";
+
 const Page = (): JSX.Element => {
   const { query } = useRouter();
   const initialSessionId =
@@ -18,6 +21,7 @@ const Page = (): JSX.Element => {
   return (
     <AssistantView
       initialSessionId={initialSessionId}
+      introText={INTRO_TEXT}
       sessionKey={SESSION_KEY}
     />
   );
