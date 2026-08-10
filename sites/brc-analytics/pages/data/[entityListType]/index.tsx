@@ -31,12 +31,11 @@ const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  // Only entities with page metadata get an explore list page (workflows and
+  // priority-pathogens have their own pages). Driving the paths off
+  // ENTITY_LIST_META keeps them from drifting apart.
   const paths = config()
-    // Workflows has no explore list page; priority-pathogens has its own page.
-    .entities.filter(
-      (entity) =>
-        entity.route !== "workflows" && entity.route !== "priority-pathogens"
-    )
+    .entities.filter((entity) => entity.route in ENTITY_LIST_META)
     .map((entity) => ({ params: { entityListType: entity.route } }));
   return {
     fallback: false,
@@ -51,12 +50,13 @@ export const getStaticProps: GetStaticProps<
   if (!params?.entityListType) return { notFound: true };
 
   const entityMeta = ENTITY_LIST_META[params.entityListType];
+  if (!entityMeta) return { notFound: true };
 
   return {
     props: {
       entityListType: params.entityListType,
-      pageDescription: entityMeta?.pageDescription,
-      pageTitle: entityMeta?.pageTitle,
+      pageDescription: entityMeta.pageDescription,
+      pageTitle: entityMeta.pageTitle,
     },
   };
 };
