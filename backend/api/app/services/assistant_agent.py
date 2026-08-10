@@ -6,7 +6,7 @@ import json
 import logging
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
@@ -997,6 +997,7 @@ class AssistantAgent:
         session_id: Optional[str] = None,
         owner_keycloak_sub: Optional[str] = None,
         turn_id: Optional[UUID] = None,
+        on_turn: Optional[Callable[[TurnTelemetry], None]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry]:
         """Same as chat(), plus the per-turn record the API layer logs.
 
@@ -1005,6 +1006,48 @@ class AssistantAgent:
         so the returned record carries the id already tagged on Sentry.
         """
         turn_id = turn_id or uuid4()
+        turn_start = time.monotonic()
+        # Per-call, not instance state: the agent is a singleton and concurrent
+        # turns would clobber each other. _run_turn fills this in as soon as it
+        # has a session, so a failure can still name the session it belonged to.
+        progress: dict = {}
+        try:
+            return await self._run_turn(
+                message,
+                session_id,
+                owner_keycloak_sub,
+                turn_id,
+                turn_start,
+                on_turn,
+                progress,
+            )
+        except Exception as exc:
+            if on_turn is not None:
+                on_turn(
+                    TurnTelemetry.for_error(
+                        exc,
+                        turn_id=turn_id,
+                        session_id=progress.get("session_id", session_id),
+                        turn_index=progress.get("turn_index"),
+                        owner_keycloak_sub=owner_keycloak_sub,
+                        user_message=message,
+                        latency_ms=int((time.monotonic() - turn_start) * 1000),
+                        model=self.settings.AI_PRIMARY_MODEL or None,
+                        provider=self.get_provider(),
+                    )
+                )
+            raise
+
+    async def _run_turn(
+        self,
+        message: str,
+        session_id: Optional[str],
+        owner_keycloak_sub: Optional[str],
+        turn_id: UUID,
+        turn_start: float,
+        on_turn: Optional[Callable[[TurnTelemetry], None]],
+        progress: dict,
+    ) -> tuple[ChatResponse, TurnTelemetry]:
         if not self.is_available():
             raise AssistantUnavailableError(
                 "Assistant agent is not available (check AI_API_KEY)"
@@ -1032,6 +1075,8 @@ class AssistantAgent:
         # turn_index column comment.
         turn_index = int(state.metadata.get("turn_count", 0) or 0)
         state.metadata["turn_count"] = turn_index + 1
+        progress["session_id"] = state.session_id
+        progress["turn_index"] = turn_index
 
         # Record user message
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
@@ -1059,7 +1104,6 @@ class AssistantAgent:
         # Monotonic, not wall clock: this drives the extractor's remaining
         # budget as well as the logged latency, so an NTP or VM clock jump
         # could otherwise skip extraction or blow the frontend timeout.
-        turn_start = time.monotonic()
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
@@ -1161,6 +1205,8 @@ class AssistantAgent:
             provider=self.get_provider(),
         )
 
+        if on_turn is not None:
+            on_turn(telemetry)
         return response, telemetry
 
     def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:

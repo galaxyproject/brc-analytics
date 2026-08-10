@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Optional
 from uuid import uuid4
 
@@ -24,7 +23,6 @@ from app.models.assistant import (
     ChatRequest,
     ChatResponse,
     SessionRestoreResponse,
-    TurnTelemetry,
 )
 from app.models.user_data import UserMeResponse
 from app.services import turn_log
@@ -100,33 +98,17 @@ async def assistant_chat(
     # as the row we write for it, and the two can actually be joined.
     turn_id = uuid4()
     sentry_sdk.set_tag("assistant.turn_id", str(turn_id))
-    turn_started = time.monotonic()
 
     try:
-        try:
-            chat_response, telemetry = await agent.chat_with_telemetry(
-                request.message,
-                request.session_id,
-                current_user.sub if current_user else None,
-                turn_id=turn_id,
-            )
-        except Exception as exc:
-            # Record the failure before the mapping below turns it into an
-            # HTTP status. Without this the corpus only contains the turns that
-            # worked, which is the opposite of what a beta needs.
-            turn_log.schedule(
-                TurnTelemetry.for_error(
-                    exc,
-                    turn_id=turn_id,
-                    session_id=request.session_id,
-                    owner_keycloak_sub=current_user.sub if current_user else None,
-                    user_message=request.message,
-                    latency_ms=int((time.monotonic() - turn_started) * 1000),
-                    model=agent.settings.AI_PRIMARY_MODEL or None,
-                    provider=agent.get_provider(),
-                )
-            )
-            raise
+        chat_response, _telemetry = await agent.chat_with_telemetry(
+            request.message,
+            request.session_id,
+            current_user.sub if current_user else None,
+            turn_id=turn_id,
+            # The agent records the turn itself, success or failure -- it is the
+            # only layer that knows the session it created before a failure.
+            on_turn=turn_log.schedule,
+        )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
         raise HTTPException(status_code=504, detail=str(e)) from e
@@ -177,8 +159,6 @@ async def assistant_chat(
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
-
-    turn_log.schedule(telemetry)
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response

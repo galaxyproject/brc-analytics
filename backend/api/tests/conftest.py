@@ -63,20 +63,26 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     fake_agent.is_available.return_value = True
     fake_agent.settings = get_settings()
     fake_agent.get_provider.return_value = "anthropic"
-    fake_agent.chat_with_telemetry = AsyncMock(
-        return_value=(
-            ChatResponse(
-                session_id="sess-abc",
-                reply="hi",
-                schema_state=AnalysisSchema(),
-            ),
-            TurnTelemetry(
-                session_id="sess-abc",
-                user_message="hello",
-                assistant_reply="hi",
-            ),
-        )
+    stub_turn = (
+        ChatResponse(
+            session_id="sess-abc",
+            reply="hi",
+            schema_state=AnalysisSchema(),
+        ),
+        TurnTelemetry(
+            session_id="sess-abc",
+            user_message="hello",
+            assistant_reply="hi",
+        ),
     )
+
+    # Recording lives in the agent now, so the stub has to honour the sink.
+    async def _chat_with_telemetry(*args, on_turn=None, **kwargs):
+        if on_turn is not None:
+            on_turn(stub_turn[1])
+        return stub_turn
+
+    fake_agent.chat_with_telemetry = AsyncMock(side_effect=_chat_with_telemetry)
     fake_agent.session_service = MagicMock()
     fake_agent.session_service.get_session = AsyncMock(
         return_value=SessionState(session_id="sess-abc")

@@ -236,28 +236,6 @@ class TestChatEndpointLogging:
         assert captured[0].assistant_reply == "hi"
         assert captured[0].outcome == TurnOutcome.SUCCESS
 
-    def test_failed_turn_is_logged_with_the_prompt_and_error_kind(
-        self, app_with_stubbed_agent, client, monkeypatch
-    ):
-        # The point of #1294 during a beta is seeing what breaks, so a turn
-        # that raises must still leave a row carrying the prompt.
-        from pydantic_ai.exceptions import ModelHTTPError
-
-        captured = self._capture(monkeypatch)
-        agent = self._agent(app_with_stubbed_agent)
-        agent.chat_with_telemetry = AsyncMock(
-            side_effect=ModelHTTPError(status_code=429, model_name="m", body=None)
-        )
-
-        resp = client.post("/api/v1/assistant/chat", json={"message": "boom"})
-
-        assert resp.status_code == 429
-        assert len(captured) == 1
-        assert captured[0].outcome == TurnOutcome.ERROR
-        assert captured[0].error_kind == "ModelHTTPError"
-        assert captured[0].user_message == "boom"
-        assert captured[0].assistant_reply is None
-
     def test_turn_id_tags_sentry_and_reaches_the_agent(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
@@ -272,19 +250,6 @@ class TestChatEndpointLogging:
         assert resp.status_code == 200
         passed = agent.chat_with_telemetry.await_args.kwargs["turn_id"]
         assert tags["assistant.turn_id"] == str(passed)
-
-    def test_failed_turn_reuses_the_sentry_turn_id(
-        self, app_with_stubbed_agent, client, monkeypatch
-    ):
-        captured = self._capture(monkeypatch)
-        tags = self._tags(monkeypatch)
-        agent = self._agent(app_with_stubbed_agent)
-        agent.chat_with_telemetry = AsyncMock(side_effect=RuntimeError("boom"))
-
-        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
-
-        assert resp.status_code == 500
-        assert tags["assistant.turn_id"] == str(captured[0].turn_id)
 
     def test_chat_succeeds_when_no_database_is_configured(
         self, app_with_stubbed_agent, client, monkeypatch
@@ -561,3 +526,69 @@ async def test_drain_gives_up_rather_than_hanging_shutdown():
         assert time.monotonic() - start < 5
     finally:
         task.cancel()
+
+
+class TestAgentRecordsFailures:
+    """Recording lives in the agent: it is the only layer that knows the
+    session it created before the turn blew up."""
+
+    def _agent_with_session(self):
+        from app.models.assistant import AnalysisSchema, SessionState
+
+        agent = _stub_agent()
+        state = SessionState(
+            session_id="sess-created", schema_state=AnalysisSchema(), messages=[]
+        )
+        agent.session_service = SimpleNamespace(
+            create_session=AsyncMock(return_value=state),
+            require_session=AsyncMock(return_value=state),
+            save_session=AsyncMock(),
+        )
+        agent._extract_state = AsyncMock(return_value=({}, None))
+        return agent
+
+    @pytest.mark.asyncio
+    async def test_a_failed_first_turn_still_names_its_session(self):
+        # The endpoint only knows request.session_id, which is None on a first
+        # turn -- so the agent has to supply the session it just created, or
+        # the failures worth reading lose their grouping.
+        recorded = []
+        agent = self._agent_with_session()
+        agent._run_agent_with_retry = AsyncMock(side_effect=RuntimeError("upstream"))
+
+        with pytest.raises(RuntimeError):
+            await agent.chat_with_telemetry(
+                "hello", session_id=None, on_turn=recorded.append
+            )
+
+        assert len(recorded) == 1
+        assert recorded[0].outcome == TurnOutcome.ERROR
+        assert recorded[0].error_kind == "RuntimeError"
+        assert recorded[0].session_id == "sess-created"
+        assert recorded[0].turn_index == 0
+        assert recorded[0].user_message == "hello"
+        assert recorded[0].assistant_reply is None
+
+    @pytest.mark.asyncio
+    async def test_a_failure_before_any_session_exists_is_still_recorded(self):
+        agent = _stub_agent()
+        agent.agent = None  # is_available() -> False, fails before session setup
+        recorded = []
+
+        with pytest.raises(Exception):
+            await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert len(recorded) == 1
+        assert recorded[0].session_id is None
+        assert recorded[0].user_message == "hello"
+
+    @pytest.mark.asyncio
+    async def test_the_success_record_reaches_the_sink_once(self):
+        recorded = []
+        agent = self._agent_with_session()
+        agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+
+        await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert len(recorded) == 1
+        assert recorded[0].outcome == TurnOutcome.SUCCESS
