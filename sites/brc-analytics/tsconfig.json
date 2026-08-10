@@ -7,7 +7,6 @@
       "@catalog/*": ["../../catalog/*"],
       "@repo/shared": ["../../packages/shared/index.ts"],
       "@repo/shared/*": ["../../packages/shared/*"],
-      "@routes/*": ["../../routes/*"],
       "@site-config/*": ["../../site-config/*"],
       "images/*": ["../../images/*"]
     }

@@ -4,10 +4,10 @@ import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entitie
 import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { Branding } from "@ga2/components/layout/Branding/branding";
+import { ROUTES as SITE_ROUTES } from "@ga2/routes/constants";
 import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
-import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";

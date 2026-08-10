@@ -1,4 +1,5 @@
 import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
+import { ROUTES } from "@brc/routes/constants";
 import {
   getPriorityColor,
   getPriorityLabel,
@@ -11,7 +12,6 @@ import {
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CardActionArea, Chip, Typography } from "@mui/material";
-import { ROUTES } from "@routes/constants";
 import { MDXRemote } from "next-mdx-remote";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
