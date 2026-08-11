@@ -18,6 +18,9 @@ describe("useAutoCycle", () => {
     const { result } = renderHook(() => useAutoCycle(EMPTY));
 
     expect(result.current.activeIndex).toBe("");
+    // No interval is scheduled at all for an empty list (this would still be 1
+    // if the early-return were removed, even though activeIndex wouldn't change).
+    expect(jest.getTimerCount()).toBe(0);
     act(() => {
       jest.advanceTimersByTime(15000);
     });
@@ -28,6 +31,8 @@ describe("useAutoCycle", () => {
     const { result } = renderHook(() => useAutoCycle(KEYS));
 
     expect(result.current.activeIndex).toBe("0");
+    // An interval is scheduled when there are keys to cycle through.
+    expect(jest.getTimerCount()).toBe(1);
     act(() => {
       jest.advanceTimersByTime(5000);
     });
