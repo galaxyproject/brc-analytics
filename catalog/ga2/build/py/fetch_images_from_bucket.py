@@ -55,6 +55,12 @@ def download_s3_folder_public(endpoint, bucket, prefix, local_dir):
             if object_key.endswith("/"):
                 continue
 
+            # Skip the fallback placeholder — it is a committed repo asset (see
+            # #1635), not managed by the bucket, so a fetch must never overwrite
+            # it or pull the unused .png variants alongside it.
+            if os.path.basename(object_key).startswith("missing_image"):
+                continue
+
             # Construct the local path to maintain the folder structure
             # e.g., 'images/sub/file.jpg' -> './genomeark_images/sub/file.jpg'
             relative_key = object_key.replace(prefix, "", 1)
