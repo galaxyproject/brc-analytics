@@ -1,6 +1,6 @@
 import { BRC_PAGE_META } from "@brc/meta/constants";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
-import type { PageMeta } from "@repo/shared/meta/types";
+import type { ThemedPageProps } from "@repo/shared/meta/types";
 import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { AssistantView } from "@repo/shared/views/AssistantView/assistantView";
 import { type GetStaticProps } from "next";
@@ -28,11 +28,7 @@ const Page = (): JSX.Element => {
   );
 };
 
-export const getStaticProps: GetStaticProps<
-  PageMeta & {
-    themeOptions: object;
-  }
-> = async () => {
+export const getStaticProps: GetStaticProps<ThemedPageProps> = async () => {
   return {
     props: {
       ...BRC_PAGE_META.ASSISTANT,
