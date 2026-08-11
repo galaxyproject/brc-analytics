@@ -33,9 +33,6 @@ backend/**/.env
 /.vscode
 .idea
 
-# nvm
-.nvmrc
-
 # favicons
 /sites/ga2/public/favicons/*
 /sites/brc-analytics/public/favicons/*
