@@ -106,10 +106,10 @@ LOG_LEVEL=INFO
 
 ```bash
 # Run e2e tests
-npm run test:e2e
+npm run test:e2e:api
 
 # Or with Playwright directly
-npx playwright test tests/e2e/03-api-health.spec.ts
+npx playwright test tests/e2e/api/03-api-health.spec.ts
 ```
 
 ## Architecture

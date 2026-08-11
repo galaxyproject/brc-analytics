@@ -28,6 +28,6 @@ rm -rf sites/*/public/api sites/*/public/favicons
 rm -rf public
 
 # TypeScript incremental build info.
-find . -name "*.tsbuildinfo" -not -path "./node_modules/*" -delete
+find . -name node_modules -prune -o -name "*.tsbuildinfo" -type f -delete
 
 echo "Cleaned build artifacts."
