@@ -20238,13 +20238,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_007474575.1/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Sandraabisror",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Lynx_du_Canada_.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1415234291,
     "level": "Scaffold",
@@ -20302,7 +20296,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lynx canadensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_007474575.1"
   },
@@ -20314,13 +20308,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_007474575.2/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Sandraabisror",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Lynx_du_Canada_.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1416309019,
     "level": "Scaffold",
@@ -20378,7 +20366,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lynx canadensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_007474575.2"
   },
@@ -27432,13 +27420,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 3117275501,
     "level": "Complete Genome",
@@ -27499,7 +27481,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Homo sapiens",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": null
   },
@@ -33396,13 +33378,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_015220095.1/",
     "gcPercent": 40.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 765970641,
     "level": "Scaffold",
@@ -33465,7 +33441,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Sebastes umbrosus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015220095.1"
   },
@@ -34024,13 +34000,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_015852565.1/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 490782628,
     "level": "Chromosome",
@@ -34103,7 +34073,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Branchiostoma floridae x Branchiostoma japonicum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_015852565.1"
   },
@@ -34273,13 +34243,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_016695395.2/",
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2902197670,
     "level": "Chromosome",
@@ -34677,7 +34641,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Homo sapiens",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016695395.2"
   },
@@ -34689,13 +34653,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_016700455.2/",
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2744463177,
     "level": "Chromosome",
@@ -35093,7 +35051,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Homo sapiens",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_016700455.2"
   },
@@ -36165,13 +36123,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_017639675.1/",
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Ubs6u!d-pongsakorn",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/82/Aplochiton_taeniatus_map.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 461946147,
     "level": "Chromosome",
@@ -36383,7 +36335,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Aplochiton taeniatus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017639675.1"
   },
@@ -36395,13 +36347,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_017639685.1/",
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Ubs6u!d-pongsakorn",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/82/Aplochiton_taeniatus_map.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 560414924,
     "level": "Scaffold",
@@ -36458,7 +36404,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Aplochiton taeniatus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017639685.1"
   },
@@ -36629,13 +36575,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_017976305.1/",
     "gcPercent": 42.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Roger Culos",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Cuculus_canorus_bangsi_MHNT.ZOO.2010.11.149.13.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1063845602,
     "level": "Scaffold",
@@ -36698,7 +36638,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Cuculus canorus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "b",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017976305.1"
   },
@@ -36864,13 +36804,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_019207075.1/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 405532174,
     "level": "Chromosome",
@@ -36914,7 +36848,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Branchiostoma floridae x Branchiostoma belcheri",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_019207075.1"
   },
@@ -43285,13 +43219,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_024803745.1/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2845613926,
     "level": "Scaffold",
@@ -43392,7 +43320,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_024803745.1"
   },
@@ -49583,13 +49511,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_028021495.1/",
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 661271547,
     "level": "Scaffold",
@@ -49653,7 +49575,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lycodopsis pacificus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_028021495.1"
   },
@@ -49665,13 +49587,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_028022725.1/",
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 646369862,
     "level": "Chromosome",
@@ -49735,7 +49651,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lycodopsis pacificus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_028022725.1"
   },
@@ -55701,13 +55617,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_029633845.1/",
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1477069270,
     "level": "Scaffold",
@@ -55766,7 +55676,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lampris incognitus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_029633845.1"
   },
@@ -56235,13 +56145,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_030015355.1/",
     "gcPercent": 40,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 996754446,
     "level": "Scaffold",
@@ -56510,7 +56414,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Trichomycterus rosablanca",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_030015355.1"
   },
@@ -64267,13 +64171,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_031878665.1/",
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1879249320,
     "level": "Chromosome",
@@ -64682,7 +64580,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031878665.1"
   },
@@ -64694,13 +64592,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_031878675.1/",
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2025633870,
     "level": "Chromosome",
@@ -65109,7 +65001,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Megascapheus bottae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_031878675.1"
   },
@@ -68090,13 +67982,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_035047345.1/",
     "gcPercent": 44.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 2373187502,
     "level": "Scaffold",
@@ -68156,7 +68042,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Bradypodion ventrale",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "r",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_035047345.1"
   },
@@ -71553,13 +71439,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_036365475.1/",
     "gcPercent": 40.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 958875937,
     "level": "Chromosome",
@@ -71695,7 +71575,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Amia ocellicauda",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_036365475.1"
   },
@@ -87107,13 +86987,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 39.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 322493648,
     "level": "Chromosome",
@@ -87156,7 +87030,7 @@
     "taxonomicLevelPhylum": "Hemichordata",
     "taxonomicLevelSpecies": "Saccoglossus sp. HW-2024a",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_040954595.1"
   },
@@ -87168,13 +87042,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 39.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 319515952,
     "level": "Chromosome",
@@ -87259,7 +87127,7 @@
     "taxonomicLevelPhylum": "Hemichordata",
     "taxonomicLevelSpecies": "Balanoglossus misakiensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_040954595.2"
   },
@@ -87271,13 +87139,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 39.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 328591656,
     "level": "Chromosome",
@@ -87320,7 +87182,7 @@
     "taxonomicLevelPhylum": "Hemichordata",
     "taxonomicLevelSpecies": "Saccoglossus sp. HW-2024a",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_040954625.1"
   },
@@ -87332,13 +87194,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_040954625.2/",
     "gcPercent": 39.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 329678253,
     "level": "Chromosome",
@@ -87423,7 +87279,7 @@
     "taxonomicLevelPhylum": "Hemichordata",
     "taxonomicLevelSpecies": "Balanoglossus misakiensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_040954625.2"
   },
@@ -88541,13 +88397,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 39.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 735099811,
     "level": "Chromosome",
@@ -88665,7 +88515,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Arripis georgiana",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_042242115.1"
   },
@@ -88813,13 +88663,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 40,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 801586327,
     "level": "Chromosome",
@@ -88937,7 +88781,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Arripis georgiana",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_042242135.1"
   },
@@ -90737,13 +90581,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_043880425.1/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 2323175246,
     "level": "Chromosome",
@@ -90859,7 +90697,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Rhinolophus yonghoiseni",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_043880425.1"
   },
@@ -92456,13 +92294,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 40,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Bleeker, P.(Pieter),1819-1878",
-      "license": "Public domain",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Atlas_ichthyologique_des_Indes_orientales_n%C3%A9%C3%AArlandaises_-_publi%C3%A9_sous_les_auspices_du_gouvernement_colonial_n%C3%A9%C3%AArlandais_%28IA_Atlasichthyolog00BleeF%29.pdf",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1146345582,
     "level": "Chromosome",
@@ -92581,7 +92413,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Pristipomoides typus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_045363885.1"
   },
@@ -92593,13 +92425,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 40,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Bleeker, P.(Pieter),1819-1878",
-      "license": "Public domain",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Atlas_ichthyologique_des_Indes_orientales_n%C3%A9%C3%AArlandaises_-_publi%C3%A9_sous_les_auspices_du_gouvernement_colonial_n%C3%A9%C3%AArlandais_%28IA_Atlasichthyolog00BleeF%29.pdf",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1147302341,
     "level": "Chromosome",
@@ -92718,7 +92544,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Pristipomoides typus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_045363895.1"
   },
@@ -93905,13 +93731,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 46,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2282703727,
     "level": "Chromosome",
@@ -94036,7 +93856,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Dibamus cf. smithi",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "r",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_046126795.1"
   },
@@ -94048,13 +93868,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 45.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1821555219,
     "level": "Chromosome",
@@ -94179,7 +93993,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Dibamus cf. smithi",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "r",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_046126825.1"
   },
@@ -99048,13 +98862,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1018963042,
     "level": "Chromosome",
@@ -99161,7 +98969,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Epinephelus rankini",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048129065.1"
   },
@@ -99280,13 +99088,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1035398499,
     "level": "Chromosome",
@@ -99393,7 +99195,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Epinephelus rankini",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048129235.1"
   },
@@ -99850,13 +99652,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 39,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 953377980,
     "level": "Chromosome",
@@ -99915,7 +99711,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Rhinogobio nasutus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048301585.1"
   },
@@ -100449,13 +100245,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 722757191,
     "level": "Chromosome",
@@ -100571,7 +100361,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Polymixia cf. hollisterae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048537225.1"
   },
@@ -100583,13 +100373,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 707857291,
     "level": "Chromosome",
@@ -100705,7 +100489,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Polymixia cf. hollisterae",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048537235.1"
   },
@@ -100798,13 +100582,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 803134922,
     "level": "Chromosome",
@@ -100861,7 +100639,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Coilia mystus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048544215.1"
   },
@@ -100873,13 +100651,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 854254650,
     "level": "Chromosome",
@@ -100936,7 +100708,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Coilia mystus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_048544225.1"
   },
@@ -105959,13 +105731,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Magdaléna Kostková",
-      "license": "CC0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Lepidogalaxias.png",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 742016821,
     "level": "Chromosome",
@@ -106063,7 +105829,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lepidogalaxias salamandroides",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_049190655.1"
   },
@@ -106075,13 +105841,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Magdaléna Kostková",
-      "license": "CC0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Lepidogalaxias.png",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 735065728,
     "level": "Chromosome",
@@ -106179,7 +105939,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lepidogalaxias salamandroides",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_049190665.1"
   },
@@ -109229,13 +108989,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 5319222779,
     "level": "Chromosome",
@@ -109286,7 +109040,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Rhinatrema bivittatum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_901001135.2"
   },
@@ -109947,13 +109701,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 4615304139,
     "level": "Scaffold",
@@ -110004,7 +109752,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Rhinatrema bivittatum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_901001175.1"
   },
@@ -110895,13 +110643,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 4685923413,
     "level": "Chromosome",
@@ -111639,7 +111381,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Microcaecilia unicolor",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_901765095.2"
   },
@@ -111651,13 +111393,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 3698322623,
     "level": "Scaffold",
@@ -111708,7 +111444,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Microcaecilia unicolor",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_901765105.1"
   },
@@ -116018,13 +115754,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 37.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Gosse, Philip Henry 1810-1888",
-      "license": "Public domain",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/04/A_manual_of_marine_zoology_for_the_British_Isles_%28IA_bub_gb_WGQZAAAAYAAJ%29.pdf",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 605489456,
     "level": "Chromosome",
@@ -116083,7 +115813,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Aplidium turbinatum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_918807975.1"
   },
@@ -116430,13 +116160,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 986023149,
     "level": "Chromosome",
@@ -116513,7 +116237,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Telmatherina bonti",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_933228915.1"
   },
@@ -116525,13 +116249,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 781234592,
     "level": "Contig",
@@ -116593,7 +116311,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Telmatherina bonti",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_933228925.1"
   },
@@ -117769,13 +117487,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_947561715.1/",
     "gcPercent": 39,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 196955708,
     "level": "Chromosome",
@@ -117834,7 +117546,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Ascidia mentula",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_947561715.1"
   },
@@ -119035,13 +118747,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 797787753,
     "level": "Chromosome",
@@ -119117,7 +118823,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Hyperoplus immaculatus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_949357725.1"
   },
@@ -119129,13 +118835,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 763769615,
     "level": "Contig",
@@ -119196,7 +118896,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Hyperoplus immaculatus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_949358355.1"
   },
@@ -119985,13 +119685,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 43.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 2848420111,
     "level": "Chromosome",
@@ -120048,7 +119742,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Sylvilagus floridanus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_949820135.1"
   },
@@ -123509,13 +123203,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 42,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1367966668,
     "level": "Chromosome",
@@ -123588,7 +123276,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Gymnoscopelus braueri",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963280865.1"
   },
@@ -123600,13 +123288,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 42,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1279160753,
     "level": "Scaffold",
@@ -123664,7 +123346,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Gymnoscopelus braueri",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963281105.1"
   },
@@ -124119,13 +123801,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 42,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1318637544,
     "level": "Chromosome",
@@ -124198,7 +123874,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Gymnoscopelus microlampas",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963454915.1"
   },
@@ -125044,13 +124720,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 38,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 906920133,
     "level": "Chromosome",
@@ -125109,7 +124779,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Trididemnum clinides",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963675345.1"
   },
@@ -125547,13 +125217,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 42.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1658830932,
     "level": "Chromosome",
@@ -125626,7 +125290,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Nannobrachium achirus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963921795.1"
   },
@@ -125638,13 +125302,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 42.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1148206488,
     "level": "Chromosome",
@@ -125717,7 +125375,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Protomyctophum bolini",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963924005.1"
   },
@@ -126260,13 +125918,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 3427786127,
     "level": "Chromosome",
@@ -126353,7 +126005,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Notolepis coatsorum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963971535.1"
   },
@@ -126365,13 +126017,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1085777971,
     "level": "Chromosome",
@@ -126455,7 +126101,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Nansenia antarctica",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_963989245.1"
   },
@@ -129844,13 +129490,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1235309700,
     "level": "Chromosome",
@@ -129923,7 +129563,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Protomyctophum parallelum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_964188405.1"
   },
@@ -129935,13 +129575,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 43,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1013731500,
     "level": "Chromosome",
@@ -130014,7 +129648,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Protomyctophum parallelum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_964188415.1"
   },
@@ -135566,13 +135200,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCA_964339955.1/",
     "gcPercent": 42.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 1892221984,
     "level": "Chromosome",
@@ -135644,7 +135272,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Pipistrellus hanaki",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_964339955.1"
   },
@@ -142006,13 +141634,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 25.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 790658053,
     "level": "Scaffold",
@@ -142071,7 +141693,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Thalia democratica",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_965202575.1"
   },
@@ -142083,13 +141705,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 25.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 801799274,
     "level": "Chromosome",
@@ -142148,7 +141764,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Thalia democratica",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "k",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_965202585.1"
   },
@@ -142620,13 +142236,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "RiftreefatEnglish Wikipedia",
-      "license": "CC BY 2.5",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Aulonocara_jacobfreigi.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 945366440,
     "level": "Chromosome",
@@ -142706,7 +142316,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Aulonocara stuartgranti",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_965226115.1"
   },
@@ -143199,13 +142809,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 3099441038,
     "level": "Chromosome",
@@ -143266,7 +142870,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Homo sapiens",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000001405.40"
   },
@@ -154700,13 +154304,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Sandraabisror",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Lynx_du_Canada_.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 2408883772,
     "level": "Chromosome",
@@ -154764,7 +154362,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lynx canadensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_007474595.1"
   },
@@ -154776,13 +154374,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCF_007474595.2/",
     "gcPercent": 41.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Sandraabisror",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "Wikimedia",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Lynx_du_Canada_.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 2407810255,
     "level": "Chromosome",
@@ -155555,7 +155147,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lynx canadensis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "m",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_007474595.2"
   },
@@ -169784,13 +169376,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 800904020,
     "level": "Chromosome",
@@ -169853,7 +169439,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Sebastes umbrosus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_015220745.1"
   },
@@ -174795,13 +174381,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCF_017976375.1/",
     "gcPercent": 42,
     "geneModelUrl": null,
-    "image": {
-      "credit": "Roger Culos",
-      "license": "CC BY-SA 4.0",
-      "sourceName": "",
-      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Cuculus_canorus_bangsi_MHNT.ZOO.2010.11.149.13.jpg",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1180136575,
     "level": "Chromosome",
@@ -175047,7 +174627,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Cuculus canorus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "b",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_017976375.1"
   },
@@ -178538,13 +178118,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 40,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1150004004,
     "level": "Chromosome",
@@ -178607,7 +178181,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Girardinichthys multiradiatus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_021462225.1"
   },
@@ -193058,13 +192632,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 45,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1482357630,
     "level": "Chromosome",
@@ -193123,7 +192691,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Lampris incognitus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_029633865.1"
   },
@@ -193507,13 +193075,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCF_030014385.1/",
     "gcPercent": 40.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 1045025885,
     "level": "Chromosome",
@@ -193782,7 +193344,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Trichomycterus rosablanca",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_030014385.1"
   },
@@ -201389,13 +200951,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/vgp/data/genomes/GCF_036373705.1/",
     "gcPercent": 41,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 989103751,
     "level": "Chromosome",
@@ -201531,7 +201087,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Amia ocellicauda",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "f",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_036373705.1"
   },
@@ -212854,13 +212410,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 5319222779,
     "level": "Chromosome",
@@ -213962,7 +213512,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Rhinatrema bivittatum",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_901001135.1"
   },
@@ -214298,13 +213848,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 44,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "No",
     "length": 4685923413,
     "level": "Chromosome",
@@ -214355,7 +213899,7 @@
     "taxonomicLevelPhylum": "Chordata",
     "taxonomicLevelSpecies": "Microcaecilia unicolor",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "a",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_901765095.1"
   },
@@ -216737,13 +216281,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 36.5,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 918306378,
     "level": "Chromosome",
@@ -216791,7 +216329,7 @@
     "taxonomicLevelPhylum": "Mollusca",
     "taxonomicLevelSpecies": "Pecten maximus",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "x",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_902652985.1"
   },
@@ -223349,13 +222887,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 37,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 435265205,
     "level": "Chromosome",
@@ -223420,7 +222952,7 @@
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Aricia agestis",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "i",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_905147365.1"
   },
@@ -223432,13 +222964,7 @@
     "galaxyDatacacheUrl": null,
     "gcPercent": 36,
     "geneModelUrl": null,
-    "image": {
-      "credit": "",
-      "license": "",
-      "sourceName": "",
-      "sourceUrl": "",
-      "url": "/organism_image/missing_image_1024x1024.jpg"
-    },
+    "image": null,
     "isRef": "Yes",
     "length": 516571003,
     "level": "Chromosome",
@@ -223505,7 +223031,7 @@
     "taxonomicLevelPhylum": "Arthropoda",
     "taxonomicLevelSpecies": "Pararge aegeria",
     "taxonomicLevelStrain": "None",
-    "thumbnailUrl": "/organism_image/missing_image_300x300.jpg",
+    "thumbnailUrl": null,
     "tolId": "i",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_905163445.1"
   },

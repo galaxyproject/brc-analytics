@@ -1,6 +1,6 @@
 # images
 /sites/ga2/public/organism_image/*
-!/sites/ga2/public/organism_image/missing_image_*
+!/sites/ga2/public/organism_image/missing_image*
 
 # dependencies
 /node_modules

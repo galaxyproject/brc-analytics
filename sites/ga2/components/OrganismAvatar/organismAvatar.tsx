@@ -11,14 +11,16 @@ import {
   SourceLink,
   Thumbnail,
 } from "./organismAvatar.styles";
+
+const MISSING_IMAGE_URL = "/organism_image/missing_image.png";
+
 interface OrganismAvatarProps {
-  image: ImageData;
+  image?: ImageData | null;
   isThumbnail?: boolean;
+  thumbnailUrl?: string | null;
 }
 
-const AttributionDetails: React.FC<Pick<OrganismAvatarProps, "image">> = ({
-  image,
-}) => (
+const AttributionDetails: React.FC<{ image: ImageData }> = ({ image }) => (
   <>
     {image.credit && <Detail>By: {image.credit}</Detail>}
     {image.license && <Detail>License: {image.license}</Detail>}
@@ -31,10 +33,20 @@ const AttributionDetails: React.FC<Pick<OrganismAvatarProps, "image">> = ({
 export const OrganismAvatar: React.FC<OrganismAvatarProps> = ({
   image,
   isThumbnail = false,
+  thumbnailUrl,
 }) => {
+  // List view: always render a small thumbnail, falling back to a generic
+  // missing-image graphic when the organism has no image.
   if (isThumbnail) {
-    return <Thumbnail src={image.url} alt="Organism thumbnail" />;
+    return (
+      <Thumbnail
+        src={thumbnailUrl || MISSING_IMAGE_URL}
+        alt="Organism thumbnail"
+      />
+    );
   }
+  // Detail view: render nothing when there is no image, rather than an empty box.
+  if (!image) return null;
   return (
     <Card>
       <CardMedia image={image.url} title="Organism" />

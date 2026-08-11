@@ -130,8 +130,8 @@ export const buildOrganismImageThumbnail = (
   entity: GA2OrganismEntity | GA2AssemblyEntity
 ): ComponentProps<typeof OrganismAvatar> => {
   return {
-    image: entity.image,
     isThumbnail: true,
+    thumbnailUrl: entity.thumbnailUrl,
   };
 };
 

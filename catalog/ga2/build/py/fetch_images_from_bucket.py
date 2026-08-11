@@ -55,9 +55,9 @@ def download_s3_folder_public(endpoint, bucket, prefix, local_dir):
             if object_key.endswith("/"):
                 continue
 
-            # Skip the fallback placeholder — it is a committed repo asset (see
-            # #1635), not managed by the bucket, so a fetch must never overwrite
-            # it or pull the unused .png variants alongside it.
+            # Skip the bucket's missing-image images: the catalog emits a null
+            # image for organisms without a picture, so these are never served
+            # and do not need to be downloaded.
             if os.path.basename(object_key).startswith("missing_image"):
                 continue
 
