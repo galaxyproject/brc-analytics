@@ -1,6 +1,6 @@
-import { Fragment, JSX } from "react";
-import { SectionHero } from "../../components/Layout/components/AppLayout/components/Section/components/SectionHero/sectionHero";
-import { LoganSearch } from "../../components/LoganSearch/loganSearch";
+import { LoganSearch } from "@brc/components/LoganSearch/loganSearch";
+import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
+import { Fragment, type JSX } from "react";
 import { SearchContainer, SearchSection } from "./loganSearchView.styles";
 
 const BREADCRUMBS = [

@@ -1,3 +1,4 @@
+import { ControlRow } from "@brc/components/LoganSearch/loganSearch.styles";
 import {
   Alert,
   Card,
@@ -6,9 +7,8 @@ import {
   LinearProgress,
   Typography,
 } from "@mui/material";
-import { JSX } from "react";
-import { useKmindexSearch } from "../../../hooks/useKmindexSearch";
-import { ControlRow } from "../loganSearch.styles";
+import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import { type JSX } from "react";
 
 interface LoganSearchStatusProps {
   search: ReturnType<typeof useKmindexSearch>;

@@ -1,6 +1,6 @@
+import { useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import ky from "ky";
-import { useKmindexSearch } from "../../app/hooks/useKmindexSearch";
 
 jest.mock("ky", () => ({
   __esModule: true,

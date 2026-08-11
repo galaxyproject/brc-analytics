@@ -1,5 +1,5 @@
-import { JSX } from "react";
-import { useKmindexSearch } from "../../hooks/useKmindexSearch";
+import { useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import { type JSX } from "react";
 import { LoganSearchForm } from "./LoganSearchForm/loganSearchForm";
 import { LoganSearchResults } from "./LoganSearchResults/loganSearchResults";
 import { LoganSearchStatus } from "./LoganSearchStatus/loganSearchStatus";
