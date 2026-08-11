@@ -18,7 +18,7 @@
     "clean": "./scripts/clean.sh",
     "start:ga2": "npx serve sites/ga2/out",
     "lint": "eslint .",
-    "typecheck": "next typegen sites/brc-analytics & pid1=$!; next typegen sites/ga2 & pid2=$!; wait $pid1 && wait $pid2 && tsc --noEmit",
+    "typecheck": "next typegen sites/brc-analytics & p1=$!; next typegen sites/ga2 & p2=$!; wait $p1; s1=$?; wait $p2; s2=$?; [ $s1 -eq 0 ] && [ $s2 -eq 0 ] && tsc --noEmit",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
     "format:python": "./scripts/format-python.sh",
