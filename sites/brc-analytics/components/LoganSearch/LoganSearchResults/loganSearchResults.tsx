@@ -1,3 +1,4 @@
+import { ResultsToolbar } from "@brc/components/LoganSearch/loganSearch.styles";
 import { OpenInNew } from "@mui/icons-material";
 import {
   Alert,
@@ -13,9 +14,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { JSX } from "react";
-import { PAGE_SIZE, useKmindexSearch } from "../../../hooks/useKmindexSearch";
-import { ResultsToolbar } from "../loganSearch.styles";
+import {
+  PAGE_SIZE,
+  type useKmindexSearch,
+} from "@repo/shared/hooks/useKmindexSearch";
+import { type JSX } from "react";
 
 interface LoganSearchResultsProps {
   search: ReturnType<typeof useKmindexSearch>;

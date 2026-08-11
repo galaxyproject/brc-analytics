@@ -1,7 +1,7 @@
-import { StyledPagesMain } from "@/components/Layout/components/Main/main.styles";
-import { LoganSearchView } from "@/views/LoganSearchView/loganSearchView";
-import { GetStaticProps } from "next";
-import { JSX } from "react";
+import { LoganSearchView } from "@brc/views/LoganSearchView/loganSearchView";
+import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import { type GetStaticProps } from "next";
+import { type JSX } from "react";
 
 export const LoganSearchPage = (): JSX.Element => {
   return <LoganSearchView />;

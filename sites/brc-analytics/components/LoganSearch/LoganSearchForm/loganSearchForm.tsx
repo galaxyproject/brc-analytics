@@ -1,3 +1,14 @@
+import {
+  ControlRow,
+  FieldRow,
+  FormColumn,
+  FormGrid,
+} from "@brc/components/LoganSearch/loganSearch.styles";
+import {
+  countBases,
+  groupIndexes,
+  toIndexName,
+} from "@brc/components/LoganSearch/utils";
 import { Search } from "@mui/icons-material";
 import {
   Button,
@@ -9,15 +20,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { JSX, useMemo, useState } from "react";
-import { useKmindexSearch } from "../../../hooks/useKmindexSearch";
-import {
-  ControlRow,
-  FieldRow,
-  FormColumn,
-  FormGrid,
-} from "../loganSearch.styles";
-import { countBases, groupIndexes, toIndexName } from "../utils";
+import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import { type JSX, useMemo, useState } from "react";
 
 interface LoganSearchFormProps {
   search: ReturnType<typeof useKmindexSearch>;
