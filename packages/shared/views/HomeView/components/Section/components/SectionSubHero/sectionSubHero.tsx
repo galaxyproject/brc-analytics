@@ -1,7 +1,7 @@
 import { AccordionDetails, AccordionSummary, Fade, Slide } from "@mui/material";
 import { type JSX } from "react";
 import { ACCORDION_PROPS, FADE_PROPS, SLIDE_PROPS } from "./constants";
-import { useAutoCycle } from "./hooks/UseAutoCycle/hook";
+import { useActiveIndex } from "./hooks/UseActiveIndex/hook";
 import {
   AccordionBox,
   Section,
@@ -24,8 +24,9 @@ export const SectionSubHero = ({
   images,
   steps,
 }: Props): JSX.Element => {
-  const indexKeys = steps.map((_, index) => String(index));
-  const { activeIndex, onSelectIndex } = useAutoCycle(indexKeys);
+  const { activeIndex, onSelectIndex } = useActiveIndex(
+    steps.length > 0 ? "0" : ""
+  );
   return (
     <Section className={className}>
       <SectionLayout>
