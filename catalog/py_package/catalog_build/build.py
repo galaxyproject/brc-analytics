@@ -1989,12 +1989,8 @@ def get_image_path(
     if os.path.exists(potential_path):
         return potential_path
     else:
-        # Return the path to the default missing image
+        # No species image found — return the missing-image marker path. The
+        # catalog build detects this marker and emits a null image, so the
+        # marker file itself does not need to exist on disk.
         print(f"No image found for {potential_path}.")
-        missing_file_path = os.path.join(folder_path, "missing_image" + file_suffix)
-        if os.path.exists(missing_file_path):
-            return missing_file_path
-        else:
-            raise FileNotFoundError(
-                f"No species image found, or missing_image{file_suffix} in {folder_path}"
-            )
+        return os.path.join(folder_path, "missing_image" + file_suffix)

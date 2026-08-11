@@ -68,7 +68,8 @@ function buildOrganismImage(row: SourceGenome): ImageData | null {
  * @returns served URL (/organism_image/...), or null for a missing image.
  */
 function resolveOrganismImageUrl(path: string): string | null {
-  if (path.includes(MISSING_IMAGE_MARKER)) return null;
+  const basename = path.split("/").pop() ?? "";
+  if (!path || basename.startsWith(MISSING_IMAGE_MARKER)) return null;
   return path.replace("sites/ga2/public/", "/");
 }
 
@@ -242,7 +243,7 @@ function buildOrganism(
       new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
     ),
     genomes: [...(organism?.genomes ?? []), genome],
-    image: genome.image,
+    image: organism?.image ?? genome.image,
     maxScaffoldN50: getMaxDefined(organism?.maxScaffoldN50, genome.scaffoldN50),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
@@ -254,7 +255,7 @@ function buildOrganism(
     taxonomicLevelOrder: defaultStringToNone(genome.taxonomicLevelOrder),
     taxonomicLevelPhylum: defaultStringToNone(genome.taxonomicLevelPhylum),
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
-    thumbnailUrl: genome.thumbnailUrl,
+    thumbnailUrl: organism?.thumbnailUrl ?? genome.thumbnailUrl,
     tolId: genome.tolId,
   };
 }

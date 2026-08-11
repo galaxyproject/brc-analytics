@@ -15,7 +15,7 @@ import {
 const MISSING_IMAGE_URL = "/organism_image/missing_image.png";
 
 interface OrganismAvatarProps {
-  image: ImageData | null;
+  image?: ImageData | null;
   isThumbnail?: boolean;
   thumbnailUrl?: string | null;
 }
@@ -40,7 +40,7 @@ export const OrganismAvatar: React.FC<OrganismAvatarProps> = ({
   if (isThumbnail) {
     return (
       <Thumbnail
-        src={thumbnailUrl ?? MISSING_IMAGE_URL}
+        src={thumbnailUrl || MISSING_IMAGE_URL}
         alt="Organism thumbnail"
       />
     );
