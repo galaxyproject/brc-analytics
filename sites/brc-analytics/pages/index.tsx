@@ -3,6 +3,7 @@ import { BRC_PAGE_META } from "@brc/meta/constants";
 import { HomeView } from "@brc/views/HomeView/homeView";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { StyledMain } from "@repo/shared/components/layout/Main/main.styles";
+import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
@@ -21,7 +22,7 @@ export const getStaticProps: GetStaticProps = async () => {
       pageDescription: BRC_PAGE_META.HOME.pageDescription,
       pageTitle: config().appTitle,
       themeOptions: {
-        palette: { background: { default: "#FAFBFB" } },
+        palette: { background: { default: SMOKE_LIGHTEST } },
       },
     },
   };

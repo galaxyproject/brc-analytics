@@ -6,6 +6,7 @@ import {
   buildMDXSlug,
 } from "@databiosphere/findable-ui/lib/utils/mdx/staticGeneration/utils";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
+import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { sanitizeFrontmatter } from "@repo/shared/views/docs/common/frontmatter/utils";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@repo/shared/views/docs/common/staticGeneration/utils";
@@ -35,7 +36,7 @@ export const getStaticProps: GetStaticProps<StaticProps> = async (
     slug,
     sanitizeFrontmatter,
     { mdxOptions: { development: process.env.NODE_ENV !== "production" } },
-    { themeOptions: { palette: { background: { default: "#FAFBFB" } } } }
+    { themeOptions: { palette: { background: { default: SMOKE_LIGHTEST } } } }
   );
 
   // If the static props are not found, return not found.

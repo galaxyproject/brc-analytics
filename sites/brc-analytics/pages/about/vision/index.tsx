@@ -2,6 +2,7 @@ import { BRC_PAGE_META } from "@brc/meta/constants";
 import { VisionView } from "@brc/views/VisionView/visionView";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import type { PageMeta } from "@repo/shared/meta/types";
+import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
@@ -18,7 +19,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       ...BRC_PAGE_META.VISION,
       themeOptions: {
-        palette: { background: { default: "#FAFBFB" } }, // SMOKE_LIGHTEST
+        palette: { background: { default: SMOKE_LIGHTEST } },
       },
     },
   };

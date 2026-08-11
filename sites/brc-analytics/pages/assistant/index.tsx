@@ -1,6 +1,7 @@
 import { BRC_PAGE_META } from "@brc/meta/constants";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import type { PageMeta } from "@repo/shared/meta/types";
+import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { AssistantView } from "@repo/shared/views/AssistantView/assistantView";
 import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
@@ -36,7 +37,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       ...BRC_PAGE_META.ASSISTANT,
       themeOptions: {
-        palette: { background: { default: "#FAFBFB" } },
+        palette: { background: { default: SMOKE_LIGHTEST } },
       },
     },
   };
