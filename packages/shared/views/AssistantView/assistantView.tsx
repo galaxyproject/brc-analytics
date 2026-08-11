@@ -21,9 +21,15 @@ import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
 interface Props {
   initialSessionId?: string;
+  introText: string;
+  sessionKey: string;
 }
 
-export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
+export const AssistantView = ({
+  initialSessionId,
+  introText,
+  sessionKey,
+}: Props): JSX.Element => {
   const {
     error,
     handoffUrl,
@@ -40,6 +46,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
     suggestions,
   } = useAssistantChat({
     initialSessionId,
+    sessionKey,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
   // Read per-site via findable-ui's getConfig rather than importing one site's
@@ -100,6 +107,7 @@ export const AssistantView = ({ initialSessionId }: Props): JSX.Element => {
           <ChatColumn>
             <ChatPanel
               error={error}
+              introText={introText}
               isRestoring={isRestoring}
               loading={loading}
               messages={messages}

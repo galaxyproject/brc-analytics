@@ -3,9 +3,11 @@ node_modules
 .pnp
 .pnp.js
 
-# Build outputs
+# Build outputs (root + per-site)
 out
 .next
+sites/*/out
+sites/*/.next
 
 # Testing
 coverage
@@ -28,6 +30,7 @@ Thumbs.db
 .env.local
 .env.development
 .env.production.local
+sites/*/.env*
 
 # Python
 __pycache__

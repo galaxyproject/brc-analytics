@@ -53,7 +53,9 @@ describe("useAssistantChat restore", () => {
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(404));
 
-    const { result } = renderHook(() => useAssistantChat({}));
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
 
     await waitFor(() => expect(result.current.isRestoring).toBe(false));
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
@@ -64,7 +66,7 @@ describe("useAssistantChat restore", () => {
     mockClient.assistantRestore.mockRejectedValue(httpError(404));
 
     const { result } = renderHook(() =>
-      useAssistantChat({ initialSessionId: STORED_ID })
+      useAssistantChat({ initialSessionId: STORED_ID, sessionKey: SESSION_KEY })
     );
 
     await waitFor(() => expect(result.current.isRestoring).toBe(false));
@@ -77,7 +79,9 @@ describe("useAssistantChat restore", () => {
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(403));
 
-    const { result } = renderHook(() => useAssistantChat({}));
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
 
     await waitFor(() => expect(result.current.isRestoring).toBe(false));
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
@@ -87,7 +91,9 @@ describe("useAssistantChat restore", () => {
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(429));
 
-    const { result } = renderHook(() => useAssistantChat({}));
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
 
     await waitFor(() => expect(result.current.error).not.toBeNull());
     expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
@@ -97,7 +103,9 @@ describe("useAssistantChat restore", () => {
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(503));
 
-    const { result } = renderHook(() => useAssistantChat({}));
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
 
     await waitFor(() => expect(result.current.error).not.toBeNull());
     expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
@@ -118,7 +126,9 @@ describe("useAssistantChat restore", () => {
       suggestions: [],
     } as unknown as Awaited<ReturnType<typeof mockClient.assistantChat>>);
 
-    const { result } = renderHook(() => useAssistantChat({}));
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
     await waitFor(() => expect(result.current.error).not.toBeNull());
 
     await act(async () => {
@@ -138,7 +148,7 @@ describe("useAssistantChat restore", () => {
     mockClient.assistantRestore.mockRejectedValue(httpError(503));
 
     const { result } = renderHook(() =>
-      useAssistantChat({ initialSessionId: STORED_ID })
+      useAssistantChat({ initialSessionId: STORED_ID, sessionKey: SESSION_KEY })
     );
     await waitFor(() => expect(result.current.error).not.toBeNull());
 

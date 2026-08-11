@@ -6,19 +6,21 @@ Using Node.js version `22.12.0`, run `npm install` in the root directory of the 
 
 ### Sites
 
-The repository hosts two sites. **BRC Analytics** builds from the repo root (`pages/`), and the commands below target it by default. **Genome Ark 2 (GA2)** is a standalone app under [`sites/ga2/`](sites/ga2/README.md) with its own `:ga2` scripts. Each GA2 command is the counterpart of the BRC command noted alongside it.
+The repository is an npm-workspaces monorepo hosting two standalone Next.js sites — **BRC Analytics** ([`sites/brc-analytics/`](sites/brc-analytics/README.md)) and **Genome Ark 2 (GA2)** ([`sites/ga2/`](sites/ga2/README.md)). Both build from their own `pages/` and import shared, site-agnostic code from the `@repo/shared` workspace package ([`packages/shared`](packages/shared)). Each site has its own `:brc` / `:ga2` scripts; the two commands in each pair are counterparts.
 
 ### Typechecking
 
-The app is written with TypeScript and Next.js. Because Next generates local-only type definitions under `.next` in order to check page routes, erroneous type errors may appear when those types become out-of-sync with new code changes. To avoid this, any typechecking should be done by running `npm run typecheck`, which will first update Next's generated types. Additionally, if type errors are reported in `.next` by another program such as an editor, it may be possible to resolve them by running the same script, or by running `npx next typegen` to only generate types.
+The app is written with TypeScript and Next.js. Run `npm run typecheck` (`tsc --noEmit`) to type-check the whole workspace — both sites and the shared package. Next generates local-only route type definitions under each site's `.next` during a build; if an editor reports stale type errors from there, running that site's build (e.g. `npm run build-local:brc`) regenerates them.
 
 ## Using the development server
 
-The app can be run for development using `npm run dev`, and accessed at `http://localhost:3000`. For GA2, use `npm run dev:ga2`.
+The app can be run for development using `npm run dev:brc` (BRC) or `npm run dev:ga2` (GA2), and accessed at `http://localhost:3000`.
 
 ## Building the app locally
 
-Run `npm run build:local` to build. The built app can be run using `npm start`, and accessed at `http://localhost:3000`. For GA2, build with `npm run build-local:ga2` and serve with `npm run start:ga2`.
+Build with `npm run build-local:brc` (BRC) or `npm run build-local:ga2` (GA2), then serve the built app with `npm run start:brc` / `npm run start:ga2`, accessed at `http://localhost:3000`.
+
+Run `npm run clean` to remove build artifacts (Next output, static exports, generated env/API/favicons, TS build info, Playwright results). It leaves `node_modules`, local `.env*.local` secrets, and fetched organism images untouched.
 
 ## Running the full stack with Docker
 
@@ -182,20 +184,20 @@ This project uses Playwright for E2E testing to ensure reliability across differ
 
 ### Running Tests
 
-To run FE E2E tests:
+To run the BRC Analytics FE E2E tests:
 
 ```
-npm run test:e2e
-```
-
-To run BE E2E tests:
-
-```
-npm run test:e2e:api
+npm run test:e2e:brc
 ```
 
 To run the GA2 smoke tests:
 
 ```
 npm run test:e2e:ga2
+```
+
+To run BE E2E tests:
+
+```
+npm run test:e2e:api
 ```

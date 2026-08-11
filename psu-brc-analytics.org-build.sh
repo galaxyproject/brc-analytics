@@ -3,7 +3,7 @@
 set -e
 
 echo \"Deleting ./out/\"
-rm -rf ./out
+rm -rf ./sites/brc-analytics/out
 
 # install node version 22.12.0
 n 22.12.0
@@ -11,10 +11,10 @@ npm ci
 export NEXT_PUBLIC_BASE_PATH=""
 
 # Build catalog
-npm run build:prod
+npm run build-prod:brc
 
 export BUCKET=s3://izk-brc-analytics.org/
-export SRCDIR=out/
+export SRCDIR=sites/brc-analytics/out/
 
 aws s3 sync  $SRCDIR $BUCKET --delete --profile brc-analytics
 aws cloudfront create-invalidation --distribution-id E3KF2GIJB5RIFD --paths "/*" --profile brc-analytics

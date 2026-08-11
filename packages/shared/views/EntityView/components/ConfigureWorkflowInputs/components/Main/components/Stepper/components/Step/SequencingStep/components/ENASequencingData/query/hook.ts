@@ -1,10 +1,10 @@
 import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import {
   type BaseReadRun,
   type ENAReadRunsQuery,
 } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { useWorkflowEntity } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
-import { type AppSiteConfig } from "@site-config/common/entities";
 import {
   type DefaultError,
   useQuery as useReactQuery,

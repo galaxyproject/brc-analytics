@@ -1,9 +1,10 @@
-import { SLUGIFY_OPTIONS } from "@/common/constants";
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { type Outbreak } from "@brc/apis/outbreak";
 import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
+import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
+import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
@@ -60,7 +61,6 @@ import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
 } from "@repo/shared/views/OrganismView/components/Main/constants";
-import { ROUTES as SITE_ROUTES } from "@routes/constants";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
@@ -306,7 +306,6 @@ export const buildPriorityPathogen = (entity: {
             pathname: SITE_ROUTES.PRIORITY_PATHOGEN,
             query: {
               entityId: slugify(priorityPathogenName, SLUGIFY_OPTIONS),
-              entityListType: "priority-pathogens",
             },
           });
         }

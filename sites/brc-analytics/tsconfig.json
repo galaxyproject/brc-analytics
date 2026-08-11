@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@brc/*": ["../../sites/brc-analytics/*"],
+      "@catalog/*": ["../../catalog/*"],
+      "@repo/shared": ["../../packages/shared/index.ts"],
+      "@repo/shared/*": ["../../packages/shared/*"],
+      "@site-config/*": ["../../site-config/*"],
+      "images/*": ["../../images/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../@types/findable-ui.d.ts",
+    "../../packages/shared/@types/theme.d.ts",
+    "../../@types/vega-embed.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}

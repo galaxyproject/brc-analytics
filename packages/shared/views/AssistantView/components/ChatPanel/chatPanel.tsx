@@ -20,6 +20,7 @@ interface ChatMessageDisplay {
 
 interface ChatPanelProps {
   error: string | null;
+  introText: string;
   isRestoring?: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
@@ -35,6 +36,7 @@ interface ChatPanelProps {
  * The main chat interface with message list, input, and suggestion chips.
  * @param props - Component props
  * @param props.error - Error message to display
+ * @param props.introText - Welcome/intro text shown before any messages
  * @param props.isRestoring - Whether a previous session is being restored
  * @param props.loading - Whether the assistant is processing
  * @param props.messages - Chat message history
@@ -48,6 +50,7 @@ interface ChatPanelProps {
  */
 export const ChatPanel = ({
   error,
+  introText,
   isRestoring,
   loading,
   messages,
@@ -124,9 +127,7 @@ export const ChatPanel = ({
         {!isRestoring && messages.length === 0 && (
           <Box sx={{ p: 4, textAlign: "center" }}>
             <Typography color="text.secondary" variant="body1">
-              Welcome! I can help you explore the BRC catalog -- organisms,
-              assemblies, and workflows -- and set up an analysis to run in
-              Galaxy. Try naming an organism or an analysis type to get started.
+              {introText}
             </Typography>
           </Box>
         )}
