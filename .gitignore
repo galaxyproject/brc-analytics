@@ -18,6 +18,8 @@ npm-debug.log*
 
 # env files
 .env*.local
+/.env.development
+/.env.production
 /sites/*/.env*
 backend/**/.env
 
@@ -44,6 +46,10 @@ backend/**/.env
 
 # Build Dir
 out/
+
+# root-level generated assets — each app builds under sites/*, so a public/ at
+# the repo root is a leftover and must never be committed
+/public
 
 # Playwright test artifacts
 test-results/
