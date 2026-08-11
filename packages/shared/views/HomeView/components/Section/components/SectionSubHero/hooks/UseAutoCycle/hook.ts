@@ -4,7 +4,7 @@ import { getNextIndex } from "./utils";
 
 export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
   const cycleRef = useRef<NodeJS.Timeout | null>(null);
-  const [activeIndex, setActiveIndex] = useState<string>(indexKeys[0]);
+  const [activeIndex, setActiveIndex] = useState<string>(indexKeys[0] ?? "");
 
   const clearAutoCycle = useCallback((): void => {
     if (cycleRef.current) {
@@ -15,6 +15,7 @@ export function useAutoCycle(indexKeys: string[]): UseAutoCycle {
 
   const startAutoCycle = useCallback((): void => {
     clearAutoCycle();
+    if (indexKeys.length === 0) return;
     cycleRef.current = setInterval(
       () => setActiveIndex((prevIndex) => getNextIndex(indexKeys, prevIndex)),
       5000

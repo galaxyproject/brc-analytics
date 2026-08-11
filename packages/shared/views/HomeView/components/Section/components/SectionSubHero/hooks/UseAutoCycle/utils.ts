@@ -5,6 +5,7 @@
  * @returns next index key.
  */
 export function getNextIndex(indexKeys: string[], prevIndex: string): string {
+  if (indexKeys.length === 0) return prevIndex;
   const currentIndex = indexKeys.findIndex(
     (indexKey) => indexKey === prevIndex
   );
