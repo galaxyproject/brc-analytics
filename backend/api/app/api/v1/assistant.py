@@ -109,9 +109,11 @@ async def assistant_chat(
             request.session_id,
             current_user.sub if current_user else None,
             turn_id=turn_id,
-            # The agent records the turn itself, success or failure -- it is the
-            # only layer that knows the session it created before a failure.
-            on_turn=turn_log.schedule,
+            # The agent records the turn itself, success or failure -- it is
+            # the only layer that knows the session it created before a
+            # failure. Awaited inline: the insert is milliseconds against a
+            # turn that spends seconds in inference.
+            on_turn=turn_log.record,
         )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")

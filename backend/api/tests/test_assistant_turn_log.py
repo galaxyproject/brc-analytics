@@ -196,18 +196,14 @@ async def test_concurrent_turns_sharing_an_index_both_persist():
 class TestChatEndpointLogging:
     """Endpoint-side guarantees: schedule a log, never break the turn."""
 
-    def _capture(self, monkeypatch):
-        """Capture what the endpoint hands to turn_log.
+    def _sink_passed_to(self, agent):
+        """The endpoint's job is to hand the agent the right sink.
 
-        The real write is detached, so asserting on its completion from a sync
-        TestClient would race. Scheduling is the endpoint's responsibility;
-        persistence is covered by TestScheduleAndWrite below.
+        The agent does the recording (it is the only layer that knows the
+        session it created before a failure), so what the endpoint owns is the
+        wiring; TestAgentRecordsFailures covers the recording itself.
         """
-        from app.services import turn_log
-
-        captured = []
-        monkeypatch.setattr(turn_log, "schedule", captured.append)
-        return captured
+        return agent.chat_with_telemetry.await_args.kwargs["on_turn"]
 
     def _tags(self, monkeypatch):
         from app.api.v1 import assistant as assistant_module
@@ -223,25 +219,21 @@ class TestChatEndpointLogging:
 
         return app.dependency_overrides[get_assistant_agent]()
 
-    def test_successful_turn_is_scheduled_for_logging(
+    def test_the_endpoint_hands_the_agent_the_turn_log_sink(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
-        captured = self._capture(monkeypatch)
+        agent = self._agent(app_with_stubbed_agent)
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
         assert resp.status_code == 200
-        assert len(captured) == 1
-        assert captured[0].session_id == "sess-abc"
-        assert captured[0].assistant_reply == "hi"
-        assert captured[0].outcome == TurnOutcome.SUCCESS
+        assert self._sink_passed_to(agent) is turn_log.record
 
     def test_turn_id_tags_sentry_and_reaches_the_agent(
         self, app_with_stubbed_agent, client, monkeypatch
     ):
         # The id has to be minted before the run and handed to the agent, or a
         # Sentry event raised inside it can't be joined back to the row.
-        self._capture(monkeypatch)
         tags = self._tags(monkeypatch)
         agent = self._agent(app_with_stubbed_agent)
 
@@ -267,60 +259,17 @@ class TestChatEndpointLogging:
         assert not get_settings().DATABASE_URL
 
         scheduled = []
-        monkeypatch.setattr(turn_log, "_write_with_timeout", scheduled.append)
+
+        async def _spy(t):
+            scheduled.append(t)
+
+        monkeypatch.setattr(turn_log, "_write", _spy)
 
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
 
         assert resp.status_code == 200
         assert scheduled == []
         assert resp.json()["reply"] == "hi"
-
-
-class TestScheduleAndWrite:
-    """turn_log.schedule() gating, and the write's fail-open contract."""
-
-    def _telemetry(self):
-        return TurnTelemetry(session_id="s1", user_message="hi")
-
-    def _no_task_scheduled(self, monkeypatch):
-        created = []
-        monkeypatch.setattr(turn_log.asyncio, "create_task", created.append)
-        turn_log.schedule(self._telemetry())
-        return created
-
-    def test_no_task_is_scheduled_without_a_database(self, monkeypatch):
-        monkeypatch.delenv("DATABASE_URL", raising=False)
-        assert self._no_task_scheduled(monkeypatch) == []
-
-    def test_no_task_is_scheduled_when_logging_is_disabled(self, monkeypatch):
-        monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
-        monkeypatch.setenv("ASSISTANT_TURN_LOGGING_ENABLED", "false")
-        assert self._no_task_scheduled(monkeypatch) == []
-
-    @pytest.mark.asyncio
-    async def test_a_broken_write_is_swallowed(self, monkeypatch):
-        async def boom(telemetry):
-            raise RuntimeError("database is on fire")
-
-        monkeypatch.setattr(turn_log, "_write", boom)
-
-        # Must not raise -- it runs detached, so an escape would be unhandled.
-        await turn_log._write_with_timeout(self._telemetry())
-
-    @pytest.mark.asyncio
-    async def test_a_stalled_write_gives_up(self, monkeypatch):
-        import asyncio as aio
-
-        async def never_finishes(telemetry):
-            await aio.sleep(60)
-
-        monkeypatch.setattr(turn_log, "_write", never_finishes)
-        monkeypatch.setenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "0.05")
-
-        start = time.monotonic()
-        await turn_log._write_with_timeout(self._telemetry())
-
-        assert time.monotonic() - start < 5
 
 
 def _stub_agent():
@@ -353,55 +302,43 @@ def _fake_run_result(new_messages):
     )
 
 
-@pytest.mark.asyncio
-async def test_chat_with_telemetry_reports_usage_latency_and_this_turns_messages():
-    from app.models.assistant import AnalysisSchema, SessionState
+class TestWriteIsFailOpen:
+    """A log failure must never surface to the user, even inline."""
 
-    agent = _stub_agent()
-    state = SessionState(session_id="s1", schema_state=AnalysisSchema(), messages=[])
-    agent.session_service = SimpleNamespace(
-        create_session=AsyncMock(return_value=state),
-        require_session=AsyncMock(return_value=state),
-        save_session=AsyncMock(),
-    )
-    agent._run_agent_with_retry = AsyncMock(
-        return_value=_fake_run_result([{"kind": "response", "parts": ["tool call"]}])
-    )
-    agent._extract_state = AsyncMock(return_value=({}, None))
+    def _telemetry(self):
+        return TurnTelemetry(session_id="s1", user_message="hi")
 
-    response, telemetry = await agent.chat_with_telemetry("hello")
+    @pytest.mark.asyncio
+    async def test_a_broken_write_is_swallowed(self, monkeypatch):
+        async def boom(telemetry):
+            raise RuntimeError("database is on fire")
 
-    assert response.reply == "Ready to go."
-    # The transcript is observability-only and must not ride the response.
-    assert "transcript" not in response.model_dump()
-    assert telemetry.session_id == "s1"
-    assert telemetry.user_message == "hello"
-    assert telemetry.assistant_reply == "Ready to go."
-    assert telemetry.transcript == [{"kind": "response", "parts": ["tool call"]}]
-    assert telemetry.token_usage.total_tokens == 15
-    assert telemetry.token_usage.tool_calls == 2
-    assert telemetry.latency_ms >= 0
+        monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+        from app.core.config import get_settings
 
+        get_settings.cache_clear()
+        monkeypatch.setattr(turn_log, "_write", boom)
 
-@pytest.mark.asyncio
-async def test_turn_index_increments_across_turns_in_a_session():
-    from app.models.assistant import AnalysisSchema, SessionState
+        # Must not raise -- the caller is mid-turn with a reply in hand.
+        await turn_log.record(self._telemetry())
 
-    agent = _stub_agent()
-    state = SessionState(session_id="s1", schema_state=AnalysisSchema(), messages=[])
-    agent.session_service = SimpleNamespace(
-        create_session=AsyncMock(return_value=state),
-        require_session=AsyncMock(return_value=state),
-        save_session=AsyncMock(),
-    )
-    agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
-    agent._extract_state = AsyncMock(return_value=({}, None))
+    @pytest.mark.asyncio
+    async def test_a_stalled_write_gives_up_on_the_timeout(self, monkeypatch):
+        import asyncio as aio
 
-    _, first = await agent.chat_with_telemetry("one")
-    _, second = await agent.chat_with_telemetry("two", session_id="s1")
-    _, third = await agent.chat_with_telemetry("three", session_id="s1")
+        async def never_finishes(telemetry):
+            await aio.sleep(60)
 
-    assert [first.turn_index, second.turn_index, third.turn_index] == [0, 1, 2]
+        monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+        monkeypatch.setenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "0.05")
+        from app.core.config import get_settings
+
+        get_settings.cache_clear()
+        monkeypatch.setattr(turn_log, "_write", never_finishes)
+
+        start = time.monotonic()
+        await turn_log.record(self._telemetry())
+        assert time.monotonic() - start < 5
 
 
 class TestTranscriptCap:
@@ -494,49 +431,6 @@ class TestRetentionSweep:
             assert deleted == 1
             remaining = await session.execute(select(AssistantTurnLog.session_id))
             assert list(remaining.scalars().all()) == ["new"]
-
-
-@pytest.mark.asyncio
-async def test_shutdown_waits_for_in_flight_turn_log_writes():
-    """A deploy must not drop the turns logged just before it.
-
-    The write is detached, and shutdown disposes the DB engine -- without a
-    drain, whatever was in flight dies with it.
-    """
-    import asyncio as aio
-
-    from app.services import turn_log as turn_log_mod
-
-    finished = []
-
-    async def slow_write():
-        await aio.sleep(0.05)
-        finished.append(True)
-
-    task = aio.create_task(slow_write())
-    turn_log_mod._pending_writes.add(task)
-    task.add_done_callback(turn_log_mod._pending_writes.discard)
-
-    await turn_log_mod.drain(timeout=2.0)
-
-    assert finished == [True]
-
-
-@pytest.mark.asyncio
-async def test_drain_gives_up_rather_than_hanging_shutdown():
-    import asyncio as aio
-
-    from app.services import turn_log as turn_log_mod
-
-    task = aio.create_task(aio.sleep(30))
-    turn_log_mod._pending_writes.add(task)
-    task.add_done_callback(turn_log_mod._pending_writes.discard)
-    try:
-        start = time.monotonic()
-        await turn_log_mod.drain(timeout=0.05)
-        assert time.monotonic() - start < 5
-    finally:
-        task.cancel()
 
 
 class TestAgentRecordsFailures:
@@ -769,20 +663,6 @@ async def test_a_nonpositive_retention_window_refuses_to_purge(monkeypatch):
         assert list(remaining.scalars().all()) == ["fresh"]
 
 
-@pytest.mark.asyncio
-async def test_drain_cancels_stragglers_so_none_outlive_close_db():
-    """A leftover write would rebuild the engine that close_db just disposed."""
-    import asyncio as aio
-
-    task = aio.create_task(aio.sleep(30))
-    turn_log._pending_writes.add(task)
-    task.add_done_callback(turn_log._pending_writes.discard)
-
-    await turn_log.drain(timeout=0.05)
-
-    assert task.cancelled() or task.done()
-
-
 class TestInfoRetentionWindow:
     """/info must only advertise a window the deployment will actually enforce."""
 
@@ -868,17 +748,15 @@ class TestLoggingAndNoticeStayInSync:
         ({"ASSISTANT_TURN_LOG_RETENTION_DAYS": "-5"}, "negative window"),
     ]
 
-    def _fake_create_task(self, monkeypatch):
-        """Record scheduled coroutines without running them."""
-        created = []
+    def _spy_on_write(self, monkeypatch):
+        """Count actual inserts without touching a database."""
+        written = []
 
-        def _capture(coro):
-            coro.close()  # nothing awaits it here; avoid the warning
-            created.append(coro)
-            return MagicMock()
+        async def _spy(telemetry):
+            written.append(telemetry)
 
-        monkeypatch.setattr(turn_log.asyncio, "create_task", _capture)
-        return created
+        monkeypatch.setattr(turn_log, "_write", _spy)
+        return written
 
     def _apply(self, monkeypatch, env):
         from app.core.config import get_settings
@@ -893,25 +771,27 @@ class TestLoggingAndNoticeStayInSync:
         return get_settings()
 
     @pytest.mark.parametrize("env,label", CONFIGS)
-    def test_nothing_is_written_when_nothing_is_advertised(
+    @pytest.mark.asyncio
+    async def test_nothing_is_written_when_nothing_is_advertised(
         self, monkeypatch, env, label
     ):
         settings = self._apply(monkeypatch, env)
 
         assert turn_log.active_retention_days(settings) is None, label
 
-        created = self._fake_create_task(monkeypatch)
-        turn_log.schedule(TurnTelemetry(session_id="s", user_message="hi"))
-        assert created == [], f"logged with no user notice ({label})"
+        written = self._spy_on_write(monkeypatch)
+        await turn_log.record(TurnTelemetry(session_id="s", user_message="hi"))
+        assert written == [], f"logged with no user notice ({label})"
 
-    def test_the_default_deployment_both_logs_and_discloses(self, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_the_default_deployment_both_logs_and_discloses(self, monkeypatch):
         settings = self._apply(monkeypatch, {})
 
         assert turn_log.active_retention_days(settings) == 90
 
-        created = self._fake_create_task(monkeypatch)
-        turn_log.schedule(TurnTelemetry(session_id="s", user_message="hi"))
-        assert len(created) == 1
+        written = self._spy_on_write(monkeypatch)
+        await turn_log.record(TurnTelemetry(session_id="s", user_message="hi"))
+        assert len(written) == 1
 
 
 @pytest.mark.parametrize("days", ["0", "-3"])
@@ -924,3 +804,45 @@ def test_no_sweep_is_started_for_a_window_that_cannot_be_enforced(monkeypatch, d
     get_settings.cache_clear()
 
     assert turn_log.start_purge_task() is None
+
+
+@pytest.mark.asyncio
+async def test_a_broken_log_sink_does_not_cost_the_user_their_reply():
+    """The sink is fire-and-forget; a reply we already computed outranks a row."""
+    from app.models.assistant import AnalysisSchema, SessionState
+
+    agent = _stub_agent()
+    state = SessionState(session_id="s1", schema_state=AnalysisSchema())
+    agent.session_service = SimpleNamespace(
+        create_session=AsyncMock(return_value=state),
+        require_session=AsyncMock(return_value=state),
+        save_session=AsyncMock(),
+    )
+    agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+    agent._extract_state = AsyncMock(return_value=({}, None))
+
+    def exploding_sink(_telemetry):
+        raise RuntimeError("sink is down")
+
+    response, _ = await agent.chat_with_telemetry("hi", on_turn=exploding_sink)
+
+    assert response.reply == "Ready to go."
+
+
+@pytest.mark.asyncio
+async def test_an_unresolved_session_is_recorded_as_null_not_as_the_request_id():
+    """We only name a session we actually resolved."""
+    agent = _stub_agent()
+    agent.session_service = SimpleNamespace(
+        create_session=AsyncMock(side_effect=RuntimeError("session store down")),
+        require_session=AsyncMock(side_effect=RuntimeError("session store down")),
+        save_session=AsyncMock(),
+    )
+    recorded = []
+
+    with pytest.raises(RuntimeError):
+        await agent.chat_with_telemetry(
+            "hi", session_id="unvalidated-id", on_turn=recorded.append
+        )
+
+    assert recorded[0].session_id is None

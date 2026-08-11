@@ -126,10 +126,12 @@ ASSISTANT_TURN_LOG_TIMEOUT_SECONDS=2           # bound on a single write
 ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES=65536  # per-row transcript cap
 ```
 
-The write runs off the response path as a detached task and is fail-open, so a
-missing, slow, or broken database costs the user nothing -- failures go to the
-log and to Sentry. With no `DATABASE_URL` nothing is recorded and the app warns
-once at startup.
+The write is awaited in the request and is fail-open, so a missing, slow, or
+broken database costs the user nothing -- failures go to the log and to Sentry,
+and the reply is returned regardless. An insert is a few milliseconds against a
+turn that spends seconds in inference, and `ASSISTANT_TURN_LOG_TIMEOUT_SECONDS`
+bounds the worst case. With no `DATABASE_URL` nothing is recorded and the app
+warns once at startup.
 
 `transcript` holds this turn's pydantic-ai messages including tool calls and
 returns, capped at `ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES`. Tool returns are

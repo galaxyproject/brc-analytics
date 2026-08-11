@@ -1,8 +1,11 @@
 """Durable per-turn assistant logging (#1294).
 
-Owns both halves of the turn log's background work: writing rows off the
-response path, and sweeping expired ones. The chat endpoint only calls
-`schedule()`; `main.py` only opens `lifecycle()`.
+Owns both halves of the turn log: writing a row per turn, and sweeping expired
+ones. The agent calls `record()`; `main.py` opens `lifecycle()` for the sweep.
+
+The write is awaited in the request. An insert is a few milliseconds against a
+turn that spends seconds in model inference, and it is the try/except -- not
+detachment -- that keeps a log failure from costing a user their reply.
 
 Writes are fail-open by design. Losing a log row must never cost a user their
 reply, so every failure here is swallowed after being reported.
@@ -12,7 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timedelta, timezone
 
 import sentry_sdk
@@ -47,13 +50,6 @@ def _strip_nuls(value):
 
 # Detached writes need a strong reference or the loop may collect them
 # mid-flight. Discarded on completion.
-_pending_writes: set[asyncio.Task] = set()
-
-# Analytics must not starve user-facing endpoints for pooled connections
-# (pool_size=5, max_overflow=10), so writes queue in-process instead.
-_write_slots = asyncio.Semaphore(2)
-
-
 def active_retention_days(settings=None) -> int | None:
     """The window we keep turns for, or None when we aren't keeping them.
 
@@ -72,55 +68,22 @@ def active_retention_days(settings=None) -> int | None:
     return days if days >= 1 else None
 
 
-def schedule(telemetry: TurnTelemetry) -> None:
-    """Persist one turn, off the response path. Returns immediately."""
+async def record(telemetry: TurnTelemetry) -> None:
+    """Persist one turn. Never raises.
+
+    Awaited in the request rather than backgrounded. The insert is a few
+    milliseconds against a turn that spends seconds in model inference, and it
+    is the try/except -- not the detachment -- that keeps a log failure from
+    costing a user their reply. Doing it inline also means nothing is ever in
+    flight at shutdown, so there is no drain to get wrong.
+    """
     settings = get_settings()
     if active_retention_days(settings) is None:
         return
 
-    task = asyncio.create_task(_write_with_timeout(telemetry))
-    _pending_writes.add(task)
-    task.add_done_callback(_pending_writes.discard)
-
-
-async def drain(timeout: float = 5.0) -> None:
-    """Let in-flight writes finish before the DB engine goes away.
-
-    Shutdown disposes the engine, so without this the turns logged in the last
-    moments before a deploy are lost -- often the ones worth reading.
-    """
-    if not _pending_writes:
-        return
-    tasks = list(_pending_writes)
-    logger.info("Waiting on %d in-flight turn log writes", len(tasks))
-    _, still_running = await asyncio.wait(tasks, timeout=timeout)
-    if still_running:
-        # Cancel rather than abandon: close_db() is next and nulls the engine,
-        # so a straggler reaching db_session() would build a fresh engine and
-        # connection pool that nothing will ever dispose.
-        logger.warning(
-            "Giving up on %d turn log writes still running at shutdown",
-            len(still_running),
-        )
-        for task in still_running:
-            task.cancel()
-        await asyncio.gather(*still_running, return_exceptions=True)
-
-
-async def _write_with_timeout(telemetry: TurnTelemetry) -> None:
-    """Never raises -- this runs detached, so an escape would be unhandled."""
-    settings = get_settings()
-
-    async def _acquire_and_write() -> None:
-        # Inside the timeout: with only a couple of slots, queueing for one is
-        # exactly where a write stalls, and a bound that excluded the wait
-        # would let a backlog outlive the drain and die at close_db().
-        async with _write_slots:
-            await _write(telemetry)
-
     try:
         await asyncio.wait_for(
-            _acquire_and_write(),
+            _write(telemetry),
             timeout=settings.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
@@ -244,19 +207,12 @@ def start_purge_task() -> asyncio.Task | None:
 
 @asynccontextmanager
 async def lifecycle():
-    """Run the sweep for the app's lifetime and drain writes on the way out.
-
-    The drain has to happen before the DB engine is disposed, so owning both
-    ends here keeps that ordering out of main.py.
-    """
+    """Run the retention sweep for the app's lifetime."""
     purge_task = start_purge_task()
     try:
         yield
     finally:
         if purge_task is not None:
             purge_task.cancel()
-            try:
+            with suppress(asyncio.CancelledError):
                 await purge_task
-            except asyncio.CancelledError:
-                pass
-        await drain()

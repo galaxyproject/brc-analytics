@@ -25,21 +25,6 @@ SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
 
 
 @pytest.fixture(autouse=True)
-def _no_leaked_turn_log_writes():
-    """Keep turn_log's module-global pending set from leaking across tests.
-
-    A test that schedules a write (or fakes create_task) leaves an entry
-    behind, and the next test to run the app lifespan then blocks for the
-    full drain timeout on it.
-    """
-    from app.services import turn_log
-
-    turn_log._pending_writes.clear()
-    yield
-    turn_log._pending_writes.clear()
-
-
-@pytest.fixture(autouse=True)
 def _fresh_settings():
     """Settings are lru_cached, so monkeypatched env leaks between tests."""
     get_settings.cache_clear()
@@ -94,7 +79,7 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     # Recording lives in the agent now, so the stub has to honour the sink.
     async def _chat_with_telemetry(*args, on_turn=None, **kwargs):
         if on_turn is not None:
-            on_turn(stub_turn[1])
+            await on_turn(stub_turn[1])
         return stub_turn
 
     fake_agent.chat_with_telemetry = AsyncMock(side_effect=_chat_with_telemetry)

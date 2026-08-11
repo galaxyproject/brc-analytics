@@ -6,7 +6,7 @@ import json
 import logging
 import re
 import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
@@ -421,6 +421,21 @@ _STATE_FIELDS = (
     "workflow",
     "data_source",
 )
+
+
+async def _safe_record(
+    sink: Callable[[TurnTelemetry], Awaitable[None]], telemetry: TurnTelemetry
+) -> None:
+    """Hand a turn to the log sink without letting it break the turn.
+
+    The sink is fail-open by contract; if it raises anyway we would throw away
+    a reply we already computed (or replace the real exception on the error
+    path) for the sake of a log row.
+    """
+    try:
+        await sink(telemetry)
+    except Exception:
+        logger.exception("Failed to record turn %s", telemetry.turn_id)
 
 
 class AssistantAgent:
@@ -997,7 +1012,7 @@ class AssistantAgent:
         session_id: Optional[str] = None,
         owner_keycloak_sub: Optional[str] = None,
         turn_id: Optional[UUID] = None,
-        on_turn: Optional[Callable[[TurnTelemetry], None]] = None,
+        on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry]:
         """Same as chat(), plus the per-turn record the API layer logs.
 
@@ -1030,18 +1045,19 @@ class AssistantAgent:
             raise
         except Exception as exc:
             if on_turn is not None:
-                on_turn(
+                await _safe_record(
+                    on_turn,
                     TurnTelemetry.for_error(
                         exc,
                         turn_id=turn_id,
-                        session_id=progress.get("session_id", session_id),
+                        session_id=progress.get("session_id"),
                         turn_index=progress.get("turn_index"),
                         owner_keycloak_sub=owner_keycloak_sub,
                         user_message=message,
                         latency_ms=int((time.monotonic() - turn_start) * 1000),
                         model=self.settings.AI_PRIMARY_MODEL or None,
                         provider=self.get_provider(),
-                    )
+                    ),
                 )
             raise
 
@@ -1052,7 +1068,7 @@ class AssistantAgent:
         owner_keycloak_sub: Optional[str],
         turn_id: UUID,
         turn_start: float,
-        on_turn: Optional[Callable[[TurnTelemetry], None]],
+        on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]],
         progress: dict,
     ) -> tuple[ChatResponse, TurnTelemetry]:
         if not self.is_available():
@@ -1213,7 +1229,7 @@ class AssistantAgent:
         )
 
         if on_turn is not None:
-            on_turn(telemetry)
+            await _safe_record(on_turn, telemetry)
         return response, telemetry
 
     def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:

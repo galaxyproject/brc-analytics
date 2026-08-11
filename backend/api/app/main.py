@@ -74,8 +74,7 @@ def create_app() -> FastAPI:
                     "conversations will not be recorded beyond the Redis session TTL"
                 )
 
-            # Owns the retention sweep and drains in-flight writes on the way
-            # out -- both have to finish before close_db() disposes the engine.
+            # Owns the retention sweep for the app's lifetime.
             async with turn_log.lifecycle():
                 yield
 
