@@ -25,6 +25,21 @@ SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
 
 
 @pytest.fixture(autouse=True)
+def _no_leaked_turn_log_writes():
+    """Keep turn_log's module-global pending set from leaking across tests.
+
+    A test that schedules a write (or fakes create_task) leaves an entry
+    behind, and the next test to run the app lifespan then blocks for the
+    full drain timeout on it.
+    """
+    from app.services import turn_log
+
+    turn_log._pending_writes.clear()
+    yield
+    turn_log._pending_writes.clear()
+
+
+@pytest.fixture(autouse=True)
 def _fresh_settings():
     """Settings are lru_cached, so monkeypatched env leaks between tests."""
     get_settings.cache_clear()

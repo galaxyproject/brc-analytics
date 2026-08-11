@@ -43,24 +43,13 @@ async def assistant_info(
     """Surface assistant configuration for UI attribution (model + provider)."""
     available = agent.is_available()
     settings = agent.settings
-    # Only advertise a window the deployment actually enforces -- logging on,
-    # a sink to write to, and a sweep that will delete.
-    # The >= 1 mirrors purge_expired's guard: a non-positive window means the
-    # sweep refuses to run, so advertising it would promise a deletion that
-    # never happens.
-    logging_on = (
-        settings.ASSISTANT_TURN_LOGGING_ENABLED
-        and bool(settings.DATABASE_URL)
-        and settings.ASSISTANT_TURN_LOG_PURGE_ENABLED
-        and settings.ASSISTANT_TURN_LOG_RETENTION_DAYS >= 1
-    )
     return AssistantInfoResponse(
         available=available,
         model=settings.AI_PRIMARY_MODEL if available else None,
         provider=agent.get_provider() if available else None,
-        turn_log_retention_days=(
-            settings.ASSISTANT_TURN_LOG_RETENTION_DAYS if logging_on else None
-        ),
+        # Same predicate the writer uses, so the notice can never disagree
+        # with whether we are actually keeping anything.
+        turn_log_retention_days=turn_log.active_retention_days(settings),
     )
 
 

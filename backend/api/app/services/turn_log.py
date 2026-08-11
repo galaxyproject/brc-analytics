@@ -39,7 +39,7 @@ def _strip_nuls(value):
     if isinstance(value, str):
         return value.replace("\x00", "")
     if isinstance(value, dict):
-        return {k: _strip_nuls(v) for k, v in value.items()}
+        return {_strip_nuls(k): _strip_nuls(v) for k, v in value.items()}
     if isinstance(value, list):
         return [_strip_nuls(v) for v in value]
     return value
@@ -54,10 +54,28 @@ _pending_writes: set[asyncio.Task] = set()
 _write_slots = asyncio.Semaphore(2)
 
 
+def active_retention_days(settings=None) -> int | None:
+    """The window we keep turns for, or None when we aren't keeping them.
+
+    Single source of truth for both halves of the contract: the writer will not
+    persist a turn unless this returns a number, and /info shows the user the
+    same number. Keeping them on one predicate is what stops a deployment from
+    logging conversations while the UI shows no notice -- or promising a
+    deletion no sweep will carry out.
+    """
+    settings = settings or get_settings()
+    if not settings.ASSISTANT_TURN_LOGGING_ENABLED or not settings.DATABASE_URL:
+        return None
+    if not settings.ASSISTANT_TURN_LOG_PURGE_ENABLED:
+        return None
+    days = settings.ASSISTANT_TURN_LOG_RETENTION_DAYS
+    return days if days >= 1 else None
+
+
 def schedule(telemetry: TurnTelemetry) -> None:
     """Persist one turn, off the response path. Returns immediately."""
     settings = get_settings()
-    if not settings.ASSISTANT_TURN_LOGGING_ENABLED or not settings.DATABASE_URL:
+    if active_retention_days(settings) is None:
         return
 
     task = asyncio.create_task(_write_with_timeout(telemetry))
@@ -206,9 +224,9 @@ def start_purge_task() -> asyncio.Task | None:
     if not settings.ASSISTANT_TURN_LOG_PURGE_ENABLED:
         # The UI still promises deletion, so say this out loud.
         logger.warning(
-            "Turn log retention sweep is disabled; rows will not be deleted "
-            "after %d days despite the notice shown to users",
-            settings.ASSISTANT_TURN_LOG_RETENTION_DAYS,
+            "Turn log retention sweep is disabled; nothing will be deleted "
+            "automatically. Turn logging is off too, so no conversations are "
+            "being recorded -- re-enable the sweep to start logging again.",
         )
         return None
 

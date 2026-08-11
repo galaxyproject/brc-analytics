@@ -850,3 +850,65 @@ class TestInfoRetentionWindow:
             ASSISTANT_TURN_LOG_PURGE_ENABLED="false",
         )
         assert days is None
+
+
+class TestLoggingAndNoticeStayInSync:
+    """The writer and the user-facing notice must agree, in both directions.
+
+    Logging without a notice is a privacy problem; a notice without logging
+    (or without an enforced window) is a promise nothing keeps. One predicate
+    drives both, and these pin it.
+    """
+
+    CONFIGS = [
+        ({"ASSISTANT_TURN_LOGGING_ENABLED": "false"}, "logging off"),
+        ({"DATABASE_URL": None}, "no database"),
+        ({"ASSISTANT_TURN_LOG_PURGE_ENABLED": "false"}, "sweep off"),
+        ({"ASSISTANT_TURN_LOG_RETENTION_DAYS": "0"}, "zero-day window"),
+        ({"ASSISTANT_TURN_LOG_RETENTION_DAYS": "-5"}, "negative window"),
+    ]
+
+    def _fake_create_task(self, monkeypatch):
+        """Record scheduled coroutines without running them."""
+        created = []
+
+        def _capture(coro):
+            coro.close()  # nothing awaits it here; avoid the warning
+            created.append(coro)
+            return MagicMock()
+
+        monkeypatch.setattr(turn_log.asyncio, "create_task", _capture)
+        return created
+
+    def _apply(self, monkeypatch, env):
+        from app.core.config import get_settings
+
+        monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+        for key, value in env.items():
+            if value is None:
+                monkeypatch.delenv(key, raising=False)
+            else:
+                monkeypatch.setenv(key, value)
+        get_settings.cache_clear()
+        return get_settings()
+
+    @pytest.mark.parametrize("env,label", CONFIGS)
+    def test_nothing_is_written_when_nothing_is_advertised(
+        self, monkeypatch, env, label
+    ):
+        settings = self._apply(monkeypatch, env)
+
+        assert turn_log.active_retention_days(settings) is None, label
+
+        created = self._fake_create_task(monkeypatch)
+        turn_log.schedule(TurnTelemetry(session_id="s", user_message="hi"))
+        assert created == [], f"logged with no user notice ({label})"
+
+    def test_the_default_deployment_both_logs_and_discloses(self, monkeypatch):
+        settings = self._apply(monkeypatch, {})
+
+        assert turn_log.active_retention_days(settings) == 90
+
+        created = self._fake_create_task(monkeypatch)
+        turn_log.schedule(TurnTelemetry(session_id="s", user_message="hi"))
+        assert len(created) == 1
