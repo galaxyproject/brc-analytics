@@ -12,7 +12,7 @@ UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/VGP/assemblyList.jso
 
 GENOMES_OUTPUT_PATH = "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv"
 
-ORGANISM_IMAGE_PATH = "public/organism_image"
+ORGANISM_IMAGE_PATH = "sites/ga2/public/organism_image"
 
 ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
 
