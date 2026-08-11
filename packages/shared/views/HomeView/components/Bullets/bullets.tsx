@@ -22,9 +22,6 @@ export const Bullets = ({
           onClick={(): void => {
             onBullet(bullet);
           }}
-          onKeyDown={(): void => {
-            onBullet(bullet);
-          }}
         >
           <StyledDot isActive={activeBullet === bullet} />
         </Bullet>
