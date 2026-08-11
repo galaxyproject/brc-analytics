@@ -2,6 +2,7 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
 import {
   GA2AssemblyEntity,
+  ImageData,
   SRAData,
 } from "../../../../sites/ga2/apis/assembly";
 import { GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
@@ -37,7 +38,39 @@ const SOURCE_PATH_GENOMES =
 const SOURCE_PATH_RAWDATA =
   "catalog/ga2/build/intermediate/primary-data-ncbi.tsv";
 
+const MISSING_IMAGE_MARKER = "missing_image";
+
 buildCatalog();
+
+/**
+ * Builds organism image data for a source row, or null when the row has no real
+ * image (only the missing-image placeholder).
+ * @param row - Source genome row.
+ * @returns image data, or null when there is no real image.
+ */
+function buildOrganismImage(row: SourceGenome): ImageData | null {
+  const url = resolveOrganismImageUrl(row.organismImageUrl);
+  if (!url) return null;
+  return {
+    credit: row.organismImageCredit,
+    license: row.organismImageLicense,
+    sourceName: row.organismImageSourceName,
+    sourceUrl: row.organismImageSourceUrl,
+    url,
+  };
+}
+
+/**
+ * Converts a built organism-image path to its served URL, or null when it is
+ * the missing-image placeholder — so the app can decide list-placeholder vs
+ * detail-no-image rather than rendering the fallback everywhere.
+ * @param path - Built image path (e.g. sites/ga2/public/organism_image/...).
+ * @returns served URL (/organism_image/...), or null for a missing image.
+ */
+function resolveOrganismImageUrl(path: string): string | null {
+  if (path.includes(MISSING_IMAGE_MARKER)) return null;
+  return path.replace("sites/ga2/public/", "/");
+}
 
 async function buildCatalog(): Promise<void> {
   const sraData = await buildSraData();
@@ -143,13 +176,7 @@ async function buildAssemblies(
       galaxyDatacacheUrl: parseStringOrNull(row.galaxyDatacacheUrl),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
-      image: {
-        credit: row.organismImageCredit,
-        license: row.organismImageLicense,
-        sourceName: row.organismImageSourceName,
-        sourceUrl: row.organismImageSourceUrl,
-        url: row.organismImageUrl.replace("sites/ga2/public/", "/"),
-      },
+      image: buildOrganismImage(row),
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
@@ -177,7 +204,7 @@ async function buildAssemblies(
         row.taxonomicLevelStrain,
         row.strain
       ),
-      thumbnailUrl: row.organismThumbnailUrl.replace("sites/ga2/public/", "/"),
+      thumbnailUrl: resolveOrganismImageUrl(row.organismThumbnailUrl),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });

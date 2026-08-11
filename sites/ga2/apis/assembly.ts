@@ -8,7 +8,7 @@ export interface GA2AssemblyEntity {
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
   geneModelUrl: string | null;
-  image: ImageData;
+  image: ImageData | null;
   isRef: "No" | "Yes";
   length: number;
   level: string;
@@ -32,7 +32,7 @@ export interface GA2AssemblyEntity {
   taxonomicLevelPhylum: string;
   taxonomicLevelSpecies: string;
   taxonomicLevelStrain: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string | null;
   tolId: string;
   ucscBrowserUrl: string | null;
 }

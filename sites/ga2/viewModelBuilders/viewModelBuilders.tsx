@@ -132,6 +132,7 @@ export const buildOrganismImageThumbnail = (
   return {
     image: entity.image,
     isThumbnail: true,
+    thumbnailUrl: entity.thumbnailUrl,
   };
 };
 
