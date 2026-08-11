@@ -148,7 +148,7 @@ async function buildAssemblies(
         license: row.organismImageLicense,
         sourceName: row.organismImageSourceName,
         sourceUrl: row.organismImageSourceUrl,
-        url: row.organismImageUrl.replace("public/", "/"),
+        url: row.organismImageUrl.replace("sites/ga2/public/", "/"),
       },
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
@@ -177,7 +177,7 @@ async function buildAssemblies(
         row.taxonomicLevelStrain,
         row.strain
       ),
-      thumbnailUrl: row.organismThumbnailUrl.replace("public/", "/"),
+      thumbnailUrl: row.organismThumbnailUrl.replace("sites/ga2/public/", "/"),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
