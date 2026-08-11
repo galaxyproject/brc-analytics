@@ -48,8 +48,6 @@ def _strip_nuls(value):
     return value
 
 
-# Detached writes need a strong reference or the loop may collect them
-# mid-flight. Discarded on completion.
 def active_retention_days(settings=None) -> int | None:
     """The window we keep turns for, or None when we aren't keeping them.
 

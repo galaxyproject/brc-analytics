@@ -83,8 +83,8 @@ class Settings:
         self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
             os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
         )
-        # The write runs off the response path, so this bounds a detached task
-        # rather than user-visible latency.
+        # The write is awaited in the request, so this is the cap on what a
+        # slow database can add to a turn. Kept low for that reason.
         self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(
             os.getenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "2.0")
         )
