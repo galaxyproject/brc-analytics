@@ -218,22 +218,26 @@ async def _purge_loop() -> None:
 
 
 def start_purge_task() -> asyncio.Task | None:
+    """Start the sweep, or explain why there isn't one."""
     settings = get_settings()
-    if not settings.DATABASE_URL:
-        return None
-    if not settings.ASSISTANT_TURN_LOG_PURGE_ENABLED:
-        # The UI still promises deletion, so say this out loud.
-        logger.warning(
-            "Turn log retention sweep is disabled; nothing will be deleted "
-            "automatically. Turn logging is off too, so no conversations are "
-            "being recorded -- re-enable the sweep to start logging again.",
-        )
+    days = active_retention_days(settings)
+    if days is None:
+        # Same predicate as the writer, so we never spin a loop that can only
+        # log errors -- a non-positive window makes purge_expired refuse.
+        if settings.DATABASE_URL and settings.ASSISTANT_TURN_LOGGING_ENABLED:
+            logger.warning(
+                "No turn log retention sweep: %s. Turn logging is disabled too, "
+                "so nothing is being recorded.",
+                "sweep switched off"
+                if not settings.ASSISTANT_TURN_LOG_PURGE_ENABLED
+                else f"retention window is {settings.ASSISTANT_TURN_LOG_RETENTION_DAYS} days",
+            )
         return None
 
     logger.info(
         "Turn log retention sweep every %.1fh, window %d days",
         settings.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS,
-        settings.ASSISTANT_TURN_LOG_RETENTION_DAYS,
+        days,
     )
     return asyncio.create_task(_purge_loop())
 

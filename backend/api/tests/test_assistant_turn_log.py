@@ -912,3 +912,15 @@ class TestLoggingAndNoticeStayInSync:
         created = self._fake_create_task(monkeypatch)
         turn_log.schedule(TurnTelemetry(session_id="s", user_message="hi"))
         assert len(created) == 1
+
+
+@pytest.mark.parametrize("days", ["0", "-3"])
+def test_no_sweep_is_started_for_a_window_that_cannot_be_enforced(monkeypatch, days):
+    """purge_expired refuses days < 1, so a loop here could only log errors."""
+    from app.core.config import get_settings
+
+    monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    monkeypatch.setenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", days)
+    get_settings.cache_clear()
+
+    assert turn_log.start_purge_task() is None
