@@ -23,7 +23,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
       appTheme={createGa2Theme(props.pageProps.themeOptions)}
       defaultDescription={GA2_DEFAULT_DESCRIPTION}
       isEntitiesLoaded={isEntitiesLoaded}
-      loginEnabled={appConfig.loginEnabled}
     />
   );
 }

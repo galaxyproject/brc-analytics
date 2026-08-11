@@ -5,7 +5,6 @@ import { AppLayout as DXAppLayout } from "@databiosphere/findable-ui/lib/compone
 import { Floating } from "@databiosphere/findable-ui/lib/components/Layout/components/Floating/floating";
 import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/header";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
-import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
 import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
@@ -22,6 +21,7 @@ import {
 import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter";
 import { StyledFooter } from "@repo/shared/components/layout/Footer/footer.styles";
 import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import type { PageMeta } from "@repo/shared/meta/types";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
@@ -51,12 +51,11 @@ export type AppPropsWithComponent = AppProps & {
 };
 
 export interface AppProvidersProps {
-  appConfig: SiteConfig;
+  appConfig: AppSiteConfig;
   appProps: AppPropsWithComponent;
   appTheme: Theme;
   defaultDescription: string;
   isEntitiesLoaded: boolean;
-  loginEnabled?: boolean;
 }
 
 /**
@@ -69,7 +68,6 @@ export interface AppProvidersProps {
  * @param props.appTheme - Resolved MUI/Emotion theme.
  * @param props.defaultDescription - Fallback OG description for the site.
  * @param props.isEntitiesLoaded - Whether the entity cache has loaded.
- * @param props.loginEnabled - Whether authentication is enabled for the site.
  * @returns the application shell.
  */
 export function AppProviders({
@@ -78,7 +76,6 @@ export function AppProviders({
   appTheme,
   defaultDescription,
   isEntitiesLoaded,
-  loginEnabled,
 }: AppProvidersProps): JSX.Element {
   const { Component, pageProps } = appProps;
   const { layout, redirectRootToPath } = appConfig;
@@ -108,7 +105,7 @@ export function AppProviders({
             <QueryClientProvider client={queryClient}>
               <ServicesProvider>
                 <SystemStatusProvider>
-                  <AuthProvider loginEnabled={loginEnabled}>
+                  <AuthProvider loginEnabled={appConfig.loginEnabled}>
                     <LayoutDimensionsProvider>
                       <AppLayout>
                         <DXHeader {...header} />

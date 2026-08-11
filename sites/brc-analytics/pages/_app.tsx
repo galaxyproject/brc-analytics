@@ -22,7 +22,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
       appTheme={createBrcTheme(props.pageProps.themeOptions)}
       defaultDescription={BRC_DEFAULT_DESCRIPTION}
       isEntitiesLoaded={isEntitiesLoaded}
-      loginEnabled={appConfig.loginEnabled}
     />
   );
 }
