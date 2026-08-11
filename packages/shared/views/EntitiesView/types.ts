@@ -1,5 +1,1 @@
-import type { PageMeta } from "@repo/shared/meta/types";
-
-export interface Props extends Partial<PageMeta> {
-  entityListType: string;
-}
+export type { EntitiesPageProps as Props } from "@repo/shared/services/staticGeneration/entities/types";
