@@ -1,7 +1,7 @@
 import { Section } from "@brc/views/PriorityPathogenView/ui/Section/section";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { ListItem } from "@mui/material";
-import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
 import { type JSX } from "react";
 import { StyledList } from "./resourcesSection.styles";
 import type { Props } from "./types";

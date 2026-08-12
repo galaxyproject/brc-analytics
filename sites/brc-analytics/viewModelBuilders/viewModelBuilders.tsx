@@ -8,7 +8,6 @@ import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
-import { type KeyValueSection } from "@brc/views/PriorityPathogenView/ui/Section/KeyValueSection/keyValueSection";
 import { type MDXSection } from "@brc/views/PriorityPathogenView/ui/Section/MDXSection/mdxSection";
 import { type Breadcrumb } from "@databiosphere/findable-ui/lib/components/common/Breadcrumbs/breadcrumbs";
 import {
@@ -57,6 +56,7 @@ import {
   getGenomeSerotypeText,
   getGenomeStrainText,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import { type KeyValueSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection";
 import {
   COLUMN_PRESET_KEY,
   COLUMN_PRESET_LABEL,
