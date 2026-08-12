@@ -1,5 +1,6 @@
 import logging
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from alembic import command
@@ -60,9 +61,20 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
     return _session_factory
 
 
-async def get_db_session() -> AsyncIterator[AsyncSession]:
+@asynccontextmanager
+async def db_session() -> AsyncIterator[AsyncSession]:
+    """Session for work outside a request -- background tasks, scripts, sweeps.
+
+    get_db_session() is a FastAPI dependency and its session is closed when the
+    request ends, which is no use to work that outlives one.
+    """
     session_factory = get_session_factory()
     async with session_factory() as session:
+        yield session
+
+
+async def get_db_session() -> AsyncIterator[AsyncSession]:
+    async with db_session() as session:
         yield session
 
 

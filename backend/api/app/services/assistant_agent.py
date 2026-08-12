@@ -6,8 +6,9 @@ import json
 import logging
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 from urllib.parse import urlencode
+from uuid import UUID, uuid4
 
 from pydantic_ai import Agent, RunContext, Tool
 from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
@@ -34,6 +35,8 @@ from app.models.assistant import (
     SessionState,
     SuggestionChip,
     TokenUsage,
+    TurnOutcome,
+    TurnTelemetry,
 )
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
@@ -418,6 +421,21 @@ _STATE_FIELDS = (
     "workflow",
     "data_source",
 )
+
+
+async def _safe_record(
+    sink: Callable[[TurnTelemetry], Awaitable[None]], telemetry: TurnTelemetry
+) -> None:
+    """Hand a turn to the log sink without letting it break the turn.
+
+    The sink is fail-open by contract; if it raises anyway we would throw away
+    a reply we already computed (or replace the real exception on the error
+    path) for the sake of a log row.
+    """
+    try:
+        await sink(telemetry)
+    except Exception:
+        logger.exception("Failed to record turn %s", telemetry.turn_id)
 
 
 class AssistantAgent:
@@ -983,6 +1001,76 @@ class AssistantAgent:
 
         Creates a new session if session_id is None or not found.
         """
+        response, _telemetry = await self.chat_with_telemetry(
+            message, session_id, owner_keycloak_sub
+        )
+        return response
+
+    async def chat_with_telemetry(
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        owner_keycloak_sub: Optional[str] = None,
+        turn_id: Optional[UUID] = None,
+        on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]] = None,
+    ) -> tuple[ChatResponse, TurnTelemetry]:
+        """Same as chat(), plus the per-turn record the API layer logs.
+
+        Split out so the agent stays DB-agnostic: it hands back what happened
+        and the endpoint decides whether to persist it. turn_id is passed in
+        so the returned record carries the id already tagged on Sentry.
+        """
+        turn_id = turn_id or uuid4()
+        turn_start = time.monotonic()
+        # Per-call, not instance state: the agent is a singleton and concurrent
+        # turns would clobber each other. _run_turn fills this in as soon as it
+        # has a session, so a failure can still name the session it belonged to.
+        progress: dict = {}
+        try:
+            return await self._run_turn(
+                message,
+                session_id,
+                owner_keycloak_sub,
+                turn_id,
+                turn_start,
+                on_turn,
+                progress,
+            )
+        except PermissionError:
+            # Session belongs to someone else. Recording it would file this
+            # caller's message text under the owner's session_id, and the
+            # review queries don't filter on outcome -- so a maintainer
+            # reading that conversation would see a stranger's message in it.
+            # A rejected request isn't a turn.
+            raise
+        except Exception as exc:
+            if on_turn is not None:
+                await _safe_record(
+                    on_turn,
+                    TurnTelemetry.for_error(
+                        exc,
+                        turn_id=turn_id,
+                        session_id=progress.get("session_id"),
+                        turn_index=progress.get("turn_index"),
+                        owner_keycloak_sub=owner_keycloak_sub,
+                        user_message=message,
+                        latency_ms=int((time.monotonic() - turn_start) * 1000),
+                        model=self.settings.AI_PRIMARY_MODEL or None,
+                        provider=self.get_provider(),
+                    ),
+                )
+            raise
+
+    async def _run_turn(
+        self,
+        message: str,
+        session_id: Optional[str],
+        owner_keycloak_sub: Optional[str],
+        turn_id: UUID,
+        turn_start: float,
+        on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]],
+        progress: dict,
+    ) -> tuple[ChatResponse, TurnTelemetry]:
         if not self.is_available():
             raise AssistantUnavailableError(
                 "Assistant agent is not available (check AI_API_KEY)"
@@ -1004,6 +1092,14 @@ class AssistantAgent:
             state = await self.session_service.create_session(
                 owner_keycloak_sub=owner_keycloak_sub
             )
+
+        # From metadata, not len(state.messages), which is capped at 100 and
+        # would silently restart the numbering. Ordering hint only -- see the
+        # turn_index column comment.
+        turn_index = int(state.metadata.get("turn_count", 0) or 0)
+        state.metadata["turn_count"] = turn_index + 1
+        progress["session_id"] = state.session_id
+        progress["turn_index"] = turn_index
 
         # Record user message
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
@@ -1028,7 +1124,9 @@ class AssistantAgent:
 
         # 1) Conversational reply -- plain text, so it can't fail on structured
         # grounds. This is the only thing the user waits on for their answer.
-        turn_start = time.time()
+        # Monotonic, not wall clock: this drives the extractor's remaining
+        # budget as well as the logged latency, so an NTP or VM clock jump
+        # could otherwise skip extraction or blow the frontend timeout.
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
@@ -1050,7 +1148,7 @@ class AssistantAgent:
         # failure (or when the budget's spent) the updates are empty -> the prior
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
-        remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.time() - turn_start)
+        remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
         if remaining < EXTRACT_MIN_BUDGET_SECONDS:
             logger.warning(
                 "Reply used the turn budget (%.1fs left); skipping extraction, "
@@ -1099,7 +1197,7 @@ class AssistantAgent:
             schema_state, session_id=state.session_id
         )
 
-        return ChatResponse(
+        response = ChatResponse(
             session_id=state.session_id,
             reply=reply_text,
             schema_state=schema_state,
@@ -1108,6 +1206,71 @@ class AssistantAgent:
             handoff_url=handoff_url,
             token_usage=token_usage,
         )
+
+        transcript, truncated = self._build_transcript(
+            result, state.agent_message_history
+        )
+
+        telemetry = TurnTelemetry(
+            turn_id=turn_id,
+            session_id=state.session_id,
+            turn_index=turn_index,
+            owner_keycloak_sub=owner_keycloak_sub,
+            user_message=message,
+            assistant_reply=reply_text,
+            outcome=TurnOutcome.SUCCESS,
+            transcript=transcript,
+            transcript_truncated=truncated,
+            schema_state=schema_state.model_dump(mode="json"),
+            token_usage=token_usage,
+            latency_ms=int((time.monotonic() - turn_start) * 1000),
+            model=self.settings.AI_PRIMARY_MODEL or None,
+            provider=self.get_provider(),
+        )
+
+        if on_turn is not None:
+            await _safe_record(on_turn, telemetry)
+        return response, telemetry
+
+    def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:
+        """Take this turn's messages off the already-serialized history.
+
+        `serialized` is to_jsonable_python(all_messages()), which we just built
+        for Redis; new_messages() is its tail. Slicing avoids serializing the
+        same tool returns twice on the response path. Bounded by a byte budget
+        because tool returns are unbounded -- one broad catalog query would
+        otherwise bloat the row, the WAL, and every backup.
+        """
+        try:
+            count = len(result.new_messages())
+        except Exception:
+            logger.warning("Failed to read turn messages", exc_info=True)
+            return [], False
+        if not count:
+            return [], False
+
+        messages = serialized[-count:]
+        budget = self.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES
+
+        # Fast path: most turns fit, so one encode beats one per message.
+        if len(json.dumps(messages, default=str).encode()) <= budget:
+            return messages, False
+
+        kept: list = []
+        used = 0
+        for message in messages:
+            size = len(json.dumps(message, default=str).encode())
+            if used + size > budget:
+                break
+            kept.append(message)
+            used += size
+        logger.info(
+            "Turn transcript hit the %d byte cap; kept %d of %d messages",
+            budget,
+            len(kept),
+            count,
+        )
+        return kept, True
 
     async def restore_saved_session(
         self,

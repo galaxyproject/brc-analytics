@@ -66,6 +66,35 @@ class Settings:
             os.getenv("RUN_MIGRATIONS_ON_STARTUP", "false").lower() == "true"
         )
 
+        # Durable per-turn assistant logging (#1294). Requires DATABASE_URL --
+        # without it there is no sink and the write is skipped.
+        self.ASSISTANT_TURN_LOGGING_ENABLED: bool = (
+            os.getenv("ASSISTANT_TURN_LOGGING_ENABLED", "true").lower() == "true"
+        )
+        self.ASSISTANT_TURN_LOG_RETENTION_DAYS: int = int(
+            os.getenv("ASSISTANT_TURN_LOG_RETENTION_DAYS", "90")
+        )
+        # The sweep runs in-app so the 90-day deletion the UI promises doesn't
+        # depend on someone installing a cron job. Disabling it is an explicit
+        # choice to stop honouring that notice, and it warns when you do.
+        self.ASSISTANT_TURN_LOG_PURGE_ENABLED: bool = (
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_ENABLED", "true").lower() == "true"
+        )
+        self.ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS", "6")
+        )
+        # The write is awaited in the request, so this is the cap on what a
+        # slow database can add to a turn. Kept low for that reason.
+        self.ASSISTANT_TURN_LOG_TIMEOUT_SECONDS: float = float(
+            os.getenv("ASSISTANT_TURN_LOG_TIMEOUT_SECONDS", "2.0")
+        )
+        # Tool returns are unbounded -- a broad query_catalog call can serialize
+        # to a lot of JSON. Cap the stored transcript so one row can't bloat the
+        # table, WAL, and backups; transcript_truncated records when it bit.
+        self.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES: int = int(
+            os.getenv("ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES", "65536")
+        )
+
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(
             "ENA_API_BASE", "https://www.ebi.ac.uk/ena/portal/api"

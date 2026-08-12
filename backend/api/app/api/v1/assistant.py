@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
+from uuid import uuid4
 
+import sentry_sdk
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from pydantic_ai.exceptions import (
     AgentRunError,
@@ -23,6 +25,7 @@ from app.models.assistant import (
     SessionRestoreResponse,
 )
 from app.models.user_data import UserMeResponse
+from app.services import turn_log
 from app.services.assistant_agent import (
     AssistantTimeoutError,
     AssistantUnavailableError,
@@ -39,10 +42,14 @@ async def assistant_info(
 ):
     """Surface assistant configuration for UI attribution (model + provider)."""
     available = agent.is_available()
+    settings = agent.settings
     return AssistantInfoResponse(
         available=available,
-        model=agent.settings.AI_PRIMARY_MODEL if available else None,
+        model=settings.AI_PRIMARY_MODEL if available else None,
         provider=agent.get_provider() if available else None,
+        # Same predicate the writer uses, so the notice can never disagree
+        # with whether we are actually keeping anything.
+        turn_log_retention_days=turn_log.active_retention_days(settings),
     )
 
 
@@ -91,11 +98,22 @@ async def assistant_chat(
                 detail="Assistant session belongs to another user",
             ) from e
 
+    # Minted here so a Sentry event raised inside the run carries the same id
+    # as the row we write for it, and the two can actually be joined.
+    turn_id = uuid4()
+    sentry_sdk.set_tag("assistant.turn_id", str(turn_id))
+
     try:
-        chat_response = await agent.chat(
+        chat_response, _telemetry = await agent.chat_with_telemetry(
             request.message,
             request.session_id,
             current_user.sub if current_user else None,
+            turn_id=turn_id,
+            # The agent records the turn itself, success or failure -- it is
+            # the only layer that knows the session it created before a
+            # failure. Awaited inline: the insert is milliseconds against a
+            # turn that spends seconds in inference.
+            on_turn=turn_log.record,
         )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
