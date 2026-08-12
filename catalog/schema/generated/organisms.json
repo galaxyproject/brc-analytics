@@ -11,6 +11,16 @@
                     },
                     "type": "array"
                 },
+                "synonyms": {
+                    "description": "Curated alternative names for the organism, such as abbreviations and colloquial names. NCBI's taxonomy generally doesn't list these, so they're specified here and merged with the synonyms from NCBI's names.dmp during the catalog build.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
                 "taxonomy_id": {
                     "description": "An NCBI Taxonomy ID at rank 'species'.",
                     "type": "integer"

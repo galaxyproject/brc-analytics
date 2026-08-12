@@ -61,6 +61,23 @@ models:
         data_tests:
           - not_null:
               name: organism_taxonomy_has_names
+      - name: synonyms
+        data_tests:
+          - not_null:
+              name: organism_taxonomy_has_synonyms
+  - name: taxonomy_organism_synonyms
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique:
+              name: organism_synonyms_unique_ids
+          - not_null:
+              name: organism_synonyms_have_ids
+      - name: synonyms
+        data_tests:
+          # Non-null, but may be an empty list
+          - not_null:
+              name: organism_synonyms_have_synonym_lists
   - name: taxonomy_outbreaks
     # Only tested when the catalog has outbreaks; otherwise the model is an
     # empty placeholder and these assertions would be meaningless.

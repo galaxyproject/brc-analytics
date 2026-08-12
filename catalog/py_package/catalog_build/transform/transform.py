@@ -151,7 +151,11 @@ def get_test_results(
 
 
 def do_dbt_transformations(
-    temp_folder_path: Path, *, taxonomic_levels: list[str], has_outbreaks: bool
+    temp_folder_path: Path,
+    *,
+    taxonomic_levels: list[str],
+    has_outbreaks: bool,
+    has_curated_synonyms: bool,
 ) -> TransformResult:
     """
     Run the dbt transformations against the loaded DuckDB database.
@@ -161,6 +165,8 @@ def do_dbt_transformations(
       taxonomic_levels: Taxonomic levels to build columns for, passed to dbt as a var
       has_outbreaks: Whether the catalog includes outbreaks, passed to dbt as a var so
         the shared models can skip outbreak-specific logic when absent
+      has_curated_synonyms: Whether any curated organism synonyms were loaded, passed to
+        dbt as a var so the shared models can skip the source table when it's absent
 
     Returns:
       A TransformResult containing the dbt test results
@@ -177,6 +183,7 @@ def do_dbt_transformations(
                 "duckdb_path": get_db_path_string(temp_folder_path),
                 "taxonomic_levels": taxonomic_levels,
                 "has_outbreaks": has_outbreaks,
+                "has_curated_synonyms": has_curated_synonyms,
             },
         ),
     )

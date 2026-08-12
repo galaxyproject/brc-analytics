@@ -385,6 +385,13 @@ class Organism(ConfiguredBaseModel):
             "linkml_meta": {"alias": "ploidy", "domain_of": ["Organism", "Workflow"]}
         },
     )
+    synonyms: Optional[List[str]] = Field(
+        default=None,
+        description="""Curated alternative names for the organism, such as abbreviations and colloquial names. NCBI's taxonomy generally doesn't list these, so they're specified here and merged with the synonyms from NCBI's names.dmp during the catalog build.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "synonyms", "domain_of": ["Organism"]}
+        },
+    )
 
 
 class Outbreaks(ConfiguredBaseModel):

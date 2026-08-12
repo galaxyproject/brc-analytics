@@ -10,6 +10,7 @@ export interface BRCDataCatalogOrganism {
   otherTaxa: string[] | null;
   priority: OUTBREAK_PRIORITY | null;
   priorityPathogenName: string | null;
+  synonyms: string[];
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
   taxonomicLevelDomain: string;
