@@ -154,7 +154,7 @@ of the markers are nuclear and two mitochondrial [3], and they were assembled fr
 | `Nu_CDS1`–`Nu_CDS4`            | 4 nuclear                  | a SNP-mining workflow across four whole genomes, covering 13 SNPs and resolving 57 stool specimens into 19 genotypes [4] |
 | `Mt-Junction`                  | 1 mitochondrial            | the mitochondrial junction region, evaluated on 134 laboratory-confirmed cases and yielding 14 sequence types [5]        |
 
-here is the whole panel drawn at base resolution, with primers from the three papers that introduced them [4, 5, 11]. Every base of every amplicon is shown: primer footprints in red, PART
+Here is the whole panel drawn at base resolution, with primers from the three papers that introduced them [4, 5, 11]. Every base of every amplicon is shown: primer footprints in red, PART
 haplotype-calling windows in alternating blue with their boundaries ruled and labelled, and
 everything not called in grey. The nucleotides are small, enough to see the
 structure and be able to follow a motif, not to read comfortably at arm's length.
@@ -329,8 +329,9 @@ and 24 of the 25 in `PRJNA357478`. `PRJNA1130490` has a date for 251 of its 348 
 
 **9,054 runs, 966 Gbp. 9,016 are amplicon and 38 are whole-genome.** Of the amplicon runs,
 **8,522 used the eight-marker panel**: CDC's 8,325, Canada's 186, and 11 FDA water samples. The
-other 494 used the 63-marker or 52-locus panels. How comparable those are is not yet
-established, because neither panel's target coordinates are public.
+other 494 did not: 469 used the 63-marker or 52-locus panels, and 25 (`PRJNA357478`) were
+typed on the mitochondrion alone. How comparable the panels are is not yet established,
+because neither the 63-marker nor the 52-locus target coordinates are public.
 
 `PRJNA578931` spans specimens collected 2018 to 2025, released 2019 to 2026. Collection year and
 release year are different things, and a year in this post means collection, because
@@ -529,17 +530,18 @@ above, against CDC's deposited calls. That is a narrower claim, and a checkable 
 
 ## Methods
 
-Everything in this post that is not attributed to a source in the list below, we computed. Each
-figure comes from one of the scripts named here, all of which fetch their inputs from public URLs
-and APIs at run time rather than from a local copy.
+Everything in this post that is not attributed to a source in the list below, we
+computed. Every figure and table derives from public URLs and APIs queried at run
+time rather than from a local copy, and the queries and procedures are described below.
 
 **The sequencing landscape.** Run counts, library strategies, base counts and release dates come
 from an NCBI `esearch` on `Cyclospora[Organism]` in the `sra` database, fetched as `runinfo` via
 an eutils history handle, cross-checked against the ENA Portal API for the same taxon
-(`scripts/harvest_sra.sh`, `scripts/summarize_sra.py`). ENA returns 8,211 runs against NCBI's
+. ENA returns 8,211 runs against NCBI's
 9,054, and we reconciled that gap accession by accession rather than picking the larger number.
 Every ENA run is present in NCBI—the ENA-only set is empty—so ENA is a strict subset and the
-844-run difference is mirroring lag, concentrated in `PRJNA578931` (690) and `PRJNA1130490` (147)
+843-run difference is mirroring lag, accounted for by `PRJNA578931` (690),
+`PRJNA1130490` (147) and `PRJNA1482563` (6)
 and dominated by the most recent releases (555 from April 2026, 140 from March 2026). Query scope
 was checked too: `Cyclospora[Organism]`, `txid88456[Organism:exp]` and
 `Cyclospora cayetanensis[Organism]` return identical counts, and no run in SRA is assigned to the
@@ -549,13 +551,13 @@ for taxon 88456.
 
 **Collection year and US state.** Neither is in a structured BioSample field. Both are parsed out
 of the sample name, which uses two schemes across release batches, `19USNY13G1196CcS0011` and
-`DC25-FL0040-Cx1-S` (`scripts/parse_cdc_samples.py`). Names matching neither scheme are recorded
+`DC25-FL0040-Cx1-S`. Names matching neither scheme are recorded
 as unknown rather than guessed. This is also how the year-by-year counts in the data section were
 produced.
 
 **Which datasets used which panel.** From the `Gene Targets` / `gene_targets` attribute on the
 BioSample records themselves, fetched with `efetch db=biosample` in batches of 100
-(`scripts/build_gold_benchmark.py` writes the full map to `data/cdc_biosample_alias.tsv`). The
+(the full map is in `data/cdc_biosample_alias.tsv`). The
 free-text method description on the FDA water samples was read directly from those records.
 
 **What is not published about the 63-marker panel.** This is a negative claim, so here is the
@@ -575,7 +577,7 @@ and in CDC's public code, not that no description exists anywhere.
 attribute, which is a different field from `SampleName` and absent from SRA runinfo. Each of the
 203 labels was resolved by `esearch db=biosample` on the identifier, then `elink` to the `sra`
 database, then `esummary` for the run accession, and finally the ENA `search` endpoint for the
-FASTQ URLs (`scripts/build_gold_benchmark.py`). Identifiers were normalised for case and for
+FASTQ URLs. Identifiers were normalised for case and for
 hyphen-versus-underscore before joining.
 
 **Read lengths.** Measured directly. FASTQ files were downloaded from ENA and every read length
@@ -585,20 +587,19 @@ was determined.
 
 **Primer placement and PART boundaries.** Each published primer sequence was located in the
 marker reference FASTA by exact string match, including the reverse complement for reverse
-primers. `scripts/plot_marker_sequences.py` asserts that every forward primer begins at base 1,
+primers. We assert that every forward primer begins at base 1,
 that every reverse primer ends at the final base, and that the PART intervals in the BED coincide
 with the primer footprints. All seven markers pass, which is the basis for the claim that the
 PARTs are the primer-free interior of each amplicon.
 
 **Haplotype-defining sites.** For each PART, the named haplotypes were compared column by column
 and every position where they differ recorded, together with the alleles observed there
-(`scripts/plot_marker_sequences.py`, output in `data/haplotype_sites.tsv`). PARTs with a single
+(output in [`data/haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv)). PARTs with a single
 named haplotype, or whose haplotypes differ in length, are excluded from this count rather than
 aligned.
 
 **The expected-truth barcode.** Built by joining CDC's deposited haplotype sheet to the manifest
-on the normalised specimen identifier (`scripts/plot_expected_truth.py`, output in
-`data/expected_truth.tsv`). The counts of how many published calls fall inside or outside the
+on the normalised specimen identifier (output in [`data/expected_truth.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/expected_truth.tsv)). The counts of how many published calls fall inside or outside the
 Feb-2020 reference set were computed by testing each positive call in the sheet against the names
 in that reference file.
 
