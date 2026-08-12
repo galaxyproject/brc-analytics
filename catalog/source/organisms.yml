@@ -101,9 +101,13 @@ organisms:
   - taxonomy_id: 562
     ploidy:
       - HAPLOID
+    synonyms:
+      - E. coli
   - taxonomy_id: 573
     ploidy:
       - HAPLOID
+    synonyms:
+      - K. pneumoniae
   - taxonomy_id: 582
     ploidy:
       - HAPLOID
@@ -257,6 +261,8 @@ organisms:
   - taxonomy_id: 1280
     ploidy:
       - HAPLOID
+    synonyms:
+      - S. aureus
   - taxonomy_id: 1309
     ploidy:
       - HAPLOID
@@ -329,6 +335,10 @@ organisms:
   - taxonomy_id: 1773
     ploidy:
       - HAPLOID
+    synonyms:
+      - TB
+      - MTB
+      - M. tuberculosis
   - taxonomy_id: 1824
     ploidy:
       - HAPLOID
@@ -409,6 +419,8 @@ organisms:
       - HAPLOID
       - DIPLOID
       - POLYPLOID
+    synonyms:
+      - S. cerevisiae
   - taxonomy_id: 4952
     ploidy:
       - HAPLOID
@@ -561,6 +573,8 @@ organisms:
   - taxonomy_id: 5476
     ploidy:
       - DIPLOID
+    synonyms:
+      - C. albicans
   - taxonomy_id: 5478
     ploidy:
       - HAPLOID
@@ -747,6 +761,8 @@ organisms:
   - taxonomy_id: 5833
     ploidy:
       - HAPLOID
+    synonyms:
+      - P. falciparum
   - taxonomy_id: 5849
     ploidy:
       - HAPLOID
@@ -762,6 +778,8 @@ organisms:
   - taxonomy_id: 5855
     ploidy:
       - HAPLOID
+    synonyms:
+      - P. vivax
   - taxonomy_id: 5857
     ploidy:
       - HAPLOID
@@ -973,6 +991,8 @@ organisms:
   - taxonomy_id: 7227
     ploidy:
       - DIPLOID
+    synonyms:
+      - D. melanogaster
   - taxonomy_id: 7370
     ploidy:
       - DIPLOID
@@ -3628,6 +3648,8 @@ organisms:
   - taxonomy_id: 498019
     ploidy:
       - HAPLOID
+    synonyms:
+      - C. auris
   - taxonomy_id: 505693
     ploidy:
       - HAPLOID
@@ -3857,6 +3879,8 @@ organisms:
   - taxonomy_id: 746128
     ploidy:
       - HAPLOID
+    synonyms:
+      - A. fumigatus
   - taxonomy_id: 751941
     ploidy:
       - HAPLOID
@@ -5914,9 +5938,13 @@ organisms:
   - taxonomy_id: 3048448
     ploidy:
       - HAPLOID
+    synonyms:
+      - WNV
   - taxonomy_id: 3048459
     ploidy:
       - HAPLOID
+    synonyms:
+      - ZIKV
   - taxonomy_id: 3049952
     ploidy:
       - HAPLOID
@@ -5950,6 +5978,8 @@ organisms:
   - taxonomy_id: 3050299
     ploidy:
       - HAPLOID
+    synonyms:
+      - EBV
   - taxonomy_id: 3050300
     ploidy:
       - HAPLOID
@@ -6001,6 +6031,8 @@ organisms:
   - taxonomy_id: 3052230
     ploidy:
       - HAPLOID
+    synonyms:
+      - HCV
   - taxonomy_id: 3052236
     ploidy:
       - HAPLOID
@@ -6073,6 +6105,9 @@ organisms:
   - taxonomy_id: 3052462
     ploidy:
       - HAPLOID
+    synonyms:
+      - EBOV
+      - Ebola
   - taxonomy_id: 3052464
     ploidy:
       - HAPLOID
@@ -6422,12 +6457,21 @@ organisms:
   - taxonomy_id: 3418604
     ploidy:
       - HAPLOID
+    synonyms:
+      - SARS-CoV-2
+      - COVID-19
+      - COVID
   - taxonomy_id: 3418650
     ploidy:
       - HAPLOID
+    synonyms:
+      - HIV-1
+      - HIV
   - taxonomy_id: 3418651
     ploidy:
       - HAPLOID
+    synonyms:
+      - HIV-2
   - taxonomy_id: 3422298
     ploidy:
       - HAPLOID
@@ -6584,6 +6628,8 @@ organisms:
   - taxonomy_id: 3431302
     ploidy:
       - HAPLOID
+    synonyms:
+      - HBV
   - taxonomy_id: 3431360
     ploidy:
       - HAPLOID
@@ -6596,6 +6642,9 @@ organisms:
   - taxonomy_id: 3431483
     ploidy:
       - HAPLOID
+    synonyms:
+      - MPXV
+      - mpox
   - taxonomy_id: 3431487
     ploidy:
       - HAPLOID

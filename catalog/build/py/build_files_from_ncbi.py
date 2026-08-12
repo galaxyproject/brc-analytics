@@ -7,6 +7,7 @@ OUTBREAKS_PATH = "catalog/source/outbreaks.yml"
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
+ORGANISM_SYNONYMS_OUTPUT_PATH = "catalog/build/intermediate/organism-synonyms.tsv"
 OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
@@ -69,6 +70,7 @@ if __name__ == "__main__":
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
         organisms_path=ORGANISMS_PATH,
+        organism_synonyms_output_path=ORGANISM_SYNONYMS_OUTPUT_PATH,
         outbreaks_path=OUTBREAKS_PATH,
         outbreak_taxonomy_mapping_path=OUTBREAK_TAXONOMY_MAPPING_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/brc/data/genomes",

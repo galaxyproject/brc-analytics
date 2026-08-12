@@ -252,6 +252,8 @@ export interface Organism {
     taxonomy_id: number,
     /** The possible ploidy states (number of chromosome sets) that the organism may have, which determines compatible workflows. */
     ploidy: OrganismPloidy[],
+    /** Curated alternative names for the organism, such as abbreviations and colloquial names. NCBI's taxonomy generally doesn't list these, so they're specified here and merged with the synonyms from NCBI's names.dmp during the catalog build. */
+    synonyms?: string[] | null,
 }
 
 

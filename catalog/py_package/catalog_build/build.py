@@ -1431,6 +1431,31 @@ def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_p
         print(f"Wrote taxonomy mapping to {output_path}")
 
 
+def save_organism_synonyms(organism_taxonomy_df, output_path):
+    """
+    Create and save a TSV file mapping each organism's taxonomy ID to its synonyms, for
+    use by build-organisms.ts.
+
+    Args:
+        organism_taxonomy_df: DataFrame of organism taxonomy data built in the database,
+          with `taxonomy_id` and `synonyms` columns
+        output_path: Path to save the TSV file at
+    """
+    synonyms_df = pd.DataFrame(
+        {
+            "taxonomy_id": organism_taxonomy_df["taxonomy_id"],
+            # Serialized as JSON because synonyms may contain arbitrary characters
+            # (including commas), as done for the assemblies' common names
+            "synonyms": organism_taxonomy_df["synonyms"].map(
+                lambda synonyms: json.dumps(list(synonyms))
+            ),
+        }
+    )
+    # Sorted for consistent output between runs
+    synonyms_df.sort_values("taxonomy_id").to_csv(output_path, index=False, sep="\t")
+    print(f"Wrote organism synonyms to {output_path}")
+
+
 def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
@@ -1566,6 +1591,7 @@ def load_and_transform(
         temp_folder_path,
         taxonomic_levels=taxonomic_levels,
         has_outbreaks=outbreaks_df is not None,
+        has_curated_synonyms=load_result.has_curated_synonyms,
     )
 
     # Get transformed data and return along with metadata
@@ -1595,6 +1621,7 @@ def build_files(
     primary_output_path=None,
     qc_report_path=None,
     organisms_path,
+    organism_synonyms_output_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
     organism_image_path=None,
@@ -1616,6 +1643,7 @@ def build_files(
       primary_output_path: Path to save SRA metadata at
       qc_report_path: Path to save QC report to (if omitted, no report is generated)
       organisms_path: Path of input organisms YAML, used to perform checks
+      organism_synonyms_output_path: Path to save each organism's synonyms at (if omitted, they aren't saved)
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
       organism_image_path: path to folder containing organism images
@@ -1952,6 +1980,10 @@ def build_files(
         qc_report_text = make_qc_report(**qc_report_params)
         with open(qc_report_path, "w") as file:
             file.write(qc_report_text)
+
+    # Save the organisms' synonyms for use by build-organisms.ts
+    if organism_synonyms_output_path is not None:
+        save_organism_synonyms(organism_taxonomy_df, organism_synonyms_output_path)
 
     # If taxonomy_mapping_path is provided and we have outbreak taxonomy IDs,
     # save the taxonomy mapping for use by build-outbreaks.ts

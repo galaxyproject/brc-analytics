@@ -5,17 +5,35 @@ import {
   accumulateArrayOrNullValues,
   accumulateArrayValue,
   incrementValue,
+  parseJsonList,
+  readValuesFile,
   verifyUniqueIds,
 } from "./utils";
 
-export function buildOrganisms(
+const SOURCE_PATH_ORGANISM_SYNONYMS =
+  "catalog/build/intermediate/organism-synonyms.tsv";
+
+/**
+ * Row of the organism synonyms file built by the Python catalog build.
+ */
+interface SourceOrganismSynonyms {
+  synonyms: string;
+  taxonomy_id: string;
+}
+
+export async function buildOrganisms(
   genomes: BRCDataCatalogGenome[]
-): BRCDataCatalogOrganism[] {
+): Promise<BRCDataCatalogOrganism[]> {
+  const synonymsByTaxonomyId = await getSynonymsByTaxonomyId();
   const organismsByTaxonomyId = new Map<string, BRCDataCatalogOrganism>();
   for (const genome of genomes) {
     organismsByTaxonomyId.set(
       genome.speciesTaxonomyId,
-      buildOrganism(organismsByTaxonomyId.get(genome.speciesTaxonomyId), genome)
+      buildOrganism(
+        organismsByTaxonomyId.get(genome.speciesTaxonomyId),
+        genome,
+        synonymsByTaxonomyId.get(genome.speciesTaxonomyId) ?? []
+      )
     );
   }
   const sortedRows = Array.from(organismsByTaxonomyId.values()).sort((a, b) =>
@@ -25,9 +43,26 @@ export function buildOrganisms(
   return sortedRows;
 }
 
+/**
+ * Read the synonyms built for each of the catalog's organisms, which combine NCBI's
+ * synonyms with the curated synonyms from the source organisms file.
+ * @returns map from organism taxonomy ID to that organism's synonyms.
+ */
+async function getSynonymsByTaxonomyId(): Promise<Map<string, string[]>> {
+  const sourceRows = await readValuesFile<SourceOrganismSynonyms>(
+    SOURCE_PATH_ORGANISM_SYNONYMS,
+    undefined,
+    ["taxonomy_id", "synonyms"]
+  );
+  return new Map(
+    sourceRows.map((row) => [row.taxonomy_id, parseJsonList(row.synonyms)])
+  );
+}
+
 function buildOrganism(
   organism: BRCDataCatalogOrganism | undefined,
-  genome: BRCDataCatalogGenome
+  genome: BRCDataCatalogGenome,
+  synonyms: string[]
 ): BRCDataCatalogOrganism {
   return {
     assemblyCount: incrementValue(organism?.assemblyCount),
@@ -48,6 +83,7 @@ function buildOrganism(
     priority: organism?.priority ?? genome.priority,
     priorityPathogenName:
       organism?.priorityPathogenName ?? genome.priorityPathogenName,
+    synonyms,
     taxonomicGroup: genome.taxonomicGroup,
     taxonomicLevelClass: genome.taxonomicLevelClass,
     taxonomicLevelDomain: genome.taxonomicLevelDomain,
