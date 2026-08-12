@@ -1,5 +1,5 @@
 {
-    "assembly_count": 5506,
+    "assembly_count": 5507,
     "children": [
         {
             "assembly_count": 398,
@@ -5063,7 +5063,7 @@
             "rank": "domain"
         },
         {
-            "assembly_count": 4482,
+            "assembly_count": 4483,
             "children": [
                 {
                     "assembly_count": 2,
@@ -17060,7 +17060,7 @@
                     "rank": "phylum"
                 },
                 {
-                    "assembly_count": 267,
+                    "assembly_count": 268,
                     "children": [
                         {
                             "assembly_count": 149,
@@ -17577,7 +17577,7 @@
                             "rank": "class"
                         },
                         {
-                            "assembly_count": 118,
+                            "assembly_count": 119,
                             "children": [
                                 {
                                     "assembly_count": 3,
@@ -17641,10 +17641,10 @@
                                     "rank": "order"
                                 },
                                 {
-                                    "assembly_count": 115,
+                                    "assembly_count": 116,
                                     "children": [
                                         {
-                                            "assembly_count": 41,
+                                            "assembly_count": 42,
                                             "children": [
                                                 {
                                                     "assembly_count": 10,
@@ -17711,10 +17711,10 @@
                                                     "rank": "genus"
                                                 },
                                                 {
-                                                    "assembly_count": 31,
+                                                    "assembly_count": 32,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 31,
+                                                            "assembly_count": 32,
                                                             "children": [],
                                                             "name": "Cyclospora cayetanensis",
                                                             "ncbi_tax_id": "88456",
