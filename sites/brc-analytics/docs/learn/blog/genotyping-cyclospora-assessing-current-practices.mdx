@@ -15,15 +15,15 @@ Anton Nekrutenko<sup>1</sup>
 <sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State
 University, University Park, PA, USA
 
-This is the first post in a series on the analysis of
-_[Cyclospora](https://en.wikipedia.org/wiki/Cyclospora)_
-([taxid 44417](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=44417)) outbreaks. In
-this part we
-summarize existing resources and describe our initial analysis validation strategy.
+<Alert icon={false} severity="warning">
+  This is the first post in a series on the analysis of
+  *[Cyclospora](https://en.wikipedia.org/wiki/Cyclospora)* ([taxid
+  44417](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=44417))
+  outbreaks. In this part we summarize existing resources and describe our
+  initial analysis validation strategy.
+</Alert>
 
 ## The current state of affairs in _Cyclospora cayetanensis_ typing
-
-### _Cyclospora_
 
 _[Cyclospora cayetanensis](https://en.wikipedia.org/wiki/Cyclospora_cayetanensis)_
 ([taxid 88456](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=88456)) is a
@@ -72,8 +72,9 @@ travel information, 48 had been to Mexico [22].
 
 There is no continuous in vitro culture system, and no animal model in routine use. Experimental
 infection has been reported in oysters, freshwater clams, Swiss albino mice and guinea pigs [16],
-but nothing that the field treats as a working model. In practice everything known about this
-parasite comes from patient stool, which is also the only source of DNA.
+but nothing that the field treats as a working model. In practice almost everything known about this parasite comes from patient stool, which is
+also where parasite DNA is most abundant. The exceptions matter and appear later: the assay
+has been run on irrigation water, and a separate one was developed for fresh produce.
 
 ### The genome assemblies
 
@@ -101,7 +102,7 @@ Named points on that distribution, with three other apicomplexan references for 
 | `GCA_020976615.1` most contiguous         | 310       | 524 kb     | 40×        | none        | MiSeq + MinION | no                                                    |
 | `GCF_002999335.1` CcayRef3, the reference | 738       | 193 kb     | 20×        | full        | MiSeq          | [yes](https://brc-analytics.org/data/organisms/88456) |
 | `GCF_000769155.1` ASM76915v2              | 3,573     | 44 kb      | not stated | full        | 454 + GAIIx    | [yes](https://brc-analytics.org/data/organisms/88456) |
-| `GCA_002893405.1` most fragmented         | 7,910     | 216 kb     | 20×        | none        | MiSeq          | [yes](https://brc-analytics.org/data/organisms/88456) |
+| `GCA_002893405.1` most contigs            | 7,910     | 216 kb     | 20×        | none        | MiSeq          | [yes](https://brc-analytics.org/data/organisms/88456) |
 | **all 49, median**                        | **1,391** | **103 kb** | **20×**    | **2 of 49** | MiSeq          | **31 of 49**                                          |
 | _P. falciparum_ 3D7 `GCF_000002765.6`     | 14        | 1.69 Mb    | —          | full        | —              | —                                                     |
 | _C. parvum_ IOWA `GCF_000165345.1`        | 18        | 1.01 Mb    | —          | full        | —              | —                                                     |
@@ -109,11 +110,13 @@ Named points on that distribution, with three other apicomplexan references for 
 
 Three things follow. Contiguity is an order of magnitude short of the other apicomplexans, and the
 single most contiguous assembly—the only one of the 49 that used long reads—is one of the 18
-BRC Analytics does not carry [15]. That gap is inherited rather than chosen: BRC builds its
-catalog against UCSC's assembly hub list, which holds exactly the same 31 for this taxon, so an
-assembly absent there is absent downstream [28]. Reported coverage is 20× for 35 of the 49 and no more than 40× for
+BRC Analytics does not carry [15]. The gap originates upstream: BRC builds its catalog against UCSC's assembly hub list, which holds
+exactly the same 31 for this taxon [28]. Sourcing exclusively from that list is still a design
+choice, and closing the gap needs a supplementation route rather than only an upstream fix. Reported coverage is 20× for 35 of the 49 and no more than 40× for
 44 of them. And the reference itself is a pool: its BioSample states that reads from **two strains
-were combined to create it** [24], so it cannot be used to phase a mixed infection.
+were combined to create it** [24]. Where the two strains differ, that reference either collapses
+the difference or carries one strain's allele, so reads from the other are penalised at exactly the
+positions genotyping depends on.
 
 Everything downstream is built on that. Which is why _Cyclospora_ is genotyped from a small panel
 of amplicons rather than from genomes.
@@ -122,14 +125,16 @@ of amplicons rather than from genomes.
 
 _Cyclospora_ is not typed one way. FDA developed a targeted amplicon sequencing assay over
 **52 loci**, 49 of them nuclear, covering 396 known SNP sites, with an enrichment step that makes
-it sensitive enough for food rather than stool alone [25]. CDC and FDA have since converged on a
+it sensitive enough for food rather than stool alone [25]. CDC and FDA have since jointly generated data on a
 third scheme, an **expanded 63-marker panel** [27]. It has 348 public runs and, as of 2026-08-12,
 no publication we can find, no preprint, and no released marker list: its BioSample records name
 the targets only as `63 markers found through Cyclospora genome`, and the Methods section records
 how far that search went. The mitochondrial genome can also be typed on its own, which
-is what CFSAN's 25 runs did. More loci is not automatically finer resolution: run head to head on
-66 clinical specimens, the 52-locus assay resolved 24 genetic clusters against the eight-marker
-scheme's 27, with 15 clusters identical between them [26].
+is what CFSAN's 25 runs did. More loci does not automatically mean finer resolution. Run head to head on 66 clinical specimens,
+the 52-locus assay resolved 24 genetic clusters against the eight-marker scheme's 27, with 15
+identical between them [26]. Cluster counts alone settle nothing about which is more accurate—
+that needs epidemiological labels neither panel has been scored against here—but they do not
+support the assumption that the larger panel simply resolves more.
 
 In the series of analyses detailed in this blog we will concentrate on the CDC's eight-marker
 panel because it is published, well defined, and widely used: (1) 8,522 of the 9,016 public
@@ -149,7 +154,7 @@ of the markers are nuclear and two mitochondrial [3], and they were assembled fr
 | `Nu_CDS1`–`Nu_CDS4`            | 4 nuclear                  | a SNP-mining workflow across four whole genomes, covering 13 SNPs and resolving 57 stool specimens into 19 genotypes [4] |
 | `Mt-Junction`                  | 1 mitochondrial            | the mitochondrial junction region, evaluated on 134 laboratory-confirmed cases and yielding 14 sequence types [5]        |
 
-Here is the whole panel drawn at base resolution, with primers from the three papers that introduced them [4, 5, 11]. Every base of every amplicon is shown: primer footprints in red, PART
+here is the whole panel drawn at base resolution, with primers from the three papers that introduced them [4, 5, 11]. Every base of every amplicon is shown: primer footprints in red, PART
 haplotype-calling windows in alternating blue with their boundaries ruled and labelled, and
 everything not called in grey. The nucleotides are small, enough to see the
 structure and be able to follow a motif, not to read comfortably at arm's length.
@@ -254,7 +259,7 @@ The gold letters stacked beneath each site are the **alternative bases** seen th
 are
 biallelic. A few carry three. The full list—marker, PART, amplicon and PART-local coordinate,
 reference base and observed alleles—is in
-[`haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv).
+[`data/haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv).
 
 The eighth marker is not typed by
 alignment. This is `Cmt214.A`, the longest of the twenty junction references:
@@ -324,7 +329,8 @@ and 24 of the 25 in `PRJNA357478`. `PRJNA1130490` has a date for 251 of its 348 
 
 **9,054 runs, 966 Gbp. 9,016 are amplicon and 38 are whole-genome.** Of the amplicon runs,
 **8,522 used the eight-marker panel**: CDC's 8,325, Canada's 186, and 11 FDA water samples. The
-other 494 used the 63-marker or 52-locus panels and are not comparable.
+other 494 used the 63-marker or 52-locus panels. How comparable those are is not yet
+established, because neither panel's target coordinates are public.
 
 `PRJNA578931` spans specimens collected 2018 to 2025, released 2019 to 2026. Collection year and
 release year are different things, and a year in this post means collection, because
@@ -368,8 +374,8 @@ analysis pipeline [10].
 
 ### "The gold standard"
 
-Buried in CDC's own typing workflow repository [10], in a directory called
-`REFERENCE_CLUSTER_LIST`, is a 204-line text file:
+In CDC's typing workflow repository [10], in a directory called `REFERENCE_CLUSTER_LIST`, is a
+204-line text file:
 
 ```
 $ head -4 2018_gold_clusters.txt
@@ -428,9 +434,14 @@ history, and no publication that presents this sheet as its result. So it is the
 reference for what our pipeline should reproduce, and we will report concordance against it—
 but "CDC's deposited calls" is the honest description, not "published".
 
-**153 of the 203** appear in it (Vendor A 98, Vendor B 55).
+**153 of the 203** appear in it, unevenly: **Vendor A 98 of 99, Vendor B 55 of 104**. So
+concordance is reported against those 153 rather than as a general accuracy figure. Mapping all
+203 will show whether the absent specimens failed CDC's five-of-eight amplification criterion,
+which is the likeliest reason they are missing.
+
 The median specimen carries **27 haplotype calls** for Vendor A and 24 for Vendor B, across a
-median of 7 and 6 of the 8 loci respectively. Note how much grey there is: locus dropout is routine, not exceptional.
+median of 7 and 6 of the 8 loci respectively. Note how much grey there is: locus dropout is
+routine, not exceptional.
 
 **The two clusters are visibly different.** Ten haplotypes differ by 50 percentage points or
 more between the two vendor outbreaks:
@@ -466,7 +477,7 @@ non-human samples in the entire public record: surface and agricultural water fr
 River in California and the C-23 canal in Florida, collected between November 2020 and June 2021,
 with GPS coordinates and exact dates.
 
-### The plan
+### What we do next and what the next blog post will describe
 
 The first thing to do with the 203 labelled specimens is to see whether an open pipeline, built
 only from public artifacts, recovers CDC's clusters from raw reads.
@@ -476,6 +487,45 @@ per-PART coverage, (4) call every haplotype at every PART, (5) assemble a specim
 presence matrix, (6) compute distances with the published heuristic [12], which CDC reported
 adopting in place of the earlier Bayesian ensemble [6], and (7) cluster and score against
 Vendor A/B.
+
+### What this design cannot tell us
+
+Three limitations are worth stating before any results, because none of them is fixed by running
+the pipeline more carefully.
+
+**There is no physical ground truth.** Every reference we score against is another laboratory's
+software output, not a specimen of known composition. A mock community—oocysts mixed at known
+ratios and sequenced on this panel—would separate caller error from reference error, and none
+exists publicly. The only laboratory-seeded material in the archive, `PRJNA952552`, was run on the
+FDA 52-locus panel rather than this one. So this gap cannot be closed with public data, and a
+concordance figure against CDC's calls measures agreement with CDC, not accuracy.
+
+**Differential locus dropout is an untested failure mode.** The distance statistic was built to
+accommodate "heterogeneous (mixed) genotypes and specimens with partial genotyping data" [2], but
+designed-for is not the same as measured. The case that matters is two specimens that drop
+_different_ loci: their similarity is then computed over whichever loci happen to survive in both.
+Part 2 will mask loci in silico at the dropout rates we observe and report how far the distance
+matrix and the cluster score move.
+
+**Joining archive metadata is more fragile than it looks.** Collection year and state are parsed
+from sample names rather than read from structured fields, and names matching no known scheme are
+recorded as unknown rather than guessed. That catches parsing failures but not the worse case,
+where parsing succeeds against the wrong field. A concrete instance: ENA's `sample_alias` for
+`PRJNA578931` returns the SampleName (`18USIAxxx1056CcS0011`), not the CDC specimen identifier
+(`C_WI090_18`) that the haplotype sheet is keyed on. Joining on it returns zero matches out of
+8,325—a clean, confident and entirely wrong answer.
+
+One further constraint belongs to the assay rather than to us. The eight markers are separate PCR
+products, so no read pair spans two of them and haplotypes cannot be phased across loci by any
+method. Within a PART the haplotype is already the phased unit, a whole sequence variant rather
+than independent SNPs. Whether two haplotypes at different loci come from one strain or from a
+mixed infection is therefore not recoverable from this data, for us or for anyone.
+
+One thing we are not doing, stated plainly given the limitations above. CDC's production system is
+not public—its data statement directs readers to contact the authors [7]. We are not
+reimplementing that system and will not claim to. What we are building is an independent open
+implementation of the published method, benchmarked against published labels and, with the caveats
+above, against CDC's deposited calls. That is a narrower claim, and a checkable one.
 
 ## Methods
 
@@ -487,7 +537,14 @@ and APIs at run time rather than from a local copy.
 from an NCBI `esearch` on `Cyclospora[Organism]` in the `sra` database, fetched as `runinfo` via
 an eutils history handle, cross-checked against the ENA Portal API for the same taxon
 (`scripts/harvest_sra.sh`, `scripts/summarize_sra.py`). ENA returns 8,211 runs against NCBI's
-9,054, so the NCBI figures are the ones quoted. Assembly counts come from the NCBI Datasets API
+9,054, and we reconciled that gap accession by accession rather than picking the larger number.
+Every ENA run is present in NCBI—the ENA-only set is empty—so ENA is a strict subset and the
+844-run difference is mirroring lag, concentrated in `PRJNA578931` (690) and `PRJNA1130490` (147)
+and dominated by the most recent releases (555 from April 2026, 140 from March 2026). Query scope
+was checked too: `Cyclospora[Organism]`, `txid88456[Organism:exp]` and
+`Cyclospora cayetanensis[Organism]` return identical counts, and no run in SRA is assigned to the
+genus but not to this species, so the genus-level query and the species-level assembly census
+cover the same material. Assembly counts come from the NCBI Datasets API
 for taxon 88456.
 
 **Collection year and US state.** Neither is in a structured BioSample field. Both are parsed out
@@ -535,15 +592,13 @@ PARTs are the primer-free interior of each amplicon.
 
 **Haplotype-defining sites.** For each PART, the named haplotypes were compared column by column
 and every position where they differ recorded, together with the alleles observed there
-(`scripts/plot_marker_sequences.py`, output in
-[`haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv)).
-PARTs with a single named haplotype, or whose haplotypes differ in length, are excluded from this
-count rather than aligned.
+(`scripts/plot_marker_sequences.py`, output in `data/haplotype_sites.tsv`). PARTs with a single
+named haplotype, or whose haplotypes differ in length, are excluded from this count rather than
+aligned.
 
 **The expected-truth barcode.** Built by joining CDC's deposited haplotype sheet to the manifest
 on the normalised specimen identifier (`scripts/plot_expected_truth.py`, output in
-[`expected_truth.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/expected_truth.tsv)).
-The counts of how many published calls fall inside or outside the
+`data/expected_truth.tsv`). The counts of how many published calls fall inside or outside the
 Feb-2020 reference set were computed by testing each positive call in the sheet against the names
 in that reference file.
 
@@ -596,13 +651,12 @@ in that reference file.
     doi:[10.1017/S0031182019000581](https://doi.org/10.1017/S0031182019000581) ·
     [PMID 31148531](https://pubmed.ncbi.nlm.nih.gov/31148531/)—Fig. 3 is the barcode layout reproduced here.
 12. Eukaryotyping—R implementation of Plucinski's Bayesian method and Barratt's heuristic
-    definition of genetic distance.
-    [github.com/Joel-Barratt/Eukaryotyping](https://github.com/Joel-Barratt/Eukaryotyping)
+    definition of genetic distance. [github.com/Joel-Barratt/Eukaryotyping](https://github.com/Joel-Barratt/Eukaryotyping)
 13. Eukaryotpying-Python (repository name misspelled upstream), including
     `haplotype_sheets/2022-10-24Joel_haplotype_sheet.txt`.
     [github.com/Joel-Barratt/Eukaryotpying-Python](https://github.com/Joel-Barratt/Eukaryotpying-Python)
 14. NCBI BioProject `PRJNA578931`, _Cyclospora_ Genotyping (CDC).
-    [ncbi.nlm.nih.gov/bioproject/PRJNA578931](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA578931)
+    [www.ncbi.nlm.nih.gov/bioproject/PRJNA578931](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA578931)
 15. BRC Analytics organism page for _Cyclospora cayetanensis_ (taxid 88456).
     [brc-analytics.org/data/organisms/88456](https://brc-analytics.org/data/organisms/88456)
 16. Totton SC, O'Connor AM, Naganathan T, Martinez BAF, Sargeant JM (2021) A review of
@@ -636,8 +690,7 @@ in that reference file.
 24. NCBI Assembly `GCF_002999335.1` (CcayRef3), the _C. cayetanensis_ reference genome, and its
     BioSample `SAMN08618443`, which states: "This Biosample consists of two strains of
     C.cayetanensis. Sequence reads from the two strains have been combined to create the Reference
-    Genome Assembly."
-    [ncbi.nlm.nih.gov/biosample/SAMN08618443](https://www.ncbi.nlm.nih.gov/biosample/SAMN08618443)
+    Genome Assembly." [www.ncbi.nlm.nih.gov/biosample/SAMN08618443](https://www.ncbi.nlm.nih.gov/biosample/SAMN08618443)
 25. Leonard SR, Mammel MK, Gharizadeh B, _et al._ (2023) Development of a targeted amplicon
     sequencing method for genotyping _Cyclospora cayetanensis_ from fresh produce and clinical
     samples with enhanced genomic resolution and sensitivity. _Frontiers in Microbiology_ 14:1212863.
@@ -651,11 +704,10 @@ in that reference file.
     description states that it "contains NGS data generated by CDC and the U.S. Food and Drug
     Administration (FDA) using an expanded Cyclospora genotyping panel comprising 63 genetic markers
     spread throughout the Cyclospora genome."
-    [ncbi.nlm.nih.gov/bioproject/PRJNA1130490](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1130490)
+    [www.ncbi.nlm.nih.gov/bioproject/PRJNA1130490](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1130490)
 28. UCSC BRC assembly hub list, the upstream source BRC Analytics builds its catalog against.
     It contains 31 _C. cayetanensis_ assemblies, the same 31 BRC serves, and does not contain
-    `GCA_020976615.1`.
-    [hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json](https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json)
+    `GCA_020976615.1`. [hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json](https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json)
 29. CDC, Investigation Update: Cyclospora Outbreak, July 2026, published 2026-07-16, updated
     2026-08-05. Its "Traceback and laboratory data" section names no genotyping method.
     [Archived 2026-08-08](https://web.archive.org/web/20260808084325/https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/investigation.html)
