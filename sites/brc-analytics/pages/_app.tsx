@@ -7,21 +7,19 @@ import {
   AppProviders,
   type AppPropsWithComponent,
 } from "@repo/shared/components/layout/AppProviders/appProviders";
-import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
 import { type JSX } from "react";
 
 setFeatureFlags(["assembly-workflows", "hyphy", "lmls", "pangenome"]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();
-  const isEntitiesLoaded = useEntities(ensureEntitiesLoaded);
   return (
     <AppProviders
       appConfig={appConfig}
       appProps={props}
       appTheme={createBrcTheme(props.pageProps.themeOptions)}
       defaultDescription={BRC_DEFAULT_DESCRIPTION}
-      isEntitiesLoaded={isEntitiesLoaded}
+      ensureEntitiesLoaded={ensureEntitiesLoaded}
     />
   );
 }
