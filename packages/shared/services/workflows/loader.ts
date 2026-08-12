@@ -1,9 +1,28 @@
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { formatTrsId } from "@repo/shared/workflow/utils";
+import { type EntitiesLoader } from "./hooks/UseEntities/types";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
+
+/**
+ * Creates a single-flight entities loader: concurrent and repeat calls share
+ * one in-flight load, and a rejected load is dropped from the memo so a later
+ * call re-attempts instead of returning the cached failure forever.
+ * @param load - Loader that resolves once the site's entities and workflows are loaded.
+ * @returns Memoized loader.
+ */
+export function createEntitiesLoader(load: EntitiesLoader): EntitiesLoader {
+  let loadPromise: Promise<void> | null = null;
+  return (config: SiteConfig): Promise<void> => {
+    loadPromise ??= load(config).catch((error) => {
+      loadPromise = null;
+      throw error;
+    });
+    return loadPromise;
+  };
+}
 
 /**
  * Fetches entities from the API.

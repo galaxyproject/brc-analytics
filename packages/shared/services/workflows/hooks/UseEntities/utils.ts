@@ -31,11 +31,13 @@ export async function runEntitiesLoad(
 /**
  * Coerces an unknown rejection value into a DataExplorerError. Guards against
  * non-Error rejection reasons, which the DataExplorerError constructor cannot
- * take directly.
+ * take directly, and passes an existing DataExplorerError through unchanged so
+ * its request fields aren't dropped by re-wrapping.
  * @param value - Rejection value.
  * @returns DataExplorerError wrapping the value.
  */
 export function toDataExplorerError(value: unknown): DataExplorerError {
+  if (value instanceof DataExplorerError) return value;
   return new DataExplorerError(
     value instanceof Error ? value : new Error(String(value))
   );

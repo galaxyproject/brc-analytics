@@ -31,7 +31,7 @@ export function EntityDataGate({
       <Error
         errorMessage={error.message}
         requestUrlMessage={error.requestUrlMessage}
-        rootPath={getConfig().redirectRootToPath}
+        rootPath={getConfig()?.redirectRootToPath}
       />
     );
   return <>{fallback}</>;
