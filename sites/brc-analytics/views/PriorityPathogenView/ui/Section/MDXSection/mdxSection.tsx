@@ -1,5 +1,5 @@
 import { Section } from "@brc/views/PriorityPathogenView/ui/Section/section";
-import { FluidPaper } from "@repo/shared/components/Paper/components/FluidPaper/fluidPaper";
+import { FluidPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/components/FluidPaper/fluidPaper";
 import { MDXRemote } from "next-mdx-remote";
 import { type JSX } from "react";
 import { COMPONENTS } from "./constants";
