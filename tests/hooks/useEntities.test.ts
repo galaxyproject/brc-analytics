@@ -67,6 +67,26 @@ describe("useEntities", () => {
     expect(result.current.isLoaded).toBe(false);
   });
 
+  test("clears a previous error when a later load succeeds", async () => {
+    const failingLoader = jest
+      .fn()
+      .mockRejectedValue(new Error("fetch failed"));
+    const succeedingLoader = jest.fn().mockResolvedValue(undefined);
+
+    const { rerender, result } = renderHook(
+      ({ loader }) => useEntities(loader),
+      { initialProps: { loader: failingLoader } }
+    );
+    await waitFor(() =>
+      expect(result.current.error).toBeInstanceOf(DataExplorerError)
+    );
+
+    rerender({ loader: succeedingLoader });
+
+    await waitFor(() => expect(result.current.isLoaded).toBe(true));
+    expect(result.current.error).toBeUndefined();
+  });
+
   test("does not load without a config", () => {
     mockGetConfig.mockReturnValue(undefined as unknown as SiteConfig);
     const loader = jest.fn().mockResolvedValue(undefined);

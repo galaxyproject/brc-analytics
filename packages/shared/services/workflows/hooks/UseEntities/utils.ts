@@ -9,17 +9,20 @@ import { type EntitiesLoader } from "./types";
  * @param ensureEntitiesLoaded - Loader that resolves once the entities and workflows are loaded.
  * @param config - Site config.
  * @param onLoaded - Called with true when the load succeeds.
- * @param onError - Called with the coerced error when the load fails.
+ * @param onError - Called with the coerced error when the load fails, and with
+ * undefined when it succeeds, so a stale error from an earlier attempt never
+ * outlives a successful load.
  * @returns Promise that resolves once the outcome has been reported.
  */
 export async function runEntitiesLoad(
   ensureEntitiesLoaded: EntitiesLoader,
   config: SiteConfig,
   onLoaded: (isLoaded: boolean) => void,
-  onError: (error: DataExplorerError) => void
+  onError: (error?: DataExplorerError) => void
 ): Promise<void> {
   try {
     await ensureEntitiesLoaded(config);
+    onError(undefined);
     onLoaded(true);
   } catch (error) {
     const dataExplorerError = toDataExplorerError(error);
