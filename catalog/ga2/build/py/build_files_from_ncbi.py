@@ -16,8 +16,6 @@ ORGANISM_IMAGE_PATH = "sites/ga2/public/organism_image"
 
 ORGANISM_IMAGE_INFO_PATH = "catalog/ga2/source/organism_image_data.json"
 
-PRIMARYDATA_OUTPUT_PATH = "catalog/ga2/build/intermediate/primary-data-ncbi.tsv"
-
 BUILD_META_OUTPUT_PATH = "catalog/ga2/output/data-build-meta.json"
 
 QC_REPORT_PATH = "catalog/ga2/output/qc-report.data.md"
@@ -103,9 +101,7 @@ def build_ncbi_data():
         do_gene_model_urls=False,
         organisms_path=ORGANISMS_PATH,
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
-        primary_output_path=PRIMARYDATA_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
-        extract_primary_data=False,
         organism_image_path=ORGANISM_IMAGE_PATH,
         organism_image_source_information_path=ORGANISM_IMAGE_INFO_PATH,
         datacache_base_url="http://datacache.galaxyproject.org/vgp/data/genomes",
