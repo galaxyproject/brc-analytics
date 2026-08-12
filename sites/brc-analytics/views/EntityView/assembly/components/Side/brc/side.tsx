@@ -6,8 +6,8 @@ import {
   buildAssemblyResources,
 } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
-import { StyledFluidPaper } from "@repo/shared/views/EntityView/assembly/components/Side/side.styles";
 import { KeyValueSection } from "@repo/shared/views/EntityView/components/KeyValueSection/keyValueSection";
+import { StyledFluidPaper } from "@repo/shared/views/EntityView/ui/styles";
 import { mapAssemblyToOrganism } from "@repo/shared/views/WorkflowInputsView/utils";
 import { type JSX } from "react";
 import { StyledSection } from "./side.styles";
