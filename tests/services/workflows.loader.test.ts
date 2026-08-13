@@ -3,6 +3,7 @@ import { API as BRC_API } from "@brc/services/workflows/routes";
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {
+  createEntitiesLoader,
   loadEntities,
   loadWorkflows,
 } from "@repo/shared/services/workflows/loader";
@@ -15,6 +16,33 @@ import {
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
+
+describe("createEntitiesLoader", () => {
+  const CONFIG = {} as SiteConfig;
+
+  test("shares a single in-flight load across calls", async () => {
+    const load = jest.fn().mockResolvedValue(undefined);
+    const ensureLoaded = createEntitiesLoader(load);
+
+    await Promise.all([ensureLoaded(CONFIG), ensureLoaded(CONFIG)]);
+    await ensureLoaded(CONFIG);
+
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  test("drops a rejected load so a later call re-attempts", async () => {
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("fetch failed"))
+      .mockResolvedValueOnce(undefined);
+    const ensureLoaded = createEntitiesLoader(load);
+
+    await expect(ensureLoaded(CONFIG)).rejects.toThrow("fetch failed");
+    await expect(ensureLoaded(CONFIG)).resolves.toBeUndefined();
+
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+});
 
 describe("workflows loader", () => {
   let fetchMock: jest.MockedFunction<typeof fetch>;
