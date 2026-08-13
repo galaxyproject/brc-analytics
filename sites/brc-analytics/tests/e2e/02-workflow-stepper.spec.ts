@@ -1,9 +1,8 @@
-// .js extension required: Playwright uses Node's native module resolution which
-// enforces the package exports field strictly (no auto-resolving extensions).
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters.js";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { type Locator, type Page } from "@playwright/test";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { buildConfigureWorkflowUrl } from "@repo/shared/routes/utils";
 import { expect, test } from "./utils/fixtures";
 
 /**
@@ -42,15 +41,16 @@ const STEP_LOAD_TIMEOUT = 15000;
 expect.configure({ timeout: STEP_LOAD_TIMEOUT });
 
 /**
- * Builds a configure-workflow URL for the given workflow TRS ID.
+ * Builds an assembly configure-workflow URL for the given workflow TRS ID.
  * @param trsId - The TRS ID of the workflow.
  * @returns The configure-workflow URL.
  */
-function buildConfigureWorkflowUrl(trsId: string): string {
-  return replaceParameters(ROUTES.CONFIGURE_WORKFLOW, {
-    entityId: ASSEMBLY_ENTITY_ID,
-    trsId,
-  });
+function buildAssemblyConfigureWorkflowUrl(trsId: string): string {
+  return buildConfigureWorkflowUrl(
+    ROUTES.CONFIGURE_WORKFLOW,
+    ASSEMBLY_ENTITY_ID,
+    trsId
+  );
 }
 
 /**
@@ -81,7 +81,7 @@ async function advancePastGtfStep(page: Page): Promise<Locator> {
 
 test.describe("Workflow Stepper", () => {
   test.describe("RNA-seq PE workflow", () => {
-    const url = buildConfigureWorkflowUrl(RNASEQ_PE_TRS_ID);
+    const url = buildAssemblyConfigureWorkflowUrl(RNASEQ_PE_TRS_ID);
 
     test.beforeEach(async ({ page }) => {
       await page.goto(url);
@@ -186,7 +186,7 @@ test.describe("Workflow Stepper", () => {
   });
 
   test.describe("ATAC-seq workflow", () => {
-    const url = buildConfigureWorkflowUrl(ATACSEQ_TRS_ID);
+    const url = buildAssemblyConfigureWorkflowUrl(ATACSEQ_TRS_ID);
 
     test.beforeEach(async ({ page }) => {
       await page.goto(url);
@@ -229,7 +229,7 @@ test.describe("Workflow Stepper", () => {
   });
 
   test.describe("page structure", () => {
-    const url = buildConfigureWorkflowUrl(RNASEQ_PE_TRS_ID);
+    const url = buildAssemblyConfigureWorkflowUrl(RNASEQ_PE_TRS_ID);
 
     test.beforeEach(async ({ page }) => {
       await page.goto(url);
@@ -264,10 +264,11 @@ test.describe("Organism workflow route", () => {
     page,
   }) => {
     await page.goto(
-      replaceParameters(ROUTES.CONFIGURE_ORGANISM_WORKFLOW, {
-        entityId: ORGANISM_ENTITY_ID,
-        trsId: ORGANISM_TRS_ID,
-      })
+      buildConfigureWorkflowUrl(
+        ROUTES.CONFIGURE_ORGANISM_WORKFLOW,
+        ORGANISM_ENTITY_ID,
+        ORGANISM_TRS_ID
+      )
     );
 
     await expect(
@@ -279,7 +280,7 @@ test.describe("Organism workflow route", () => {
     page,
   }) => {
     const workflowsPath = replaceParameters(
-      ROUTES.CONFIGURE_ORGANISM_WORKFLOW.split("?")[0],
+      ROUTES.CONFIGURE_ORGANISM_WORKFLOW,
       { entityId: ORGANISM_ENTITY_ID }
     );
     const organismPath = replaceParameters(ROUTES.ORGANISM, {
