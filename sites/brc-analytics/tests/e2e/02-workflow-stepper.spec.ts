@@ -292,3 +292,34 @@ test.describe("Organism workflow route", () => {
     await expect(page).toHaveURL(new RegExp(`${organismPath}$`));
   });
 });
+
+test.describe("Stale workflow URL", () => {
+  test("should render the workflow not-found state for an unknown assembly trsId", async ({
+    page,
+  }) => {
+    await page.goto(buildAssemblyConfigureWorkflowUrl("not-a-real-workflow"));
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Workflow not found" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "View Available Workflows" })
+    ).toBeVisible();
+  });
+
+  test("should render the workflow not-found state for an unknown organism trsId", async ({
+    page,
+  }) => {
+    await page.goto(
+      buildConfigureWorkflowUrl(
+        ROUTES.CONFIGURE_ORGANISM_WORKFLOW,
+        ORGANISM_ENTITY_ID,
+        "not-a-real-workflow"
+      )
+    );
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Workflow not found" })
+    ).toBeVisible();
+  });
+});

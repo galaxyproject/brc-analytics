@@ -1,6 +1,10 @@
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
+import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import type {
   EntityPageParams,
@@ -20,7 +24,17 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
 
   return (
     <EntityDataGate>
-      <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />
+      <WorkflowGate
+        fallback={
+          <WorkflowNotFound
+            entityContext="organism"
+            href={replaceParameters(ROUTES.ORGANISM, { entityId })}
+          />
+        }
+        trsId={trsId}
+      >
+        <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />
+      </WorkflowGate>
     </EntityDataGate>
   );
 };
