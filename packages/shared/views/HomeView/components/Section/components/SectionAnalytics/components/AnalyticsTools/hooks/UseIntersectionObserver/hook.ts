@@ -1,0 +1,37 @@
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { INTERSECTION_OBSERVER_OPTIONS } from "./constants";
+import { type UseIntersectionObserver } from "./types";
+
+export function useIntersectionObserver(
+  ref: RefObject<HTMLElement | null>
+): UseIntersectionObserver {
+  const observerRef = useRef<IntersectionObserver>(null);
+  const [isIntersecting, setIsIntersecting] = useState<boolean>(false);
+
+  const onIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      setIsIntersecting(entry.isIntersecting);
+    });
+  }, []);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(onIntersection, {
+      root: ref.current,
+      ...INTERSECTION_OBSERVER_OPTIONS,
+    });
+    if (ref.current?.lastElementChild) {
+      observerRef.current.observe(ref.current.lastElementChild);
+    }
+    return (): void => {
+      observerRef.current?.disconnect();
+    };
+  }, [onIntersection, ref]);
+
+  return { isIntersecting };
+}

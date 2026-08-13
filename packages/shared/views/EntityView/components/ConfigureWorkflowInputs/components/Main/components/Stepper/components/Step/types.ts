@@ -1,0 +1,41 @@
+import { type StepProps as MStepProps } from "@mui/material";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import {
+  type OnContinue,
+  type OnEdit,
+} from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/types";
+import {
+  type ConfiguredInput,
+  type OnConfigure,
+} from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import { type ComponentType, type ReactNode } from "react";
+import {
+  type OnLaunchGalaxy,
+  type Status,
+} from "./hooks/UseLaunchGalaxy/types";
+
+export interface StepConfig {
+  description?: ReactNode;
+  disabled?: boolean;
+  hasSidePanel?: boolean;
+  key: keyof ConfiguredInput | "readRunsAny" | "sampleSheet";
+  label: string;
+  renderValue?: (ci: ConfiguredInput) => string | undefined;
+  Step: ComponentType<StepProps>;
+}
+
+export interface StepProps
+  extends
+    Pick<StepConfig, "description" | "disabled">,
+    Pick<MStepProps, "completed" | "last">,
+    Required<Pick<MStepProps, "index" | "active">> {
+  configuredInput: ConfiguredInput;
+  entryLabel: string;
+  onConfigure: OnConfigure;
+  onContinue: OnContinue;
+  onEdit: OnEdit;
+  onLaunchGalaxy: OnLaunchGalaxy;
+  status: Status;
+  stepKey: keyof ConfiguredInput | "readRunsAny" | "sampleSheet";
+  workflow: Workflow;
+}

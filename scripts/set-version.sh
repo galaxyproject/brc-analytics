@@ -6,6 +6,15 @@ if [ "$1" == "dev" ]; then
   TARGET_ENV_FILE=".env.development"
 fi
 
+# Per-site apps keep their env file under sites/<site>. Required — no root
+# fallback, matching build.sh/dev.sh fail-fast on a missing target.
+if [ -z "${2:-}" ]; then
+  echo "Usage: set-version.sh <dev|\"\"> <project-dir>" >&2
+  exit 1
+fi
+PROJECT_DIR="$2"
+TARGET_ENV_FILE="$PROJECT_DIR/$TARGET_ENV_FILE"
+
 # Get the current git hash
 GIT_HASH=$(git rev-parse HEAD)
 

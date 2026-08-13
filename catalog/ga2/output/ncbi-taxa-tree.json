@@ -6578,13 +6578,13 @@
                                                                 {
                                                                     "assembly_count": 3,
                                                                     "children": [],
-                                                                    "name": "Thomomys bottae",
-                                                                    "ncbi_tax_id": "10013",
+                                                                    "name": "Megascapheus bottae",
+                                                                    "ncbi_tax_id": "3774380",
                                                                     "rank": "species"
                                                                 }
                                                             ],
-                                                            "name": "Thomomys",
-                                                            "ncbi_tax_id": "10011",
+                                                            "name": "Megascapheus",
+                                                            "ncbi_tax_id": "3774376",
                                                             "rank": "genus"
                                                         }
                                                     ],

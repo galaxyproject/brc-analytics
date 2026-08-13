@@ -1,32 +1,26 @@
-import { getConfiguredValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
-import type { ConfiguredInput } from "@/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { getConfiguredValues } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
+import type { ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 // Mock workflow constants to avoid pulling in unneeded modules
-jest.mock(
-  "../../../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants",
-  () => ({
-    DIFFERENTIAL_EXPRESSION_ANALYSIS: {
-      trsId: "differential-expression-analysis",
-    },
-  })
-);
+jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
+  DIFFERENTIAL_EXPRESSION_ANALYSIS: {
+    trsId: "differential-expression-analysis",
+  },
+}));
 
-jest.mock(
-  "../../../app/views/AnalyzeWorkflowsView/loganSearch/constants",
-  () => ({
-    LOGAN_SEARCH: {
-      trsId: "logan-search",
-    },
-  })
-);
+jest.mock("@repo/shared/workflow/loganSearch", () => ({
+  LOGAN_SEARCH: {
+    trsId: "logan-search",
+  },
+}));
 
-jest.mock("../../../app/views/AnalyzeWorkflowsView/lexicmap/constants", () => ({
+jest.mock("@repo/shared/workflow/lexicmap", () => ({
   LEXICMAP: {
     trsId: "lexicmap",
   },

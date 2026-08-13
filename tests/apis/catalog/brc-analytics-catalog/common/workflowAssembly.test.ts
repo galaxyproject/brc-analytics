@@ -1,4 +1,4 @@
-import { workflowMeetsAssemblyMinimum } from "@/apis/catalog/brc-analytics-catalog/common/workflowAssembly";
+import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 
 describe("workflowMeetsAssemblyMinimum", () => {
   test("returns true when assemblyCountMin is 0 (no assembly requirement)", () => {

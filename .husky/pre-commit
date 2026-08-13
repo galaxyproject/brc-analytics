@@ -21,7 +21,7 @@ echo '🐍 Formatting Python files with Ruff...'
 npm run format:python
 
 # Check TypeScript
-npx tsc --noEmit ||
+npm run typecheck ||
 (
 	echo 'TypeScript compile failed';
 	false;

@@ -1,12 +1,14 @@
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";
+import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
-import { JSX } from "react";
-import { useAssemblyFavorites } from "../../hooks/UseAssemblyFavorites/hook";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
-export function AssemblyFavoriteButton({ accession }: Props): JSX.Element {
+export function AssemblyFavoriteButton({
+  accession,
+}: Props): JSX.Element | null {
   const {
     isAuthenticated,
     isConfigured,
@@ -16,7 +18,11 @@ export function AssemblyFavoriteButton({ accession }: Props): JSX.Element {
   const { error, isFavorited, isLoading, isToggling, toggleFavorite } =
     useAssemblyFavorites();
 
-  if (!isConfigured || isAuthLoading) {
+  // Login is not enabled on this site — a permanent state, not a loading one —
+  // so favorites can't be offered and the button renders nothing.
+  if (!isConfigured) return null;
+
+  if (isAuthLoading) {
     return <CircularProgress size={20} />;
   }
 

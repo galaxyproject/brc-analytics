@@ -1,6 +1,6 @@
-import { useDropzone } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/hooks/useDropzone";
+import { useDropzone } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Dropzone/hooks/useDropzone";
 import { act, renderHook } from "@testing-library/react";
-import { DragEvent } from "react";
+import { type DragEvent } from "react";
 
 /**
  * Creates a mock DragEvent with configurable currentTarget and relatedTarget.

@@ -1,5 +1,5 @@
-import { CategoryGroup } from "@databiosphere/findable-ui/lib/config/entities";
-import { CATEGORY_REGISTRY } from "../common/category/categoryRegistry";
+import { type CategoryGroup } from "@databiosphere/findable-ui/lib/config/entities";
+import { CATEGORY_REGISTRY } from "@site-config/ga2/local/index/common/category/categoryRegistry";
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [
   {

@@ -1,6 +1,6 @@
 import NextHead from "next/head";
 import { useRouter } from "next/router";
-import { JSX } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 export const OgMeta = ({

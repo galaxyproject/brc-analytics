@@ -1,13 +1,13 @@
+import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   createContext,
-  JSX,
-  ReactNode,
+  type JSX,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL } from "../../config/api";
 
 interface AuthUser {
   email: string;

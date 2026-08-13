@@ -14,28 +14,30 @@ RUN npm ci
 # Copy source files
 COPY . .
 
-# Set up build environment
-# Uses docker-specific config that works with nginx proxy
-RUN cp ./site-config/brc-analytics/docker/.env .env.production
+# Set up the build environment: copies the docker-specific env (nginx-proxy
+# config) to sites/brc-analytics/.env.production and the site favicons. Uses the
+# `docker` env rather than `build-local:brc` so the local env doesn't clobber it.
+RUN ./scripts/build.sh brc-analytics docker
 
-# Set version info
-RUN ./scripts/set-version.sh
-
-# Sync API config
-RUN ./scripts/sync-api-brc-analytics.sh
+# Set version info (appended to the site env)
+RUN ./scripts/set-version.sh "" sites/brc-analytics
 
 # Build the catalog data
 RUN npm run build-brc-db
 
-# Build Next.js static export (outputs to /app/out)
+# Sync API config into the site's public dir. Runs after the catalog build so
+# the static export ships the freshly built JSON, not the committed output.
+RUN ./scripts/sync-api-brc-analytics.sh
+
+# Build Next.js static export (outputs to /app/sites/brc-analytics/out)
 # Next 16 removed the `--no-lint` flag and no longer runs ESLint during build.
-RUN npm run build:local
+RUN npx next build sites/brc-analytics --webpack
 
 # Stage 2: Serve with nginx
 FROM nginx:alpine AS runtime
 
 # Copy built static files
-COPY --from=builder /app/out /usr/share/nginx/html
+COPY --from=builder /app/sites/brc-analytics/out /usr/share/nginx/html
 
 # Copy nginx config for API proxying
 COPY backend/nginx.conf /etc/nginx/conf.d/default.conf

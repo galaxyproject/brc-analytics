@@ -7,7 +7,7 @@ import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/m
 import { Typography } from "@mui/material";
 import { Section } from "@repo/shared/views/EntityView/ui/Section/section";
 import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { StyledButtonBase } from "./analysisPortals.styles";
 import type { Props } from "./types";
 

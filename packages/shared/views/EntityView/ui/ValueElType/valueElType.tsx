@@ -1,7 +1,7 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import type { TypographyProps } from "@mui/material";
 import { Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 /**
  * Renders a value element type for the KeyValuePairs component.

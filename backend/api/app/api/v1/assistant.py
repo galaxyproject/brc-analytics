@@ -1,7 +1,15 @@
 import logging
 from typing import Optional
+from uuid import uuid4
 
+import sentry_sdk
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from pydantic_ai.exceptions import (
+    AgentRunError,
+    ConcurrencyLimitExceeded,
+    ModelHTTPError,
+    UsageLimitExceeded,
+)
 
 from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import (
@@ -17,7 +25,11 @@ from app.models.assistant import (
     SessionRestoreResponse,
 )
 from app.models.user_data import UserMeResponse
-from app.services.assistant_agent import AssistantTimeoutError
+from app.services import turn_log
+from app.services.assistant_agent import (
+    AssistantTimeoutError,
+    AssistantUnavailableError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +42,14 @@ async def assistant_info(
 ):
     """Surface assistant configuration for UI attribution (model + provider)."""
     available = agent.is_available()
+    settings = agent.settings
     return AssistantInfoResponse(
         available=available,
-        model=agent.settings.AI_PRIMARY_MODEL if available else None,
+        model=settings.AI_PRIMARY_MODEL if available else None,
         provider=agent.get_provider() if available else None,
+        # Same predicate the writer uses, so the notice can never disagree
+        # with whether we are actually keeping anything.
+        turn_log_retention_days=turn_log.active_retention_days(settings),
     )
 
 
@@ -82,11 +98,22 @@ async def assistant_chat(
                 detail="Assistant session belongs to another user",
             ) from e
 
+    # Minted here so a Sentry event raised inside the run carries the same id
+    # as the row we write for it, and the two can actually be joined.
+    turn_id = uuid4()
+    sentry_sdk.set_tag("assistant.turn_id", str(turn_id))
+
     try:
-        chat_response = await agent.chat(
+        chat_response, _telemetry = await agent.chat_with_telemetry(
             request.message,
             request.session_id,
             current_user.sub if current_user else None,
+            turn_id=turn_id,
+            # The agent records the turn itself, success or failure -- it is
+            # the only layer that knows the session it created before a
+            # failure. Awaited inline: the insert is milliseconds against a
+            # turn that spends seconds in inference.
+            on_turn=turn_log.record,
         )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
@@ -96,9 +123,45 @@ async def assistant_chat(
             status_code=403,
             detail="Assistant session belongs to another user",
         ) from e
-    except RuntimeError as e:
-        logger.exception("Assistant chat unavailable (RuntimeError)")
-        raise HTTPException(status_code=503, detail=str(e)) from e
+    except AssistantUnavailableError as e:
+        # The one case where "unavailable" is the truth. Narrowed from a bare
+        # RuntimeError catch, which also swallowed unrelated runtime bugs and
+        # returned their messages to the client.
+        logger.exception("Assistant chat unavailable (not configured)")
+        raise HTTPException(
+            status_code=503, detail="The analysis assistant is not configured"
+        ) from e
+    except ModelHTTPError as e:
+        # Upstream said no. Keep its meaning: throttling stays throttling and an
+        # upstream outage stays an outage, both of which are worth retrying and
+        # both of which the client already has distinct messaging for. Only a
+        # provider 4xx we can't act on falls through to a generic failure.
+        logger.exception("Assistant model call failed upstream (%s)", e.status_code)
+        if e.status_code == 429:
+            raise HTTPException(
+                status_code=429, detail="The assistant is rate limited right now"
+            ) from e
+        if e.status_code >= 500:
+            raise HTTPException(
+                status_code=503, detail="The assistant's model provider is unavailable"
+            ) from e
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
+    except (UsageLimitExceeded, ConcurrencyLimitExceeded) as e:
+        # A cap we set, not a broken run: retrying later is the right advice.
+        logger.exception("Assistant chat hit a usage or concurrency limit")
+        raise HTTPException(
+            status_code=429, detail="The assistant is at capacity right now"
+        ) from e
+    except AgentRunError as e:
+        # What's left is the run itself going wrong -- a tool exhausting its
+        # retries, unparseable model output. One broken turn, not an outage, and
+        # not worth retrying: the same question fails the same way.
+        logger.exception("Assistant chat run failed")
+        raise HTTPException(
+            status_code=500, detail="The assistant could not complete that request"
+        ) from e
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e

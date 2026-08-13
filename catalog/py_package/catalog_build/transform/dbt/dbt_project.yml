@@ -20,3 +20,7 @@ models:
 
 data_tests:
   +severity: warn
+  # Persist failing rows to audit tables so the QC report can list them. The
+  # short test names set in schema.yml keep these table names readable, and the
+  # run_results.json artifact records each table's exact name for lookup.
+  +store_failures: true

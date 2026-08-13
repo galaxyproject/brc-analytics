@@ -1,11 +1,13 @@
-import * as C from "@/components";
-import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
-import { MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
+import { ROUTES } from "@brc/routes/constants";
+import { DiscourseIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/DiscourseIcon/discourseIcon";
+import { GitHubIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/GitHubIcon/gitHubIcon";
+import { type SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
+import { type MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { ROUTES } from "../../../routes/constants";
+import { CalendarIcon } from "@repo/shared/components/CustomIcon/components/CalendarIcon/calendarIcon";
 
 export const SOCIALS = {
   CALENDAR: {
@@ -29,15 +31,15 @@ export const SOCIALS = {
 export const socialMenuItems: MenuItem[] = [
   {
     ...SOCIALS.CALENDAR,
-    icon: C.CalendarIcon({ fontSize: "small" }),
+    icon: CalendarIcon({ fontSize: "small" }),
   },
   {
     ...SOCIALS.DISCOURSE,
-    icon: C.DiscourseIcon({ fontSize: "small" }),
+    icon: DiscourseIcon({ fontSize: "small" }),
   },
   {
     ...SOCIALS.GITHUB,
-    icon: C.GitHubIcon({ fontSize: "small" }),
+    icon: GitHubIcon({ fontSize: "small" }),
   },
 ];
 
@@ -45,15 +47,15 @@ export const socialMedia: SocialMedia = {
   socials: [
     {
       ...SOCIALS.CALENDAR,
-      Icon: C.CalendarIcon,
+      Icon: CalendarIcon,
     },
     {
       ...SOCIALS.DISCOURSE,
-      Icon: C.DiscourseIcon,
+      Icon: DiscourseIcon,
     },
     {
       ...SOCIALS.GITHUB,
-      Icon: C.GitHubIcon,
+      Icon: GitHubIcon,
     },
   ],
 };

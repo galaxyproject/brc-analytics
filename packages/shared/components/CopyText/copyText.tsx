@@ -1,5 +1,5 @@
 import { Grid, Typography } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { ClipboardCopy } from "./components/ClipboardCopy/clipboardCopy";
 import type { Props } from "./types";
 

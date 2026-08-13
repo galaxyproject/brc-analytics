@@ -1,4 +1,4 @@
-import { CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
+import { type CategoryConfig } from "@databiosphere/findable-ui/lib/common/categories/config/types";
 import * as CATEGORY_CONFIG from "./configs";
 
 export const CATEGORY_REGISTRY: Record<string, CategoryConfig> = {

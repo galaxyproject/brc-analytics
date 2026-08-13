@@ -1,23 +1,48 @@
+import { loadPangenomes } from "@brc/services/workflows/loader";
+import { API as BRC_API } from "@brc/services/workflows/routes";
+import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import type { Workflow } from "@repo/shared/apis/workflow";
 import {
+  createEntitiesLoader,
   loadEntities,
-  loadPangenomes,
   loadWorkflows,
-} from "@/services/workflows/loader";
-import { API } from "@/services/workflows/routes";
-import { getEntitiesById, getEntitiesByType } from "@/services/workflows/store";
-import { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+} from "@repo/shared/services/workflows/loader";
+import { API } from "@repo/shared/services/workflows/routes";
+import {
+  getEntitiesById,
+  getEntitiesByType,
+} from "@repo/shared/services/workflows/store";
 
 const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
 
-jest.mock("../../app/views/AnalyzeWorkflowsView/components/Main/utils", () => ({
-  formatTrsId: (trsId: string): string => trsId,
-}));
+describe("createEntitiesLoader", () => {
+  const CONFIG = {} as SiteConfig;
 
-jest.mock("../../app/views/AnalyzeWorkflowsView/custom/constants", () => ({
-  CUSTOM_WORKFLOW: { trsId: "custom-workflow" },
-}));
+  test("shares a single in-flight load across calls", async () => {
+    const load = jest.fn().mockResolvedValue(undefined);
+    const ensureLoaded = createEntitiesLoader(load);
+
+    await Promise.all([ensureLoaded(CONFIG), ensureLoaded(CONFIG)]);
+    await ensureLoaded(CONFIG);
+
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  test("drops a rejected load so a later call re-attempts", async () => {
+    const load = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("fetch failed"))
+      .mockResolvedValueOnce(undefined);
+    const ensureLoaded = createEntitiesLoader(load);
+
+    await expect(ensureLoaded(CONFIG)).rejects.toThrow("fetch failed");
+    await expect(ensureLoaded(CONFIG)).resolves.toBeUndefined();
+
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+});
 
 describe("workflows loader", () => {
   let fetchMock: jest.MockedFunction<typeof fetch>;
@@ -104,10 +129,11 @@ describe("workflows loader", () => {
   describe("loadWorkflows", () => {
     test("loads workflow categories, flattens workflows, and populates store", async () => {
       const categories = [{ workflows: [{ trsId: "trs-1" }] }];
+      const extraWorkflows = [{ trsId: "custom-workflow" } as Workflow];
 
       fetchMock.mockResolvedValue(mockFetchResponse(categories));
 
-      await loadWorkflows();
+      await loadWorkflows(extraWorkflows);
 
       expect(fetchMock).toHaveBeenCalledWith(API.workflows);
 
@@ -145,7 +171,7 @@ describe("workflows loader", () => {
 
       await loadPangenomes();
 
-      expect(fetchMock).toHaveBeenCalledWith(API.pangenomes);
+      expect(fetchMock).toHaveBeenCalledWith(BRC_API.pangenomes);
 
       const byId = getEntitiesById().get("pangenomes");
       const byType = getEntitiesByType().get("pangenomes");

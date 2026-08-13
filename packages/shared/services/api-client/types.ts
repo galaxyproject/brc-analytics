@@ -59,6 +59,7 @@ export interface AssistantInfoResponse {
   available: boolean;
   model: string | null;
   provider: string | null;
+  turn_log_retention_days: number | null;
 }
 
 export interface UserPreferences {

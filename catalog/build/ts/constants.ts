@@ -5,7 +5,7 @@ export const CORE_SOURCE_GENOME_KEYS = [
   "accession",
   "annotationStatus",
   "chromosomeCount",
-  "commonName",
+  "commonNames",
   "coverage",
   "galaxyDatacacheUrl",
   "gcPercent",

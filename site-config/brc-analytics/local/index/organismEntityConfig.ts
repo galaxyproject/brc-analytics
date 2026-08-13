@@ -1,20 +1,36 @@
-import { BRCDataCatalogOrganism } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { getOrganismId } from "@/apis/catalog/brc-analytics-catalog/common/utils";
-import * as C from "@/components";
-import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
+import { getOrganismId } from "@brc/apis/utils";
+import * as V from "@brc/viewModelBuilders/viewModelBuilders";
+import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { BasicCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/BasicCell/basicCell";
+import { NTagCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/NTagCell/nTagCell";
 import {
-  ComponentConfig,
-  ListConfig,
+  type ComponentConfig,
+  type ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
+import { Chip } from "@mui/material";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import { type AppEntityConfig } from "@repo/shared/config/types";
+import {
+  buildAssemblyCount,
+  buildOrganismAssemblyTaxonomyIds,
+  buildOrganismTaxonomicGroup,
+  buildTaxonomicLevelClass,
+  buildTaxonomicLevelDomain,
+  buildTaxonomicLevelFamily,
+  buildTaxonomicLevelGenus,
+  buildTaxonomicLevelKingdom,
+  buildTaxonomicLevelOrder,
+  buildTaxonomicLevelPhylum,
+} from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
-import { AppEntityConfig } from "@site-config/common/entities";
-import { organismMainColumn } from "../entity/organism/organismMainColumn";
-import { organismTop } from "../entity/organism/organismTop";
+import { organismMainColumn } from "@site-config/brc-analytics/local/entity/organism/organismMainColumn";
+import { organismTop } from "@site-config/brc-analytics/local/entity/organism/organismTop";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
 
@@ -100,81 +116,81 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
     columns: [
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelDomain,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelDomain,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_DOMAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
+          component: BasicCell,
           viewBuilder: V.buildTaxonomicLevelRealm,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_REALM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelKingdom,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelKingdom,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_KINGDOM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_KINGDOM,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelPhylum,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelPhylum,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_PHYLUM,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelClass,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelClass,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_CLASS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_CLASS,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelOrder,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelOrder,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ORDER,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ORDER,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelFamily,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelFamily,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_FAMILY,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_FAMILY,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildTaxonomicLevelGenus,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildTaxonomicLevelGenus,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_GENUS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_GENUS,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.Link,
+          component: Link,
           viewBuilder: V.buildOrganismTaxonomicLevelSpecies,
-        } as ComponentConfig<typeof C.Link, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof Link, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SPECIES,
         meta: { columnPinned: true },
@@ -182,54 +198,54 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       },
       {
         componentConfig: {
-          component: C.NTagCell,
+          component: NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelStrain,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_STRAIN,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_STRAIN,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.NTagCell,
+          component: NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelSerotype,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SEROTYPE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_SEROTYPE,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.NTagCell,
+          component: NTagCell,
           viewBuilder: V.buildOrganismTaxonomicLevelIsolate,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE,
         width: { max: "1fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildCommonName,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: NTagCell,
+          viewBuilder: V.buildCommonNames,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
         width: { max: "0.65fr", min: "auto" },
       },
       {
         componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: V.buildOrganismAssemblyTaxonomyIds,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+          component: NTagCell,
+          viewBuilder: buildOrganismAssemblyTaxonomyIds,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_TAXONOMY_IDS,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
         width: { max: "0.65fr", min: "164px" },
       },
       {
         componentConfig: {
-          component: C.NTagCell,
-          viewBuilder: V.buildOrganismTaxonomicGroup,
-        } as ComponentConfig<typeof C.NTagCell, BRCDataCatalogOrganism>,
+          component: NTagCell,
+          viewBuilder: buildOrganismTaxonomicGroup,
+        } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_GROUP,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_GROUP,
         width: { max: "0.65fr", min: "164px" },
@@ -238,22 +254,22 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
         componentConfig: {
           children: [
             {
-              component: C.Chip,
+              component: Chip,
               viewBuilder: V.buildPriorityPathogen,
-            } as ComponentConfig<typeof C.Chip, BRCDataCatalogOrganism>,
+            } as ComponentConfig<typeof Chip, BRCDataCatalogOrganism>,
           ],
-          component: C.Tooltip,
+          component: Tooltip,
           viewBuilder: V.buildPriorityPathogenTooltip,
-        } as ComponentConfig<typeof C.Tooltip, BRCDataCatalogOrganism>,
+        } as ComponentConfig<typeof Tooltip, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.PRIORITY_PATHOGEN_NAME,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.PRIORITY_PATHOGEN_NAME,
         width: { max: "0.5fr", min: "142px" },
       },
       {
         componentConfig: {
-          component: C.BasicCell,
-          viewBuilder: V.buildAssemblyCount,
-        } as ComponentConfig<typeof C.BasicCell, BRCDataCatalogOrganism>,
+          component: BasicCell,
+          viewBuilder: buildAssemblyCount,
+        } as ComponentConfig<typeof BasicCell, BRCDataCatalogOrganism>,
         header: BRC_DATA_CATALOG_CATEGORY_LABEL.ASSEMBLY_COUNT,
         id: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_COUNT,
         width: { max: "0.65fr", min: "164px" },

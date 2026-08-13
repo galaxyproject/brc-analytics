@@ -1,9 +1,5 @@
-// buildLevel references component types only (erased at runtime); mock the
-// component barrel so importing it doesn't pull untransformable MDX modules.
-jest.mock("app/components", () => ({}));
-
-import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildLevel } from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
+import { buildLevel } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 
 describe("buildLevel", () => {
   test.each([

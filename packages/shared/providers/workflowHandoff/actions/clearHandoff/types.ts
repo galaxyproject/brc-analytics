@@ -1,0 +1,18 @@
+import { type WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type EntityKey } from "@repo/shared/providers/workflowHandoff/types";
+
+/**
+ * Action to clear the handoff payload for an entity+path cell.
+ */
+export interface ClearHandoffAction {
+  payload: ClearHandoffPayload;
+  type: WorkflowHandoffActionKind.ClearHandoff;
+}
+
+/**
+ * Payload for the ClearHandoff action.
+ */
+export interface ClearHandoffPayload {
+  entity: EntityKey;
+  path: string;
+}

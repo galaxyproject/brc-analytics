@@ -1,6 +1,6 @@
-import * as C from "@/components";
-import { SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
-import { MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
+import { GitHubIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/GitHubIcon/gitHubIcon";
+import { type SocialMedia } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
+import { type MenuItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/components/NavigationMenuItems/navigationMenuItems";
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
@@ -18,7 +18,7 @@ export const SOCIALS = {
 export const socialMenuItems: MenuItem[] = [
   {
     ...SOCIALS.GITHUB,
-    icon: C.GitHubIcon({ fontSize: "small" }),
+    icon: GitHubIcon({ fontSize: "small" }),
   },
 ];
 
@@ -26,7 +26,7 @@ export const socialMedia: SocialMedia = {
   socials: [
     {
       ...SOCIALS.GITHUB,
-      Icon: C.GitHubIcon,
+      Icon: GitHubIcon,
     },
   ],
 };

@@ -1,0 +1,52 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "About the Assistant"
+contentType: "ARTICLE"
+description: ""
+enableOutline: true
+title: "About the Assistant"
+---
+
+## What is the Analysis Assistant?
+
+The Analysis Assistant is a chat interface that helps you set up a genomic analysis on BRC Analytics without hunting through the catalog yourself. You describe what you want to do in plain language, and the assistant helps you pick an organism, a genome assembly, and a compatible workflow from the BRC catalog. Once your setup is complete, it hands off to the workflow stepper so you can review the configuration and launch the analysis in Galaxy.
+
+The assistant is in **beta**. Like any AI tool, it can make mistakes -- double-check anything important before relying on it, and use the **Feedback** button on the assistant page to tell us what's working and what isn't.
+
+## How to use it
+
+1. **Ask in plain language.** Start by describing your analysis -- for example, _"I want to call variants for Plasmodium falciparum"_ -- or just say what organism you're working with.
+2. **Explore the catalog.** The assistant looks up real organisms, assemblies, and workflows from the BRC catalog. It will suggest options and ask follow-up questions to narrow things down.
+3. **Configure your analysis.** As you answer, the assistant fills in the pieces it needs: the reference assembly, the workflow, and details about your data.
+4. **Hand off to the workflow stepper.** When the setup is ready, the assistant hands you off to the workflow stepper with your selections pre-filled. From there you can review everything and launch in Galaxy.
+
+If the assistant doesn't have what you're looking for -- for example, an organism or assembly that isn't in the catalog -- it will say so. You can browse the [catalog](/data/organisms) directly, or ask us to add it on the [community forum](https://help.brc-analytics.org) or by [opening an issue](https://github.com/galaxyproject/brc-analytics/issues). Those are the same places the assistant will point you when it hits a gap.
+
+## What it can't do (yet)
+
+The assistant is focused on the catalog-to-Galaxy setup flow described above. It can't:
+
+- Help with analyses or workflows that aren't in the BRC catalog, or build a custom analysis pipeline from scratch.
+- Work with organisms, assemblies, or annotation files that aren't already in the catalog.
+- Interpret your results, write or summarize papers, or answer general research questions.
+- Browse external resources (like UCSC Genome Browser tracks) on your behalf.
+
+If you need something it can't do, let us know on the [community forum](https://help.brc-analytics.org) or by [opening an issue](https://github.com/galaxyproject/brc-analytics/issues) -- it helps us prioritize.
+
+## Feedback and getting help
+
+Two different things, and they go to two different places:
+
+- **How the assistant itself did** -- the **Feedback** button on the assistant page. It opens a short form and needs no account. Use it when a reply was wrong, confusing, or unhelpful. During the beta this is the signal we're watching most closely, so it's worth a sentence even when something only felt slightly off.
+- **Help with an analysis, or something missing from the catalog** -- the [community forum](https://help.brc-analytics.org) or [GitHub issues](https://github.com/galaxyproject/brc-analytics/issues). Both are public, so the next person with the same question finds the answer. Email [help@brc-analytics.org](mailto:help@brc-analytics.org) instead if you'd rather not post in the open.
+
+## What happens to your messages
+
+The assistant runs on a large language model hosted by a third-party provider. The model in use is named at the bottom of the assistant page. To generate a reply, what you type is sent to that provider along with the catalog context the assistant looked up on your behalf -- so please don't enter sensitive, confidential, or personally identifying information.
+
+Your conversation is held in short-lived server-side storage so you can pick up where you left off. It expires on its own about two hours after your last message, so an active conversation keeps going and an abandoned one clears itself. If you're signed in and save an analysis, a copy of the conversation is kept with your account until you delete it -- for a long chat that copy covers the most recent hundred messages rather than the whole thing.
+
+During the beta we may also keep a copy of each exchange -- what you asked, what the assistant answered, and which catalog lookups it made -- so we can see where it helps and where it falls short. Whether that's on, and how long those records are kept before they're deleted automatically, is stated at the bottom of the assistant page; on this site it's 90 days. If the notice isn't there, nothing is being kept beyond the short-lived storage described above. Only the maintainers can read them, they aren't published or shared, and nothing is recorded about you beyond your account if you're signed in. Routine database backups can hold a copy for a while after that, and those age out on their own schedule. This is the same reason the point above matters: don't type anything into the assistant you wouldn't want kept.

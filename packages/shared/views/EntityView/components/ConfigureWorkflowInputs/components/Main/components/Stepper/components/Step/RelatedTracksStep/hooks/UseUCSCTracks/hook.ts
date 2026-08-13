@@ -1,0 +1,20 @@
+import { useAsync } from "@databiosphere/findable-ui/lib/hooks/useAsync";
+import { type UcscTrackNode } from "@repo/shared/utils/ucsc-tracks-api/types";
+import { getAssemblyTracks } from "@repo/shared/utils/ucsc-tracks-api/ucsc-tracks-api";
+import { useCallback, useEffect } from "react";
+import { type UseUCSCTracks } from "./types";
+
+export const useUCSCTracks = (assembly?: string): UseUCSCTracks => {
+  const { data, run } = useAsync<UcscTrackNode[] | undefined>();
+
+  const onRequestData = useCallback(async (): Promise<void> => {
+    if (!assembly) return;
+    run(getAssemblyTracks(assembly));
+  }, [assembly, run]);
+
+  useEffect(() => {
+    onRequestData();
+  }, [onRequestData]);
+
+  return { data };
+};

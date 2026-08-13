@@ -48,7 +48,10 @@ def test_unknown_field_rejected():
 
 
 def test_unknown_facet_and_sort_fields_rejected():
-    with pytest.raises(ValueError, match="unknown field"):
+    # facet_by is an enum of the facetable fields, so an unknown name is refused
+    # by the schema before the per-entity check ever runs; sort is still a plain
+    # string and gets there.
+    with pytest.raises(ValueError):
         CatalogQuery(operation="facets", facet_by=["nope"])
     with pytest.raises(ValueError, match="unknown field"):
         CatalogQuery(sort=[Sort(field="nope")])
@@ -181,7 +184,10 @@ def test_compile_ne_and_not_in_are_null_safe():
 
 
 def test_facet_on_list_field_rejected():
-    with pytest.raises(ValueError, match="cannot facet on list field"):
+    # A list field is no longer offered in the facet_by enum at all, so the model
+    # cannot name one. A field that is scalar on one entity and a list on another
+    # would clear the enum and be caught by the per-entity facetable check.
+    with pytest.raises(ValueError):
         CatalogQuery(operation="facets", facet_by=["ploidy"])
 
 
@@ -476,26 +482,26 @@ def organism_con():
             taxonomicLevelSpecies VARCHAR,
             taxonomicLevelGenus VARCHAR,
             taxonomicLevelDomain VARCHAR,
-            commonName VARCHAR,
+            commonNames VARCHAR[],
             assemblyCount BIGINT,
             taxonomicGroup VARCHAR[]
         )
         """
     )
     rows = [
-        # taxid, species, genus, domain, common, assemblyCount, group
+        # taxid, species, genus, domain, commonNames, assemblyCount, group
         (
             "7165",
             "Anopheles gambiae",
             "Anopheles",
             "Eukaryota",
-            "mosquito",
+            ["mosquito", "African malaria mosquito"],
             12,
             ["Inv"],
         ),
-        ("7173", "Anopheles stephensi", "Anopheles", "Eukaryota", None, 5, ["Inv"]),
-        ("62324", "Anopheles funestus", "Anopheles", "Eukaryota", None, 3, ["Inv"]),
-        ("5476", "Candida albicans", "Candida", "Eukaryota", None, 8, ["Fungi"]),
+        ("7173", "Anopheles stephensi", "Anopheles", "Eukaryota", [], 5, ["Inv"]),
+        ("62324", "Anopheles funestus", "Anopheles", "Eukaryota", [], 3, ["Inv"]),
+        ("5476", "Candida albicans", "Candida", "Eukaryota", [], 8, ["Fungi"]),
     ]
     c.executemany("INSERT INTO organism VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     yield c
@@ -539,7 +545,7 @@ def test_organism_clade_list_is_bounded(organism_con):
     assert set(out["rows"][0]) == {
         "ncbiTaxonomyId",
         "taxonomicLevelSpecies",
-        "commonName",
+        "commonNames",
         "assemblyCount",
     }
 

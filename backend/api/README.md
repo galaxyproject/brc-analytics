@@ -102,14 +102,121 @@ CORS_ORIGINS=http://localhost:3000,http://localhost
 LOG_LEVEL=INFO
 ```
 
+## Assistant conversation logging
+
+Assistant sessions live in Redis with a 2 hour TTL, so without a durable sink
+there is no record of what users asked or how the assistant answered. When
+`DATABASE_URL` is set, each turn is also written to the `assistant_turn_log`
+table: the user's message, the reply, this turn's tool calls and their returns,
+the analysis-tracker snapshot, token counts, latency, and the model that
+produced it.
+
+Failed turns are recorded too, with `outcome='error'` and the exception class
+in `error_kind` -- otherwise the corpus would only contain the requests that
+happened to work, which is the opposite of what a beta needs. Each turn carries
+a `turn_id` that is also set as a Sentry tag (`assistant.turn_id`), so an
+exception over there joins to the prompt that caused it.
+
+```bash
+ASSISTANT_TURN_LOGGING_ENABLED=true            # false stops recording turns
+ASSISTANT_TURN_LOG_RETENTION_DAYS=90           # deletion window
+ASSISTANT_TURN_LOG_PURGE_ENABLED=true          # false disables the sweep
+ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS=6      # how often the sweep runs
+ASSISTANT_TURN_LOG_TIMEOUT_SECONDS=2           # bound on a single write
+ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES=65536  # per-row transcript cap
+```
+
+The write is awaited in the request and is fail-open, so a missing, slow, or
+broken database costs the user nothing -- failures go to the log and to Sentry,
+and the reply is returned regardless. An insert is a few milliseconds against a
+turn that spends seconds in inference, and `ASSISTANT_TURN_LOG_TIMEOUT_SECONDS`
+bounds the worst case. With no `DATABASE_URL` nothing is recorded and the app
+warns once at startup.
+
+`transcript` holds this turn's pydantic-ai messages including tool calls and
+returns, capped at `ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES`. Tool returns are
+unbounded, and one broad catalog query would otherwise bloat the row, the WAL,
+and every backup. Messages are kept in order until the budget runs out, so the
+prompt and first tool calls always survive; `transcript_truncated` marks rows
+where trailing messages were dropped.
+
+Note `turn_index` is a best-effort ordering hint read from Redis session
+metadata, not a unique sequence -- concurrent requests on one session can share
+a value. Order by `created_at`; use `turn_id` as the unique handle.
+
+**Retention.** The app runs the sweep itself every
+`ASSISTANT_TURN_LOG_PURGE_INTERVAL_HOURS` (see `app/services/turn_log.py`), so
+the 90-day deletion the UI promises doesn't depend on anyone installing a cron
+job. The purge is an idempotent
+`DELETE ... WHERE created_at < cutoff`, so running it in several workers is
+harmless. The script is for manual use:
+
+```bash
+python -m scripts.purge_assistant_turn_logs --dry-run   # count what would go
+python -m scripts.purge_assistant_turn_logs --days 30   # one-off shorter window
+```
+
+Database backups can retain deleted content past the window; align backup
+retention with what `/learn/assistant` tells users.
+
+**Privacy.** Messages are free text and may contain whatever a user typed, so
+the table is treated as user data: it lives in the app database under the same
+access controls as `saved_analyses`, is not exposed through any API endpoint,
+and is readable only by maintainers with direct database access. Authenticated
+turns carry a `user_id`; anonymous turns are grouped by `session_id` only, with
+no IP or other network identifier stored. Deleting a user nulls the `user_id`
+rather than deleting the rows, matching `workflow_runs`. Users are told
+conversations are logged during the beta on the assistant page and in
+`/learn/assistant`.
+
+### Reviewing the beta corpus
+
+```sql
+-- Recent prompts and replies
+SELECT created_at, session_id, user_message, assistant_reply
+FROM assistant_turn_log
+WHERE outcome = 'success'
+ORDER BY created_at DESC
+LIMIT 50;
+
+-- One conversation end to end
+SELECT created_at, outcome, user_message, assistant_reply
+FROM assistant_turn_log
+WHERE session_id = :session_id
+ORDER BY created_at;
+
+-- What's breaking, and on which prompts
+SELECT error_kind, count(*), min(created_at), max(created_at)
+FROM assistant_turn_log
+WHERE outcome = 'error'
+GROUP BY error_kind
+ORDER BY count(*) DESC;
+
+-- Turns per session, to see where people drop off
+SELECT turns, count(*) AS sessions FROM (
+  SELECT session_id, count(*) AS turns
+  FROM assistant_turn_log
+  WHERE session_id IS NOT NULL
+  GROUP BY session_id
+) t
+GROUP BY turns
+ORDER BY turns;
+
+-- Cost and latency by model
+SELECT model, count(*) AS turns, sum(total_tokens) AS tokens,
+       round(avg(latency_ms)) AS avg_ms
+FROM assistant_turn_log
+GROUP BY model;
+```
+
 ## Testing
 
 ```bash
 # Run e2e tests
-npm run test:e2e
+npm run test:e2e:api
 
 # Or with Playwright directly
-npx playwright test tests/e2e/03-api-health.spec.ts
+npx playwright test tests/e2e/api/03-api-health.spec.ts
 ```
 
 ## Architecture

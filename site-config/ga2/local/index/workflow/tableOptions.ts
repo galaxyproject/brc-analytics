@@ -1,7 +1,7 @@
 import { SORT_DIRECTION } from "@databiosphere/findable-ui/lib/config/entities";
-import { TableOptions } from "@tanstack/react-table";
+import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
+import { type TableOptions } from "@tanstack/react-table";
 import { CATEGORY_CONFIG } from "./categoryGroupConfig";
-import { WorkflowEntity } from "./types";
 
 export const TABLE_OPTIONS: Omit<
   TableOptions<WorkflowEntity>,

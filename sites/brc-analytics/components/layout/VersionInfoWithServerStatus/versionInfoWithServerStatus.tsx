@@ -1,0 +1,36 @@
+"use client";
+
+import { VersionInfo } from "@databiosphere/findable-ui/lib/components/Layout/components/Footer/components/VersionInfo/versionInfo";
+import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
+import { Box, Tooltip } from "@mui/material";
+import { API_BASE_URL } from "@repo/shared/config/api";
+import { type JSX, useEffect, useState } from "react";
+
+export const VersionInfoWithServerStatus = (): JSX.Element => {
+  const [backendVersion, setBackendVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/version`)
+      .then((res) => res.json())
+      .then((data) => setBackendVersion(data.version))
+      .catch(() => setBackendVersion(null));
+  }, []);
+
+  const connected = backendVersion !== null;
+  const label = connected ? `API: ${backendVersion}` : "API: unavailable";
+
+  return (
+    <Box sx={{ alignItems: "center", display: "flex", gap: 0.5 }}>
+      <VersionInfo />
+      <Tooltip arrow title={label}>
+        <DnsOutlinedIcon
+          sx={{
+            color: connected ? "action.disabled" : "error.main",
+            cursor: "default",
+            fontSize: 16,
+          }}
+        />
+      </Tooltip>
+    </Box>
+  );
+};

@@ -1,4 +1,4 @@
-import type { OutbreakPriority as OUTBREAK_PRIORITY } from "../../../catalog/schema/generated/schema";
+import type { OutbreakPriority as OUTBREAK_PRIORITY } from "@catalog/schema/generated/schema";
 import type { ORGANISM_PLOIDY } from "./schema-types";
 
 /**
@@ -14,7 +14,7 @@ export interface AssemblyContract {
   chromosomes: number | null;
   // Optional fields are absent on some catalogs' assemblies; consumers must
   // default when absent.
-  commonName?: string | null;
+  commonNames?: string[];
   coverage: string | null;
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;

@@ -1,5 +1,5 @@
-import { useTaxonomyMatches } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
-import type { ReadRun } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
+import { useTaxonomyMatches } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/components/DataSelector/components/Alert/hooks/UseTaxonomyMatches/hook";
+import type { ReadRun } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import type { Table } from "@tanstack/react-table";
 import { renderHook } from "@testing-library/react";
 

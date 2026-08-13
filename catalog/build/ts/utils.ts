@@ -3,7 +3,7 @@ import fsp from "fs/promises";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
-import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
 import {
   OrganismPloidy,
   Organism as SourceOrganism,
@@ -192,6 +192,20 @@ export function accumulateArrayValue<T>(
 
 export function defaultStringToNone(value: string): string {
   return value || "None";
+}
+
+export function parseJsonList(value: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) throw new Error("JSON value is not an array");
+    if (!parsed.every((item) => typeof item === "string"))
+      throw new Error("JSON array contains non-string value");
+    return parsed;
+  } catch (e) {
+    throw new Error(
+      `Invalid JSON string list: ${JSON.stringify(value)} (${e})`
+    );
+  }
 }
 
 export function parseListOrNull(value: string): string[] | null {

@@ -1,5 +1,5 @@
 import path from "path";
-import { Outbreak } from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
+import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
 import { Outbreaks as SourceOutbreaks } from "../../schema/generated/schema";
 import { readMdxFile, readValuesFile, readYamlFile } from "./utils";
 

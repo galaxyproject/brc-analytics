@@ -1,12 +1,12 @@
-import type { BRCDataCatalogGenome } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildAssemblyWorkflows } from "@/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import type { BRCDataCatalogGenome } from "@brc/apis/assembly";
 import {
   ORGANISM_PLOIDY,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 
 describe("buildAssemblyWorkflows - scope filtering", () => {
@@ -14,7 +14,7 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
     accession: "AC",
     annotationStatus: null,
     chromosomes: null,
-    commonName: null,
+    commonNames: [],
     coverage: null,
     galaxyDatacacheUrl: null,
     gcPercent: null,

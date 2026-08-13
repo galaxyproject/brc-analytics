@@ -1,0 +1,6 @@
+import { type PrimaryContrasts } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+
+export interface UsePrimaryContrasts {
+  disabled: boolean;
+  primaryContrasts: PrimaryContrasts | null;
+}

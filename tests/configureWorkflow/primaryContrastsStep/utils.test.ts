@@ -1,4 +1,4 @@
-import { getUniqueFactorValues } from "@/components/Entity/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/utils";
+import { getUniqueFactorValues } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/utils";
 
 describe("getUniqueFactorValues", () => {
   test("extracts unique values from primary factor column", () => {

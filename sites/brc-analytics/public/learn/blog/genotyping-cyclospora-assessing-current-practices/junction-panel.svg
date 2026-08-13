@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="903" height="496" viewBox="0 0 903 496">
+<rect width="903" height="496" fill="#ffffff"/>
+<text x="14" y="26" font-size="13.5" font-weight="bold" fill="#1b1f24" font-family="DejaVu Sans, sans-serif">The Mt-Junction reference set: all 20 sequences</text>
+<text x="14" y="43" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">drawn to a common scale · each block is one 15 nt unit matching a motif exactly, shaded by variant · flanks in grey, primers in red</text>
+<text x="14" y="57" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">motif I = TAGTATTATTTATAA · motif II = TAGTATTATTTTTAA · they differ at one position</text>
+<rect x="118" y="78" width="332.4" height="11" fill="#e7eaee"/>
+<rect x="118" y="78" width="67.1" height="11" fill="#c8553d"/>
+<rect x="386.4" y="78" width="64.0" height="11" fill="#c8553d"/>
+<text x="110" y="87.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt109.A</text>
+<text x="459.4" y="87.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">109 bp · no units</text>
+<line x1="14" y1="92.0" x2="888.7" y2="92.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="95" width="411.8" height="11" fill="#e7eaee"/>
+<rect x="118" y="95" width="67.1" height="11" fill="#c8553d"/>
+<rect x="313.2" y="95" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="104.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt127.A</text>
+<text x="538.8" y="104.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">135 bp · II</text>
+<line x1="14" y1="109.0" x2="888.7" y2="109.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="112" width="469.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="112" width="67.1" height="11" fill="#c8553d"/>
+<rect x="523.6" y="112" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="112" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="112" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="121.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt154.A</text>
+<text x="596.7" y="121.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">154 bp · I-II</text>
+<rect x="118" y="129" width="469.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="129" width="67.1" height="11" fill="#c8553d"/>
+<rect x="523.6" y="129" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="129" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="129" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="138.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt154.B</text>
+<text x="596.7" y="138.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">154 bp · I-II</text>
+<rect x="118" y="146" width="469.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="146" width="67.1" height="11" fill="#c8553d"/>
+<rect x="523.6" y="146" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="146" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="146" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="146" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="155.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt154.C</text>
+<text x="596.7" y="155.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">154 bp · I-II-II</text>
+<rect x="118" y="163" width="469.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="163" width="67.1" height="11" fill="#c8553d"/>
+<rect x="523.6" y="163" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="163" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="163" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="172.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt154.D</text>
+<text x="596.7" y="172.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">154 bp · I-II</text>
+<rect x="118" y="180" width="469.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="180" width="67.1" height="11" fill="#c8553d"/>
+<rect x="523.6" y="180" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="180" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="180" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="189.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt154.E</text>
+<text x="596.7" y="189.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">154 bp · II-II</text>
+<line x1="14" y1="194.0" x2="888.7" y2="194.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="197" width="515.4" height="11" fill="#e7eaee"/>
+<rect x="118" y="197" width="67.1" height="11" fill="#c8553d"/>
+<rect x="569.4" y="197" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="197" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="197" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="197" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="206.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt169.A</text>
+<text x="642.4" y="206.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">169 bp · I-II-II</text>
+<rect x="118" y="214" width="515.4" height="11" fill="#e7eaee"/>
+<rect x="118" y="214" width="67.1" height="11" fill="#c8553d"/>
+<rect x="569.4" y="214" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="214" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="214" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="214" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="223.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt169.B</text>
+<text x="642.4" y="223.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">169 bp · I-I-II</text>
+<rect x="118" y="231" width="515.4" height="11" fill="#e7eaee"/>
+<rect x="118" y="231" width="67.1" height="11" fill="#c8553d"/>
+<rect x="569.4" y="231" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="231" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="231" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="231" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="240.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt169.C</text>
+<text x="642.4" y="240.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">169 bp · II-II-II</text>
+<line x1="14" y1="245.0" x2="888.7" y2="245.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="248" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="248" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="248" width="64.0" height="11" fill="#c8553d"/>
+<rect x="358.9" y="248" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="248" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="248" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="257.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.A</text>
+<text x="688.2" y="257.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · I-II-II</text>
+<rect x="118" y="265" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="265" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="265" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="265" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="265" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="265" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="265" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="274.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.B</text>
+<text x="688.2" y="274.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · I-II-II-II</text>
+<rect x="118" y="282" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="282" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="282" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="282" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="282" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="282" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="282" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="291.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.C</text>
+<text x="688.2" y="291.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · I-I-I-II</text>
+<rect x="118" y="299" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="299" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="299" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="299" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="299" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="299" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="299" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="308.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.D</text>
+<text x="688.2" y="308.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · I-II-I-II</text>
+<rect x="118" y="316" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="316" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="316" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="316" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="316" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="316" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="316" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="325.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.E</text>
+<text x="688.2" y="325.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · II-I-II-II</text>
+<rect x="118" y="333" width="561.2" height="11" fill="#e7eaee"/>
+<rect x="118" y="333" width="67.1" height="11" fill="#c8553d"/>
+<rect x="615.1" y="333" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="333" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="333" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="333" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="333" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="342.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt184.F</text>
+<text x="688.2" y="342.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">184 bp · I-I-II-II</text>
+<line x1="14" y1="347.0" x2="888.7" y2="347.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="350" width="606.9" height="11" fill="#e7eaee"/>
+<rect x="118" y="350" width="67.1" height="11" fill="#c8553d"/>
+<rect x="660.9" y="350" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="350" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="350" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="350" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="350" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="496.2" y="350" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="359.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt199.A</text>
+<text x="733.9" y="359.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">199 bp · I-I-II-II-II</text>
+<rect x="118" y="367" width="606.9" height="11" fill="#e7eaee"/>
+<rect x="118" y="367" width="67.1" height="11" fill="#c8553d"/>
+<rect x="660.9" y="367" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="367" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="367" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="367" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="367" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="496.2" y="367" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="376.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt199.B</text>
+<text x="733.9" y="376.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">199 bp · II-I-II-II-II</text>
+<rect x="118" y="384" width="606.9" height="11" fill="#e7eaee"/>
+<rect x="118" y="384" width="67.1" height="11" fill="#c8553d"/>
+<rect x="660.9" y="384" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="384" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="384" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="384" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="384" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="496.2" y="384" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="393.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt199.C</text>
+<text x="733.9" y="393.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">199 bp · I-I-I-II-II</text>
+<line x1="14" y1="398.0" x2="888.7" y2="398.0" stroke="#dfe3e8" stroke-width="1"/>
+<rect x="118" y="401" width="652.7" height="11" fill="#e7eaee"/>
+<rect x="118" y="401" width="67.1" height="11" fill="#c8553d"/>
+<rect x="706.6" y="401" width="64.0" height="11" fill="#c8553d"/>
+<rect x="313.2" y="401" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="358.9" y="401" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="404.7" y="401" width="45.8" height="11" fill="#5f8f4a" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="450.4" y="401" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="496.2" y="401" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<rect x="542.0" y="401" width="45.8" height="11" fill="#a8c47f" stroke="#ffffff" stroke-width="0.9"/>
+<text x="110" y="410.0" font-size="9" fill="#1b1f24" text-anchor="end" font-family="DejaVu Sans Mono, monospace">Cmt214.A</text>
+<text x="779.7" y="410.0" font-size="8.5" fill="#68717c" font-family="DejaVu Sans, sans-serif">214 bp · I-I-I-II-II-II</text>
+<rect x="14" y="431" width="12" height="10" fill="#c8553d" stroke="#c8ccd2" stroke-width="0.4"/>
+<text x="31" y="440" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">PCR primer</text>
+<rect x="107.0" y="431" width="12" height="10" fill="#e7eaee" stroke="#c8ccd2" stroke-width="0.4"/>
+<text x="124.0" y="440" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">constant flank</text>
+<rect x="221.2" y="431" width="12" height="10" fill="#5f8f4a" stroke="#c8ccd2" stroke-width="0.4"/>
+<text x="238.2" y="440" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">repeat unit, motif I</text>
+<rect x="367.2" y="431" width="12" height="10" fill="#a8c47f" stroke="#c8ccd2" stroke-width="0.4"/>
+<text x="384.2" y="440" font-size="9" fill="#68717c" font-family="DejaVu Sans, sans-serif">repeat unit, motif II</text>
+<text x="14" y="457" font-size="8" fill="#68717c" font-family="DejaVu Sans, sans-serif">Cmt109.A has no exact-match units. Cmt127.A is 135 bp, not 127, and carries 11 nt of Nextera adapter in its truncated 3&#8242; flank. Equal-length references can differ in unit count because the flanks contain near-copies of the motif, so the array boundary is set by exact matching rather than being fixed.</text>
+</svg>

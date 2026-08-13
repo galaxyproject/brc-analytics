@@ -2,13 +2,10 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
 import {
   GA2AssemblyEntity,
-  GA2OrganismEntity,
-  SRAData,
-} from "../../../../app/apis/catalog/ga2/entities";
-import {
-  getAssemblyId,
-  getOrganismId,
-} from "../../../../app/apis/catalog/ga2/utils";
+  ImageData,
+} from "../../../../sites/ga2/apis/assembly";
+import { GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
+import { getAssemblyId, getOrganismId } from "../../../../sites/ga2/apis/utils";
 import {
   buildWorkflowAssemblyMappings,
   generateWorkflowMappingsQC,
@@ -29,22 +26,51 @@ import {
   saveJson,
   verifyUniqueIds,
 } from "../../../build/ts/utils";
-import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
-import { SourceGenome, SourceRawData } from "./entities";
+import { SOURCE_GENOME_KEYS } from "./constants";
+import { SourceGenome } from "./entities";
 
 const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
 
-const SOURCE_PATH_RAWDATA =
-  "catalog/ga2/build/intermediate/primary-data-ncbi.tsv";
+const MISSING_IMAGE_MARKER = "missing_image";
 
 buildCatalog();
 
+/**
+ * Builds organism image data for a source row, or null when the row has no real
+ * image (only the missing-image placeholder).
+ * @param row - Source genome row.
+ * @returns image data, or null when there is no real image.
+ */
+function buildOrganismImage(row: SourceGenome): ImageData | null {
+  const url = resolveOrganismImageUrl(row.organismImageUrl);
+  if (!url) return null;
+  return {
+    credit: row.organismImageCredit,
+    license: row.organismImageLicense,
+    sourceName: row.organismImageSourceName,
+    sourceUrl: row.organismImageSourceUrl,
+    url,
+  };
+}
+
+/**
+ * Converts a built organism-image path to its served URL, or null when it is
+ * the missing-image placeholder — so the app can decide list-placeholder vs
+ * detail-no-image rather than rendering the fallback everywhere.
+ * @param path - Built image path (e.g. sites/ga2/public/organism_image/...).
+ * @returns served URL (/organism_image/...), or null for a missing image.
+ */
+function resolveOrganismImageUrl(path: string): string | null {
+  const basename = path.split("/").pop() ?? "";
+  if (!path || basename.startsWith(MISSING_IMAGE_MARKER)) return null;
+  return path.replace("sites/ga2/public/", "/");
+}
+
 async function buildCatalog(): Promise<void> {
-  const sraData = await buildSraData();
-  const genomes = await buildAssemblies(sraData);
+  const genomes = await buildAssemblies();
   const organisms = buildOrganisms(genomes);
 
   console.log("Assemblies:", genomes.length);
@@ -88,33 +114,7 @@ async function buildCatalog(): Promise<void> {
   console.log("Done");
 }
 
-async function buildSraData(): Promise<SRAData[]> {
-  const rawddataRows = await readValuesFile<SourceRawData>(
-    SOURCE_PATH_RAWDATA,
-    undefined,
-    SOURCE_RAWDATA_KEYS
-  );
-  return rawddataRows.map(
-    (row): SRAData => ({
-      accession: row.accession,
-      biosample: row.biosample,
-      instrument: row.instrument,
-      library_layout: row.library_layout,
-      library_source: row.library_source,
-      library_strategy: row.library_strategy,
-      platform: row.platform,
-      run_total_bases: parseNumberOrNull(row.run_total_bases),
-      sra_run_acc: row.sra_run_acc,
-      sra_sample_acc: row.sra_sample_acc,
-      sra_study_acc: row.sra_study_acc,
-      total_bases: parseNumberOrNull(row.total_bases),
-    })
-  );
-}
-
-async function buildAssemblies(
-  sraData: SRAData[]
-): Promise<GA2AssemblyEntity[]> {
+async function buildAssemblies(): Promise<GA2AssemblyEntity[]> {
   const sourceRows = await readValuesFile<SourceGenome>(
     SOURCE_PATH_GENOMES,
     undefined,
@@ -146,13 +146,7 @@ async function buildAssemblies(
       galaxyDatacacheUrl: parseStringOrNull(row.galaxyDatacacheUrl),
       gcPercent: parseNumberOrNull(row.gcPercent),
       geneModelUrl: parseStringOrNull(row.geneModelUrl),
-      image: {
-        credit: row.organismImageCredit,
-        license: row.organismImageLicense,
-        sourceName: row.organismImageSourceName,
-        sourceUrl: row.organismImageSourceUrl,
-        url: row.organismImageUrl.replace("public/", "/"),
-      },
+      image: buildOrganismImage(row),
       isRef: parseBoolean(row.isRef),
       length: parseNumber(row.length),
       level: row.level,
@@ -164,7 +158,6 @@ async function buildAssemblies(
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
       speciesTaxonomyId: row.speciesTaxonomyId,
-      sra_data: sraData.filter((rawRow) => rawRow.accession === row.accession),
       strainName: parseStringOrNull(row.strain),
       taxonomicGroup: parseList(row.taxonomicGroup),
       taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
@@ -180,7 +173,7 @@ async function buildAssemblies(
         row.taxonomicLevelStrain,
         row.strain
       ),
-      thumbnailUrl: row.organismThumbnailUrl.replace("public/", "/"),
+      thumbnailUrl: resolveOrganismImageUrl(row.organismThumbnailUrl),
       tolId: tolIds[0] ?? null,
       ucscBrowserUrl: parseStringOrNull(row.ucscBrowser),
     });
@@ -218,7 +211,7 @@ function buildOrganism(
       new Set([...(organism?.assemblyTaxonomyIds ?? []), genome.ncbiTaxonomyId])
     ),
     genomes: [...(organism?.genomes ?? []), genome],
-    image: genome.image,
+    image: organism?.image ?? genome.image,
     maxScaffoldN50: getMaxDefined(organism?.maxScaffoldN50, genome.scaffoldN50),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     taxonomicGroup: genome.taxonomicGroup,
@@ -230,7 +223,7 @@ function buildOrganism(
     taxonomicLevelOrder: defaultStringToNone(genome.taxonomicLevelOrder),
     taxonomicLevelPhylum: defaultStringToNone(genome.taxonomicLevelPhylum),
     taxonomicLevelSpecies: genome.taxonomicLevelSpecies,
-    thumbnailUrl: genome.thumbnailUrl,
+    thumbnailUrl: organism?.thumbnailUrl ?? genome.thumbnailUrl,
     tolId: genome.tolId,
   };
 }

@@ -28,6 +28,7 @@ from app.core.dependencies import (
     reset_all_services,
 )
 from app.db.session import close_db, init_db
+from app.services import turn_log
 from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
@@ -60,12 +61,22 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         async with mcp_app.lifespan(app):
             cache_service = get_cache_service()
-            await cache_service.flush_all()
-            logger.info("Cache cleared on startup")
+            cleared = await cache_service.clear_caches()
+            logger.info("Cleared %d cached response keys on startup", cleared)
 
             await init_db()
 
-            yield
+            # A live assistant with no durable log is the failure mode #1294
+            # exists to prevent, and it's silent -- say so at boot.
+            if settings.ASSISTANT_TURN_LOGGING_ENABLED and not settings.DATABASE_URL:
+                logger.warning(
+                    "Assistant turn logging is enabled but DATABASE_URL is unset; "
+                    "conversations will not be recorded beyond the Redis session TTL"
+                )
+
+            # Owns the retention sweep for the app's lifetime.
+            async with turn_log.lifecycle():
+                yield
 
             auth_service = get_auth_service()
             await auth_service.close()

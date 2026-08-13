@@ -1,0 +1,24 @@
+import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
+import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
+import { AlertTitle, Typography } from "@mui/material";
+import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { type JSX } from "react";
+import { StyledAlert } from "./uploadMyData.styles";
+
+export const UploadMyData = (): JSX.Element => {
+  return (
+    <StyledAlert {...ALERT_PROPS.STANDARD_INFO}>
+      <AlertTitle variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_500}>
+        Upload Your Data in Galaxy
+      </AlertTitle>
+      <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400_2_LINES}>
+        You will have an opportunity to upload your own data to your Galaxy
+        history. See{" "}
+        <AppLink href="/learn/getting-started/galaxy-data-import-methods">
+          Getting Your Data into Galaxy
+        </AppLink>{" "}
+        for detailed instructions.
+      </Typography>
+    </StyledAlert>
+  );
+};

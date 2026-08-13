@@ -1,0 +1,14 @@
+import { WorkflowHandoffActionKind } from "@repo/shared/providers/workflowHandoff/actions/types";
+import { type ClearHandoffAction, type ClearHandoffPayload } from "./types";
+
+/**
+ * Action creator for clearing a handoff payload.
+ * @param payload - Payload.
+ * @returns Action with payload and action type.
+ */
+export function clearHandoff(payload: ClearHandoffPayload): ClearHandoffAction {
+  return {
+    payload,
+    type: WorkflowHandoffActionKind.ClearHandoff,
+  };
+}

@@ -1,8 +1,6 @@
-import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-} from "../../../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { getOrganismId } from "../../../app/apis/catalog/brc-analytics-catalog/common/utils";
+import { BRCDataCatalogGenome } from "../../../sites/brc-analytics/apis/assembly";
+import { BRCDataCatalogOrganism } from "../../../sites/brc-analytics/apis/organism";
+import { getOrganismId } from "../../../sites/brc-analytics/apis/utils";
 import {
   accumulateArrayOrNullValues,
   accumulateArrayValue,
@@ -37,7 +35,10 @@ function buildOrganism(
       organism?.assemblyTaxonomyIds,
       genome.ncbiTaxonomyId
     ),
-    commonName: genome.commonName,
+    commonNames: accumulateArrayValue(
+      organism?.commonNames,
+      ...genome.commonNames
+    ),
     genomes: accumulateArrayValue(organism?.genomes, genome),
     ncbiTaxonomyId: genome.speciesTaxonomyId,
     otherTaxa: accumulateArrayOrNullValues(

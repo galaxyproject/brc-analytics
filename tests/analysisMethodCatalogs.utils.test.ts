@@ -4,10 +4,10 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-import type { BRCDataCatalogGenome } from "../app/apis/catalog/brc-analytics-catalog/common/entities";
-import { buildAssemblyWorkflows } from "../app/views/AnalyzeWorkflowsView/components/Main/utils";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "../app/views/AnalyzeWorkflowsView/differentialExpressionAnalysis/constants";
+import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
+import type { BRCDataCatalogGenome } from "../sites/brc-analytics/apis/assembly";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [
@@ -109,7 +109,7 @@ describe("buildAssemblyWorkflows", () => {
     accession: "AC",
     annotationStatus: null,
     chromosomes: null,
-    commonName: null,
+    commonNames: [],
     coverage: null,
     galaxyDatacacheUrl: null,
     gcPercent: null,

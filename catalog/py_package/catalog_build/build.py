@@ -18,7 +18,12 @@ from bs4 import BeautifulSoup
 from requests.exceptions import ConnectTimeout
 
 from .load import do_dlt_load
-from .qc_utils import format_list_section, format_raw_section, join_report
+from .qc_utils import (
+    format_list_section,
+    format_markdown_table,
+    format_raw_section,
+    join_report,
+)
 from .transform import DBTTestResult, do_dbt_transformations
 from .utils import get_db_path
 
@@ -306,9 +311,11 @@ def get_species_df(assembly_taxonomy_df, taxonomic_group_sets, taxonomic_levels)
             "lineageTaxonomyIds": assembly_taxonomy_df["lineage_taxonomy_ids"].map(
                 lambda ids: ",".join([str(id) for id in ids])
             ),
-            # TODO: this may not be the most significant common name
-            "commonName": assembly_taxonomy_df["common_names"].map(
-                lambda names: names[0] if len(names) else None
+            # All available common names, genbank common name first (ordering set
+            # in the taxonomy_lineages_with_names dbt model). Serialized as JSON
+            # because names may contain arbitrary characters (including commas).
+            "commonNames": assembly_taxonomy_df["common_names"].map(
+                lambda names: json.dumps(list(names))
             ),
             **taxonomic_group_columns,
             **taxonomic_level_columns,
@@ -601,7 +608,8 @@ def report_inconsistent_taxonomy_ids(df):
     inconsistent_ids_strings = [
         (
             f"{species} strain {strain}" if strain else species,
-            ", ".join([str(id) for id in ids]),
+            # Sort the IDs, since set iteration order isn't consistent between runs
+            ", ".join([str(id) for id in sorted(ids, key=int)]),
         )
         for (species, strain), ids in inconsistent_ids_series.items()
     ]
@@ -654,7 +662,10 @@ def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
         ),
         "leaves_missing_species": leaves_missing_species,
         "zero_assemblies_taxa": zero_assemblies_taxa,
-        "missing_ranks": set(taxonomic_levels) - present_ranks,
+        # Filter rather than taking a set difference, to report the ranks in the order given
+        "missing_ranks": [
+            level for level in taxonomic_levels if level not in present_ranks
+        ],
     }
 
 
@@ -1095,6 +1106,43 @@ def check_organisms_without_assemblies(
     ]
 
 
+def format_dbt_test_failures_section(title, dbt_test_results):
+    """
+    Render the unsuccessful dbt tests, each with a sample of failing rows.
+
+    Each entry is keyed by the readable test name (set in schema.yml) and shows
+    the status, failing-row count, dbt's message, and a small table of sample
+    failing rows when available.
+    """
+    lines = [title, ""]
+    unsuccessful = [result for result in dbt_test_results if not result.success]
+    if not unsuccessful:
+        lines += ["None", ""]
+        return lines
+    for result in unsuccessful:
+        count = result.failure_count
+        count_text = (
+            f", {count} failing row{'' if count == 1 else 's'}"
+            if count is not None
+            else ""
+        )
+        lines += [
+            f"### `{result.test_name}` — status `{result.status}`{count_text}",
+            "",
+        ]
+        if result.message:
+            lines += [result.message, ""]
+        if result.failure_sample:
+            sample_rows = result.failure_sample
+            lines += format_markdown_table(sample_rows, cell_truncation_threshold=200)
+            if count is not None and count > len(sample_rows):
+                lines += [
+                    f"_Showing {len(sample_rows)} of {count} failing rows._",
+                    "",
+                ]
+    return lines
+
+
 def make_qc_report(
     *,
     missing_ncbi_assemblies,
@@ -1113,6 +1161,15 @@ def make_qc_report(
     organisms_not_species_rank=None,
     organisms_without_assemblies=None,
 ):
+    """
+    Render the catalog data QC report as markdown.
+
+    The report is committed to the repo, so its contents should be consistent between
+    runs on unchanged data. This function renders each list in the order given rather
+    than sorting it, so the callers are responsible for passing consistently-ordered
+    values. In particular, anything derived from a set needs sorting first, since set
+    iteration order isn't consistent between runs.
+    """
     # Convert simple lists to items for format_list_section
     ncbi_assemblies_items = (
         list(missing_ncbi_assemblies) if len(missing_ncbi_assemblies) > 0 else []
@@ -1213,11 +1270,6 @@ def make_qc_report(
         if organisms_without_assemblies
         else []
     )
-    unsuccessful_dbt_tests_items = [
-        f"`{result.test_name}` (status `{result.status}`){'' if result.message is None else ': ' + result.message}"
-        for result in dbt_test_results
-        if not result.success
-    ]
 
     # Compose report modularly using shared QC utils
     lines = ["# Catalog Data QC report", ""]
@@ -1275,8 +1327,8 @@ def make_qc_report(
         paired_accessions_items,
     )
     lines += format_raw_section("## Taxonomy tree", tree_checks_text)
-    lines += format_list_section(
-        "## Unsuccessful dbt tests", unsuccessful_dbt_tests_items
+    lines += format_dbt_test_failures_section(
+        "## Unsuccessful dbt tests", dbt_test_results
     )
 
     return join_report(lines)
@@ -1312,8 +1364,9 @@ def get_outbreak_taxonomy_ids(
     if source_outbreaks_df is None:
         return []
 
-    # Return list of unique taxonomy IDs, converted to strings
-    return list(
+    # Return list of unique taxonomy IDs, converted to strings and sorted for
+    # consistency between runs, since set iteration order isn't consistent
+    return sorted(
         {
             # Add primary taxonomy IDs
             *(
@@ -1332,7 +1385,8 @@ def get_outbreak_taxonomy_ids(
                 and "highlight_descendant_taxonomy_ids" in source_outbreaks_df.columns
                 else ()
             ),
-        }
+        },
+        key=int,
     )
 
 
@@ -1718,7 +1772,10 @@ def build_files(
     )
 
     # Single merge with the combined mapping
-    genomes_df = genomes_with_species_df.merge(ucsc_mapping, how="left", on="accession")
+    # The dataframe is sorted by accession for consistent output; any changes done after the sorting should preserve order
+    genomes_df = genomes_with_species_df.merge(
+        ucsc_mapping, how="left", on="accession"
+    ).sort_values("accession", kind="stable")
 
     qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1838,14 +1895,12 @@ def build_files(
                     "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
                 )
 
-    # Sort by accession for consistent output
-    genomes_df = genomes_df.sort_values("accession")
-
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
     print(f"Wrote to {genomes_output_path}")
 
     if extract_primary_data:
+        primarydata_df = primarydata_df.sort_values("accession", kind="stable")
         primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
         print(f"Wrote to {primary_output_path}")
 
@@ -1934,12 +1989,8 @@ def get_image_path(
     if os.path.exists(potential_path):
         return potential_path
     else:
-        # Return the path to the default missing image
+        # No species image found — return the missing-image marker path. The
+        # catalog build detects this marker and emits a null image, so the
+        # marker file itself does not need to exist on disk.
         print(f"No image found for {potential_path}.")
-        missing_file_path = os.path.join(folder_path, "missing_image" + file_suffix)
-        if os.path.exists(missing_file_path):
-            return missing_file_path
-        else:
-            raise FileNotFoundError(
-                f"No species image found, or missing_image{file_suffix} in {folder_path}"
-            )
+        return os.path.join(folder_path, "missing_image" + file_suffix)

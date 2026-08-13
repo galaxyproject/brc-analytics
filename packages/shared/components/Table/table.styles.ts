@@ -1,6 +1,6 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
-import { ThemeProps } from "@databiosphere/findable-ui/lib/theme/types";
+import { type ThemeProps } from "@databiosphere/findable-ui/lib/theme/types";
 import { css } from "@emotion/react";
 
 export const tableStyles = (props: ThemeProps) => css`

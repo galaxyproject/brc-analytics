@@ -8164,8 +8164,77 @@
                                     "assembly_count": 38,
                                     "children": [
                                         {
-                                            "assembly_count": 32,
+                                            "assembly_count": 37,
                                             "children": [
+                                                {
+                                                    "assembly_count": 5,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Sclerotinia sclerotiorum 1980 UF-70",
+                                                                            "ncbi_tax_id": "665079",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
+                                                                    "name": "Sclerotinia sclerotiorum",
+                                                                    "ncbi_tax_id": "5180",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Sclerotinia",
+                                                            "ncbi_tax_id": "5179",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 3,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 3,
+                                                                    "children": [
+                                                                        {
+                                                                            "assembly_count": 1,
+                                                                            "children": [],
+                                                                            "name": "Botrytis cinerea B05.10",
+                                                                            "ncbi_tax_id": "332648",
+                                                                            "rank": "strain"
+                                                                        }
+                                                                    ],
+                                                                    "name": "Botrytis cinerea",
+                                                                    "ncbi_tax_id": "40559",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Botrytis",
+                                                            "ncbi_tax_id": "33196",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 1,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Monilinia fructicola",
+                                                                    "ncbi_tax_id": "38448",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Monilinia",
+                                                            "ncbi_tax_id": "38447",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Sclerotiniaceae",
+                                                    "ncbi_tax_id": "28983",
+                                                    "rank": "family"
+                                                },
                                                 {
                                                     "assembly_count": 32,
                                                     "children": [
@@ -8363,83 +8432,6 @@
                                                     ],
                                                     "name": "Erysiphaceae",
                                                     "ncbi_tax_id": "34371",
-                                                    "rank": "family"
-                                                }
-                                            ],
-                                            "name": "Erysiphales",
-                                            "ncbi_tax_id": "5120",
-                                            "rank": "order"
-                                        },
-                                        {
-                                            "assembly_count": 5,
-                                            "children": [
-                                                {
-                                                    "assembly_count": 5,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Sclerotinia sclerotiorum 1980 UF-70",
-                                                                            "ncbi_tax_id": "665079",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Sclerotinia sclerotiorum",
-                                                                    "ncbi_tax_id": "5180",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Sclerotinia",
-                                                            "ncbi_tax_id": "5179",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 3,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 3,
-                                                                    "children": [
-                                                                        {
-                                                                            "assembly_count": 1,
-                                                                            "children": [],
-                                                                            "name": "Botrytis cinerea B05.10",
-                                                                            "ncbi_tax_id": "332648",
-                                                                            "rank": "strain"
-                                                                        }
-                                                                    ],
-                                                                    "name": "Botrytis cinerea",
-                                                                    "ncbi_tax_id": "40559",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Botrytis",
-                                                            "ncbi_tax_id": "33196",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 1,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Monilinia fructicola",
-                                                                    "ncbi_tax_id": "38448",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Monilinia",
-                                                            "ncbi_tax_id": "38447",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Sclerotiniaceae",
-                                                    "ncbi_tax_id": "28983",
                                                     "rank": "family"
                                                 }
                                             ],
@@ -23268,7 +23260,7 @@
                                             "rank": "genus"
                                         }
                                     ],
-                                    "name": "Entamoebidae",
+                                    "name": "Endamoebidae",
                                     "ncbi_tax_id": "33084",
                                     "rank": "family"
                                 },

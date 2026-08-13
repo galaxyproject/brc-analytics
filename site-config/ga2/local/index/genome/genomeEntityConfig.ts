@@ -1,11 +1,11 @@
-import { GA2AssemblyEntity } from "@/apis/catalog/ga2/entities";
-import { getAssemblyId, getAssemblyTitle } from "@/apis/catalog/ga2/utils";
 import {
-  ListConfig,
+  type ListConfig,
   SORT_DIRECTION,
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
-import { AppEntityConfig } from "@site-config/common/entities";
+import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
+import { getAssemblyId, getAssemblyTitle } from "@ga2/apis/utils";
+import { type AppEntityConfig } from "@repo/shared/config/types";
 import { GA2_CATEGORY_KEY } from "@site-config/ga2/category";
 import { CATEGORY_GROUPS } from "./categoryGroups";
 import { COLUMNS } from "./columns";
@@ -20,7 +20,7 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
   },
   detail: {
     detailOverviews: [],
-    staticLoad: true,
+    staticLoad: false,
     tabs: [],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,

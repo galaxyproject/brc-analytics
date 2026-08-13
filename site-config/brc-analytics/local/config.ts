@@ -1,27 +1,25 @@
-import {
-  BRCDataCatalogGenome,
-  BRCDataCatalogOrganism,
-  Outbreak,
-} from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "@/components";
-import { TaxonomyNode } from "@/components/Home/components/Section/components/SectionViz/data";
+import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
+import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
+import { type Outbreak } from "@brc/apis/outbreak";
+import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
+import { Branding } from "@brc/components/layout/Branding/branding";
+import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";
+import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
+import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { APP_KEYS } from "@site-config/common/constants";
-import { AppSiteConfig } from "@site-config/common/entities";
-import data from "catalog/output/ncbi-taxa-tree.json";
 import { createElement } from "react";
-import { ROUTES as SITE_ROUTES } from "../../../routes/constants";
+import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
-import { WorkflowEntity } from "./index/workflow/types";
+import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflowEntityConfig";
 import { socialMedia } from "./socialMedia";
-import { THEME_OPTIONS } from "./theme/constants";
 
 const LOCALHOST = "http://localhost:3000";
 const APP_TITLE = "BRC Analytics";
@@ -36,7 +34,6 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
- * @param taxTreeData - Taxonomy tree data.
  * @param loginEnabled - Whether to show the login button.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
@@ -52,11 +49,9 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
-  taxTreeData = data as TaxonomyNode,
   loginEnabled = LOGIN_ENABLED
 ): AppSiteConfig {
   return {
-    appKey: APP_KEYS.BRC_ANALYTICS,
     appTitle: APP_TITLE,
     browserURL: browserUrl,
     dataSource: {
@@ -73,7 +68,7 @@ export function makeConfig(
     layout: {
       floating,
       footer: {
-        Branding: C.Branding(),
+        Branding: Branding(),
         navLinks: [
           {
             label: "BV-BRC",
@@ -87,11 +82,11 @@ export function makeConfig(
           },
         ],
         socials: socialMedia.socials,
-        versionInfo: createElement(C.VersionInfoWithServerStatus),
+        versionInfo: createElement(VersionInfoWithServerStatus),
       },
       header: {
-        actions: loginEnabled ? createElement(C.AuthButton) : undefined,
-        logo: C.Logo({
+        actions: loginEnabled ? createElement(AuthButton) : undefined,
+        logo: Logo({
           alt: APP_TITLE,
           height: 26,
           link: "/",
@@ -119,16 +114,10 @@ export function makeConfig(
     loginEnabled,
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
-    taxTree: taxTreeData,
-    themeOptions: THEME_OPTIONS,
+    supportUrl: SUPPORT_URL,
   };
 }
 
-const config: AppSiteConfig = makeConfig(
-  BROWSER_URL,
-  GIT_HUB_REPO_URL,
-  data as TaxonomyNode,
-  true
-);
+const config: AppSiteConfig = makeConfig(BROWSER_URL, GIT_HUB_REPO_URL, true);
 
 export default config;

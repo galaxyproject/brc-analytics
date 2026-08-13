@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
@@ -162,6 +163,47 @@ class ChatResponse(BaseModel):
     token_usage: Optional[TokenUsage] = None
 
 
+class TurnOutcome(str, Enum):
+    """Whether a turn produced a reply or blew up."""
+
+    ERROR = "error"
+    SUCCESS = "success"
+
+
+class TurnTelemetry(BaseModel):
+    """Per-turn observability payload for durable logging (#1294).
+
+    Deliberately kept off ChatResponse: the transcript carries raw tool calls
+    and returns, which the browser has no business receiving.
+
+    Also built for failed turns, where there is no reply, no usage, and
+    possibly no session yet -- hence the optional fields.
+    """
+
+    # Minted before the agent runs so a Sentry event and this row share an id.
+    turn_id: UUID = Field(default_factory=uuid4)
+    session_id: Optional[str] = None
+    turn_index: Optional[int] = None
+    owner_keycloak_sub: Optional[str] = None
+    user_message: str
+    assistant_reply: Optional[str] = None
+    outcome: TurnOutcome = TurnOutcome.SUCCESS
+    error_kind: Optional[str] = None
+    # This turn's new pydantic-ai messages only, not the rehydrated history.
+    transcript: List[Dict[str, Any]] = Field(default_factory=list)
+    transcript_truncated: bool = False
+    schema_state: Dict[str, Any] = Field(default_factory=dict)
+    token_usage: TokenUsage = Field(default_factory=TokenUsage)
+    latency_ms: int = 0
+    model: Optional[str] = None
+    provider: Optional[str] = None
+
+    @classmethod
+    def for_error(cls, exc: Exception, **fields: Any) -> "TurnTelemetry":
+        """Build the record for a turn that raised, so both call sites agree."""
+        return cls(outcome=TurnOutcome.ERROR, error_kind=type(exc).__name__, **fields)
+
+
 class SessionState(BaseModel):
     """The full state stored in Redis for one assistant session."""
 
@@ -198,4 +240,12 @@ class AssistantInfoResponse(BaseModel):
     )
     provider: Optional[str] = Field(
         None, description="Provider hosting the model (e.g. 'anthropic', 'openai')"
+    )
+    turn_log_retention_days: Optional[int] = Field(
+        None,
+        description=(
+            "Days conversations are kept before deletion, or null when turn "
+            "logging is off. Served so the UI notice can't promise a window "
+            "the deployment isn't enforcing."
+        ),
     )

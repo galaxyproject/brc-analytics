@@ -2,7 +2,7 @@ import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import type { SvgIconProps } from "@mui/material";
 import { SvgIcon } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 
 export const GalaxyIcon = ({
   fontSize = SVG_ICON_PROPS.FONT_SIZE.LARGE,

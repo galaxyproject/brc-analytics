@@ -1,0 +1,77 @@
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { findEntity, getEntities, getEntity } from "./query";
+
+/**
+ * Finds an organism by entity id, returning undefined when there is no match.
+ * @param entityId - Entity id.
+ * @returns Organism, or undefined when not found.
+ */
+export function findOrganism<T extends OrganismContract>(
+  entityId: string
+): T | undefined {
+  return findEntity<T>("organisms", entityId);
+}
+
+/**
+ * Finds a workflow by TRS id, returning undefined when there is no match.
+ * @param trsId - TRS id.
+ * @returns Workflow, or undefined when not found.
+ */
+export function findWorkflow(trsId: string): Workflow | undefined {
+  return findEntity<Workflow>("workflows", trsId);
+}
+
+/**
+ * Gets assemblies.
+ * @returns Assemblies.
+ */
+export function getAssemblies<T extends AssemblyContract>(): T[] {
+  return getEntities<T>("assemblies");
+}
+
+/**
+ * Gets assembly by entity id.
+ * @param entityId - Entity id.
+ * @returns Assembly.
+ */
+export function getAssembly<T extends AssemblyContract>(entityId: string): T {
+  return getEntity<T>("assemblies", entityId);
+}
+
+/**
+ * Gets organism by entity id.
+ * @param entityId - Entity id.
+ * @returns Organism.
+ */
+export function getOrganism<T extends OrganismContract>(entityId: string): T {
+  return getEntity<T>("organisms", entityId);
+}
+
+/**
+ * Gets organisms.
+ * @returns Organisms.
+ */
+export function getOrganisms<T extends OrganismContract>(): T[] {
+  return getEntities<T>("organisms");
+}
+
+/**
+ * Gets workflow by TRS id.
+ * @param trsId - TRS id.
+ * @returns Workflow.
+ */
+export function getWorkflow(trsId: string): Workflow {
+  return getEntity<Workflow>("workflows", trsId);
+}
+
+/**
+ * Gets workflows.
+ * @returns Workflows.
+ */
+export function getWorkflows(): WorkflowCategory[] {
+  return getEntities<WorkflowCategory>("workflows");
+}

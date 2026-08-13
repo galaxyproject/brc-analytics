@@ -1,14 +1,14 @@
-import { Outbreak } from "@/apis/catalog/brc-analytics-catalog/common/entities";
-import * as C from "@/components";
-import * as V from "@/viewModelBuilders/catalog/brc-analytics-catalog/common/viewModelBuilders";
+import { type Outbreak } from "@brc/apis/outbreak";
+import * as V from "@brc/viewModelBuilders/viewModelBuilders";
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import {
-  ComponentConfig,
-  ComponentsConfig,
+  type ComponentConfig,
+  type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
 
 export const priorityPathogenTop: ComponentsConfig = [
   {
-    component: C.BackPageHero,
+    component: BackPageHero,
     viewBuilder: V.buildPriorityPathogenHero,
-  } as ComponentConfig<typeof C.BackPageHero, Outbreak>,
+  } as ComponentConfig<typeof BackPageHero, Outbreak>,
 ];

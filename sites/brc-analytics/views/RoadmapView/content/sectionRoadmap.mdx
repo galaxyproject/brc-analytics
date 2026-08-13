@@ -1,0 +1,101 @@
+<Section border>
+  <SectionLayout paired>
+    <SectionHeadline paired>
+      ## Our plan
+      <SubHeadline>
+        Creating an integrated platform that connects public data, analysis tools, and community knowledge
+      </SubHeadline>
+    </SectionHeadline>
+    <SectionContent paired>
+      <Grid gridSx={{ gap: 4 }}>
+        <Accordion>
+          <AccordionSummary>★ Progress on prior priorities</AccordionSummary>
+          <AccordionDetails>
+            #### Complete
+
+            - **hgPhyloPlace phylogenetic placement** — live within the Priority Pathogens experience.
+            - **Priority pathogen spotlight** — dedicated pages surfacing relevant data and workflows for priority organisms.
+            - **VEuPathDB gene model ingestion** — gene models now load directly alongside NCBI content for supported organisms.
+            - **Differential expression workflow for bulk RNA-seq** — available on assembly pages alongside other RNA-seq workflows, and through the workflows-first route.
+            - **Expanded Learn tab** — more walkthroughs and instructional content added.
+            - **Workflows-first navigation** — direct entry points that let users start from a workflow and find relevant data.
+            - **Galaxy DataCache integration** — downloadable genome FASTA files, pre-built indices, and other reference assets are now linked directly from BRC Analytics for supported organisms.
+
+            #### In beta / feature-flagged
+
+            - **Comparative genomics workflows** — HyPhy-powered analyses behind feature flag; unblocked by new per-organism workflow support that lets users select two or more assemblies as inputs.
+            - **Natural language analysis assistant** — a purpose-built BRC MCP server and analysis assistant agent, now in beta, enabling natural language interaction with BRC Analytics data and Galaxy.
+            - **Logan and LexicMap sequence-driven SRA search workflows** — sequences as first-class entry points, behind feature flag.
+            - **Assembly building workflows** — IWC-curated pipelines surfaced through new per-organism workflow UI; these take no assembly input, as users provide their own data to build from.
+            - **Flu subtyping workflows** — respiratory pathogen subtyping nearing release; takes no assembly input, using a curated reference FASTA set instead.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>★ Upcoming features</AccordionSummary>
+          <AccordionDetails>
+            Features in active development or planning:
+
+            - **Gene pages** as a first-class entity with dedicated workflows users can launch directly from a gene of interest.
+            - **Gene sets** built from workflow outputs, so users can find and explore genes surfaced by their analyses.
+            - **Linked user accounts & single sign-on to Galaxy**, including analysis history tracking.
+            - **Pangenome workflows plus curated reference assets** for targeted species.
+            - **Ingesting MalariaGEN releases as UCSC tracks** to layer population variation context.
+            - **Instructional pathways for exporting results back into VEuPathDB user datasets.**
+            - **Reference-guided eukaryotic pathogen annotation pipeline** inspired by the COMPANION Nextflow pipeline.
+            - **PlasmoGenEpi-adjacent surveillance workflows** for resistance screening and situational awareness.
+            - **Orthogroups with pre-computed HyPhy results** — browsable orthogroup tables with associated codon alignments and HyPhy selection analysis outputs.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Community-driven knowledge platform</AccordionSummary>
+          <AccordionDetails>
+            To keep progress tangible for the community, we are focusing on:
+
+            1. Publishing deeper walkthroughs in the Learn tab, including reproductions of key analyses for target organisms that can serve as starting points for the community.
+            2. Capturing analysis provenance (via upcoming user accounts) so users can share reproducible histories.
+            3. Documenting how to export results from BRC Analytics into VEuPathDB user datasets and other downstream resources.
+            4. Providing guidance on contributing workflows to the IWC, so community members can help shape the analyses available on the platform.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Tailored support for organisms</AccordionSummary>
+          <AccordionDetails>
+            We recognize that each organism is different, with unique biology, research communities, and funding landscapes that drive diverse analytical needs. Our next phase emphasizes:
+
+            1. Species-specific pangenome assets curated with domain experts — including pangenome graphs, cross-strain annotation projections, consensus ortholog tables, and per-orthogroup alignments and phylogenies.
+            2. Assembly building and annotation pipelines that adapt to pathogen-specific constraints, including reference-guided workflows.
+            3. Sequence-first analysis pathways (Logan, LexicMap) that let researchers search SRA using a nucleotide or protein sequence rather than navigating by organism.
+            4. Dedicated resources for priority pathogens, with combinations of data, workflows, and training tailored to specific research communities.
+            5. Support for both emerging and established research communities with the right combinations of data, workflows, and training.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Seamless data integration</AccordionSummary>
+          <AccordionDetails>
+            We aim to create a unified experience that brings together diverse data sources and analysis capabilities. Upcoming integration work targets:
+
+            1. Automated ingestion of MalariaGEN releases and other surveillance datasets as UCSC/track hub layers.
+            2. Exporting Galaxy results into VEuPathDB user datasets with clear guidance and validation.
+            3. Continuous import of gene models and annotations from public resources (e.g. VEuPathDB) alongside NCBI assets.
+            4. Natural-language-powered search across ENA/SRA with streamlined upload to Galaxy.
+            5. Embedding Galaxy analysis outputs back into BRC Analytics entity pages.
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary>Lowering barriers to bioinformatics</AccordionSummary>
+          <AccordionDetails>
+            In order to make complex analyses accessible to researchers with varying computational expertise, we will:
+
+            1. Launch linked user accounts with Galaxy single sign-on so researchers keep their histories without extra logins.
+            2. Expose MCP-backed natural language helpers that translate research questions into runnable workflows.
+            3. Continue surfacing curated, community-developed Galaxy workflows from the Intergalactic Workflow Commission (IWC) as the IWC catalog grows.
+            4. Provide instructional content for exporting results from BRC Analytics into VEuPathDB user datasets and other downstream resources.
+            5. Continue providing TACC compute and managed storage so researchers can run analyses without institutional hardware.
+            6. Create intuitive interfaces that bring together multiple resources (data, workflows, training) in one experience.
+          </AccordionDetails>
+        </Accordion>
+      </Grid>
+    </SectionContent>
+
+  </SectionLayout>
+</Section>

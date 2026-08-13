@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Favorite, SavedAnalysis, User, WorkflowRun
+from app.db.models import (
+    AssistantTurnLog,
+    Favorite,
+    SavedAnalysis,
+    User,
+    WorkflowRun,
+)
 
 
 async def get_user_by_keycloak_sub(
@@ -15,6 +22,16 @@ async def get_user_by_keycloak_sub(
 ) -> User | None:
     result = await session.execute(
         select(User).where(User.keycloak_sub == keycloak_sub)
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_user_id_by_keycloak_sub(
+    session: AsyncSession, keycloak_sub: str
+) -> uuid.UUID | None:
+    """Just the id -- avoids materializing a whole User for a foreign key."""
+    result = await session.execute(
+        select(User.id).where(User.keycloak_sub == keycloak_sub)
     )
     return result.scalar_one_or_none()
 
@@ -225,3 +242,31 @@ async def list_workflow_runs_for_user(
         .order_by(WorkflowRun.created_at.desc())
     )
     return list(result.scalars().all())
+
+
+async def create_assistant_turn_log(
+    session: AsyncSession, **fields: Any
+) -> AssistantTurnLog:
+    """Insert one turn-log row. Fields mirror AssistantTurnLog's columns.
+
+    Kept generic rather than spelling out ~19 keyword params, which were a
+    transcription of the column list and had to be edited in lockstep with it.
+    """
+    turn_log = AssistantTurnLog(**fields)
+    session.add(turn_log)
+    await session.commit()
+    # No refresh: unlike the user-facing writes above, nothing reads this row
+    # back and the factory sets expire_on_commit=False, so a re-SELECT on every
+    # turn buys nothing.
+    return turn_log
+
+
+async def purge_assistant_turn_logs_before(
+    session: AsyncSession, cutoff: datetime
+) -> int:
+    """Delete turn logs older than `cutoff`. Returns the number of rows removed."""
+    result = await session.execute(
+        delete(AssistantTurnLog).where(AssistantTurnLog.created_at < cutoff)
+    )
+    await session.commit()
+    return result.rowcount or 0

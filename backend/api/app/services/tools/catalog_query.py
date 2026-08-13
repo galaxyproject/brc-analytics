@@ -79,6 +79,10 @@ class EntitySchema:
         self.numeric_fields: set[str] = {
             f for f, t in self.fields.items() if t is FieldType.NUMERIC
         }
+        # GROUP BY on a list column buckets by whole-list equality, so only
+        # scalars can be faceted. Derived here with the rest so the tool schema,
+        # the validator and this declaration can't drift apart.
+        self.facetable_fields: set[str] = self.field_names - self.list_fields
         self.configured_columns: set[str] = self.field_names | set(self.display)
         # Fail at import on a misdeclared schema rather than late with malformed
         # SQL or an IndexError: a `list` always needs a projection, and every
@@ -136,7 +140,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
             "chromosomes": NUMERIC,
             "strainName": SCALAR,
             "coverage": SCALAR,
-            "commonName": SCALAR,
+            "commonNames": LIST,
             "geneModelUrl": SCALAR,
         },
         # ploidy is intentionally omitted from display — it's an organism-level
@@ -163,7 +167,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         source="organisms.json",
         fields={
             "ncbiTaxonomyId": SCALAR,
-            "commonName": SCALAR,
+            "commonNames": LIST,
             "assemblyCount": NUMERIC,
             "priority": SCALAR,
             "priorityPathogenName": SCALAR,
@@ -180,7 +184,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         display=(
             "ncbiTaxonomyId",
             "taxonomicLevelSpecies",
-            "commonName",
+            "commonNames",
             "assemblyCount",
         ),
         # Most relevant first: best-covered organisms (most assemblies), with the
@@ -265,6 +269,17 @@ class Op(str, Enum):
 
 Scalar = Union[str, int, float, bool]
 
+# Every field either entity can be grouped on, as a schema-level enum rather than
+# a bare string. A list field named here used to validate fine and then fail at
+# run time, and the model -- given no way to see the constraint -- reliably made
+# the same call on retry and killed the whole turn. Union across entities is
+# deliberate: the per-entity check below still catches an assembly field asked of
+# organisms, and it does so with a message naming the valid ones.
+FACETABLE_FIELDS: tuple[str, ...] = tuple(
+    sorted({f for s in ENTITY_SCHEMA.values() for f in s.facetable_fields})
+)
+FacetField = Literal[*FACETABLE_FIELDS]  # type: ignore[valid-type]
+
 
 class Filter(BaseModel):
     field: str
@@ -286,7 +301,7 @@ class CatalogQuery(BaseModel):
     # Each facet column is a separate GROUP BY query in execute(); cap the count
     # so one call can't fan out into a burst of DB work. Realistic group-bys use
     # one or two columns — 4 is comfortable headroom.
-    facet_by: list[str] = Field(default_factory=list, max_length=4)
+    facet_by: list[FacetField] = Field(default_factory=list, max_length=4)
     # Bound the page to a small, fixed size so a `list` is always a short, fully
     # rendered table — never a corpus dump or a variable-length one. The cap is the
     # default (the model can't inflate it); over it we truncate and offer to narrow
@@ -303,27 +318,31 @@ class CatalogQuery(BaseModel):
             raise ValueError("operation 'facets' needs at least one facet_by field")
         schema = ENTITY_SCHEMA[self.entity]
         allowed = schema.field_names
-        referenced = (
-            [f.field for f in self.filters]
-            + list(self.facet_by)
-            + [s.field for s in self.sort]
+        # facet_by is checked first, and against this entity's facetable set
+        # rather than its full field list. The enum spans both entities, so an
+        # assembly-only scalar reaches here on an organism query; answering that
+        # with the generic "valid fields" list would offer taxonomicGroup, the
+        # model would take the suggestion, and the Literal would reject it on the
+        # retry -- the exact exhaustion this branch exists to stop. Every field
+        # named here is one that would actually work.
+        bad_facets = sorted(
+            {c for c in self.facet_by if c not in schema.facetable_fields}
         )
+        if bad_facets:
+            raise ValueError(
+                f"cannot facet on {bad_facets} for entity {self.entity!r}; "
+                f"group-by needs a scalar field of that entity. Valid facet "
+                f"fields: {sorted(schema.facetable_fields)}"
+            )
+        referenced = [f.field for f in self.filters] + [s.field for s in self.sort]
         unknown = sorted({f for f in referenced if f not in allowed})
         if unknown:
             raise ValueError(
                 f"unknown field(s) {unknown} for entity {self.entity!r}; "
                 f"valid fields: {sorted(allowed)}"
             )
-        # GROUP BY on a list column buckets by whole-list equality (and yields
-        # list-repr keys), not per-element counts — reject it rather than mislead.
         list_fields = schema.list_fields
         numeric_fields = schema.numeric_fields
-        list_facets = sorted({c for c in self.facet_by if c in list_fields})
-        if list_facets:
-            raise ValueError(
-                f"cannot facet on list field(s) {list_facets}; "
-                "group-by needs a scalar field"
-            )
         for f in self.filters:
             # Every op except the null checks needs a value; without this, a None
             # compiles to a comparison against NULL that silently matches nothing.

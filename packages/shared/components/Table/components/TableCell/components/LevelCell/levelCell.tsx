@@ -1,6 +1,6 @@
 import { STACK_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/stack";
 import { Stack } from "@mui/material";
-import { JSX } from "react";
+import { type JSX } from "react";
 import { BAR_COUNT } from "./constants";
 import { StyledBox } from "./levelCell.styles";
 import type { Props } from "./types";

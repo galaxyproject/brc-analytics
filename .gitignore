@@ -1,11 +1,13 @@
 # images
-/public/organism_image/
+/sites/ga2/public/organism_image/*
+!/sites/ga2/public/organism_image/missing_image*
 
 # dependencies
 /node_modules
 
 # next.js
-/.next/
+.next/
+next-env.d.ts
 
 # misc
 .DS_Store
@@ -15,36 +17,42 @@
 npm-debug.log*
 
 # env files
-/.env*.local
+.env*.local
 /.env.development
 /.env.production
+/sites/*/.env*
 backend/**/.env
 
 # typescript
 *.tsbuildinfo
 
+# swc plugin cache
+.swc/
+
 # editors
 /.vscode
 .idea
 
-# nvm
-.nvmrc
-
 # favicons
-/public/favicons/*
+/sites/ga2/public/favicons/*
+/sites/brc-analytics/public/favicons/*
 
 # catalog build
 /catalog/build/temp
 /catalog/ga2/build/temp
 
 # Build Dir
-/out
+out/
+
+# root-level generated assets — each app builds under sites/*, so a public/ at
+# the repo root is a leftover and must never be committed
+/public
 
 # Playwright test artifacts
-/test-results
+test-results/
 /tests/screenshots
-/playwright-report
 /playwright/.cache
+playwright-report/
 
 # Playwright MCP server debug output
 /.playwright-mcp/
@@ -52,10 +60,10 @@ backend/**/.env
 # python
 venv
 __pycache__
-playwright-report/
 
 # public api
-/public/api
+/sites/ga2/public/api
+/sites/brc-analytics/public/api
 
 # Sentry Config File
 .env.sentry-build-plugin
