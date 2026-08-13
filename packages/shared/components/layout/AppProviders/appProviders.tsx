@@ -24,8 +24,10 @@ import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { type AppSiteConfig } from "@repo/shared/config/types";
 import type { PageMeta } from "@repo/shared/meta/types";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
-import { EntitiesLoadedProvider } from "@repo/shared/providers/entitiesLoaded/provider";
+import { EntitiesProvider } from "@repo/shared/providers/entities/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
+import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
+import { type EntitiesLoader } from "@repo/shared/services/workflows/hooks/UseEntities/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -55,19 +57,21 @@ export interface AppProvidersProps {
   appProps: AppPropsWithComponent;
   appTheme: Theme;
   defaultDescription: string;
-  isEntitiesLoaded: boolean;
+  ensureEntitiesLoaded: EntitiesLoader;
 }
 
 /**
  * Site-agnostic application shell: wires up the theme, config, data and layout
- * providers around the active page. Each site resolves its own config, theme,
- * default description and entity-loaded state and passes them in.
+ * providers around the active page, and owns the entity cache load lifecycle.
+ * Each site resolves its own config, theme, default description and entity
+ * loader and passes them in.
  * @param props - Component props.
  * @param props.appConfig - Active site config.
  * @param props.appProps - Next.js app props (Component + pageProps).
  * @param props.appTheme - Resolved MUI/Emotion theme.
  * @param props.defaultDescription - Fallback OG description for the site.
- * @param props.isEntitiesLoaded - Whether the entity cache has loaded.
+ * @param props.ensureEntitiesLoaded - Loader that resolves once the site's
+ * entities and workflows are loaded.
  * @returns the application shell.
  */
 export function AppProviders({
@@ -75,8 +79,9 @@ export function AppProviders({
   appProps,
   appTheme,
   defaultDescription,
-  isEntitiesLoaded,
+  ensureEntitiesLoaded,
 }: AppProvidersProps): JSX.Element {
+  const entities = useEntities(ensureEntitiesLoaded);
   const { Component, pageProps } = appProps;
   const { layout, redirectRootToPath } = appConfig;
   const { floating, footer, header } = layout || {};
@@ -128,12 +133,10 @@ export function AppProviders({
                                   />
                                 )}
                               >
-                                <EntitiesLoadedProvider
-                                  value={isEntitiesLoaded}
-                                >
+                                <EntitiesProvider value={entities}>
                                   <Component {...pageProps} />
                                   <Floating {...floating} />
-                                </EntitiesLoadedProvider>
+                                </EntitiesProvider>
                               </ErrorBoundary>
                             </Main>
                           </WorkflowHandoffProvider>

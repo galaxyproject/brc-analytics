@@ -1,6 +1,7 @@
 import { buildOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { BackPageContentSideColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { AssemblyFavoriteButton } from "@repo/shared/components/Favorites/components/AssemblyFavoriteButton/assemblyFavoriteButton";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import {
   buildAssemblyDetails,
   buildAssemblyResources,
@@ -20,12 +21,17 @@ import { type Props } from "./types";
  * @returns JSX element representing the side column content.
  */
 export const Side = ({ assembly }: Props): JSX.Element => {
+  const { isConfigured } = useAuth();
   return (
     <BackPageContentSideColumn>
       <StyledFluidPaper>
-        <StyledSection>
-          <AssemblyFavoriteButton accession={assembly.accession} />
-        </StyledSection>
+        {/* Without auth configured the favorite button renders nothing; skip
+            the section too so it doesn't leave an empty padded strip. */}
+        {isConfigured && (
+          <StyledSection>
+            <AssemblyFavoriteButton accession={assembly.accession} />
+          </StyledSection>
+        )}
         <KeyValueSection
           {...buildOrganismDetails(mapAssemblyToOrganism(assembly))}
           title="Organism Details"

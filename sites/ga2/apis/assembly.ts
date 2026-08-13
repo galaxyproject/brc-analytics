@@ -20,7 +20,6 @@ export interface GA2AssemblyEntity {
   scaffoldL50: number | null;
   scaffoldN50: number | null;
   speciesTaxonomyId: string;
-  sra_data: SRAData[];
   strainName: string | null;
   taxonomicGroup: string[];
   taxonomicLevelClass: string;
@@ -43,19 +42,4 @@ export interface ImageData {
   sourceName: string | null;
   sourceUrl: string | null;
   url: string;
-}
-
-export interface SRAData {
-  accession: string;
-  biosample: string;
-  instrument: string;
-  library_layout: string;
-  library_source: string;
-  library_strategy: string;
-  platform: string;
-  run_total_bases: number | null;
-  sra_run_acc: string;
-  sra_sample_acc: string;
-  sra_study_acc: string;
-  total_bases: number | null;
 }
