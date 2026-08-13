@@ -1,0 +1,738 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/blog"
+    text: "Blog"
+contentType: "ARTICLE"
+date: "2026-08-12"
+description: "A data-driven assessment of current Cyclospora cayetanensis genotyping practices — examining the CDC eight-marker panel, 9,016 public amplicon runs, and the gaps between published methods and public data."
+title: "Genotyping Cyclospora: assessing current practices"
+---
+
+Anton Nekrutenko<sup>1</sup>
+
+<sup>1</sup> Dept. of Biochemistry and Molecular Biology, The Pennsylvania State
+University, University Park, PA, USA
+
+<Alert icon={false} severity="warning">
+  This is the first post in a series on the analysis of
+  *[Cyclospora](https://en.wikipedia.org/wiki/Cyclospora)* ([taxid
+  44417](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=44417))
+  outbreaks. In this part we summarize existing resources and describe our
+  initial analysis validation strategy.
+</Alert>
+
+## The current state of affairs in _Cyclospora cayetanensis_ typing
+
+_[Cyclospora cayetanensis](https://en.wikipedia.org/wiki/Cyclospora_cayetanensis)_
+([taxid 88456](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=88456)) is a
+single-celled parasite of the phylum
+[Apicomplexa](https://en.wikipedia.org/wiki/Apicomplexa)
+([taxid 5794](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=5794)), related to
+_[Toxoplasma](https://en.wikipedia.org/wiki/Toxoplasma)_
+([taxid 5810](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=5810)) and
+_[Eimeria](https://en.wikipedia.org/wiki/Eimeria)_
+([taxid 5800](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=5800)). It infects the
+small intestine and causes
+[cyclosporiasis](https://en.wikipedia.org/wiki/Cyclosporiasis): watery
+diarrhoea lasting days to weeks, prone to relapse without
+trimethoprim-sulfamethoxazole [9].
+
+Humans are the only host in which the parasite is known to complete its life cycle [8]. However, oocysts have been recovered from other animals as well. A systematic
+review of the animal literature to December 2020 found 13 relevant studies, reporting
+_C. cayetanensis_ in Mediterranean mussels and carpet shell clams, in domestic and street dogs,
+wild chickens, wild rhesus macaques, chimpanzees and cynomolgus monkeys [16]. Its conclusion was
+that no naturally exposed animal has ever had its small intestine examined for
+endogenous stages, so no animal reservoir is confirmed, and animals shedding oocysts are more
+plausibly passive carriers than hosts [16]. Some of the animal reports do not survive
+re-inspection at all. Reanalysis of the Chinese animal literature reassigned the bovine
+"Cyclospora" to _Eimeria subspherica_
+([taxid 310759](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=310759)) on
+morphometric and SSU rRNA evidence, and found that several widely used reference sequences are
+probably _[E. tenella](https://en.wikipedia.org/wiki/Eimeria_tenella)_
+([taxid 5802](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=5802)) [17].
+
+Infection comes from food or water contaminated with faeces, most often fresh produce, and the
+parasite has one property that determines everything downstream: **the oocyst shed in faeces is
+not infectious.** It must spend one to two weeks in the environment, sporulating, before it can
+infect the next person [8, 9]. There is no person-to-person transmission to trace [8].
+
+In 2018, an unusually large year, **2,299 laboratory-confirmed cases** had been reported by
+1 October, more than double the previous year at the same point [1].
+
+The 2026 season is several times that size. CDC recorded **10,468 laboratory-confirmed
+domestically acquired cases** between 1 May and 3 August 2026, with 517 hospitalisations, 2 deaths,
+47 states reporting, and more than 12,255 further cases not laboratory confirmed [18]. The health
+advisory that opened the season gives the baseline: 1,645 confirmed cases by 14 July, against 249
+nationally over the same window in 2025 [19]. One multistate outbreak inside that total, 6,358
+cases across 15 states, was traced to iceberg lettuce from Taylor Farms de Mexico in Guanajuato and
+recalled on 17 July [20, 21]. UKHSA reported 67 cases in returning travellers, and of the 51 with
+travel information, 48 had been to Mexico [22].
+
+There is no continuous in vitro culture system, and no animal model in routine use. Experimental
+infection has been reported in oysters, freshwater clams, Swiss albino mice and guinea pigs [16],
+but nothing that the field treats as a working model. In practice almost everything known about this parasite comes from patient stool, which is
+also where parasite DNA is most abundant. The exceptions matter and appear later: the assay
+has been run on irrigation water, and a separate one was developed for fresh produce.
+
+### The genome assemblies
+
+Forty-nine _C. cayetanensis_ assemblies are public. **None is chromosome-level**, two are
+annotated, and the median one is in 1,391 pieces.
+
+<Figure
+  alt="Distribution of contig counts and contig N50 across the 49 public Cyclospora cayetanensis assemblies"
+  caption={
+    <figcaption>
+      <span>
+        Figure 1. Assembly quality across the 49 public <i>C. cayetanensis</i>{" "}
+        assemblies. None is chromosome-level and the median assembly is in 1,391
+        pieces.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/genome-quality.svg"
+/>
+
+Named points on that distribution, with three other apicomplexan references for scale:
+
+| assembly                                  | contigs   | contig N50 | coverage   | annotation  | platform       | in BRC                                                |
+| ----------------------------------------- | --------- | ---------- | ---------- | ----------- | -------------- | ----------------------------------------------------- |
+| `GCA_020976615.1` most contiguous         | 310       | 524 kb     | 40×        | none        | MiSeq + MinION | no                                                    |
+| `GCF_002999335.1` CcayRef3, the reference | 738       | 193 kb     | 20×        | full        | MiSeq          | [yes](https://brc-analytics.org/data/organisms/88456) |
+| `GCF_000769155.1` ASM76915v2              | 3,573     | 44 kb      | not stated | full        | 454 + GAIIx    | [yes](https://brc-analytics.org/data/organisms/88456) |
+| `GCA_002893405.1` most contigs            | 7,910     | 216 kb     | 20×        | none        | MiSeq          | [yes](https://brc-analytics.org/data/organisms/88456) |
+| **all 49, median**                        | **1,391** | **103 kb** | **20×**    | **2 of 49** | MiSeq          | **31 of 49**                                          |
+| _P. falciparum_ 3D7 `GCF_000002765.6`     | 14        | 1.69 Mb    | —          | full        | —              | —                                                     |
+| _C. parvum_ IOWA `GCF_000165345.1`        | 18        | 1.01 Mb    | —          | full        | —              | —                                                     |
+| _T. gondii_ ME49 `GCF_000006565.2`        | 2,507     | 1.22 Mb    | —          | full        | —              | —                                                     |
+
+Three things follow. Contiguity is an order of magnitude short of the other apicomplexans, and the
+single most contiguous assembly—the only one of the 49 that used long reads—is one of the 18
+BRC Analytics does not carry [15]. The gap originates upstream: BRC builds its catalog against UCSC's assembly hub list, which holds
+exactly the same 31 for this taxon [28]. Sourcing exclusively from that list is still a design
+choice, and closing the gap needs a supplementation route rather than only an upstream fix. Reported coverage is 20× for 35 of the 49 and no more than 40× for
+44 of them. And the reference itself is a pool: its BioSample states that reads from **two strains
+were combined to create it** [24]. Where the two strains differ, that reference either collapses
+the difference or carries one strain's allele, so reads from the other are penalised at exactly the
+positions genotyping depends on.
+
+Everything downstream is built on that. Which is why _Cyclospora_ is genotyped from a small panel
+of amplicons rather than from genomes.
+
+### The CDC genotyping panel
+
+_Cyclospora_ is not typed one way. FDA developed a targeted amplicon sequencing assay over
+**52 loci**, 49 of them nuclear, covering 396 known SNP sites, with an enrichment step that makes
+it sensitive enough for food rather than stool alone [25]. CDC and FDA have since jointly generated data on a
+third scheme, an **expanded 63-marker panel** [27]. It has 348 public runs and, as of 2026-08-12,
+no publication we can find, no preprint, and no released marker list: its BioSample records name
+the targets only as `63 markers found through Cyclospora genome`, and the Methods section records
+how far that search went. The mitochondrial genome can also be typed on its own, which
+is what CFSAN's 25 runs did. More loci does not automatically mean finer resolution. Run head to head on 66 clinical specimens,
+the 52-locus assay resolved 24 genetic clusters against the eight-marker scheme's 27, with 15
+identical between them [26]. Cluster counts alone settle nothing about which is more accurate—
+that needs epidemiological labels neither panel has been scored against here—but they do not
+support the assumption that the larger panel simply resolves more.
+
+In the series of analyses detailed in this blog we will concentrate on the CDC's eight-marker
+panel because it is published, well defined, and widely used: (1) 8,522 of the 9,016 public
+amplicon runs used it, against 494 across the other three schemes, (2) its reference sequences, haplotype-calling coordinates and caller are all released [10], while
+the 63-marker coordinates are not, (3) it is the only one of the three with a published set of
+outbreak cluster labels to score a pipeline against [10], and (4) three groups ran it—CDC, the
+Public Health Agency of Canada, and FDA on irrigation water—so cross-laboratory comparison is
+possible.
+
+CDC has genotyped clinical _Cyclospora_ specimens since 2018 to support outbreak investigations.
+The method is targeted amplicon deep sequencing of eight markers, followed by clustering [3]. Six
+of the markers are nuclear and two mitochondrial [3], and they were assembled from three studies:
+
+| markers                        |                            | origin                                                                                                                   |
+| ------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `Nu_378`, `Nu_360i2`, `Mt_MSR` | 2 nuclear, 1 mitochondrial | the genotyping scheme these were introduced with, alongside the heuristic distance measure [11]                          |
+| `Nu_CDS1`–`Nu_CDS4`            | 4 nuclear                  | a SNP-mining workflow across four whole genomes, covering 13 SNPs and resolving 57 stool specimens into 19 genotypes [4] |
+| `Mt-Junction`                  | 1 mitochondrial            | the mitochondrial junction region, evaluated on 134 laboratory-confirmed cases and yielding 14 sequence types [5]        |
+
+Here is the whole panel drawn at base resolution, with primers from the three papers that introduced them [4, 5, 11]. Every base of every amplicon is shown: primer footprints in red, PART
+haplotype-calling windows in alternating blue with their boundaries ruled and labelled, and
+everything not called in grey. The nucleotides are small, enough to see the
+structure and be able to follow a motif, not to read comfortably at arm's length.
+
+The four short nuclear CDS markers, two PARTs each:
+
+<Figure
+  alt="Nu_CDS1 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 2. Marker <code>Nu_CDS1</code>. Primer footprints in red, PART
+        windows in alternating blue, uncalled bases in grey. Gold letters
+        beneath a site are the alternative bases observed there.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds1.svg"
+/>
+
+<Figure
+  alt="Nu_CDS4 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 3. Marker <code>Nu_CDS4</code>.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds4.svg"
+/>
+
+<Figure
+  alt="Nu_CDS3 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 4. Marker <code>Nu_CDS3</code>.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds3.svg"
+/>
+
+<Figure
+  alt="Nu_CDS2 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 5. Marker <code>Nu_CDS2</code>.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds2.svg"
+/>
+
+The two long nuclear markers, which carry most of the panel's discriminating power—16 and
+20 SNPs respectively (see [`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv); [11] reported 15 for `Nu_378`):
+
+<Figure
+  alt="Nu_378 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 6. Marker <code>Nu_378</code>, which carries 16 of the panel's
+        SNPs.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-378.svg"
+/>
+
+<Figure
+  alt="Nu_360i2 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 7. Marker <code>Nu_360i2</code>, which carries 20 of the panel's
+        SNPs.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-360i2.svg"
+/>
+
+And the mitochondrial rRNA marker, the deepest-sequenced of the eight:
+
+<Figure
+  alt="Mt_MSR amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
+  caption={
+    <figcaption>
+      <span>
+        Figure 8. Marker <code>Mt_MSR</code>, the mitochondrial rRNA marker and
+        the deepest-sequenced of the eight.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-mt-msr.svg"
+/>
+
+The gold letters stacked beneath each site are the **alternative bases** seen there. Most sites
+are
+biallelic. One site carries three. The full list—marker, PART, amplicon and PART-local coordinate,
+reference base and observed alleles—is in
+[`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv).
+
+The eighth marker is not typed by
+alignment. This is `Cmt214.A`, the longest of the twenty junction references:
+
+<Figure
+  alt="The Cmt214.A junction reference, showing its 5' flank, six repeat units and 3' flank"
+  caption={
+    <figcaption>
+      <span>
+        Figure 9. <code>Cmt214.A</code>, the longest of the twenty junction
+        references: a 64 bp 5' flank, six 15 nt repeat units, and a 60 bp 3'
+        flank.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-mt-junction-cmt214.svg"
+/>
+
+`Cmt214.A` is 214 bp: a 64 bp 5' flank, six 15 nt repeat units spanning positions 65 to 154, and
+a 60 bp 3' flank. The units are not identical. Units 1 to 3 are `TAGTATTATTTATAA` and units 4 to
+6 are `TAGTATTATTTTTAA`, which differ at one position [5]. Five units give a 199 bp sequence and
+four give 184. Types are assigned from the unit count and the motif composition, matched against
+the twenty reference sequences.
+
+All twenty references, to scale:
+
+<Figure
+  alt="All twenty Mt-Junction reference sequences drawn to scale"
+  caption={
+    <figcaption>
+      <span>
+        Figure 10. The twenty <code>Mt-Junction</code> reference sequences,
+        drawn to scale. Types are assigned from repeat-unit count and motif
+        composition rather than by alignment.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/junction-panel.svg"
+/>
+
+### The sequencing data, and how much of it used this panel
+
+Every public _Cyclospora_ run, by project. All are short-read Illumina except one MinION run
+(`PRJNA772675`) and one 454 run (`PRJNA256967`).
+
+| BioProject     | runs  | collected    | strategy | platform          | panel              | who              |
+| -------------- | ----- | ------------ | -------- | ----------------- | ------------------ | ---------------- |
+| `PRJNA578931`  | 8,325 | 2018–2025    | amplicon | MiSeq             | **CDC 8-marker**   | CDC              |
+| `PRJNA1130490` | 348   | 2018–2024    | amplicon | MiSeq             | CDC/FDA 63-marker  | CDC              |
+| `PRJNA796535`  | 186   | 2010–2021    | amplicon | MiSeq             | **CDC 8-marker**   | PHAC Canada      |
+| `PRJNA1052691` | 99    | 2018–2022    | amplicon | MiSeq             | FDA 52-locus       | FDA              |
+| `PRJNA357478`  | 25    | not recorded | amplicon | MiSeq, MiniSeq    | mitochondrion only | CFSAN            |
+| `PRJNA952552`  | 22    | not recorded | amplicon | MiSeq             | FDA 52-locus       | FDA              |
+| `PRJEB109121`  | 15    | 2024–2025    | WGS      | NextSeq 500       | —                  | UR 7510          |
+| `PRJNA750933`  | 11    | 2020–2021    | amplicon | MiSeq             | **CDC 8-marker**   | FDA/CFSAN, water |
+| `PRJNA437975`  | 11    | 1997–2015    | WGS      | MiSeq             | —                  | CDC              |
+| `PRJNA1482563` | 6     | not recorded | WGS      | MiSeq             | —                  | FDA              |
+| `PRJNA772675`  | 2     | 2020         | WGS      | MiSeq, **MinION** | —                  | PHAC Canada      |
+| `PRJNA256967`  | 2     | 2011         | WGA      | **454**, GAIIx    | —                  | CDC              |
+| `PRJNA1045665` | 1     | 2016         | WGS      | MiSeq             | —                  | USDA             |
+| `PRJNA279557`  | 1     | 2018         | WGA      | NovaSeq 6000      | —                  | JCVI             |
+
+Collection dates come from the BioSample records, except for the two CDC projects where they are
+parsed from the sample names. They are year-only for almost every run. "Not recorded" means the
+field is `missing`, `not available`, or absent: all 22 of `PRJNA952552`, all 6 of `PRJNA1482563`,
+and 24 of the 25 in `PRJNA357478`. `PRJNA1130490` has a date for 251 of its 348 runs.
+
+**9,054 runs, 966 Gbp. 9,016 are amplicon and 38 are whole-genome.** Of the amplicon runs,
+**8,522 used the eight-marker panel**: CDC's 8,325, Canada's 186, and 11 FDA water samples. The
+other 494 did not: 469 used the 63-marker or 52-locus panels, and 25 (`PRJNA357478`) were
+typed on the mitochondrion alone. How comparable the panels are is not yet established,
+because neither the 63-marker nor the 52-locus target coordinates are public.
+
+`PRJNA578931` spans specimens collected 2018 to 2025, released 2019 to 2026. Collection year and
+release year are different things, and a year in this post means collection, because
+cyclosporiasis peaks May to August and each collection year is one outbreak season.
+
+| collection year | 2018  | 2019 | 2020 | 2021 | 2022 | 2023  | 2024  | 2025 |
+| --------------- | ----- | ---- | ---- | ---- | ---- | ----- | ----- | ---- |
+| specimens       | 1,039 | 797  | 987  | 720  | 956  | 1,605 | 1,316 | 896  |
+
+The table sums to 8,316; the remaining 9 of 8,325 runs have sample names that match neither
+parsing scheme and are excluded. The table stops at 2025. **No public sequencing run
+of any kind carries a 2026 collection date.** Searching PubMed, Europe PMC, Crossref, medRxiv and
+bioRxiv alongside the NCBI and ENA archives on 2026-08-11 returned thirteen items concerning the
+2026 outbreak: eight agency notices [18, 19, 20, 21, 22, 29, 30, 31], three BMJ news pieces
+[32, 33, 34], a JAMA patient page [35], and one medRxiv preprint that analyses GenBank records
+from 1997 to 2022 [23]. None of them used the eight-marker panel on 2026 specimens. The preprint states the position twice, in its results and again in its
+limitations: "molecular surveillance data for the summer 2026 outbreak remain unavailable to the
+public at the time of writing" [23]. There is no produce isolate to sequence either, because no
+food sample has tested positive—FDA re-reviewed its one presumptive positive and withdrew it
+[21]. The most recent specimens on this panel are the 896 collected in 2025 and released in April
+2026, which are the season before the outbreak.
+
+## Our plan
+
+The goal is a public implementation of this workflow that runs in Galaxy, so anyone with the data
+can genotype _Cyclospora_ without local infrastructure or private code. We begin with specimens generated by the same people who developed the panel and the
+analysis pipeline [10].
+
+### The data
+
+**203 runs inside `PRJNA578931`** released in November 2019, generated using MiSeq (10.3 GB in total):
+
+|                   |                                                      |
+| ----------------- | ---------------------------------------------------- |
+| BioProject        | `PRJNA578931`                                        |
+| runs              | 203 (99 Vendor A, 104 Vendor B)                      |
+| collection season | 2018                                                 |
+| platform          | Illumina MiSeq, 194 raw 2×250                        |
+| panel             | CDC 8-marker                                         |
+| labels            | `2018_gold_clusters.txt`, CDC typing repository [10] |
+| size              | 10.3 GB                                              |
+
+### "The gold standard"
+
+In CDC's typing workflow repository [10], in a directory called `REFERENCE_CLUSTER_LIST`, is a
+204-line text file:
+
+```
+$ head -4 2018_gold_clusters.txt
+Seq_ID Cluster_alias
+C_IA058_18 Vendor_A
+C_IA052_18 Vendor_A
+C_IA040_18 Vendor_A
+```
+
+Two hundred and three specimens, each assigned to one of two named clusters—`Vendor_A` 99,
+`Vendor_B` 104. The file's provenance is traceable to the published record.
+Two major epidemiologically-defined cyclosporiasis clusters were identified in 2018: "one
+associated with **salads** sold by a commercial vendor (Vendor A), and the other linked to
+**vegetable trays** sold by a second vendor (Vendor B)" [1]. Vendor A accounted for 511 confirmed
+cases and Vendor B for 250 [2].
+
+The labels use CDC's internal specimen ids—`C_IA013_18`. The specimen id lives in the
+BioSample **`Sample Alias`** attribute, which is a different field from `SampleName` and does not
+appear in SRA runinfo at all.
+
+CDC's own haplotype calls for a large slice of these specimens are available. Barratt et al. present
+this kind of data as a **barcode**—one row per specimen, one column per named haplotype, and a
+filled box where that haplotype was detected [11]. Applied to our benchmark specimens, using CDC's
+own calls, it looks like this:
+
+<Figure
+  alt="Barcode of CDC's deposited haplotype calls across the 153 benchmark specimens, one row per specimen and one column per named haplotype"
+  caption={
+    <figcaption>
+      <span>
+        Figure 11. CDC's deposited haplotype calls for the 153 benchmark
+        specimens that appear in the sheet. Each box is one specimen × one named
+        haplotype: filled means detected, white means the locus was called but
+        that haplotype was not found, and grey across a whole locus block means
+        no haplotype was called there at all. Locus dropout is routine, not
+        exceptional.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/expected-truth.svg"
+/>
+
+Each box is one specimen × one named haplotype. Columns are grouped into the eight loci and
+ordered within a locus by PART, then by haplotype number. There are three states: (1) a **filled
+box** means the haplotype was detected, (2) **white** means the locus was called but that particular haplotype
+was not among the ones found, and (3) **grey across a whole locus block** means no haplotype was
+called there at all.
+
+**Where these calls come from, and how much weight they carry.** They are not from a paper. The
+file is `2022-10-24Joel_haplotype_sheet.txt`, committed to CDC's `Eukaryotpying-Python`
+repository, where the README describes it as "an example of this HDS format" [13]—deposited
+example input for the distance-computation code rather than a curated release of results. The
+data is real: 2,354 specimens, CDC's own specimen identifiers, and they join cleanly to SRA. But
+there is no methods statement saying which pipeline version produced these calls, no version
+history, and no publication that presents this sheet as its result. So it is the best available
+reference for what our pipeline should reproduce, and we will report concordance against it—
+but "CDC's deposited calls" is the honest description, not "published".
+
+**153 of the 203** appear in it, unevenly: **Vendor A 98 of 99, Vendor B 55 of 104**. So
+concordance is reported against those 153 rather than as a general accuracy figure. Mapping all
+203 will show whether the absent specimens failed CDC's five-of-eight amplification criterion,
+which is the likeliest reason they are missing.
+
+The median specimen carries **26.5 haplotype calls** for Vendor A and 24 for Vendor B, across a
+median of 7 and 6 of the 8 loci respectively. Note how much grey there is: locus dropout is
+routine, not exceptional.
+
+**The two clusters are visibly different.** Ten haplotypes differ by 50 percentage points or
+more between the two vendor outbreaks:
+
+| haplotype                     | Vendor A | Vendor B |
+| ----------------------------- | -------- | -------- |
+| `Nu_378_PART_D_Hap_2`         | 0%       | **95%**  |
+| `Nu_378_PART_D_Hap_7`         | **87%**  | 0%       |
+| `Mt_Cmt169.A_Junction_Hap_8`  | 0%       | **75%**  |
+| `Nu_CDS1_PART_B_Hap_1`        | 0%       | **67%**  |
+| `Nu_CDS4_PART_A_Hap_2`        | **65%**  | 0%       |
+| `Nu_CDS1_PART_B_Hap_2`        | **64%**  | 0%       |
+| `Nu_CDS1_PART_A_Hap_1`        | 0%       | **64%**  |
+| `Mt_Cmt199.A_Junction_Hap_17` | **63%**  | 0%       |
+| `Nu_CDS1_PART_A_Hap_2`        | **57%**  | 0%       |
+| `Nu_CDS4_PART_B_Hap_2`        | **52%**  | 0%       |
+
+### Other datasets that used the same panel the same way
+
+The eight-marker panel is not unique to CDC's own archive. Three public datasets ran it, and the
+BioSample records say so explicitly:
+
+| dataset       | runs  | who                            | what the record says                                                                  |
+| ------------- | ----- | ------------------------------ | ------------------------------------------------------------------------------------- |
+| `PRJNA578931` | 8,325 | CDC                            | `Gene Targets = CDS-1; CDS-2; CDS-3; CDS-4; HC378; HC360i2; Mt-Junction; MSR`         |
+| `PRJNA796535` | 186   | Public Health Agency of Canada | `gene_targets = Nu_CDS1; Nu_CDS2; Nu_CDS3; Nu_CDS4; Nu_378; Nu_360i2; Mt_Cmt; Mt_MSR` |
+| `PRJNA750933` | 11    | FDA/CFSAN                      | "MLST-TADS targets as described by CDC (Nascimento et al., 2020)"                     |
+
+**8,522 runs in total.** Canada uses its own naming for the same eight loci, and its BioProject
+description states that the markers were "originally described by the U.S. Centers for Disease
+Control, Accession: PRJNA578931." The 11 CFSAN runs are the only naturally contaminated
+non-human samples in the entire public record: surface and agricultural water from the Salinas
+River in California and the C-23 canal in Florida, collected between November 2020 and June 2021,
+with GPS coordinates and exact dates.
+
+### What we do next and what the next blog post will describe
+
+The first thing to do with the 203 labelled specimens is to see whether an open pipeline, built
+only from public artifacts, recovers CDC's clusters from raw reads.
+
+The pipeline has seven steps: (1) trim, (2) map to the seven marker references, (3) compute
+per-PART coverage, (4) call every haplotype at every PART, (5) assemble a specimen × haplotype
+presence matrix, (6) compute distances with the published heuristic [12], which CDC reported
+adopting in place of the earlier Bayesian ensemble [6], and (7) cluster and score against
+Vendor A/B.
+
+### What this design cannot tell us
+
+Three limitations are worth stating before any results, because none of them is fixed by running
+the pipeline more carefully.
+
+**There is no physical ground truth.** Every reference we score against is another laboratory's
+software output, not a specimen of known composition. A mock community—oocysts mixed at known
+ratios and sequenced on this panel—would separate caller error from reference error, and none
+exists publicly. The only laboratory-seeded material in the archive, `PRJNA952552`, was run on the
+FDA 52-locus panel rather than this one. So this gap cannot be closed with public data, and a
+concordance figure against CDC's calls measures agreement with CDC, not accuracy.
+
+**Differential locus dropout is an untested failure mode.** The distance statistic was built to
+accommodate "heterogeneous (mixed) genotypes and specimens with partial genotyping data" [2], but
+designed-for is not the same as measured. The case that matters is two specimens that drop
+_different_ loci: their similarity is then computed over whichever loci happen to survive in both.
+Part 2 will mask loci in silico at the dropout rates we observe and report how far the distance
+matrix and the cluster score move.
+
+**Joining archive metadata is more fragile than it looks.** Collection year and state are parsed
+from sample names rather than read from structured fields, and names matching no known scheme are
+recorded as unknown rather than guessed. That catches parsing failures but not the worse case,
+where parsing succeeds against the wrong field. A concrete instance: ENA's `sample_alias` for
+`PRJNA578931` returns the SampleName (`18USIAxxx1056CcS0011`), not the CDC specimen identifier
+(`C_WI090_18`) that the haplotype sheet is keyed on. Joining on it returns zero matches out of
+8,325—a clean, confident and entirely wrong answer.
+
+One further constraint belongs to the assay rather than to us. The eight markers are separate PCR
+products, so no read pair spans two of them and haplotypes cannot be phased across loci by any
+method. Within a PART the haplotype is already the phased unit, a whole sequence variant rather
+than independent SNPs. Whether two haplotypes at different loci come from one strain or from a
+mixed infection is therefore not recoverable from this data, for us or for anyone.
+
+One thing we are not doing, stated plainly given the limitations above. CDC's production system is
+not public—its data statement directs readers to contact the authors [7]. We are not
+reimplementing that system and will not claim to. What we are building is an independent open
+implementation of the published method, benchmarked against published labels and, with the caveats
+above, against CDC's deposited calls. That is a narrower claim, and a checkable one.
+
+## Methods
+
+Everything in this post that is not attributed to a source in the list below, we
+computed. Every figure and table derives from public URLs and APIs queried at run
+time rather than from a local copy, and the queries and procedures are described below.
+
+**The sequencing landscape.** Run counts, library strategies, base counts and release dates come
+from an NCBI `esearch` on `Cyclospora[Organism]` in the `sra` database, fetched as `runinfo` via
+an eutils history handle, cross-checked against the ENA Portal API for the same taxon.
+ENA returns 8,211 runs against NCBI's
+9,054, and we reconciled that gap accession by accession rather than picking the larger number.
+Every ENA run is present in NCBI—the ENA-only set is empty—so ENA is a strict subset and the
+843-run difference is mirroring lag, accounted for by `PRJNA578931` (690),
+`PRJNA1130490` (147) and `PRJNA1482563` (6)
+and dominated by the most recent releases (555 from April 2026, 140 from March 2026). Query scope
+was checked too: `Cyclospora[Organism]`, `txid88456[Organism:exp]` and
+`Cyclospora cayetanensis[Organism]` return identical counts, and no run in SRA is assigned to the
+genus but not to this species, so the genus-level query and the species-level assembly census
+cover the same material. Assembly counts come from the NCBI Datasets API
+for taxon 88456.
+
+**Collection year and US state.** Neither is in a structured BioSample field. Both are parsed out
+of the sample name, which uses two schemes across release batches, `19USNY13G1196CcS0011` and
+`DC25-FL0040-Cx1-S`. Names matching neither scheme are recorded
+as unknown rather than guessed. This is also how the year-by-year counts in the data section were
+produced.
+
+**Which datasets used which panel.** From the `Gene Targets` / `gene_targets` attribute on the
+BioSample records themselves, fetched with `efetch db=biosample` in batches of 100.
+The
+free-text method description on the FDA water samples was read directly from those records.
+
+**What is not published about the 63-marker panel.** This is a negative claim, so here is the
+extent of it. The run count is NCBI's: 348 read runs for `PRJNA1130490`. The
+BioProject record carries no linked publication. Europe PMC full-text search returns zero results
+for `"63 markers" AND Cyclospora`, zero for `"63 genetic markers" AND Cyclospora`, and zero for
+the accession `PRJNA1130490` anywhere in full text, and none of the 23 indexed _Cyclospora_
+preprints concerns it. The two recent CDC papers that might have described it both state the
+eight-marker panel explicitly instead [3, 26]. For the markers themselves, CDC's typing workflow
+repository has 137 files, none referring to 63 markers or an expanded panel, and its reference
+FASTA still contains exactly seven non-junction records [10]. The BioSample attribute reads
+`Gene Targets = 63 markers found through Cyclospora genome`, with no names and no coordinates.
+All checked 2026-08-12. This establishes that the panel is undescribed in the indexed literature
+and in CDC's public code, not that no description exists anywhere.
+
+**The 203-specimen manifest.** CDC's specimen identifiers appear in the BioSample `Sample Alias`
+attribute, which is a different field from `SampleName` and absent from SRA runinfo. Each of the
+203 labels was resolved by `esearch db=biosample` on the identifier, then `elink` to the `sra`
+database, then `esummary` for the run accession, and finally the ENA `search` endpoint for the
+FASTQ URLs. Identifiers were normalised for case and for
+hyphen-versus-underscore before joining.
+
+**Read lengths.** Measured directly. FASTQ files were downloaded from ENA and every read length
+counted (`SRR10395970`, `SRR10415148`, `SRR31736733`). The `avgLength` field in SRA runinfo is
+the combined length of a read pair, which is how the raw-versus-pre-trimmed split across the 203
+was determined.
+
+**Primer placement and PART boundaries.** Each published primer sequence was located in the
+marker reference FASTA by exact string match, including the reverse complement for reverse
+primers. We assert that every forward primer begins at base 1,
+that every reverse primer ends at the final base, and that the PART intervals in the BED coincide
+with the primer footprints. All seven markers pass, which is the basis for the claim that the
+PARTs are the primer-free interior of each amplicon.
+
+**Haplotype-defining sites.** For each PART, the named haplotypes were compared column by column
+and every position where they differ recorded, together with the alleles observed there
+(output in [`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv)). PARTs with a single
+named haplotype, or whose haplotypes differ in length, are excluded from this count rather than
+aligned.
+
+**The expected-truth barcode.** Built by joining CDC's deposited haplotype sheet to the manifest
+on the normalised specimen identifier (output in [`expected-truth.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/expected-truth.tsv)).
+
+## Sources
+
+1. Barratt JLN, _et al._ (2021) Investigation of US _Cyclospora cayetanensis_ outbreaks in 2019
+   and evaluation of an improved _Cyclospora_ genotyping system against 2019 cyclosporiasis
+   outbreak clusters. _Epidemiology and Infection_ 149:e214.
+   doi:[10.1017/S0950268821002090](https://doi.org/10.1017/S0950268821002090) ·
+   [PMID 34511150](https://pubmed.ncbi.nlm.nih.gov/34511150/) · PMC8506454
+2. Nascimento FS, _et al._ (2020) Evaluation of an ensemble-based distance statistic for
+   clustering MLST datasets using epidemiologically defined clusters of cyclosporiasis.
+   _Epidemiology and Infection_ 148:e172.
+   doi:[10.1017/S0950268820001697](https://doi.org/10.1017/S0950268820001697) ·
+   [PMID 32741426](https://pubmed.ncbi.nlm.nih.gov/32741426/) · PMC7439293
+3. Peterson A, _et al._ (2025) Assessing the sequencing success and analytical specificity of a
+   targeted amplicon deep sequencing workflow for genotyping the foodborne parasite _Cyclospora
+   cayetanensis_. _Journal of Clinical Microbiology_.
+   doi:[10.1128/jcm.01811-24](https://doi.org/10.1128/jcm.01811-24) · [PMID 40366167](https://pubmed.ncbi.nlm.nih.gov/40366167/) · PMC12153321
+4. Houghton KA, _et al._ (2020) Development of a workflow for identification of nuclear genotyping
+   markers for _Cyclospora cayetanensis_. _Parasite_ 27:24.
+   doi:[10.1051/parasite/2020022](https://doi.org/10.1051/parasite/2020022) ·
+   [PMID 32275020](https://pubmed.ncbi.nlm.nih.gov/32275020/) · PMC7147239
+5. Nascimento FS, _et al._ (2019) Mitochondrial junction region as genotyping marker for
+   _Cyclospora cayetanensis_. _Emerging Infectious Diseases_ 25(7).
+   doi:[10.3201/eid2507.181447](https://doi.org/10.3201/eid2507.181447) ·
+   [PMID 31211668](https://pubmed.ncbi.nlm.nih.gov/31211668/) · PMC6590752
+6. Barratt JLN, _et al._ (2023) _Cyclospora cayetanensis_ comprises at least 3 species that cause
+   human cyclosporiasis. _Parasitology_ 150:269–285.
+   doi:[10.1017/S003118202200172X](https://doi.org/10.1017/S003118202200172X) ·
+   [PMID 36560856](https://pubmed.ncbi.nlm.nih.gov/36560856/) · PMC10090632
+7. Jacobson D, _et al._ (2023) Novel insights on the genetic population structure of
+   human-infecting _Cyclospora_ spp. _Current Research in Parasitology & Vector-Borne Diseases_.
+   doi:[10.1016/j.crpvbd.2023.100145](https://doi.org/10.1016/j.crpvbd.2023.100145) ·
+   [PMID 37841306](https://pubmed.ncbi.nlm.nih.gov/37841306/) · PMC10569985
+8. Dubey JP, Khan A, Rosenthal BM (2022) Life cycle and transmission of _Cyclospora cayetanensis_:
+   knowns and unknowns. _Microorganisms_ 10:118.
+   doi:[10.3390/microorganisms10010118](https://doi.org/10.3390/microorganisms10010118) ·
+   [PMID 35056567](https://pubmed.ncbi.nlm.nih.gov/35056567/)
+9. Almeria S, Cinar HN, Dubey JP (2019) _Cyclospora cayetanensis_ and cyclosporiasis: an update.
+   _Microorganisms_ 7:317.
+   doi:[10.3390/microorganisms7090317](https://doi.org/10.3390/microorganisms7090317) ·
+   [PMID 31487898](https://pubmed.ncbi.nlm.nih.gov/31487898/)
+10. CDC _Cyclospora_ typing workflow (alpha test release), including
+    `REFERENCE_CLUSTER_LIST/2018_gold_clusters.txt`, the marker and junction reference FASTAs, and
+    `CYCLOSPORA_FEB_11_2020.bed`.
+    [github.com/Joel-Barratt/CDC-Complete-Cyclospora-typing-workflow-ALPHA-TEST](https://github.com/Joel-Barratt/CDC-Complete-Cyclospora-typing-workflow-ALPHA-TEST)
+11. Barratt JLN, _et al._ (2019) Genotyping genetically heterogeneous _Cyclospora cayetanensis_
+    infections to complement epidemiological case linkage. _Parasitology_ 146:1275–1283.
+    doi:[10.1017/S0031182019000581](https://doi.org/10.1017/S0031182019000581) ·
+    [PMID 31148531](https://pubmed.ncbi.nlm.nih.gov/31148531/)—Fig. 3 is the barcode layout reproduced here.
+12. Eukaryotyping—R implementation of Plucinski's Bayesian method and Barratt's heuristic
+    definition of genetic distance. [github.com/Joel-Barratt/Eukaryotyping](https://github.com/Joel-Barratt/Eukaryotyping)
+13. Eukaryotpying-Python (repository name misspelled upstream), including
+    `haplotype_sheets/2022-10-24Joel_haplotype_sheet.txt`.
+    [github.com/Joel-Barratt/Eukaryotpying-Python](https://github.com/Joel-Barratt/Eukaryotpying-Python)
+14. NCBI BioProject `PRJNA578931`, _Cyclospora_ Genotyping (CDC).
+    [www.ncbi.nlm.nih.gov/bioproject/PRJNA578931](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA578931)
+15. BRC Analytics organism page for _Cyclospora cayetanensis_ (taxid 88456).
+    [brc-analytics.org/data/organisms/88456](https://brc-analytics.org/data/organisms/88456)
+16. Totton SC, O'Connor AM, Naganathan T, Martinez BAF, Sargeant JM (2021) A review of
+    _Cyclospora cayetanensis_ in animals. _Zoonoses and Public Health_.
+    doi:[10.1111/zph.12872](https://doi.org/10.1111/zph.12872) · [PMID 34156154](https://pubmed.ncbi.nlm.nih.gov/34156154/)
+17. Feng K, Guo Y, Li N, Xiao L, Feng Y (2025) _Cyclospora_ in humans, animals, fresh produce and
+    water in China: implications for host specificity of _Cyclospora_ species and zoonotic
+    transmission of _C. cayetanensis_. _One Health Advances_ 3:24.
+    doi:[10.1186/s44280-025-00094-y](https://doi.org/10.1186/s44280-025-00094-y)
+18. CDC, Surveillance of Cyclosporiasis, updated 2026-08-04.
+    [Archived 2026-08-09](https://web.archive.org/web/20260809172318/https://www.cdc.gov/cyclosporiasis/php/surveillance/index.html)
+19. CDC Health Advisory CDCHAN-00531, Domestically Acquired Cyclosporiasis Cases in Multiple U.S.
+    States, 2026, issued 2026-07-14.
+    [Archived 2026-08-09](https://web.archive.org/web/20260809010304/https://www.cdc.gov/han/php/notices/han00531.html)
+20. CDC outbreak notice, Cyclospora Outbreak Linked to Iceberg Lettuce, published 2026-07-14,
+    updated 2026-08-05.
+    [Archived 2026-08-09](https://web.archive.org/web/20260809115503/https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/index.html)
+21. FDA CORE advisory, Investigation of 15-State Outbreak of Cyclospora Illnesses: Iceberg Lettuce
+    (July 2026), current as of 2026-08-05.
+    [Archived 2026-08-09](https://web.archive.org/web/20260809122830/https://www.fda.gov/food/outbreaks-foodborne-illness/investigation-15-state-outbreak-cyclospora-illnesses-iceberg-lettuce-july-2026)
+    The live URL has been rewritten as the state count grew, so the snapshot is what the figures
+    quoted here refer to.
+22. UK Health Security Agency, Sharp rise in cyclospora infections linked to Mexico travel,
+    2026-07-30.
+    [Archived 2026-08-07](https://web.archive.org/web/20260807111111/https://www.gov.uk/government/news/sharp-rise-in-cyclospora-infections-linked-to-mexico-travel)
+23. Janies D, _et al._ (2026) A map of the historical spread of _Cyclospora cayetanensis_ with a
+    focus on the USA. medRxiv, posted 2026-08-03.
+    doi:[10.64898/2026.08.01.26359445](https://doi.org/10.64898/2026.08.01.26359445) ·
+    Europe PMC PPR1291175. Note the openRxiv `10.64898` prefix—the `10.1101` form of this DOI
+    does not resolve.
+24. NCBI Assembly `GCF_002999335.1` (CcayRef3), the _C. cayetanensis_ reference genome, and its
+    BioSample `SAMN08618443`, which states: "This Biosample consists of two strains of
+    C.cayetanensis. Sequence reads from the two strains have been combined to create the Reference
+    Genome Assembly." [www.ncbi.nlm.nih.gov/biosample/SAMN08618443](https://www.ncbi.nlm.nih.gov/biosample/SAMN08618443)
+25. Leonard SR, Mammel MK, Gharizadeh B, _et al._ (2023) Development of a targeted amplicon
+    sequencing method for genotyping _Cyclospora cayetanensis_ from fresh produce and clinical
+    samples with enhanced genomic resolution and sensitivity. _Frontiers in Microbiology_ 14:1212863.
+    doi:[10.3389/fmicb.2023.1212863](https://doi.org/10.3389/fmicb.2023.1212863) · [PMID 37396378](https://pubmed.ncbi.nlm.nih.gov/37396378/)
+26. Leonard SR, Mammel MK, Almeria S, _et al._ (2024) Evaluation of the increased genetic
+    resolution and utility for source tracking of a recently developed method for genotyping
+    _Cyclospora cayetanensis_. _Microorganisms_ 12:848.
+    doi:[10.3390/microorganisms12050848](https://doi.org/10.3390/microorganisms12050848) ·
+    [PMID 38792677](https://pubmed.ncbi.nlm.nih.gov/38792677/)
+27. NCBI BioProject `PRJNA1130490`, "Cyclospora genotyping expanded panel" (CDC), whose
+    description states that it "contains NGS data generated by CDC and the U.S. Food and Drug
+    Administration (FDA) using an expanded Cyclospora genotyping panel comprising 63 genetic markers
+    spread throughout the Cyclospora genome."
+    [www.ncbi.nlm.nih.gov/bioproject/PRJNA1130490](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1130490)
+28. UCSC BRC assembly hub list, the upstream source BRC Analytics builds its catalog against.
+    It contains 31 _C. cayetanensis_ assemblies, the same 31 BRC serves, and does not contain
+    `GCA_020976615.1`. [hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json](https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json)
+29. CDC, Investigation Update: Cyclospora Outbreak, July 2026, published 2026-07-16, updated
+    2026-08-05. Its "Traceback and laboratory data" section names no genotyping method.
+    [Archived 2026-08-08](https://web.archive.org/web/20260808084325/https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/investigation.html)
+30. CDC, Cyclosporiasis Outbreaks and Investigations (index page), updated 2026-08-05.
+    [Archived 2026-08-07](https://web.archive.org/web/20260807151214/https://www.cdc.gov/cyclosporiasis/outbreaks/)
+31. FDA CORE Network, Investigations of Foodborne Illness Outbreaks (tracking table). It lists
+    seven distinct _Cyclospora_ incidents for 2026, only one of which has a public CDC outbreak
+    notice.
+    [Archived 2026-08-09](https://web.archive.org/web/20260809220802/https://www.fda.gov/food/outbreaks-foodborne-illness/investigations-foodborne-illness-outbreaks)
+32. Brown C (2026) Cyclosporiasis: as "explosive diarrhoea" sweeps US, what's behind the outbreak
+    and what is Trump's role? _BMJ_, 2026-07-17.
+    doi:[10.1136/bmj-2026-100317](https://doi.org/10.1136/bmj-2026-100317) ·
+    [PMID 42468983](https://pubmed.ncbi.nlm.nih.gov/42468983/)
+33. Wise J (2026) Cyclosporiasis: should people avoid fruit and vegetables? _BMJ_, 2026-07-20.
+    doi:[10.1136/bmj-2026-100324](https://doi.org/10.1136/bmj-2026-100324) ·
+    [PMID 42476611](https://pubmed.ncbi.nlm.nih.gov/42476611/)
+34. O'Dowd A (2026) Cyclosporiasis: "explosive diarrhoea" spreads to UK in outbreak linked to
+    Mexico. _BMJ_, 2026-07-31.
+    doi:[10.1136/bmj-2026-100462](https://doi.org/10.1136/bmj-2026-100462) ·
+    [PMID 42538041](https://pubmed.ncbi.nlm.nih.gov/42538041/)
+35. Linder KA, Malani PN (2026) What is cyclosporiasis? _JAMA_ Patient Page, 2026-07-21.
+    doi:[10.1001/jama.2026.14866](https://doi.org/10.1001/jama.2026.14866) ·
+    [PMID 42479478](https://pubmed.ncbi.nlm.nih.gov/42479478/)
+
+_Data: BioProject `PRJNA578931` [14]. Labels, panel references and BED from CDC's public typing
+workflow repository [10]. Deposited haplotype calls from [13]. Genomes and annotation via the
+BRC Analytics organism page [15]. Every number in this post was pulled live on 2026-08-11 and can
+be re-derived from public sources._

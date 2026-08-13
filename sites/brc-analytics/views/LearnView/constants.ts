@@ -1,4 +1,5 @@
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
+import { ArticleIcon } from "@repo/shared/components/CustomIcon/components/ArticleIcon/articleIcon";
 import { BookmarkStarIcon } from "@repo/shared/components/CustomIcon/components/BookmarkStarIcon/bookmarkStarIcon";
 import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/LiveHelpIcon/liveHelpIcon";
@@ -36,6 +37,13 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Explore real-world research examples demonstrating BRC Analytics workflows.",
     title: "Featured Analyses",
+  },
+  {
+    StartIcon: ArticleIcon,
+    href: "/learn/blog",
+    secondaryText:
+      "Follow ongoing work in progress: methods, datasets and results as they develop.",
+    title: "Blog",
   },
   {
     StartIcon: LiveHelpIcon,
