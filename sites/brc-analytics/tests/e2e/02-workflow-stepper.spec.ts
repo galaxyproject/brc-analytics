@@ -302,9 +302,15 @@ test.describe("Stale workflow URL", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Workflow not found" })
     ).toBeVisible();
+    // The back-link target is the one thing each page configures — pin it.
     await expect(
       page.getByRole("link", { name: "View Available Workflows" })
-    ).toBeVisible();
+    ).toHaveAttribute(
+      "href",
+      replaceParameters(ROUTES.ANALYZE_WORKFLOWS, {
+        entityId: ASSEMBLY_ENTITY_ID,
+      })
+    );
   });
 
   test("should render the workflow not-found state for an unknown organism trsId", async ({
@@ -321,5 +327,11 @@ test.describe("Stale workflow URL", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Workflow not found" })
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "View Available Workflows" })
+    ).toHaveAttribute(
+      "href",
+      replaceParameters(ROUTES.ORGANISM, { entityId: ORGANISM_ENTITY_ID })
+    );
   });
 });
