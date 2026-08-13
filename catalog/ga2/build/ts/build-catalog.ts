@@ -3,7 +3,6 @@ import fsp from "fs/promises";
 import {
   GA2AssemblyEntity,
   ImageData,
-  SRAData,
 } from "../../../../sites/ga2/apis/assembly";
 import { GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
 import { getAssemblyId, getOrganismId } from "../../../../sites/ga2/apis/utils";
@@ -27,16 +26,13 @@ import {
   saveJson,
   verifyUniqueIds,
 } from "../../../build/ts/utils";
-import { SOURCE_GENOME_KEYS, SOURCE_RAWDATA_KEYS } from "./constants";
-import { SourceGenome, SourceRawData } from "./entities";
+import { SOURCE_GENOME_KEYS } from "./constants";
+import { SourceGenome } from "./entities";
 
 const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
-
-const SOURCE_PATH_RAWDATA =
-  "catalog/ga2/build/intermediate/primary-data-ncbi.tsv";
 
 const MISSING_IMAGE_MARKER = "missing_image";
 
@@ -74,8 +70,7 @@ function resolveOrganismImageUrl(path: string): string | null {
 }
 
 async function buildCatalog(): Promise<void> {
-  const sraData = await buildSraData();
-  const genomes = await buildAssemblies(sraData);
+  const genomes = await buildAssemblies();
   const organisms = buildOrganisms(genomes);
 
   console.log("Assemblies:", genomes.length);
@@ -119,33 +114,7 @@ async function buildCatalog(): Promise<void> {
   console.log("Done");
 }
 
-async function buildSraData(): Promise<SRAData[]> {
-  const rawddataRows = await readValuesFile<SourceRawData>(
-    SOURCE_PATH_RAWDATA,
-    undefined,
-    SOURCE_RAWDATA_KEYS
-  );
-  return rawddataRows.map(
-    (row): SRAData => ({
-      accession: row.accession,
-      biosample: row.biosample,
-      instrument: row.instrument,
-      library_layout: row.library_layout,
-      library_source: row.library_source,
-      library_strategy: row.library_strategy,
-      platform: row.platform,
-      run_total_bases: parseNumberOrNull(row.run_total_bases),
-      sra_run_acc: row.sra_run_acc,
-      sra_sample_acc: row.sra_sample_acc,
-      sra_study_acc: row.sra_study_acc,
-      total_bases: parseNumberOrNull(row.total_bases),
-    })
-  );
-}
-
-async function buildAssemblies(
-  sraData: SRAData[]
-): Promise<GA2AssemblyEntity[]> {
+async function buildAssemblies(): Promise<GA2AssemblyEntity[]> {
   const sourceRows = await readValuesFile<SourceGenome>(
     SOURCE_PATH_GENOMES,
     undefined,
@@ -189,7 +158,6 @@ async function buildAssemblies(
       scaffoldL50: parseNumberOrNull(row.scaffoldL50),
       scaffoldN50: parseNumberOrNull(row.scaffoldN50),
       speciesTaxonomyId: row.speciesTaxonomyId,
-      sra_data: sraData.filter((rawRow) => rawRow.accession === row.accession),
       strainName: parseStringOrNull(row.strain),
       taxonomicGroup: parseList(row.taxonomicGroup),
       taxonomicLevelClass: defaultStringToNone(row.taxonomicLevelClass),
