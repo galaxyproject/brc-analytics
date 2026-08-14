@@ -2,7 +2,11 @@ import { config } from "@brc/config/config";
 import { BRC_PAGE_META } from "@brc/meta/constants";
 import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
+import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import type {
   EntityPageParams,
@@ -34,11 +38,21 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   return (
     <EntityDataGate>
       {trsId ? (
-        <WorkflowInputsView
-          entityId={entityId}
-          organismBuilder={buildBRCOrganismDetails}
+        <WorkflowGate
+          fallback={
+            <WorkflowNotFound
+              entityContext="assembly"
+              href={replaceParameters(ROUTES.ANALYZE_WORKFLOWS, { entityId })}
+            />
+          }
           trsId={trsId}
-        />
+        >
+          <WorkflowInputsView
+            entityId={entityId}
+            organismBuilder={buildBRCOrganismDetails}
+            trsId={trsId}
+          />
+        </WorkflowGate>
       ) : (
         <AnalyzeWorkflowsView SideComponent={BRCSide} entityId={entityId} />
       )}

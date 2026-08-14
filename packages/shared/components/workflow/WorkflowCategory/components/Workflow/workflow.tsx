@@ -2,11 +2,10 @@ import { REL_ATTRIBUTE } from "@databiosphere/findable-ui/lib/components/Links/c
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Button, Grid, Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@repo/shared/components/workflow/WorkflowCategory/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { formatTrsId } from "@repo/shared/workflow/utils";
+import { buildConfigureWorkflowUrl } from "@repo/shared/routes/utils";
 import Link from "next/link";
 import { Fragment, type JSX } from "react";
 import { GRID_PROPS } from "./constants";
@@ -53,10 +52,11 @@ export const Workflow = ({
             color={BUTTON_PROPS.COLOR.PRIMARY}
             component={Link}
             disabled={!workflow.trsId}
-            href={replaceParameters(configureRoute, {
+            href={buildConfigureWorkflowUrl(
+              configureRoute,
               entityId,
-              trsId: formatTrsId(workflow.trsId),
-            })}
+              workflow.trsId
+            )}
             rel={REL_ATTRIBUTE.NO_OPENER}
             variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >

@@ -17,6 +17,15 @@ export function findOrganism<T extends OrganismContract>(
 }
 
 /**
+ * Finds a workflow by TRS id, returning undefined when there is no match.
+ * @param trsId - TRS id.
+ * @returns Workflow, or undefined when not found.
+ */
+export function findWorkflow(trsId: string): Workflow | undefined {
+  return findEntity<Workflow>("workflows", trsId);
+}
+
+/**
  * Gets assemblies.
  * @returns Assemblies.
  */

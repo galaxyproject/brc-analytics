@@ -6,7 +6,7 @@ breadcrumbs:
     text: "Blog"
 contentType: "ARTICLE"
 date: "2026-08-12"
-description: ""
+description: "A data-driven assessment of current Cyclospora cayetanensis genotyping practices — examining the CDC eight-marker panel, 9,016 public amplicon runs, and the gaps between published methods and public data."
 title: "Genotyping Cyclospora: assessing current practices"
 ---
 
@@ -92,7 +92,7 @@ annotated, and the median one is in 1,391 pieces.
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/genome_quality.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/genome-quality.svg"
 />
 
 Named points on that distribution, with three other apicomplexan references for scale:
@@ -138,7 +138,7 @@ support the assumption that the larger panel simply resolves more.
 
 In the series of analyses detailed in this blog we will concentrate on the CDC's eight-marker
 panel because it is published, well defined, and widely used: (1) 8,522 of the 9,016 public
-amplicon runs used it, against 494 for the other two, (2) its reference sequences, haplotype-calling coordinates and caller are all released [10], while
+amplicon runs used it, against 494 across the other three schemes, (2) its reference sequences, haplotype-calling coordinates and caller are all released [10], while
 the 63-marker coordinates are not, (3) it is the only one of the three with a published set of
 outbreak cluster labels to score a pipeline against [10], and (4) three groups ran it—CDC, the
 Public Health Agency of Canada, and FDA on irrigation water—so cross-laboratory comparison is
@@ -172,7 +172,7 @@ The four short nuclear CDS markers, two PARTs each:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_CDS1.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds1.svg"
 />
 
 <Figure
@@ -184,7 +184,7 @@ The four short nuclear CDS markers, two PARTs each:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_CDS4.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds4.svg"
 />
 
 <Figure
@@ -196,7 +196,7 @@ The four short nuclear CDS markers, two PARTs each:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_CDS3.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds3.svg"
 />
 
 <Figure
@@ -208,23 +208,23 @@ The four short nuclear CDS markers, two PARTs each:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_CDS2.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-cds2.svg"
 />
 
-The two long nuclear markers, which carry most of the panel's discriminating power—15 and
-20 SNPs respectively [11]:
+The two long nuclear markers, which carry most of the panel's discriminating power—16 and
+20 SNPs respectively (see [`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv); [11] reported 15 for `Nu_378`):
 
 <Figure
   alt="Nu_378 amplicon at base resolution, showing primer footprints and PART haplotype-calling windows"
   caption={
     <figcaption>
       <span>
-        Figure 6. Marker <code>Nu_378</code>, which carries 15 of the panel's
+        Figure 6. Marker <code>Nu_378</code>, which carries 16 of the panel's
         SNPs.
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_378.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-378.svg"
 />
 
 <Figure
@@ -237,7 +237,7 @@ The two long nuclear markers, which carry most of the panel's discriminating pow
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Nu_360i2.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-nu-360i2.svg"
 />
 
 And the mitochondrial rRNA marker, the deepest-sequenced of the eight:
@@ -252,14 +252,14 @@ And the mitochondrial rRNA marker, the deepest-sequenced of the eight:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Mt_MSR.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-mt-msr.svg"
 />
 
 The gold letters stacked beneath each site are the **alternative bases** seen there. Most sites
 are
-biallelic. A few carry three. The full list—marker, PART, amplicon and PART-local coordinate,
+biallelic. One site carries three. The full list—marker, PART, amplicon and PART-local coordinate,
 reference base and observed alleles—is in
-[`data/haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv).
+[`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv).
 
 The eighth marker is not typed by
 alignment. This is `Cmt214.A`, the longest of the twenty junction references:
@@ -275,7 +275,7 @@ alignment. This is `Cmt214.A`, the longest of the twenty junction references:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker_Mt_Junction_Cmt214.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/marker-mt-junction-cmt214.svg"
 />
 
 `Cmt214.A` is 214 bp: a 64 bp 5' flank, six 15 nt repeat units spanning positions 65 to 154, and
@@ -297,7 +297,7 @@ All twenty references, to scale:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/junction_panel.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/junction-panel.svg"
 />
 
 ### The sequencing data, and how much of it used this panel
@@ -341,7 +341,8 @@ cyclosporiasis peaks May to August and each collection year is one outbreak seas
 | --------------- | ----- | ---- | ---- | ---- | ---- | ----- | ----- | ---- |
 | specimens       | 1,039 | 797  | 987  | 720  | 956  | 1,605 | 1,316 | 896  |
 
-The table stops at 2025. **No public sequencing run
+The table sums to 8,316; the remaining 9 of 8,325 runs have sample names that match neither
+parsing scheme and are excluded. The table stops at 2025. **No public sequencing run
 of any kind carries a 2026 collection date.** Searching PubMed, Europe PMC, Crossref, medRxiv and
 bioRxiv alongside the NCBI and ENA archives on 2026-08-11 returned thirteen items concerning the
 2026 outbreak: eight agency notices [18, 19, 20, 21, 22, 29, 30, 31], three BMJ news pieces
@@ -416,7 +417,7 @@ own calls, it looks like this:
       </span>
     </figcaption>
   }
-  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/expected_truth.svg"
+  src="/learn/blog/genotyping-cyclospora-assessing-current-practices/expected-truth.svg"
 />
 
 Each box is one specimen × one named haplotype. Columns are grouped into the eight loci and
@@ -440,7 +441,7 @@ concordance is reported against those 153 rather than as a general accuracy figu
 203 will show whether the absent specimens failed CDC's five-of-eight amplification criterion,
 which is the likeliest reason they are missing.
 
-The median specimen carries **27 haplotype calls** for Vendor A and 24 for Vendor B, across a
+The median specimen carries **26.5 haplotype calls** for Vendor A and 24 for Vendor B, across a
 median of 7 and 6 of the 8 loci respectively. Note how much grey there is: locus dropout is
 routine, not exceptional.
 
@@ -536,8 +537,8 @@ time rather than from a local copy, and the queries and procedures are described
 
 **The sequencing landscape.** Run counts, library strategies, base counts and release dates come
 from an NCBI `esearch` on `Cyclospora[Organism]` in the `sra` database, fetched as `runinfo` via
-an eutils history handle, cross-checked against the ENA Portal API for the same taxon
-. ENA returns 8,211 runs against NCBI's
+an eutils history handle, cross-checked against the ENA Portal API for the same taxon.
+ENA returns 8,211 runs against NCBI's
 9,054, and we reconciled that gap accession by accession rather than picking the larger number.
 Every ENA run is present in NCBI—the ENA-only set is empty—so ENA is a strict subset and the
 843-run difference is mirroring lag, accounted for by `PRJNA578931` (690),
@@ -556,12 +557,12 @@ as unknown rather than guessed. This is also how the year-by-year counts in the 
 produced.
 
 **Which datasets used which panel.** From the `Gene Targets` / `gene_targets` attribute on the
-BioSample records themselves, fetched with `efetch db=biosample` in batches of 100
-(the full map is in `data/cdc_biosample_alias.tsv`). The
+BioSample records themselves, fetched with `efetch db=biosample` in batches of 100.
+The
 free-text method description on the FDA water samples was read directly from those records.
 
 **What is not published about the 63-marker panel.** This is a negative claim, so here is the
-extent of it. The run count is ENA's, which returns 348 read runs for `PRJNA1130490`. The
+extent of it. The run count is NCBI's: 348 read runs for `PRJNA1130490`. The
 BioProject record carries no linked publication. Europe PMC full-text search returns zero results
 for `"63 markers" AND Cyclospora`, zero for `"63 genetic markers" AND Cyclospora`, and zero for
 the accession `PRJNA1130490` anywhere in full text, and none of the 23 indexed _Cyclospora_
@@ -594,14 +595,12 @@ PARTs are the primer-free interior of each amplicon.
 
 **Haplotype-defining sites.** For each PART, the named haplotypes were compared column by column
 and every position where they differ recorded, together with the alleles observed there
-(output in [`data/haplotype_sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/haplotype_sites.tsv)). PARTs with a single
+(output in [`haplotype-sites.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/haplotype-sites.tsv)). PARTs with a single
 named haplotype, or whose haplotypes differ in length, are excluded from this count rather than
 aligned.
 
 **The expected-truth barcode.** Built by joining CDC's deposited haplotype sheet to the manifest
-on the normalised specimen identifier (output in [`data/expected_truth.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/data/expected_truth.tsv)). The counts of how many published calls fall inside or outside the
-Feb-2020 reference set were computed by testing each positive call in the sheet against the names
-in that reference file.
+on the normalised specimen identifier (output in [`expected-truth.tsv`](/learn/blog/genotyping-cyclospora-assessing-current-practices/expected-truth.tsv)).
 
 ## Sources
 
