@@ -29,7 +29,7 @@ University, University Park, PA, USA\
 
 Everything here uses the benchmark defined in Part 1: **203 clinical specimens from
 BioProject `PRJNA578931` [19], labelled by two epidemiologically-defined 2018 outbreaks**—Vendor A
-(salads, 99 specimens) and Vendor B (vegetable trays, 104)—taken from
+(salads, 99 specimens) and Vendor B (vegetable trays, 104) [4]—taken from
 `REFERENCE_CLUSTER_LIST/2018_gold_clusters.txt` in CDC's typing repository [6]. Those labels come
 from food-exposure investigation and are independent of any sequence data. **153 of the 203** appear
 in CDC's deposited haplotype sheet [8], 98 Vendor A and 55 Vendor B, and that is the set most
@@ -305,7 +305,7 @@ The returned value is the expected number of shared strains,
 `0×0.055 + 1×0.903 + 2×0.042 =` **0.99**, which `run.r` flips to `2 − 0.99 =` **1.01** so larger
 means further apart.
 
-**The ensemble** is not the 50/50 average of two rank matrices the audit documents describe. `run.r`
+**The ensemble** [2] is not the 50/50 average of two rank matrices the audit documents describe. `run.r`
 line 32 computes `D = sort(Bayesian_norm)[rank(Heuristic_norm, ties.method = "random")]` — the
 sorted Bayesian _values_ re-indexed by the heuristic's rank order — then averages `D` with the
 normalised heuristic matrix. The Bayesian contributes its spread of values; its ordering, the part
@@ -348,7 +348,7 @@ reversed. CDC has since reported using the heuristic alone in place of this ense
 `MODULE_3_clustering.sh` runs `CLUSTER_FINDER.R` [6]. It calls
 [`agnes(D, diss = TRUE, method = "ward")`](https://cran.r-project.org/package=cluster), which on a
 supplied dissimilarity matrix is plain **Ward linkage** [14] — the same method the replacement uses,
-worked through on five real specimens in [Ward's linkage](#wards-linkage) below. It converts the
+worked through on five real specimens in [Ward's linkage](#step-5-deterministic-ward-hierarchical-clustering) below. It converts the
 result to an [`hclust`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/hclust.html) object
 and cuts it.
 
@@ -437,7 +437,7 @@ with the statistics behind it and what it achieves.
 ### Why PyEuk
 
 PyEuk [10] reimplements the distance and clustering steps in Python. It is Apache-2.0, installs with `pip`,
-requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, scikit-learn, and Numba).
+requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, and scikit-learn); Numba is an optional accelerator, not a requirement.
 
 The two pipelines do the same job in the same order. What differs is the implementation of each stage:
 
@@ -523,7 +523,7 @@ The index `k` runs strictly over columns in locus groups typed in **both** speci
 
 - **Resolving the Multiplicity of Infection (MOI) Paradox:** _Cyclospora_ infections often contain multiple distinct parasite strains within a single patient. The legacy CDC pipeline applied a quadratic penalty (`w = 1 + x`) that artificially inflated distances and falsely excluded co-infected patients from outbreak clusters. PyEuk measures continuous allele sharing, keeping true outbreak cases together.
 - **Pairwise-Complete vs. Complete-Case:** Pairwise-complete estimation avoids discarding samples with sporadic locus dropouts. Pairs with no shared loci default to zero distance.
-- **Performance Acceleration:** The vectorized Numba/C-accelerated pairwise distance kernel evaluates 580,000 pairwise comparisons across the cohort in under **50 milliseconds**.
+- **Performance Acceleration:** The distance kernel is pure vectorized NumPy broadcasting, with Numba JIT as an optional accelerator, so it carries no external C-compiler or ABI dependency. It evaluates the cohort's 10,296 pairwise comparisons (144 specimens) in under **50 milliseconds**.
 
 ### Step 4: Euclidean metric guarantee & positive semi-definite (PSD) repair
 
@@ -834,18 +834,16 @@ independently reproduced here, it is not quoted at all.
     [PMID 7063747](https://pubmed.ncbi.nlm.nih.gov/7063747/)
 19. NCBI BioProject `PRJNA578931`, _Cyclospora_ Genotyping (CDC).
     [www.ncbi.nlm.nih.gov/bioproject/PRJNA578931](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA578931)
+20. Shah N, Nute MG, Warnow T, Pop M (2019) Misunderstood parameter of NCBI BLAST impacts the
+    correctness of bioinformatics workflows. _Bioinformatics_ 35(9):1613–1614.
+    [doi.org/10.1093/bioinformatics/bty833](https://doi.org/10.1093/bioinformatics/bty833)
+21. Reference files for _Cyclospora cayetanensis_ amplicon genotyping (CDC 8-marker panel):
+    `markers.fa`, `parts.bed`, `haplotypes78.fa` and `junction.fa`, redeposited unmodified from
+    CDC's release with checksums and provenance. Zenodo, CC0.
+    [doi.org/10.5281/zenodo.21924355](https://doi.org/10.5281/zenodo.21924355)
 
 _Data: BioProject `PRJNA578931` [19]. Labels, module source, reference sequences and the published
 1,078-specimen distance matrix from CDC's typing workflow repository [6]. Deposited haplotype calls
 from [8]. The reimplementation under examination and the review thread are [10] and [11]. Every
 measurement in this post was made on the 153- and 203-specimen sets described in Part 1 and can be
 re-derived from those artifacts._
-
-20. Shah N, Nute MG, Warnow T, Pop M (2019) Misunderstood parameter of NCBI BLAST impacts the
-    correctness of bioinformatics workflows. _Bioinformatics_ 35(9):1613–1614.
-    [doi.org/10.1093/bioinformatics/bty833](https://doi.org/10.1093/bioinformatics/bty833)
-
-21. Reference files for _Cyclospora cayetanensis_ amplicon genotyping (CDC 8-marker panel):
-    `markers.fa`, `parts.bed`, `haplotypes78.fa` and `junction.fa`, redeposited unmodified from
-    CDC's release with checksums and provenance. Zenodo, CC0.
-    [doi.org/10.5281/zenodo.21924355](https://doi.org/10.5281/zenodo.21924355)
