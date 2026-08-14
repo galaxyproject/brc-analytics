@@ -33,3 +33,7 @@ venv
 
 # vendored boundary geometry -- must stay byte-identical to world-atlas 2.0.2
 /sites/brc-analytics/public/geo/countries-110m.json
+
+# published slide decks -- self-contained HTML served verbatim from public/.
+# Reformatting them would rewrite authored markup we do not maintain here.
+/sites/*/public/presentations
