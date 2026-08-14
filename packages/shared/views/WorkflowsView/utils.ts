@@ -7,6 +7,7 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
+import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
@@ -51,7 +52,7 @@ function getCommonNames(assembly: AssemblyContract | undefined): string[] {
 function getTaxonomicLevelRealm(
   assembly: AssemblyContract | undefined
 ): string {
-  return assembly?.taxonomicLevelRealm ?? "Any";
+  return assembly?.taxonomicLevelRealm ?? TAXON_ANY;
 }
 
 /**
@@ -131,7 +132,7 @@ export function getWorkflows(
         ),
         category: category.name,
         scope: String(workflow.scope),
-        taxonomyId: workflow.taxonomyId ?? "Any",
+        taxonomyId: workflow.taxonomyId ?? TAXON_ANY,
       } as WorkflowEntity);
     }
   }
@@ -200,14 +201,14 @@ function indexAssemblyByTaxonomyId(
 function mapAssembly(assembly: AssemblyContract | undefined): WorkflowAssembly {
   return {
     commonNames: getCommonNames(assembly),
-    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Any",
-    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? "Any",
-    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? "Any",
-    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? "Any",
-    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? "Any",
-    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? "Any",
-    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? "Any",
+    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? TAXON_ANY,
+    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? TAXON_ANY,
+    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? TAXON_ANY,
+    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? TAXON_ANY,
+    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? TAXON_ANY,
+    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? TAXON_ANY,
+    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? TAXON_ANY,
     taxonomicLevelRealm: getTaxonomicLevelRealm(assembly),
-    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? "Any",
+    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? TAXON_ANY,
   };
 }

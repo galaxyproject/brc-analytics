@@ -1,3 +1,4 @@
+import { renderWorkflowSpecies } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type ColumnDef } from "@tanstack/react-table";
 import { CATEGORY_CONFIG } from "./categoryGroupConfig";
 import { type WorkflowEntity } from "./types";
@@ -88,6 +89,7 @@ const TAXONOMIC_LEVEL_REALM: ColumnDef<WorkflowEntity> = {
 
 const TAXONOMIC_LEVEL_SPECIES: ColumnDef<WorkflowEntity> = {
   accessorKey: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.key,
+  cell: renderWorkflowSpecies,
   filterFn: "arrIncludesSome",
   header: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.label,
   id: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.key,

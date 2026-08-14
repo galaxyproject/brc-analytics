@@ -78,6 +78,16 @@ import slugify from "slugify";
 import { getPriorityColor, getPriorityLabel } from "./priority";
 
 /**
+ * Priority-pathogen taxonName ranks (per its taxonNameField discriminator)
+ * that are genus-and-below and therefore italicized as scientific names;
+ * family/order names and free-form descriptors stay roman.
+ */
+const ITALIC_TAXON_NAME_FIELDS = new Set([
+  "taxonomicLevelGenus",
+  "taxonomicLevelSpecies",
+]);
+
+/**
  * Build props for the common names cell.
  * @param entity - Organism or genome entity.
  * @returns Props for the NTagCell component.
@@ -389,6 +399,15 @@ export const buildPriorityPathogenDetails = (
       variant={CHIP_PROPS.VARIANT.STATUS}
     />
   );
+  // Italics apply to genus-and-below taxon names only; taxonNameField carries
+  // the name's rank, so family/order names and descriptors stay roman.
+  const taxonLabel = ITALIC_TAXON_NAME_FIELDS.has(
+    priorityPathogen.taxonNameField ?? ""
+  ) ? (
+    <ScientificName>{priorityPathogen.taxonName}</ScientificName>
+  ) : (
+    priorityPathogen.taxonName
+  );
   [
     ["Organisms", ROUTES.ORGANISMS],
     ["Assemblies", ROUTES.GENOMES],
@@ -401,7 +420,7 @@ export const buildPriorityPathogenDetails = (
           pathname
         )}
       >
-        <ScientificName>{priorityPathogen.taxonName}</ScientificName>
+        {taxonLabel}
       </AppLink>
     );
   });
@@ -462,6 +481,8 @@ export const buildOrganismHero = (
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
+    // Deliberately not italicized: at hero scale the scientific-name italic
+    // reads as styling rather than nomenclature (body-scale renders keep it).
     title: organism.taxonomicLevelSpecies,
   };
 };

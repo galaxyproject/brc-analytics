@@ -59,6 +59,8 @@ export const buildOrganismHero = (
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
     subTitle: groupTag ? <TagList tags={[groupTag]} /> : undefined,
+    // Deliberately not italicized: at hero scale the scientific-name italic
+    // reads as styling rather than nomenclature (body-scale renders keep it).
     title: entity.taxonomicLevelSpecies,
   };
 };

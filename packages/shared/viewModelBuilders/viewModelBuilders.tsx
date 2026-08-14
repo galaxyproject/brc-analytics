@@ -30,8 +30,9 @@ import { type Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { type AnalysisPortals } from "@repo/shared/views/EntityView/assembly/components/Side/AnalysisPortals/analysisPortals";
+import { type CellContext } from "@tanstack/react-table";
 import { parseISO } from "date-fns";
-import type { ComponentProps } from "react";
+import { type ComponentProps, type ReactNode } from "react";
 import {
   ENTITY_DETAIL_LABEL,
   GALAXY_DATACACHE,
@@ -40,6 +41,7 @@ import {
   NCBI_DATASETS_URL,
   NCBI_TAXONOMY,
   SPECIES_TAG_LABEL,
+  TAXON_ANY,
 } from "./constants";
 
 /**
@@ -635,4 +637,18 @@ export function getGenomeStrainText(
   if (entity.taxonomicLevelStrain !== "None")
     return entity.taxonomicLevelStrain;
   return defaultValue;
+}
+
+/**
+ * Renders a workflows-table species cell as a scientific name, keeping the
+ * "Any" applicability sentinel roman.
+ * @param ctx - Cell context.
+ * @returns Species cell content.
+ */
+export function renderWorkflowSpecies<T>(
+  ctx: CellContext<T, unknown>
+): ReactNode {
+  const value = ctx.getValue<string | undefined>();
+  if (!value || value === TAXON_ANY) return value ?? null;
+  return <ScientificName>{value}</ScientificName>;
 }
