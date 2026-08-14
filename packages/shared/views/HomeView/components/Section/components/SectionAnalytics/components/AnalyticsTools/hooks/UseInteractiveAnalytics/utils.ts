@@ -24,5 +24,7 @@ export function rotateCards(
   if (!swipeEnabled) {
     return cards;
   }
-  return [...cards.slice(activeIndex), ...cards.slice(0, activeIndex)];
+  // Normalize so an out-of-range index wraps like the rotation it represents.
+  const offset = cards.length ? activeIndex % cards.length : 0;
+  return [...cards.slice(offset), ...cards.slice(0, offset)];
 }
