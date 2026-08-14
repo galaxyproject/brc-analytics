@@ -39,7 +39,7 @@ numbers below are computed on. Every denominator is stated, because they differ.
 
 The published workflow consists of three modules [6] executed sequentially.
 
-### Module 1—Consumes sequences reads and produces a haplotype list
+### Module 1—Consumes sequence reads and produces a haplotype list
 
 `MODULE_1_hap_caller.sh` turns paired FASTQ into presence calls, one specimen at a time [6]:
 
@@ -437,7 +437,7 @@ with the statistics behind it and what it achieves.
 ### Why PyEuk
 
 PyEuk [10] reimplements the distance and clustering steps in Python. It is Apache-2.0, installs with `pip`,
-requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, and scikit-learn).
+requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, scikit-learn, and Numba).
 
 The two pipelines do the same job in the same order. What differs is the implementation of each stage:
 
