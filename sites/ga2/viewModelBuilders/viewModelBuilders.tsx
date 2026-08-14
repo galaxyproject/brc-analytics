@@ -59,7 +59,7 @@ export const buildOrganismHero = (
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
     subTitle: groupTag ? <TagList tags={[groupTag]} /> : undefined,
-    title: <ScientificName>{entity.taxonomicLevelSpecies}</ScientificName>,
+    title: entity.taxonomicLevelSpecies,
   };
 };
 

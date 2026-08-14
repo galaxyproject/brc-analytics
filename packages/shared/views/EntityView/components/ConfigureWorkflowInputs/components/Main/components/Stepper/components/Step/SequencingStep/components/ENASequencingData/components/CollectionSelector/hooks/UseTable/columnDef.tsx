@@ -1,5 +1,6 @@
 import { COLUMN_DEF } from "@databiosphere/findable-ui/lib/components/Table/common/columnDef";
 import { LinkCell } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/LinkCell/linkCell";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { BasicCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/components/TableCell/components/BasicCell/basicCell";
 import { type ReadRun } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
@@ -136,6 +137,7 @@ const SAMPLE_ACCESSION: ColumnDef<ReadRun> = {
 const SCIENTIFIC_NAME: ColumnDef<ReadRun> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.SCIENTIFIC_NAME.key,
+  cell: (ctx) => <ScientificName>{ctx.getValue<string>()}</ScientificName>,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.SCIENTIFIC_NAME.label,
   meta: META,

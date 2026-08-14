@@ -1,3 +1,4 @@
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import {
   buildNTagProps,
   renderNTagCell,
@@ -190,6 +191,7 @@ const TAXONOMIC_LEVEL_SEROTYPE: ColumnDef<Assembly> = {
 const TAXONOMIC_LEVEL_SPECIES: ColumnDef<Assembly> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.key,
+  cell: (ctx) => <ScientificName>{ctx.getValue<string>()}</ScientificName>,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.label,
   id: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.key,
