@@ -8,6 +8,7 @@ import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { type OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
 import { type Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
@@ -58,7 +59,7 @@ export const buildOrganismHero = (
       { path: "", text: entity.taxonomicLevelSpecies },
     ],
     subTitle: groupTag ? <TagList tags={[groupTag]} /> : undefined,
-    title: entity.taxonomicLevelSpecies,
+    title: <ScientificName>{entity.taxonomicLevelSpecies}</ScientificName>,
   };
 };
 
@@ -306,7 +307,7 @@ export const buildOrganismSpecies = (
   entity: GA2OrganismEntity
 ): ComponentProps<typeof Link> => {
   return {
-    label: entity.taxonomicLevelSpecies,
+    label: <ScientificName>{entity.taxonomicLevelSpecies}</ScientificName>,
     url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.ncbiTaxonomyId)}`,
   };
 };
@@ -330,7 +331,7 @@ export const buildAssemblySpecies = (
   return {
     ncbiTaxonomyId: entity.ncbiTaxonomyId,
     species: {
-      label: entity.taxonomicLevelSpecies,
+      label: <ScientificName>{entity.taxonomicLevelSpecies}</ScientificName>,
       url: `${ROUTES.ORGANISMS}/${sanitizeEntityId(entity.speciesTaxonomyId)}`,
     },
     tags,

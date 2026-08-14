@@ -18,6 +18,7 @@ import type {
 } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { CopyText } from "@repo/shared/components/CopyText/copyText";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { type AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import {
   LEVEL_FILLED_COUNT,
@@ -358,7 +359,7 @@ export const buildOrganismDetails = (
   keyValuePairs.set(
     ENTITY_DETAIL_LABEL.TAXONOMIC_LEVEL_SPECIES,
     <Link
-      label={taxonomicLevelSpecies}
+      label={<ScientificName>{taxonomicLevelSpecies}</ScientificName>}
       url={`${ROUTES.ORGANISMS}/${encodeURIComponent(sanitizeEntityId(ncbiTaxonomyId))}`}
     />
   );

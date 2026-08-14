@@ -25,6 +25,7 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { Chip } from "@mui/material";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
@@ -120,7 +121,7 @@ export const buildGenomeSpecies = (
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
     species: {
-      label: genome.taxonomicLevelSpecies,
+      label: <ScientificName>{genome.taxonomicLevelSpecies}</ScientificName>,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     },
     tags,
@@ -225,7 +226,7 @@ export const buildOrganismTaxonomicLevelSpecies = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof Link> => {
   return {
-    label: organism.taxonomicLevelSpecies,
+    label: <ScientificName>{organism.taxonomicLevelSpecies}</ScientificName>,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
@@ -400,7 +401,7 @@ export const buildPriorityPathogenDetails = (
           pathname
         )}
       >
-        {priorityPathogen.taxonName}
+        <ScientificName>{priorityPathogen.taxonName}</ScientificName>
       </AppLink>
     );
   });
@@ -461,7 +462,7 @@ export const buildOrganismHero = (
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
-    title: organism.taxonomicLevelSpecies,
+    title: <ScientificName>{organism.taxonomicLevelSpecies}</ScientificName>,
   };
 };
 
