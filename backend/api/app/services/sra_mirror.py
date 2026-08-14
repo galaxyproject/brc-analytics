@@ -13,6 +13,7 @@ import copy
 import datetime
 import functools
 import logging
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -267,7 +268,18 @@ class SRAMirrorService:
         # line instead of one flattened "failed" with a raw traceback.
         con: Optional[duckdb.DuckDBPyConnection] = None
         try:
-            con = duckdb.connect(self.mirror_path, read_only=True)
+            # Pin the spill directory. DuckDB defaults temp_directory to
+            # "<database>.tmp", which here resolves inside the read-only bind
+            # mount that carries the mirror -- and the container runs as a
+            # non-root user while Docker creates that mount's parent as root,
+            # so the process cannot create it either way. Any query large
+            # enough to spill would fail on a path nobody chose. gettempdir()
+            # honours TMPDIR and falls back to /tmp, which is writable.
+            con = duckdb.connect(
+                self.mirror_path,
+                read_only=True,
+                config={"temp_directory": tempfile.gettempdir()},
+            )
             meta = dict(con.execute("SELECT key, value FROM mirror_meta").fetchall())
             total_runs = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
         except duckdb.IOException as exc:
