@@ -437,7 +437,7 @@ with the statistics behind it and what it achieves.
 ### Why PyEuk
 
 PyEuk [10] reimplements the distance and clustering steps in Python. It is Apache-2.0, installs with `pip`,
-requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, and scikit-learn); Numba is an optional accelerator, not a requirement.
+requires Python 3.8 or later, and depends only on standard scientific libraries (NumPy, SciPy, pandas, scikit-learn, and Numba).
 
 The two pipelines do the same job in the same order. What differs is the implementation of each stage:
 
@@ -452,7 +452,7 @@ The two pipelines do the same job in the same order. What differs is the impleme
       </span>
     </figcaption>
   }
-  src="/learn/blog/from-haplotype-calls-to-outbreak-clusters/pipeline-compare.svg"
+  src="/learn/blog/genotyping-cyclospora-from-haplotype-calls-to-outbreak-clusters/pipeline-compare.svg"
 />
 
 Three runs of each on the same 153-specimen sheet and the same host: the legacy heuristic under R 4.1.3 on 11 threads
@@ -473,7 +473,7 @@ scores 144 of the 153 specimens because 9 fall below its completeness filter.
       </span>
     </figcaption>
   }
-  src="/learn/blog/from-haplotype-calls-to-outbreak-clusters/distance-path.svg"
+  src="/learn/blog/genotyping-cyclospora-from-haplotype-calls-to-outbreak-clusters/distance-path.svg"
 />
 
 ### Step 1: Specimen quality, locus grouping, and multi-locus completeness filtering
@@ -523,7 +523,7 @@ The index `k` runs strictly over columns in locus groups typed in **both** speci
 
 - **Resolving the Multiplicity of Infection (MOI) Paradox:** _Cyclospora_ infections often contain multiple distinct parasite strains within a single patient. The legacy CDC pipeline applied a quadratic penalty (`w = 1 + x`) that artificially inflated distances and falsely excluded co-infected patients from outbreak clusters. PyEuk measures continuous allele sharing, keeping true outbreak cases together.
 - **Pairwise-Complete vs. Complete-Case:** Pairwise-complete estimation avoids discarding samples with sporadic locus dropouts. Pairs with no shared loci default to zero distance.
-- **Performance Acceleration:** The distance kernel is pure vectorized NumPy broadcasting, with Numba JIT as an optional accelerator, so it carries no external C-compiler or ABI dependency. It evaluates the cohort's 10,296 pairwise comparisons (144 specimens) in under **50 milliseconds**.
+- **Performance Acceleration:** The vectorized, Numba-accelerated pairwise distance kernel evaluates the cohort's 10,296 pairwise comparisons (144 specimens) in under **50 milliseconds**.
 
 ### Step 4: Euclidean metric guarantee & positive semi-definite (PSD) repair
 
