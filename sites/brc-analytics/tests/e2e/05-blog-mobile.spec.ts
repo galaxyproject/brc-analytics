@@ -36,4 +36,17 @@ test.describe("Blog post on mobile", () => {
     ).toBeVisible();
     expect(await hasHorizontalOverflow(page)).toBe(false);
   });
+
+  test("detects the overflow when the wrap rule is neutralized", async ({
+    page,
+  }) => {
+    await page.goto(BLOG_PATH);
+
+    // Inversion check: with the fix disabled, the long tokens must overflow —
+    // proving the wrap rule is load-bearing and this spec detects its loss.
+    await page.addStyleTag({
+      content: "code { overflow-wrap: normal !important; }",
+    });
+    expect(await hasHorizontalOverflow(page)).toBe(true);
+  });
 });
