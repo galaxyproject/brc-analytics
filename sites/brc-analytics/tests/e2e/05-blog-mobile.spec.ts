@@ -11,12 +11,15 @@ const BLOG_PATH =
  */
 async function hasHorizontalOverflow(page: Page): Promise<boolean> {
   return page.evaluate(() => {
-    const el = document.scrollingElement;
-    return !!el && el.scrollWidth > el.clientWidth;
+    const el = document.scrollingElement ?? document.documentElement;
+    // 1px tolerance absorbs scrollbar and sub-pixel rounding noise.
+    return el.scrollWidth > el.clientWidth + 1;
   });
 }
 
 test.describe("Blog post on mobile", () => {
+  // Viewport-only emulation: the assertion is pure CSS layout, and the full
+  // device descriptor sets isMobile, which Firefox doesn't support.
   test.use({ viewport: devices["iPhone 12"].viewport });
 
   test("long inline-code tokens wrap instead of widening the page", async ({
