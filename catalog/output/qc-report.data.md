@@ -91,7 +91,13 @@ None
 
 ## Assemblies without ploidy information
 
-N/A
+- GCA_900536235.3 (speciesTaxonomyId: 2305859)
+- GCA_900536285.3 (speciesTaxonomyId: 2306312)
+- GCA_900536295.3 (speciesTaxonomyId: 2305860)
+- GCA_900536305.3 (speciesTaxonomyId: 2306311)
+- GCA_900536325.3 (speciesTaxonomyId: 2305862)
+- GCA_900536345.3 (speciesTaxonomyId: 2305864)
+- GCA_900536415.3 (speciesTaxonomyId: 2305861)
 
 ## Outbreak descendant taxonomy IDs not found in genomes data
 
@@ -374,6 +380,13 @@ None
 - 1416333: Trypanosoma cruzi Dm28c
 - 1440170: Madariaga virus
 - 1525173: Human circovirus VS6600022
+- 1729975: Caenorhabditis quiockensis
+- 1737332: Caenorhabditis parvicauda
+- 1737333: Caenorhabditis zanzibari
+- 1737334: Caenorhabditis uteleia
+- 1737335: Caenorhabditis sulstoni
+- 1737336: Caenorhabditis waitukubuli
+- 1737337: Caenorhabditis tribulationis
 - 1882483: Testicularia cyperi
 - 1903318: Primate norovirus
 - 2126942: Fomitopsis schrenkii
