@@ -3,6 +3,7 @@ import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/Cu
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Divider, Stack, Typography } from "@mui/material";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { useWorkflowEntity } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
 import { Fragment, type JSX } from "react";
 import { Alert } from "./components/Alert/alert";
@@ -60,7 +61,9 @@ export const DataSelector = ({
                     maxWidth={200}
                     variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
                   >
-                    {taxonomicLevelSpecies}
+                    {taxonomicLevelSpecies && (
+                      <ScientificName>{taxonomicLevelSpecies}</ScientificName>
+                    )}
                   </Typography>
                 </Stack>
                 <Divider flexItem orientation="vertical">

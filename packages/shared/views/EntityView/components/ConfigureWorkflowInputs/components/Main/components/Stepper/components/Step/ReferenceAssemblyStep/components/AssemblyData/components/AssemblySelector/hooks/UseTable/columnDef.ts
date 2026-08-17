@@ -2,6 +2,7 @@ import {
   buildNTagProps,
   renderNTagCell,
 } from "@repo/shared/components/Table/components/TableCell/components/NTagCell/utils";
+import { renderScientificName } from "@repo/shared/components/Table/components/TableCell/components/ScientificName/utils";
 import { SelectCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
 import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
@@ -190,6 +191,7 @@ const TAXONOMIC_LEVEL_SEROTYPE: ColumnDef<Assembly> = {
 const TAXONOMIC_LEVEL_SPECIES: ColumnDef<Assembly> = {
   ...SORTING_COLUMN_DEF,
   accessorKey: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.key,
+  cell: renderScientificName,
   filterFn: SELECT_FILTER_FN,
   header: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.label,
   id: CATEGORY_CONFIGS.TAXONOMIC_LEVEL_SPECIES.key,

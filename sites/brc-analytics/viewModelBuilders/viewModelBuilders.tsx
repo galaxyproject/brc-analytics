@@ -25,6 +25,7 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { Chip } from "@mui/material";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
@@ -77,6 +78,16 @@ import slugify from "slugify";
 import { getPriorityColor, getPriorityLabel } from "./priority";
 
 /**
+ * Priority-pathogen taxonName ranks (per its taxonNameField discriminator)
+ * that are italicized as scientific names — genus and species only;
+ * family/order names, strains and free-form descriptors stay roman.
+ */
+const ITALIC_TAXON_NAME_FIELDS = new Set([
+  "taxonomicLevelGenus",
+  "taxonomicLevelSpecies",
+]);
+
+/**
  * Build props for the common names cell.
  * @param entity - Organism or genome entity.
  * @returns Props for the NTagCell component.
@@ -120,7 +131,7 @@ export const buildGenomeSpecies = (
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
     species: {
-      label: genome.taxonomicLevelSpecies,
+      label: <ScientificName>{genome.taxonomicLevelSpecies}</ScientificName>,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     },
     tags,
@@ -225,7 +236,7 @@ export const buildOrganismTaxonomicLevelSpecies = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof Link> => {
   return {
-    label: organism.taxonomicLevelSpecies,
+    label: <ScientificName>{organism.taxonomicLevelSpecies}</ScientificName>,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
@@ -388,6 +399,16 @@ export const buildPriorityPathogenDetails = (
       variant={CHIP_PROPS.VARIANT.STATUS}
     />
   );
+  // Italics apply to genus- and species-rank taxon names only; taxonNameField
+  // carries the name's rank, so family/order names and descriptors stay roman.
+  // An absent name passes through unwrapped rather than as an empty element.
+  const { taxonName, taxonNameField } = priorityPathogen;
+  const taxonLabel =
+    taxonName && ITALIC_TAXON_NAME_FIELDS.has(taxonNameField ?? "") ? (
+      <ScientificName>{taxonName}</ScientificName>
+    ) : (
+      taxonName
+    );
   [
     ["Organisms", ROUTES.ORGANISMS],
     ["Assemblies", ROUTES.GENOMES],
@@ -400,7 +421,7 @@ export const buildPriorityPathogenDetails = (
           pathname
         )}
       >
-        {priorityPathogen.taxonName}
+        {taxonLabel}
       </AppLink>
     );
   });
@@ -461,6 +482,8 @@ export const buildOrganismHero = (
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
+    // Deliberately not italicized: at hero scale the scientific-name italic
+    // reads as styling rather than nomenclature (body-scale renders keep it).
     title: organism.taxonomicLevelSpecies,
   };
 };
