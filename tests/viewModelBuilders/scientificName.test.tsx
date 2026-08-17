@@ -2,6 +2,7 @@ import { type Outbreak } from "@brc/apis/outbreak";
 import { buildPriorityPathogenDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { renderScientificName } from "@repo/shared/components/Table/components/TableCell/components/ScientificName/utils";
+import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { renderWorkflowSpecies } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type CellContext } from "@tanstack/react-table";
 import { isValidElement, type ReactElement } from "react";
@@ -51,7 +52,7 @@ describe("renderWorkflowSpecies", () => {
   });
 
   test("keeps the Any sentinel roman", () => {
-    expect(renderWorkflowSpecies(mockCellContext("Any"))).toBe("Any");
+    expect(renderWorkflowSpecies(mockCellContext(TAXON_ANY))).toBe(TAXON_ANY);
   });
 
   test("passes an absent value through as null", () => {
