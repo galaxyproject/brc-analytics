@@ -8,6 +8,7 @@ import {
   buildAssemblySpecies,
   buildOrganismAssemblySpecies,
 } from "@ga2/viewModelBuilders/viewModelBuilders";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {
@@ -26,7 +27,9 @@ describe("buildGenomeSpecies", () => {
 
     const props = buildGenomeSpecies(genome);
 
-    expect(props.species.label).toBe("Pseudomonas aeruginosa");
+    expect(props.species.label).toEqual(
+      <ScientificName>Pseudomonas aeruginosa</ScientificName>
+    );
     expect(props.species.url).toBe("/data/organisms/287");
     expect(props.ncbiTaxonomyId).toBe("208964");
     expect(props.tags).toEqual([
@@ -61,7 +64,9 @@ describe("buildGenomeSpecies", () => {
 
     const props = buildGenomeSpecies(genome);
 
-    expect(props.species.label).toBe("Plasmodium falciparum");
+    expect(props.species.label).toEqual(
+      <ScientificName>Plasmodium falciparum</ScientificName>
+    );
     expect(props.ncbiTaxonomyId).toBe("5833");
     expect(props.tags).toEqual([]);
   });
@@ -80,7 +85,9 @@ describe("buildAssemblySpecies", () => {
 
     const props = buildAssemblySpecies(assembly);
 
-    expect(props.species.label).toBe("Homo sapiens");
+    expect(props.species.label).toEqual(
+      <ScientificName>Homo sapiens</ScientificName>
+    );
     expect(props.species.url).toBe("/data/organisms/9606");
     expect(props.ncbiTaxonomyId).toBe("9606");
     expect(props.tags).toEqual([
