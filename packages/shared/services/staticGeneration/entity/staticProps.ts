@@ -8,17 +8,21 @@ import type { EntityPageParams, EntityPageProps } from "./types";
 /**
  * Builds getStaticProps for a single entity type's detail page. The site is
  * decoupled by injecting its config accessor; when the entity's detail config
- * opts into static loading, the entity record is fetched into `data`.
+ * opts into static loading, the entity record is fetched into `data`. An
+ * optional augmenter lets the page attach build-computed fields to the record
+ * (e.g. a pre-filtered workflows slice) so the page can prerender fully.
  * @param config - Site config accessor (provides the site's entity configs).
  * @param entityListType - Entity list type (route segment) for the page.
  * @param meta - Page metadata (description and title).
+ * @param augmentData - Optional build-time augmenter applied to the record.
  * @returns getStaticProps.
  */
-export function makeEntityStaticProps<R>(
+export function makeEntityStaticProps<R, D extends R = R>(
   config: () => Pick<SiteConfig, "entities">,
   entityListType: string,
-  meta: PageMeta
-): GetStaticProps<EntityPageProps<R>, EntityPageParams> {
+  meta: PageMeta,
+  augmentData?: (data: R) => Promise<D>
+): GetStaticProps<EntityPageProps<D>, EntityPageParams> {
   return async ({ params }) => {
     if (!params?.entityId) return { notFound: true };
 
@@ -28,7 +32,7 @@ export function makeEntityStaticProps<R>(
 
     if (!entityConfig) return { notFound: true };
 
-    const props: EntityPageProps<R> = {
+    const props: EntityPageProps<D> = {
       entityId: params.entityId,
       entityListType,
       pageDescription: meta.pageDescription,
@@ -38,7 +42,8 @@ export function makeEntityStaticProps<R>(
     if (entityConfig.detail.staticLoad) {
       await seedDatabase(entityListType, entityConfig);
       const data = await getEntity<R>(entityConfig, params.entityId);
-      if (data) props.data = data;
+      if (data)
+        props.data = augmentData ? await augmentData(data) : (data as D);
     }
 
     return { props };
