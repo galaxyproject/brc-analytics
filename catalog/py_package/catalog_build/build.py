@@ -13,10 +13,11 @@ import bs4
 import duckdb
 import pandas as pd
 import requests
-import yaml
 from bs4 import BeautifulSoup
+from linkml_runtime.loaders import YAMLLoader
 from requests.exceptions import ConnectTimeout
 
+from .generated_schema import schema
 from .load import do_dlt_load
 from .qc_utils import (
     format_list_section,
@@ -205,25 +206,36 @@ def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
     return all_reports
 
 
+def read_dataframe_from_yaml(yaml_path, schema_model, list_key):
+    """
+    Reads a YAML file using a given Pydantic model, and creates a dataframe from a list of entities provided by the data.
+
+    Args:
+        yaml_path: Path of the YAML file to read.
+        schema_model: Pydantic model representing the root schema class for the YAML file.
+        list_key: Key of the root object in which the list of entities is held.
+
+    Returns:
+        df: Dataframe representing the list of entities.
+    """
+    yaml_data = YAMLLoader().load(source=yaml_path, target_class=schema_model)
+    return pd.DataFrame(row.model_dump() for row in getattr(yaml_data, list_key))
+
+
 def read_assemblies(assemblies_path):
-    with open(assemblies_path) as stream:
-        return pd.DataFrame(yaml.safe_load(stream)["assemblies"])
+    return read_dataframe_from_yaml(assemblies_path, schema.Assemblies, "assemblies")
 
 
 def read_organisms(organisms_path):
-    with open(organisms_path) as stream:
-        organisms_data = yaml.safe_load(stream)["organisms"]
-        # Convert taxonomy_id to string to ensure consistent type handling
-        for organism in organisms_data:
-            organism["taxonomy_id"] = str(organism["taxonomy_id"])
-        return pd.DataFrame(organisms_data)
+    return read_dataframe_from_yaml(
+        organisms_path, schema.Organisms, "organisms"
+    ).astype({"taxonomy_id": "string"})
 
 
 def read_outbreaks(outbreaks_path):
     if outbreaks_path is None:
         return None
-    with open(outbreaks_path) as stream:
-        return pd.DataFrame(yaml.safe_load(stream)["outbreaks"])
+    return read_dataframe_from_yaml(outbreaks_path, schema.Outbreaks, "outbreaks")
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
