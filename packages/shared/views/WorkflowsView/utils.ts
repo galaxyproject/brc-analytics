@@ -39,7 +39,7 @@ function findAssemblyByTaxonomyId(
 function getCommonNames(assembly: AssemblyContract | undefined): string[] {
   // A missing commonNames field reads as ["Any"]; a present-but-empty
   // commonNames reads as ["None"].
-  if (!assembly || assembly.commonNames === undefined) return ["Any"];
+  if (!assembly || assembly.commonNames === undefined) return [TAXON_ANY];
   return assembly.commonNames.length ? assembly.commonNames : ["None"];
 }
 
@@ -143,7 +143,7 @@ export function getWorkflows(
     assembly: mapAssembly(undefined),
     category: "Transcriptomics",
     scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope),
-    taxonomyId: "Any",
+    taxonomyId: TAXON_ANY,
   } as WorkflowEntity);
 
   // Add LMLS workflows if feature flag is enabled.
@@ -153,7 +153,7 @@ export function getWorkflows(
       assembly: mapAssembly(undefined),
       category: "Sequence Analysis",
       scope: String(LOGAN_SEARCH.scope),
-      taxonomyId: "Any",
+      taxonomyId: TAXON_ANY,
     } as WorkflowEntity);
 
     workflows.push({
@@ -161,7 +161,7 @@ export function getWorkflows(
       assembly: mapAssembly(undefined),
       category: "Sequence Analysis",
       scope: String(LEXICMAP.scope),
-      taxonomyId: "Any",
+      taxonomyId: TAXON_ANY,
     } as WorkflowEntity);
   }
 
