@@ -399,15 +399,16 @@ export const buildPriorityPathogenDetails = (
       variant={CHIP_PROPS.VARIANT.STATUS}
     />
   );
-  // Italics apply to genus-and-below taxon names only; taxonNameField carries
-  // the name's rank, so family/order names and descriptors stay roman.
-  const taxonLabel = ITALIC_TAXON_NAME_FIELDS.has(
-    priorityPathogen.taxonNameField ?? ""
-  ) ? (
-    <ScientificName>{priorityPathogen.taxonName}</ScientificName>
-  ) : (
-    priorityPathogen.taxonName
-  );
+  // Italics apply to genus- and species-rank taxon names only; taxonNameField
+  // carries the name's rank, so family/order names and descriptors stay roman.
+  // An absent name passes through unwrapped rather than as an empty element.
+  const { taxonName, taxonNameField } = priorityPathogen;
+  const taxonLabel =
+    taxonName && ITALIC_TAXON_NAME_FIELDS.has(taxonNameField ?? "") ? (
+      <ScientificName>{taxonName}</ScientificName>
+    ) : (
+      taxonName
+    );
   [
     ["Organisms", ROUTES.ORGANISMS],
     ["Assemblies", ROUTES.GENOMES],
