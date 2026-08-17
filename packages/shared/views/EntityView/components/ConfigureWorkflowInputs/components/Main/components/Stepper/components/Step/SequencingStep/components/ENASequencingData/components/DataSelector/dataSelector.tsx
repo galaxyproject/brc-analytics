@@ -61,7 +61,9 @@ export const DataSelector = ({
                     maxWidth={200}
                     variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
                   >
-                    <ScientificName>{taxonomicLevelSpecies}</ScientificName>
+                    {taxonomicLevelSpecies && (
+                      <ScientificName>{taxonomicLevelSpecies}</ScientificName>
+                    )}
                   </Typography>
                 </Stack>
                 <Divider flexItem orientation="vertical">

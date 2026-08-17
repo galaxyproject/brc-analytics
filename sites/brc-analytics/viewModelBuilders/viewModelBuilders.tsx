@@ -79,8 +79,8 @@ import { getPriorityColor, getPriorityLabel } from "./priority";
 
 /**
  * Priority-pathogen taxonName ranks (per its taxonNameField discriminator)
- * that are genus-and-below and therefore italicized as scientific names;
- * family/order names and free-form descriptors stay roman.
+ * that are italicized as scientific names — genus and species only;
+ * family/order names, strains and free-form descriptors stay roman.
  */
 const ITALIC_TAXON_NAME_FIELDS = new Set([
   "taxonomicLevelGenus",
