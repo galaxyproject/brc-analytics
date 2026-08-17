@@ -26,11 +26,13 @@ import { getTrackTypes } from "./utils";
  * Gated on the `pangenome` feature flag and the organism's species having a
  * pangenome — renders nothing otherwise.
  * @param props - Component props.
- * @param props.organism - Organism whose species pangenome to render.
+ * @param props.pangenome - The species' pangenome bundle, when it has one.
  * @returns The Pangenome section, or null when there is no pangenome to show.
  */
-export const PangenomeSection = ({ organism }: Props): JSX.Element | null => {
-  const pangenome = useShowPangenome(organism.ncbiTaxonomyId);
+export const PangenomeSection = ({
+  pangenome: pangenomeProp,
+}: Props): JSX.Element | null => {
+  const pangenome = useShowPangenome(pangenomeProp);
   const { members } = pangenome ?? {};
   const table = useTable({ columns: COLUMNS, data: members ?? [] });
 

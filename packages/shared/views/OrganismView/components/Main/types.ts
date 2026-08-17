@@ -1,4 +1,4 @@
-import type { OrganismContract } from "@repo/shared/apis/types";
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import type {
   RowData,
   TableOptions,
@@ -17,5 +17,5 @@ export interface Props<T extends RowData> {
     tableOptions: Pick<TableOptions<T>, "columns" | "data" | "initialState">;
   };
   entityId: string;
-  organism: OrganismContract;
+  workflowCategories: WorkflowCategory[];
 }

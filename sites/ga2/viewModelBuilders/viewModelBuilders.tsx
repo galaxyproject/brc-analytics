@@ -6,6 +6,7 @@ import { ChipCell } from "@databiosphere/findable-ui/lib/components/Table/compon
 import { type GA2AssemblyEntity } from "@ga2/apis/assembly";
 import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import { type OrganismAvatar } from "@ga2/components/OrganismAvatar/organismAvatar";
+import { type GA2OrganismDetail } from "@ga2/services/staticGeneration/organism/types";
 import { type Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
@@ -71,7 +72,7 @@ export const buildOrganismHero = (
  * @returns Props for the OrganismViewMain component.
  */
 export const buildOrganismViewMain = (
-  entity: GA2OrganismEntity
+  entity: GA2OrganismDetail
 ): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
@@ -79,7 +80,7 @@ export const buildOrganismViewMain = (
       tableOptions: buildOrganismGenomesTable(entity),
     },
     entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
-    organism: entity,
+    workflowCategories: entity.workflowCategories,
   };
 };
 
