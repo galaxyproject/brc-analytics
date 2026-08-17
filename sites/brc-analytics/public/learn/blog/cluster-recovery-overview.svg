@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="314" viewBox="0 0 560 314">
+<rect width="560" height="314" fill="#ffffff"/>
+
+<!-- Heading -->
+<text x="28" y="26" font-size="9" font-weight="500" fill="#8a939e" font-family="DejaVu Sans, sans-serif">Ward linkage — merge cost</text>
+
+<!-- Cost axis -->
+<line x1="72" y1="250" x2="72" y2="70" stroke="#e3e6ea" stroke-width="0.5"/>
+<line x1="72" y1="250" x2="512" y2="250" stroke="#e3e6ea" stroke-width="0.5"/>
+
+<line x1="68" y1="250" x2="72" y2="250" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="63" y="252" font-size="6" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">0</text>
+<line x1="68" y1="180.9" x2="72" y2="180.9" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="63" y="183" font-size="6" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">0.02</text>
+<line x1="68" y1="111.8" x2="72" y2="111.8" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="63" y="114" font-size="6" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">0.04</text>
+
+<!-- Cluster 1: WI100 + WI008, cost 0.0015 -->
+<line x1="120" y1="250" x2="120" y2="244.8" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="190" y1="250" x2="190" y2="244.8" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="120" y1="244.8" x2="190" y2="244.8" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="155" y1="244.8" x2="155" y2="74.9" stroke="#2c6fad" stroke-width="1.4"/>
+
+<!-- Cluster 2: IL126 + MO003, cost 0.0019 -->
+<line x1="370" y1="250" x2="370" y2="243.4" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="440" y1="250" x2="440" y2="243.4" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="370" y1="243.4" x2="440" y2="243.4" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="405" y1="243.4" x2="405" y2="143.3" stroke="#2c6fad" stroke-width="1.4"/>
+
+<!-- IL036 joins {IL126, MO003}, cost 0.0309 -->
+<line x1="300" y1="250" x2="300" y2="143.3" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="300" y1="143.3" x2="405" y2="143.3" stroke="#2c6fad" stroke-width="1.4"/>
+<line x1="352.5" y1="143.3" x2="352.5" y2="74.9" stroke="#2c6fad" stroke-width="1.4"/>
+
+<!-- Root join, cost 0.0507 -->
+<line x1="155" y1="74.9" x2="352.5" y2="74.9" stroke="#b8bec6" stroke-width="1.2" stroke-dasharray="3 2"/>
+
+<!-- The gap the cut exploits -->
+<line x1="500" y1="143.3" x2="500" y2="74.9" stroke="#b8860b" stroke-width="0.8"/>
+<line x1="497" y1="143.3" x2="503" y2="143.3" stroke="#b8860b" stroke-width="0.8"/>
+<line x1="497" y1="74.9" x2="503" y2="74.9" stroke="#b8860b" stroke-width="0.8"/>
+<text x="507" y="112" font-size="6" fill="#b8860b" font-family="DejaVu Sans, sans-serif">gap</text>
+
+<!-- Leaf labels -->
+<text x="120" y="264" font-size="7" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">WI100</text>
+<text x="190" y="264" font-size="7" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">WI008</text>
+<text x="300" y="264" font-size="7" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">IL036</text>
+<text x="370" y="264" font-size="7" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">IL126</text>
+<text x="440" y="264" font-size="7" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">MO003</text>
+
+<!-- Cluster brackets -->
+<line x1="112" y1="274" x2="198" y2="274" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="155" y="286" font-size="6" fill="#a0a8b2" text-anchor="middle" font-family="DejaVu Sans, sans-serif">Vendor B</text>
+<line x1="292" y1="274" x2="448" y2="274" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="370" y="286" font-size="6" fill="#a0a8b2" text-anchor="middle" font-family="DejaVu Sans, sans-serif">Vendor A</text>
+
+<!-- Footer note -->
+<text x="28" y="302" font-size="6" fill="#a0a8b2" font-family="DejaVu Sans, sans-serif">Two clusters recovered from haplotype calls alone — no epidemiological label used.</text>
+</svg>
