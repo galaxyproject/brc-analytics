@@ -37,9 +37,12 @@ export function loadWorkflowCategories(
 ): Promise<WorkflowCategory[]> {
   let promise = categoriesByFile.get(staticLoadFile);
   if (!promise) {
-    promise = fsp
-      .readFile(staticLoadFile, "utf8")
-      .then((text) => JSON.parse(text) as WorkflowCategory[]);
+    promise = fsp.readFile(staticLoadFile, "utf8").then((text) => {
+      const categories = JSON.parse(text) as WorkflowCategory[];
+      if (!Array.isArray(categories))
+        throw new Error(`Workflows catalog is not an array: ${staticLoadFile}`);
+      return categories;
+    });
     // Don't cache a failed read — evict on rejection so a transient error
     // doesn't poison every subsequent page render in the same worker.
     promise.catch(() => categoriesByFile.delete(staticLoadFile));

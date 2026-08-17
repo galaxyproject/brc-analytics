@@ -9,7 +9,7 @@ import { type BRCOrganismDetail } from "./types";
 // served /api/pangenomes.json — keep the two in step if the output ever moves.
 const PANGENOMES_STATIC_LOAD_FILE = "catalog/output/pangenomes.json";
 
-let pangenomesPromise: Promise<Pangenome[]> | null = null;
+let pangenomesPromise: Promise<Map<string, Pangenome>> | null = null;
 
 /**
  * Attaches the build-computed fields the organism detail page renders — the
@@ -25,9 +25,7 @@ export async function augmentOrganismDetail(
     config,
     organism
   );
-  const pangenome = (await loadPangenomes()).find(
-    (p) => p.speciesTaxonomyId === organism.ncbiTaxonomyId
-  );
+  const pangenome = (await loadPangenomes()).get(organism.ncbiTaxonomyId);
   // Spread the pangenome conditionally: getStaticProps output must be
   // JSON-serializable, and an explicit `undefined` field is not.
   return {
@@ -38,26 +36,28 @@ export async function augmentOrganismDetail(
 }
 
 /**
- * Reads the pangenomes catalog, memoized per build worker. An absent file is
- * expected (pangenome data is optional) and reads as empty, with a warning so
- * a real regression stays debuggable; any other failure — including a
- * malformed payload — fails the build loudly rather than silently shipping
- * every organism page without its pangenome.
- * @returns Pangenomes, or an empty list when the file is absent.
+ * Reads the pangenomes catalog into a map keyed by species taxonomy ID
+ * (mirroring the former runtime store keying), memoized per build worker so
+ * the per-page lookup is O(1). An absent file is expected (pangenome data is
+ * optional) and reads as empty, with a warning so a real regression stays
+ * debuggable; any other failure — including a malformed payload — fails the
+ * build loudly rather than silently shipping every organism page without its
+ * pangenome.
+ * @returns Pangenomes keyed by species taxonomy ID; empty when the file is absent.
  */
-function loadPangenomes(): Promise<Pangenome[]> {
+function loadPangenomes(): Promise<Map<string, Pangenome>> {
   pangenomesPromise ??= fsp
     .readFile(PANGENOMES_STATIC_LOAD_FILE, "utf8")
     .then((text) => {
       const pangenomes = JSON.parse(text) as Pangenome[];
       if (!Array.isArray(pangenomes))
         throw new Error("Pangenomes catalog is not an array");
-      return pangenomes;
+      return new Map(pangenomes.map((p) => [p.speciesTaxonomyId, p]));
     })
     .catch((error) => {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         console.warn("Pangenomes catalog not found; skipping.", error);
-        return [];
+        return new Map<string, Pangenome>();
       }
       pangenomesPromise = null;
       throw error;
