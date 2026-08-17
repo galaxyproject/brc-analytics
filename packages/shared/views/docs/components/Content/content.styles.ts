@@ -12,6 +12,7 @@ const code = css`
   code {
     background-color: ${PALETTE.SMOKE_LIGHT};
     font-size: inherit;
+    overflow-wrap: anywhere;
     padding: 0 2px;
   }
 `;
