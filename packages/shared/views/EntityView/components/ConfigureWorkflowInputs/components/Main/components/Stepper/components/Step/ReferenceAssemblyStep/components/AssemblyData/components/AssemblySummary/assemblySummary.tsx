@@ -56,9 +56,11 @@ export const AssemblySummary = ({
                 <TableRow key={row.id}>
                   <TableCell>{row.original.accession}</TableCell>
                   <TableCell>
-                    <ScientificName>
-                      {row.original.taxonomicLevelSpecies}
-                    </ScientificName>
+                    {row.original.taxonomicLevelSpecies && (
+                      <ScientificName>
+                        {row.original.taxonomicLevelSpecies}
+                      </ScientificName>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
