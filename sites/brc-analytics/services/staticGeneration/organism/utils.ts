@@ -1,12 +1,12 @@
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { type Pangenome } from "@brc/apis/pangenome";
 import { config } from "@brc/config/config";
-import { FEATURE_FLAGS } from "@brc/config/featureFlags";
-import { loadWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/utils";
-import { buildOrganismWorkflows } from "@repo/shared/views/OrganismView/components/Main/utils";
+import { loadOrganismWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/utils";
 import { promises as fsp } from "fs";
 import { type BRCOrganismDetail } from "./types";
 
+// The catalog build's pangenomes output; the sync-api script copies it to the
+// served /api/pangenomes.json — keep the two in step if the output ever moves.
 const PANGENOMES_STATIC_LOAD_FILE = "catalog/output/pangenomes.json";
 
 let pangenomesPromise: Promise<Pangenome[]> | null = null;
@@ -21,17 +21,13 @@ let pangenomesPromise: Promise<Pangenome[]> | null = null;
 export async function augmentOrganismDetail(
   organism: BRCDataCatalogOrganism
 ): Promise<BRCOrganismDetail> {
-  const categories = await loadWorkflowCategories(getWorkflowsStaticLoadFile());
-  const workflowCategories = buildOrganismWorkflows(
-    organism,
-    categories,
-    FEATURE_FLAGS.includes("assembly-workflows")
+  const workflowCategories = await loadOrganismWorkflowCategories(
+    config,
+    organism
   );
-  const pangenome = FEATURE_FLAGS.includes("pangenome")
-    ? (await loadPangenomes()).find(
-        (p) => p.speciesTaxonomyId === organism.ncbiTaxonomyId
-      )
-    : undefined;
+  const pangenome = (await loadPangenomes()).find(
+    (p) => p.speciesTaxonomyId === organism.ncbiTaxonomyId
+  );
   // Spread the pangenome conditionally: getStaticProps output must be
   // JSON-serializable, and an explicit `undefined` field is not.
   return {
@@ -42,28 +38,29 @@ export async function augmentOrganismDetail(
 }
 
 /**
- * Returns the workflows catalog file path from the site's workflows entity
- * config, so build and runtime read the same source.
- * @returns Workflows catalog file path.
- */
-function getWorkflowsStaticLoadFile(): string {
-  const staticLoadFile = config().entities.find(
-    ({ route }) => route === "workflows"
-  )?.staticLoadFile;
-  if (!staticLoadFile) throw new Error("Workflows staticLoadFile not found");
-  return staticLoadFile;
-}
-
-/**
- * Reads the pangenomes catalog, memoized per build worker. Pangenome data is
- * optional (may be absent before its build lands), mirroring the runtime
- * loader's non-fatal handling.
+ * Reads the pangenomes catalog, memoized per build worker. An absent file is
+ * expected (pangenome data is optional) and reads as empty, with a warning so
+ * a real regression stays debuggable; any other failure — including a
+ * malformed payload — fails the build loudly rather than silently shipping
+ * every organism page without its pangenome.
  * @returns Pangenomes, or an empty list when the file is absent.
  */
 function loadPangenomes(): Promise<Pangenome[]> {
   pangenomesPromise ??= fsp
     .readFile(PANGENOMES_STATIC_LOAD_FILE, "utf8")
-    .then((text) => JSON.parse(text) as Pangenome[])
-    .catch(() => []);
+    .then((text) => {
+      const pangenomes = JSON.parse(text) as Pangenome[];
+      if (!Array.isArray(pangenomes))
+        throw new Error("Pangenomes catalog is not an array");
+      return pangenomes;
+    })
+    .catch((error) => {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        console.warn("Pangenomes catalog not found; skipping.", error);
+        return [];
+      }
+      pangenomesPromise = null;
+      throw error;
+    });
   return pangenomesPromise;
 }
