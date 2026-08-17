@@ -1,6 +1,5 @@
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
 import { config } from "@ga2/config/config";
-import { FEATURE_FLAGS } from "@ga2/config/featureFlags";
 import { GA2_DEFAULT_DESCRIPTION } from "@ga2/meta/constants";
 import { ensureEntitiesLoaded } from "@ga2/services/workflows/hooks/UseEntities/utils";
 import "@ga2/styles/fonts/fonts.css";
@@ -11,7 +10,7 @@ import {
 } from "@repo/shared/components/layout/AppProviders/appProviders";
 import { type JSX } from "react";
 
-setFeatureFlags(FEATURE_FLAGS);
+setFeatureFlags(["assembly-workflows", "hyphy", "lmls"]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();

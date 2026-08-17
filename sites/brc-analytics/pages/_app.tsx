@@ -1,5 +1,4 @@
 import { config } from "@brc/config/config";
-import { FEATURE_FLAGS } from "@brc/config/featureFlags";
 import { BRC_DEFAULT_DESCRIPTION } from "@brc/meta/constants";
 import { ensureEntitiesLoaded } from "@brc/services/workflows/hooks/UseEntities/utils";
 import { createBrcTheme } from "@brc/theme/theme";
@@ -10,7 +9,7 @@ import {
 } from "@repo/shared/components/layout/AppProviders/appProviders";
 import { type JSX } from "react";
 
-setFeatureFlags(FEATURE_FLAGS);
+setFeatureFlags(["assembly-workflows", "hyphy", "lmls", "pangenome"]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();
