@@ -9,8 +9,8 @@ None
 | Workflow | Compatible Assemblies |
 |----------|----------------------|
 | Variant calling and consensus construction from paired end short read data of non-segmented viral genomes | 13 |
-| Paired end variant calling in haploid system | 4513 |
-| Paired end variant and ploidy-aware genotype calling | 5506 |
+| Paired end variant calling in haploid system | 4514 |
+| Paired end variant and ploidy-aware genotype calling | 5507 |
 | COVID-19: variation analysis on ARTIC PE data | 2 |
 | COVID-19: variation analysis on WGS PE data | 2 |
 | COVID-19: variation analysis on WGS SE data | 2 |
@@ -21,7 +21,7 @@ None
 | ATAC-seq Analysis: Chromatin Accessibility Profiling | 5499 |
 | ChIP-seq Analysis: Paired-End Read Processing | 5499 |
 | ChIP-seq Analysis: Single-End Read Processing | 5499 |
-| Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 5506 |
+| Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates | 5507 |
 | CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping | 5499 |
 | Capture Hi-C Processing: FASTQ to Balanced Cool Files | 4875 |
 | Hi-C Processing: FASTQ to Balanced Cool Files | 4875 |
@@ -30,12 +30,12 @@ None
 | Influenza A isolate subtyping and consensus sequence generation | 7 |
 | Pox Virus Illumina Amplicon Workflow from half-genomes | 2 |
 | AMR Gene Detection | 393 |
-| Genome annotation with Braker3 | 4482 |
+| Genome annotation with Braker3 | 4483 |
 | Bacterial Genome Annotation | 393 |
-| lncRNAs annotation workflow | 4482 |
-| Genome assembly with Flye | 5506 |
+| lncRNAs annotation workflow | 4483 |
+| Genome assembly with Flye | 5507 |
 | Bacterial Genome Assembly using Shovill | 398 |
-| Assembly polishing with long reads | 5506 |
+| Assembly polishing with long reads | 5507 |
 | CAPHEINE: Combined HyPhy Core and Compare | 624 |
 
 ## Summary Statistics
