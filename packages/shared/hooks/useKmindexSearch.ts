@@ -46,7 +46,7 @@ export interface KmindexJobStatus {
 }
 
 export interface KmindexSubmission {
-  index: string;
+  indexes: string[];
   sequence: string;
   threshold: number;
   zvalue: number;

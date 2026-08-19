@@ -1,47 +1,32 @@
 /**
  * kmindex index names are STRATEGY_DIVISION, e.g. "METAGENOMIC_ENV" or
- * "GENOMICSINGLECELL_BCT". There are over a hundred of them, which is far too
- * many for one flat dropdown, so the picker splits them into two axes.
+ * "GENOMICSINGLECELL_BCT". The tool's select is multiple="true", so a query can
+ * name any combination of them; the strategy prefix is only used to group the
+ * options so a list of over a hundred stays scannable.
  */
-export interface IndexAxes {
-  byStrategy: Map<string, string[]>;
-  strategies: string[];
+
+/**
+ * Library strategy an index belongs to, used as its option group.
+ * @param index - Index name from the API.
+ * @returns The strategy prefix, or the whole name when there is no separator.
+ */
+export function indexStrategy(index: string): string {
+  // Split on the LAST underscore: divisions are always a single trailing token.
+  const separator = index.lastIndexOf("_");
+  return separator < 1 ? index : index.slice(0, separator);
 }
 
 /**
- * Group index names into strategy -> divisions.
+ * Sort index names by strategy, then by division, so grouped options stay
+ * contiguous -- MUI's groupBy renders headers in list order, not by key.
  * @param indexes - Flat list of index names from the API.
- * @returns Strategies and the divisions available under each.
+ * @returns A new, sorted list.
  */
-export function groupIndexes(indexes: string[]): IndexAxes {
-  const byStrategy = new Map<string, string[]>();
-
-  for (const index of indexes) {
-    // Split on the LAST underscore: strategies themselves contain underscores
-    // in neither direction today, but divisions are always a single token.
-    const separator = index.lastIndexOf("_");
-    if (separator < 1) continue;
-    const strategy = index.slice(0, separator);
-    const division = index.slice(separator + 1);
-    const divisions = byStrategy.get(strategy) ?? [];
-    divisions.push(division);
-    byStrategy.set(strategy, divisions);
-  }
-
-  for (const divisions of byStrategy.values()) divisions.sort();
-
-  return { byStrategy, strategies: [...byStrategy.keys()].sort() };
-}
-
-/**
- * Reassemble an index name from its two axes.
- * @param strategy - Library strategy, e.g. "METAGENOMIC".
- * @param division - Taxonomic division, e.g. "ENV".
- * @returns The index name, or an empty string when either axis is unset.
- */
-export function toIndexName(strategy: string, division: string): string {
-  if (!strategy || !division) return "";
-  return `${strategy}_${division}`;
+export function sortIndexes(indexes: string[]): string[] {
+  return [...indexes].sort(
+    (a, b) =>
+      indexStrategy(a).localeCompare(indexStrategy(b)) || a.localeCompare(b)
+  );
 }
 
 /**

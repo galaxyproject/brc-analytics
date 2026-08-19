@@ -10,7 +10,11 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError
 
-from app.models.galaxy import MAX_QUERY_BASES, KmindexQuerySubmission
+from app.models.galaxy import (
+    MAX_INDEXES,
+    MAX_QUERY_BASES,
+    KmindexQuerySubmission,
+)
 from app.services.galaxy_service import GalaxyService
 
 
@@ -140,14 +144,18 @@ class TestQueryValidation:
 
     def test_multi_record_fasta_rejected(self):
         with pytest.raises(ValidationError, match="one sequence per query"):
-            KmindexQuerySubmission(sequence=">a\nACGT\n>b\nTTTT\n", index="GENOMIC_BCT")
+            KmindexQuerySubmission(
+                sequence=">a\nACGT\n>b\nTTTT\n", indexes=["GENOMIC_BCT"]
+            )
 
     def test_single_record_accepted(self):
-        submission = KmindexQuerySubmission(sequence=">a\nACGT\n", index="GENOMIC_BCT")
-        assert submission.index == "GENOMIC_BCT"
+        submission = KmindexQuerySubmission(
+            sequence=">a\nACGT\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.indexes == ["GENOMIC_BCT"]
 
     def test_headerless_sequence_accepted(self):
-        assert KmindexQuerySubmission(sequence="ACGT", index="GENOMIC_BCT")
+        assert KmindexQuerySubmission(sequence="ACGT", indexes=["GENOMIC_BCT"])
 
 
 class TestQueryLengthCap:
@@ -156,22 +164,71 @@ class TestQueryLengthCap:
     def test_over_limit_rejected(self):
         with pytest.raises(ValidationError, match="the limit is 2500"):
             KmindexQuerySubmission(
-                sequence=">q\n" + "A" * (MAX_QUERY_BASES + 1), index="GENOMIC_BCT"
+                sequence=">q\n" + "A" * (MAX_QUERY_BASES + 1), indexes=["GENOMIC_BCT"]
             )
 
     def test_at_limit_accepted(self):
         assert KmindexQuerySubmission(
-            sequence=">q\n" + "A" * MAX_QUERY_BASES, index="GENOMIC_BCT"
+            sequence=">q\n" + "A" * MAX_QUERY_BASES, indexes=["GENOMIC_BCT"]
         )
 
     def test_header_and_newlines_do_not_count_toward_the_limit(self):
         """A long header shouldn't push an otherwise-legal query over."""
         wrapped = "\n".join("A" * 60 for _ in range(MAX_QUERY_BASES // 60))
         assert KmindexQuerySubmission(
-            sequence=">" + "n" * 200 + "\n" + wrapped, index="GENOMIC_BCT"
+            sequence=">" + "n" * 200 + "\n" + wrapped, indexes=["GENOMIC_BCT"]
         )
 
     def test_oversized_payload_rejected_before_parsing(self):
         """max_length guards against a multi-megabyte body reaching the validators."""
         with pytest.raises(ValidationError):
-            KmindexQuerySubmission(sequence="A" * 100_000, index="GENOMIC_BCT")
+            KmindexQuerySubmission(sequence="A" * 100_000, indexes=["GENOMIC_BCT"])
+
+
+class TestIndexSelection:
+    """kmindex_query's select is multiple="true"; the cap on it is ours."""
+
+    def test_multiple_indexes_accepted(self):
+        submission = KmindexQuerySubmission(
+            sequence="ACGT", indexes=["GENOMIC_BCT", "METAGENOMIC_ENV"]
+        )
+        assert submission.indexes == ["GENOMIC_BCT", "METAGENOMIC_ENV"]
+
+    def test_duplicates_collapse(self):
+        """A repeated index would merge its hits into the ranked list twice."""
+        submission = KmindexQuerySubmission(
+            sequence="ACGT", indexes=["GENOMIC_BCT", "GENOMIC_BCT"]
+        )
+        assert submission.indexes == ["GENOMIC_BCT"]
+
+    def test_blanks_dropped(self):
+        submission = KmindexQuerySubmission(
+            sequence="ACGT", indexes=["  GENOMIC_BCT  ", "", "   "]
+        )
+        assert submission.indexes == ["GENOMIC_BCT"]
+
+    def test_selection_order_preserved(self):
+        submission = KmindexQuerySubmission(
+            sequence="ACGT", indexes=["METAGENOMIC_ENV", "GENOMIC_BCT"]
+        )
+        assert submission.indexes == ["METAGENOMIC_ENV", "GENOMIC_BCT"]
+
+    def test_empty_list_rejected(self):
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(sequence="ACGT", indexes=[])
+
+    def test_all_blank_rejected(self):
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(sequence="ACGT", indexes=["", "  "])
+
+    def test_over_the_cap_rejected(self):
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(
+                sequence="ACGT", indexes=[f"IDX_{n}" for n in range(MAX_INDEXES + 1)]
+            )
+
+    def test_at_the_cap_accepted(self):
+        assert KmindexQuerySubmission(
+            sequence="ACGT", indexes=[f"IDX_{n}" for n in range(MAX_INDEXES)]
+        )
+
