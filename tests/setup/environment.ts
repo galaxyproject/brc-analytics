@@ -3,4 +3,4 @@
 // NODE_ENV=test -- so NEXT_PUBLIC_ENVIRONMENT is unset under test and anything
 // resolving it at import time (packages/shared/components/Document) throws.
 // Default to the local environment, leaving an explicitly set value alone.
-process.env.NEXT_PUBLIC_ENVIRONMENT ||= "local";
+process.env.NEXT_PUBLIC_ENVIRONMENT ??= "local";
