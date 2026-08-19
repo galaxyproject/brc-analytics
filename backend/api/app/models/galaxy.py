@@ -35,6 +35,14 @@ class GalaxyJobSubmission(BaseModel):
 
 MAX_QUERY_BASES = 2500
 
+# kmindex_query's index select is multiple="true", so one job can search any
+# combination of the ~109 registered indexes and write a JSON per shard for each.
+# The ceiling is ours, not the tool's: a single index already fans out to dozens
+# of shard datasets (GENOMIC_BCT alone is 55), and we download every one of them
+# through a service account Galaxy rate-limits. Raise this once the aggregation
+# path stops pulling shards one dataset at a time.
+MAX_INDEXES = 8
+
 
 class KmindexQuerySubmission(BaseModel):
     """Request model for a Logan/kmindex sequence search."""
@@ -47,8 +55,13 @@ class KmindexQuerySubmission(BaseModel):
         max_length=MAX_QUERY_BASES * 4,
         description="Query sequence in FASTA format",
     )
-    index: str = Field(
-        ..., description="kmindex index name, e.g. 'METAGENOMIC_ENV' or 'GENOMIC_BCT'"
+    indexes: List[str] = Field(
+        ...,
+        min_length=1,
+        description=(
+            "kmindex index names to search in one job, e.g. "
+            "['METAGENOMIC_ENV', 'GENOMIC_BCT']"
+        ),
     )
     # kmindex indexes s-mers and queries (s+z)-mers; z=6 is the tool default and
     # matches a standard k-mer query.
@@ -59,6 +72,29 @@ class KmindexQuerySubmission(BaseModel):
     filename: Optional[str] = Field(
         default="query", description="Name for the uploaded query file"
     )
+
+    @field_validator("indexes")
+    @classmethod
+    def distinct_and_bounded(cls, value: List[str]) -> List[str]:
+        """
+        Drop blanks, de-duplicate, and cap how many indexes one job may search.
+
+        Duplicates matter beyond tidiness: kmindex keys its output JSON by shard,
+        so the same index twice would merge its hits into the ranked list twice.
+        """
+        seen: List[str] = []
+        for name in value:
+            cleaned = name.strip()
+            if cleaned and cleaned not in seen:
+                seen.append(cleaned)
+
+        if not seen:
+            raise ValueError("Select at least one index")
+        if len(seen) > MAX_INDEXES:
+            raise ValueError(
+                f"Selected {len(seen)} indexes; at most {MAX_INDEXES} per query"
+            )
+        return seen
 
     @field_validator("sequence")
     @classmethod

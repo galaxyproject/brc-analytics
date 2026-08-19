@@ -172,7 +172,7 @@ class GalaxyService:
             )
 
         logger.info(
-            f"Submitting kmindex query against {submission.index} "
+            f"Submitting kmindex query against {', '.join(submission.indexes)} "
             f"({len(submission.sequence)} chars)"
         )
 
@@ -189,7 +189,10 @@ class GalaxyService:
                 job_id=job_id,
                 upload_dataset_id=upload_dataset_id,
                 status="submitted",
-                message=f"kmindex job {job_id} submitted against {submission.index}",
+                message=(
+                    f"kmindex job {job_id} submitted against "
+                    f"{len(submission.indexes)} index(es)"
+                ),
             )
 
         except Exception as e:
@@ -570,14 +573,16 @@ class GalaxyService:
     async def _run_kmindex_query(
         self, input_dataset_id: str, submission: KmindexQuerySubmission, history_id: str
     ) -> str:
-        """Run kmindex_query against a Logan index and return the job ID."""
+        """Run kmindex_query against one or more Logan indexes, returning the job ID."""
         try:
             # Conditional params must use flattened "cond|param" keys. The nested
             # dict form is accepted but silently drops the inner select, which
             # runs kmindex with --index '' and fails on the node.
             tool_inputs = {
                 "db_opts|db_opts_selector": "db",
-                "db_opts|kmindex": submission.index,
+                # multiple="true" on the tool's select, so this takes the list as-is;
+                # a bare string would be read as a single index name.
+                "db_opts|kmindex": submission.indexes,
                 "fastx": {"src": "hda", "id": input_dataset_id},
                 "format": "json",
                 "threshold": submission.threshold,
@@ -597,7 +602,8 @@ class GalaxyService:
 
             job_id = jobs[0]["id"]
             logger.info(
-                f"Started kmindex query job {job_id} against {submission.index}"
+                f"Started kmindex query job {job_id} against "
+                f"{', '.join(submission.indexes)}"
             )
             return job_id
 

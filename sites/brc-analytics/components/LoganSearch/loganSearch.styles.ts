@@ -6,18 +6,7 @@ export const SearchContainer = styled.div`
   gap: 24px;
 `;
 
-export const FieldRow = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-/* The query box wants width; the index pickers and threshold don't. Side by
+/* The query box wants width; the index picker and threshold don't. Side by
    side they fill the row instead of leaving the right half of a 1200px page
    empty. Collapses to one column before the two halves get too cramped. */
 export const FormGrid = styled.div`

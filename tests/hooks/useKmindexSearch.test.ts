@@ -108,7 +108,7 @@ describe("job id in the URL", () => {
 
     await act(async () => {
       await result.current.submit({
-        index: "GENOMIC_BCT",
+        indexes: ["GENOMIC_BCT", "METAGENOMIC_ENV"],
         sequence: ">q\nACGT",
         threshold: 0.3,
         zvalue: 6,
