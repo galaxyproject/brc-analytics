@@ -4,6 +4,7 @@ import { BookmarkStarIcon } from "@repo/shared/components/CustomIcon/components/
 import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/GalaxyIcon/galaxyIcon";
 import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
+import { SlidesIcon } from "@repo/shared/components/CustomIcon/components/SlidesIcon/slidesIcon";
 import { SmartToyIcon } from "@repo/shared/components/CustomIcon/components/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "@repo/shared/components/CustomIcon/components/YouTubeIcon/youTubeIcon";
 import { type SectionContentCard } from "@repo/shared/views/docs/components/SectionContentCard/sectionContentCard";
@@ -44,6 +45,13 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Follow ongoing work in progress: methods, datasets and results as they develop.",
     title: "Blog",
+  },
+  {
+    StartIcon: SlidesIcon,
+    href: "/learn/presentations",
+    secondaryText:
+      "Slide decks from talks and webinars on BRC Analytics and the work behind it.",
+    title: "Presentations",
   },
   {
     StartIcon: LiveHelpIcon,
