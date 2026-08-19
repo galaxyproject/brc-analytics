@@ -232,3 +232,58 @@ class TestIndexSelection:
             sequence="ACGT", indexes=[f"IDX_{n}" for n in range(MAX_INDEXES)]
         )
 
+
+class TestTieBreakIsArchiveNeutral:
+    """
+    Equal scores are the common case, not an edge case.
+
+    A conserved query against GENOMIC_BCT returned 305,061 hits scoring exactly
+    1.0 against a 50,000 cap, so the cap boundary falls inside one tie band and
+    the tie-break alone chooses the result set. Ordering by accession orders by
+    archive prefix, and the prefix predicts submitting country.
+    """
+
+    @staticmethod
+    def _status(shard_count):
+        outputs = [MagicMock() for _ in range(shard_count)]
+        for i, o in enumerate(outputs):
+            o.dataset.id = f"ds{i}"
+        return MagicMock(
+            is_complete=True, is_successful=True, state="ok", outputs=outputs
+        )
+
+    @pytest.mark.asyncio
+    async def test_all_archives_survive_a_tie_band(self, service):
+        # Every hit scores the same, so ordering is entirely the tie-break.
+        # Alphabetically DRR < ERR < SRR, so an accession sort keeps only DRR.
+        hits = {}
+        for prefix in ("DRR", "ERR", "SRR"):
+            for n in range(300):
+                hits[f"{prefix}{n:06d}"] = 1.0
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(return_value={"IDX_1": {"q": hits}})
+
+        aggregate = await service._aggregate_shards("job1")
+
+        head = [h["accession"][:3] for h in aggregate["hits"][:300]]
+        assert set(head) == {"DRR", "ERR", "SRR"}, (
+            f"one archive monopolises the head of the tie band; got {sorted(set(head))}"
+        )
+        # Proportional to within a wide margin -- this guards against a
+        # systematic bias, not against sampling noise.
+        for prefix in ("DRR", "ERR", "SRR"):
+            assert 50 < head.count(prefix) < 150
+
+    @pytest.mark.asyncio
+    async def test_ordering_is_still_deterministic(self, service):
+        hits = {f"SRR{n:06d}": 0.5 for n in range(50)}
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+
+        service._download_shard = AsyncMock(return_value={"IDX_1": {"q": hits}})
+        first = await service._aggregate_shards("job1")
+        service._download_shard = AsyncMock(return_value={"IDX_1": {"q": hits}})
+        second = await service._aggregate_shards("job1")
+
+        assert [h["accession"] for h in first["hits"]] == [
+            h["accession"] for h in second["hits"]
+        ]
