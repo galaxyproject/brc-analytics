@@ -1,6 +1,7 @@
 """Galaxy API integration service using BioBLEND."""
 
 import asyncio
+import hashlib
 import json
 import logging
 import random
@@ -53,6 +54,16 @@ KMINDEX_MAX_HITS = 50000
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
 _AGGREGATION_LOCK = asyncio.Lock()
+
+
+def _tie_break(accession: str) -> str:
+    """
+    Stable, archive-neutral ordering key for equal-scoring hits.
+
+    Deterministic across processes and runs, which is what lets the merged list
+    be paged coherently and re-aggregated to the same answer.
+    """
+    return hashlib.md5(accession.encode()).hexdigest()
 
 
 def _find_kmindex_options(inputs: List[dict]) -> List[str]:
@@ -359,10 +370,21 @@ class GalaxyService:
             if shard_had_hits:
                 shards_with_hits += 1
 
-        # Sort on accession as well as score: ties are common, and shards land
-        # in completion order, so score alone leaves equal-scoring hits free to
-        # reshuffle between aggregations and make paged offsets incoherent.
-        hits.sort(key=lambda h: (-h["score"], h["accession"]))
+        # Sort on more than score: ties are common, and shards land in completion
+        # order, so score alone leaves equal-scoring hits free to reshuffle
+        # between aggregations and make paged offsets incoherent.
+        #
+        # The second key has to be a hash rather than the accession itself. Ties
+        # are not a rare edge here -- a conserved query returns them by the
+        # hundred thousand (a 16S fragment at threshold 0.5 gave 305,061 hits
+        # scoring exactly 1.0 against a 50,000 cap), so the cap boundary sits
+        # inside one tie band and the tie-break alone decides the whole result
+        # set. Accession order is archive-prefix order, and the prefix predicts
+        # the submitting country: DRR is DDBJ, ERR is ENA, SRR is NCBI. Sorting
+        # by accession returned zero SRR rows out of a true 65.1%, so the
+        # country column reported a distribution manufactured by the sort.
+        # md5 reproduces the real composition to within 0.2 points.
+        hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
         truncated = len(hits) > KMINDEX_MAX_HITS
         if truncated:
             logger.warning(
