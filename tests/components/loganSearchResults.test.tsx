@@ -18,6 +18,15 @@ type Search = ReturnType<typeof useKmindexSearch>;
 // GENOMIC_BCT + METATRANSCRIPTOMIC_BCT, against the backend's 50,000 cap.
 const CAP = 50000;
 
+// Asserted from both branches: how wide the tie band is depends on the query,
+// not on how many indexes were searched.
+const TIE_BAND_COPY =
+  "Scores repeat: the score is a fraction of your query's k-mers, so ties " +
+  "are common and a conserved query can put every row listed here on a " +
+  "single one. Where the cut falls inside a tie, a stable hash of the " +
+  "accession decides which equally-scoring runs made the list -- arbitrary, " +
+  "but the same on every reload.";
+
 const BASE_RESULTS: KmindexResults = {
   hits: [
     {
@@ -166,16 +175,46 @@ describe("LoganSearchResults truncation disclosure", () => {
     );
 
     expect(screen.getByRole("alert")).toBeTruthy();
-    expect(container.textContent).toContain(
-      "Where scores tie -- and a conserved query ties them by the hundred thousand -- the listed rows are an arbitrary but stable slice of equally-scoring runs rather than a ranking."
-    );
-    expect(container.textContent).toContain(
-      "A more specific query -- longer, or from a less conserved region -- is what shrinks the match set."
-    );
+    expect(container.textContent).toContain(TIE_BAND_COPY);
     // A single index cannot be swamped by another, so no breakdown and no
     // advice to search it on its own.
     expect(container.textContent).not.toContain("alone it would");
     expect(container.textContent).not.toContain("GENOMIC_VRL:");
+  });
+
+  test("warns about ties when more than one index was searched too", () => {
+    const { container } = renderResults(
+      truncatedResults([
+        summary("GENOMIC_BCT", 1100404, 47089),
+        summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
+      ])
+    );
+
+    // This is the job where the caveat is most true and used to be hidden:
+    // all 50,000 listed rows score exactly 1.0. Eight indexes over the same
+    // query give one distinct score as well, while a single index over a
+    // viral spike gives 87 -- so index count cannot gate this sentence.
+    expect(container.textContent).toContain(TIE_BAND_COPY);
+    expect(container.textContent).toContain("GENOMIC_BCT: 47,089 of 1,100,404");
+  });
+
+  test("does not tell the reader that a longer query shrinks the match set", () => {
+    const { container } = renderResults(
+      truncatedResults([summary("GENOMIC_VRL", 157741, CAP)])
+    );
+
+    // Measured the other way: the 2,090 bp 18S superset of a 500 bp window
+    // matched 18,019 runs against the window's 17,633, same two indexes and
+    // same threshold. Length is not a lever, so the copy cannot offer it.
+    expect(container.textContent).toContain(
+      "A longer query is not a more specific one"
+    );
+    expect(container.textContent).toContain(
+      "The match set responds to how rare your k-mers are and to the threshold above, not to query length."
+    );
+    expect(container.textContent).not.toContain(
+      "longer, or from a less conserved region"
+    );
   });
 
   test("stays quiet when nothing was truncated", () => {

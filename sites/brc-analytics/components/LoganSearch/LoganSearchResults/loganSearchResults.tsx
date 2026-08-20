@@ -75,6 +75,9 @@ export const LoganSearchResults = ({
   const perIndex = [...(results.per_index ?? [])].sort(
     (a, b) => b.hits_before_cap - a.hits_before_cap
   );
+  // Gates the per-index content only. Index count says nothing about how the
+  // scores are distributed, so it must not decide whether the tie-band caveat
+  // is shown.
   const showPerIndex = perIndex.length > 1;
 
   // A backend predating the breakdown sends neither total_matches nor
@@ -154,7 +157,7 @@ export const LoganSearchResults = ({
               listed here. A conserved query can match hundreds of thousands of
               runs at a perfect k-mer score, so it may not clear the cap at all.
             </Typography>
-            {showPerIndex ? (
+            {showPerIndex && (
               <>
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   The cap is one score sort across every index, applied after
@@ -172,16 +175,26 @@ export const LoganSearchResults = ({
                   </Typography>
                 ))}
               </>
-            ) : (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Where scores tie -- and a conserved query ties them by the
-                hundred thousand -- the listed rows are an arbitrary but stable
-                slice of equally-scoring runs rather than a ranking.
-              </Typography>
             )}
+            {/* Unconditional: how wide the tie band is depends on the query,
+                not on how many indexes were searched, and the backend sends
+                nothing that measures it. Two indexes over 16S and eight over
+                the same put all 50,000 listed rows on one score; one index
+                over a viral spike gave 87 distinct scores. */}
             <Typography variant="body2" sx={{ mt: 1 }}>
-              A more specific query -- longer, or from a less conserved region
-              -- is what shrinks the match set.
+              Scores repeat: the score is a fraction of your query&apos;s
+              k-mers, so ties are common and a conserved query can put every row
+              listed here on a single one. Where the cut falls inside a tie, a
+              stable hash of the accession decides which equally-scoring runs
+              made the list -- arbitrary, but the same on every reload.
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              A longer query is not a more specific one: kmindex scores the
+              fraction of your query&apos;s k-mers a run shares, so extending
+              into conserved flanking sequence raises that fraction in unrelated
+              runs too -- a 4x longer version of the same 18S query matched more
+              runs here, not fewer. The match set responds to how rare your
+              k-mers are and to the threshold above, not to query length.
             </Typography>
           </Alert>
         )}
