@@ -22,18 +22,29 @@ export interface KmindexHit {
   sra: SraRunMetadata | null;
 }
 
+export interface KmindexIndexSummary {
+  hits_after_cap: number;
+  hits_before_cap: number;
+  index: string;
+}
+
 export interface KmindexResults {
   hits: KmindexHit[];
   job_id: string;
   limit: number;
   offset: number;
+  per_index: KmindexIndexSummary[];
   query_name: string | null;
   shards_failed: number;
   shards_searched: number;
   shards_with_hits: number;
   sra_annotated: number;
   sra_mirror_available: boolean;
+  // Pageable rows, i.e. what survived the cap. Paging math stays on this.
   total_hits: number;
+  // Rows the search actually matched, before the cap; equals total_hits when
+  // truncated is false.
+  total_matches: number;
   truncated: boolean;
 }
 
