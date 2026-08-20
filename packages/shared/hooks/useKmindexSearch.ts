@@ -28,7 +28,47 @@ export interface KmindexIndexSummary {
   index: string;
 }
 
+export interface KmindexFacetValue {
+  count: number;
+  value: string;
+}
+
+export interface KmindexFacet {
+  // Column the facet was counted over: assay_type | platform | librarylayout
+  // | instrument | country | release_year.
+  name: string;
+  // Matched rows whose value fell outside `values`, i.e. the tail.
+  other: number;
+  // Matched rows with no value for this facet. Non-zero for country in
+  // particular, where over a fifth of SRA has no usable geography.
+  unknown: number;
+  values: KmindexFacetValue[];
+}
+
+// Summary of the FULL pre-cap match set, computed server-side before the hit
+// list is truncated. The listed hits are the top of a global score sort, and
+// the top of the score range over-represents whatever is common there, so
+// anything tallied from them disagrees with these counts -- on the measured
+// job, Escherichia coli 70.2% against a true Salmonella enterica 29.2%.
+export interface KmindexCohort {
+  bioprojects: number;
+  countries: number;
+  facets: KmindexFacet[];
+  // Matched rows the SRA mirror knows; facet and organism counts are over
+  // these, not over `total`.
+  in_mirror: number;
+  organisms: number;
+  studies: number;
+  // Counts only -- organism has too many distinct values to facet.
+  top_organisms: KmindexFacetValue[];
+  // Equals total_matches on KmindexResults.
+  total: number;
+}
+
 export interface KmindexResults {
+  // Optional because a backend predating the cohort summary omits it entirely,
+  // as does a job whose SRA mirror was unavailable.
+  cohort?: KmindexCohort | null;
   hits: KmindexHit[];
   job_id: string;
   limit: number;

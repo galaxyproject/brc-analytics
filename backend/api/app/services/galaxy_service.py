@@ -7,7 +7,7 @@ import logging
 import random
 import time
 from collections import Counter
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from bioblend.galaxy import GalaxyInstance
 
@@ -102,17 +102,25 @@ def _decode_tool_param(value: object) -> object:
     return value
 
 
-def _submitted_index_names(job_params: Optional[dict]) -> List[str]:
+def _submitted_index_names(job_params: Optional[dict]) -> Optional[List[str]]:
     """
     The kmindex indexes a job was submitted against, read from its parameters.
 
     This is the authoritative per-job list -- the tool's current option set says
     what the instance offers today, not what this job searched. Galaxy is loose
-    about the shape it echoes back, so accept every form it takes; an empty list
-    means the job carries no readable selection, not that none was made.
+    about the shape it echoes back, so accept every form it takes.
+
+    Returns None when the parameters carry no readable selection, and a list --
+    possibly empty -- when one was actually parsed. The two must not collapse:
+    every hit whose shard matches no name is bucketed as "(unattributed)", so a
+    silent [] turns a perfectly good hit list into a 100%-unattributed
+    breakdown that the caller would then cache for a day. This is reachable,
+    not theoretical -- the tool's db_opts conditional has a second case, and a
+    job submitted with db_opts_selector "histdb" (a user-supplied index file)
+    carries no kmindex key at all.
     """
     if not isinstance(job_params, dict):
-        return []
+        return None
 
     # The job is submitted with the flat "db_opts|kmindex" key, but kmindex_query
     # nests that select inside a conditional and Galaxy echoes the conditional
@@ -122,6 +130,8 @@ def _submitted_index_names(job_params: Optional[dict]) -> List[str]:
     if raw is None:
         section = _decode_tool_param(job_params.get("db_opts"))
         raw = section.get("kmindex") if isinstance(section, dict) else None
+    if raw is None:
+        return None
 
     # A multiple="true" select echoes a list, but one that took a single value
     # can come back as a bare name.
@@ -129,7 +139,7 @@ def _submitted_index_names(job_params: Optional[dict]) -> List[str]:
     if isinstance(selection, str):
         selection = [selection]
     if not isinstance(selection, list):
-        return []
+        return None
     return [str(name).strip() for name in selection if str(name).strip()]
 
 
@@ -407,6 +417,38 @@ class GalaxyService:
                 results.sra_annotated += 1
         return results
 
+    async def _cohort_for(
+        self, job_id: str, hits: List[dict]
+    ) -> Tuple[Optional[dict], bool]:
+        """
+        Count and facet the complete hit set against the SRA mirror.
+
+        Returns (cohort, failed). The flag separates a mirror that isn't
+        configured -- a steady state, where retrying changes nothing and the
+        result is safe to cache without a cohort -- from a read that broke,
+        which must not be cached, because the pre-cap hit list it would have
+        been computed from stops existing when aggregation returns.
+
+        Runs in a worker thread: the mirror is sync DuckDB, and this query
+        takes about a second on a million-hit job, which is far too long to
+        spend on the event loop.
+        """
+        if not self.sra_mirror or not self.sra_mirror.is_available():
+            return None, False
+
+        try:
+            cohort = await asyncio.to_thread(
+                self.sra_mirror.cohort_for_accessions,
+                [hit["accession"] for hit in hits],
+            )
+        except Exception as e:
+            # Nothing is salvaged from a failed read. The cohort is the number
+            # every other count in the response is measured against, so a
+            # partially-filled one would undermine exactly what it exists for.
+            logger.warning(f"kmindex job {job_id}: cohort query failed: {e}")
+            return None, True
+        return cohort, False
+
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
         cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
@@ -427,7 +469,9 @@ class GalaxyService:
         # Read the submitted index list up front. It is what attributes the
         # shard keys, and taking it before the downloads keeps the round trip
         # off the span where both the full and the capped hit list are alive.
-        submitted_indexes = await self._submitted_indexes(job_id)
+        # get_job_status already fetched the job dict this comes out of, so on
+        # a cold read it is handed over rather than fetched again.
+        submitted_indexes = await self._submitted_indexes(job_id, status.params)
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
         shards = list(
@@ -506,6 +550,17 @@ class GalaxyService:
         # accessions against this 50,000 cap, and reporting only the cap
         # presents 4% of the result as the whole of it.
         total_matches = len(hits)
+
+        # Summarize the whole match set before anything is thrown away. The
+        # cap is a global score sort, so counting what survives it counts the
+        # cap: on this job's real 1,133,516 hits the surviving 50,000 put
+        # E. coli first at 70.2% and left Salmonella enterica -- the true
+        # leader at 29.2% -- out of the top five entirely, with 947 of 10,927
+        # organisms and 3,894 of 19,014 BioProjects still represented. Done
+        # here, while the full list is the only one alive, so the peak is one
+        # hit list rather than two plus a summary.
+        cohort, cohort_failed = await self._cohort_for(job_id, hits)
+
         truncated = total_matches > KMINDEX_MAX_HITS
         capped = hits
         if truncated:
@@ -527,6 +582,7 @@ class GalaxyService:
             )
 
         aggregate = {
+            "cohort": cohort,
             "hits": hits,
             "per_index": per_index,
             "query_name": query_name,
@@ -553,30 +609,77 @@ class GalaxyService:
                 f"kmindex job {job_id}: submitted index list unreadable; "
                 "returning an unattributed breakdown uncached"
             )
+        elif not submitted_indexes and total_matches:
+            # Parsed, but empty: every shard key then attributes to nothing and
+            # the breakdown is 100% "(unattributed)" -- the same unrefreshable
+            # state as an unreadable list, so it gets the same refusal. Only a
+            # hit list with something in it can land here; an empty one has
+            # nothing to misattribute.
+            logger.error(
+                f"kmindex job {job_id}: submitted index list parsed as empty "
+                f"but {total_matches} hits matched; returning an unattributed "
+                "breakdown uncached"
+            )
         else:
-            await self.cache.set(cache_key, aggregate, CacheTTL.ONE_DAY)
+            # A failed cohort read deliberately does NOT veto the cache. Every
+            # refusal above is about the hit list itself being wrong; the
+            # cohort is an optional enrichment over a hit list that is correct,
+            # and letting it block the cache inverts the cost. Re-aggregation
+            # is 84-280 shard downloads from a rate-limited Galaxy behind a
+            # process-wide lock, and the failure need not be transient:
+            # is_available() only checks that a connection exists and
+            # _initialize never validates the columns this query needs, so a
+            # mirror on an older schema reports available and raises every
+            # time -- which made every results poll and every page click
+            # re-download every shard, forever. A short TTL bounds the retry
+            # instead of removing it: one re-aggregation per hour rather than
+            # one per request, and a genuinely transient failure still heals
+            # on its own.
+            ttl = CacheTTL.ONE_DAY
+            if cohort_failed:
+                ttl = CacheTTL.ONE_HOUR
+                logger.error(
+                    f"kmindex job {job_id}: cohort query failed; returning "
+                    f"results without a cohort, cached for {ttl}s so the read "
+                    "is retried rather than repeated on every request"
+                )
+            await self.cache.set(cache_key, aggregate, ttl)
 
         return aggregate
 
-    async def _submitted_indexes(self, job_id: str) -> Optional[List[str]]:
+    async def _submitted_indexes(
+        self, job_id: str, params: Optional[dict] = None
+    ) -> Optional[List[str]]:
         """
         The index names this job was submitted against, or None if unreadable.
 
         Deliberately not the tool's option list: building that form needs a
         history, and the history lookup's error path creates one per call, which
-        would have a read-only results request writing to Galaxy. show_job is a
-        read-only metadata call on a job this path is already reading, it cannot
-        be poisoned by an unrelated lookup failing, and it answers for this job
-        rather than for whatever the instance offers today.
+        would have a read-only results request writing to Galaxy. The job's own
+        parameters are read-only, cannot be poisoned by an unrelated lookup
+        failing, and answer for this job rather than for whatever the instance
+        offers today.
+
+        @param job_id: the job whose parameters to read.
+        @param params: parameters already fetched by the caller. Passing them
+            avoids a third show_job round trip per cold results request -- and
+            with it a metadata call that has no retry budget, unlike the seven
+            attempts plus straggler sweep every shard download gets, and whose
+            failure used to discard the whole aggregation. None means "not
+            carried", so fall back to fetching.
+        @returns: the parsed index names, or None if they could not be read.
         """
-        try:
-            job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
-            return _submitted_index_names(job.get("params"))
-        except Exception as e:
-            logger.warning(
-                f"kmindex job {job_id}: could not read the submitted index list: {e}"
-            )
-            return None
+        if params is None:
+            try:
+                job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+                params = job.get("params")
+            except Exception as e:
+                logger.warning(
+                    f"kmindex job {job_id}: could not read the submitted "
+                    f"index list: {e}"
+                )
+                return None
+        return _submitted_index_names(params)
 
     @staticmethod
     def _page_kmindex(
@@ -599,6 +702,10 @@ class GalaxyService:
             shards_with_hits=aggregate.get("shards_with_hits", 0),
             truncated=aggregate.get("truncated", False),
             per_index=aggregate["per_index"],
+            # Absent on an aggregate cached before cohorts existed, and on one
+            # built while the mirror was unavailable. Absent is the honest
+            # answer in both cases: there is no partial cohort to render.
+            cohort=aggregate.get("cohort"),
             limit=limit,
             offset=offset,
             hits=[KmindexHit(**h) for h in hits[offset : offset + limit]],
@@ -637,6 +744,9 @@ class GalaxyService:
                 stdout=job_data.get("stdout"),
                 stderr=job_data.get("stderr"),
                 exit_code=job_data.get("exit_code"),
+                # Carried for in-process callers (see the field's comment);
+                # excluded from both the response and the cached model_dump.
+                params=job_data.get("params"),
             )
 
             # Debug: log state changes
@@ -645,9 +755,10 @@ class GalaxyService:
                 f"complete: {status.is_complete}, successful: {status.is_successful}"
             )
 
-            # If job is complete, get outputs
+            # If job is complete, get outputs. Hand over the job dict already
+            # fetched above rather than making _get_job_outputs re-fetch it.
             if status.is_complete:
-                status.outputs = await self._get_job_outputs(job_id)
+                status.outputs = await self._get_job_outputs(job_id, job_data)
                 # Cache completed job status for 1 hour
                 await self.cache.set(cache_key, status.model_dump(), CacheTTL.ONE_HOUR)
 
@@ -839,11 +950,22 @@ class GalaxyService:
                 f"Failed to run random lines tool using BioBLEND: {str(e)}"
             ) from e
 
-    async def _get_job_outputs(self, job_id: str) -> List[GalaxyJobOutput]:
-        """Get output information for a job using BioBLEND."""
+    async def _get_job_outputs(
+        self, job_id: str, job_details: Optional[dict] = None
+    ) -> List[GalaxyJobOutput]:
+        """
+        Get output information for a job using BioBLEND.
+
+        @param job_id: the job whose outputs to read.
+        @param job_details: an already-fetched job dict. Callers that just
+            fetched one pass it in; re-fetching is a second identical GET
+            against a rate-limited Galaxy for a dict we already hold.
+        @returns: one entry per output dataset.
+        """
         try:
             # Get job outputs using BioBLEND
-            job_details = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+            if job_details is None:
+                job_details = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
             outputs = []
 
             # Get outputs from job details

@@ -3,6 +3,12 @@
 These cover the failure modes where an incomplete result could be presented --
 or worse, cached -- as a complete one, plus the merge-time bookkeeping. They
 stub bioblend rather than touching a real Galaxy instance.
+
+Mocked job statuses carry params=None, which models a status that did not come
+with the job's parameters -- one served from the status cache, where the field
+is excluded. The code under test then falls back to the stubbed show_job, which
+is the path most of these tests are exercising. TestJobMetadataIsFetchedOnce
+covers the other side, where the parameters are carried and no fetch happens.
 """
 
 import json
@@ -11,9 +17,12 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError
 
+from app.core.cache import CacheTTL
 from app.models.galaxy import (
     MAX_INDEXES,
     MAX_QUERY_BASES,
+    GalaxyJobState,
+    GalaxyJobStatus,
     KmindexQuerySubmission,
 )
 from app.services import galaxy_service
@@ -93,7 +102,11 @@ class TestMergeBookkeeping:
         for i, o in enumerate(outputs):
             o.dataset.id = f"ds{i}"
         return MagicMock(
-            is_complete=True, is_successful=True, state="ok", outputs=outputs
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
         )
 
     @pytest.mark.asyncio
@@ -255,7 +268,11 @@ class TestTieBreakIsArchiveNeutral:
         for i, o in enumerate(outputs):
             o.dataset.id = f"ds{i}"
         return MagicMock(
-            is_complete=True, is_successful=True, state="ok", outputs=outputs
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
         )
 
     @pytest.mark.asyncio
@@ -310,7 +327,11 @@ class TestCapReporting:
         for i, o in enumerate(outputs):
             o.dataset.id = f"ds{i}"
         return MagicMock(
-            is_complete=True, is_successful=True, state="ok", outputs=outputs
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
         )
 
     @staticmethod
@@ -454,10 +475,36 @@ class TestSubmittedIndexNames:
 
         assert _submitted_index_names(params) == ["GENOMIC_BCT"]
 
-    def test_missing_or_unusable_params_yield_no_names(self):
-        assert _submitted_index_names(None) == []
-        assert _submitted_index_names({}) == []
-        assert _submitted_index_names({"db_opts": "not json"}) == []
+    def test_unreadable_params_are_none_not_an_empty_selection(self):
+        # None rather than [], because the caller decides whether to cache on
+        # exactly this distinction: [] is a selection that named nothing, while
+        # None is "this job carries no readable selection".
+        assert _submitted_index_names(None) is None
+        assert _submitted_index_names({}) is None
+        assert _submitted_index_names({"db_opts": "not json"}) is None
+        assert _submitted_index_names({"db_opts|kmindex": {"unexpected": 1}}) is None
+
+    def test_histdb_job_carrying_no_kmindex_key_is_unreadable(self):
+        # The tool's db_opts conditional has a second case: a user-supplied
+        # index file, which carries no kmindex key at all. The results endpoint
+        # accepts an arbitrary job id, so this shape is reachable rather than
+        # hypothetical -- and it used to parse as [].
+        params = {
+            "db_opts": json.dumps(
+                {
+                    "__current_case__": 0,
+                    "db_opts_selector": "histdb",
+                    "histdb": {"values": [{"id": "abc123", "src": "hda"}]},
+                }
+            )
+        }
+
+        assert _submitted_index_names(params) is None
+
+    def test_an_explicitly_empty_selection_is_readable_and_empty(self):
+        # Parsed, so it is a list -- the other half of the distinction above.
+        assert _submitted_index_names({"db_opts|kmindex": []}) == []
+        assert _submitted_index_names({"db_opts|kmindex": ["  ", ""]}) == []
 
 
 class TestIndexAttribution:
@@ -476,7 +523,11 @@ class TestIndexAttribution:
         for i, o in enumerate(outputs):
             o.dataset.id = f"ds{i}"
         return MagicMock(
-            is_complete=True, is_successful=True, state="ok", outputs=outputs
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
         )
 
     @staticmethod
@@ -598,6 +649,58 @@ class TestIndexAttribution:
         service.cache.set.assert_not_called()
 
     @pytest.mark.asyncio
+    async def test_histdb_job_is_not_cached_as_all_unattributed(self, service):
+        """A job whose parameters carry no kmindex key must not be cached.
+
+        The names used to come back as [] for every shape that could not be
+        parsed, which sailed past the `is None` guard and wrote a
+        100%-(unattributed) breakdown with a one-day TTL and no refresh path --
+        precisely the state that guard exists to prevent.
+        """
+        service.gi.jobs.show_job = MagicMock(
+            return_value={
+                "params": {
+                    "db_opts": json.dumps(
+                        {
+                            "__current_case__": 0,
+                            "db_opts_selector": "histdb",
+                            "histdb": {"values": [{"id": "abc123", "src": "hda"}]},
+                        }
+                    )
+                }
+            }
+        )
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_2": {"q": {"SRR1": 1.0, "SRR2": 0.9}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        # Still served: the hits are real, only the attribution is unknown.
+        assert [s["index"] for s in aggregate["per_index"]] == [KMINDEX_UNATTRIBUTED]
+        assert aggregate["total_matches"] == 2
+        # But not frozen that way for a day.
+        service.cache.set.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_readable_but_empty_selection_with_hits_is_not_cached(self, service):
+        # Distinguishable from unreadable, but it still attributes every hit to
+        # nothing, which is the same unrefreshable state -- so the same refusal.
+        service.gi.jobs.show_job = MagicMock(
+            return_value={"params": {"db_opts|kmindex": []}}
+        )
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_2": {"q": {"SRR1": 1.0}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert [s["index"] for s in aggregate["per_index"]] == [KMINDEX_UNATTRIBUTED]
+        service.cache.set.assert_not_called()
+
+    @pytest.mark.asyncio
     async def test_results_path_creates_no_history(self, service):
         # Reading the tool's option list needs a history, and that lookup's
         # error path creates a fresh timestamped one on every call. A results
@@ -631,7 +734,11 @@ class TestVersionedAggregateCacheKey:
         for i, o in enumerate(outputs):
             o.dataset.id = f"ds{i}"
         return MagicMock(
-            is_complete=True, is_successful=True, state="ok", outputs=outputs
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
         )
 
     @staticmethod
@@ -681,3 +788,374 @@ class TestVersionedAggregateCacheKey:
         assert results.total_matches == results.total_hits == 2
         assert results.truncated is False
         assert [s.index for s in results.per_index] == ["GENOMIC_BCT"]
+
+
+def _cohort_payload(total: int, in_mirror: int) -> dict:
+    """A cohort shaped like the mirror really returns one.
+
+    Counts reconcile the way the real query guarantees -- values + other +
+    unknown == in_mirror on every facet -- and the country facet carries SRA's
+    'uncalculated' sentinel in `unknown` rather than as a value, which is the
+    thing that would otherwise render as a top-three country.
+
+    @param total: hits before the cap, i.e. total_matches.
+    @param in_mirror: how many of those the mirror knows.
+    @returns: the cohort dict as the mirror service hands it over.
+    """
+    return {
+        "bioprojects": 19014,
+        "countries": 186,
+        "facets": [
+            {
+                "name": "country",
+                "other": 4,
+                "unknown": 6,
+                "values": [
+                    {"count": in_mirror - 12, "value": "USA"},
+                    {"count": 2, "value": "United Kingdom"},
+                ],
+            },
+            {
+                "name": "platform",
+                "other": 0,
+                "unknown": 0,
+                "values": [{"count": in_mirror, "value": "ILLUMINA"}],
+            },
+        ],
+        "in_mirror": in_mirror,
+        "organisms": 10927,
+        "studies": 19148,
+        "top_organisms": [{"count": in_mirror, "value": "Salmonella enterica"}],
+        "total": total,
+    }
+
+
+def duckdb_binder_error() -> Exception:
+    """The shape a mirror on an older schema fails with, every single call."""
+    return RuntimeError(
+        'Binder Error: Referenced column "geo_loc_name_country_calc" not found'
+    )
+
+
+class TestCohortOverTheFullHitSet:
+    """
+    The cohort has to describe the query, not the cap.
+
+    The visible rows are the top of a global score sort, so counting them
+    counts the truncation: on the real 1,133,516-hit job the surviving 50,000
+    reported E. coli first at 70.2% when the true leader was Salmonella
+    enterica at 29.2% -- which the capped set does not contain at all -- and
+    947 organisms where the full set has 10,927.
+    """
+
+    @staticmethod
+    def _status(shard_count):
+        outputs = [MagicMock() for _ in range(shard_count)]
+        for i, o in enumerate(outputs):
+            o.dataset.id = f"ds{i}"
+        return MagicMock(
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
+        )
+
+    @staticmethod
+    def _job(indexes):
+        return {
+            "params": {
+                "db_opts": json.dumps(
+                    {
+                        "__current_case__": 1,
+                        "db_opts_selector": "db",
+                        "kmindex": indexes,
+                    }
+                )
+            }
+        }
+
+    def _mirror(self, service, cohort=None, side_effect=None):
+        """Attach a stub SRA mirror to `service`.
+
+        @param service: the GalaxyService under test.
+        @param cohort: dict the mirror returns for the full hit set.
+        @param side_effect: raise this instead, to model a broken read.
+        @returns: the stub, so a test can inspect the call it received.
+        """
+        mirror = MagicMock()
+        mirror.is_available = MagicMock(return_value=True)
+        mirror.cohort_for_accessions = MagicMock(
+            return_value=cohort, side_effect=side_effect
+        )
+        service.sra_mirror = mirror
+        return mirror
+
+    def _wire(self, service, hits=25):
+        """Point the service at one shard carrying `hits` equal-scoring hits."""
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(["GENOMIC_BCT"]))
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={
+                "GENOMIC_BCT_10_null": {"q": {f"SRR{n:06d}": 1.0 for n in range(hits)}}
+            }
+        )
+
+    @pytest.mark.asyncio
+    async def test_cohort_is_computed_from_every_hit_not_the_capped_page(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_MAX_HITS", 10)
+        mirror = self._mirror(service, _cohort_payload(total=25, in_mirror=24))
+        self._wire(service, hits=25)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        # The whole point: the mirror saw all 25, not the 10 that survived.
+        (accessions,) = mirror.cohort_for_accessions.call_args.args
+        assert len(accessions) == 25
+        assert results.total_hits == 10
+        assert results.cohort.total == results.total_matches == 25
+
+    @pytest.mark.asyncio
+    async def test_cohort_facets_reconcile_on_the_wire(self, service):
+        self._mirror(service, _cohort_payload(total=25, in_mirror=24))
+        self._wire(service, hits=25)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        for facet in results.cohort.facets:
+            listed = sum(v.count for v in facet.values)
+            assert listed + facet.other + facet.unknown == results.cohort.in_mirror
+        country = next(f for f in results.cohort.facets if f.name == "country")
+        assert "uncalculated" not in [v.value for v in country.values]
+
+    @pytest.mark.asyncio
+    async def test_no_mirror_yields_no_cohort_and_still_caches(self, service):
+        service.sra_mirror = None
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.cohort is None
+        # A missing mirror is a steady state, not a transient failure -- there
+        # is nothing to retry, so the hit list is still worth caching.
+        service.cache.set.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_unavailable_mirror_yields_no_cohort(self, service):
+        mirror = MagicMock()
+        mirror.is_available = MagicMock(return_value=False)
+        service.sra_mirror = mirror
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service._page_kmindex(aggregate, "job1", 5, 0).cohort is None
+        mirror.cohort_for_accessions.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_failed_cohort_read_still_caches_the_correct_hit_list(self, service):
+        self._mirror(service, side_effect=RuntimeError("mirror read failed"))
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        # Nothing partial is served...
+        assert results.cohort is None
+        # ...but the hit list, the breakdown and total_matches are all correct.
+        # The cohort is an optional enrichment, so letting it veto the cache of
+        # a correct result would invert the cost -- see the re-aggregation test
+        # below for what that cost actually is.
+        service.cache.set.assert_called_once()
+        _key, _value, ttl = service.cache.set.call_args.args
+        # Short, so the read is retried rather than abandoned for a day.
+        assert ttl == CacheTTL.ONE_HOUR
+
+    @pytest.mark.asyncio
+    async def test_deterministic_cohort_failure_aggregates_once_not_per_request(
+        self, service
+    ):
+        """A cohort read that fails the same way every time must not re-download
+        every shard on every poll.
+
+        Deterministic causes are reachable: is_available() is only
+        `self._con is not None`, and _initialize validates that mirror_meta and
+        runs exist but never the columns this query needs -- so a mirror on an
+        older schema reports available and raises on every call. Every results
+        poll and every page click would then re-download all 84 shard datasets
+        from a rate-limited Galaxy, serialized against every other kmindex user
+        on the process-wide aggregation lock.
+        """
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        mirror = self._mirror(
+            service,
+            side_effect=duckdb_binder_error(),
+        )
+        self._wire(service, hits=5)
+
+        for _ in range(3):
+            results = await service.get_kmindex_results("job1")
+
+        # The hit list is still correct and still served, just without a cohort.
+        assert results.cohort is None
+        assert results.total_matches == 5
+        # One aggregation for three polls: the failure is retried on a timer,
+        # not on every request.
+        assert service._download_shard.await_count == 1
+        assert mirror.cohort_for_accessions.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_cohort_survives_the_cache_round_trip(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        self._wire(service, hits=5)
+
+        first = await service.get_kmindex_results("job1")
+        second = await service.get_kmindex_results("job1")
+
+        assert first.cohort == second.cohort
+        # The mirror is only asked once: the second call reads the cached
+        # aggregate, which is the only place the cohort still exists.
+        assert mirror.cohort_for_accessions.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_aggregate_cached_before_cohorts_reads_as_no_cohort(self, service):
+        # A v2 entry written before this existed is not wrong, just silent --
+        # so it stays readable rather than forcing every warm job to
+        # re-download its shards from a rate-limited Galaxy.
+        aggregate = {
+            "hits": [{"accession": "SRR9", "score": 0.9, "shard": "GENOMIC_BCT_2"}],
+            "per_index": [
+                {"hits_after_cap": 1, "hits_before_cap": 1, "index": "GENOMIC_BCT"}
+            ],
+            "query_name": "q",
+            "shards_failed": 0,
+            "shards_searched": 1,
+            "shards_with_hits": 1,
+            "total_matches": 1,
+            "truncated": False,
+        }
+
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.cohort is None
+        assert results.total_matches == 1
+
+
+class TestJobMetadataIsFetchedOnce:
+    """
+    One cold results request should make one show_job GET, not three.
+
+    get_job_status already holds the full job dict, params included;
+    _get_job_outputs re-fetched it and _submitted_indexes fetched it a third
+    time purely for params it could have been handed. That third call had no
+    retry budget -- unlike the seven attempts plus 20s straggler sweep every
+    shard download gets -- and its failure discarded the whole aggregation. At
+    280 shards throttled to two concurrent, that is minutes of rate-limited
+    work thrown away because a metadata GET blipped.
+    """
+
+    @staticmethod
+    def _wire(service, shard_count=3):
+        """Stub a complete job whose show_job answers status, outputs and params.
+
+        @param service: the GalaxyService under test.
+        @param shard_count: how many output datasets the job exposes.
+        @returns: None; the service is mutated in place.
+        """
+        service.gi.jobs.show_job = MagicMock(
+            return_value={
+                "state": "ok",
+                "create_time": "t0",
+                "update_time": "t1",
+                "outputs": {f"out{i}": {"id": f"ds{i}"} for i in range(shard_count)},
+                "params": {
+                    "db_opts": json.dumps(
+                        {
+                            "__current_case__": 1,
+                            "db_opts_selector": "db",
+                            "kmindex": ["GENOMIC_BCT"],
+                        }
+                    )
+                },
+            }
+        )
+        service.gi.datasets.show_dataset = MagicMock(
+            side_effect=lambda ds_id: {
+                "id": ds_id,
+                "name": ds_id,
+                "state": "ok",
+                "file_ext": "json",
+            }
+        )
+        service._download_shard = AsyncMock(
+            side_effect=lambda ds_id, sem: {
+                f"GENOMIC_BCT_{ds_id[2:]}": {"q": {f"SRR{ds_id[2:]}": 1.0}}
+            }
+        )
+
+    @pytest.mark.asyncio
+    async def test_one_show_job_per_cold_results_request(self, service):
+        service.sra_mirror = None
+        self._wire(service)
+
+        results = await service.get_kmindex_results("job1", limit=25, offset=0)
+
+        assert service.gi.jobs.show_job.call_count == 1
+        # And that single fetch still attributed every shard, so the round trips
+        # were redundant rather than load-bearing.
+        assert [s.index for s in results.per_index] == ["GENOMIC_BCT"]
+        assert results.total_matches == 3
+
+    @pytest.mark.asyncio
+    async def test_status_without_params_falls_back_to_one_fetch(self, service):
+        # A status served from the status cache carries no params, since the
+        # field is excluded from model_dump. The index list stays readable --
+        # at the cost of the one round trip, not three.
+        service.sra_mirror = None
+        self._wire(service)
+        cached_shape = (await service.get_job_status("job1")).model_copy(
+            update={"params": None}
+        )
+        service.gi.jobs.show_job.reset_mock()
+        service.get_job_status = AsyncMock(return_value=cached_shape)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        assert [s["index"] for s in aggregate["per_index"]] == ["GENOMIC_BCT"]
+
+    def test_params_reach_neither_the_wire_nor_the_status_cache(self):
+        status = GalaxyJobStatus(
+            job_id="job1",
+            state=GalaxyJobState.OK,
+            created_time="t0",
+            updated_time="t1",
+            params={"db_opts|kmindex": ["GENOMIC_BCT"]},
+        )
+
+        # Carried in-process for the aggregation path...
+        assert status.params == {"db_opts|kmindex": ["GENOMIC_BCT"]}
+        # ...but excluded from the public response model and from the dict the
+        # status cache stores, so a job's raw tool parameters stay internal.
+        assert "params" not in status.model_dump()
+        assert "params" not in status.model_dump_json()
