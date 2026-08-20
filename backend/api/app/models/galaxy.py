@@ -166,6 +166,65 @@ class KmindexIndexSummary(BaseModel):
     index: str
 
 
+class KmindexFacetValue(BaseModel):
+    """One value of a cohort facet, with how many matched runs carry it."""
+
+    count: int
+    value: str
+
+
+class KmindexFacet(BaseModel):
+    """A facet computed over every matched run, not just the pageable ones."""
+
+    name: str = Field(
+        ...,
+        description="assay_type | platform | librarylayout | instrument | "
+        "country | release_year",
+    )
+    other: int = Field(
+        ...,
+        description="Matched runs whose value is real but outside the listed "
+        "values -- the long tail, kept as a count so the parts still sum",
+    )
+    unknown: int = Field(
+        ...,
+        description="Matched runs with no usable value for this facet, "
+        "including SRA's literal sentinels -- 'uncalculated' for country "
+        "and 'unspecified' for instrument",
+    )
+    values: List[KmindexFacetValue]
+
+
+class KmindexCohort(BaseModel):
+    """
+    Counts over the complete pre-cap hit set, joined against the SRA mirror.
+
+    The paged hits are the top of a global score sort, so counting them
+    describes the cap rather than the query: on a real 1,133,516-hit job the
+    visible 50,000 put E. coli first at 70% and dropped Salmonella enterica --
+    the actual leader at 29% -- out of the list entirely. These numbers are
+    computed before the cap, so they answer for the whole match set.
+    """
+
+    bioprojects: int
+    countries: int
+    facets: List[KmindexFacet]
+    in_mirror: int = Field(
+        ...,
+        description="Matched accessions the mirror knows about, of `total`; "
+        "every count here is out of this, not out of `total`",
+    )
+    organisms: int
+    studies: int
+    top_organisms: List[KmindexFacetValue] = Field(
+        default=[],
+        description="Ten most frequent organisms. Not a facet: the tail is "
+        "10,000 names long and the mirror carries no taxid on runs, so a "
+        "taxonomic rollup is not free",
+    )
+    total: int = Field(..., description="Hits before the cap; equals total_matches")
+
+
 class KmindexResults(BaseModel):
     """Hits from a kmindex query, merged across every index shard."""
 
@@ -195,6 +254,12 @@ class KmindexResults(BaseModel):
         description="What each searched index contributed either side of the "
         "cap; the cap is one global score sort, so a small index searched "
         "alongside a large one keeps only a fraction of its hits",
+    )
+    cohort: Optional[KmindexCohort] = Field(
+        default=None,
+        description="Counts over every hit the query matched, before the cap. "
+        "Absent when the mirror could not answer -- never partially filled, "
+        "since the point of it is to be the trustworthy number",
     )
     limit: int
     offset: int
@@ -268,6 +333,17 @@ class GalaxyJobStatus(BaseModel):
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
+    # The job's tool parameters, carried in-process so callers that need them
+    # don't have to re-fetch a job dict this status was already built from.
+    # excluded, so it reaches neither the HTTP response (this is a public
+    # response_model) nor the status cache, which is written via model_dump().
+    # A reader therefore has to treat None as "not carried here", not as
+    # "this job has no parameters".
+    # Deliberately Any rather than Dict: the only consumer already opens with an
+    # isinstance check, and validating the shape here would turn a params value
+    # Galaxy shaped unexpectedly from inert into a 500 on every job endpoint,
+    # not just on index attribution.
+    params: Optional[Any] = Field(default=None, exclude=True)
 
 
 class GalaxyJobResult(BaseModel):

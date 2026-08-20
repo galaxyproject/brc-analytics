@@ -12,6 +12,7 @@ from __future__ import annotations
 import copy
 import datetime
 import functools
+import hashlib
 import logging
 import tempfile
 import threading
@@ -41,6 +42,49 @@ _CACHE_MAX_ENTRIES = 512
 # ceiling on how many accessions a caller may ask about -- see
 # runs_by_accession, which loops rather than truncating.
 _ACCESSION_BATCH_SIZE = 500
+
+# Facets computed over a whole pre-cap hit set, as (name, expression over
+# `runs`). Which columns earn a facet is a property of the data, measured
+# mirror-wide over all 43,522,611 runs rather than guessed: librarylayout (2
+# distinct) is the only one that lists in full; assay_type (44), platform
+# (21), instrument (110) and country (246) list a head and roll the tail into
+# `other`. Cardinality alone does not say how much that tail hides -- a head
+# of ten covers 99.95% of mirror rows for platform but only 85.87% for
+# instrument -- which is why `other` is always emitted and always reconciles
+# against in_mirror instead of being dropped. organism is deliberately not
+# here: 296,175 distinct values, 453 of them needed to reach 90%, and `runs`
+# carries no taxid to roll them up with, so it ships as a distinct count plus
+# a top-10 list instead. Same for bioproject and sra_study, drill-downs at
+# ~688,000 and ~702,000 values.
+_COHORT_FACETS: Tuple[Tuple[str, str], ...] = (
+    ("assay_type", "nullif(assay_type, '')"),
+    ("platform", "nullif(platform, '')"),
+    ("librarylayout", "nullif(librarylayout, '')"),
+    # 'unspecified' is SRA's literal sentinel for "no instrument was
+    # recorded", not a machine -- the same mistake as 'uncalculated' below.
+    # instrument carries no NULLs and no empty strings anywhere in the mirror,
+    # so without this the facet's `unknown` is structurally always 0, which
+    # asserts every matched run has a recorded instrument. The sentinel is
+    # 245,944 rows mirror-wide and 9,913 on the measured job, where it
+    # rendered as the 9th most common sequencing instrument.
+    ("instrument", "nullif(nullif(instrument, ''), 'unspecified')"),
+    # 'uncalculated' is SRA's literal sentinel for "no country could be
+    # derived", not a place. It is 46,248 rows on the measured job -- third
+    # place, ahead of Canada -- so treating it as a value would invent a
+    # country. It belongs in `unknown` alongside the NULLs.
+    ("country", "nullif(nullif(geo_loc_name_country_calc, ''), 'uncalculated')"),
+    ("release_year", "CAST(year(releasedate) AS VARCHAR)"),
+)
+
+# Values each facet names before the rest become `other`, and how many
+# organisms the cohort lists. Ten of each keeps the whole cohort ~3 KB on
+# the wire, against the 50,000 hit rows it is describing.
+_COHORT_FACET_VALUES = 10
+_COHORT_TOP_ORGANISMS = 10
+
+# Tag on the scalar rows of the cohort query, which shares its result set with
+# the facet rows. Empty rather than a name so it cannot collide with a facet.
+_COHORT_SCALAR_TAG = ""
 
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
@@ -174,6 +218,94 @@ def _normalize_since(value: str) -> Optional[str]:
     except ValueError:
         return None
     return s
+
+
+def _cohort_sql() -> str:
+    """The whole cohort -- six facets, four distinct counts, a row count and a
+    top-organism list -- as one statement over one join.
+
+    One statement rather than ten because the join is the expensive part: the
+    same work split across separate statements measured 1.44s against 0.34s
+    for this, on the real 1,133,516-accession job. The accession set arrives
+    as a staging file read inline, not as a bound list: `acc IN (SELECT
+    UNNEST(?))` is fine for the 25-row page runs_by_accession serves but
+    degrades badly with size -- 2.3s at 50,000 and still running after two
+    minutes at 1.13M, where read_csv is 0.32s. read_csv also keeps the whole
+    statement a pure read, which matters because the mirror is opened
+    read_only and CREATE TEMP TABLE is therefore unavailable (and there is no
+    pyarrow/pandas to register a frame with either).
+
+    Distinct counts are the other reason this cannot be batched: they do not
+    merge across chunks, so a chunked count(DISTINCT organism) would be
+    plausible and wrong.
+
+    Quote and escape handling is turned off so every staged line is one value
+    verbatim. Accessions never contain a quote character, but if one ever did
+    the default reader would not error -- it would quietly answer a different
+    question. Measured on duckdb 1.5.4: a quote paired with another one d
+    lines later reads the span between them as a single field and drops
+    exactly d accessions (60,000 staged lines with quotes 100 apart read back
+    59,900), and a value the reader does keep can still be rewritten, with
+    "SRR1" read as SRR1 and "" as NULL. Whether the drop happens depends on
+    where in the file the quotes fall -- the same pair 10,000 lines apart in a
+    20,000-line file read back intact -- so this is hardening against a silent
+    and position-dependent failure, not a certain one. Cheap either way, and
+    the one failure mode a trustworthy count cannot have.
+    """
+    projection = ",\n                   ".join(
+        f"{expr} AS {name}" for name, expr in _COHORT_FACETS
+    )
+    facet_selects = "\n        ".join(
+        f"UNION ALL SELECT '{name}', {name}, count(*) FROM m GROUP BY 2"
+        for name, _expr in _COHORT_FACETS
+    )
+    tag = _COHORT_SCALAR_TAG
+    return f"""
+        WITH q AS (SELECT column0 AS acc FROM read_csv(?, header=false,
+                       quote='', escape='',
+                       columns={{'column0':'VARCHAR'}})),
+             m AS (
+               SELECT {projection},
+                      nullif(organism, '') AS organism, bioproject, sra_study
+               FROM runs r SEMI JOIN q ON r.acc = q.acc)
+        SELECT '{tag}' AS facet, 'in_mirror' AS value, count(*) AS n FROM m
+        UNION ALL SELECT '{tag}', 'organisms', count(DISTINCT organism) FROM m
+        UNION ALL SELECT '{tag}', 'bioprojects', count(DISTINCT bioproject) FROM m
+        UNION ALL SELECT '{tag}', 'studies', count(DISTINCT sra_study) FROM m
+        UNION ALL SELECT '{tag}', 'countries', count(DISTINCT country) FROM m
+        {facet_selects}
+        UNION ALL SELECT 'organism', organism, n FROM (
+            SELECT organism, count(*) AS n FROM m WHERE organism IS NOT NULL
+            GROUP BY 1 ORDER BY n DESC, organism LIMIT {_COHORT_TOP_ORGANISMS})
+    """
+
+
+def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+    """Split one facet's grouped counts into listed values, `other` and
+    `unknown`.
+
+    Every matched row lands in exactly one of the three, so a reader can
+    reconcile the facet against in_mirror rather than having to trust it. NULL
+    is `unknown` -- the facet expressions have already folded empty strings and
+    the 'uncalculated' country sentinel into NULL, because a blank rendered as
+    a value is a claim the data does not make.
+    """
+    unknown = sum(n for value, n in counted if value is None)
+    # Ties are broken by value so the listed head is stable across runs; with
+    # 1.1M rows they are rare, but "the top 10 changed" is a bad way to learn
+    # that the underlying counts did not.
+    known = sorted(
+        ((value, n) for value, n in counted if value is not None),
+        key=lambda vn: (-vn[1], vn[0]),
+    )
+    return {
+        "name": name,
+        "other": sum(n for _value, n in known[_COHORT_FACET_VALUES:]),
+        "unknown": unknown,
+        "values": [
+            {"count": n, "value": value} for value, n in known[:_COHORT_FACET_VALUES]
+        ],
+    }
 
 
 def _synchronized(method):
@@ -746,6 +878,107 @@ class SRAMirrorService:
         }
         self._cache_put(cache_key, result)
         return result
+
+    # Deliberately not @_synchronized. That decorator holds the instance lock
+    # for the whole call, and its own justification is that "queries are
+    # sub-200ms"; this one is ~1s against a 43.5M-row table, so holding
+    # the lock across it would park every MCP tool call and assistant lookup
+    # behind one user's search. Instead the long query runs on a duckdb
+    # cursor() -- an independent connection onto the already-open database --
+    # and the lock is held only for the cache reads/writes and the cursor
+    # handoff, which are the parts that actually touch shared state. Measured:
+    # while a cursor ran a 1.4s query, the parent connection served 4,166
+    # small queries with no errors and no measurable slowdown.
+    def cohort_for_accessions(self, accessions: List[str]) -> Optional[Dict[str, Any]]:
+        """
+        Facet and count a complete hit set in one pass over the mirror.
+
+        Built for the pre-cap hit list of a sequence search, which is why it
+        takes every accession rather than a page: counting the paged rows
+        describes the display cap, not the query. On a real 1,133,516-hit job
+        the visible 50,000 reported E. coli first at 70% and dropped
+        Salmonella enterica -- the actual leader -- off the list entirely.
+
+        Returns the cohort dict, or None when the mirror is unavailable or the
+        hit set is empty. A query failure is raised rather than swallowed: the
+        caller has to be able to tell "the mirror was never there" (cache the
+        result without a cohort) from "the read failed this time" (don't), and
+        a half-filled cohort is worse than none, since the whole reason it
+        exists is to be the number that can be trusted.
+        """
+        if not self._con or not accessions:
+            return None
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return None
+
+        payload = "\n".join(wanted)
+        # Key on a digest rather than the accession tuple runs_by_accession
+        # uses: at 1.1M accessions that tuple would cost more to build, hash
+        # and hold than the query it saves. Length is carried alongside so a
+        # caller asking about the same set twice with different duplication
+        # can't be served the wrong `total`.
+        cache_key = (
+            "cohort",
+            hashlib.md5(payload.encode()).hexdigest(),
+            len(accessions),
+        )
+        with self._lock:
+            if (cached := self._cache_get(cache_key)) is not None:
+                return cached
+            cursor = self._con.cursor()
+
+        # The staging file is the join's right-hand side; it exists only for
+        # the duration of the statement and never outlives the call.
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".txt", prefix="cohort-", delete=False
+            )
+            staging.write(payload)
+            staging.close()
+            rows = cursor.execute(_cohort_sql(), [staging.name]).fetchall()
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        scalars = {value: n for facet, value, n in rows if facet == _COHORT_SCALAR_TAG}
+        grouped: Dict[str, List[Tuple[Optional[str], int]]] = {
+            name: [] for name, _expr in _COHORT_FACETS
+        }
+        organisms: List[Dict[str, Any]] = []
+        for facet, value, n in rows:
+            if facet in grouped:
+                grouped[facet].append((value, n))
+            elif facet == "organism":
+                organisms.append({"count": n, "value": value})
+        # UNION ALL does not promise to preserve branch order, so re-sort here
+        # rather than trust the LIMIT'd subquery's ordering to survive.
+        organisms.sort(key=lambda o: (-o["count"], o["value"]))
+
+        cohort = {
+            "bioprojects": scalars["bioprojects"],
+            "countries": scalars["countries"],
+            "facets": [
+                _shape_facet(name, grouped[name]) for name, _expr in _COHORT_FACETS
+            ],
+            "in_mirror": scalars["in_mirror"],
+            "organisms": scalars["organisms"],
+            "studies": scalars["studies"],
+            "top_organisms": organisms,
+            # The caller's hit count, not the deduplicated or mirrored one, so
+            # it lines up with the total_matches shown beside it. Everything
+            # else counts mirrored rows and is therefore out of in_mirror --
+            # about 99.6% of total on the measured job, and much less for a
+            # query that matches organisms the mirror was not built to carry.
+            "total": len(accessions),
+        }
+        with self._lock:
+            self._cache_put(cache_key, cohort)
+        return cohort
 
     @_synchronized
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
