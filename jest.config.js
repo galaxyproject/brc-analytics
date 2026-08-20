@@ -16,6 +16,7 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@ga2/(.*)$": "<rootDir>/sites/ga2/$1",
   },
+  setupFiles: ["<rootDir>/tests/setup/environment.ts"],
   testEnvironment: "jest-environment-jsdom",
   // Excludes Playwright e2e tests which Jest cannot parse
   testPathIgnorePatterns: ["/node_modules/", "/catalog/", "/tests/e2e/"],
