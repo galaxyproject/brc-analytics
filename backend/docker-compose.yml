@@ -27,6 +27,10 @@ services:
         required: false
     environment:
       CATALOG_PATH: /catalog/output
+      # Container path, so it is pinned here rather than left to api/.env. The
+      # export is only written when the SRA mirror is also configured, so this
+      # being set on its own costs nothing.
+      KMINDEX_EXPORT_DIR: /data/exports
       REDIS_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
@@ -38,6 +42,13 @@ services:
       # Both are needed: with only the variable set the path does not exist in
       # the container, and with only the mount the service stays disabled.
       - ${SRA_MIRROR_HOST_PATH:-/dev/null}:/data/sra-mirror.duckdb:ro
+      # Writable, unlike everything else this service mounts: a kmindex search
+      # materializes its full match set here so it can be downloaded
+      # afterwards. Named rather than a bind mount so it survives a rebuild
+      # without needing a host directory with the right ownership; the image
+      # creates /data/exports so the volume inherits the runtime user's.
+      # Retention is enforced in-process, not by the volume.
+      - kmindex_exports:/data/exports
     depends_on:
       redis:
         condition: service_healthy
@@ -64,4 +75,5 @@ services:
       start_period: 10s
 
 volumes:
+  kmindex_exports:
   redis_data:

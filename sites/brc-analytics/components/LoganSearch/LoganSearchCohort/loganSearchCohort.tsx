@@ -4,25 +4,38 @@ import {
   CohortFacetGrid,
   CohortStat,
   CohortStats,
+  ControlRow,
 } from "@brc/components/LoganSearch/loganSearch.styles";
+import { Download } from "@mui/icons-material";
 import {
   Alert,
   AlertTitle,
+  Button,
   Card,
   CardContent,
   Divider,
   LinearProgress,
   Typography,
 } from "@mui/material";
+import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
   type KmindexFacet,
+  type KmindexResults,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import { type JSX } from "react";
 
 interface LoganSearchCohortProps {
   search: ReturnType<typeof useKmindexSearch>;
+}
+
+interface CohortExportProps {
+  cohort: KmindexCohort;
+  // Rows the table below can page through, for the sentence that separates
+  // the file from the window onto it.
+  listed: number;
+  results: KmindexResults;
 }
 
 interface CohortBarsProps {
@@ -49,6 +62,24 @@ const FACET_LABELS: Record<string, string> = {
   platform: "Sequencing platform",
   release_year: "Release year",
 };
+
+// What one exported row costs as TSV. The API reports the parquet's exact
+// size but not the TSV's, because the TSV is converted on the way out and
+// never exists as a file to measure. The row count is enough to size it
+// anyway: the column set is fixed, so per-row width is a property of the
+// format more than of the data. Measured by running the backend's own export
+// and TSV writer over both real corpora -- 148.2 B/row across 1,133,516 rows
+// (168.0 MB) and 147.4 across 1,514,202 (223.2 MB) -- so 148 lands within
+// 0.4% of both. Rendered with a "~" regardless, since it is derived and the
+// parquet size beside it is not.
+const TSV_BYTES_PER_ROW = 148;
+
+// Excel and LibreOffice Calc both stop at 1,048,576 rows and truncate the rest
+// with a single dismissable warning. This export exists because the 50,000 rows
+// on screen misrepresent the match set, so steering someone to a format that
+// silently drops the tail would reintroduce the same problem in a new place --
+// and the measured job is 1,133,516 rows, over the limit.
+const SPREADSHEET_ROW_LIMIT = 1048576;
 
 /**
  * Display name for a facet, falling back to a de-underscored column name so an
@@ -82,6 +113,26 @@ function formatShare(count: number, total: number): string {
   if (share < 0.1) return "<0.1%";
   if (count < total && share > 99.9) return ">99.9%";
   return `${share.toFixed(1)}%`;
+}
+
+/**
+ * Bytes as a short size.
+ *
+ * The two formats sit an order of magnitude apart -- a 15.6 MB parquet beside
+ * a 168 MB TSV, and further apart still on a large match set -- so a fixed
+ * number of decimals is either a lost digit at the bottom of that range or
+ * noise at the top.
+ * @param bytes - Size in bytes.
+ * @returns Size in decimal units.
+ */
+function formatBytes(bytes: number): string {
+  const mb = bytes / 1e6;
+  if (mb >= 1000) return `${(mb / 1000).toFixed(1)} GB`;
+  if (mb >= 100) return `${Math.round(mb)} MB`;
+  if (mb >= 1) return `${mb.toFixed(1)} MB`;
+  // A sub-kilobyte export would still be a file worth naming, so don't let it
+  // round to "0 kB".
+  return `${Math.max(Math.round(bytes / 1e3), 1)} kB`;
 }
 
 /**
@@ -209,6 +260,124 @@ function CohortBars({ rows, total }: CohortBarsProps): JSX.Element {
   );
 }
 
+/**
+ * The match set as a file.
+ *
+ * This hangs off the cohort and not off the table on purpose. The file is
+ * every run the query matched, which is what this card is about; the table is
+ * an explicit window onto the top of that set. A download button on the window
+ * would quietly undo the distinction the card exists to draw.
+ * @param props - Component props.
+ * @param props.cohort - Cohort summary, for how much of the file the mirror
+ * could describe.
+ * @param props.listed - Rows the table below can page through.
+ * @param props.results - Results payload, for the export fields and the job
+ * id the endpoint is keyed on.
+ * @returns The download block, or null when there is no file to offer.
+ */
+function CohortExport({
+  cohort,
+  listed,
+  results,
+}: CohortExportProps): JSX.Element | null {
+  const rows = results.export_rows ?? 0;
+
+  if (results.export_status !== "available" || rows <= 0) {
+    // No file, and for most reasons -- mirror down, export directory
+    // unconfigured, file swept -- nothing the reader could do about it, so say
+    // nothing rather than explain an absence. Too many matches is the
+    // exception: that one a narrower query fixes.
+    if (results.export_status !== "too_large") return null;
+    return (
+      <>
+        <Divider sx={{ my: 2 }} />
+        <Typography color="textSecondary" component="div" variant="caption">
+          Too many matched runs to prepare a download of the full set. A higher
+          minimum shared k-mer fraction, or fewer indexes, brings one back.
+        </Typography>
+      </>
+    );
+  }
+
+  const exportUrl = `${API_BASE_URL}/galaxy/kmindex/jobs/${results.job_id}/export`;
+  // The parquet's real size, so it goes on the button unqualified. A backend
+  // that reports availability without a size gets a bare "Parquet" rather
+  // than a fabricated number or a "0 kB".
+  const parquetSize = results.export_bytes
+    ? ` · ${formatBytes(results.export_bytes)}`
+    : "";
+  // Runs that matched but that the mirror has never heard of. They are in the
+  // file -- dropping them would make the row count disagree with the match
+  // count -- but their metadata columns are empty. The coverage share is
+  // already stated above, so this only says what it means for the file.
+  const missing = Math.max(cohort.total - cohort.in_mirror, 0);
+
+  return (
+    <>
+      <Divider sx={{ my: 2 }} />
+      <Typography variant="subtitle2">Download the whole match set</Typography>
+      <Typography
+        color="textSecondary"
+        component="div"
+        sx={{ mb: 1.5 }}
+        variant="caption"
+      >
+        All {rows.toLocaleString()} matched runs with their SRA metadata, in one
+        file --{" "}
+        {rows > listed
+          ? `the set these counts describe, not the ${listed.toLocaleString()} rows the table below pages through.`
+          : `the same set as the table below, joined to metadata for every row rather than the page on screen.`}
+        {missing > 0 &&
+          ` The ${missing.toLocaleString()} runs the mirror does not know are in it too, carrying their hit with the metadata columns left empty.`}
+      </Typography>
+      <ControlRow>
+        <Button
+          aria-label={`Download all ${rows.toLocaleString()} matched runs as TSV`}
+          component="a"
+          download
+          href={`${exportUrl}?format=tsv`}
+          size="small"
+          startIcon={<Download />}
+          variant="outlined"
+        >
+          TSV · ~{formatBytes(rows * TSV_BYTES_PER_ROW)}
+        </Button>
+        <Button
+          aria-label={`Download all ${rows.toLocaleString()} matched runs as Parquet`}
+          component="a"
+          download
+          href={`${exportUrl}?format=parquet`}
+          size="small"
+          startIcon={<Download />}
+          variant="outlined"
+        >
+          Parquet{parquetSize}
+        </Button>
+      </ControlRow>
+      <Typography
+        color="textSecondary"
+        component="div"
+        sx={{ mt: 1 }}
+        variant="caption"
+      >
+        {rows > SPREADSHEET_ROW_LIMIT ? (
+          <>
+            Too many rows for a spreadsheet -- Excel and Calc stop at{" "}
+            {SPREADSHEET_ROW_LIMIT.toLocaleString()} and drop the rest without
+            saying which. Parquet is the smaller download, keeps its column
+            types, and reads whole in pandas, R or DuckDB.
+          </>
+        ) : (
+          <>
+            TSV opens in a spreadsheet. Parquet is the smaller download and
+            keeps its column types, for pandas, R or DuckDB.
+          </>
+        )}
+      </Typography>
+    </>
+  );
+}
+
 export const LoganSearchCohort = ({
   search,
 }: LoganSearchCohortProps): JSX.Element | null => {
@@ -218,9 +387,12 @@ export const LoganSearchCohort = ({
   // Absent on an older backend, and on a job whose mirror was unavailable. A
   // shell of zeroes would read as "your query matched nothing", which is a
   // different and wrong claim.
-  if (!cohort || cohort.total <= 0) return null;
+  // `results` is redundant to the runtime check -- no results, no cohort --
+  // but naming it is what lets the export block below take the payload rather
+  // than re-deriving each field through an optional chain.
+  if (!results || !cohort || cohort.total <= 0) return null;
 
-  const listed = results?.total_hits ?? 0;
+  const listed = results.total_hits ?? 0;
   // The two cards describe different sets whenever the cap bit. Derived from
   // the counts rather than the truncated flag because it is precisely the gap
   // between these two numbers that the reader has to be told about.
@@ -299,6 +471,11 @@ export const LoganSearchCohort = ({
           </Typography>
         )}
 
+        {/* Directly under the claim it follows from: having just been told
+            these counts describe a set the table cannot show you, the next
+            useful thing is the set itself. */}
+        <CohortExport cohort={cohort} listed={listed} results={results} />
+
         <Divider sx={{ my: 2 }} />
 
         <Typography variant="subtitle2">Top organisms</Typography>
@@ -353,10 +530,13 @@ export const LoganSearchCohort = ({
           sx={{ display: "block", mt: 2 }}
           variant="caption"
         >
-          Counts only, nothing here is clickable. Narrowing by a value would
-          have to run over the whole match set to stay honest, and applying it
-          to the listed rows alone would reintroduce exactly the skew these
-          counts are here to correct.
+          {/* Was "nothing here is clickable", which the download above makes
+              false. The claim that has to survive is about the breakdowns,
+              not about the card. */}
+          Counts only -- these values are not filters. Narrowing by a value
+          would have to run over the whole match set to stay honest, and
+          applying it to the listed rows alone would reintroduce exactly the
+          skew these counts are here to correct.
         </Typography>
       </CardContent>
     </Card>

@@ -26,7 +26,13 @@ from app.models.galaxy import (
     KmindexResults,
     SraRunMetadata,
 )
-from app.services.sra_mirror import SRAMirrorService
+from app.services.sra_mirror import (
+    EXPORT_AVAILABLE,
+    EXPORT_TOO_LARGE,
+    EXPORT_UNAVAILABLE,
+    SRAMirrorService,
+    export_file_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -449,6 +455,41 @@ class GalaxyService:
             return None, True
         return cohort, False
 
+    async def _export_for(
+        self, job_id: str, hits: List[dict]
+    ) -> Tuple[Optional[dict], bool]:
+        """
+        Materialize the complete hit set, enriched, so it can be downloaded.
+
+        Same window and the same reason as _cohort_for: the pre-cap list is
+        alive here and nowhere else. Once aggregation returns, the aggregate
+        holds 50,000 hits with no metadata on them, so rebuilding the full
+        enriched set would mean re-downloading every shard from a rate-limited
+        Galaxy behind the process-wide lock.
+
+        Additive, so it cannot cost anyone their search: a write that fails
+        leaves the results correct and simply without a download. Returns
+        (record, failed) for the same reason _cohort_for does -- an unconfigured
+        export is a steady state worth caching for a day, a broken write is not.
+
+        @param job_id: the job being aggregated; names the file.
+        @param hits: every hit, before the cap, in ranked order.
+        @returns: the export record to store on the aggregate, and whether the
+            write failed.
+        """
+        export_dir = self.settings.KMINDEX_EXPORT_DIR
+        if not export_dir or not self.sra_mirror or not self.sra_mirror.is_available():
+            return None, False
+
+        try:
+            record = await asyncio.to_thread(
+                self.sra_mirror.export_hits, job_id, hits, export_dir
+            )
+        except Exception as e:
+            logger.warning(f"kmindex job {job_id}: export materialization failed: {e}")
+            return None, True
+        return record, False
+
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
         cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
@@ -561,6 +602,10 @@ class GalaxyService:
         # hit list rather than two plus a summary.
         cohort, cohort_failed = await self._cohort_for(job_id, hits)
 
+        # Written from the same list, in the same window, for the same reason:
+        # the capped list below has no metadata on it and is 4% of this one.
+        export, export_failed = await self._export_for(job_id, hits)
+
         truncated = total_matches > KMINDEX_MAX_HITS
         capped = hits
         if truncated:
@@ -583,6 +628,10 @@ class GalaxyService:
 
         aggregate = {
             "cohort": cohort,
+            # What was materialized, not what can be served: the file can be
+            # swept or the volume reset while this entry still claims it, so
+            # _page_kmindex checks the disk before advertising a download.
+            "export": export,
             "hits": hits,
             "per_index": per_index,
             "query_name": query_name,
@@ -634,14 +683,24 @@ class GalaxyService:
             # re-download every shard, forever. A short TTL bounds the retry
             # instead of removing it: one re-aggregation per hour rather than
             # one per request, and a genuinely transient failure still heals
-            # on its own.
+            # on its own. The export is treated identically and for the same
+            # reason: it can only be written while the full hit list is alive,
+            # so caching a failed one for a day means no download for a day.
             ttl = CacheTTL.ONE_DAY
-            if cohort_failed:
+            degraded = [
+                name
+                for name, failed in (
+                    ("cohort query", cohort_failed),
+                    ("export materialization", export_failed),
+                )
+                if failed
+            ]
+            if degraded:
                 ttl = CacheTTL.ONE_HOUR
                 logger.error(
-                    f"kmindex job {job_id}: cohort query failed; returning "
-                    f"results without a cohort, cached for {ttl}s so the read "
-                    "is retried rather than repeated on every request"
+                    f"kmindex job {job_id}: {' and '.join(degraded)} failed; "
+                    f"returning the hit list without, cached for {ttl}s so the "
+                    "work is retried rather than repeated on every request"
                 )
             await self.cache.set(cache_key, aggregate, ttl)
 
@@ -681,12 +740,67 @@ class GalaxyService:
                 return None
         return _submitted_index_names(params)
 
-    @staticmethod
+    def _export_state(self, aggregate: dict, job_id: str) -> dict:
+        """
+        What the response may say about downloading this job's full match set.
+
+        The aggregate is cached for a day; the file it describes is not.
+        Retention sweeps it and a redeployed volume loses every export at once,
+        so the cached record is a claim and the filesystem is the authority --
+        an "available" with no file behind it is downgraded here rather than
+        handed to the UI as a link that 404s. It costs one stat per page
+        request, and that stat also supplies the size, so the UI can say how
+        big the download is without a second round trip.
+
+        A stat can only answer "is there a file, and how big" -- it does not
+        open the parquet, so a file that exists but is corrupt still reports
+        available and 404s on download. The write path cannot produce one, so
+        that is external damage; the empty case is caught below because it is
+        the one shape a stat can recognise.
+
+        @param aggregate: the cached aggregate.
+        @param job_id: the job being paged.
+        @returns: status, size in bytes and row count, shaped for
+            KmindexResults' export_ fields.
+        """
+        record = aggregate.get("export") or {}
+        status = record.get("status", EXPORT_UNAVAILABLE)
+        # An entry written by another version of this code is not worth a 500;
+        # the honest reading of a status we don't recognise is "no download".
+        if status not in (EXPORT_AVAILABLE, EXPORT_TOO_LARGE):
+            status = EXPORT_UNAVAILABLE
+        absent = {"bytes": None, "rows": None, "status": status}
+        if status != EXPORT_AVAILABLE:
+            return absent
+
+        path = export_file_path(self.settings.KMINDEX_EXPORT_DIR, job_id)
+        try:
+            # is_file() as well as stat(): a directory would answer a size and
+            # then fail the download.
+            size = path.stat().st_size if path is not None and path.is_file() else None
+        except OSError:
+            size = None
+        # A zero-byte file is the one unreadable state this stat can see. It
+        # cannot be produced by the write path -- that renames into place and
+        # unlinks a failed COPY -- so it means external damage, and offering two
+        # download buttons over it would 404 both for as long as the aggregate
+        # is cached.
+        if size == 0:
+            size = None
+        if size is None:
+            logger.info(
+                f"kmindex job {job_id}: cached aggregate claims an export but "
+                "no file is on disk; reporting no download"
+            )
+            return {**absent, "status": EXPORT_UNAVAILABLE}
+        return {"bytes": size, "rows": record.get("rows"), "status": EXPORT_AVAILABLE}
+
     def _page_kmindex(
-        aggregate: dict, job_id: str, limit: int, offset: int
+        self, aggregate: dict, job_id: str, limit: int, offset: int
     ) -> KmindexResults:
         """Slice a cached aggregate into a page of results."""
         hits = aggregate["hits"]
+        export = self._export_state(aggregate, job_id)
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
@@ -706,6 +820,9 @@ class GalaxyService:
             # built while the mirror was unavailable. Absent is the honest
             # answer in both cases: there is no partial cohort to render.
             cohort=aggregate.get("cohort"),
+            export_bytes=export["bytes"],
+            export_rows=export["rows"],
+            export_status=export["status"],
             limit=limit,
             offset=offset,
             hits=[KmindexHit(**h) for h in hits[offset : offset + limit]],

@@ -14,11 +14,13 @@ import datetime
 import functools
 import hashlib
 import logging
+import os
+import re
 import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import duckdb
 
@@ -85,6 +87,85 @@ _COHORT_TOP_ORGANISMS = 10
 # Tag on the scalar rows of the cohort query, which shares its result set with
 # the facet rows. Empty rather than a name so it cannot collide with a facet.
 _COHORT_SCALAR_TAG = ""
+
+# Status of a search's materialized export, recorded on the cached aggregate.
+# The two failing states are kept apart all the way to the UI because they mean
+# different things to whoever is looking at it: the mirror or the export
+# directory being unconfigured is our deployment and nobody's business, while
+# the row ceiling is a property of their query and the one they can act on.
+EXPORT_AVAILABLE = "available"
+EXPORT_TOO_LARGE = "too_large"
+EXPORT_UNAVAILABLE = "unavailable"
+
+# Ceiling on what will be materialized, in hit rows. Above it the export is
+# skipped and the search says so, rather than the cost being discovered in
+# production.
+#
+# Measured against the real mirror: the 1,133,516-hit job is 13.8 B/row
+# parquet and 148 B/row TSV, 1.4s to stage and write, 2.9s of CPU to stream
+# the TSV back; the eight-index probe at 1,514,202 rows is 15.1 B/row, 2.0s
+# and 3.8s. Index sizes are enormously skewed -- AMPLICON alone is ~17.9M SRA
+# runs -- so a pathological selection is an order of magnitude past that. 5M
+# is ~3.3x the largest measured probe and holds the artifact to ~75 MB parquet
+# / ~740 MB TSV and the write to ~7s, which matters because the write happens
+# inside the process-wide aggregation lock where it delays every other user's
+# search. Past that a browser download stops being a useful way to move the
+# data anyway.
+EXPORT_MAX_ROWS = 5_000_000
+
+# Retention. Exports are ~16 MB each and nothing else ever deletes them.
+#
+# The age rule is the correctness anchor, not a guess: it is CacheTTL.ONE_DAY,
+# the TTL on the aggregate that carries the "there is an export" claim. Once
+# that entry expires nothing can still be pointing at the file, and the next
+# request re-aggregates and writes a fresh one. The byte budget is the disk
+# bound the age rule does not give -- a burst of searches inside one day would
+# otherwise fill the volume -- and it is expressed in bytes rather than files
+# because file size varies 5x with the row ceiling.
+EXPORT_MAX_AGE_SECONDS = 86400
+EXPORT_MAX_TOTAL_BYTES = 5 * 1024**3
+
+# Columns in a materialized export, in order. The parquet carries its own
+# names; this is the TSV header and the structural check that the two agree.
+EXPORT_COLUMNS: Tuple[str, ...] = (
+    "accession",
+    "score",
+    "shard",
+    "organism",
+    "assay_type",
+    "platform",
+    "instrument",
+    "library_layout",
+    "release_date",
+    "country",
+    "bioproject",
+    "study",
+    "mbases",
+)
+
+_EXPORT_SUFFIX = ".parquet"
+# A destination is written under this and renamed into place, so a COPY that
+# dies partway through cannot leave something that reads as a finished export.
+_EXPORT_PARTIAL_SUFFIX = ".partial"
+# Job ids arrive in a request path and become a filename here, which is the
+# only place that happens -- so constrain the shape rather than trust it.
+_EXPORT_JOB_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+# What the sweep is allowed to delete. The export directory may hold files
+# nobody here wrote, and retention must not reach them.
+_EXPORT_OWNED = re.compile(
+    r"^[A-Za-z0-9_-]{1,64}"
+    rf"{re.escape(_EXPORT_SUFFIX)}({re.escape(_EXPORT_PARTIAL_SUFFIX)})?$"
+)
+# An in-flight write is seconds, so anything wearing the partial suffix an hour
+# later is an orphan from a crash rather than a rename that has not happened.
+_EXPORT_PARTIAL_MAX_AGE_SECONDS = 3600
+# Rows pulled out of the parquet per step while streaming a TSV back. Bounds
+# the memory the conversion holds regardless of how many rows it is converting.
+_EXPORT_TSV_BATCH = 20000
+# A TSV field needs quoting only if it carries the delimiter, a line break or a
+# quote. One compiled scan per field rather than five `in` tests: measured 3.0s
+# against 4.9s over 14.7M fields.
+_EXPORT_TSV_QUOTE = re.compile(r'[\t\n\r"]')
 
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
@@ -306,6 +387,207 @@ def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[st
             {"count": n, "value": value} for value, n in known[:_COHORT_FACET_VALUES]
         ],
     }
+
+
+def _export_sql() -> str:
+    """Materialize a complete hit list, joined to the mirror, as one parquet.
+
+    The hits arrive as a staging file read inline for the same reason
+    _cohort_sql stages its accessions: `IN (SELECT UNNEST(?))` degrades badly
+    with size and does not finish in two minutes at a million rows, and the
+    mirror is opened read_only so there is no temp table to load them into.
+    Same quote and escape handling, for the same reason -- a stray quote must
+    not silently rewrite or drop rows.
+
+    LEFT, not SEMI or INNER: about 0.44% of a real job's hits are runs the
+    mirror was not built to carry (1,133,516 hits, 1,128,472 of them known),
+    and those rows keep their accession, score and shard with NULL metadata.
+    Inner-joining would drop 5,044 real matches out of the file that exists to
+    be the complete match set.
+
+    Sentinel handling matches _COHORT_FACETS exactly, so a user tallying the
+    downloaded file gets the same answer as the cohort shown on screen. SRA
+    writes 'uncalculated' where no country could be derived and 'unspecified'
+    where no instrument was recorded; both are absences, and a file that spells
+    them as values invents a country and a sequencer.
+
+    Rows come back in the order the app ranked them. The tie-break is an md5 of
+    the accession, which SQL cannot reproduce, so the rank is staged as a
+    column and ordered on -- and it costs nothing: measured 0.63s ordered
+    against 0.87s unordered, and 15.6 MB against 16.1 MB, because sorting by
+    score groups equal values for the compressor.
+
+    The two paths are numbered rather than left as bare `?`: duckdb binds a
+    COPY's destination ahead of the query's own parameters, so positional
+    markers hand the staging path to TO and the destination to read_csv.
+    """
+    return """
+        COPY (
+          SELECT h.accession, h.score, h.shard,
+                 nullif(r.organism, '') AS organism,
+                 nullif(r.assay_type, '') AS assay_type,
+                 nullif(r.platform, '') AS platform,
+                 nullif(nullif(r.instrument, ''), 'unspecified') AS instrument,
+                 nullif(r.librarylayout, '') AS library_layout,
+                 r.releasedate AS release_date,
+                 nullif(nullif(r.geo_loc_name_country_calc, ''),
+                        'uncalculated') AS country,
+                 r.bioproject, r.sra_study AS study, r.mbases
+          FROM read_csv($1, delim='\t', header=false, quote='', escape='',
+                   columns={'ordinal':'BIGINT','accession':'VARCHAR',
+                            'score':'DOUBLE','shard':'VARCHAR'}) h
+          LEFT JOIN runs r ON r.acc = h.accession
+          ORDER BY h.ordinal
+        ) TO $2 (FORMAT parquet, COMPRESSION zstd)
+    """
+
+
+def export_file_path(export_dir: str, job_id: str) -> Optional[Path]:
+    """Where a job's materialized export lives.
+
+    @param export_dir: configured export directory; empty means the feature
+        is off.
+    @param job_id: Galaxy job id, as it arrived in the request path.
+    @returns: the path, or None when there cannot be one -- the feature is off,
+        or the id is not a plain identifier and so must never become a path.
+    """
+    if not export_dir or not _EXPORT_JOB_ID.match(job_id):
+        return None
+    return Path(export_dir) / f"{job_id}{_EXPORT_SUFFIX}"
+
+
+def export_download_name(job_id: str, rows: int, extension: str) -> str:
+    """Filename for a downloaded export.
+
+    Once the file is on someone's disk this name is the only description that
+    travels with it, so it carries which search produced it and how many rows
+    it should hold.
+
+    @param job_id: Galaxy job the export was materialized from.
+    @param rows: rows in the file.
+    @param extension: file extension, without the dot.
+    @returns: e.g. logan-7c937baf0758a668-1133516-runs.tsv.
+    """
+    return f"logan-{job_id}-{rows}-runs.{extension}"
+
+
+def export_row_count(path: Path) -> int:
+    """Count the rows in a materialized export.
+
+    Read from the parquet footer rather than from the aggregate that claims the
+    file exists, so the row count in a download's name describes the bytes
+    being served and not a cache entry that may have outlived them.
+
+    @param path: the export parquet.
+    @returns: its row count.
+    """
+    con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
+    try:
+        return con.execute(
+            "SELECT count(*) FROM read_parquet(?)", [str(path)]
+        ).fetchone()[0]
+    finally:
+        con.close()
+
+
+def _tsv_field(value: Any) -> str:
+    """Render one value as a TSV field, quoting it if it would break the row."""
+    if value is None:
+        return ""
+    text = value if type(value) is str else str(value)
+    if _EXPORT_TSV_QUOTE.search(text):
+        return '"' + text.replace('"', '""') + '"'
+    return text
+
+
+def iter_export_tsv(path: Path) -> Iterator[bytes]:
+    """Stream a materialized export back as TSV, a batch of rows at a time.
+
+    Converting with DuckDB's own CSV writer is faster (0.57s against 3.0s on
+    1.13M rows) but only writes to a file, which would mean putting 168 MB on
+    disk per request and then needing a path that reliably deletes it -- one a
+    client disconnect does not run. This holds one batch in memory instead,
+    starts sending immediately, and overlaps its cost with the transfer.
+
+    @param path: the export parquet.
+    @returns: an iterator of encoded TSV chunks, header first.
+    """
+    con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
+    try:
+        yield ("\t".join(EXPORT_COLUMNS) + "\n").encode()
+        rows = con.execute("SELECT * FROM read_parquet(?)", [str(path)])
+        while batch := rows.fetchmany(_EXPORT_TSV_BATCH):
+            yield "".join(
+                "\t".join(map(_tsv_field, row)) + "\n" for row in batch
+            ).encode()
+    finally:
+        # Also reached when the client disconnects mid-download and the
+        # generator is closed, which is the case that would otherwise leak.
+        con.close()
+
+
+def sweep_exports(export_dir: str) -> int:
+    """Delete exports that are past retention, oldest first.
+
+    Deletes any `<name>.parquet` (or its `.partial`) directly inside the
+    configured directory -- it matches the shape this module writes, not a
+    record of what it wrote, so a parquet someone else put there is a
+    candidate too. That is why KMINDEX_EXPORT_DIR wants a directory of its
+    own; the shipped compose file gives it a dedicated volume. Nothing else
+    is touched: no recursion, and symlinks are skipped rather than followed,
+    so a link planted in the directory cannot redirect a delete outside it.
+
+    @param export_dir: configured export directory.
+    @returns: how many files were deleted.
+    """
+    directory = Path(export_dir)
+    now = time.time()
+    keepable: List[Tuple[float, int, Path]] = []
+    doomed: List[Path] = []
+    try:
+        entries = list(directory.iterdir())
+    except OSError as exc:
+        logger.warning("Could not sweep exports in %s: %s", export_dir, exc)
+        return 0
+
+    for entry in entries:
+        if entry.is_symlink() or not _EXPORT_OWNED.match(entry.name):
+            continue
+        try:
+            stat = entry.stat()
+        except OSError:
+            continue
+        if not entry.is_file():
+            continue
+        age = now - stat.st_mtime
+        partial = entry.name.endswith(_EXPORT_PARTIAL_SUFFIX)
+        if age > (
+            _EXPORT_PARTIAL_MAX_AGE_SECONDS if partial else EXPORT_MAX_AGE_SECONDS
+        ):
+            doomed.append(entry)
+        elif not partial:
+            keepable.append((stat.st_mtime, stat.st_size, entry))
+
+    # Oldest first, so what survives the byte budget is what a cached aggregate
+    # is most likely to still be pointing at.
+    keepable.sort()
+    budget = EXPORT_MAX_TOTAL_BYTES - sum(size for _mtime, size, _p in keepable)
+    for _mtime, size, entry in keepable:
+        if budget >= 0:
+            break
+        doomed.append(entry)
+        budget += size
+
+    deleted = 0
+    for entry in doomed:
+        try:
+            entry.unlink()
+            deleted += 1
+        except OSError as exc:
+            logger.warning("Could not delete stale export %s: %s", entry, exc)
+    if deleted:
+        logger.info("Swept %d stale kmindex export(s) from %s", deleted, export_dir)
+    return deleted
 
 
 def _synchronized(method):
@@ -830,6 +1112,12 @@ class SRAMirrorService:
         a caller should expect misses. How many depends on how the mirror was
         built: a taxid-filtered mirror misses most of what a Logan query
         matches, since Logan indexes all of SRA.
+
+        The 'uncalculated' country and 'unspecified' instrument sentinels come
+        back as None, matching _COHORT_FACETS and the export. All three describe
+        the same runs on the same screen, and this was the one path still
+        spelling an absence as a value -- a search's table showed a country of
+        "uncalculated" beside a cohort that counted it as not recorded.
         """
         if not self._con or not accessions:
             return {}
@@ -853,8 +1141,11 @@ class SRAMirrorService:
                 self._con.execute(
                     """
                     SELECT acc, sra_study, bioproject, organism, assay_type,
-                           platform, instrument, librarylayout, releasedate,
-                           geo_loc_name_country_calc, mbases
+                           platform,
+                           nullif(instrument, 'unspecified'),
+                           librarylayout, releasedate,
+                           nullif(geo_loc_name_country_calc, 'uncalculated'),
+                           mbases
                     FROM runs WHERE acc IN (SELECT UNNEST(?))
                     """,
                     [batch],
@@ -979,6 +1270,107 @@ class SRAMirrorService:
         with self._lock:
             self._cache_put(cache_key, cohort)
         return cohort
+
+    # Not @_synchronized, for the reason spelled out above cohort_for_accessions:
+    # this is a ~1.5s stage-and-write against a 43.5M-row table, and holding the
+    # instance lock across it would park every MCP tool call behind one user's
+    # download. The cursor gives it its own connection onto the open database;
+    # the lock covers only the handoff.
+    def export_hits(
+        self, job_id: str, hits: List[Dict[str, Any]], export_dir: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Write a search's complete hit list, enriched from the mirror, to disk.
+
+        Called during aggregation because that is the only moment the full
+        match set exists: the aggregate keeps 50,000 hits and discards the
+        rest, so afterwards the only way back to the other million is to
+        re-download 84-280 shard datasets from a rate-limited Galaxy. Same
+        window, and the same reason, as cohort_for_accessions.
+
+        Writes to a partial name and renames into place, so a crash cannot
+        leave a truncated file that reads as a complete export.
+
+        @param job_id: Galaxy job the hits belong to; names the file.
+        @param hits: every hit, before the display cap, as accession/score/shard
+            dicts in ranked order.
+        @param export_dir: configured export directory.
+        @returns: {"rows": n, "status": ...} describing what a caller may now
+            advertise, or None when nothing was written and nothing should be
+            said about it -- the mirror is unavailable, the feature is off, or
+            there were no hits. A write failure raises rather than returning a
+            status, so the caller can tell a broken write from a disabled one.
+        """
+        destination = export_file_path(export_dir, job_id)
+        if not self._con or destination is None or not hits:
+            return None
+
+        if len(hits) > EXPORT_MAX_ROWS:
+            logger.warning(
+                "kmindex job %s: %s hits exceeds the %s-row export ceiling; "
+                "skipping materialization",
+                job_id,
+                f"{len(hits):,}",
+                f"{EXPORT_MAX_ROWS:,}",
+            )
+            return {"rows": None, "status": EXPORT_TOO_LARGE}
+
+        # Before the write, so the budget frees space for the file about to
+        # land and the new export is never its own sweep candidate.
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        sweep_exports(export_dir)
+
+        # A per-attempt partial name, not a deterministic one. The aggregation
+        # lock is an asyncio.Lock, so it orders one event loop and nothing more:
+        # a second worker or replica writing the same job would otherwise share
+        # this path and one would rename the other's half-written file into
+        # place. mkstemp in the destination directory keeps the rename atomic
+        # and removes the question.
+        fd, partial_name = tempfile.mkstemp(
+            dir=destination.parent,
+            prefix=f"{destination.stem}-",
+            suffix=f"{_EXPORT_SUFFIX}{_EXPORT_PARTIAL_SUFFIX}",
+        )
+        os.close(fd)
+        partial = Path(partial_name)
+        with self._lock:
+            cursor = self._con.cursor()
+
+        # The staging file is the join's left-hand side and never outlives the
+        # call; it carries the rank because the app's md5 tie-break has no SQL
+        # equivalent, and the export ships in the order the app ranked it.
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".tsv", prefix="kmindex-export-", delete=False
+            )
+            for ordinal, hit in enumerate(hits):
+                staging.write(
+                    f"{ordinal}\t{hit['accession']}\t{hit['score']}\t{hit['shard']}\n"
+                )
+            staging.close()
+            cursor.execute(_export_sql(), [staging.name, str(partial)])
+        except Exception:
+            try:
+                partial.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        partial.replace(destination)
+        # Count the file, not the input. They agree only while runs.acc happens
+        # to be unique -- there is no constraint on it -- and a LEFT JOIN that
+        # fanned out would put a row count in the download's filename that the
+        # file does not have.
+        return {
+            "rows": export_row_count(destination),
+            "status": EXPORT_AVAILABLE,
+        }
 
     @_synchronized
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
