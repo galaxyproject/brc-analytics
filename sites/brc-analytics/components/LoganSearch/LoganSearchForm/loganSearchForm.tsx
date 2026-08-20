@@ -36,13 +36,27 @@ const MAX_QUERY_BASES = 2500;
 // since each index fans out to dozens of datasets we pull individually.
 const MAX_INDEXES = 8;
 
-// Environmental metagenomes are the most generally interesting starting point,
-// but fall back to whatever the instance actually has registered.
-const DEFAULT_INDEX = "METAGENOMIC_ENV";
+// Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
+// and it carries all but a handful of that query's hits. Fall back to whatever
+// the instance actually has registered.
+const DEFAULT_INDEX = "GENOMIC_INV";
 
-const SAMPLE_QUERY = `>example_query
-ATTGAACGCTGGCGGCAGGCCTAACACATGCAAGTCGAACGGTAACAGGAAGAAGCTTGCTTCTTTGCTGACGAGTGGCGGACGGGTGAGTAATGTCTGGG
-AAACTGCCTGATGGAGGGGGATAACTACTGGAAACGGTAGCTAATACCGCATAACGTCGCAAGACCAAAGAGGGGGACCTTCGGGCCTCTTGCCATCGGAT`;
+// A 500 bp window of the P. falciparum 18S rRNA (GenBank M19172.1). Measured
+// against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages at
+// 25 a page, where the bacterial 16S fragment that used to sit here returned
+// 31,405 against METAGENOMIC_ENV. Neither truncates; the old pair was a worse
+// first run, not a truncated one. What the swap really buys is a coherent pair:
+// a Plasmodium query against the division Plasmodium sits in, rather than
+// against environmental metagenomes.
+const SAMPLE_QUERY = `>Plasmodium_falciparum_18S
+GCGTATATTAAAATTGTTGCAGTTAAAACGCTCGTAGTTGAATTTCAAAGAATCGATATTTTATTGTAAC
+TATTCTAGGGGAACTATTTTAGCTTTTGGCTTTAATACGCTTCCTCTATTATTATGTTCTTTAAATAACA
+AAGATTCTTTTTAAAATCCCCACTTTTGCTTTTGCTTTTTTGGGGATTTTGTTACTTTGAGTAAATTAGA
+GTGTTCAAAGCAAACAGTTAAAGCATTTACTGTGTTTGAATACTATAGCATGGAATAACAAAATTGAACA
+AGCTAAAATTTTTTGTTCTTTTTTCTTATTTTGGCTTAGTTACGATTAATAGGAGTAGCTTGGGGACATT
+CGTATTCAGATGTCAGAGGTGAAATTCTTAGATTTTCTGGAGACGAACAACTGCGAAAGCATTTGTCTAA
+AATACTTCCATTAATCAAGAACGAAAGTTAAGGGAGTGAAGACGATCAGATACCGTCGTAATCTTAACCA
+TAAACTATGC`;
 
 export const LoganSearchForm = ({
   search,
