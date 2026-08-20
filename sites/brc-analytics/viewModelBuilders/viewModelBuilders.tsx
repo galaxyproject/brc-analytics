@@ -5,6 +5,7 @@ import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
 import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
 import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
+import { type BRCOrganismDetail } from "@brc/services/staticGeneration/organism/types";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
@@ -465,7 +466,7 @@ export const buildTaxonomicLevelRealm = (entity: {
  * @returns Props to be used for the BackPageHero component.
  */
 export const buildOrganismHero = (
-  organism: BRCDataCatalogOrganism
+  organism: BRCOrganismDetail
 ): ComponentProps<typeof BackPageHero> => {
   // The species/group/priority are constant across the organism's assemblies,
   // so surface group + priority as header chips rather than repeating them on
@@ -480,7 +481,7 @@ export const buildOrganismHero = (
   if (priorityTag) tags.push(priorityTag);
   return {
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
-    children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
+    children: <Tabs pangenome={organism.pangenome} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
     // Deliberately not italicized: at hero scale the scientific-name italic
     // reads as styling rather than nomenclature (body-scale renders keep it).
@@ -494,7 +495,7 @@ export const buildOrganismHero = (
  * @returns Props for the OrganismViewMain component.
  */
 export const buildOrganismViewMain = (
-  organism: BRCDataCatalogOrganism
+  organism: BRCOrganismDetail
 ): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
@@ -502,7 +503,8 @@ export const buildOrganismViewMain = (
       tableOptions: buildOrganismGenomesTable(organism),
     },
     entityId: getOrganismId(organism),
-    organism,
+    pangenome: organism.pangenome,
+    workflowCategories: organism.workflowCategories,
   };
 };
 

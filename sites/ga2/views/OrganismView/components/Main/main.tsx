@@ -11,17 +11,20 @@ import { type JSX } from "react";
  * @param props - Component props.
  * @param props.assembly - Assemblies section props (column presets + table options).
  * @param props.entityId - Organism entity ID.
- * @param props.organism - Organism.
+ * @param props.workflowCategories - Organism-compatible workflow categories.
  * @returns A JSX element with the organism detail main content.
  */
 export const Main = <T extends RowData>({
   assembly,
   entityId,
-  organism,
+  workflowCategories,
 }: Props<T>): JSX.Element => {
   return (
     <Stack spacing={8} useFlexGap>
-      <WorkflowsSection entityId={entityId} organism={organism} />
+      <WorkflowsSection
+        entityId={entityId}
+        workflowCategories={workflowCategories}
+      />
       <AssembliesSection {...assembly} />
     </Stack>
   );

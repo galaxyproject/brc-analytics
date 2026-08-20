@@ -1,3 +1,5 @@
+import { type Pangenome } from "@brc/apis/pangenome";
+
 export interface Props {
-  ncbiTaxonomyId: string;
+  pangenome?: Pangenome;
 }

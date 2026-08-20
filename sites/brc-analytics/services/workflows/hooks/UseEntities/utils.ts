@@ -1,4 +1,3 @@
-import { loadPangenomes } from "@brc/services/workflows/loader";
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import {
   createEntitiesLoader,
@@ -17,8 +16,6 @@ import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
  */
 export const ensureEntitiesLoaded = createEntitiesLoader(
   async (config: SiteConfig): Promise<void> => {
-    // Load in parallel so the optional pangenome fetch adds no serial latency
-    // to the core workflows/entities load that every data page depends on.
     await Promise.all([
       loadWorkflows([
         CUSTOM_WORKFLOW,
@@ -26,7 +23,6 @@ export const ensureEntitiesLoaded = createEntitiesLoader(
         LOGAN_SEARCH,
         LEXICMAP,
       ]),
-      loadPangenomes(),
       loadEntities(config),
     ]);
   }
