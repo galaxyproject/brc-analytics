@@ -1159,3 +1159,409 @@ class TestJobMetadataIsFetchedOnce:
         # status cache stores, so a job's raw tool parameters stay internal.
         assert "params" not in status.model_dump()
         assert "params" not in status.model_dump_json()
+
+
+class TestExportOfTheFullMatchSet:
+    """
+    The download has to be written while the full hit list is alive.
+
+    The aggregate keeps 50,000 hits and joins metadata onto the 25 on screen,
+    so "every match, with its metadata" exists for exactly the span
+    _aggregate_shards runs in. After that, rebuilding it means re-downloading
+    84-280 shard datasets from a rate-limited Galaxy behind a process-wide
+    lock. These cover that it is written from the whole list, that a failure
+    costs nobody their search, and that a day-old cache entry cannot advertise
+    a file that is no longer there.
+    """
+
+    @staticmethod
+    def _status(shard_count):
+        outputs = [MagicMock() for _ in range(shard_count)]
+        for i, o in enumerate(outputs):
+            o.dataset.id = f"ds{i}"
+        return MagicMock(
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=None,
+        )
+
+    @staticmethod
+    def _job(indexes):
+        return {
+            "params": {
+                "db_opts": json.dumps(
+                    {
+                        "__current_case__": 1,
+                        "db_opts_selector": "db",
+                        "kmindex": indexes,
+                    }
+                )
+            }
+        }
+
+    def _mirror(self, service, record=None, side_effect=None):
+        """Attach a stub SRA mirror whose export_hits returns `record`.
+
+        @param service: the GalaxyService under test.
+        @param record: what materialization reports back.
+        @param side_effect: raise this instead, to model a broken write.
+        @returns: the stub, so a test can inspect the call it received.
+        """
+        mirror = MagicMock()
+        mirror.is_available = MagicMock(return_value=True)
+        mirror.cohort_for_accessions = MagicMock(return_value=None)
+        mirror.export_hits = MagicMock(return_value=record, side_effect=side_effect)
+        service.sra_mirror = mirror
+        return mirror
+
+    def _wire(self, service, hits=25):
+        """Point the service at one shard carrying `hits` equal-scoring hits."""
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(["GENOMIC_BCT"]))
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={
+                "GENOMIC_BCT_10_null": {"q": {f"SRR{n:06d}": 1.0 for n in range(hits)}}
+            }
+        )
+
+    @staticmethod
+    def _materialize(directory, job_id="job1", rows=25):
+        """Put a file where the export for `job_id` would have been written."""
+        path = directory / f"{job_id}.parquet"
+        path.write_bytes(b"PAR1" * rows)
+        return path
+
+    @pytest.mark.asyncio
+    async def test_no_export_directory_writes_nothing_and_offers_nothing(self, service):
+        # The default deployment. Nothing is materialized, nothing is claimed,
+        # and no error is raised on the way past.
+        mirror = self._mirror(service)
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        mirror.export_hits.assert_not_called()
+        assert results.export_status == "unavailable"
+        assert results.export_rows is None
+        assert results.export_bytes is None
+        assert results.total_matches == 5
+
+    @pytest.mark.asyncio
+    async def test_unavailable_mirror_writes_nothing(
+        self, service, monkeypatch, tmp_path
+    ):
+        # There is no export without the mirror: the join is the whole point.
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        mirror = self._mirror(service)
+        mirror.is_available = MagicMock(return_value=False)
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        mirror.export_hits.assert_not_called()
+        assert service._page_kmindex(aggregate, "job1", 5, 0).export_status == (
+            "unavailable"
+        )
+
+    @pytest.mark.asyncio
+    async def test_export_is_written_from_every_hit_not_the_capped_page(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        monkeypatch.setattr(galaxy_service, "KMINDEX_MAX_HITS", 10)
+        mirror = self._mirror(service, {"rows": 25, "status": "available"})
+        self._wire(service, hits=25)
+        self._materialize(tmp_path)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        # The file was written from all 25, not the 10 that survived the cap.
+        _job_id, hits, _dir = mirror.export_hits.call_args.args
+        assert len(hits) == 25
+        assert results.total_hits == 10
+        assert results.export_rows == results.total_matches == 25
+
+    @pytest.mark.asyncio
+    async def test_export_runs_off_the_event_loop(self, service, monkeypatch, tmp_path):
+        # It is a ~1.5s DuckDB write on a million-hit job, which is far too
+        # long to spend on the loop.
+        import threading
+
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        seen = {}
+        mirror = self._mirror(service, {"rows": 5, "status": "available"})
+        mirror.export_hits = MagicMock(
+            side_effect=lambda *args: seen.setdefault("thread", threading.get_ident())
+            and {"rows": 5, "status": "available"}
+        )
+        self._wire(service, hits=5)
+
+        await service._aggregate_shards("job1")
+
+        assert seen["thread"] != threading.get_ident()
+
+    @pytest.mark.asyncio
+    async def test_a_failed_write_leaves_the_search_working(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._mirror(service, side_effect=OSError("No space left on device"))
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        # The hit list, the breakdown and total_matches are all still correct;
+        # the download is simply not on offer.
+        assert results.total_matches == 5
+        assert len(results.hits) == 5
+        assert results.export_status == "unavailable"
+        # Cached, because re-aggregation costs 84-280 shard downloads -- but
+        # only for an hour, because the file can only ever be written from a
+        # hit list that no longer exists once this returns.
+        service.cache.set.assert_called_once()
+        _key, _value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_HOUR
+
+    @pytest.mark.asyncio
+    async def test_a_hit_set_over_the_ceiling_says_so_and_is_cached_for_a_day(
+        self, service, monkeypatch, tmp_path
+    ):
+        # Nothing to retry: the query matched more than is worth materializing,
+        # and it will match the same number tomorrow.
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._mirror(service, {"rows": None, "status": "too_large"})
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.export_status == "too_large"
+        assert results.export_rows is None
+        _key, _value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_DAY
+
+    @pytest.mark.asyncio
+    async def test_a_swept_file_is_not_advertised_by_the_cached_aggregate(
+        self, service, monkeypatch, tmp_path
+    ):
+        # The aggregate lives a day; retention and a redeployed volume do not
+        # respect it. The cached record is a claim, the filesystem is the
+        # authority -- otherwise the UI shows a link that 404s.
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._mirror(service, {"rows": 25, "status": "available"})
+        self._wire(service, hits=25)
+        path = self._materialize(tmp_path)
+
+        aggregate = await service._aggregate_shards("job1")
+        assert service._page_kmindex(aggregate, "job1", 5, 0).export_status == (
+            "available"
+        )
+
+        path.unlink()
+        stale = service._page_kmindex(aggregate, "job1", 5, 0)
+        assert stale.export_status == "unavailable"
+        assert stale.export_rows is None
+        assert stale.export_bytes is None
+
+    @pytest.mark.asyncio
+    async def test_size_is_read_from_the_file_being_offered(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._mirror(service, {"rows": 25, "status": "available"})
+        self._wire(service, hits=25)
+        path = self._materialize(tmp_path)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.export_bytes == path.stat().st_size
+
+    @pytest.mark.asyncio
+    async def test_export_is_written_once_and_survives_the_cache_round_trip(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        mirror = self._mirror(service, {"rows": 5, "status": "available"})
+        self._wire(service, hits=5)
+        self._materialize(tmp_path, rows=5)
+
+        first = await service.get_kmindex_results("job1")
+        second = await service.get_kmindex_results("job1")
+
+        assert first.export_rows == second.export_rows == 5
+        # Written once: the second call reads the cached aggregate, and the
+        # file it points at is still on disk.
+        assert mirror.export_hits.call_count == 1
+
+    def test_an_unrecognised_cached_status_reads_as_unavailable(self, service):
+        # The aggregate outlives the code that wrote it by up to a day. A
+        # status from another version is worth "no download", not a 500 on the
+        # results endpoint.
+        aggregate = {
+            "export": {"rows": 5, "status": "materialising"},
+            "hits": [],
+            "per_index": [],
+            "query_name": "q",
+            "total_matches": 0,
+        }
+
+        assert service._page_kmindex(aggregate, "job1", 5, 0).export_status == (
+            "unavailable"
+        )
+
+    @pytest.mark.asyncio
+    async def test_aggregate_cached_before_exports_reads_as_unavailable(self, service):
+        # A v2 entry written before this existed is not wrong, just silent --
+        # so it stays readable rather than forcing every warm job to
+        # re-download its shards from a rate-limited Galaxy.
+        aggregate = {
+            "hits": [{"accession": "SRR9", "score": 0.9, "shard": "GENOMIC_BCT_2"}],
+            "per_index": [
+                {"hits_after_cap": 1, "hits_before_cap": 1, "index": "GENOMIC_BCT"}
+            ],
+            "query_name": "q",
+            "shards_failed": 0,
+            "shards_searched": 1,
+            "shards_with_hits": 1,
+            "total_matches": 1,
+            "truncated": False,
+        }
+
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.export_status == "unavailable"
+        assert results.export_rows is None
+
+
+class TestExportEndpoint:
+    """Serving a materialized export.
+
+    The file is a finished artifact: the endpoint never touches Galaxy and
+    never needs the mirror, so a job whose export exists stays downloadable
+    even while both are down.
+    """
+
+    @staticmethod
+    def _client(export_dir, monkeypatch):
+        """A test client over the galaxy router alone, with the export
+        directory configured.
+
+        @param export_dir: value for KMINDEX_EXPORT_DIR, or None to leave it
+            unset.
+        @param monkeypatch: the test's monkeypatch fixture.
+        @returns: a TestClient.
+        """
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app.api.v1 import galaxy as galaxy_api
+        from app.core.config import get_settings
+        from app.core.dependencies import check_rate_limit
+
+        if export_dir is not None:
+            monkeypatch.setenv("KMINDEX_EXPORT_DIR", str(export_dir))
+        get_settings.cache_clear()
+
+        app = FastAPI()
+        app.include_router(galaxy_api.router, prefix="/galaxy")
+        app.dependency_overrides[check_rate_limit] = lambda: None
+        return TestClient(app)
+
+    @staticmethod
+    def _export(directory, job_id="job1", accessions=("SRR1", "SRR2")):
+        """Write an export-shaped parquet where the endpoint will look."""
+        import duckdb
+
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        tail = ", ".join(f"NULL AS {name}" for name in EXPORT_COLUMNS[3:])
+        rows = " UNION ALL ".join(
+            f"SELECT '{acc}' AS accession, 1.0 AS score, 'IDX_1' AS shard, {tail}"
+            for acc in accessions
+        )
+        con = duckdb.connect()
+        try:
+            con.execute(
+                f"COPY ({rows}) TO '{directory / f'{job_id}.parquet'}' (FORMAT parquet)"
+            )
+        finally:
+            con.close()
+
+    def test_a_job_with_no_file_404s(self, tmp_path, monkeypatch):
+        client = self._client(tmp_path, monkeypatch)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/export")
+
+        assert response.status_code == 404
+        assert "job1" in response.json()["detail"]
+
+    def test_an_unset_export_directory_404s(self, tmp_path, monkeypatch):
+        monkeypatch.delenv("KMINDEX_EXPORT_DIR", raising=False)
+        client = self._client(None, monkeypatch)
+        self._export(tmp_path)
+
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 404
+
+    def test_a_job_id_that_is_not_an_identifier_404s(self, tmp_path, monkeypatch):
+        # It is a filename here, so it never gets to be a path.
+        client = self._client(tmp_path, monkeypatch)
+
+        assert client.get("/galaxy/kmindex/jobs/..%2F..%2Fetc/export").status_code in (
+            404,
+            405,
+        )
+        assert client.get("/galaxy/kmindex/jobs/job.1/export").status_code == 404
+
+    def test_parquet_is_served_as_is_and_named_for_the_job_and_row_count(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch)
+        self._export(tmp_path, accessions=("SRR1", "SRR2", "SRR3"))
+
+        response = client.get("/galaxy/kmindex/jobs/job1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "job1.parquet").read_bytes()
+        assert (
+            response.headers["content-disposition"]
+            == 'attachment; filename="logan-job1-3-runs.parquet"'
+        )
+
+    def test_tsv_is_converted_on_the_way_out(self, tmp_path, monkeypatch):
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        client = self._client(tmp_path, monkeypatch)
+        self._export(tmp_path)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/export?format=tsv")
+        lines = response.text.splitlines()
+
+        assert response.status_code == 200
+        assert lines[0] == "\t".join(EXPORT_COLUMNS)
+        assert [line.split("\t")[0] for line in lines[1:]] == ["SRR1", "SRR2"]
+        assert (
+            'filename="logan-job1-2-runs.tsv"'
+            in (response.headers["content-disposition"])
+        )
+
+    def test_an_unknown_format_is_rejected(self, tmp_path, monkeypatch):
+        client = self._client(tmp_path, monkeypatch)
+        self._export(tmp_path)
+
+        assert client.get(
+            "/galaxy/kmindex/jobs/job1/export?format=xlsx"
+        ).status_code == (422)

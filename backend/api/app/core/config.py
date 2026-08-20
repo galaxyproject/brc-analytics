@@ -176,6 +176,12 @@ class Settings:
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
 
+        # Where a kmindex search's full, mirror-enriched match set is written
+        # so it can be downloaded afterwards. Empty path disables the export
+        # entirely: nothing is materialized, the results advertise no download
+        # and the endpoint 404s. Must be writable, unlike SRA_MIRROR_PATH.
+        self.KMINDEX_EXPORT_DIR: str = os.getenv("KMINDEX_EXPORT_DIR", "")
+
         # Galaxy job execution. Empty API key disables the Galaxy endpoints --
         # the key is a service account, so jobs land in one shared account
         # rather than the visitor's own Galaxy session.

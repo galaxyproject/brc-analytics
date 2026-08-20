@@ -65,10 +65,33 @@ export interface KmindexCohort {
   total: number;
 }
 
+// Whether a search's full match set can be downloaded, and when it cannot,
+// why. "too_large" is a property of the query -- it matched more rows than
+// are worth materializing -- and the only one of the two a reader can act
+// on; "unavailable" is everything on our side, from an unconfigured mirror
+// to a file that has since been swept.
+export type KmindexExportStatus = "available" | "too_large" | "unavailable";
+
 export interface KmindexResults {
   // Optional because a backend predating the cohort summary omits it entirely,
   // as does a job whose SRA mirror was unavailable.
   cohort?: KmindexCohort | null;
+  // Size on disk of the downloadable export, which is the parquet download
+  // byte for byte; the TSV rendering is produced on request and is ~10x
+  // larger. Null unless export_status is "available".
+  export_bytes?: number | null;
+  // Rows in that export: every hit before the cap, so this tracks
+  // total_matches rather than the capped total_hits. Null unless
+  // export_status is "available".
+  export_rows?: number | null;
+  // Whether the enriched full match set can be downloaded from
+  // .../jobs/{job_id}/export, and when it cannot, why. The file is
+  // materialized once during aggregation while the pre-cap hit list is still
+  // alive, so "unavailable" is not something asking again fixes -- the mirror
+  // or export directory is unconfigured, or the file has since been swept.
+  // Optional for the same reason cohort is: a backend predating the export
+  // omits it entirely.
+  export_status?: KmindexExportStatus;
   hits: KmindexHit[];
   job_id: string;
   limit: number;

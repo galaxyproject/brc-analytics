@@ -6,10 +6,14 @@ built at a temp path so the service's real read-only queries run against it.
 """
 
 import logging
+import os
+import time
+from pathlib import Path
 
 import duckdb
 import pytest
 
+from app.services import sra_mirror
 from app.services.sra_mirror import SRAMirrorService
 
 
@@ -767,3 +771,400 @@ class TestCohortForAccessions:
         # Structural guard for the same thing: @_synchronized would wrap it.
         assert not hasattr(SRAMirrorService.cohort_for_accessions, "__wrapped__")
         assert hasattr(SRAMirrorService.runs_by_accession, "__wrapped__")
+
+
+@pytest.fixture()
+def exports(tmp_path):
+    """A writable export directory of its own.
+
+    Separate from tmp_path because the mirror fixtures put their .duckdb file
+    there, and half of these assert that nothing was written.
+    """
+    path = tmp_path / "exports"
+    path.mkdir()
+    return path
+
+
+def _hits(accessions: list, shard: str = "GENOMIC_BCT_10_null") -> list:
+    """Shape a list of accessions like the hit dicts aggregation hands over.
+
+    Descending scores, so the staged rank is not the same as accession order
+    and a query that lost the ranking would be visible.
+    """
+    return [
+        {"accession": acc, "score": 1.0 - index / 10000, "shard": shard}
+        for index, acc in enumerate(accessions)
+    ]
+
+
+def _read_export(path) -> list:
+    """Read a materialized export back, in file order."""
+    con = duckdb.connect()
+    try:
+        return con.execute(f"SELECT * FROM read_parquet('{path}')").fetchall()
+    finally:
+        con.close()
+
+
+class TestExportHits:
+    """Materializing the complete match set while it is still alive.
+
+    Aggregation keeps 50,000 hits and discards the rest, and joins metadata
+    onto the 25 rows on screen -- so the enriched full match set exists for
+    exactly the span this runs in. These cover what the file has to get right
+    to be worth writing: every hit in it, the ones the mirror has never heard
+    of included, counted and spelled the same way the cohort beside it counts
+    and spells them.
+    """
+
+    def test_unset_directory_writes_nothing(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        assert svc.export_hits("job1", _hits(accessions), "") is None
+        assert list(exports.glob("*.parquet")) == []
+
+    def test_unavailable_mirror_writes_nothing(self, exports):
+        svc = SRAMirrorService("")
+        assert svc.is_available() is False
+        assert svc.export_hits("job1", _hits(["SRR001"]), str(exports)) is None
+        assert list(exports.iterdir()) == []
+
+    def test_empty_hit_list_writes_nothing(self, cohort_mirror, exports):
+        svc, _accessions = cohort_mirror
+        assert svc.export_hits("job1", [], str(exports)) is None
+        assert list(exports.iterdir()) == []
+
+    def test_rows_the_mirror_does_not_know_keep_their_hit_data(
+        self, cohort_mirror, exports
+    ):
+        # 0.44% of a real job's hits are runs the mirror was not built to
+        # carry. An inner join would drop 5,044 real matches out of the file
+        # that exists to be the complete match set, and leave its row count
+        # disagreeing with the total_matches shown beside it.
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions + ["SRR_NOT_MIRRORED"])
+
+        record = svc.export_hits("job1", hits, str(exports))
+
+        assert record == {"rows": len(hits), "status": sra_mirror.EXPORT_AVAILABLE}
+        rows = _read_export(exports / "job1.parquet")
+        assert len(rows) == len(hits)
+        unmirrored = next(r for r in rows if r[0] == "SRR_NOT_MIRRORED")
+        # Hit data kept...
+        assert unmirrored[2] == "GENOMIC_BCT_10_null"
+        assert unmirrored[1] == pytest.approx(hits[-1]["score"])
+        # ...metadata simply absent, rather than the row being absent.
+        assert all(value is None for value in unmirrored[3:])
+
+    def test_country_sentinel_is_normalised_the_same_way_as_the_cohort(
+        self, cohort_mirror, exports
+    ):
+        # 'uncalculated' is SRA's "no country could be derived", not a place.
+        # If the file spells it as a value while the cohort counts it as
+        # unknown, the two disagree about the same rows -- and the file is the
+        # one someone will tally themselves.
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        country_column = sra_mirror.EXPORT_COLUMNS.index("country")
+        rows = _read_export(exports / "job1.parquet")
+        blank = sum(1 for r in rows if r[country_column] is None)
+        assert "uncalculated" not in {r[country_column] for r in rows}
+
+        cohort = svc.cohort_for_accessions(accessions)
+        facet = next(f for f in cohort["facets"] if f["name"] == "country")
+        assert blank == facet["unknown"] == 9
+
+    def test_instrument_sentinel_is_normalised_the_same_way_too(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        instrument = sra_mirror.EXPORT_COLUMNS.index("instrument")
+        rows = _read_export(exports / "job1.parquet")
+        blank = sum(1 for r in rows if r[instrument] is None)
+
+        cohort = svc.cohort_for_accessions(accessions)
+        facet = next(f for f in cohort["facets"] if f["name"] == "instrument")
+        assert blank == facet["unknown"] == 6
+
+    def test_columns_are_the_declared_export_columns(self, cohort_mirror, exports):
+        # EXPORT_COLUMNS is the TSV header; if the parquet drifts from it the
+        # header would label the wrong columns and nothing else would notice.
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        con = duckdb.connect()
+        try:
+            described = con.execute(
+                f"DESCRIBE SELECT * FROM read_parquet('{exports / 'job1.parquet'}')"
+            ).fetchall()
+        finally:
+            con.close()
+        assert tuple(row[0] for row in described) == sra_mirror.EXPORT_COLUMNS
+
+    def test_rows_are_written_in_the_order_the_app_ranked_them(
+        self, cohort_mirror, exports
+    ):
+        # The tie-break is an md5 the SQL cannot reproduce, so the rank is
+        # staged and ordered on. Without it the join returns hash order and
+        # the file's first row is not the best hit.
+        svc, accessions = cohort_mirror
+        hits = _hits(sorted(accessions, reverse=True))
+
+        svc.export_hits("job1", hits, str(exports))
+
+        rows = _read_export(exports / "job1.parquet")
+        assert [r[0] for r in rows] == [h["accession"] for h in hits]
+
+    def test_row_ceiling_skips_the_write_and_names_the_reason(
+        self, cohort_mirror, exports, monkeypatch, caplog
+    ):
+        # Index sizes are skewed enough that a pathological selection is an
+        # order of magnitude past anything measured, so the ceiling decides
+        # what happens rather than production discovering it.
+        svc, accessions = cohort_mirror
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_ROWS", 5)
+
+        with caplog.at_level(logging.WARNING):
+            record = svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert record == {"rows": None, "status": sra_mirror.EXPORT_TOO_LARGE}
+        assert list(exports.iterdir()) == []
+        assert "export ceiling" in caplog.text
+
+    def test_a_hit_set_at_the_ceiling_is_still_written(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions)
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_ROWS", len(hits))
+
+        record = svc.export_hits("job1", hits, str(exports))
+
+        assert record["status"] == sra_mirror.EXPORT_AVAILABLE
+
+    def test_a_failed_write_leaves_nothing_that_reads_as_an_export(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        # The COPY writes a partial name and renames it into place, so a write
+        # that dies partway through cannot leave a truncated file the endpoint
+        # would happily serve as the complete match set.
+        svc, accessions = cohort_mirror
+        monkeypatch.setattr(
+            sra_mirror,
+            "_export_sql",
+            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+        )
+
+        with pytest.raises(duckdb.Error):
+            svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert list(exports.iterdir()) == []
+
+    def test_staging_file_is_removed_even_when_the_write_fails(
+        self, cohort_mirror, exports, monkeypatch, tmp_path
+    ):
+        import tempfile
+
+        svc, accessions = cohort_mirror
+        staging_dir = tmp_path / "staging"
+        staging_dir.mkdir()
+        monkeypatch.setattr(tempfile, "tempdir", str(staging_dir))
+
+        svc.export_hits("job1", _hits(accessions), str(exports))
+        assert list(staging_dir.iterdir()) == []
+
+        monkeypatch.setattr(
+            sra_mirror,
+            "_export_sql",
+            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+        )
+        with pytest.raises(duckdb.Error):
+            svc.export_hits("job2", _hits(accessions), str(exports))
+        assert list(staging_dir.iterdir()) == []
+
+    def test_re_running_a_job_replaces_its_file(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+        svc.export_hits("job1", _hits(accessions[:3]), str(exports))
+
+        assert [p.name for p in exports.iterdir()] == ["job1.parquet"]
+        assert len(_read_export(exports / "job1.parquet")) == 3
+
+    def test_export_is_not_wrapped_in_the_lock_decorator(self):
+        # Same structural guard as the cohort: @_synchronized holds the
+        # instance lock for the whole call and premises itself on sub-200ms
+        # queries, and this one is a ~1.5s write.
+        assert not hasattr(SRAMirrorService.export_hits, "__wrapped__")
+
+
+def _touch_export(directory: Path, name: str, size: int, age: float) -> Path:
+    """Put a file of a given size and age in the export directory."""
+    path = directory / name
+    path.write_bytes(b"x" * size)
+    stamp = time.time() - age
+    os.utime(path, (stamp, stamp))
+    return path
+
+
+class TestExportRetention:
+    """Exports are ~16 MB each and nothing else ever deletes them.
+
+    The sweep runs at write time rather than on a background task, which means
+    it runs in a directory it does not own exclusively -- so what it will not
+    touch matters as much as what it will.
+    """
+
+    def test_age_ceiling_is_the_aggregate_cache_ttl(self):
+        # Not a coincidence to be maintained by hand: the aggregate is what
+        # carries the "there is an export" claim, so once it expires nothing
+        # can still be pointing at the file.
+        from app.core.cache import CacheTTL
+
+        assert sra_mirror.EXPORT_MAX_AGE_SECONDS == CacheTTL.ONE_DAY
+
+    def test_deletes_exports_past_the_age_ceiling(self, exports):
+        stale = _touch_export(exports, "old.parquet", 10, 86400 * 2)
+        fresh = _touch_export(exports, "new.parquet", 10, 60)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not stale.exists()
+        assert fresh.exists()
+
+    def test_leaves_files_it_did_not_write(self, exports):
+        # The volume may hold anything; retention must not reach it.
+        others = [
+            _touch_export(exports, "notes.txt", 10, 86400 * 5),
+            _touch_export(exports, "sra-mirror.duckdb", 10, 86400 * 5),
+            _touch_export(exports, "job one.parquet", 10, 86400 * 5),
+            _touch_export(exports, "job1.parquet.bak", 10, 86400 * 5),
+        ]
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert all(path.exists() for path in others)
+
+    def test_does_not_follow_a_symlink_out_of_the_directory(self, exports, tmp_path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        target = _touch_export(outside, "precious.parquet", 10, 86400 * 5)
+        (exports / "job1.parquet").symlink_to(target)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert target.exists()
+        assert (exports / "job1.parquet").is_symlink()
+
+    def test_byte_budget_deletes_oldest_first(self, exports, monkeypatch):
+        # The age rule alone is unbounded: a day's worth of searches can fill
+        # a volume without any single file being old enough to sweep.
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_TOTAL_BYTES", 250)
+        oldest = _touch_export(exports, "a.parquet", 100, 3000)
+        middle = _touch_export(exports, "b.parquet", 100, 2000)
+        newest = _touch_export(exports, "c.parquet", 100, 1000)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not oldest.exists()
+        assert middle.exists() and newest.exists()
+
+    def test_budget_stops_as_soon_as_it_fits(self, exports, monkeypatch):
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_TOTAL_BYTES", 300)
+        kept = [
+            _touch_export(exports, "a.parquet", 100, 3000),
+            _touch_export(exports, "b.parquet", 100, 2000),
+            _touch_export(exports, "c.parquet", 100, 1000),
+        ]
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert all(path.exists() for path in kept)
+
+    def test_orphaned_partials_go_sooner_than_finished_exports(self, exports):
+        # An in-flight write is seconds; one wearing the partial suffix hours
+        # later is a crash, and it is not a file anyone can be served.
+        orphan = _touch_export(exports, "job1.parquet.partial", 10, 7200)
+        inflight = _touch_export(exports, "job2.parquet.partial", 10, 5)
+        finished = _touch_export(exports, "job3.parquet", 10, 7200)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not orphan.exists()
+        assert inflight.exists() and finished.exists()
+
+    def test_a_missing_directory_is_not_an_error(self, exports):
+        assert sra_mirror.sweep_exports(str(exports / "nope")) == 0
+
+    def test_the_write_sweeps_before_it_lands(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        stale = _touch_export(exports, "old.parquet", 10, 86400 * 2)
+
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert not stale.exists()
+        assert (exports / "job1.parquet").exists()
+
+
+class TestExportServing:
+    """Reading a materialized export back out, which the mirror is not needed
+    for -- the file is a finished artifact and outlives the service that
+    wrote it."""
+
+    def test_path_is_none_when_the_feature_is_off(self):
+        assert sra_mirror.export_file_path("", "job1") is None
+
+    def test_path_refuses_anything_that_is_not_an_identifier(self, exports):
+        # The job id arrives in a request path and becomes a filename here,
+        # which is the only place that happens.
+        for job_id in ("../etc/passwd", "a/b", "job.1", "", "x" * 65, "job\x00"):
+            assert sra_mirror.export_file_path(str(exports), job_id) is None
+
+    def test_download_name_states_the_job_and_the_row_count(self):
+        # Once downloaded this is the only description that travels with the
+        # file.
+        assert (
+            sra_mirror.export_download_name("7c937baf0758a668", 1133516, "tsv")
+            == "logan-7c937baf0758a668-1133516-runs.tsv"
+        )
+
+    def test_row_count_comes_from_the_file_not_from_a_caller(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert sra_mirror.export_row_count(exports / "job1.parquet") == len(accessions)
+
+    def test_tsv_has_the_declared_header_and_one_row_per_hit(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions + ["SRR_NOT_MIRRORED"])
+        svc.export_hits("job1", hits, str(exports))
+
+        text = b"".join(sra_mirror.iter_export_tsv(exports / "job1.parquet")).decode()
+        lines = text.splitlines()
+
+        assert lines[0] == "\t".join(sra_mirror.EXPORT_COLUMNS)
+        assert len(lines) == len(hits) + 1
+        # The unmirrored row is present with empty metadata cells, not missing.
+        unmirrored = next(ln for ln in lines if ln.startswith("SRR_NOT_MIRRORED\t"))
+        assert unmirrored.split("\t")[3:] == [""] * 10
+
+    def test_a_value_that_would_break_the_row_is_quoted(self, exports):
+        # Nothing in the mirror carries a tab today, but a TSV that silently
+        # shifts every column after one is worse than a quoted field.
+        path = exports / "job1.parquet"
+        con = duckdb.connect()
+        try:
+            columns = ", ".join(
+                f"NULL AS {name}" for name in sra_mirror.EXPORT_COLUMNS[3:]
+            )
+            con.execute(
+                f"""COPY (SELECT 'SRR1' AS accession, 1.0 AS score,
+                    e'IDX\\t"x"' AS shard, {columns})
+                    TO '{path}' (FORMAT parquet)"""
+            )
+        finally:
+            con.close()
+
+        rows = b"".join(sra_mirror.iter_export_tsv(path)).decode().splitlines()
+
+        assert rows[1].split("\t")[0] == "SRR1"
+        assert '"IDX\t""x"""' in rows[1]

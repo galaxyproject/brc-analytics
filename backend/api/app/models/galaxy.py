@@ -1,7 +1,7 @@
 """Galaxy API integration models."""
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -260,6 +260,27 @@ class KmindexResults(BaseModel):
         description="Counts over every hit the query matched, before the cap. "
         "Absent when the mirror could not answer -- never partially filled, "
         "since the point of it is to be the trustworthy number",
+    )
+    export_bytes: Optional[int] = Field(
+        default=None,
+        description="Size of the downloadable export, which is the parquet "
+        "download byte for byte; the TSV rendering is produced on request and "
+        "is ~10x larger",
+    )
+    export_rows: Optional[int] = Field(
+        default=None,
+        description="Rows in that export -- every hit before the cap, so it "
+        "equals total_matches rather than total_hits",
+    )
+    export_status: Literal["available", "too_large", "unavailable"] = Field(
+        default="unavailable",
+        description="Whether the full, mirror-enriched match set can be "
+        "downloaded, and when it cannot, why: 'too_large' means the query "
+        "matched more rows than are worth materializing, 'unavailable' that "
+        "the mirror or export directory is unconfigured, that the write "
+        "failed, or that the file has since been swept. 'available' is "
+        "checked against the file on disk, not against the cached aggregate "
+        "that claims it, so it is never set for a link that would 404",
     )
     limit: int
     offset: int

@@ -1,11 +1,14 @@
 """Galaxy API integration endpoints."""
 
+import asyncio
 import logging
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import FileResponse, StreamingResponse
 
 from app.core.cache import CacheService
+from app.core.config import get_settings
 from app.core.dependencies import (
     check_rate_limit,
     check_submit_rate_limit,
@@ -21,7 +24,13 @@ from app.models.galaxy import (
     KmindexResults,
 )
 from app.services.galaxy_service import GalaxyService
-from app.services.sra_mirror import SRAMirrorService
+from app.services.sra_mirror import (
+    SRAMirrorService,
+    export_download_name,
+    export_file_path,
+    export_row_count,
+    iter_export_tsv,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -191,6 +200,65 @@ async def get_kmindex_results(
         raise HTTPException(
             status_code=500, detail=f"Failed to get kmindex results: {str(e)}"
         ) from e
+
+
+@router.get("/kmindex/jobs/{job_id}/export")
+async def export_kmindex_results(
+    job_id: str,
+    format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
+    _rate_limit=Depends(check_rate_limit),
+) -> Response:
+    """
+    Download every hit a kmindex query matched, joined to its SRA metadata.
+
+    This is the whole match set, not the 50,000 the results endpoint pages and
+    not the 25 rows it annotates -- on a real job, 1,133,516 rows against a
+    displayed 50,000. It was written once during aggregation, which is the only
+    moment the full list exists, so this only ever serves a finished file and
+    never touches Galaxy.
+
+    parquet is the file as materialized, served byte for byte (16 MB on the
+    measured job). tsv is converted on the way out for anything that wants a
+    plain text table, and streams rather than being assembled in memory -- the
+    same rows are 168 MB as text.
+
+    @param job_id: the completed kmindex job.
+    @param format: parquet or tsv.
+    @returns: the export as an attachment, named for the job and its row count.
+    """
+    path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
+    if path is None or not path.is_file():
+        raise HTTPException(
+            status_code=404,
+            detail=f"No downloadable export for job {job_id}",
+        )
+
+    try:
+        # Read from the parquet footer, so the count in the filename describes
+        # the bytes being sent rather than a cache entry that outlived them.
+        rows = await asyncio.to_thread(export_row_count, path)
+    except Exception as e:
+        # Only reachable if the file is corrupt, which the write's rename-into-
+        # place is meant to prevent. Nothing the caller can do differently, so
+        # it reads as absent to them and as an error in the log.
+        logger.error(f"kmindex export for {job_id} is unreadable: {str(e)}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"No downloadable export for job {job_id}",
+        ) from e
+
+    if format == "tsv":
+        filename = export_download_name(job_id, rows, "tsv")
+        return StreamingResponse(
+            iter_export_tsv(path),
+            media_type="text/tab-separated-values",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    return FileResponse(
+        path,
+        media_type="application/vnd.apache.parquet",
+        filename=export_download_name(job_id, rows, "parquet"),
+    )
 
 
 @router.get("/jobs/{job_id}/status", response_model=GalaxyJobStatus)
