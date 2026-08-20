@@ -158,12 +158,27 @@ class KmindexHit(BaseModel):
     )
 
 
+class KmindexIndexSummary(BaseModel):
+    """Per-index hit counts either side of the global cap."""
+
+    hits_after_cap: int
+    hits_before_cap: int
+    index: str
+
+
 class KmindexResults(BaseModel):
     """Hits from a kmindex query, merged across every index shard."""
 
     job_id: str
     query_name: Optional[str] = None
-    total_hits: int = Field(..., description="Hits across all shards before paging")
+    total_hits: int = Field(
+        ..., description="Pageable hits, i.e. after the aggregation cap"
+    )
+    total_matches: int = Field(
+        ...,
+        description="Hits the query actually matched, before the aggregation "
+        "cap; equals total_hits when not truncated",
+    )
     shards_searched: int
     shards_with_hits: int
     shards_failed: int = Field(
@@ -174,6 +189,12 @@ class KmindexResults(BaseModel):
     truncated: bool = Field(
         default=False,
         description="True when the merged hit list hit the aggregation cap",
+    )
+    per_index: List[KmindexIndexSummary] = Field(
+        default=[],
+        description="What each searched index contributed either side of the "
+        "cap; the cap is one global score sort, so a small index searched "
+        "alongside a large one keeps only a fraction of its hits",
     )
     limit: int
     offset: int

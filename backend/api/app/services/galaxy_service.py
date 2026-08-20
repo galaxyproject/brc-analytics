@@ -6,6 +6,7 @@ import json
 import logging
 import random
 import time
+from collections import Counter
 from typing import List, Optional
 
 from bioblend.galaxy import GalaxyInstance
@@ -50,6 +51,19 @@ KMINDEX_RETRY_SWEEP_DELAY = 20.0
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
 
+# Bucket for hits whose shard key matches no known index name. Guessing an
+# attribution would corrupt the very number the caller is trusting to tell them
+# how much the cap dropped, so name the uncertainty instead.
+KMINDEX_UNATTRIBUTED = "(unattributed)"
+
+# Version the aggregate cache key. Entries written before the truncation
+# breakdown existed carry `truncated` but no pre-cap count, so reading one back
+# would render "50,000 accessions matched, 0 of them missing" -- a contradiction
+# asserted more confidently than the bare count it replaced. They live a day and
+# clear_caches() does not reach this namespace (CACHE_KEY_PATTERNS in
+# app/core/cache.py), so the key itself is what has to change.
+KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v2"
+
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
@@ -76,6 +90,102 @@ def _find_kmindex_options(inputs: List[dict]) -> List[str]:
             if found:
                 return found
     return []
+
+
+def _decode_tool_param(value: object) -> object:
+    """Decode a parameter Galaxy echoed as JSON, leaving plain text alone."""
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return value
+    return value
+
+
+def _submitted_index_names(job_params: Optional[dict]) -> List[str]:
+    """
+    The kmindex indexes a job was submitted against, read from its parameters.
+
+    This is the authoritative per-job list -- the tool's current option set says
+    what the instance offers today, not what this job searched. Galaxy is loose
+    about the shape it echoes back, so accept every form it takes; an empty list
+    means the job carries no readable selection, not that none was made.
+    """
+    if not isinstance(job_params, dict):
+        return []
+
+    # The job is submitted with the flat "db_opts|kmindex" key, but kmindex_query
+    # nests that select inside a conditional and Galaxy echoes the conditional
+    # back as one JSON-encoded "db_opts" object -- which is what both real probe
+    # jobs returned. Try the flat key first, then the nest.
+    raw = job_params.get("db_opts|kmindex")
+    if raw is None:
+        section = _decode_tool_param(job_params.get("db_opts"))
+        raw = section.get("kmindex") if isinstance(section, dict) else None
+
+    # A multiple="true" select echoes a list, but one that took a single value
+    # can come back as a bare name.
+    selection = _decode_tool_param(raw)
+    if isinstance(selection, str):
+        selection = [selection]
+    if not isinstance(selection, list):
+        return []
+    return [str(name).strip() for name in selection if str(name).strip()]
+
+
+def _index_for_shard(shard_name: str, index_names: List[str]) -> Optional[str]:
+    """
+    Recover which index a shard key belongs to, longest known name wins.
+
+    kmindex appends a shard number and sometimes a further partition id, and
+    not always consistently -- "GENOMIC_BCT_2", "GENOMIC_BCT_10_null" and
+    "GENOMIC_BCT_21_0" all came out of one job. Index names contain underscores
+    themselves, so splitting on "_" cannot recover the name; only matching
+    against the known list can. Longest match wins so a name that prefixes
+    another index's name can't claim its shards.
+    """
+    best: Optional[str] = None
+    for name in index_names:
+        if shard_name == name or shard_name.startswith(f"{name}_"):
+            if best is None or len(name) > len(best):
+                best = name
+    return best
+
+
+def _summarize_indexes(
+    before: List[dict], after: List[dict], index_names: List[str]
+) -> List[dict]:
+    """
+    Break the hit counts down by index, either side of the cap.
+
+    The cap is one global score sort over the merged list, so an index's share
+    of what survives is not its share of what matched, and the shortfall is not
+    a simple function of size either. In a real eight-index job the 39 hits from
+    METAGENOMIC_UNKNOWN were cut to none at all, while the 1,100,404-hit
+    GENOMIC_BCT beside it kept 2.9%. Every submitted index gets a row even when
+    it matched nothing, because "the index I added found nothing" and "the index
+    I added is missing from the report" read identically otherwise.
+    """
+    # Resolve per distinct shard, not per hit: a large index is tens of shards
+    # but over a million hits.
+    attribution = {
+        shard: _index_for_shard(shard, index_names) or KMINDEX_UNATTRIBUTED
+        for shard in {hit["shard"] for hit in before}
+    }
+    before_counts = Counter(attribution[hit["shard"]] for hit in before)
+    after_counts = Counter(attribution[hit["shard"]] for hit in after)
+
+    totals = {name: 0 for name in index_names}
+    totals.update(before_counts)
+
+    return [
+        {
+            "hits_after_cap": after_counts.get(index, 0),
+            "hits_before_cap": count,
+            "index": index,
+        }
+        for index, count in sorted(totals.items(), key=lambda kv: (-kv[1], kv[0]))
+    ]
 
 
 class GalaxyService:
@@ -244,7 +354,7 @@ class GalaxyService:
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        cache_key = self.cache.make_key("galaxy:kmindex_agg", {"job_id": job_id})
+        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
         aggregate = await self.cache.get(cache_key)
 
         if aggregate is None:
@@ -299,7 +409,7 @@ class GalaxyService:
 
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
-        cache_key = self.cache.make_key("galaxy:kmindex_agg", {"job_id": job_id})
+        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
 
         status = await self.get_job_status(job_id)
         if not status.is_complete:
@@ -313,6 +423,11 @@ class GalaxyService:
             raise Exception(
                 f"Job {job_id} reported success but exposed no output datasets"
             )
+
+        # Read the submitted index list up front. It is what attributes the
+        # shard keys, and taking it before the downloads keeps the round trip
+        # off the span where both the full and the capped hit list are alive.
+        submitted_indexes = await self._submitted_indexes(job_id)
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
         shards = list(
@@ -385,35 +500,83 @@ class GalaxyService:
         # country column reported a distribution manufactured by the sort.
         # md5 reproduces the real composition to within 0.2 points.
         hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
-        truncated = len(hits) > KMINDEX_MAX_HITS
+
+        # Count before capping. The true match count is the number the caller
+        # needs to judge the answer -- a 16S fragment matched 1,133,516
+        # accessions against this 50,000 cap, and reporting only the cap
+        # presents 4% of the result as the whole of it.
+        total_matches = len(hits)
+        truncated = total_matches > KMINDEX_MAX_HITS
+        capped = hits
         if truncated:
             logger.warning(
-                f"kmindex job {job_id} returned {len(hits)} hits; "
+                f"kmindex job {job_id} returned {total_matches} hits; "
                 f"capping at {KMINDEX_MAX_HITS}"
             )
-            hits = hits[:KMINDEX_MAX_HITS]
+            capped = hits[:KMINDEX_MAX_HITS]
+        per_index = _summarize_indexes(hits, capped, submitted_indexes or [])
+        hits = capped
+
+        unattributed = next(
+            (s for s in per_index if s["index"] == KMINDEX_UNATTRIBUTED), None
+        )
+        if unattributed:
+            logger.warning(
+                f"kmindex job {job_id}: {unattributed['hits_before_cap']} hits "
+                "could not be attributed to a known index"
+            )
 
         aggregate = {
             "hits": hits,
+            "per_index": per_index,
             "query_name": query_name,
             "shards_failed": shards_failed,
             "shards_searched": len(shards),
             "shards_with_hits": shards_with_hits,
+            "total_matches": total_matches,
             "truncated": truncated,
         }
 
         # A dropped shard means missing accessions, and a hit count that looks
         # authoritative while being wrong is worse than a slow answer. Report it,
-        # and don't cache it -- the next request gets a clean attempt.
+        # and don't cache it -- the next request gets a clean attempt. An
+        # unreadable index list gets the same treatment: a day of
+        # "(unattributed)" parked beside a perfectly good hit list has no way to
+        # refresh itself.
         if shards_failed:
             logger.error(
                 f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
                 "failed to download; returning a partial result uncached"
             )
+        elif submitted_indexes is None:
+            logger.error(
+                f"kmindex job {job_id}: submitted index list unreadable; "
+                "returning an unattributed breakdown uncached"
+            )
         else:
             await self.cache.set(cache_key, aggregate, CacheTTL.ONE_DAY)
 
         return aggregate
+
+    async def _submitted_indexes(self, job_id: str) -> Optional[List[str]]:
+        """
+        The index names this job was submitted against, or None if unreadable.
+
+        Deliberately not the tool's option list: building that form needs a
+        history, and the history lookup's error path creates one per call, which
+        would have a read-only results request writing to Galaxy. show_job is a
+        read-only metadata call on a job this path is already reading, it cannot
+        be poisoned by an unrelated lookup failing, and it answers for this job
+        rather than for whatever the instance offers today.
+        """
+        try:
+            job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+            return _submitted_index_names(job.get("params"))
+        except Exception as e:
+            logger.warning(
+                f"kmindex job {job_id}: could not read the submitted index list: {e}"
+            )
+            return None
 
     @staticmethod
     def _page_kmindex(
@@ -424,11 +587,18 @@ class GalaxyService:
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
+            # total_hits is what's pageable, so it stays post-cap; total_matches
+            # carries the true count. Neither is defaulted: the cache key is
+            # versioned, so an entry written before these keys existed reads as
+            # a miss and is recomputed, rather than being filled in with the
+            # post-cap count and rendered as "50,000 matched, none missing".
             total_hits=len(hits),
+            total_matches=aggregate["total_matches"],
             shards_failed=aggregate.get("shards_failed", 0),
             shards_searched=aggregate.get("shards_searched", 0),
             shards_with_hits=aggregate.get("shards_with_hits", 0),
             truncated=aggregate.get("truncated", False),
+            per_index=aggregate["per_index"],
             limit=limit,
             offset=offset,
             hits=[KmindexHit(**h) for h in hits[offset : offset + limit]],
