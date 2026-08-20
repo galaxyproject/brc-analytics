@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  type KmindexIndexSummary,
   PAGE_SIZE,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
@@ -25,6 +26,33 @@ interface LoganSearchResultsProps {
 }
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
+
+/**
+ * One line saying what the cap did to a single index, and what searching it
+ * alone would recover.
+ *
+ * Three outcomes read alike but mean different things: an index that matched
+ * nothing was searched and came up empty, an index that matched but kept
+ * nothing was outranked by the others, and an index whose own matches fit
+ * inside the cap is the only one that comes back complete on its own -- the
+ * large index just moves from most of the cap to all of it.
+ * @param summary - Per-index hit counts either side of the cap.
+ * @param cap - Rows the listing can hold, i.e. total_hits while truncated.
+ * @returns Sentence describing this index's share of the listing.
+ */
+function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
+  const { hits_after_cap: kept, hits_before_cap: matched } = summary;
+  const listed = kept.toLocaleString();
+  const total = matched.toLocaleString();
+  if (matched === 0) return "no matches";
+  if (kept === matched) return `all ${total} listed`;
+  const alone =
+    matched <= cap
+      ? `alone it would return all ${total}`
+      : `alone it would still cap at ${cap.toLocaleString()}`;
+  if (kept === 0) return `${total} matched, none listed -- ${alone}`;
+  return `${listed} of ${total} listed -- ${alone}`;
+}
 
 export const LoganSearchResults = ({
   search,
@@ -42,6 +70,37 @@ export const LoganSearchResults = ({
     );
   }
 
+  // Largest index first: the point of the breakdown is showing which index got
+  // swamped by which, and selection order buries that.
+  const perIndex = [...(results.per_index ?? [])].sort(
+    (a, b) => b.hits_before_cap - a.hits_before_cap
+  );
+  const showPerIndex = perIndex.length > 1;
+
+  // A backend predating the breakdown sends neither total_matches nor
+  // per_index, so both need the same guard: an unguarded read of
+  // total_matches throws inside render and unmounts the whole card, which is
+  // worse than the count it was meant to show being missing.
+  const totalMatches = results.total_matches ?? results.total_hits;
+  const notListed = Math.max(totalMatches - results.total_hits, 0);
+  // While truncated the listing is exactly the cap, so total_hits names it.
+  const cap = results.total_hits;
+
+  let headline = `${results.total_hits.toLocaleString()} SRA accessions`;
+  let capNote: string | null = null;
+  if (results.truncated) {
+    // notListed is 0 only when the match count went missing; "the remaining 0"
+    // would be a worse answer than naming the cap and leaving it there.
+    headline =
+      notListed > 0
+        ? `${totalMatches.toLocaleString()} SRA accessions matched`
+        : `${cap.toLocaleString()} SRA accessions listed`;
+    capNote =
+      notListed > 0
+        ? `Listing the ${cap.toLocaleString()} highest-scoring -- the remaining ${notListed.toLocaleString()} cannot be paged to.`
+        : `Capped at ${cap.toLocaleString()} -- more accessions matched than can be listed.`;
+  }
+
   return (
     <Card sx={{ mt: 2 }}>
       <CardContent>
@@ -52,9 +111,24 @@ export const LoganSearchResults = ({
           </Alert>
         )}
         <ResultsToolbar>
-          <Typography variant="h6">
-            {results.total_hits.toLocaleString()} SRA accessions
-          </Typography>
+          <div>
+            <Typography variant="h6">{headline}</Typography>
+            {capNote && (
+              <Typography color="textSecondary" variant="body2">
+                {capNote}
+              </Typography>
+            )}
+            {!results.truncated && showPerIndex && (
+              <Typography color="textSecondary" component="div" variant="body2">
+                {perIndex
+                  .map(
+                    (summary) =>
+                      `${summary.index} ${summary.hits_before_cap.toLocaleString()}`
+                  )
+                  .join(" · ")}
+              </Typography>
+            )}
+          </div>
           <div>
             <Chip
               label={`${results.shards_with_hits}/${results.shards_searched} shards`}
@@ -63,22 +137,54 @@ export const LoganSearchResults = ({
             />
             {results.sra_mirror_available && (
               <Chip
-                label={`${results.sra_annotated}/${results.hits.length} in SRA mirror`}
+                label={`SRA mirror: ${results.sra_annotated}/${results.hits.length} on this page`}
                 size="small"
-                sx={{ mr: 1 }}
                 title="Logan indexes all of SRA; the mirror covers BRC-relevant organisms, so hits outside that scope have no metadata"
-              />
-            )}
-            {results.truncated && (
-              <Chip
-                color="warning"
-                label="Capped at 50,000"
-                size="small"
-                title="Raise the threshold to narrow the result set"
               />
             )}
           </div>
         </ResultsToolbar>
+
+        {results.truncated && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              Raising the threshold shrinks the underlying match count, but it
+              does not re-rank what you see: the same accessions come back in
+              the same order until the threshold rises above the lowest score
+              listed here. A conserved query can match hundreds of thousands of
+              runs at a perfect k-mer score, so it may not clear the cap at all.
+            </Typography>
+            {showPerIndex ? (
+              <>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  The cap is one score sort across every index, applied after
+                  the shards merge, so each index keeps only what ranked highest
+                  overall -- an index with few matches can keep none of them.
+                </Typography>
+                {perIndex.map((summary) => (
+                  <Typography
+                    component="div"
+                    key={summary.index}
+                    variant="body2"
+                    sx={{ mt: 0.5 }}
+                  >
+                    {summary.index}: {describeIndexShare(summary, cap)}
+                  </Typography>
+                ))}
+              </>
+            ) : (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Where scores tie -- and a conserved query ties them by the
+                hundred thousand -- the listed rows are an arbitrary but stable
+                slice of equally-scoring runs rather than a ranking.
+              </Typography>
+            )}
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              A more specific query -- longer, or from a less conserved region
+              -- is what shrinks the match set.
+            </Typography>
+          </Alert>
+        )}
 
         <Table size="small">
           <TableHead>

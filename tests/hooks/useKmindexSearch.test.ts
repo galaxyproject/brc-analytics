@@ -44,6 +44,7 @@ const RESULTS = {
   job_id: JOB_ID,
   limit: 25,
   offset: 0,
+  per_index: [{ hits_after_cap: 0, hits_before_cap: 0, index: "GENOMIC_BCT" }],
   query_name: "q",
   shards_failed: 0,
   shards_searched: 55,
@@ -51,6 +52,7 @@ const RESULTS = {
   sra_annotated: 0,
   sra_mirror_available: true,
   total_hits: 0,
+  total_matches: 0,
   truncated: false,
 };
 
