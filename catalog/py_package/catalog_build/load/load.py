@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from .catalog_source import load_catalog_source_data
+from .ncbi_api import load_ncbi_api_data
 from .ncbi_taxonomy import load_ncbi_taxonomy
 
 
@@ -16,9 +17,9 @@ def do_dlt_load(
     *,
     temp_folder_path: Path,
     dlt_pipeline_prefix: str,
-    assemblies_df: pd.DataFrame,
-    organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame | None,
+    assemblies_path: Path,
+    organisms_path: Path,
+    outbreaks_path: Path | None,
 ):
     """
     Load NCBI taxonomy and catalog source taxa into DuckDB via dlt.
@@ -33,16 +34,20 @@ def do_dlt_load(
     Returns:
       A LoadResult with the verified NCBI taxdump MD5 digest
     """
+    load_catalog_source_data(
+        temp_folder_path=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
+        assemblies_path=assemblies_path,
+        organisms_path=organisms_path,
+        outbreaks_path=outbreaks_path,
+    )
+
     ncbi_taxdump_md5 = load_ncbi_taxonomy(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
 
-    load_catalog_source_data(
-        temp_folder_path=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        assemblies_df=assemblies_df,
-        organisms_df=organisms_df,
-        outbreaks_df=outbreaks_df,
+    load_ncbi_api_data(
+        temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
 
     return LoadResult(ncbi_taxdump_md5=ncbi_taxdump_md5)
