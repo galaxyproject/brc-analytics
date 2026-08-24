@@ -8,10 +8,10 @@ import {
   Typography,
 } from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
-import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { useFavorites } from "@repo/shared/providers/favorites/provider";
 import { getEntity } from "@repo/shared/services/workflows/query";
 import { type Assembly } from "@repo/shared/views/WorkflowInputsView/types";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function FavoritesPage(): JSX.Element {
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { error, favorites, isLoading } = useAssemblyFavorites();
+  const { error, favorites, isLoading } = useFavorites();
 
   function getAssembly(accession: string): Assembly | null {
     try {

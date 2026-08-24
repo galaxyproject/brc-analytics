@@ -1,8 +1,9 @@
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Button, CircularProgress, Tooltip } from "@mui/material";
-import { useAssemblyFavorites } from "@repo/shared/components/Favorites/hooks/UseAssemblyFavorites/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
+import { useFavorites } from "@repo/shared/providers/favorites/provider";
 import { type JSX } from "react";
 import type { Props } from "./types";
 
@@ -16,7 +17,7 @@ export function AssemblyFavoriteButton({
     login,
   } = useAuth();
   const { error, isFavorited, isLoading, isToggling, toggleFavorite } =
-    useAssemblyFavorites();
+    useFavorites();
 
   // Login is not enabled on this site — a permanent state, not a loading one —
   // so favorites can't be offered and the button renders nothing.
@@ -40,11 +41,11 @@ export function AssemblyFavoriteButton({
     );
   }
 
-  const favorited = isFavorited(accession);
+  const favorited = isFavorited(ENTITY_TYPE.ASSEMBLY, accession);
   const button = (
     <Button
       disabled={isLoading || isToggling}
-      onClick={() => void toggleFavorite(accession)}
+      onClick={() => void toggleFavorite(ENTITY_TYPE.ASSEMBLY, accession)}
       startIcon={favorited ? <StarIcon /> : <StarBorderIcon />}
       variant={favorited ? "contained" : "outlined"}
     >
