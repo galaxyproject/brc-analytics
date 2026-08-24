@@ -7,10 +7,10 @@ from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import get_assistant_agent, get_current_user_db
 from app.core.session_signing import require_session_cookie, set_session_cookie
 from app.db.crud import (
-    create_saved_analysis,
     delete_saved_analysis,
     get_saved_analysis,
     list_saved_analyses_for_user,
+    upsert_saved_analysis,
 )
 from app.db.models import User
 from app.db.session import get_db_session
@@ -71,13 +71,14 @@ async def save_analysis_snapshot(
             status_code=403, detail="Assistant session does not belong to this user"
         ) from err
 
-    saved_analysis = await create_saved_analysis(
+    saved_analysis = await upsert_saved_analysis(
         session,
         current_user_db,
-        title=payload.title or _build_default_title(state.messages),
-        schema=state.schema_state.model_dump(mode="json"),
+        agent_message_history=state.agent_message_history,
         messages=[message.model_dump(mode="json") for message in state.messages],
+        schema=state.schema_state.model_dump(mode="json"),
         source_session=state.session_id,
+        title=payload.title or _build_default_title(state.messages),
     )
     return SavedAnalysisSummary.model_validate(saved_analysis, from_attributes=True)
 
