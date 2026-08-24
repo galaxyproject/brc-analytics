@@ -19,10 +19,16 @@ export function useUserResource<T>(
   // than flashing its empty state before the load resolves.
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  // Lets a late response from a superseded request be dropped.
+  // Lets a late response from a superseded call to load() be dropped, no
+  // matter which branch below that prior call took.
   const requestIdRef = useRef(0);
 
   const load = useCallback(async (): Promise<void> => {
+    // Invalidate anything in flight before doing anything else: an auth change
+    // must not let a previous session's response land after we have cleared
+    // state, which is how signed-out users saw stale data.
+    const requestId = ++requestIdRef.current;
+
     if (isAuthLoading) {
       setIsLoading(true);
       return;
@@ -35,7 +41,6 @@ export function useUserResource<T>(
       return;
     }
 
-    const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
     try {
