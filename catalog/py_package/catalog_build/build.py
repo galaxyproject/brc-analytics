@@ -225,7 +225,7 @@ def get_genomes_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     genomes_df["strain"] = ncbi_genomes_df["organism__infraspecific_names"].map(
-        lambda names: names.get("strain", ""), na_action="ignore"
+        lambda names: json.loads(names).get("strain", ""), na_action="ignore"
     )
     genomes_df["isRef"] = (
         ncbi_genomes_df["assembly_info__refseq_category"] == "reference genome"
@@ -248,15 +248,18 @@ def get_biosample_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
         ncbi_genomes_df["assembly_info__biosample"].notna()
     ]
 
+    # Parse biosample JSON values
+    parsed_biosamples = ncbi_genomes_df["assembly_info__biosample"].map(
+        json.loads, na_action="ignore"
+    )
+
     return pd.DataFrame(
         {
             "accession": ncbi_genomes_df["accession"],
-            "biosample": ncbi_genomes_df["assembly_info__biosample"].map(
+            "biosample": parsed_biosamples.map(
                 lambda biosample: biosample["accession"], na_action="ignore"
             ),
-            "sample_ids": ncbi_genomes_df["assembly_info__biosample"].map(
-                get_sample_ids
-            ),
+            "sample_ids": parsed_biosamples.map(get_sample_ids, na_action="ignore"),
         }
     )
 
@@ -1411,7 +1414,7 @@ def build_files(
     dlt_pipeline_prefix,
     build_meta_output_path,
     taxonomic_group_sets=None,
-    do_gene_model_urls=False,
+    do_gene_model_urls=False,  # TODO re-enable
     extract_primary_data=False,
     primary_output_path=None,
     qc_report_path=None,
