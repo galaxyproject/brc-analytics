@@ -106,7 +106,7 @@ class SavedAnalysis(Base):
     # looked up -- restore_saved_session used to rebuild from display
     # messages alone.
     agent_message_history: Mapped[list] = mapped_column(
-        JSON, default=list, nullable=False
+        JSON, default=list, nullable=False, server_default="[]"
     )
     source_session: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(

@@ -167,13 +167,26 @@ async def get_saved_analysis(
     return result.scalar_one_or_none()
 
 
+async def _get_saved_analysis_by_session(
+    session: AsyncSession, user_id: uuid.UUID, source_session: str
+) -> SavedAnalysis | None:
+    """Takes an id, not a User: the retry path runs after a rollback, which
+    expires the ORM object and would turn `user.id` into a lazy load."""
+    return await session.scalar(
+        select(SavedAnalysis).where(
+            SavedAnalysis.user_id == user_id,
+            SavedAnalysis.source_session == source_session,
+        )
+    )
+
+
 async def upsert_saved_analysis(
     session: AsyncSession,
     user: User,
     *,
-    agent_message_history: list,
-    messages: list,
-    schema: dict,
+    agent_message_history: list[dict[str, Any]],
+    messages: list[dict[str, Any]],
+    schema: dict[str, Any],
     source_session: str,
     title: str,
 ) -> SavedAnalysis:
@@ -183,27 +196,44 @@ async def upsert_saved_analysis(
     life. The title is only set on insert -- a user who renames an analysis
     must not have it overwritten by the next turn.
     """
-    existing = await session.scalar(
-        select(SavedAnalysis).where(
-            SavedAnalysis.user_id == user.id,
-            SavedAnalysis.source_session == source_session,
-        )
-    )
+    if not source_session:
+        # NULLs compare distinct, so a missing key would match nothing on the
+        # SELECT and slip past the unique index -- a fresh row every turn
+        # rather than the loud failure you'd want.
+        raise ValueError("upsert_saved_analysis requires a source_session")
+
+    user_id = user.id
+    existing = await _get_saved_analysis_by_session(session, user_id, source_session)
     if existing is None:
-        existing = SavedAnalysis(
+        created = SavedAnalysis(
             agent_message_history=agent_message_history,
             messages=messages,
             schema=schema,
             source_session=source_session,
             title=title,
-            user_id=user.id,
+            user_id=user_id,
         )
-        session.add(existing)
-    else:
-        existing.agent_message_history = agent_message_history
-        existing.messages = messages
-        existing.schema = schema
+        session.add(created)
+        try:
+            await session.commit()
+        except IntegrityError:
+            # Race window: two turns of the same conversation land together,
+            # both SELECT nothing, and the unique index rejects the second.
+            # The caller is fail-open, so raising here would silently drop an
+            # auto-save. Recover onto the winner's row instead.
+            await session.rollback()
+            existing = await _get_saved_analysis_by_session(
+                session, user_id, source_session
+            )
+            if existing is None:
+                raise
+        else:
+            await session.refresh(created)
+            return created
 
+    existing.agent_message_history = agent_message_history
+    existing.messages = messages
+    existing.schema = schema
     await session.commit()
     await session.refresh(existing)
     return existing
