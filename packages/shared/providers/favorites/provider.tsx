@@ -77,10 +77,13 @@ export function FavoritesProvider({
       ),
     [favorites]
   );
-  // Mirrors the latest computed keys for toggleFavorite to read; only ever
-  // read inside a callback, never during render.
-  // eslint-disable-next-line react-hooks/refs -- ref is read only inside callbacks, not during render
-  keysRef.current = keys;
+  // Written post-commit, not during render -- an interrupted render that
+  // never commits must not mutate this shared ref. toggleFavorite only runs
+  // from event handlers, which always fire after effects have flushed, so it
+  // still observes the latest committed keys.
+  useEffect(() => {
+    keysRef.current = keys;
+  }, [keys]);
 
   useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
