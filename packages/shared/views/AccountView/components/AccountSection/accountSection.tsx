@@ -38,7 +38,7 @@ export function AccountSection({
     if (isLoading) {
       return (
         <Stack alignItems="center" py={4}>
-          <CircularProgress size={28} />
+          <CircularProgress aria-label="Loading" size={28} />
         </Stack>
       );
     }
