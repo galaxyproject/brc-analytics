@@ -101,6 +101,13 @@ class SavedAnalysis(Base):
     title: Mapped[str | None] = mapped_column(Text, nullable=True)
     schema: Mapped[dict] = mapped_column(JSON, nullable=False)
     messages: Mapped[list] = mapped_column(JSON, nullable=False)
+    # pydantic-ai's own message history, including tool calls and returns.
+    # Without it a resumed conversation has no memory of anything the agent
+    # looked up -- restore_saved_session used to rebuild from display
+    # messages alone.
+    agent_message_history: Mapped[list] = mapped_column(
+        JSON, default=list, nullable=False
+    )
     source_session: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -115,6 +122,20 @@ class SavedAnalysis(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="saved_analyses")
+
+    __table_args__ = (
+        # One row per conversation. source_session points at the currently
+        # live Redis session, so the per-turn write is an upsert rather than
+        # the INSERT that used to duplicate a row on every save click.
+        # NULLs compare distinct in both Postgres and SQLite, so analyses
+        # whose session has expired do not collide.
+        Index(
+            "uq_saved_analyses_user_session",
+            "user_id",
+            "source_session",
+            unique=True,
+        ),
+    )
 
 
 class WorkflowRun(Base):

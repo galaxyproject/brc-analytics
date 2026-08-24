@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from app.core.config import SESSION_COOKIE_NAME, get_settings
 from app.core.session_signing import sign_session_id
 from app.db.crud import (
-    create_saved_analysis,
     get_user_by_keycloak_sub,
     upsert_favorite,
+    upsert_saved_analysis,
     upsert_user_from_claims,
 )
 from app.db.models import Base, User
@@ -196,17 +196,18 @@ def test_saved_analyses_are_scoped_to_current_user(persistence_client):
         async with session_factory() as session:
             user_a = await get_user_by_keycloak_sub(session, "user-a")
             assert user_a is not None
-            saved_analysis = await create_saved_analysis(
+            saved_analysis = await upsert_saved_analysis(
                 session,
                 user_a,
-                title="User A analysis",
-                schema=AnalysisSchema().model_dump(mode="json"),
+                agent_message_history=[],
                 messages=[
                     ChatMessage(
                         role=MessageRole.USER, content="analyze plasmodium"
                     ).model_dump(mode="json")
                 ],
+                schema=AnalysisSchema().model_dump(mode="json"),
                 source_session="session-a",
+                title="User A analysis",
             )
             return str(saved_analysis.id)
 

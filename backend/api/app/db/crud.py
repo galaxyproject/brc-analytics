@@ -167,26 +167,62 @@ async def get_saved_analysis(
     return result.scalar_one_or_none()
 
 
-async def create_saved_analysis(
+async def upsert_saved_analysis(
     session: AsyncSession,
     user: User,
     *,
-    title: str | None,
-    schema: dict[str, Any],
-    messages: list[dict[str, Any]],
-    source_session: str | None,
+    agent_message_history: list,
+    messages: list,
+    schema: dict,
+    source_session: str,
+    title: str,
 ) -> SavedAnalysis:
-    saved_analysis = SavedAnalysis(
-        user_id=user.id,
-        title=title,
-        schema=schema,
-        messages=messages,
-        source_session=source_session,
+    """Write this conversation's current state, creating the row once.
+
+    Keyed on the live session so a conversation is one row for its whole
+    life. The title is only set on insert -- a user who renames an analysis
+    must not have it overwritten by the next turn.
+    """
+    existing = await session.scalar(
+        select(SavedAnalysis).where(
+            SavedAnalysis.user_id == user.id,
+            SavedAnalysis.source_session == source_session,
+        )
     )
-    session.add(saved_analysis)
+    if existing is None:
+        existing = SavedAnalysis(
+            agent_message_history=agent_message_history,
+            messages=messages,
+            schema=schema,
+            source_session=source_session,
+            title=title,
+            user_id=user.id,
+        )
+        session.add(existing)
+    else:
+        existing.agent_message_history = agent_message_history
+        existing.messages = messages
+        existing.schema = schema
+
     await session.commit()
-    await session.refresh(saved_analysis)
-    return saved_analysis
+    await session.refresh(existing)
+    return existing
+
+
+async def repoint_saved_analysis_session(
+    session: AsyncSession,
+    user: User,
+    saved_analysis_id: str,
+    source_session: str | None,
+) -> SavedAnalysis | None:
+    """Point an analysis at a freshly rehydrated Redis session."""
+    analysis = await get_saved_analysis(session, user, saved_analysis_id)
+    if analysis is None:
+        return None
+    analysis.source_session = source_session
+    await session.commit()
+    await session.refresh(analysis)
+    return analysis
 
 
 async def delete_saved_analysis(
