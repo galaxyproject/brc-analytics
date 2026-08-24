@@ -30,11 +30,6 @@ class FavoriteResponse(FavoritePayload):
     created_at: datetime
 
 
-class SaveAnalysisRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=255)
-    title: str | None = Field(default=None, max_length=255)
-
-
 class SavedAnalysisSummary(BaseModel):
     created_at: datetime
     id: str
@@ -49,6 +44,7 @@ class SavedAnalysisSummary(BaseModel):
 
 
 class SavedAnalysisDetail(SavedAnalysisSummary):
+    agent_message_history: list = Field(default_factory=list)
     messages: list[ChatMessage]
     schema_state: AnalysisSchema = Field(alias="schema")
 
