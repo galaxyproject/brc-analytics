@@ -167,12 +167,18 @@ async def assistant_chat(
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
     # Auto-save for signed-in users. Read back rather than threading state out
-    # of the agent, which stays DB-agnostic; the store is fail-open so this
-    # cannot cost the user their reply.
+    # of the agent, which stays DB-agnostic; the store is fail-open and the
+    # read back is guarded, so nothing here can cost the user their reply.
     if current_user:
-        state = await agent.session_service.get_session(chat_response.session_id)
-        if state is not None:
-            await analysis_store.record(state)
+        try:
+            state = await agent.session_service.get_session(chat_response.session_id)
+            if state is not None:
+                await analysis_store.record(state)
+        except Exception:
+            # get_session reads Redis strictly and raises on a blip, so
+            # without this a cache hiccup would 500 a turn whose reply already
+            # succeeded -- the one thing the auto-save must never do.
+            logger.exception("Failed to auto-save session %s", chat_response.session_id)
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response

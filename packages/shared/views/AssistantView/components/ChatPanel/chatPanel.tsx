@@ -143,7 +143,9 @@ export const ChatPanel = ({
       />
 
       <InputRow>
-        {isConfigured && isAuthenticated && (
+        {/* Only once there is something to save -- on an empty chat the hint
+        describes nothing. */}
+        {isConfigured && isAuthenticated && messages.length > 0 && (
           <Typography color="text.secondary" variant="caption">
             Saved to your account
           </Typography>

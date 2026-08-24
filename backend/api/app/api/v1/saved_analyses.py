@@ -46,7 +46,6 @@ async def get_saved_analysis_detail(
         raise HTTPException(status_code=404, detail="Saved analysis not found")
 
     return SavedAnalysisDetail(
-        agent_message_history=saved_analysis.agent_message_history,
         created_at=saved_analysis.created_at,
         id=str(saved_analysis.id),
         messages=[

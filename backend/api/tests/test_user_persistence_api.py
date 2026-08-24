@@ -469,3 +469,41 @@ def test_open_rehydrates_the_agent_history(persistence_client):
 
     restored = agent.session_service.sessions[opened.json()["session_id"]]
     assert restored.agent_message_history == [{"kind": "request"}]
+
+
+def test_a_session_read_failure_does_not_cost_the_reply(persistence_client):
+    """get_session reads Redis strictly and raises on a blip -- the turn has
+    already succeeded by then, so it must not become a 500."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    async def unavailable(session_id: str):
+        raise RuntimeError("redis is down")
+
+    agent.session_service.get_session = unavailable
+
+    response = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+    assert response.status_code == 200, response.text
+    assert response.json()["reply"] == "ok"
+
+
+def test_detail_does_not_ship_the_agent_transcript(persistence_client):
+    """The raw pydantic-ai history is server-side only -- nothing reads it in
+    the browser and it carries every tool call and return."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    agent.session_service.sessions[session_id].agent_message_history = [
+        {"kind": "request"}
+    ]
+    client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "and again", "session_id": session_id},
+    )
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    detail = client.get(f"/api/v1/saved_analyses/{analysis_id}")
+
+    assert detail.status_code == 200, detail.text
+    assert "agent_message_history" not in detail.json()
