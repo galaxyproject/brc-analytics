@@ -81,6 +81,11 @@ sources:
             data_tests:
               - not_null:
                   name: ncbi_genomes_have_tax_ids
+              - relationships:
+                  name: ncbi_genome_taxa_in_assembly_taxonomy
+                  arguments:
+                    to: ref('taxonomy_assemblies')
+                    field: taxonomy_id
 
   - name: catalog_source
     description: >
@@ -89,15 +94,10 @@ sources:
     tables:
       - name: assemblies
         columns:
-          - name: taxonomy_id
+          - name: accession
             data_tests:
               - not_null:
-                  name: catalog_assemblies_have_tax_ids
-              - relationships:
-                  name: catalog_assembly_taxa_in_assembly_taxonomy
-                  arguments:
-                    to: ref('taxonomy_assemblies')
-                    field: taxonomy_id
+                  name: catalog_assemblies_have_accessions
       - name: organisms
         columns:
           - name: taxonomy_id
