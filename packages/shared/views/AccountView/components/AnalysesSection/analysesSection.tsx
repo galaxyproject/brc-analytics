@@ -3,7 +3,7 @@ import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { AccountCard } from "@repo/shared/views/AccountView/components/AccountCard/accountCard";
 import { AccountSection } from "@repo/shared/views/AccountView/components/AccountSection/accountSection";
 import { useRouter } from "next/router";
-import { type JSX, useCallback } from "react";
+import { type JSX, useCallback, useState } from "react";
 import type { Props } from "./types";
 
 /**
@@ -15,22 +15,43 @@ import type { Props } from "./types";
 export function AnalysesSection({ resource }: Props): JSX.Element {
   const router = useRouter();
   const { error, isLoading, items, setItems } = resource;
+  // Delete/open failures are local to this section -- a rejected request must
+  // not be left as an unhandled promise rejection that tells the user nothing.
+  const [actionError, setActionError] = useState<Error | null>(null);
 
   const handleDelete = useCallback(
     async (id: string): Promise<void> => {
-      await apiClient.deleteSavedAnalysis(id);
-      setItems((current) => current.filter((item) => item.id !== id));
+      setActionError(null);
+      try {
+        await apiClient.deleteSavedAnalysis(id);
+        setItems((current) => current.filter((item) => item.id !== id));
+      } catch (err) {
+        setActionError(
+          err instanceof Error
+            ? err
+            : new Error("Failed to delete saved analysis.")
+        );
+      }
     },
     [setItems]
   );
 
   const handleOpen = useCallback(
     async (id: string): Promise<void> => {
-      const opened = await apiClient.openSavedAnalysis(id);
-      await router.push({
-        pathname: "/assistant",
-        query: { sessionId: opened.session_id },
-      });
+      setActionError(null);
+      try {
+        const opened = await apiClient.openSavedAnalysis(id);
+        await router.push({
+          pathname: "/assistant",
+          query: { sessionId: opened.session_id },
+        });
+      } catch (err) {
+        setActionError(
+          err instanceof Error
+            ? err
+            : new Error("Failed to open saved analysis.")
+        );
+      }
     },
     [router]
   );
@@ -44,7 +65,9 @@ export function AnalysesSection({ resource }: Props): JSX.Element {
           you are signed in.
         </Typography>
       }
-      error={error}
+      // The resource error wins when both are set: a failed load is more
+      // fundamental than a failed row action.
+      error={error ?? actionError}
       id="analyses"
       isLoading={isLoading}
       title="Analyses"
