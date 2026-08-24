@@ -377,3 +377,40 @@ def test_upsert_user_recovers_from_concurrent_insert_race(persistence_app, monke
         assert users[0].email == "updated@example.com"
 
     asyncio.run(scenario())
+
+
+def test_favorites_returns_every_entity_type_by_default(persistence_client):
+    """The workspace lists both types, so one call must return both."""
+    client, _session_factory, _current_sub, _agent = persistence_client
+    client.post(
+        "/api/v1/favorites",
+        json={"entity_id": "GCF_000001405.40", "entity_type": "assembly"},
+    )
+    client.post(
+        "/api/v1/favorites",
+        json={"entity_id": "5833", "entity_type": "organism"},
+    )
+
+    listed = client.get("/api/v1/favorites").json()
+
+    assert {favorite["entity_type"] for favorite in listed} == {
+        "assembly",
+        "organism",
+    }
+
+
+def test_favorites_still_filters_when_asked(persistence_client):
+    client, _session_factory, _current_sub, _agent = persistence_client
+    client.post(
+        "/api/v1/favorites",
+        json={"entity_id": "GCF_000001405.40", "entity_type": "assembly"},
+    )
+    client.post(
+        "/api/v1/favorites",
+        json={"entity_id": "5833", "entity_type": "organism"},
+    )
+
+    listed = client.get("/api/v1/favorites", params={"entity_type": "organism"}).json()
+
+    assert len(listed) == 1
+    assert listed[0]["entity_id"] == "5833"
