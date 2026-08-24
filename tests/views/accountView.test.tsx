@@ -13,12 +13,22 @@ import "@testing-library/jest-dom";
 jest.mock("@repo/shared/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
 }));
+// Only useFavorites is stubbed -- favoriteKey stays real, so FavoritesSection
+// importing it (rather than re-deriving the format) doesn't resolve to
+// undefined here.
 jest.mock("@repo/shared/providers/favorites/provider", () => ({
+  ...jest.requireActual("@repo/shared/providers/favorites/provider"),
   useFavorites: jest.fn(),
 }));
+// requireActual above still evaluates the provider module top-to-bottom,
+// which imports the real api-client -- and that pulls in ky, an ESM-only
+// package Jest can't parse. Stub it out.
 jest.mock("@repo/shared/services/api-client/api-client", () => ({
   apiClient: {
+    createFavorite: jest.fn(),
+    deleteFavorite: jest.fn(),
     deleteSavedAnalysis: jest.fn(),
+    getFavorites: jest.fn(),
     getSavedAnalyses: jest.fn(),
     getWorkflowRuns: jest.fn(),
     openSavedAnalysis: jest.fn(),
@@ -79,6 +89,25 @@ describe("AccountView", () => {
     setFavorites();
     mockClient.getSavedAnalyses.mockResolvedValue([]);
     mockClient.getWorkflowRuns.mockResolvedValue([]);
+  });
+
+  test("shows a single loading state before deciding between sections and the empty panel", async () => {
+    // getSavedAnalyses/getWorkflowRuns resolve on a post-mount effect, so the
+    // synchronous render still reflects the workspace's not-yet-resolved
+    // first load.
+    renderAccountView();
+
+    expect(
+      screen.getByRole("progressbar", { name: "Loading your workspace" })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("region")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Browse assemblies/i)).not.toBeInTheDocument();
+
+    // Let the pending fetches settle within the test so the resulting state
+    // update doesn't land after the test has already finished.
+    await waitFor(() =>
+      expect(screen.getByText(/Browse assemblies/i)).toBeInTheDocument()
+    );
   });
 
   test("shows a getting-started panel when everything is empty", async () => {
@@ -202,6 +231,25 @@ describe("AccountView", () => {
       expect(screen.getByText("analyses unavailable")).toBeInTheDocument()
     );
     expect(screen.queryByText(/Browse assemblies/i)).not.toBeInTheDocument();
+  });
+
+  test("shows one alert, not two, when the shared favorites fetch fails", async () => {
+    mockUseFavorites.mockReturnValue({
+      error: new Error("favorites unavailable"),
+      favorites: [],
+      isFavorited: () => false,
+      isLoading: false,
+      isToggling: false,
+      toggleFavorite: jest.fn(),
+      togglingKey: null,
+    } as unknown as ReturnType<typeof useFavorites>);
+
+    renderAccountView();
+
+    await waitFor(() =>
+      expect(screen.getAllByText("favorites unavailable")).toHaveLength(1)
+    );
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
   });
 
   test("prompts a signed-out visitor to sign in", () => {

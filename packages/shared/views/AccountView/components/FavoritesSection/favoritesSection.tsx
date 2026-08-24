@@ -1,6 +1,9 @@
 import { Button, Typography } from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
-import { useFavorites } from "@repo/shared/providers/favorites/provider";
+import {
+  favoriteKey,
+  useFavorites,
+} from "@repo/shared/providers/favorites/provider";
 import type { FavoriteEntityType } from "@repo/shared/providers/favorites/types";
 import { AccountCard } from "@repo/shared/views/AccountView/components/AccountCard/accountCard";
 import { AccountSection } from "@repo/shared/views/AccountView/components/AccountSection/accountSection";
@@ -16,8 +19,10 @@ import { ENTITY_TYPE_DISPLAY, getFavoriteLabel } from "./utils";
  * @returns the section element.
  */
 export function FavoritesSection({ entityType }: Props): JSX.Element {
-  const { error, favorites, isLoading, toggleFavorite, togglingKey } =
-    useFavorites();
+  // error is deliberately not read here -- both instances of this section
+  // share one favorites fetch, so AccountView surfaces that failure once at
+  // the workspace level instead of once per section.
+  const { favorites, isLoading, toggleFavorite, togglingKey } = useFavorites();
   const { emptyState, entityRoute, title } = ENTITY_TYPE_DISPLAY[entityType];
 
   const items = useMemo(
@@ -33,7 +38,6 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
           {emptyState}
         </Typography>
       }
-      error={error}
       id={entityRoute}
       isLoading={isLoading}
       title={title}
@@ -52,7 +56,8 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
                   </Button>
                   <Button
                     disabled={
-                      togglingKey === `${entityType}:${favorite.entity_id}`
+                      togglingKey ===
+                      favoriteKey(entityType, favorite.entity_id)
                     }
                     onClick={() =>
                       void toggleFavorite(entityType, favorite.entity_id)

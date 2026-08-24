@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Alert, CircularProgress, Stack, Typography } from "@mui/material";
 import { useUserResource } from "@repo/shared/hooks/UseUserResource/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
@@ -8,7 +8,7 @@ import type {
   SavedAnalysisSummary,
   WorkflowRunResponse,
 } from "@repo/shared/services/api-client/types";
-import { type JSX } from "react";
+import { type JSX, useEffect, useState } from "react";
 import { AnalysesSection } from "./components/AnalysesSection/analysesSection";
 import { EmptyWorkspace } from "./components/EmptyWorkspace/emptyWorkspace";
 import { FavoritesSection } from "./components/FavoritesSection/favoritesSection";
@@ -49,6 +49,49 @@ export function AccountView(): JSX.Element {
     analyses.items.length === 0 &&
     launches.items.length === 0;
 
+  // Sticky once true: whether to show sections or EmptyWorkspace can't be
+  // decided until the first load resolves, and re-checking on every later
+  // loading blip (a reload, a retry) would flash the workspace between the
+  // two -- once we've resolved once, the sections themselves own their own
+  // per-resource loading state.
+  const [hasResolvedOnce, setHasResolvedOnce] = useState(false);
+  useEffect(() => {
+    if (!isLoading) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+      setHasResolvedOnce(true);
+    }
+  }, [isLoading]);
+
+  /**
+   * The workspace body: a single loading state until the first load
+   * resolves, then either the getting-started panel or the four sections.
+   * @returns the workspace body element.
+   */
+  function renderContent(): JSX.Element {
+    if (!hasResolvedOnce) {
+      return (
+        <Stack alignItems="center" py={4}>
+          <CircularProgress aria-label="Loading your workspace" size={32} />
+        </Stack>
+      );
+    }
+    if (isEmpty) return <EmptyWorkspace />;
+    return (
+      <>
+        <AnalysesSection resource={analyses} />
+        {/* Both FavoritesSection instances share one fetch, so a failure is
+            one failure -- show it once here rather than once per section
+            (which read the same error from the shared context). */}
+        {favoritesError && (
+          <Alert severity="error">{favoritesError.message}</Alert>
+        )}
+        <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
+        <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
+        <LaunchesSection resource={launches} />
+      </>
+    );
+  }
+
   return (
     <SignInGate message="Your workspace is tied to your BRC Analytics account.">
       <Stack spacing={5}>
@@ -64,16 +107,7 @@ export function AccountView(): JSX.Element {
             )}
           </Stack>
         )}
-        {!isLoading && isEmpty ? (
-          <EmptyWorkspace />
-        ) : (
-          <>
-            <AnalysesSection resource={analyses} />
-            <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
-            <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
-            <LaunchesSection resource={launches} />
-          </>
-        )}
+        {renderContent()}
       </Stack>
     </SignInGate>
   );
