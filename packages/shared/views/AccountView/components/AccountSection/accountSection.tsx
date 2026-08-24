@@ -43,8 +43,18 @@ export function AccountSection({
       );
     }
     // An error takes precedence over the empty state: a failed load is not
-    // evidence the user has nothing saved.
-    if (error) return <Alert severity="error">{error.message}</Alert>;
+    // evidence the user has nothing saved. When there are records to show
+    // alongside it -- e.g. a failed row action -- keep them visible under the
+    // alert rather than replacing them; only a resource-level failure with
+    // nothing loaded collapses to the alert alone.
+    if (error) {
+      return (
+        <Stack spacing={2}>
+          <Alert severity="error">{error.message}</Alert>
+          {children && <Stack spacing={2}>{children}</Stack>}
+        </Stack>
+      );
+    }
     if (!children) return <>{emptyState}</>;
     return <Stack spacing={2}>{children}</Stack>;
   }
