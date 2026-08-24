@@ -84,19 +84,10 @@ export const apiClient = {
     return httpClient.get("workflow_runs").json();
   },
 
-  restoreSavedAnalysis: async (
+  openSavedAnalysis: async (
     id: string
   ): Promise<SavedAnalysisRestoreResponse> => {
-    return httpClient.post(`saved_analyses/${id}/restore`).json();
-  },
-
-  saveAnalysis: async (
-    session_id: string,
-    title?: string
-  ): Promise<SavedAnalysisSummary> => {
-    return httpClient
-      .post("saved_analyses", { json: { session_id, title } })
-      .json();
+    return httpClient.post(`saved_analyses/${id}/open`).json();
   },
 
   updatePreferences: async (

@@ -1,4 +1,3 @@
-import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
@@ -24,9 +23,6 @@ interface UseAssistantChatReturn {
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
-  saveAnalysis: () => Promise<void>;
-  saveLoading: boolean;
-  saveMessage: string | null;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   suggestions: SuggestionChip[];
@@ -47,7 +43,7 @@ interface UseAssistantChatOptions {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, sendMessage, save/reset/retry functions.
+ * @returns Chat state, sendMessage, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialMessage,
@@ -65,8 +61,6 @@ export const useAssistantChat = ({
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
     null
   );
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
   const initialMessageSentRef = useRef(false);
@@ -162,7 +156,6 @@ export const useAssistantChat = ({
       setLoading(true);
       setError(null);
       setLastFailedMessage(null);
-      setSaveMessage(null);
 
       // Add user message immediately for responsiveness
       setMessages((prev) => [...prev, { content: message, role: "user" }]);
@@ -255,28 +248,7 @@ export const useAssistantChat = ({
     setHandoffUrl(null);
     setError(null);
     setLastFailedMessage(null);
-    setSaveMessage(null);
   }, [router, sessionKey]);
-
-  const saveAnalysis = useCallback(async (): Promise<void> => {
-    if (!sessionIdRef.current) {
-      setSaveMessage("There is no active assistant session to save.");
-      return;
-    }
-
-    setSaveLoading(true);
-    setSaveMessage(null);
-    try {
-      const savedAnalysis = await apiClient.saveAnalysis(sessionIdRef.current);
-      setSaveMessage(
-        savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
-      );
-    } catch {
-      setSaveMessage("Failed to save this analysis.");
-    } finally {
-      setSaveLoading(false);
-    }
-  }, []);
 
   return {
     error,
@@ -287,9 +259,6 @@ export const useAssistantChat = ({
     messages,
     onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
-    saveAnalysis,
-    saveLoading,
-    saveMessage,
     schema,
     sendMessage,
     suggestions,

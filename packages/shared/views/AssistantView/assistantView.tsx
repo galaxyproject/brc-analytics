@@ -40,9 +40,6 @@ export const AssistantView = ({
     messages,
     onRetry,
     resetSession,
-    saveAnalysis,
-    saveLoading,
-    saveMessage,
     schema,
     sendMessage,
     suggestions,
@@ -116,10 +113,7 @@ export const AssistantView = ({
               loading={loading}
               messages={messages}
               onRetry={onRetry}
-              onSave={saveAnalysis}
               onSend={sendMessage}
-              saveLabel={saveMessage}
-              saveLoading={saveLoading}
               suggestions={suggestions}
             />
           </ChatColumn>
