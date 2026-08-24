@@ -25,7 +25,7 @@ from app.models.assistant import (
     SessionRestoreResponse,
 )
 from app.models.user_data import UserMeResponse
-from app.services import turn_log
+from app.services import analysis_store, turn_log
 from app.services.assistant_agent import (
     AssistantTimeoutError,
     AssistantUnavailableError,
@@ -165,6 +165,14 @@ async def assistant_chat(
     except Exception as e:
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
+
+    # Auto-save for signed-in users. Read back rather than threading state out
+    # of the agent, which stays DB-agnostic; the store is fail-open so this
+    # cannot cost the user their reply.
+    if current_user:
+        state = await agent.session_service.get_session(chat_response.session_id)
+        if state is not None:
+            await analysis_store.record(state)
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response

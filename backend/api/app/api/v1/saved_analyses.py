@@ -1,37 +1,24 @@
-from typing import Optional
-
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import get_assistant_agent, get_current_user_db
-from app.core.session_signing import require_session_cookie, set_session_cookie
+from app.core.session_signing import set_session_cookie
 from app.db.crud import (
     delete_saved_analysis,
     get_saved_analysis,
     list_saved_analyses_for_user,
-    upsert_saved_analysis,
+    repoint_saved_analysis_session,
 )
 from app.db.models import User
 from app.db.session import get_db_session
 from app.models.assistant import AnalysisSchema, ChatMessage
 from app.models.user_data import (
-    SaveAnalysisRequest,
     SavedAnalysisDetail,
     SavedAnalysisRestoreResponse,
     SavedAnalysisSummary,
 )
 
 router = APIRouter()
-
-
-def _build_default_title(messages: list[ChatMessage]) -> str:
-    first_user_message = next(
-        (message for message in messages if message.role == "user"), None
-    )
-    if first_user_message is None:
-        return "Saved analysis"
-    return first_user_message.content[:80]
 
 
 @router.get("", response_model=list[SavedAnalysisSummary])
@@ -44,43 +31,6 @@ async def get_saved_analysis_list(
         SavedAnalysisSummary.model_validate(saved_analysis, from_attributes=True)
         for saved_analysis in saved_analyses
     ]
-
-
-@router.post("", response_model=SavedAnalysisSummary)
-async def save_analysis_snapshot(
-    payload: SaveAnalysisRequest,
-    current_user_db: User = Depends(get_current_user_db),
-    agent=Depends(get_assistant_agent),
-    session: AsyncSession = Depends(get_db_session),
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
-) -> SavedAnalysisSummary:
-    # Anonymous-then-authenticated flow: the user started a chat logged
-    # out, then signed in to save it. Cookie possession proves it's the
-    # same browser, so claim the session for them before saving.
-    require_session_cookie(payload.session_id, session_cookie)
-    try:
-        state = await agent.session_service.claim_session(
-            payload.session_id, current_user_db.keycloak_sub
-        )
-    except KeyError as err:
-        raise HTTPException(
-            status_code=404, detail="Assistant session not found"
-        ) from err
-    except PermissionError as err:
-        raise HTTPException(
-            status_code=403, detail="Assistant session does not belong to this user"
-        ) from err
-
-    saved_analysis = await upsert_saved_analysis(
-        session,
-        current_user_db,
-        agent_message_history=state.agent_message_history,
-        messages=[message.model_dump(mode="json") for message in state.messages],
-        schema=state.schema_state.model_dump(mode="json"),
-        source_session=state.session_id,
-        title=payload.title or _build_default_title(state.messages),
-    )
-    return SavedAnalysisSummary.model_validate(saved_analysis, from_attributes=True)
 
 
 @router.get("/{saved_analysis_id}", response_model=SavedAnalysisDetail)
@@ -96,6 +46,7 @@ async def get_saved_analysis_detail(
         raise HTTPException(status_code=404, detail="Saved analysis not found")
 
     return SavedAnalysisDetail(
+        agent_message_history=saved_analysis.agent_message_history,
         created_at=saved_analysis.created_at,
         id=str(saved_analysis.id),
         messages=[
@@ -108,16 +59,20 @@ async def get_saved_analysis_detail(
     )
 
 
-@router.post(
-    "/{saved_analysis_id}/restore", response_model=SavedAnalysisRestoreResponse
-)
-async def restore_saved_analysis(
+@router.post("/{saved_analysis_id}/open", response_model=SavedAnalysisRestoreResponse)
+async def open_saved_analysis(
     saved_analysis_id: str,
     response: Response,
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
     session: AsyncSession = Depends(get_db_session),
 ) -> SavedAnalysisRestoreResponse:
+    """Resume a saved conversation, continuing the same analysis.
+
+    The Redis session behind an analysis expires after two hours, so opening
+    one mints a fresh session and repoints the row at it. The analysis keeps
+    its id -- resuming is not a new analysis.
+    """
     saved_analysis = await get_saved_analysis(
         session, current_user_db, saved_analysis_id
     )
@@ -125,15 +80,18 @@ async def restore_saved_analysis(
         raise HTTPException(status_code=404, detail="Saved analysis not found")
 
     restored_state = await agent.restore_saved_session(
-        owner_keycloak_sub=current_user_db.keycloak_sub,
-        schema_state=AnalysisSchema.model_validate(saved_analysis.schema),
+        agent_message_history=saved_analysis.agent_message_history,
         messages=[
             ChatMessage.model_validate(message) for message in saved_analysis.messages
         ],
+        owner_keycloak_sub=current_user_db.keycloak_sub,
+        schema_state=AnalysisSchema.model_validate(saved_analysis.schema),
     )
-    # Bind the restored session to this browser so the frontend can
-    # immediately call GET /assistant/session/{id} to hydrate computed
-    # handoff state (is_complete, handoff_url, suggestions).
+    await repoint_saved_analysis_session(
+        session, current_user_db, saved_analysis_id, restored_state.session_id
+    )
+    # Bind the session to this browser so the frontend can hydrate computed
+    # handoff state from GET /assistant/session/{id}.
     set_session_cookie(response, restored_state.session_id)
     return SavedAnalysisRestoreResponse(session_id=restored_state.session_id)
 
