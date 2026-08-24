@@ -8,6 +8,6 @@ select
   {% endfor %}
   list(l.tax_id order by l.depth desc) as lineage_taxonomy_ids,
   first(l.common_names order by l.tax_id) filter (l.is_query_taxon) as common_names
-from {{ source("catalog_source", "assembly_taxa") }} t
+from {{ ref("taxonomy_assembly_taxa") }} t
 join {{ ref("taxonomy_lineages_with_names") }} l on l.query_tax_id = t.taxonomy_id
 group by t.taxonomy_id

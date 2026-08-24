@@ -54,12 +54,40 @@ sources:
               - not_null:
                   name: ncbi_merged_have_new_id
 
+  - name: ncbi_api
+    description: >
+      Data fetched from the NCBI API.
+    schema: ncbi_api
+    tables:
+      - name: genomes
+        columns:
+          - name: accession
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_accessions
+          - name: assembly_info__assembly_level
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_levels
+          - name: assembly_info__release_date
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_release_dates
+          - name: assembly_stats__total_sequence_length
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_lengths
+          - name: organism__tax_id
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_tax_ids
+
   - name: catalog_source
     description: >
       Catalog inputs written into DuckDB by build.py before the dbt run.
     schema: catalog_source
     tables:
-      - name: assembly_taxa
+      - name: assemblies
         columns:
           - name: taxonomy_id
             data_tests:
@@ -70,7 +98,7 @@ sources:
                   arguments:
                     to: ref('taxonomy_assemblies')
                     field: taxonomy_id
-      - name: organism_taxa
+      - name: organisms
         columns:
           - name: taxonomy_id
             data_tests:
@@ -85,7 +113,7 @@ sources:
             description: >
               JSON list of the curated synonyms specified for the organism in the
               source organisms file, or null where none are specified.
-      - name: outbreak_taxa
+      - name: outbreaks
         # Only tested when the catalog has outbreaks
         columns:
           - name: taxonomy_id

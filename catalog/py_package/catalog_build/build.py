@@ -14,10 +14,7 @@ import duckdb
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from linkml_runtime.loaders import YAMLLoader
-from requests.exceptions import ConnectTimeout
 
-from .generated_schema import schema
 from .load import do_dlt_load
 from .qc_utils import (
     format_list_section,
@@ -31,211 +28,6 @@ from .utils import get_db_path
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
 log = logging.getLogger(__name__)
-
-
-def rate_limit_handler(request_call, max_retries=5):
-    response = request_call()
-    for attempt in range(max_retries):
-        if response.status_code != 429:
-            break
-        # Use Retry-After if provided, otherwise use exponential backoff
-        retry_after = max(
-            int(response.headers.get("Retry-After", 0)), 2 ** (attempt + 1)
-        )
-        print(f"Rate limited, waiting {retry_after} seconds")
-        time.sleep(retry_after)
-        response = request_call()
-    response.raise_for_status()
-    return response
-
-
-def post_ncbi_request(url, json_data, batch_size=1000, min_batch_size=50):
-    """
-    Makes a POST request to the NCBI API with error handling and rate limiting.
-    Handles pagination if the response contains next_page_token and processes requests in batches.
-    Adaptively reduces batch size if requests fail.
-
-    Args:
-      url: The API endpoint URL
-      json_data: The data to send in the request body
-      batch_size: Initial maximum number of items to process in a single request
-      min_batch_size: Minimum batch size to try before giving up
-
-    Returns:
-      List of all reports from paginated responses
-
-    Raises:
-      Exception: If the request fails or contains errors even with minimum batch size
-    """
-    all_reports = []
-    processed_count = 0
-
-    # Get the list of IDs to process (assuming they're in a list in the json_data)
-    id_key = next((k for k in json_data if isinstance(json_data[k], list)), None)
-    if not id_key:
-        raise ValueError("No list of IDs found in json_data")
-
-    ids = json_data[id_key]
-    total_ids = len(ids)
-    current_batch_size = batch_size
-
-    while processed_count < total_ids:
-        # Create a batch of IDs
-        batch = ids[processed_count : processed_count + current_batch_size]
-        batch_num = processed_count // current_batch_size + 1
-        print(
-            f"Processing batch {batch_num} (size: {len(batch)}, {processed_count}/{total_ids})"
-        )
-
-        # Create a new json_data with just the current batch
-        batch_data = {**json_data}
-        batch_data[id_key] = batch
-
-        # Add page_size parameter if not present
-        if "page_size" not in batch_data:
-            batch_data["page_size"] = 100
-
-        success = False
-        retry_count = 0
-
-        # Try with progressively smaller batch sizes until success or minimum reached
-        while not success and current_batch_size >= min_batch_size:
-            try:
-                batch_reports = []
-                inner_page = 1
-
-                # Remove any page token from previous attempts
-                if "page_token" in batch_data:
-                    del batch_data["page_token"]
-                if "next_page_token" in batch_data:
-                    del batch_data["next_page_token"]
-
-                while True:
-                    print(f"Requesting page {inner_page} (batch size: {len(batch)})")
-
-                    # Add page token to request if it exists
-                    if "next_page_token" in batch_data:
-                        batch_data["page_token"] = batch_data.pop("next_page_token")
-
-                    # Use rate_limit_handler to make the request with proper retry logic
-                    response = rate_limit_handler(
-                        lambda data=batch_data: requests.post(url, json=data)
-                    )
-
-                    if response.status_code != 200:
-                        raise Exception(
-                            f"Failed to fetch data: {response.status_code} {response.text}"
-                        )
-
-                    data = response.json()
-
-                    if "reports" not in data:
-                        if "total_count" in data:
-                            # API returned total_count but no reports, likely too many results
-                            total = data["total_count"]
-                            print(f"API returned total_count of {total} but no reports")
-                            raise ValueError(
-                                "Too many results, need to reduce batch size"
-                            )
-                        else:
-                            # Some other issue with the response
-                            raise Exception(f"Unexpected response format: {data}")
-                    else:
-                        invalid = [r for r in data["reports"] if r.get("errors")]
-                        if invalid:
-                            for r in invalid:
-                                print(
-                                    f"Warning: Skipping unrecognized taxonomy ID(s): {r.get('query', [])}"
-                                )
-                            data["reports"] = [
-                                r for r in data["reports"] if not r.get("errors")
-                            ]
-
-                    batch_reports.extend(data["reports"])
-
-                    next_page_token = data.get("next_page_token")
-                    if not next_page_token:
-                        break
-
-                    batch_data["next_page_token"] = next_page_token
-                    inner_page += 1
-
-                # If we get here, the batch was processed successfully
-                all_reports.extend(batch_reports)
-                processed_count += len(batch)
-                success = True
-
-            except ValueError as e:
-                # Specific error for batch size issues
-                if "reduce batch size" in str(e):
-                    retry_count += 1
-                    current_batch_size = max(current_batch_size // 2, min_batch_size)
-                    print(f"Reducing batch size to {current_batch_size}")
-
-                    # If we're at the minimum batch size, try with an even smaller page_size
-                    if (
-                        current_batch_size == min_batch_size
-                        and batch_data["page_size"] > 10
-                    ):
-                        batch_data["page_size"] = batch_data["page_size"] // 2
-                        new_page_size = batch_data["page_size"]
-                        print(f"Also reducing page_size to {new_page_size}")
-                else:
-                    # Not a batch size issue, re-raise
-                    raise
-            except Exception as e:
-                # For other exceptions, also try reducing batch size
-                retry_count += 1
-                if retry_count <= 3:  # Limit retries
-                    current_batch_size = max(current_batch_size // 2, min_batch_size)
-                    print(
-                        f"Request failed. Reducing batch size to {current_batch_size}"
-                    )
-                else:
-                    # Too many retries, give up
-                    msg = f"Failed after {retry_count} retries with size {current_batch_size}"
-                    raise Exception(msg) from e
-
-        # If we couldn't process even with minimum batch size, raise exception
-        if not success:
-            msg = f"Failed to process batch even with minimum size of {min_batch_size}"
-            raise Exception(msg)
-
-        # Reset for next batch
-
-    return all_reports
-
-
-def read_dataframe_from_yaml(yaml_path, schema_model, list_key):
-    """
-    Reads a YAML file using a given Pydantic model, and creates a dataframe from a list of entities provided by the data.
-
-    Args:
-        yaml_path: Path of the YAML file to read.
-        schema_model: Pydantic model representing the root schema class for the YAML file.
-        list_key: Key of the root object in which the list of entities is held.
-
-    Returns:
-        df: Dataframe representing the list of entities.
-    """
-    yaml_data = YAMLLoader().load(source=yaml_path, target_class=schema_model)
-    return pd.DataFrame(row.model_dump() for row in getattr(yaml_data, list_key))
-
-
-def read_assemblies(assemblies_path):
-    return read_dataframe_from_yaml(assemblies_path, schema.Assemblies, "assemblies")
-
-
-def read_organisms(organisms_path):
-    return read_dataframe_from_yaml(
-        organisms_path, schema.Organisms, "organisms"
-    ).astype({"taxonomy_id": "string"})
-
-
-def read_outbreaks(outbreaks_path):
-    if outbreaks_path is None:
-        return None
-    return read_dataframe_from_yaml(outbreaks_path, schema.Outbreaks, "outbreaks")
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -403,91 +195,83 @@ def get_species_subtree(
     }
 
 
-def get_genome_row(genome_info):
-    refseq_category = genome_info["assembly_info"].get("refseq_category")
-    return {
-        "strain": genome_info["organism"]
-        .get("infraspecific_names", {})
-        .get("strain", ""),
-        "taxonomyId": str(genome_info["organism"]["tax_id"]),
-        "releaseDate": genome_info["assembly_info"]["release_date"],
-        "accession": genome_info["accession"],
-        "currentAccession": genome_info.get(
-            "current_accession", genome_info["accession"]
-        ),
-        "isRef": refseq_category == "reference genome",
-        "level": genome_info["assembly_info"]["assembly_level"],
-        "assemblyStatus": genome_info["assembly_info"].get(
-            "assembly_status", "ASSEMBLY_STATUS_UNKNOWN"
-        ),
-        "chromosomeCount": genome_info["assembly_stats"].get(
-            "total_number_of_chromosomes"
-        ),
-        "length": genome_info["assembly_stats"]["total_sequence_length"],
-        "scaffoldCount": genome_info["assembly_stats"].get("number_of_scaffolds"),
-        "scaffoldN50": genome_info["assembly_stats"].get("scaffold_n50"),
-        "scaffoldL50": genome_info["assembly_stats"].get("scaffold_l50"),
-        "coverage": genome_info["assembly_stats"].get("genome_coverage"),
-        "gcPercent": genome_info["assembly_stats"].get("gc_percent"),
-        "annotationStatus": genome_info.get("annotation_info", {}).get("status"),
-        "pairedAccession": genome_info.get("paired_accession"),
+def get_genomes_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
+    column_mapping = {
+        "organism__tax_id": "taxonomyId",
+        "assembly_info__release_date": "releaseDate",
+        "accession": "accession",
+        "current_accession": "currentAccession",
+        "assembly_info__assembly_level": "level",
+        "assembly_status": "assemblyStatus",
+        "assembly_stats__total_number_of_chromosomes": "chromosomeCount",
+        "assembly_stats__total_sequence_length": "length",
+        "assembly_stats__number_of_scaffolds": "scaffoldCount",
+        "assembly_stats__scaffold_n50": "scaffoldN50",
+        "assembly_stats__scaffold_l50": "scaffoldL50",
+        "assembly_stats__genome_coverage": "coverage",
+        "assembly_stats__gc_percent": "gcPercent",
+        "annotation_info__status": "annotationStatus",
+        "paired_accession": "pairedAccession",
     }
+    genomes_df = (
+        ncbi_genomes_df[column_mapping.keys()]
+        .rename(columns=column_mapping)
+        .astype({"taxonomyId": "string"})
+    )
+    genomes_df = genomes_df.fillna(
+        {
+            "currentAccession": genomes_df["accession"],
+            "assemblyStatus": "ASSEMBLY_STATUS_UNKNOWN",
+        }
+    )
+    genomes_df["strain"] = ncbi_genomes_df["organism__infraspecific_names"].map(
+        lambda names: names.get("strain", ""), na_action="ignore"
+    )
+    genomes_df["isRef"] = (
+        ncbi_genomes_df["assembly_info__refseq_category"] == "reference genome"
+    )
+    return genomes_df
 
 
-def get_biosample_data(genome_info):
-    return {
-        "accession": genome_info["accession"],
-        "biosample": genome_info["assembly_info"]["biosample"]["accession"],
-        "sample_ids": ",".join(
+def get_biosample_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
+    def get_sample_ids(biosample):
+        return ",".join(
             [
                 f"{sample['db']}:{sample['value']}"
-                for sample in genome_info["assembly_info"]["biosample"].get(
-                    "sample_ids", ""
-                )
+                for sample in biosample.get("sample_ids", "")
                 if "db" in sample
             ]
-        ),
-    }
+        )
+
+    # Restrict genomes to ones with biosamples
+    ncbi_genomes_df = ncbi_genomes_df[
+        ncbi_genomes_df["assembly_info__biosample"].notna()
+    ]
+
+    return pd.DataFrame(
+        {
+            "accession": ncbi_genomes_df["accession"],
+            "biosample": ncbi_genomes_df["assembly_info__biosample"].map(
+                lambda biosample: biosample["accession"], na_action="ignore"
+            ),
+            "sample_ids": ncbi_genomes_df["assembly_info__biosample"].map(
+                get_sample_ids
+            ),
+        }
+    )
 
 
-def get_genomes_and_primarydata_df(accessions):
+def get_genomes_and_primarydata_df(ncbi_genomes_df: pd.DataFrame):
     """
-    Fetches genome information and creates DataFrames for genomes and biosample data.
+    Takes loaded NCBI genomes and creates DataFrames for genomes and biosample data.
 
     Args:
-      accessions: List of genome accessions to fetch information for
+      ncbi_genomes_df: Dataframe of genome metadata loaded via dlt
 
     Returns:
       Tuple of (genomes_df, biosample_df)
     """
-    # Convert pandas Series to list if necessary
-    if isinstance(accessions, pd.Series):
-        accessions = accessions.tolist()
-
-    url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report"
-
-    # Use post_ncbi_request with adaptive batch sizing
-    reports = post_ncbi_request(
-        url,
-        {
-            "accessions": accessions,
-            "filters": {
-                "assembly_version": "all_assemblies"  # Include old or suppressed assemblies
-            },
-            "page_size": 500,  # Initial page size for pagination
-        },
-    )
-
-    return (
-        pd.DataFrame(data=[get_genome_row(info) for info in reports]),
-        pd.DataFrame(
-            data=[
-                get_biosample_data(info)
-                for info in reports
-                if "biosample" in info["assembly_info"]
-            ]
-        ),
-    )
+    return (get_genomes_df(ncbi_genomes_df), get_biosample_df(ncbi_genomes_df))
 
 
 def _get_gene_model_urls_from_genark_list():
@@ -1533,6 +1317,10 @@ def save_build_metadata(path: str, meta: BuildMetadata):
 
 @dataclass
 class LoadAndTransformResult:
+    assemblies_source: pd.DataFrame
+    organisms_source: pd.DataFrame
+    outbreaks_source: pd.DataFrame | None
+    ncbi_genomes: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
     taxonomy_outbreaks: pd.DataFrame
@@ -1545,9 +1333,9 @@ def load_and_transform(
     temp_folder_path_string: str,
     dlt_pipeline_prefix: str,
     taxonomic_levels: list[str],
-    assemblies_df: pd.DataFrame,
-    organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame | None,
+    assemblies_path: Path,
+    organisms_path: Path,
+    outbreaks_path: Path | None,
 ):
     """
     Load source data and NCBI taxonomy via dlt, transform it via dbt, and return the results.
@@ -1581,21 +1369,29 @@ def load_and_transform(
     load_result = do_dlt_load(
         temp_folder_path=temp_folder_path,
         dlt_pipeline_prefix=dlt_pipeline_prefix,
-        assemblies_df=assemblies_df,
-        organisms_df=organisms_df,
-        outbreaks_df=outbreaks_df,
+        assemblies_path=assemblies_path,
+        organisms_path=organisms_path,
+        outbreaks_path=outbreaks_path,
     )
 
     # Transform loaded data via dbt
     transform_result = do_dbt_transformations(
         temp_folder_path,
         taxonomic_levels=taxonomic_levels,
-        has_outbreaks=outbreaks_df is not None,
+        has_outbreaks=outbreaks_path is not None,
     )
 
     # Get transformed data and return along with metadata
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
         return LoadAndTransformResult(
+            assemblies_source=con.query("select * from catalog_source.assemblies").df(),
+            organisms_source=con.query("select * from catalog_source.organisms").df(),
+            outbreaks_source=(
+                None
+                if outbreaks_path is None
+                else con.query("select * from catalog_source.outbreaks").df()
+            ),
+            ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
@@ -1656,12 +1452,28 @@ def build_files(
 
     qc_report_params = {}
 
-    # We'll get the taxa names after we've built the species info to reuse the taxon maps
-
-    source_list_df = read_assemblies(assemblies_path)
+    # Do database-based loading and transformation
+    load_and_transform_result = load_and_transform(
+        temp_folder_path_string=temp_folder_path,
+        dlt_pipeline_prefix=dlt_pipeline_prefix,
+        taxonomic_levels=taxonomic_levels_for_tree,
+        assemblies_path=Path(assemblies_path),
+        organisms_path=Path(organisms_path),
+        outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+    )
+    source_list_df = load_and_transform_result.assemblies_source
+    source_organisms_df = load_and_transform_result.organisms_source.astype(
+        {"taxonomy_id": "string"}
+    )
+    # Outbreaks are optional (only some catalogs use them), so source_outbreaks_df is None when no path is given
+    source_outbreaks_df = load_and_transform_result.outbreaks_source
+    assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
+    organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
+    outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
+    qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
-        source_list_df["accession"]
+        load_and_transform_result.ncbi_genomes
     )
 
     primarydata_df["sra_sample_acc"] = primarydata_df["sample_ids"].str.split(",")
@@ -1696,25 +1508,6 @@ def build_files(
         source_list_df["accession"],
         base_genomes_df["accession"],
     )
-
-    # Load source organisms and outbreaks; outbreaks are optional (only some
-    # catalogs use them), so source_outbreaks_df is None when no path is given
-    source_organisms_df = read_organisms(organisms_path)
-    source_outbreaks_df = read_outbreaks(outbreaks_path)
-
-    # Do database-based loading and transformation
-    load_and_transform_result = load_and_transform(
-        temp_folder_path_string=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        taxonomic_levels=taxonomic_levels_for_tree,
-        assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
-        organisms_df=source_organisms_df,
-        outbreaks_df=source_outbreaks_df,
-    )
-    assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
-    organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
-    outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
-    qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
     # Create species DataFrame using the assemblies' taxonomy
     species_df = get_species_df(

@@ -2,46 +2,72 @@ from pathlib import Path
 
 import dlt
 import pandas as pd
+from linkml_runtime.loaders import YAMLLoader
 
+from ..generated_schema import schema
 from ..utils import get_db_path_string
 
 
-@dlt.resource(name="outbreak_taxa", write_disposition="replace")
-def outbreak_taxa(df: pd.DataFrame):
-    yield df
+def read_dataframe_from_yaml(
+    yaml_path: Path, schema_model: type[schema.ConfiguredBaseModel], list_key: str
+):
+    """
+    Reads a YAML file using a given Pydantic model, and creates a dataframe from a list of entities provided by the data.
+
+    Args:
+        yaml_path: Path of the YAML file to read.
+        schema_model: Pydantic model representing the root schema class for the YAML file.
+        list_key: Key of the root object in which the list of entities is held.
+
+    Returns:
+        df: Dataframe representing the list of entities.
+    """
+    yaml_data = YAMLLoader().load(source=str(yaml_path), target_class=schema_model)
+    return pd.DataFrame(row.model_dump() for row in getattr(yaml_data, list_key))
 
 
-@dlt.resource(
-    name="organism_taxa",
-    write_disposition="replace",
-    # The type is specified explicitly because it can't be inferred when no organism
-    # specifies any synonyms, in which case the column wouldn't be materialized at all
-    columns={"synonyms": {"data_type": "json"}},
-)
-def organism_taxa(df: pd.DataFrame):
-    yield df
+def read_assemblies(assemblies_path: Path):
+    return read_dataframe_from_yaml(assemblies_path, schema.Assemblies, "assemblies")
 
 
-@dlt.resource(name="assembly_taxa", write_disposition="replace")
-def assembly_taxa(df: pd.DataFrame):
-    yield df
+def read_organisms(organisms_path: Path):
+    return read_dataframe_from_yaml(organisms_path, schema.Organisms, "organisms")
+
+
+def read_outbreaks(outbreaks_path: Path):
+    return read_dataframe_from_yaml(outbreaks_path, schema.Outbreaks, "outbreaks")
+
+
+@dlt.resource(name="outbreaks", write_disposition="replace")
+def outbreaks_source(outbreaks_path: Path):
+    yield read_outbreaks(outbreaks_path)
+
+
+@dlt.resource(name="organisms", write_disposition="replace")
+def organisms_source(organisms_path: Path):
+    yield read_organisms(organisms_path)
+
+
+@dlt.resource(name="assemblies", write_disposition="replace")
+def assemblies_source(assemblies_path: Path):
+    yield read_assemblies(assemblies_path)
 
 
 @dlt.source
-def catalog_taxa(
+def catalog_source(
     *,
-    assembly_taxa_df: pd.DataFrame,
-    organism_taxa_df: pd.DataFrame,
-    outbreak_taxa_df: pd.DataFrame | None,
+    assemblies_path: Path,
+    organisms_path: Path,
+    outbreaks_path: Path | None,
 ):
     resources = [
-        assembly_taxa(assembly_taxa_df),
-        organism_taxa(organism_taxa_df),
+        assemblies_source(assemblies_path),
+        organisms_source(organisms_path),
     ]
-    # Only load outbreak taxa for catalogs that have outbreaks; when absent, the
-    # shared dbt models skip the outbreak_taxa source entirely (see has_outbreaks var)
-    if outbreak_taxa_df is not None:
-        resources.append(outbreak_taxa(outbreak_taxa_df))
+    # Only load outbreaks for catalogs that have them; when absent, the shared
+    # dbt models skip using outbreaks data entirely (see has_outbreaks var)
+    if outbreaks_path is not None:
+        resources.append(outbreaks_source(outbreaks_path))
     return resources
 
 
@@ -49,9 +75,9 @@ def load_catalog_source_data(
     *,
     temp_folder_path: Path,
     dlt_pipeline_prefix: str,
-    assemblies_df: pd.DataFrame,
-    organisms_df: pd.DataFrame,
-    outbreaks_df: pd.DataFrame | None,
+    assemblies_path: Path,
+    organisms_path: Path,
+    outbreaks_path: Path | None,
 ):
     """
     Load unique taxonomy IDs for the catalog's assemblies, organisms, and outbreaks into
@@ -64,30 +90,15 @@ def load_catalog_source_data(
       organisms_df: DataFrame of source organisms (must include `taxonomy_id` and `synonyms` columns, the latter containing a list of curated synonyms or None per organism)
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
     """
-    # Get dataframes with just unique taxonomy IDs as ints, plus the organisms' curated
-    # synonyms; duplicates are dropped by taxonomy ID alone, since the lists of synonyms
-    # aren't hashable
-    assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
-    organism_taxa_df = (
-        organisms_df[["taxonomy_id", "synonyms"]]
-        .astype({"taxonomy_id": "Int64"})
-        .drop_duplicates(subset="taxonomy_id")
-    )
-    outbreak_taxa_df = (
-        outbreaks_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
-        if outbreaks_df is not None
-        else None
-    )
-
     pipeline = dlt.pipeline(
         pipeline_name=dlt_pipeline_prefix + "catalog_source",
         destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
         dataset_name="catalog_source",
     )
     pipeline.run(
-        catalog_taxa(
-            assembly_taxa_df=assembly_taxa_df,
-            organism_taxa_df=organism_taxa_df,
-            outbreak_taxa_df=outbreak_taxa_df,
+        catalog_source(
+            assemblies_path=assemblies_path,
+            organisms_path=organisms_path,
+            outbreaks_path=outbreaks_path,
         )
     )
