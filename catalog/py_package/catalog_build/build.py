@@ -202,7 +202,7 @@ def get_genomes_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
         "accession": "accession",
         "current_accession": "currentAccession",
         "assembly_info__assembly_level": "level",
-        "assembly_status": "assemblyStatus",
+        "assembly_info__assembly_status": "assemblyStatus",
         "assembly_stats__total_number_of_chromosomes": "chromosomeCount",
         "assembly_stats__total_sequence_length": "length",
         "assembly_stats__number_of_scaffolds": "scaffoldCount",
