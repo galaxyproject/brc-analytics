@@ -94,17 +94,17 @@ export default function Page(): JSX.Element {
     }
   }
 
-  async function handleRestore(id: string): Promise<void> {
+  async function handleOpen(id: string): Promise<void> {
     setError(null);
     try {
-      const restored = await apiClient.restoreSavedAnalysis(id);
+      const opened = await apiClient.openSavedAnalysis(id);
       await router.push({
         pathname: "/assistant",
-        query: { [ASSISTANT_QUERY_PARAM.SESSION_ID]: restored.session_id },
+        query: { [ASSISTANT_QUERY_PARAM.SESSION_ID]: opened.session_id },
       });
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to restore saved analysis."
+        err instanceof Error ? err.message : "Failed to open saved analysis."
       );
     }
   }
@@ -141,7 +141,7 @@ export default function Page(): JSX.Element {
     if (savedAnalyses.length === 0) {
       return (
         <Typography variant="body1">
-          You have not saved any assistant analyses yet.
+          You have not started any assistant analyses yet.
         </Typography>
       );
     }
@@ -167,10 +167,10 @@ export default function Page(): JSX.Element {
               </Typography>
               <Stack direction="row" spacing={1}>
                 <Button
-                  onClick={() => void handleRestore(savedAnalysis.id)}
+                  onClick={() => void handleOpen(savedAnalysis.id)}
                   variant="contained"
                 >
-                  Restore
+                  Open
                 </Button>
                 <Button
                   onClick={() => void handleDelete(savedAnalysis.id)}
@@ -191,7 +191,7 @@ export default function Page(): JSX.Element {
       <SectionHero
         breadcrumbs={BREADCRUMBS}
         head="Saved Analyses"
-        subHead="Saved assistant sessions are restored into a fresh working session so the snapshot stays immutable."
+        subHead="Your assistant conversations are saved automatically. Opening one resumes it where you left off."
       />
       <Box sx={{ maxWidth: 960, mx: "auto", px: 3, py: 6, width: "100%" }}>
         {renderContent()}

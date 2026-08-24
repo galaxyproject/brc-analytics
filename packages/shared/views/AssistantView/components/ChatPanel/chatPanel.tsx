@@ -26,10 +26,7 @@ interface ChatPanelProps {
   loading: boolean;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
-  onSave: () => void;
   onSend: (message: string) => void;
-  saveLabel: string | null;
-  saveLoading: boolean;
   suggestions: SuggestionChip[];
 }
 
@@ -42,10 +39,7 @@ interface ChatPanelProps {
  * @param props.loading - Whether the assistant is processing
  * @param props.messages - Chat message history
  * @param props.onRetry - Callback to retry the last failed request
- * @param props.onSave - Callback to save the current chat
  * @param props.onSend - Callback to send a message
- * @param props.saveLabel - Save status message
- * @param props.saveLoading - Whether a save request is in flight
  * @param props.suggestions - Suggestion chips to display
  * @returns Chat panel element
  */
@@ -56,18 +50,10 @@ export const ChatPanel = ({
   loading,
   messages,
   onRetry,
-  onSave,
   onSend,
-  saveLabel,
-  saveLoading,
   suggestions,
 }: ChatPanelProps): JSX.Element => {
-  const {
-    isAuthenticated,
-    isConfigured,
-    isLoading: isAuthLoading,
-    login,
-  } = useAuth();
+  const { isAuthenticated, isConfigured, login } = useAuth();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -97,21 +83,6 @@ export const ChatPanel = ({
   };
 
   const inputDisabled = loading || !!isRestoring;
-
-  const handleSave = (): void => {
-    if (isConfigured && !isAuthLoading && !isAuthenticated) {
-      login();
-      return;
-    }
-    onSave();
-  };
-
-  let saveButtonLabel = "Save";
-  if (saveLoading) {
-    saveButtonLabel = "Saving...";
-  } else if (isConfigured && !isAuthenticated) {
-    saveButtonLabel = "Sign In to Save";
-  }
 
   return (
     <ChatContainer>
@@ -172,15 +143,16 @@ export const ChatPanel = ({
       />
 
       <InputRow>
-        <Button
-          disabled={
-            loading || saveLoading || messages.length === 0 || isAuthLoading
-          }
-          onClick={handleSave}
-          variant="outlined"
-        >
-          {saveButtonLabel}
-        </Button>
+        {isConfigured && isAuthenticated && (
+          <Typography color="text.secondary" variant="caption">
+            Saved to your account
+          </Typography>
+        )}
+        {isConfigured && !isAuthenticated && messages.length >= 2 && (
+          <Button onClick={login} size="small" variant="text">
+            Sign in to keep this conversation
+          </Button>
+        )}
         <TextField
           disabled={inputDisabled}
           fullWidth
@@ -200,13 +172,6 @@ export const ChatPanel = ({
           Send
         </Button>
       </InputRow>
-      {saveLabel && (
-        <Box sx={{ pb: 2, px: 2 }}>
-          <Typography color="text.secondary" variant="body2">
-            {saveLabel}
-          </Typography>
-        </Box>
-      )}
     </ChatContainer>
   );
 };
