@@ -17,15 +17,20 @@ import type { Props } from "./types";
  * @param props - Component props.
  * @param props.children - Content shown to a signed-in user.
  * @param props.message - Why signing in is needed.
- * @returns the gated content or a sign-in prompt.
+ * @returns the gated content, a sign-in prompt, or null when login is off.
  */
-export function SignInGate({ children, message }: Props): JSX.Element {
+export function SignInGate({ children, message }: Props): JSX.Element | null {
   const { isAuthenticated, isConfigured, isLoading, login } = useAuth();
 
-  if (!isConfigured || isLoading) {
+  // Login is not enabled on this site -- a permanent state, not a loading one.
+  // Combining these two into one guard is what made the pages this replaces
+  // sit on a spinner forever wherever login was off.
+  if (!isConfigured) return null;
+
+  if (isLoading) {
     return (
       <Stack alignItems="center" py={6}>
-        <CircularProgress />
+        <CircularProgress aria-label="Loading" />
       </Stack>
     );
   }
