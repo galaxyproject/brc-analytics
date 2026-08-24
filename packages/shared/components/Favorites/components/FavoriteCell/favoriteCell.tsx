@@ -1,0 +1,68 @@
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import { IconButton, Tooltip } from "@mui/material";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
+import {
+  favoriteKey,
+  useFavorites,
+} from "@repo/shared/providers/favorites/provider";
+import { type JSX } from "react";
+import type { Props } from "./types";
+
+/**
+ * Star control for one row of a list table.
+ *
+ * State comes from FavoritesProvider, so rendering this in every row of the
+ * assemblies (~5,500) or organisms (~2,000) table still costs one request.
+ * @param props - Component props.
+ * @param props.entityId - Entity id for this row.
+ * @param props.entityType - Which kind of entity this table lists.
+ * @returns the star control, or null where login is not configured.
+ */
+export function FavoriteCell({
+  entityId,
+  entityType,
+}: Props): JSX.Element | null {
+  const {
+    isAuthenticated,
+    isConfigured,
+    isLoading: isAuthLoading,
+    login,
+  } = useAuth();
+  const { isFavorited, toggleFavorite, togglingKey } = useFavorites();
+
+  // Login is off on this site -- a permanent state, not a loading one.
+  if (!isConfigured || isAuthLoading) return null;
+
+  const favorited = isAuthenticated && isFavorited(entityType, entityId);
+  const label = favorited
+    ? `Remove ${entityId} from saved`
+    : `Save ${entityId}`;
+
+  function handleClick(): void {
+    if (!isAuthenticated) {
+      login();
+      return;
+    }
+    void toggleFavorite(entityType, entityId);
+  }
+
+  return (
+    <Tooltip title={isAuthenticated ? label : "Sign in to save"}>
+      <IconButton
+        aria-label={label}
+        // Only the row in flight is disabled -- gating on the shared
+        // isToggling flag would freeze every star in the table.
+        disabled={togglingKey === favoriteKey(entityType, entityId)}
+        onClick={handleClick}
+        size="small"
+      >
+        {favorited ? (
+          <StarIcon color="primary" fontSize="small" />
+        ) : (
+          <StarBorderIcon fontSize="small" />
+        )}
+      </IconButton>
+    </Tooltip>
+  );
+}
