@@ -44,7 +44,8 @@ class SavedAnalysisSummary(BaseModel):
 
 
 class SavedAnalysisDetail(SavedAnalysisSummary):
-    agent_message_history: list = Field(default_factory=list)
+    # No agent_message_history: the raw pydantic-ai transcript (tool calls and
+    # their returns) is only ever read server-side by the open endpoint.
     messages: list[ChatMessage]
     schema_state: AnalysisSchema = Field(alias="schema")
 
