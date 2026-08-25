@@ -15,6 +15,14 @@ from app.models.assistant import (
 from app.services import analysis_store
 
 
+@pytest.fixture(autouse=True)
+def _database_configured(monkeypatch):
+    """Every test below exercises the write path, which needs DATABASE_URL
+    set -- except test_returns_early_when_database_is_not_configured, which
+    replaces get_settings entirely and so is unaffected by this env var."""
+    monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+
+
 def _state(**overrides) -> SessionState:
     defaults = {
         "messages": [
@@ -27,6 +35,25 @@ def _state(**overrides) -> SessionState:
     }
     defaults.update(overrides)
     return SessionState(**defaults)
+
+
+@pytest.mark.asyncio
+async def test_returns_early_when_database_is_not_configured():
+    """A deployment can run OIDC-authenticated chat with DATABASE_URL unset --
+    get_optional_current_user only checks the JWT. record() must not attempt
+    a write in that case, or every authenticated turn logs an exception and
+    fires Sentry even though the write is fail-open."""
+    settings = SimpleNamespace(DATABASE_URL="")
+
+    with (
+        patch.object(analysis_store, "get_settings", return_value=settings),
+        patch.object(analysis_store, "db_session") as db,
+        patch.object(analysis_store, "sentry_sdk") as sentry,
+    ):
+        await analysis_store.record(_state())
+
+    db.assert_not_called()
+    sentry.capture_exception.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -172,7 +199,9 @@ async def test_a_slow_write_is_abandoned_not_awaited():
     async def never_finishes(*args, **kwargs):
         await asyncio.sleep(10)
 
-    settings = SimpleNamespace(ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS=0.01)
+    settings = SimpleNamespace(
+        ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS=0.01, DATABASE_URL="postgresql://fake"
+    )
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", never_finishes),

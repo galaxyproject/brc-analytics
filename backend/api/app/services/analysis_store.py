@@ -54,6 +54,13 @@ async def record(state: SessionState) -> None:
     try, so even a malformed session cannot cost the user their reply.
     """
     settings = get_settings()
+    if not settings.DATABASE_URL:
+        # No sink to write to. The chat endpoint authenticates via JWT alone
+        # (get_optional_current_user), so a deployment with OIDC enabled and
+        # DATABASE_URL unset is reachable -- without this, every authenticated
+        # turn would log an exception and fire Sentry.
+        return
+
     try:
         await asyncio.wait_for(
             _write(state),
