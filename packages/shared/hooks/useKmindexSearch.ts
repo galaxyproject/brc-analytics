@@ -225,7 +225,10 @@ export const useKmindexSearch = (): KmindexSearchActions &
   useEffect(() => {
     let cancelled = false;
 
-    ky.get(`${API_BASE_URL}/galaxy/kmindex/indexes`, { timeout: 120000 })
+    ky.get(`${API_BASE_URL}/galaxy/kmindex/indexes`, {
+      credentials: "include",
+      timeout: 120000,
+    })
       .json<{ count: number; indexes: string[] }>()
       .then(({ indexes }) => {
         if (!cancelled)
@@ -254,6 +257,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
       try {
         const results = await ky
           .get(`${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`, {
+            credentials: "include",
             searchParams: { limit: PAGE_SIZE, offset },
             // Cold aggregation pulls every shard from Galaxy; the warm path
             // returns from cache in milliseconds.
@@ -280,6 +284,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
         try {
           const status = await ky
             .get(`${API_BASE_URL}/galaxy/jobs/${jobId}/status`, {
+              credentials: "include",
               timeout: 30000,
             })
             .json<KmindexJobStatus>();
@@ -340,6 +345,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
       try {
         const { job_id } = await ky
           .post(`${API_BASE_URL}/galaxy/kmindex/submit`, {
+            credentials: "include",
             json: submission,
             timeout: 120000,
           })

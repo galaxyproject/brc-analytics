@@ -103,6 +103,9 @@ describe("job id in the URL", () => {
   it("does not reattach when no job is named", async () => {
     const { result } = await renderSettled();
     expect(result.current.jobId).toBeNull();
+    expect(mockKy.get.mock.calls[0][1]).toMatchObject({
+      credentials: "include",
+    });
   });
 
   it("records the job id on submit so a reload can pick it up", async () => {
@@ -130,5 +133,23 @@ describe("job id in the URL", () => {
 
     expect(new URLSearchParams(window.location.search).get("job")).toBeNull();
     expect(result.current.jobId).toBeNull();
+  });
+});
+
+describe("session cookie", () => {
+  it("sends the session cookie with submissions", async () => {
+    mockKy.post.mockReturnValue(jsonOf({ job_id: JOB_ID }));
+    const { result } = await renderSettled();
+    await act(async () => {
+      await result.current.submit({
+        indexes: ["GENOMIC_BCT"],
+        sequence: ">q\nACGT",
+        threshold: 0.3,
+        zvalue: 6,
+      });
+    });
+    expect(mockKy.post.mock.calls[0][1]).toMatchObject({
+      credentials: "include",
+    });
   });
 });
