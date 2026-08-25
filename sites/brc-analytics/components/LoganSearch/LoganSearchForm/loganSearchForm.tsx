@@ -3,6 +3,7 @@ import {
   FormColumn,
   FormGrid,
 } from "@brc/components/LoganSearch/loganSearch.styles";
+import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import {
   countBases,
   indexStrategy,
@@ -93,6 +94,7 @@ export const LoganSearchForm = ({
   return (
     <Card>
       <CardContent>
+        <ConnectGalaxyAccount />
         <FormGrid>
           <FormColumn>
             <Typography variant="h6">Query sequence</Typography>
