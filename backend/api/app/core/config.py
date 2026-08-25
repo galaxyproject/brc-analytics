@@ -195,6 +195,11 @@ class Settings:
         self.GALAXY_API_URL: str = os.getenv(
             "GALAXY_API_URL", "https://test.galaxyproject.org/api"
         )
+        # Galaxy's web root. bioblend wants this rather than the API URL, and
+        # so do the login and ownership-record URLs -- derive it once here
+        # instead of stripping "/api" at each call site, where a str.replace
+        # would also eat an "/api" in the middle of a hostname or path.
+        self.GALAXY_BASE_URL: str = self.GALAXY_API_URL.removesuffix("/api")
         self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
 
         # Galaxy tool IDs

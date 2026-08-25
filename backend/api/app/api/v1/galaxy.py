@@ -226,9 +226,7 @@ async def submit_kmindex_query(
                             user_id=user.id,
                             galaxy_job_id=response.job_id,
                             galaxy_instance_url=(
-                                galaxy_service.settings.GALAXY_API_URL.replace(
-                                    "/api", ""
-                                )
+                                galaxy_service.settings.GALAXY_BASE_URL
                             ),
                             tool="kmindex",
                             params={"indexes": submission.indexes},
