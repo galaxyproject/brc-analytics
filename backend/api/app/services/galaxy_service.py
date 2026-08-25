@@ -1147,8 +1147,16 @@ class GalaxyService:
             return f"Error retrieving dataset content: {str(e)}"
 
     async def _get_or_create_shared_history(self) -> str:
-        """Get or create the shared 'BRC ANALYTICS JOBS' history using BioBLEND."""
-        shared_history_name = "BRC ANALYTICS JOBS"
+        """Find or create the history jobs land in.
+
+        Service-account jobs share one "BRC ANALYTICS JOBS" history; a signed-in
+        user's jobs go to a "BRC Logan Search" history in their own account --
+        the bearer token scopes get_histories()/create_history to that user.
+        """
+        if self.credential is not None and self.credential.kind == "user":
+            shared_history_name = "BRC Logan Search"
+        else:
+            shared_history_name = "BRC ANALYTICS JOBS"
 
         if self._shared_history_id:
             return self._shared_history_id

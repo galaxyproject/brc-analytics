@@ -129,3 +129,32 @@ def test_no_credential_and_no_key_disables_service(monkeypatch):
 def test_secret_is_not_in_repr():
     cred = GalaxyCredential(kind="user", secret="tok", user_sub="u1")
     assert "tok" not in repr(cred)
+
+
+@pytest.mark.asyncio
+async def test_user_jobs_use_per_user_history_name():
+    cache = MagicMock()
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            cache,
+            credential=GalaxyCredential(kind="user", secret="tok", user_sub="u1"),
+        )
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(return_value=[])
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h1"})
+    await svc._get_or_create_shared_history()
+    svc.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
+
+
+@pytest.mark.asyncio
+async def test_service_jobs_keep_shared_history_name():
+    cache = MagicMock()
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            cache, credential=GalaxyCredential(kind="service", secret="k")
+        )
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(return_value=[])
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h2"})
+    await svc._get_or_create_shared_history()
+    svc.gi.histories.create_history.assert_called_once_with(name="BRC ANALYTICS JOBS")
