@@ -81,12 +81,21 @@ export function AccountView(): JSX.Element {
         <AnalysesSection resource={analyses} />
         {/* Both FavoritesSection instances share one fetch, so a failure is
             one failure -- show it once here rather than once per section
-            (which read the same error from the shared context). */}
-        {favoritesError && (
-          <Alert severity="error">{favoritesError.message}</Alert>
+            (which read the same error from the shared context). Grouped with
+            the sections it describes in a tighter Stack so it reads as part
+            of that content, not as its own wide-gapped section. */}
+        {favoritesError ? (
+          <Stack spacing={2}>
+            <Alert severity="error">{favoritesError.message}</Alert>
+            <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
+            <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
+          </Stack>
+        ) : (
+          <>
+            <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
+            <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
+          </>
         )}
-        <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
-        <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
         <LaunchesSection resource={launches} />
       </>
     );

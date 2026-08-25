@@ -16,7 +16,8 @@ import type { Props } from "./types";
  * @param props.children - The section's records.
  * @param props.count - Number of records, shown beside the heading.
  * @param props.emptyState - Shown when there is nothing and no error.
- * @param props.error - Load failure, shown in place of the empty state.
+ * @param props.error - Load failure. Shown above existing children when
+ * there are any, or in place of the empty state when nothing has loaded.
  * @param props.id - Anchor id and heading association.
  * @param props.isLoading - Whether the section is still loading.
  * @param props.title - Section heading.
