@@ -17,6 +17,8 @@ from app.core.dependencies import (
     get_sra_mirror_service,
 )
 from app.core.galaxy_credential import GalaxyCredential
+from app.db.crud import create_galaxy_job, get_user_by_keycloak_sub
+from app.db.session import db_session
 from app.models.galaxy import (
     GalaxyJobResponse,
     GalaxyJobResult,
@@ -159,6 +161,37 @@ async def submit_kmindex_query(
 
         response = await galaxy_service.submit_kmindex_query(submission)
         logger.info(f"kmindex query submitted successfully: {response.job_id}")
+
+        credential = galaxy_service.credential
+        if (
+            credential is not None
+            and credential.kind == "user"
+            and get_settings().DATABASE_URL
+        ):
+            # Lazy DB access on purpose: a Depends(get_db_session) here would
+            # 500 this anonymous-capable route wherever DATABASE_URL is unset.
+            try:
+                async with db_session() as db:
+                    user = await get_user_by_keycloak_sub(db, credential.user_sub)
+                    if user is not None:
+                        await create_galaxy_job(
+                            db,
+                            user_id=user.id,
+                            galaxy_job_id=response.job_id,
+                            galaxy_instance_url=(
+                                galaxy_service.settings.GALAXY_API_URL.replace(
+                                    "/api", ""
+                                )
+                            ),
+                            tool="kmindex",
+                            params={"indexes": submission.indexes},
+                        )
+                        await db.commit()
+            except Exception:
+                logger.exception(
+                    "Failed to record ownership for job %s", response.job_id
+                )
+
         return response
 
     except HTTPException:
