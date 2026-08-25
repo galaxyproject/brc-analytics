@@ -90,4 +90,14 @@ describe("FavoritesSection", () => {
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
+
+  test("does not claim nothing is saved when the shared favorites load failed", () => {
+    renderSection({ error: new Error("favorites unavailable"), favorites: [] });
+
+    expect(
+      screen.queryByText(
+        "Save an assembly from its page or from the assemblies list to keep it here."
+      )
+    ).not.toBeInTheDocument();
+  });
 });
