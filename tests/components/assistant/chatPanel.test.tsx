@@ -44,24 +44,42 @@ function signedIn(): void {
   });
 }
 
+function signedOut(): void {
+  mockUseAuth.mockReturnValue({
+    isAuthenticated: false,
+    isConfigured: true,
+    isLoading: false,
+    login: jest.fn(),
+    logout: jest.fn(),
+    user: null,
+  });
+}
+
 const noop = (): void => undefined;
+
+const TURN = [
+  { content: "hi", role: "user" as const },
+  { content: "hello back", role: "assistant" as const },
+];
 
 describe("ChatPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test("does not claim to have saved after only the user's own message", () => {
-    // A turn isn't complete -- and therefore nothing has been saved -- until
-    // a reply comes back. Before that, messages holds just the user's turn.
+  test("does not claim to have saved just because the user is signed in", () => {
+    // Signing in does not itself persist anything -- auto-save rides on chat
+    // turns. Inferring "saved" from auth state told people their conversation
+    // was kept when it was still only in an expiring session.
     signedIn();
 
     render(
       <ChatPanel
         error={null}
         introText="Ask away"
-        loading
-        messages={[{ content: "hi", role: "user" }]}
+        isSaved={false}
+        loading={false}
+        messages={TURN}
         onSend={noop}
         suggestions={[]}
       />
@@ -70,23 +88,41 @@ describe("ChatPanel", () => {
     expect(screen.queryByText("Saved to your account")).not.toBeInTheDocument();
   });
 
-  test("shows the saved hint once a full turn has completed", () => {
+  test("shows the saved hint once the backend confirms the write", () => {
     signedIn();
 
     render(
       <ChatPanel
         error={null}
         introText="Ask away"
+        isSaved
         loading={false}
-        messages={[
-          { content: "hi", role: "user" },
-          { content: "hello back", role: "assistant" },
-        ]}
+        messages={TURN}
         onSend={noop}
         suggestions={[]}
       />
     );
 
     expect(screen.getByText("Saved to your account")).toBeInTheDocument();
+  });
+
+  test("offers to keep an anonymous conversation", () => {
+    signedOut();
+
+    render(
+      <ChatPanel
+        error={null}
+        introText="Ask away"
+        isSaved={false}
+        loading={false}
+        messages={TURN}
+        onSend={noop}
+        suggestions={[]}
+      />
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Sign in to keep this conversation" })
+    ).toBeInTheDocument();
   });
 });

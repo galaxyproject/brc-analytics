@@ -161,6 +161,19 @@ class ChatResponse(BaseModel):
         description="URL to the workflow stepper, set when is_complete is True",
     )
     token_usage: Optional[TokenUsage] = None
+    saved: bool = Field(
+        False,
+        description=(
+            "True when this turn was persisted to the user's saved analyses. "
+            "Always False for anonymous conversations."
+        ),
+    )
+
+
+class SessionSaveResponse(BaseModel):
+    """Response from explicitly saving a session to the user's account."""
+
+    saved_analysis_id: str
 
 
 class TurnOutcome(str, Enum):

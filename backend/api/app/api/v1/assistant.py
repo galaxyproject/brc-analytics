@@ -15,6 +15,7 @@ from app.core.config import SESSION_COOKIE_NAME
 from app.core.dependencies import (
     check_rate_limit,
     get_assistant_agent,
+    get_current_user,
     get_optional_current_user,
 )
 from app.core.session_signing import require_session_cookie, set_session_cookie
@@ -23,6 +24,7 @@ from app.models.assistant import (
     ChatRequest,
     ChatResponse,
     SessionRestoreResponse,
+    SessionSaveResponse,
 )
 from app.models.user_data import UserMeResponse
 from app.services import analysis_store, turn_log
@@ -173,7 +175,9 @@ async def assistant_chat(
         try:
             state = await agent.session_service.get_session(chat_response.session_id)
             if state is not None:
-                await analysis_store.record(state)
+                # Reported back so the UI can say "saved" on an acknowledgement
+                # rather than on the assumption that being signed in means kept.
+                chat_response.saved = await analysis_store.record(state)
         except Exception:
             # get_session reads Redis strictly and raises on a blip, so
             # without this a cache hiccup would 500 a turn whose reply already
@@ -221,6 +225,50 @@ async def restore_session(
         is_complete=is_complete,
         handoff_url=handoff_url,
     )
+
+
+@router.post("/session/{session_id}/save", response_model=SessionSaveResponse)
+async def save_session_to_account(
+    session_id: str,
+    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    current_user: UserMeResponse = Depends(get_current_user),
+    agent=Depends(get_assistant_agent),
+) -> SessionSaveResponse:
+    """Claim this conversation for the signed-in user and save it now.
+
+    Auto-save rides on chat turns, which leaves a gap the UI cannot honestly
+    paper over: a user who signs in *because* we offered to keep the
+    conversation has not sent a turn since, so nothing has been written and
+    the session dies with its two-hour Redis TTL. This closes that gap, and
+    unlike the per-turn write it reports failure rather than swallowing it.
+    """
+    require_session_cookie(session_id, session_cookie)
+
+    try:
+        state = await agent.session_service.claim_session(session_id, current_user.sub)
+    except KeyError as e:
+        raise HTTPException(
+            status_code=404, detail="Session not found or expired"
+        ) from e
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=403, detail="Assistant session belongs to another user"
+        ) from e
+
+    try:
+        saved_analysis_id = await analysis_store.persist(state)
+    except Exception as e:
+        logger.exception("Failed to save session %s to account", session_id)
+        raise HTTPException(
+            status_code=503, detail="Could not save this conversation"
+        ) from e
+
+    if saved_analysis_id is None:
+        # An empty conversation has nothing worth listing. Not an error, but
+        # the caller must not be told it was saved.
+        raise HTTPException(status_code=409, detail="Nothing to save yet")
+
+    return SessionSaveResponse(saved_analysis_id=saved_analysis_id)
 
 
 @router.delete("/session/{session_id}", status_code=204)

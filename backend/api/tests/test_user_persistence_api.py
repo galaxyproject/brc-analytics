@@ -1,5 +1,6 @@
 import asyncio
 import json
+from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
@@ -523,6 +524,107 @@ async def _repoint_analysis(session_factory, analysis_id: str, source_session: s
     async with session_factory() as session:
         user = await get_user_by_keycloak_sub(session, "user-a")
         await repoint_saved_analysis_session(session, user, analysis_id, source_session)
+
+
+@contextmanager
+def _signed_out(client):
+    """Run a block with nobody signed in, then put the test user back.
+
+    Restores the fixture's override rather than popping the key -- popping
+    falls through to the real cookie-reading dependency, and every
+    authenticated call after the block 401s.
+    """
+    from app.core import dependencies
+
+    overrides = client.app.dependency_overrides
+    previous = overrides[dependencies.get_optional_current_user]
+    overrides[dependencies.get_optional_current_user] = lambda: None
+    try:
+        yield
+    finally:
+        overrides[dependencies.get_optional_current_user] = previous
+
+
+def test_chat_reports_whether_the_turn_was_saved(persistence_client):
+    """The UI says "Saved to your account" on this flag, so it has to mean it."""
+    client, _session_factory, _current_sub, _agent = persistence_client
+
+    authenticated = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    assert authenticated.json()["saved"] is True
+
+    with _signed_out(client):
+        anonymous = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+    assert anonymous.json()["saved"] is False
+
+
+def test_signing_in_saves_the_conversation_without_another_turn(persistence_client):
+    """We offer to keep an anonymous conversation if the user signs in. Auto-save
+    rides on chat turns, so without this endpoint that promise waits on a turn
+    the user may never send -- and the session dies with its Redis TTL."""
+    client, _session_factory, _current_sub, _agent = persistence_client
+
+    with _signed_out(client):
+        anonymous = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+    session_id = anonymous.json()["session_id"]
+    assert client.get("/api/v1/saved_analyses").json() == []
+
+    saved = client.post(f"/api/v1/assistant/session/{session_id}/save")
+    assert saved.status_code == 200, saved.text
+
+    listed = client.get("/api/v1/saved_analyses").json()
+    assert len(listed) == 1
+    assert saved.json()["saved_analysis_id"] == listed[0]["id"]
+
+
+def test_saving_twice_keeps_one_analysis(persistence_client):
+    client, _session_factory, _current_sub, _agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+
+    client.post(f"/api/v1/assistant/session/{session_id}/save")
+    client.post(f"/api/v1/assistant/session/{session_id}/save")
+
+    assert len(client.get("/api/v1/saved_analyses").json()) == 1
+
+
+def test_saving_an_empty_session_is_not_reported_as_saved(persistence_client):
+    """Better a refusal than a "saved" the account page contradicts."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    session_id = uuid4().hex
+    agent.session_service.sessions[session_id] = SessionState(session_id=session_id)
+
+    response = client.post(f"/api/v1/assistant/session/{session_id}/save")
+
+    assert response.status_code == 409
+    assert client.get("/api/v1/saved_analyses").json() == []
+
+
+def test_saving_an_expired_session_is_a_404(persistence_client):
+    client, _session_factory, _current_sub, _agent = persistence_client
+
+    response = client.post(f"/api/v1/assistant/session/{uuid4().hex}/save")
+
+    assert response.status_code == 404
+
+
+def test_saving_another_users_session_is_refused(persistence_client):
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    session_id = uuid4().hex
+    agent.session_service.sessions[session_id] = SessionState(
+        session_id=session_id,
+        owner_keycloak_sub="user-b",
+        messages=[ChatMessage(role=MessageRole.USER, content="theirs")],
+    )
+
+    response = client.post(f"/api/v1/assistant/session/{session_id}/save")
+
+    assert response.status_code == 403
+    assert client.get("/api/v1/saved_analyses").json() == []
 
 
 def test_open_rehydrates_the_agent_history(persistence_client):

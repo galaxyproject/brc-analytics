@@ -1,3 +1,4 @@
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
@@ -19,6 +20,7 @@ interface UseAssistantChatReturn {
   handoffUrl: string | null;
   isComplete: boolean;
   isRestoring: boolean;
+  isSaved: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
@@ -54,6 +56,7 @@ export const useAssistantChat = ({
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -64,7 +67,9 @@ export const useAssistantChat = ({
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
   const initialMessageSentRef = useRef(false);
+  const saveAttemptRef = useRef<string | null>(null);
   const router = useRouter();
+  const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
   // A question of whitespace is no question: it would neither be asked nor
   // leave the conversation it displaced restorable.
   const question = initialMessage?.trim();
@@ -148,6 +153,47 @@ export const useAssistantChat = ({
     };
   }, [initialSessionId, question, router.isReady, sessionKey]);
 
+  // Auto-save rides on chat turns, which leaves the sign-in case uncovered:
+  // someone who signed in *because* we offered to keep this conversation has
+  // not sent a turn since, so nothing has been written and the session dies
+  // with its two-hour TTL. Claim and persist it as soon as we know who they
+  // are -- and only let the UI call it saved once that has come back.
+  useEffect(() => {
+    if (!isConfigured || isAuthLoading || !isAuthenticated) return;
+    // A turn in flight is about to save this itself, and mid-send the
+    // messages already include the user's line with no reply yet.
+    if (isSaved || isRestoring || loading) return;
+    const sessionId = sessionIdRef.current;
+    if (!sessionId || messages.length === 0) return;
+    // Once per session. Without this, a deployment that cannot save at all
+    // (no database configured) would fire a doomed request every turn.
+    if (saveAttemptRef.current === sessionId) return;
+    saveAttemptRef.current = sessionId;
+
+    let cancelled = false;
+    assistantAPIClient
+      .assistantSaveSession(sessionId)
+      .then(() => {
+        if (!cancelled) setIsSaved(true);
+      })
+      .catch(() => {
+        // The label stays off, which is the honest reading. The next turn's
+        // auto-save is the retry.
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [
+    isAuthLoading,
+    isAuthenticated,
+    isConfigured,
+    isRestoring,
+    isSaved,
+    loading,
+    messages.length,
+  ]);
+
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
       if (!message.trim() || sendingRef.current) return;
@@ -180,6 +226,10 @@ export const useAssistantChat = ({
         setSuggestions(response.suggestions);
         setIsComplete(response.is_complete);
         setHandoffUrl(response.handoff_url);
+        // Latched, not mirrored: a later turn whose write fails does not
+        // un-save the turns already on disk, and flickering the label would
+        // say something worse than either state on its own.
+        if (response.saved) setIsSaved(true);
       } catch (err) {
         const errorMessage = handleChatError(err);
         setError(errorMessage);
@@ -245,6 +295,7 @@ export const useAssistantChat = ({
     setSchema(null);
     setSuggestions([]);
     setIsComplete(false);
+    setIsSaved(false);
     setHandoffUrl(null);
     setError(null);
     setLastFailedMessage(null);
@@ -255,6 +306,7 @@ export const useAssistantChat = ({
     handoffUrl,
     isComplete,
     isRestoring,
+    isSaved,
     loading,
     messages,
     onRetry: lastFailedMessage ? retry : undefined,

@@ -4,6 +4,7 @@ import type {
   AssistantChatResponse,
   AssistantInfoResponse,
   SessionRestoreResponse,
+  SessionSaveResponse,
 } from "@repo/shared/services/api-client/types";
 import ky, { type HTTPError } from "ky";
 
@@ -84,5 +85,19 @@ export const assistantAPIClient = {
     return httpClient
       .get(`assistant/session/${sessionId}`, { retry: { limit: 0 } })
       .json();
+  },
+
+  /**
+   * Save a session to the signed-in user's account without waiting for a turn.
+   *
+   * Auto-save rides on chat turns, which leaves the sign-in case uncovered:
+   * someone who signs in to keep a conversation has not sent a turn since.
+   * @param sessionId - Session to claim and persist
+   * @returns Promise resolving to the saved analysis id
+   */
+  assistantSaveSession: async (
+    sessionId: string
+  ): Promise<SessionSaveResponse> => {
+    return httpClient.post(`assistant/session/${sessionId}/save`).json();
   },
 };
