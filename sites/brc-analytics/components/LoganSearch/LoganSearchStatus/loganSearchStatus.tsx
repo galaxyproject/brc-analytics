@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { type JSX } from "react";
 
 interface LoganSearchStatusProps {
@@ -36,7 +37,14 @@ const STATE_LABELS: Record<string, string> = {
 export const LoganSearchStatus = ({
   search,
 }: LoganSearchStatusProps): JSX.Element | null => {
-  const { error, isLoadingResults, jobId, jobStatus, results } = search;
+  const { error, identity, isLoadingResults, jobId, jobStatus, results } =
+    search;
+  const { isAuthenticated } = useAuth();
+  // A signed-in visitor whose search still ran under the service key means the
+  // session couldn't be turned into a Galaxy credential. The search works, so
+  // it isn't an error -- but the job landed in the shared account rather than
+  // theirs, and they'd otherwise never know.
+  const ranAsSharedAccount = isAuthenticated && identity === "service";
 
   if (error) {
     return (
@@ -52,24 +60,33 @@ export const LoganSearchStatus = ({
   const isDone = Boolean(results);
 
   return (
-    <Card sx={{ mt: 2 }}>
-      <CardContent>
-        <ControlRow>
-          <Typography variant="subtitle1">Job {jobId}</Typography>
-          <Chip
-            color={STATE_COLORS[state] ?? "default"}
-            label={STATE_LABELS[state] ?? state}
-            size="small"
-          />
-        </ControlRow>
-        {!isDone && <LinearProgress sx={{ mt: 2 }} />}
-        {isLoadingResults && (
-          <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
-            Merging hits across index shards -- this takes a moment the first
-            time.
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
+    <>
+      {ranAsSharedAccount && (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          This search ran under the shared BRC account because your session
+          couldn&apos;t be verified -- sign in again to run searches as
+          yourself.
+        </Alert>
+      )}
+      <Card sx={{ mt: 2 }}>
+        <CardContent>
+          <ControlRow>
+            <Typography variant="subtitle1">Job {jobId}</Typography>
+            <Chip
+              color={STATE_COLORS[state] ?? "default"}
+              label={STATE_LABELS[state] ?? state}
+              size="small"
+            />
+          </ControlRow>
+          {!isDone && <LinearProgress sx={{ mt: 2 }} />}
+          {isLoadingResults && (
+            <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
+              Merging hits across index shards -- this takes a moment the first
+              time.
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 };

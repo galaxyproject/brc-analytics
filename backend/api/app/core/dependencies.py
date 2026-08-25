@@ -150,10 +150,15 @@ async def get_galaxy_credential(
     if brc_session:
         try:
             token = await auth.get_valid_access_token(brc_session)
-        except Exception:
+        except Exception as e:
             # A session-store or IdP blip must not take down an
-            # anonymous-capable route -- degrade to the service key.
-            logger.warning("Session token lookup failed; using service credential")
+            # anonymous-capable route -- degrade to the service key. The
+            # exception type is the only clue that this happened at all,
+            # since the request then succeeds as an anonymous one.
+            logger.warning(
+                "Session token lookup failed (%s); using service credential",
+                type(e).__name__,
+            )
             token = None
         if token:
             claims = auth.decode_token_claims(token)

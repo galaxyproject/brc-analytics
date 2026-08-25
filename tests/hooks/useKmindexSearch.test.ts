@@ -153,3 +153,57 @@ describe("session cookie", () => {
     });
   });
 });
+
+describe("which account the search ran under", () => {
+  /**
+   * Submit once against whatever mockKy.post is currently returning.
+   * @returns The rendered hook result.
+   */
+  async function submitOnce(): Promise<
+    ReturnType<typeof renderHook<ReturnType<typeof useKmindexSearch>, unknown>>
+  > {
+    const rendered = await renderSettled();
+    await act(async () => {
+      await rendered.result.current.submit({
+        indexes: ["GENOMIC_BCT"],
+        sequence: ">q\nACGT",
+        threshold: 0.3,
+        zvalue: 6,
+      });
+    });
+    return rendered;
+  }
+
+  it("captures a service-account fallback from the submit response", async () => {
+    mockKy.post.mockReturnValue(
+      jsonOf({ identity: "service", job_id: JOB_ID })
+    );
+    const { result } = await submitOnce();
+    expect(result.current.identity).toBe("service");
+  });
+
+  it("captures a user-account submission", async () => {
+    mockKy.post.mockReturnValue(jsonOf({ identity: "user", job_id: JOB_ID }));
+    const { result } = await submitOnce();
+    expect(result.current.identity).toBe("user");
+  });
+
+  it("is null when the response says nothing about identity", async () => {
+    mockKy.post.mockReturnValue(jsonOf({ job_id: JOB_ID }));
+    const { result } = await submitOnce();
+    expect(result.current.identity).toBeNull();
+  });
+
+  it("clears the identity on reset", async () => {
+    mockKy.post.mockReturnValue(
+      jsonOf({ identity: "service", job_id: JOB_ID })
+    );
+    const { result } = await submitOnce();
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.identity).toBeNull();
+  });
+});
