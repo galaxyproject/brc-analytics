@@ -34,11 +34,20 @@ def upgrade() -> None:
             sa.ForeignKey("users.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("galaxy_job_id", sa.Text(), nullable=False, unique=True),
+        sa.Column("galaxy_job_id", sa.Text(), nullable=False),
         sa.Column("galaxy_instance_url", sa.Text(), nullable=False),
         sa.Column("tool", sa.String(length=64), nullable=False),
-        sa.Column("params", _json_type(), nullable=False),
+        sa.Column(
+            "params",
+            _json_type(),
+            nullable=False,
+            server_default=sa.text("'{}'"),
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        # Named explicitly: an anonymous unique constraint gets a
+        # backend-generated name that downgrade and later migrations can't
+        # address.
+        sa.UniqueConstraint("galaxy_job_id", name="uq_galaxy_jobs_galaxy_job_id"),
     )
     op.create_index("ix_galaxy_jobs_user_id", "galaxy_jobs", ["user_id"])
 

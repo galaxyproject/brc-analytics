@@ -264,9 +264,7 @@ class GalaxyService:
             self.gi = None
         else:
             self._galaxy_available = True
-            base_url = self.settings.GALAXY_API_URL.replace(
-                "/api", ""
-            )  # BioBLEND expects base URL without /api
+            base_url = self.settings.GALAXY_BASE_URL
             if credential.kind == "user":
                 # bioblend sends token as "Authorization: Bearer <token>"
                 self.gi = GalaxyInstance(url=base_url, token=credential.secret)
@@ -286,7 +284,7 @@ class GalaxyService:
 
     def galaxy_login_url(self) -> str:
         """The Galaxy OIDC login URL that links the user's account (302 flow)."""
-        base = self.settings.GALAXY_API_URL.replace("/api", "")
+        base = self.settings.GALAXY_BASE_URL
         return f"{base}/authnz/{self.settings.GALAXY_OIDC_PROVIDER}/login?redirect=true"
 
     async def submit_job(self, submission: GalaxyJobSubmission) -> GalaxyJobResponse:
