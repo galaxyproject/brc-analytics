@@ -19,6 +19,10 @@ SESSION_PREFIX = "auth:session:"
 SESSION_TTL = 3600  # 1 hour, matches refresh token lifetime
 COOKIE_NAME = "brc_session"
 
+# Treat a token expiring within this many seconds as already expired, so a
+# Galaxy call cannot start with a token that dies mid-request.
+TOKEN_EXPIRY_LEEWAY = 30
+
 
 class AuthService:
     """Handles OIDC authentication with Keycloak using the BFF pattern.
@@ -204,18 +208,38 @@ class AuthService:
             return {}
 
     async def get_user_info(self, session_id: str) -> dict[str, Any] | None:
-        """Extract user info from the session's access token.
+        """Extract user info from the session's access token, refreshing if needed."""
+        access_token = await self.get_valid_access_token(session_id)
+        if not access_token:
+            return None
+        claims = self.decode_token_claims(access_token)
+        return {
+            "sub": claims.get("sub"),
+            "email": claims.get("email"),
+            "name": claims.get("name"),
+            "preferred_username": claims.get("preferred_username"),
+            "given_name": claims.get("given_name"),
+            "family_name": claims.get("family_name"),
+            "email_verified": claims.get("email_verified"),
+            "realm_roles": claims.get("realm_access", {}).get("roles", []),
+        }
 
-        If the access token is expired, attempts a refresh first.
+    async def get_valid_access_token(self, session_id: str) -> str | None:
+        """Return a currently-valid access token for this session, or None.
+
+        Refreshes when the token is expired (or within TOKEN_EXPIRY_LEEWAY of
+        it). Refresh tokens are one-time-use on our realms, so a failed refresh
+        re-reads the session: a concurrent request may have already rotated it.
         """
         session = await self.get_session(session_id)
         if not session:
             return None
 
         claims = self.decode_token_claims(session["access_token"])
+        if claims.get("exp", 0) >= time.time() + TOKEN_EXPIRY_LEEWAY:
+            return session["access_token"]
 
-        # If the token looks expired and we have a refresh token, try refreshing
-        if claims.get("exp", 0) < time.time() and session.get("refresh_token"):
+        if session.get("refresh_token"):
             refreshed = await self.refresh_tokens(session["refresh_token"])
             if refreshed:
                 await self._redis.setex(
@@ -233,28 +257,13 @@ class AuthService:
                         }
                     ),
                 )
-                claims = self.decode_token_claims(refreshed["access_token"])
-            else:
-                # Refresh failed — possibly because a concurrent request
-                # already used the refresh token (Keycloak rotates them).
-                # Re-read the session; if it was updated, use the new tokens.
-                session = await self.get_session(session_id)
-                if not session:
-                    return None
+                return refreshed["access_token"]
+            session = await self.get_session(session_id)
+            if session:
                 claims = self.decode_token_claims(session["access_token"])
-                if claims.get("exp", 0) < time.time():
-                    return None
-
-        return {
-            "sub": claims.get("sub"),
-            "email": claims.get("email"),
-            "name": claims.get("name"),
-            "preferred_username": claims.get("preferred_username"),
-            "given_name": claims.get("given_name"),
-            "family_name": claims.get("family_name"),
-            "email_verified": claims.get("email_verified"),
-            "realm_roles": claims.get("realm_access", {}).get("roles", []),
-        }
+                if claims.get("exp", 0) >= time.time():
+                    return session["access_token"]
+        return None
 
     async def revoke_session_tokens(self, session_id: str) -> None:
         """Revoke tokens at Keycloak before deleting the local session."""
