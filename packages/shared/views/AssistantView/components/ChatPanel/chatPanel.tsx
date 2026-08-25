@@ -23,6 +23,7 @@ interface ChatPanelProps {
   error: string | null;
   introText: string;
   isRestoring?: boolean;
+  isSaved: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
@@ -36,6 +37,7 @@ interface ChatPanelProps {
  * @param props.error - Error message to display
  * @param props.introText - Welcome/intro text shown before any messages
  * @param props.isRestoring - Whether a previous session is being restored
+ * @param props.isSaved - Whether the backend has confirmed this conversation is persisted
  * @param props.loading - Whether the assistant is processing
  * @param props.messages - Chat message history
  * @param props.onRetry - Callback to retry the last failed request
@@ -47,6 +49,7 @@ export const ChatPanel = ({
   error,
   introText,
   isRestoring,
+  isSaved,
   loading,
   messages,
   onRetry,
@@ -143,10 +146,11 @@ export const ChatPanel = ({
       />
 
       <InputRow>
-        {/* >= 2 matches the sign-in prompt below: a real turn (user message
-        plus reply) has to complete before there is anything saved to point
-        at, not just the user's own message. */}
-        {isConfigured && isAuthenticated && messages.length >= 2 && (
+        {/* Driven by the backend telling us it wrote the row, not by being
+        signed in with messages on screen. Signing in does not itself save
+        anything, so inferring it here told users their conversation was kept
+        moments before its session expired. */}
+        {isSaved && (
           <Typography color="text.secondary" variant="caption">
             Saved to your account
           </Typography>

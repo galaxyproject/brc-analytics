@@ -39,6 +39,7 @@ export const AssistantView = ({
     error,
     handoffUrl,
     isRestoring,
+    isSaved,
     loading,
     logan,
     messages,
@@ -115,6 +116,7 @@ export const AssistantView = ({
               error={error}
               introText={introText}
               isRestoring={isRestoring}
+              isSaved={isSaved}
               loading={loading}
               messages={messages}
               onRetry={onRetry}

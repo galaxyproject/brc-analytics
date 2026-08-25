@@ -167,6 +167,19 @@ class ChatResponse(BaseModel):
         default=None,
         description="Set when the session was opened from a Logan search",
     )
+    saved: bool = Field(
+        False,
+        description=(
+            "True when this turn was persisted to the user's saved analyses. "
+            "Always False for anonymous conversations."
+        ),
+    )
+
+
+class SessionSaveResponse(BaseModel):
+    """Response from explicitly saving a session to the user's account."""
+
+    saved_analysis_id: str
 
 
 class TurnOutcome(str, Enum):

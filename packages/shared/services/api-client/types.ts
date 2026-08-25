@@ -62,10 +62,16 @@ export interface AssistantChatResponse {
   is_complete: boolean;
   logan?: LoganContext | null;
   reply: string;
+  /** True when the backend persisted this turn to the user's saved analyses. */
+  saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
   token_usage?: TokenUsage;
+}
+
+export interface SessionSaveResponse {
+  saved_analysis_id: string;
 }
 
 export interface SessionRestoreResponse {
