@@ -29,7 +29,8 @@ export function FavoriteCell({
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { isFavorited, toggleFavorite, togglingKey } = useFavorites();
+  const { isFavorited, isLoading, toggleFavorite, togglingKey } =
+    useFavorites();
 
   // Login is off on this site -- a permanent state, not a loading one.
   if (!isConfigured || isAuthLoading) return null;
@@ -51,9 +52,14 @@ export function FavoriteCell({
     <Tooltip title={isAuthenticated ? label : "Sign in to save"}>
       <IconButton
         aria-label={label}
-        // Only the row in flight is disabled -- gating on the shared
-        // isToggling flag would freeze every star in the table.
-        disabled={togglingKey === favoriteKey(entityType, entityId)}
+        // isLoading covers the window before the initial GET /favorites
+        // resolves, when isFavorited reads an empty set -- a click there
+        // would fire a create for an entity that may already be saved.
+        // Only the row in flight is disabled by togglingKey -- gating on the
+        // shared isToggling flag would freeze every star in the table.
+        disabled={
+          isLoading || togglingKey === favoriteKey(entityType, entityId)
+        }
         onClick={handleClick}
         size="small"
       >

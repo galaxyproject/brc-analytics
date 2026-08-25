@@ -122,6 +122,19 @@ describe("FavoriteCell", () => {
     expect(screen.getByRole("button")).not.toBeDisabled();
   });
 
+  test("disables while the initial favorites fetch is loading", () => {
+    // Before GET /favorites resolves, isFavorited reads an empty set -- a
+    // click in that window would fire a create for an entity that may
+    // already be saved.
+    setFavorites({ isLoading: true });
+
+    render(
+      <FavoriteCell entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />
+    );
+
+    expect(screen.getByRole("button")).toBeDisabled();
+  });
+
   test("prompts sign-in instead of toggling when signed out", () => {
     const toggleFavorite = setFavorites();
     const login = jest.fn();

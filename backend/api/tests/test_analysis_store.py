@@ -5,7 +5,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from app.models.assistant import AnalysisSchema, ChatMessage, MessageRole, SessionState
+from app.models.assistant import (
+    AnalysisSchema,
+    ChatMessage,
+    MessageRole,
+    SchemaField,
+    SessionState,
+)
 from app.services import analysis_store
 
 
@@ -73,6 +79,46 @@ async def test_truncates_a_long_title():
         await analysis_store.record(state)
 
     assert len(captured["title"]) == 80
+
+
+@pytest.mark.asyncio
+async def test_nul_bytes_are_scrubbed_on_every_persisted_field():
+    """Postgres rejects NUL in text/jsonb, and a user can paste one into the
+    chat box. state.messages is rewritten in full on every turn, so one
+    unscrubbed NUL would poison every future auto-save for this conversation,
+    not just the turn it arrived on. strip_nuls is exercised elsewhere only
+    through turn_log -- pin that it applies here too, on all four fields."""
+    captured = {}
+
+    async def fake_upsert(session, user, **kwargs):
+        captured.update(kwargs)
+
+    state = _state(
+        agent_message_history=[{"role": "assistant", "content": "tool\x00output"}],
+        messages=[
+            ChatMessage(
+                content="Find me a Plasmodium\x00 assembly", role=MessageRole.USER
+            ),
+        ],
+        schema_state=AnalysisSchema(
+            organism=SchemaField(value="Plasmodium\x00 falciparum")
+        ),
+    )
+
+    with (
+        patch.object(analysis_store, "upsert_saved_analysis", fake_upsert),
+        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "db_session"),
+    ):
+        await analysis_store.record(state)
+
+    assert "\x00" not in captured["title"]
+    assert captured["title"] == "Find me a Plasmodium assembly"
+    assert all("\x00" not in message["content"] for message in captured["messages"])
+    assert all(
+        "\x00" not in entry["content"] for entry in captured["agent_message_history"]
+    )
+    assert "\x00" not in captured["schema"]["organism"]["value"]
 
 
 @pytest.mark.asyncio
