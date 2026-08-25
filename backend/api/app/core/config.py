@@ -142,6 +142,13 @@ class Settings:
             os.getenv("SUBMIT_RATE_LIMIT_WINDOW", "3600")
         )
 
+        # Per-user submit budget for signed-in users. Roomier than the anonymous
+        # pool: an authenticated user is accountable, and Galaxy's own per-user
+        # quotas are the real backstop.
+        self.SUBMIT_RATE_LIMIT_USER_REQUESTS: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
+        )
+
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
         # header itself -- otherwise clients can spoof IPs.

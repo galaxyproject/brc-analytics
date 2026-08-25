@@ -107,18 +107,20 @@ def get_submit_rate_limiter() -> RateLimiter:
     return limiter
 
 
+@lru_cache(maxsize=1)
+def get_user_submit_rate_limiter() -> RateLimiter:
+    cache = get_cache_service()
+    settings = get_settings()
+    return RateLimiter(
+        cache=cache,
+        requests=settings.SUBMIT_RATE_LIMIT_USER_REQUESTS,
+        window=settings.SUBMIT_RATE_LIMIT_WINDOW,
+        namespace="ratelimit:submit-user",
+    )
+
+
 async def check_rate_limit(request: Request) -> dict:
     rate_limiter = get_rate_limiter()
-    return await rate_limiter.check(request)
-
-
-async def check_submit_rate_limit(request: Request) -> dict:
-    """Rate limit for endpoints that launch Galaxy jobs.
-
-    Applied on top of check_rate_limit, not instead of it -- the general
-    budget still bounds request volume, this one bounds compute.
-    """
-    rate_limiter = get_submit_rate_limiter()
     return await rate_limiter.check(request)
 
 
@@ -168,6 +170,24 @@ async def get_galaxy_credential(
     return None
 
 
+async def check_submit_rate_limit(
+    request: Request,
+    credential: GalaxyCredential | None = Depends(get_galaxy_credential),
+) -> dict:
+    """Rate limit for endpoints that launch Galaxy jobs.
+
+    Applied on top of check_rate_limit, not instead of it -- the general
+    budget still bounds request volume, this one bounds compute. Signed-in
+    users get their own per-user budget; anonymous traffic shares the
+    per-IP pool exactly as before.
+    """
+    if credential is not None and credential.kind == "user":
+        return await get_user_submit_rate_limiter().check(
+            request, principal=credential.user_sub
+        )
+    return await get_submit_rate_limiter().check(request)
+
+
 async def get_current_user(
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
 ) -> UserMeResponse:
@@ -210,3 +230,4 @@ def reset_all_services() -> None:
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()
     get_submit_rate_limiter.cache_clear()
+    get_user_submit_rate_limiter.cache_clear()

@@ -90,3 +90,14 @@ class TestClientKey:
             gs.return_value.TRUST_PROXY_HEADERS = True
             req = _make_request("10.0.0.1", ", , ,")
             assert limiter._get_client_key(req) == "ratelimit:10.0.0.1"
+
+
+def test_principal_key_overrides_ip(limiter):
+    request = _make_request("1.2.3.4", None)
+    key = limiter._get_client_key(request, principal="user-sub-1")
+    assert key == f"{limiter.namespace}:user:user-sub-1"
+
+
+def test_no_principal_keeps_ip_key(limiter):
+    request = _make_request("1.2.3.4", None)
+    assert limiter._get_client_key(request) == f"{limiter.namespace}:1.2.3.4"
