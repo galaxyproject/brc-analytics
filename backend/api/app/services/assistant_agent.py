@@ -1278,6 +1278,7 @@ class AssistantAgent:
         agent_message_history: list | None = None,
         owner_keycloak_sub: str,
         messages: list[ChatMessage],
+        saved_analysis_id: str,
         schema_state: AnalysisSchema,
     ) -> SessionState:
         """Rehydrate a saved conversation into a live session.
@@ -1285,15 +1286,19 @@ class AssistantAgent:
         agent_message_history carries the pydantic-ai transcript -- tool calls
         and their returns. Without it the resumed agent has no memory of
         anything it looked up and re-derives it on the next turn.
+
+        saved_analysis_id travels with the session so auto-saves from it land
+        back on the same row, however many times the analysis is reopened.
         """
         state = await self.session_service.create_session(
             owner_keycloak_sub=owner_keycloak_sub,
             schema_state=schema_state,
             messages=messages,
         )
+        state.saved_analysis_id = saved_analysis_id
         if agent_message_history:
             state.agent_message_history = agent_message_history
-            await self.session_service.save_session(state)
+        await self.session_service.save_session(state)
         return state
 
     @staticmethod

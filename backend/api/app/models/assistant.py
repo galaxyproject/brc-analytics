@@ -209,6 +209,10 @@ class SessionState(BaseModel):
 
     session_id: str
     owner_keycloak_sub: Optional[str] = None
+    # The SavedAnalysis this conversation belongs to, once one exists. The
+    # session id is a mutable pointer -- reopening an analysis can move it --
+    # so auto-save keys on this instead wherever the session knows it.
+    saved_analysis_id: Optional[str] = None
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
     suggestions: List[SuggestionChip] = Field(default_factory=list)

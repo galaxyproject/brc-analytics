@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from app.core.config import get_settings
 from app.db.crud import (
     get_user_by_keycloak_sub,
+    repoint_saved_analysis_session,
     upsert_favorite,
     upsert_saved_analysis,
     upsert_user_from_claims,
@@ -102,6 +103,7 @@ class FakeAssistantAgent:
         *,
         agent_message_history: list | None = None,
         owner_keycloak_sub: str,
+        saved_analysis_id: str,
         schema_state: AnalysisSchema,
         messages: list[ChatMessage],
     ) -> SessionState:
@@ -109,6 +111,7 @@ class FakeAssistantAgent:
         state = SessionState(
             session_id=session_id,
             owner_keycloak_sub=owner_keycloak_sub,
+            saved_analysis_id=saved_analysis_id,
             schema_state=schema_state,
             messages=messages,
             agent_message_history=agent_message_history or [],
@@ -434,20 +437,92 @@ def test_manual_save_endpoint_is_gone(persistence_client):
     assert response.status_code == 405
 
 
-def test_open_repoints_the_analysis_at_the_new_session(persistence_client):
+def test_open_reuses_the_live_session(persistence_client):
+    """Minting a second session for a conversation that already has a live one
+    strands whoever still holds the first -- their next turn would find no row
+    for it and start a second copy of the analysis."""
     client, _session_factory, _current_sub, _agent = persistence_client
 
-    client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
     analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
 
     opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
     assert opened.status_code == 200, opened.text
+    assert opened.json()["session_id"] == session_id
+
+    listed = client.get("/api/v1/saved_analyses").json()
+    assert len(listed) == 1
+    assert listed[0]["source_session"] == session_id
+
+
+def test_open_carries_the_analysis_id_onto_the_live_session(persistence_client):
+    """A conversation saved but never reopened has a session older than its
+    row, so it does not know its own analysis id until someone opens it."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    assert agent.session_service.sessions[session_id].saved_analysis_id is None
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+
+    assert agent.session_service.sessions[session_id].saved_analysis_id == analysis_id
+
+
+def test_open_repoints_the_analysis_when_the_session_expired(persistence_client):
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    # Two-hour TTL elapses; the conversation outlives its session.
+    del agent.session_service.sessions[chat.json()["session_id"]]
+
+    opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+    assert opened.status_code == 200, opened.text
     new_session_id = opened.json()["session_id"]
+    assert new_session_id != chat.json()["session_id"]
 
     listed = client.get("/api/v1/saved_analyses").json()
     assert len(listed) == 1
     assert listed[0]["id"] == analysis_id
     assert listed[0]["source_session"] == new_session_id
+
+
+def test_a_second_device_opening_does_not_split_the_analysis(persistence_client):
+    """The row can only point at one live session. A device still holding the
+    other one must land back on the same row rather than starting a rival copy
+    of the conversation."""
+    client, session_factory, _current_sub, _agent = persistence_client
+
+    client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    device_a = client.post(f"/api/v1/saved_analyses/{analysis_id}/open").json()[
+        "session_id"
+    ]
+
+    # Device B opens the same analysis and the row follows it. Forced directly:
+    # the reuse above deliberately hands both devices the one live session, so
+    # the split state is only reachable when B minted a session of its own.
+    asyncio.run(
+        _repoint_analysis(session_factory, analysis_id, "session-held-by-device-b")
+    )
+
+    client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "still here", "session_id": device_a},
+    )
+
+    listed = client.get("/api/v1/saved_analyses").json()
+    assert len(listed) == 1
+    assert listed[0]["id"] == analysis_id
+
+
+async def _repoint_analysis(session_factory, analysis_id: str, source_session: str):
+    async with session_factory() as session:
+        user = await get_user_by_keycloak_sub(session, "user-a")
+        await repoint_saved_analysis_session(session, user, analysis_id, source_session)
 
 
 def test_open_rehydrates_the_agent_history(persistence_client):
