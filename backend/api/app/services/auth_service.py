@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import hashlib
 import json
@@ -22,6 +23,16 @@ COOKIE_NAME = "brc_session"
 # Treat a token expiring within this many seconds as already expired, so a
 # Galaxy call cannot start with a token that dies mid-request.
 TOKEN_EXPIRY_LEEWAY = 30
+
+# Refresh tokens are one-time-use on our realms (revokeRefreshToken=true,
+# refreshTokenMaxReuse=0), so only one request per session may talk to
+# Keycloak; everyone else waits for the rotation to land in Redis.
+REFRESH_LOCK_PREFIX = "auth:refresh:"
+# Comfortably longer than a Keycloak round trip, short enough that a crashed
+# holder cannot wedge the session for long.
+REFRESH_LOCK_TTL = 10
+REFRESH_POLL_ATTEMPTS = 5
+REFRESH_POLL_INTERVAL = 0.2
 
 
 class AuthService:
@@ -224,22 +235,49 @@ class AuthService:
             "realm_roles": claims.get("realm_access", {}).get("roles", []),
         }
 
+    def _token_is_usable(self, access_token: str) -> bool:
+        """Whether this token survives TOKEN_EXPIRY_LEEWAY more seconds."""
+        claims = self.decode_token_claims(access_token)
+        return claims.get("exp", 0) >= time.time() + TOKEN_EXPIRY_LEEWAY
+
+    async def _await_rotated_token(self, session_id: str) -> str | None:
+        """Wait for the lock holder's rotation to land, without refreshing.
+
+        Spending the session's one-shot refresh token here would revoke the
+        rotation the holder is about to write, so a loser only ever reads.
+        """
+        for _ in range(REFRESH_POLL_ATTEMPTS):
+            await asyncio.sleep(REFRESH_POLL_INTERVAL)
+            session = await self.get_session(session_id)
+            if session and self._token_is_usable(session["access_token"]):
+                return session["access_token"]
+        logger.warning("Gave up waiting for a concurrent token refresh on this session")
+        return None
+
     async def get_valid_access_token(self, session_id: str) -> str | None:
         """Return a currently-valid access token for this session, or None.
 
         Refreshes when the token is expired (or within TOKEN_EXPIRY_LEEWAY of
-        it). Refresh tokens are one-time-use on our realms, so a failed refresh
-        re-reads the session: a concurrent request may have already rotated it.
+        it). Refresh tokens are one-time-use on our realms, so the refresh is
+        single-flight: one request takes a Redis lock and talks to Keycloak,
+        and concurrent requests wait for its rotation instead of racing it.
         """
         session = await self.get_session(session_id)
         if not session:
             return None
 
-        claims = self.decode_token_claims(session["access_token"])
-        if claims.get("exp", 0) >= time.time() + TOKEN_EXPIRY_LEEWAY:
+        if self._token_is_usable(session["access_token"]):
             return session["access_token"]
 
-        if session.get("refresh_token"):
+        if not session.get("refresh_token"):
+            return None
+
+        lock_key = f"{REFRESH_LOCK_PREFIX}{session_id}"
+        acquired = await self._redis.set(lock_key, "1", nx=True, ex=REFRESH_LOCK_TTL)
+        if not acquired:
+            return await self._await_rotated_token(session_id)
+
+        try:
             refreshed = await self.refresh_tokens(session["refresh_token"])
             if refreshed:
                 await self._redis.setex(
@@ -258,12 +296,14 @@ class AuthService:
                     ),
                 )
                 return refreshed["access_token"]
+            # The refresh token was spent -- a request that rotated it just
+            # before we took the lock is the likeliest explanation, so re-read.
             session = await self.get_session(session_id)
-            if session:
-                claims = self.decode_token_claims(session["access_token"])
-                if claims.get("exp", 0) >= time.time():
-                    return session["access_token"]
-        return None
+            if session and self._token_is_usable(session["access_token"]):
+                return session["access_token"]
+            return None
+        finally:
+            await self._redis.delete(lock_key)
 
     async def revoke_session_tokens(self, session_id: str) -> None:
         """Revoke tokens at Keycloak before deleting the local session."""
