@@ -7,7 +7,7 @@ import pytest
 
 from app.core.dependencies import get_galaxy_credential
 from app.core.galaxy_credential import GalaxyCredential
-from app.services.galaxy_service import GalaxyService
+from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
 
 
 def make_auth(token: str | None, sub: str | None = "u1") -> MagicMock:
@@ -158,3 +158,61 @@ async def test_service_jobs_keep_shared_history_name():
     svc.gi.histories.create_history = MagicMock(return_value={"id": "h2"})
     await svc._get_or_create_shared_history()
     svc.gi.histories.create_history.assert_called_once_with(name="BRC ANALYTICS JOBS")
+
+
+def test_galaxy_login_url_derives_from_api_url(monkeypatch):
+    monkeypatch.setenv("GALAXY_API_URL", "https://test.galaxyproject.org/api")
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            MagicMock(), credential=GalaxyCredential(kind="user", secret="t")
+        )
+    assert svc.galaxy_login_url() == (
+        "https://test.galaxyproject.org/authnz/keycloak/login?redirect=true"
+    )
+    get_settings.cache_clear()
+
+
+@pytest.mark.asyncio
+async def test_unlinked_401_becomes_account_not_linked_error():
+    from bioblend import ConnectionError as BioblendConnectionError
+
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            MagicMock(), credential=GalaxyCredential(kind="user", secret="t")
+        )
+    err = BioblendConnectionError("401", body="", status_code=401)
+    svc._get_or_create_shared_history = AsyncMock(side_effect=err)
+    from app.models.galaxy import KmindexQuerySubmission
+
+    submission = KmindexQuerySubmission(
+        sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
+        indexes=["GENOMIC_BCT"],
+    )
+    with pytest.raises(GalaxyAccountNotLinkedError):
+        await svc.submit_kmindex_query(submission)
+
+
+@pytest.mark.asyncio
+async def test_submit_response_carries_credential_identity():
+    from app.models.galaxy import KmindexQuerySubmission
+
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            MagicMock(),
+            credential=GalaxyCredential(kind="user", secret="t", user_sub="u1"),
+        )
+    svc._get_or_create_shared_history = AsyncMock(return_value="h1")
+    svc._upload_fasta = AsyncMock(return_value="d1")
+    svc._run_kmindex_query = AsyncMock(return_value="job1")
+
+    submission = KmindexQuerySubmission(
+        sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
+        indexes=["GENOMIC_BCT"],
+    )
+    response = await svc.submit_kmindex_query(submission)
+
+    assert response.identity == "user"
+    assert response.job_id == "job1"

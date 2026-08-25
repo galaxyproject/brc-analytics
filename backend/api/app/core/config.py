@@ -209,6 +209,10 @@ class Settings:
             "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.6.1+galaxy3",
         )
 
+        # Which Galaxy OIDC backend links accounts (the provider name in Galaxy's
+        # oidc_backends_config.xml). Used to build the connect-your-account URL.
+        self.GALAXY_OIDC_PROVIDER: str = os.getenv("GALAXY_OIDC_PROVIDER", "keycloak")
+
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(
             "KEYCLOAK_ISSUER_URL",

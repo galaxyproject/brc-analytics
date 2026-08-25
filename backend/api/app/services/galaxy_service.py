@@ -9,6 +9,7 @@ import time
 from collections import Counter
 from typing import List, Optional, Tuple
 
+from bioblend import ConnectionError as BioblendConnectionError
 from bioblend.galaxy import GalaxyInstance
 
 from app.core.cache import CacheService, CacheTTL
@@ -36,6 +37,15 @@ from app.services.sra_mirror import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class GalaxyAccountNotLinkedError(Exception):
+    """The bearer token verified, but Galaxy has no account linked to it yet.
+
+    Galaxy only maps sub -> user after one browser OIDC login (creates the
+    UserAuthnzToken row). str(self) is the URL that completes the link.
+    """
+
 
 # kmindex splits an index into shards and emits one JSON dataset per shard, so a
 # single query fans out into dozens of dataset downloads. Galaxy answers 429 if
@@ -254,6 +264,11 @@ class GalaxyService:
         """Check if Galaxy service is available."""
         return self._galaxy_available and self.gi is not None
 
+    def galaxy_login_url(self) -> str:
+        """The Galaxy OIDC login URL that links the user's account (302 flow)."""
+        base = self.settings.GALAXY_API_URL.replace("/api", "")
+        return f"{base}/authnz/{self.settings.GALAXY_OIDC_PROVIDER}/login?redirect=true"
+
     async def submit_job(self, submission: GalaxyJobSubmission) -> GalaxyJobResponse:
         """
         Submit a complete job: upload data and run the random lines tool.
@@ -338,6 +353,7 @@ class GalaxyService:
                 job_id=job_id,
                 upload_dataset_id=upload_dataset_id,
                 status="submitted",
+                identity=self.credential.kind if self.credential else None,
                 message=(
                     f"kmindex job {job_id} submitted against "
                     f"{len(submission.indexes)} index(es)"
@@ -345,6 +361,13 @@ class GalaxyService:
             )
 
         except Exception as e:
+            if (
+                isinstance(e, BioblendConnectionError)
+                and getattr(e, "status_code", None) == 401
+                and self.credential is not None
+                and self.credential.kind == "user"
+            ):
+                raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
 

@@ -300,6 +300,19 @@ class GalaxyJobResponse(BaseModel):
     upload_dataset_id: str = Field(..., description="ID of the uploaded dataset")
     status: str = Field(default="submitted", description="Initial job status")
     message: str = Field(default="Job submitted successfully")
+    identity: Optional[str] = Field(
+        default=None, description="Which credential ran the job: service or user"
+    )
+
+
+class GalaxyAccountStatus(BaseModel):
+    """Whether the caller can run Galaxy jobs as themselves."""
+
+    galaxy_login_url: Optional[str] = None
+    galaxy_user_id: Optional[str] = None
+    galaxy_username: Optional[str] = None
+    identity: str = Field(..., description="none, service, or user")
+    linked: bool
 
 
 class GalaxyDataset(BaseModel):
