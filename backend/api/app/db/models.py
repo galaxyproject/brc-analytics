@@ -164,6 +164,37 @@ class WorkflowRun(Base):
     user: Mapped[User | None] = relationship(back_populates="workflow_runs")
 
 
+class GalaxyJob(Base):
+    """Ownership record for a Galaxy job submitted by a signed-in user.
+
+    Anonymous (service-account) jobs write no row -- the job id stays the
+    only handle, exactly as before user accounts existed.
+    """
+
+    __tablename__ = "galaxy_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    galaxy_job_id: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    galaxy_instance_url: Mapped[str] = mapped_column(Text, nullable=False)
+    tool: Mapped[str] = mapped_column(String(64), nullable=False)
+    params: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        nullable=False,
+    )
+
+
 class AssistantTurnLog(Base):
     """One row per assistant turn -- a user message and what came back.
 
