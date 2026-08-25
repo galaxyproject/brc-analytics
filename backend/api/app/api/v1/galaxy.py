@@ -4,6 +4,7 @@ import asyncio
 import logging
 from typing import Any, Dict, Optional
 
+from bioblend import ConnectionError as BioblendConnectionError
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.responses import FileResponse, StreamingResponse
 
@@ -20,6 +21,7 @@ from app.core.galaxy_credential import GalaxyCredential
 from app.db.crud import create_galaxy_job, get_user_by_keycloak_sub
 from app.db.session import db_session
 from app.models.galaxy import (
+    GalaxyAccountStatus,
     GalaxyJobResponse,
     GalaxyJobResult,
     GalaxyJobStatus,
@@ -27,7 +29,7 @@ from app.models.galaxy import (
     KmindexQuerySubmission,
     KmindexResults,
 )
-from app.services.galaxy_service import GalaxyService
+from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
 from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
@@ -59,6 +61,45 @@ async def galaxy_health(galaxy_service: GalaxyService = Depends(get_galaxy_servi
         "upload_tool_id": galaxy_service.settings.GALAXY_UPLOAD_TOOL_ID,
         "random_lines_tool_id": galaxy_service.settings.GALAXY_RANDOM_LINES_TOOL_ID,
     }
+
+
+@router.get("/user", response_model=GalaxyAccountStatus)
+async def get_galaxy_account(
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """Report whether this caller's Galaxy identity is linked and usable."""
+    cred = galaxy_service.credential
+    if cred is None:
+        return GalaxyAccountStatus(identity="none", linked=False)
+    if cred.kind == "service":
+        return GalaxyAccountStatus(identity="service", linked=False)
+    try:
+        me = await asyncio.to_thread(galaxy_service.gi.users.get_current_user)
+    except BioblendConnectionError as e:
+        if getattr(e, "status_code", None) == 401:
+            return GalaxyAccountStatus(
+                galaxy_login_url=galaxy_service.galaxy_login_url(),
+                identity="user",
+                linked=False,
+            )
+        logger.error(f"Galaxy account check failed: {e}")
+        raise HTTPException(
+            status_code=502, detail="Galaxy account check failed"
+        ) from e
+    except Exception as e:
+        # Transport-level failures (Galaxy unreachable) are not bioblend's
+        # ConnectionError -- still a 502, never a traceback.
+        logger.error(f"Galaxy account check failed: {e}")
+        raise HTTPException(
+            status_code=502, detail="Galaxy account check failed"
+        ) from e
+    return GalaxyAccountStatus(
+        galaxy_user_id=me.get("id"),
+        galaxy_username=me.get("username"),
+        identity="user",
+        linked=True,
+    )
 
 
 @router.post("/submit-job", response_model=GalaxyJobResponse)
@@ -196,6 +237,14 @@ async def submit_kmindex_query(
 
     except HTTPException:
         raise
+    except GalaxyAccountNotLinkedError as e:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "galaxy_account_not_linked",
+                "galaxy_login_url": str(e),
+            },
+        ) from e
     except Exception as e:
         logger.error(f"Failed to submit kmindex query: {str(e)}")
         raise HTTPException(
