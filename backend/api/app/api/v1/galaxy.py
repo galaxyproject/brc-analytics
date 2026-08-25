@@ -29,7 +29,11 @@ from app.models.galaxy import (
     KmindexQuerySubmission,
     KmindexResults,
 )
-from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
+from app.services.galaxy_service import (
+    GalaxyAccountNotLinkedError,
+    GalaxyService,
+    _is_unlinked_account_error,
+)
 from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
@@ -76,20 +80,22 @@ async def get_galaxy_account(
         return GalaxyAccountStatus(identity="service", linked=False)
     try:
         me = await asyncio.to_thread(galaxy_service.gi.users.get_current_user)
-    except BioblendConnectionError as e:
-        if getattr(e, "status_code", None) == 401:
-            return GalaxyAccountStatus(
-                galaxy_login_url=galaxy_service.galaxy_login_url(),
-                identity="user",
-                linked=False,
-            )
-        logger.error(f"Galaxy account check failed: {e}")
-        raise HTTPException(
-            status_code=502, detail="Galaxy account check failed"
-        ) from e
     except Exception as e:
-        # Transport-level failures (Galaxy unreachable) are not bioblend's
-        # ConnectionError -- still a 502, never a traceback.
+        # One arm: transport-level failures (Galaxy unreachable) are not
+        # bioblend's ConnectionError, and a 401 for a rejected token is not the
+        # same thing as a 401 for an account nobody has linked yet.
+        if isinstance(e, BioblendConnectionError):
+            if getattr(e, "status_code", None) == 401:
+                logger.warning(
+                    "Galaxy rejected the user's bearer token: %s",
+                    getattr(e, "body", ""),
+                )
+            if _is_unlinked_account_error(e):
+                return GalaxyAccountStatus(
+                    galaxy_login_url=galaxy_service.galaxy_login_url(),
+                    identity="user",
+                    linked=False,
+                )
         logger.error(f"Galaxy account check failed: {e}")
         raise HTTPException(
             status_code=502, detail="Galaxy account check failed"

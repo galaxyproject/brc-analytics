@@ -24,6 +24,18 @@ from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SUBMISSION_PAYLOAD = {"sequence": "ACGT", "indexes": ["GENOMIC_BCT"]}
 
+# Verbatim from galaxy/lib/galaxy/authnz/managers.py -- the two 401s we have
+# to tell apart.
+UNLINKED_BODY = json.dumps(
+    {
+        "err_msg": (
+            "Cannot locate user by access token. The user should log into "
+            "Galaxy at least once with this OIDC provider."
+        )
+    }
+)
+INVALID_TOKEN_BODY = json.dumps({"err_msg": "Invalid access token."})
+
 
 async def _no_rate_limit():
     return {"limit": 100, "remaining": 100, "reset": 60}
@@ -142,7 +154,7 @@ def test_user_credential_unlinked_401_offers_login_url(app_client, monkeypatch):
         )
     service.gi = MagicMock()
     service.gi.users.get_current_user.side_effect = BioblendConnectionError(
-        "401", body="", status_code=401
+        "401", body=UNLINKED_BODY, status_code=401
     )
     app.dependency_overrides[get_galaxy_service] = lambda: service
 
@@ -155,6 +167,27 @@ def test_user_credential_unlinked_401_offers_login_url(app_client, monkeypatch):
     assert body["galaxy_login_url"] == (
         "https://test.galaxyproject.org/authnz/keycloak/login?redirect=true"
     )
+
+
+def test_user_credential_invalid_token_401_returns_502(app_client):
+    """A token Galaxy refuses outright is a configuration problem on our side;
+    telling the user to connect their account would send them in circles."""
+    app, client = app_client
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        service = GalaxyService(
+            MagicMock(),
+            credential=GalaxyCredential(kind="user", secret="t", user_sub="u1"),
+        )
+    service.gi = MagicMock()
+    service.gi.users.get_current_user.side_effect = BioblendConnectionError(
+        "401", body=INVALID_TOKEN_BODY, status_code=401
+    )
+    app.dependency_overrides[get_galaxy_service] = lambda: service
+
+    response = client.get("/api/v1/galaxy/user")
+
+    assert response.status_code == 502
+    assert response.json()["detail"] == "Galaxy account check failed"
 
 
 def test_user_credential_transport_error_returns_502(app_client):
