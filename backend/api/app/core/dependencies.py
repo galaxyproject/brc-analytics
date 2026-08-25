@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheService
 from app.core.config import get_settings
+from app.core.galaxy_credential import GalaxyCredential
 from app.core.rate_limit import RateLimiter
 from app.db.crud import get_user_by_keycloak_sub
 from app.db.models import User
@@ -133,6 +134,38 @@ async def get_optional_current_user(
         return None
 
     return UserMeResponse.model_validate(user_info)
+
+
+async def get_galaxy_credential(
+    brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
+    auth: AuthService = Depends(get_auth_service),
+) -> GalaxyCredential | None:
+    """Resolve which credential Galaxy calls should use for this request.
+
+    A logged-in user's own bearer token wins; the shared service-account key
+    is the anonymous fallback; None means Galaxy endpoints are disabled.
+    """
+    if brc_session:
+        try:
+            token = await auth.get_valid_access_token(brc_session)
+        except Exception:
+            # A session-store or IdP blip must not take down an
+            # anonymous-capable route -- degrade to the service key.
+            logger.warning("Session token lookup failed; using service credential")
+            token = None
+        if token:
+            claims = auth.decode_token_claims(token)
+            if claims.get("sub"):
+                return GalaxyCredential(
+                    kind="user",
+                    secret=token,
+                    preferred_username=claims.get("preferred_username"),
+                    user_sub=claims["sub"],
+                )
+    settings = get_settings()
+    if settings.GALAXY_API_KEY:
+        return GalaxyCredential(kind="service", secret=settings.GALAXY_API_KEY)
+    return None
 
 
 async def get_current_user(

@@ -13,6 +13,7 @@ from bioblend.galaxy import GalaxyInstance
 
 from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
+from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     GalaxyDataset,
     GalaxyJobOutput,
@@ -208,39 +209,50 @@ class GalaxyService:
     """Service for interacting with Galaxy API using BioBLEND."""
 
     def __init__(
-        self, cache: CacheService, sra_mirror: Optional[SRAMirrorService] = None
+        self,
+        cache: CacheService,
+        sra_mirror: Optional[SRAMirrorService] = None,
+        credential: Optional[GalaxyCredential] = None,
     ):
         self.cache = cache
         self.sra_mirror = sra_mirror
         self.settings = get_settings()
 
-        # Check if Galaxy is configured
-        if not self.settings.GALAXY_API_KEY:
+        if credential is None and self.settings.GALAXY_API_KEY:
+            # Back-compat construction path (tests, scripts): same behavior as
+            # before credentials existed -- the service key from settings.
+            credential = GalaxyCredential(
+                kind="service", secret=self.settings.GALAXY_API_KEY
+            )
+        self.credential = credential
+
+        if credential is None:
             logger.warning(
-                "Galaxy API key not configured - Galaxy features will be disabled"
+                "No Galaxy credential resolved - Galaxy features will be disabled"
             )
             self._galaxy_available = False
             self.gi = None
         else:
             self._galaxy_available = True
-            # Initialize BioBLEND Galaxy instance
-            self.gi = GalaxyInstance(
-                url=self.settings.GALAXY_API_URL.replace(
-                    "/api", ""
-                ),  # BioBLEND expects base URL without /api
-                key=self.settings.GALAXY_API_KEY,
-            )
+            base_url = self.settings.GALAXY_API_URL.replace(
+                "/api", ""
+            )  # BioBLEND expects base URL without /api
+            if credential.kind == "user":
+                # bioblend sends token as "Authorization: Bearer <token>"
+                self.gi = GalaxyInstance(url=base_url, token=credential.secret)
+            else:
+                self.gi = GalaxyInstance(url=base_url, key=credential.secret)
             logger.info(
-                "Galaxy service initialized with BioBLEND for URL: "
+                f"Galaxy service initialized ({credential.kind}) for URL: "
                 f"{self.settings.GALAXY_API_URL}"
             )
 
-        # Shared BRC Analytics history
+        # Memoized per instance, so a history id never leaks across requests/users.
         self._shared_history_id = None
 
     def is_available(self) -> bool:
         """Check if Galaxy service is available."""
-        return self._galaxy_available and bool(self.settings.GALAXY_API_KEY)
+        return self._galaxy_available and self.gi is not None
 
     async def submit_job(self, submission: GalaxyJobSubmission) -> GalaxyJobResponse:
         """
