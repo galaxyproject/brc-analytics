@@ -28,9 +28,11 @@ TOKEN_EXPIRY_LEEWAY = 30
 # refreshTokenMaxReuse=0), so only one request per session may talk to
 # Keycloak; everyone else waits for the rotation to land in Redis.
 REFRESH_LOCK_PREFIX = "auth:refresh:"
-# Comfortably longer than a Keycloak round trip, short enough that a crashed
-# holder cannot wedge the session for long.
-REFRESH_LOCK_TTL = 10
+# Must comfortably exceed the httpx client timeout (10s) times the two round
+# trips a cold refresh makes (discovery + token POST) -- otherwise a stalled
+# holder's lock can expire before it finishes, letting a second request take
+# the lock and spend the same one-time refresh token out from under it.
+REFRESH_LOCK_TTL = 30
 REFRESH_POLL_ATTEMPTS = 5
 REFRESH_POLL_INTERVAL = 0.2
 
@@ -273,7 +275,10 @@ class AuthService:
             return None
 
         lock_key = f"{REFRESH_LOCK_PREFIX}{session_id}"
-        acquired = await self._redis.set(lock_key, "1", nx=True, ex=REFRESH_LOCK_TTL)
+        lock_token = secrets.token_hex(16)
+        acquired = await self._redis.set(
+            lock_key, lock_token, nx=True, ex=REFRESH_LOCK_TTL
+        )
         if not acquired:
             return await self._await_rotated_token(session_id)
 
@@ -303,7 +308,28 @@ class AuthService:
                 return session["access_token"]
             return None
         finally:
-            await self._redis.delete(lock_key)
+            await self._release_refresh_lock(lock_key, lock_token)
+
+    async def _release_refresh_lock(self, lock_key: str, token: str) -> None:
+        """Delete the refresh lock only if we still own it.
+
+        The lock can outlive our own request (a slow Keycloak call past
+        REFRESH_LOCK_TTL) and get picked up by a later holder; blindly
+        deleting it in `finally` would then delete *their* lock instead of
+        ours. The get-then-del has to be one atomic step, so it runs as a
+        Lua script rather than two round trips we could race between.
+        """
+        script = (
+            'if redis.call("get", KEYS[1]) == ARGV[1] then '
+            'return redis.call("del", KEYS[1]) '
+            "else return 0 end"
+        )
+        try:
+            await self._redis.eval(script, 1, lock_key, token)
+        except Exception as e:
+            # A release failure just means the lock sits until its TTL
+            # expires -- not worth failing the request over.
+            logger.debug("Failed to release refresh lock %s: %s", lock_key, e)
 
     async def revoke_session_tokens(self, session_id: str) -> None:
         """Revoke tokens at Keycloak before deleting the local session."""

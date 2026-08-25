@@ -54,6 +54,14 @@ class FakeRedis:
     async def delete(self, key: str) -> int:
         return 1 if self.store.pop(key, None) is not None else 0
 
+    async def eval(self, script: str, numkeys: int, *keys_and_args: str) -> int:
+        # Only the release script is ever run through here -- a
+        # compare-and-delete of KEYS[1] against ARGV[1].
+        key, value = keys_and_args[0], keys_and_args[1]
+        if self.store.get(key) == value:
+            return 1 if self.store.pop(key, None) is not None else 0
+        return 0
+
 
 @pytest.fixture()
 def auth() -> AuthService:
@@ -110,6 +118,26 @@ async def test_refresh_lock_is_released_after_a_refresh(auth):
     )
     await auth.get_valid_access_token("s1")
     assert f"{REFRESH_LOCK_PREFIX}s1" not in auth._redis.store
+
+
+@pytest.mark.asyncio
+async def test_release_only_deletes_own_lock(auth, monkeypatch):
+    seed_session(auth, session_blob(make_token(-10)))
+    monkeypatch.setattr(
+        "app.services.auth_service.secrets.token_hex", lambda n: "our-token"
+    )
+
+    async def refresh(_refresh_token: str) -> dict[str, Any]:
+        # Simulate our lock outliving its TTL mid-refresh and a later holder
+        # taking it over before we get back around to releasing.
+        auth._redis.store[f"{REFRESH_LOCK_PREFIX}s1"] = "someone-elses-token"
+        return {"access_token": make_token(300), "expires_in": 300}
+
+    auth.refresh_tokens = AsyncMock(side_effect=refresh)
+
+    await auth.get_valid_access_token("s1")
+
+    assert auth._redis.store[f"{REFRESH_LOCK_PREFIX}s1"] == "someone-elses-token"
 
 
 @pytest.mark.asyncio
