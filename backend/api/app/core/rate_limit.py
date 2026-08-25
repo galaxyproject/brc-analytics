@@ -37,12 +37,14 @@ class RateLimiter:
         self.window = window
         self.namespace = namespace
 
-    def _get_client_key(self, request: Request) -> str:
-        """Generate rate limit key for a client based on IP address.
+    def _get_client_key(self, request: Request, principal: str | None = None) -> str:
+        """Rate-limit key: the authenticated principal when given, else client IP.
 
         Honors X-Forwarded-For only when TRUST_PROXY_HEADERS is set --
         otherwise XFF is spoofable and breaks per-IP rate limits.
         """
+        if principal:
+            return f"{self.namespace}:user:{principal}"
         client_ip = request.client.host if request.client else "unknown"
         if get_settings().TRUST_PROXY_HEADERS:
             forwarded = request.headers.get("x-forwarded-for")
@@ -57,14 +59,14 @@ class RateLimiter:
                         break
         return f"{self.namespace}:{client_ip}"
 
-    async def check(self, request: Request) -> dict:
+    async def check(self, request: Request, principal: str | None = None) -> dict:
         """
         Check if request is allowed under rate limit.
 
         Returns dict with rate limit info.
         Raises HTTPException 429 if rate limit exceeded.
         """
-        key = self._get_client_key(request)
+        key = self._get_client_key(request, principal)
 
         try:
             # Use Redis INCR with TTL for atomic counter
