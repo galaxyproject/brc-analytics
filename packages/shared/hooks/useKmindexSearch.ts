@@ -128,6 +128,10 @@ export interface KmindexSubmission {
 
 interface KmindexSearchState {
   error: string | null;
+  // Which Galaxy account the running search was submitted under: "user" for
+  // the signed-in visitor's own, "service" for the shared BRC account. Null
+  // until a submission answers -- a job reattached from ?job= never learns it.
+  identity: string | null;
   indexes: string[];
   isLoadingIndexes: boolean;
   isLoadingResults: boolean;
@@ -148,6 +152,7 @@ export const PAGE_SIZE = 25;
 
 const INITIAL_STATE: KmindexSearchState = {
   error: null,
+  identity: null,
   indexes: [],
   isLoadingIndexes: true,
   isLoadingResults: false,
@@ -336,6 +341,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
       setState((prev) => ({
         ...prev,
         error: null,
+        identity: null,
         isSubmitting: true,
         jobId: null,
         jobStatus: null,
@@ -343,15 +349,20 @@ export const useKmindexSearch = (): KmindexSearchActions &
       }));
 
       try {
-        const { job_id } = await ky
+        const { identity, job_id } = await ky
           .post(`${API_BASE_URL}/galaxy/kmindex/submit`, {
             credentials: "include",
             json: submission,
             timeout: 120000,
           })
-          .json<{ job_id: string }>();
+          .json<{ identity?: string | null; job_id: string }>();
 
-        setState((prev) => ({ ...prev, isSubmitting: false, jobId: job_id }));
+        setState((prev) => ({
+          ...prev,
+          identity: identity ?? null,
+          isSubmitting: false,
+          jobId: job_id,
+        }));
         syncJobParam(job_id);
         startPolling(job_id);
       } catch (error: unknown) {
