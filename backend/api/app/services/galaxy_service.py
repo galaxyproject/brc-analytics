@@ -47,6 +47,26 @@ class GalaxyAccountNotLinkedError(Exception):
     """
 
 
+# Galaxy answers 401 for two very different things: a token it decoded but
+# has no linked account for ("Cannot locate user by access token. The user
+# should log into Galaxy at least once with this OIDC provider.") and a token
+# it rejected outright ("Invalid access token."), which means a bad audience,
+# scope, or signature. Only the first is something the user can fix by
+# connecting their account -- see galaxy/lib/galaxy/authnz/managers.py.
+UNLINKED_ACCOUNT_MARKERS = ("locate user", "log into galaxy")
+
+
+def _is_unlinked_account_error(e: BioblendConnectionError) -> bool:
+    """Whether this 401 is Galaxy saying the account is merely unlinked."""
+    if getattr(e, "status_code", None) != 401:
+        return False
+    body = getattr(e, "body", None) or ""
+    if isinstance(body, bytes):
+        body = body.decode("utf-8", errors="replace")
+    lowered = str(body).lower()
+    return any(marker in lowered for marker in UNLINKED_ACCOUNT_MARKERS)
+
+
 # kmindex splits an index into shards and emits one JSON dataset per shard, so a
 # single query fans out into dozens of dataset downloads. Galaxy answers 429 if
 # those go out unthrottled.
@@ -367,7 +387,14 @@ class GalaxyService:
                 and self.credential is not None
                 and self.credential.kind == "user"
             ):
-                raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
+                # The body distinguishes "connect your account" from "this
+                # token is wrong"; it never contains the token itself.
+                logger.warning(
+                    "Galaxy rejected the user's bearer token: %s",
+                    getattr(e, "body", ""),
+                )
+                if _is_unlinked_account_error(e):
+                    raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
 
@@ -1211,6 +1238,11 @@ class GalaxyService:
 
         except Exception as e:
             logger.error(f"Error getting or creating shared history: {e}")
+            if self.credential is not None and self.credential.kind == "user":
+                # Never litter someone's own account with timestamped strays
+                # over a transient blip, and let an unlinked 401 travel intact
+                # to the connect-prompt mapping instead of dying here.
+                raise
             # Fallback to creating a new history with timestamp
             fallback_name = f"{shared_history_name} - {int(time.time())}"
             logger.warning(f"Falling back to creating history: {fallback_name}")

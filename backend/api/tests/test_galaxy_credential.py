@@ -1,6 +1,7 @@
 """Credential resolution: user bearer wins, service key is the anonymous
 fallback, and GalaxyService passes each to bioblend the right way."""
 
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -8,6 +9,18 @@ import pytest
 from app.core.dependencies import get_galaxy_credential
 from app.core.galaxy_credential import GalaxyCredential
 from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
+
+# Verbatim from galaxy/lib/galaxy/authnz/managers.py -- the two 401s we have
+# to tell apart.
+UNLINKED_BODY = json.dumps(
+    {
+        "err_msg": (
+            "Cannot locate user by access token. The user should log into "
+            "Galaxy at least once with this OIDC provider."
+        )
+    }
+)
+INVALID_TOKEN_BODY = json.dumps({"err_msg": "Invalid access token."})
 
 
 def make_auth(token: str | None, sub: str | None = "u1") -> MagicMock:
@@ -175,24 +188,75 @@ def test_galaxy_login_url_derives_from_api_url(monkeypatch):
     get_settings.cache_clear()
 
 
+def _user_service() -> GalaxyService:
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        return GalaxyService(
+            MagicMock(), credential=GalaxyCredential(kind="user", secret="t")
+        )
+
+
+def _submission():
+    from app.models.galaxy import KmindexQuerySubmission
+
+    return KmindexQuerySubmission(
+        sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
+        indexes=["GENOMIC_BCT"],
+    )
+
+
 @pytest.mark.asyncio
 async def test_unlinked_401_becomes_account_not_linked_error():
     from bioblend import ConnectionError as BioblendConnectionError
 
+    svc = _user_service()
+    err = BioblendConnectionError("401", body=UNLINKED_BODY, status_code=401)
+    svc._get_or_create_shared_history = AsyncMock(side_effect=err)
+
+    with pytest.raises(GalaxyAccountNotLinkedError):
+        await svc.submit_kmindex_query(_submission())
+
+
+@pytest.mark.asyncio
+async def test_invalid_token_401_is_not_a_connect_prompt():
+    """A rejected token means bad audience/scope/signature -- connecting the
+    account would not fix it, so it must not masquerade as a link prompt."""
+    from bioblend import ConnectionError as BioblendConnectionError
+
+    svc = _user_service()
+    err = BioblendConnectionError("401", body=INVALID_TOKEN_BODY, status_code=401)
+    svc._get_or_create_shared_history = AsyncMock(side_effect=err)
+
+    with pytest.raises(Exception) as excinfo:
+        await svc.submit_kmindex_query(_submission())
+    assert not isinstance(excinfo.value, GalaxyAccountNotLinkedError)
+
+
+@pytest.mark.asyncio
+async def test_user_history_failure_does_not_fall_back_to_a_timestamped_history():
+    svc = _user_service()
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(side_effect=RuntimeError("boom"))
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h9"})
+
+    with pytest.raises(RuntimeError):
+        await svc._get_or_create_shared_history()
+    svc.gi.histories.create_history.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_service_history_failure_still_falls_back():
+    cache = MagicMock()
     with patch("app.services.galaxy_service.GalaxyInstance"):
         svc = GalaxyService(
-            MagicMock(), credential=GalaxyCredential(kind="user", secret="t")
+            cache, credential=GalaxyCredential(kind="service", secret="k")
         )
-    err = BioblendConnectionError("401", body="", status_code=401)
-    svc._get_or_create_shared_history = AsyncMock(side_effect=err)
-    from app.models.galaxy import KmindexQuerySubmission
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(side_effect=RuntimeError("boom"))
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h9"})
 
-    submission = KmindexQuerySubmission(
-        sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
-        indexes=["GENOMIC_BCT"],
-    )
-    with pytest.raises(GalaxyAccountNotLinkedError):
-        await svc.submit_kmindex_query(submission)
+    assert await svc._get_or_create_shared_history() == "h9"
+    name = svc.gi.histories.create_history.call_args.kwargs["name"]
+    assert name.startswith("BRC ANALYTICS JOBS - ")
 
 
 @pytest.mark.asyncio
