@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.dialects.postgresql import UUID
@@ -184,7 +185,7 @@ class GalaxyJob(Base):
         nullable=False,
         index=True,
     )
-    galaxy_job_id: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    galaxy_job_id: Mapped[str] = mapped_column(Text, nullable=False)
     galaxy_instance_url: Mapped[str] = mapped_column(Text, nullable=False)
     tool: Mapped[str] = mapped_column(String(64), nullable=False)
     params: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
@@ -192,6 +193,12 @@ class GalaxyJob(Base):
         DateTime(timezone=True),
         default=utcnow,
         nullable=False,
+    )
+
+    __table_args__ = (
+        # Named to match migration 0004, which names it explicitly rather
+        # than relying on a backend-generated name.
+        UniqueConstraint("galaxy_job_id", name="uq_galaxy_jobs_galaxy_job_id"),
     )
 
 

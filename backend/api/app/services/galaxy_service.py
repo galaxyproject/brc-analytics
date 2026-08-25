@@ -56,7 +56,7 @@ class GalaxyAccountNotLinkedError(Exception):
 UNLINKED_ACCOUNT_MARKERS = ("locate user", "log into galaxy")
 
 
-def _is_unlinked_account_error(e: BioblendConnectionError) -> bool:
+def is_unlinked_account_error(e: BioblendConnectionError) -> bool:
     """Whether this 401 is Galaxy saying the account is merely unlinked."""
     if getattr(e, "status_code", None) != 401:
         return False
@@ -388,10 +388,10 @@ class GalaxyService:
                 # The body distinguishes "connect your account" from "this
                 # token is wrong"; it never contains the token itself.
                 logger.warning(
-                    "Galaxy rejected the user's bearer token: %s",
+                    "Galaxy returned 401 for the user's bearer token: %s",
                     getattr(e, "body", ""),
                 )
-                if _is_unlinked_account_error(e):
+                if is_unlinked_account_error(e):
                     raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
