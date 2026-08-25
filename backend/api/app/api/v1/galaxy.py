@@ -32,7 +32,7 @@ from app.models.galaxy import (
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
     GalaxyService,
-    _is_unlinked_account_error,
+    is_unlinked_account_error,
 )
 from app.services.sra_mirror import (
     SRAMirrorService,
@@ -87,10 +87,10 @@ async def get_galaxy_account(
         if isinstance(e, BioblendConnectionError):
             if getattr(e, "status_code", None) == 401:
                 logger.warning(
-                    "Galaxy rejected the user's bearer token: %s",
+                    "Galaxy returned 401 for the user's bearer token: %s",
                     getattr(e, "body", ""),
                 )
-            if _is_unlinked_account_error(e):
+            if is_unlinked_account_error(e):
                 return GalaxyAccountStatus(
                     galaxy_login_url=galaxy_service.galaxy_login_url(),
                     identity="user",

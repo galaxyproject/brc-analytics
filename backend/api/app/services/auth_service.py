@@ -253,7 +253,10 @@ class AuthService:
             session = await self.get_session(session_id)
             if session and self._token_is_usable(session["access_token"]):
                 return session["access_token"]
-        logger.warning("Gave up waiting for a concurrent token refresh on this session")
+        logger.warning(
+            "Gave up waiting for a concurrent token refresh on session %s...",
+            session_id[:8],
+        )
         return None
 
     async def get_valid_access_token(self, session_id: str) -> str | None:
