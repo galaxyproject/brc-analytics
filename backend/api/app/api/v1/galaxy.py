@@ -13,8 +13,10 @@ from app.core.dependencies import (
     check_rate_limit,
     check_submit_rate_limit,
     get_cache_service,
+    get_galaxy_credential,
     get_sra_mirror_service,
 )
+from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     GalaxyJobResponse,
     GalaxyJobResult,
@@ -39,9 +41,10 @@ router = APIRouter()
 async def get_galaxy_service(
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
+    credential: Optional[GalaxyCredential] = Depends(get_galaxy_credential),
 ) -> GalaxyService:
     """Dependency to get Galaxy service instance."""
-    return GalaxyService(cache, sra_mirror=sra_mirror)
+    return GalaxyService(cache, sra_mirror=sra_mirror, credential=credential)
 
 
 @router.get("/health")
