@@ -143,9 +143,10 @@ export const ChatPanel = ({
       />
 
       <InputRow>
-        {/* Only once there is something to save -- on an empty chat the hint
-        describes nothing. */}
-        {isConfigured && isAuthenticated && messages.length > 0 && (
+        {/* >= 2 matches the sign-in prompt below: a real turn (user message
+        plus reply) has to complete before there is anything saved to point
+        at, not just the user's own message. */}
+        {isConfigured && isAuthenticated && messages.length >= 2 && (
           <Typography color="text.secondary" variant="caption">
             Saved to your account
           </Typography>
