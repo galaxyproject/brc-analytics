@@ -19,10 +19,11 @@ import { ENTITY_TYPE_DISPLAY, getFavoriteLabel } from "./utils";
  * @returns the section element.
  */
 export function FavoritesSection({ entityType }: Props): JSX.Element {
-  // error is deliberately not read here -- both instances of this section
-  // share one favorites fetch, so AccountView surfaces that failure once at
-  // the workspace level instead of once per section.
-  const { favorites, isLoading, toggleFavorite, togglingKey } = useFavorites();
+  // error is read only to suppress the empty-state copy below -- AccountView
+  // still owns the single workspace-level alert, so it is not passed on to
+  // AccountSection's own error prop (that would render a second alert here).
+  const { error, favorites, isLoading, toggleFavorite, togglingKey } =
+    useFavorites();
   const { emptyState, entityRoute, title } = ENTITY_TYPE_DISPLAY[entityType];
 
   const items = useMemo(
@@ -34,9 +35,13 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
     <AccountSection
       count={items.length}
       emptyState={
-        <Typography color="text.secondary" variant="body2">
-          {emptyState}
-        </Typography>
+        // A failed load is not evidence the user has nothing saved -- render
+        // nothing here rather than the "nothing saved" copy.
+        error ? undefined : (
+          <Typography color="text.secondary" variant="body2">
+            {emptyState}
+          </Typography>
+        )
       }
       id={entityRoute}
       isLoading={isLoading}
