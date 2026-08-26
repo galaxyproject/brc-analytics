@@ -139,9 +139,18 @@ def get_species_tree(assemblies_df, taxonomic_levels):
     Returns:
       A nested tree structure of species
     """
-    # Generate the tree, filling NA in the assemblies dataframe to enable grouping for absent values
+    # Generate the tree, filling NA in the assemblies dataframe (limited to taxon columns) to enable grouping for absent values
+    all_taxonomic_level_column_names = [
+        get_key(level)
+        for level in taxonomic_levels
+        for get_key in (get_taxonomic_level_key, get_taxonomic_level_id_key)
+    ]
     return get_species_subtree(
-        "root", "1", "NA", assemblies_df.fillna(""), taxonomic_levels
+        "root",
+        "1",
+        "NA",
+        assemblies_df[all_taxonomic_level_column_names].fillna(""),
+        taxonomic_levels,
     )
 
 
