@@ -1177,6 +1177,7 @@ def get_outbreak_taxonomy_ids(
             # optional per outbreak, so the column may be absent entirely.
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
+                .map(json.loads, na_action="ignore")
                 .explode()
                 .dropna()
                 .astype("string")

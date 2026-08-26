@@ -1,54 +1,52 @@
 from pathlib import Path
+from typing import ClassVar
 
 import dlt
-import pandas as pd
-from linkml_runtime.loaders import YAMLLoader
+import yaml
 
 from ..generated_schema import schema
 from ..utils import get_db_path_string
 
 
-def read_dataframe_from_yaml(
-    yaml_path: Path, schema_model: type[schema.ConfiguredBaseModel], list_key: str
-):
+def read_entity_list_from_yaml(yaml_path: Path, list_key: str):
     """
-    Reads a YAML file using a given Pydantic model, and creates a dataframe from a list of entities provided by the data.
+    Reads a YAML file and extracts a list of entities provided therein.
 
     Args:
         yaml_path: Path of the YAML file to read.
-        schema_model: Pydantic model representing the root schema class for the YAML file.
         list_key: Key of the root object in which the list of entities is held.
 
     Returns:
-        df: Dataframe representing the list of entities.
+        entities: List of entities.
     """
-    yaml_data = YAMLLoader().load(source=str(yaml_path), target_class=schema_model)
-    return pd.DataFrame(row.model_dump() for row in getattr(yaml_data, list_key))
+    with yaml_path.open() as f:
+        yaml_data = yaml.safe_load(f)
+    return yaml_data[list_key]
 
 
 def read_assemblies(assemblies_path: Path):
-    return read_dataframe_from_yaml(assemblies_path, schema.Assemblies, "assemblies")
+    return read_entity_list_from_yaml(assemblies_path, "assemblies")
 
 
 def read_organisms(organisms_path: Path):
-    return read_dataframe_from_yaml(organisms_path, schema.Organisms, "organisms")
+    return read_entity_list_from_yaml(organisms_path, "organisms")
 
 
 def read_outbreaks(outbreaks_path: Path):
-    return read_dataframe_from_yaml(outbreaks_path, schema.Outbreaks, "outbreaks")
+    return read_entity_list_from_yaml(outbreaks_path, "outbreaks")
 
 
-@dlt.resource(name="outbreaks", write_disposition="replace")
+@dlt.resource(name="outbreaks", write_disposition="replace", columns=schema.Outbreak)
 def outbreaks_source(outbreaks_path: Path):
     yield read_outbreaks(outbreaks_path)
 
 
-@dlt.resource(name="organisms", write_disposition="replace")
+@dlt.resource(name="organisms", write_disposition="replace", columns=schema.Organism)
 def organisms_source(organisms_path: Path):
     yield read_organisms(organisms_path)
 
 
-@dlt.resource(name="assemblies", write_disposition="replace")
+@dlt.resource(name="assemblies", write_disposition="replace", columns=schema.Assembly)
 def assemblies_source(assemblies_path: Path):
     yield read_assemblies(assemblies_path)
 
@@ -86,9 +84,9 @@ def load_catalog_source_data(
     Args:
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       dlt_pipeline_prefix: Catalog-specific prefix applied to the dlt pipeline name
-      assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include `taxonomy_id` and `synonyms` columns, the latter containing a list of curated synonyms or None per organism)
-      outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
+      assemblies_path: Path of source assemblies YAML
+      organisms_path: Path of source organisms YAML
+      outbreaks_path: Path of source outbreaks YAML, or None for catalogs without outbreaks
     """
     pipeline = dlt.pipeline(
         pipeline_name=dlt_pipeline_prefix + "catalog_source",
