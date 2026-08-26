@@ -26,7 +26,7 @@ export function FavoriteButton({
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { error, isFavorited, isLoading, toggleFavorite, togglingKey } =
+  const { error, isFavorited, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
 
   // Login is off on this site -- a permanent state, not a loading one -- so
@@ -54,7 +54,9 @@ export function FavoriteButton({
     <Button
       // Only this entity's own toggle disables it -- gating on the shared
       // isToggling flag would freeze every control on the page.
-      disabled={isLoading || togglingKey === favoriteKey(entityType, entityId)}
+      disabled={
+        isLoading || togglingKeys.has(favoriteKey(entityType, entityId))
+      }
       onClick={() => void toggleFavorite(entityType, entityId)}
       startIcon={favorited ? <StarIcon /> : <StarBorderIcon />}
       variant={favorited ? "contained" : "outlined"}

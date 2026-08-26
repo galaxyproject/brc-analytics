@@ -29,7 +29,7 @@ export function FavoriteCell({
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { isFavorited, isLoading, toggleFavorite, togglingKey } =
+  const { isFavorited, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
 
   // Login is off on this site -- a permanent state, not a loading one.
@@ -55,10 +55,10 @@ export function FavoriteCell({
         // isLoading covers the window before the initial GET /favorites
         // resolves, when isFavorited reads an empty set -- a click there
         // would fire a create for an entity that may already be saved.
-        // Only the row in flight is disabled by togglingKey -- gating on the
-        // shared isToggling flag would freeze every star in the table.
+        // Only the rows in flight are disabled -- gating on the shared
+        // isToggling flag would freeze every star in the table.
         disabled={
-          isLoading || togglingKey === favoriteKey(entityType, entityId)
+          isLoading || togglingKeys.has(favoriteKey(entityType, entityId))
         }
         onClick={handleClick}
         size="small"

@@ -45,7 +45,7 @@ function setFavorites(overrides = {}): jest.Mock {
     isLoading: false,
     isToggling: false,
     toggleFavorite,
-    togglingKey: null,
+    togglingKeys: new Set<string>(),
     ...overrides,
   } as unknown as ReturnType<typeof useFavorites>);
   return toggleFavorite;
@@ -118,7 +118,10 @@ describe("FavoriteButton", () => {
   });
 
   test("disables only while this entity is in flight", () => {
-    setFavorites({ isToggling: true, togglingKey: "organism:5833" });
+    setFavorites({
+      isToggling: true,
+      togglingKeys: new Set(["organism:5833"]),
+    });
 
     render(
       <FavoriteButton entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />

@@ -37,7 +37,7 @@ const FavoritesContext = createContext<FavoritesContextValue>({
   isLoading: false,
   isToggling: false,
   toggleFavorite: async () => {},
-  togglingKey: null,
+  togglingKeys: new Set<string>(),
 });
 
 /**
@@ -59,8 +59,14 @@ export function FavoritesProvider({
   const { isAuthenticated, isConfigured } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [togglingKey, setTogglingKey] = useState<string | null>(null);
+  const [togglingKeys, setTogglingKeys] = useState<Set<string>>(
+    () => new Set()
+  );
   const [error, setError] = useState<Error | null>(null);
+  // Mirrors togglingKeys for the re-entry check below, which has to be
+  // synchronous: setState is not, so two clicks in one tick would both read
+  // an empty set and both fire.
+  const pendingRef = useRef<Set<string>>(new Set());
   // Read inside toggleFavorite so the callback identity never changes -- a
   // changing identity would re-render every row of both tables.
   const keysRef = useRef<Set<string>>(new Set());
@@ -123,10 +129,14 @@ export function FavoritesProvider({
   const toggleFavorite = useCallback(
     async (entityType: FavoriteEntityType, entityId: string): Promise<void> => {
       const key = favoriteKey(entityType, entityId);
+      // One in-flight request per entity. Only the row being toggled is
+      // disabled, so toggling a second row re-enables the first while its
+      // request is still outstanding -- and a click then would fire a second
+      // create off the same pre-toggle snapshot and list the favorite twice.
+      if (pendingRef.current.has(key)) return;
+      pendingRef.current.add(key);
       setError(null);
-      // Gate re-entry so a double-click cannot fire two calls off the same
-      // pre-toggle snapshot.
-      setTogglingKey(key);
+      setTogglingKeys(new Set(pendingRef.current));
       try {
         if (!keysRef.current.has(key)) {
           const favorite = await apiClient.createFavorite(entityId, entityType);
@@ -150,7 +160,8 @@ export function FavoritesProvider({
         // with the server.
         setError(err instanceof Error ? err : new Error(String(err)));
       } finally {
-        setTogglingKey(null);
+        pendingRef.current.delete(key);
+        setTogglingKeys(new Set(pendingRef.current));
       }
     },
     []
@@ -168,11 +179,11 @@ export function FavoritesProvider({
       favorites,
       isFavorited,
       isLoading,
-      isToggling: togglingKey !== null,
+      isToggling: togglingKeys.size > 0,
       toggleFavorite,
-      togglingKey,
+      togglingKeys,
     }),
-    [error, favorites, isFavorited, isLoading, toggleFavorite, togglingKey]
+    [error, favorites, isFavorited, isLoading, toggleFavorite, togglingKeys]
   );
 
   return (

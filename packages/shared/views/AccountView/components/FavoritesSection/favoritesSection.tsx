@@ -22,7 +22,7 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
   // error is read only to suppress the empty-state copy below -- AccountView
   // still owns the single workspace-level alert, so it is not passed on to
   // AccountSection's own error prop (that would render a second alert here).
-  const { error, favorites, isLoading, toggleFavorite, togglingKey } =
+  const { error, favorites, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
   const { emptyState, entityRoute, title } = ENTITY_TYPE_DISPLAY[entityType];
 
@@ -60,10 +60,9 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
                     Open
                   </Button>
                   <Button
-                    disabled={
-                      togglingKey ===
+                    disabled={togglingKeys.has(
                       favoriteKey(entityType, favorite.entity_id)
-                    }
+                    )}
                     onClick={() =>
                       void toggleFavorite(entityType, favorite.entity_id)
                     }

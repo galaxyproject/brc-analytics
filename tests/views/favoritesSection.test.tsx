@@ -55,7 +55,7 @@ function renderSection(
     isLoading: false,
     isToggling: false,
     toggleFavorite: jest.fn(),
-    togglingKey: null,
+    togglingKeys: new Set<string>(),
     ...overrides,
   } as unknown as ReturnType<typeof useFavorites>);
 
@@ -74,13 +74,13 @@ describe("FavoritesSection", () => {
   });
 
   test("disables Remove for the row currently toggling, using the shared favoriteKey format", () => {
-    renderSection({ togglingKey: "assembly:GCF_000001405.40" });
+    renderSection({ togglingKeys: new Set(["assembly:GCF_000001405.40"]) });
 
     expect(screen.getByRole("button", { name: "Remove" })).toBeDisabled();
   });
 
   test("leaves Remove enabled when a different row is toggling", () => {
-    renderSection({ togglingKey: "organism:5833" });
+    renderSection({ togglingKeys: new Set(["organism:5833"]) });
 
     expect(screen.getByRole("button", { name: "Remove" })).not.toBeDisabled();
   });
