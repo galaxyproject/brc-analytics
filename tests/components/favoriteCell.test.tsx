@@ -45,7 +45,7 @@ function setFavorites(overrides = {}): jest.Mock {
     isLoading: false,
     isToggling: false,
     toggleFavorite,
-    togglingKey: null,
+    togglingKeys: new Set<string>(),
     ...overrides,
   } as unknown as ReturnType<typeof useFavorites>);
   return toggleFavorite;
@@ -113,7 +113,10 @@ describe("FavoriteCell", () => {
   });
 
   test("disables only the row being toggled", () => {
-    setFavorites({ isToggling: true, togglingKey: "assembly:SOME_OTHER" });
+    setFavorites({
+      isToggling: true,
+      togglingKeys: new Set(["assembly:SOME_OTHER"]),
+    });
 
     render(
       <FavoriteCell entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />

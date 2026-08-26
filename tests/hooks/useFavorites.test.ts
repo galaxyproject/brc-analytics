@@ -152,7 +152,7 @@ describe("useFavorites", () => {
       );
     });
 
-    expect(result.current.togglingKey).toBe(`assembly:${ACCESSION}`);
+    expect(result.current.togglingKeys.has(`assembly:${ACCESSION}`)).toBe(true);
     expect(result.current.isToggling).toBe(true);
 
     await act(async () => {
@@ -163,7 +163,59 @@ describe("useFavorites", () => {
       await togglePromise;
     });
 
-    expect(result.current.togglingKey).toBeNull();
+    expect(result.current.togglingKeys.size).toBe(0);
+  });
+
+  test("a row stays disabled while another row is toggled", async () => {
+    // Only the row being toggled is disabled, so if the pending set held one
+    // key, starting a second toggle would re-enable the first mid-flight --
+    // and a click there fires a second create off the same stale snapshot,
+    // listing the favorite twice.
+    // Left unresolved: both toggles have to still be in flight at the assert.
+    const inFlight: Promise<void>[] = [];
+    mockClient.createFavorite.mockImplementation(
+      () => new Promise<FavoriteResponse>(() => undefined)
+    );
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      inFlight.push(
+        result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION)
+      );
+    });
+    act(() => {
+      inFlight.push(
+        result.current.toggleFavorite(ENTITY_TYPE.ORGANISM, "5833")
+      );
+    });
+
+    expect(inFlight).toHaveLength(2);
+    expect(result.current.togglingKeys.has(`assembly:${ACCESSION}`)).toBe(true);
+    expect(result.current.togglingKeys.has("organism:5833")).toBe(true);
+  });
+
+  test("a repeat toggle of an in-flight entity is dropped, not duplicated", async () => {
+    mockClient.createFavorite.mockImplementation(
+      () => new Promise<FavoriteResponse>(() => undefined)
+    );
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const calls: Promise<void>[] = [];
+    act(() => {
+      calls.push(
+        result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION)
+      );
+      calls.push(
+        result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION)
+      );
+    });
+
+    expect(calls).toHaveLength(2);
+    expect(mockClient.createFavorite).toHaveBeenCalledTimes(1);
   });
 
   test("clears the toggling key and records error when a toggle fails", async () => {

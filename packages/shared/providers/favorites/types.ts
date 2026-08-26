@@ -13,5 +13,5 @@ export interface FavoritesContextValue {
     entityType: FavoriteEntityType,
     entityId: string
   ) => Promise<void>;
-  togglingKey: string | null;
+  togglingKeys: Set<string>;
 }

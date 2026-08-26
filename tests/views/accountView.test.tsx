@@ -72,7 +72,7 @@ function setFavorites(favorites: unknown[] = []): void {
     isLoading: false,
     isToggling: false,
     toggleFavorite: jest.fn(),
-    togglingKey: null,
+    togglingKeys: new Set<string>(),
   } as unknown as ReturnType<typeof useFavorites>);
 }
 
@@ -241,7 +241,7 @@ describe("AccountView", () => {
       isLoading: false,
       isToggling: false,
       toggleFavorite: jest.fn(),
-      togglingKey: null,
+      togglingKeys: new Set<string>(),
     } as unknown as ReturnType<typeof useFavorites>);
 
     renderAccountView();
