@@ -1424,7 +1424,7 @@ def build_files(
     dlt_pipeline_prefix,
     build_meta_output_path,
     taxonomic_group_sets=None,
-    do_gene_model_urls=False,  # TODO re-enable
+    do_gene_model_urls=True,
     extract_primary_data=False,
     primary_output_path=None,
     qc_report_path=None,
