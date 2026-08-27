@@ -1,16 +1,16 @@
-import type { EntityStoreKey } from "./types";
+import type { EntityRoute } from "./types";
 
 // entityListType -> T[]
-const ENTITIES_BY_TYPE = new Map<EntityStoreKey, unknown[]>();
+const ENTITIES_BY_TYPE = new Map<EntityRoute, unknown[]>();
 
 // entityListType -> entityId -> T
-const ENTITIES_BY_ENTITY_ID = new Map<EntityStoreKey, Map<string, unknown>>();
+const ENTITIES_BY_ENTITY_ID = new Map<EntityRoute, Map<string, unknown>>();
 
 /**
  * Gets entities by entity id.
  * @returns Map of entity list types to entity id to entity.
  */
-export function getEntitiesById(): Map<EntityStoreKey, Map<string, unknown>> {
+export function getEntitiesById(): Map<EntityRoute, Map<string, unknown>> {
   return ENTITIES_BY_ENTITY_ID;
 }
 
@@ -18,7 +18,7 @@ export function getEntitiesById(): Map<EntityStoreKey, Map<string, unknown>> {
  * Gets entities by entity list type.
  * @returns Map of entity list types to entities.
  */
-export function getEntitiesByType(): Map<EntityStoreKey, unknown[]> {
+export function getEntitiesByType(): Map<EntityRoute, unknown[]> {
   return ENTITIES_BY_TYPE;
 }
 
@@ -28,7 +28,7 @@ export function getEntitiesByType(): Map<EntityStoreKey, unknown[]> {
  * @param entitiesById - Map of entity id to entity.
  */
 export function setEntitiesById(
-  entityListType: EntityStoreKey,
+  entityListType: EntityRoute,
   entitiesById: Map<string, unknown>
 ): void {
   ENTITIES_BY_ENTITY_ID.set(entityListType, entitiesById);
@@ -40,7 +40,7 @@ export function setEntitiesById(
  * @param entities - Entities.
  */
 export function setEntitiesByType(
-  entityListType: EntityStoreKey,
+  entityListType: EntityRoute,
   entities: unknown[]
 ): void {
   ENTITIES_BY_TYPE.set(entityListType, entities);
