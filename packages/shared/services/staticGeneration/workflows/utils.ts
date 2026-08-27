@@ -7,10 +7,10 @@ import { promises as fsp } from "fs";
 const categoriesByFile = new Map<string, Promise<WorkflowCategory[]>>();
 
 /**
- * Builds the organism's compatible workflow categories at build time. The
- * feature-flagged assembly category is included — flags are per-user runtime
- * state, so the prerendered data carries the superset and the rendering
- * component applies the flag gate.
+ * Builds the organism's compatible workflow categories at build time. No
+ * feature-flag gating is applied: flags are per-user runtime state, so the
+ * prerendered data carries the flag-inclusive superset and the rendering
+ * component applies the user's flags.
  * @param config - Site config accessor (provides the site's entity configs).
  * @param organism - Organism record.
  * @returns Organism-compatible workflow categories.
@@ -22,7 +22,7 @@ export async function loadOrganismWorkflowCategories(
   const categories = await loadWorkflowCategories(
     getWorkflowsStaticLoadFile(config)
   );
-  return buildOrganismWorkflows(organism, categories, true);
+  return buildOrganismWorkflows(organism, categories);
 }
 
 /**
