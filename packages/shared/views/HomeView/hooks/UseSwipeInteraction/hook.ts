@@ -108,9 +108,10 @@ export function useSwipeInteraction(
   }, []);
 
   // Consume a dispatched swipe action: `swipeAction` is set both by the pointer
-  // handlers and by the public `onSetSwipeAction` API (e.g. the Carousel arrow
-  // buttons). This effect handles the discrete actions (FORWARD/BACKWARD advance
-  // the index; SELECT is a no-op) and acknowledges each by resetting to NONE;
+  // handlers and by the public `onSetSwipeAction` API (e.g. prev/next controls
+  // rendered alongside the swipe-able views). This effect handles the discrete
+  // actions (FORWARD/BACKWARD advance the index; SELECT is a no-op) and
+  // acknowledges each by resetting to NONE;
   // SCROLL/NONE are intentionally ignored. The reset is the "ack" half of a
   // reducer-style action cycle rather than derived state, so it's kept as an
   // effect deliberately: the shared external entry point means the logic can't

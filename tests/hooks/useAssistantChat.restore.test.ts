@@ -11,12 +11,15 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
 }));
 const mockReplace = jest.fn().mockResolvedValue(true);
 let mockQuery: Record<string, string> = {};
+let mockIsReady = true;
 jest.mock("next/router", () => ({
   useRouter: (): {
+    isReady: boolean;
     pathname: string;
     query: Record<string, string>;
     replace: jest.Mock;
   } => ({
+    isReady: mockIsReady,
     pathname: "/assistant",
     query: mockQuery,
     replace: mockReplace,
@@ -47,6 +50,7 @@ describe("useAssistantChat restore", () => {
     jest.clearAllMocks();
     localStorage.clear();
     mockQuery = {};
+    mockIsReady = true;
   });
 
   test("a 404 on a stored session clears the pointer without alarming the user", async () => {

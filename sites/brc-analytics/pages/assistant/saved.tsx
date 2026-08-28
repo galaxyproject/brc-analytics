@@ -12,6 +12,7 @@ import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionH
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
+import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
 import { useRouter } from "next/router";
 import { type JSX, useEffect, useState } from "react";
 
@@ -99,7 +100,7 @@ export default function Page(): JSX.Element {
       const restored = await apiClient.restoreSavedAnalysis(id);
       await router.push({
         pathname: "/assistant",
-        query: { sessionId: restored.session_id },
+        query: { [ASSISTANT_QUERY_PARAM.SESSION_ID]: restored.session_id },
       });
     } catch (err) {
       setError(

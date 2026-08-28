@@ -1,53 +1,30 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
-import { Button } from "@mui/material";
-import { calculateGridSize } from "@repo/shared/components/layout/SectionHero/components/Hero/common/utils";
-import { Hero } from "@repo/shared/components/layout/SectionHero/components/Hero/hero";
-import { ROUTES } from "@repo/shared/routes/constants";
-import { Fragment, type JSX } from "react";
-import { Carousel } from "./components/Carousel/carousel";
+import { type JSX } from "react";
+import { AssistantPrompt } from "./components/AssistantPrompt/assistantPrompt";
 import {
   Head,
   Headline,
+  HeroImageLeft,
+  HeroImageRight,
   SectionLayout,
   StyledSection,
   Subhead,
-  SubHeadline,
 } from "./sectionHero.styles";
 
 export const SectionHero = (): JSX.Element => {
   return (
     <StyledSection>
-      {(height, width): JSX.Element => (
-        <Fragment>
-          <Hero
-            gridSize={calculateGridSize(height)}
-            height={height}
-            width={width}
-          />
-          <SectionLayout>
-            <Headline>
-              <Head>
-                <span>Analytics for pathogen, </span>
-                <span>host, and vector data</span>
-              </Head>
-              <SubHeadline>
-                <Subhead>
-                  Comprehensive tools and workflows for exploring and
-                  interpreting genomic annotations and functional insights into
-                  disease-causing organisms and their carriers
-                </Subhead>
-                <Button
-                  {...BUTTON_PROPS.PRIMARY_LARGE_CONTAINED}
-                  href={ROUTES.ORGANISMS}
-                >
-                  Get started
-                </Button>
-              </SubHeadline>
-            </Headline>
-            <Carousel />
-          </SectionLayout>
-        </Fragment>
-      )}
+      <HeroImageLeft />
+      <HeroImageRight />
+      <SectionLayout>
+        <Headline>
+          <Head>AI-powered analytics for pathogen, host, and vector data</Head>
+          <Subhead>
+            Ask our AI assistant anything about genomic data. Get instant
+            insights into disease-causing organisms through natural conversation
+          </Subhead>
+        </Headline>
+        <AssistantPrompt />
+      </SectionLayout>
     </StyledSection>
   );
 };
