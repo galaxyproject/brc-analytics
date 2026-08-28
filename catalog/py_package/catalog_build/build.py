@@ -234,7 +234,7 @@ def get_genomes_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     genomes_df["strain"] = ncbi_genomes_df["organism__infraspecific_names"].map(
-        lambda names: json.loads(names).get("strain", ""), na_action="ignore"
+        lambda names: json.loads(names).get("strain"), na_action="ignore"
     )
     genomes_df["isRef"] = (
         ncbi_genomes_df["assembly_info__refseq_category"] == "reference genome"
@@ -408,14 +408,14 @@ def report_missing_values(
 
 def report_inconsistent_taxonomy_ids(df):
     inconsistent_ids_series = (
-        df.groupby(["species", "strain"])
+        df.groupby(["species", "strain"], dropna=False)
         .filter(lambda g: g["taxonomyId"].nunique() > 1)
-        .groupby(["species", "strain"])["taxonomyId"]
+        .groupby(["species", "strain"], dropna=False)["taxonomyId"]
         .apply(set)
     )
     inconsistent_ids_strings = [
         (
-            f"{species} strain {strain}" if strain else species,
+            f"{species} strain {strain}" if pd.notna(strain) else species,
             # Sort the IDs, since set iteration order isn't consistent between runs
             ", ".join([str(id) for id in sorted(ids, key=int)]),
         )
