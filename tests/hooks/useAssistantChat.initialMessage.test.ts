@@ -178,6 +178,29 @@ describe("useAssistantChat initial message", () => {
     );
   });
 
+  test("treats a question of whitespace as no question at all", async () => {
+    // It would never be asked (sending trims), so acting on it would strip the
+    // param, abandon the stored session and leave a blank conversation behind.
+    mockQuery = { q: "   " };
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockResolvedValue({
+      handoff_url: null,
+      is_complete: false,
+      messages: [],
+      schema_state: null,
+      session_id: STORED_ID,
+      suggestions: [],
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    renderHook(() =>
+      useAssistantChat({ initialMessage: "   ", sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(mockClient.assistantRestore).toHaveBeenCalled());
+    expect(mockClient.assistantChat).not.toHaveBeenCalled();
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
   test("restores the stored session when no question was handed over", async () => {
     mockQuery = {};
     localStorage.setItem(SESSION_KEY, STORED_ID);

@@ -71,6 +71,9 @@ export const useAssistantChat = ({
   const sendingRef = useRef(false);
   const initialMessageSentRef = useRef(false);
   const router = useRouter();
+  // A question of whitespace is no question: it would neither be asked nor
+  // leave the conversation it displaced restorable.
+  const question = initialMessage?.trim();
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
@@ -84,7 +87,7 @@ export const useAssistantChat = ({
     // its own; restoring here would graft it onto whatever came before. Asking
     // it strips it from the URL, so the sent-ref -- not the now-empty param --
     // is what keeps this closed for the rest of the mount.
-    if (initialMessageSentRef.current || initialMessage) return;
+    if (initialMessageSentRef.current || question) return;
 
     const sourceId = initialSessionId ?? localStorage.getItem(sessionKey);
     if (!sourceId) return;
@@ -145,7 +148,7 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-  }, [initialMessage, initialSessionId, router.isReady, sessionKey]);
+  }, [initialSessionId, question, router.isReady, sessionKey]);
 
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
@@ -198,16 +201,16 @@ export const useAssistantChat = ({
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (!initialMessage || initialMessageSentRef.current) return;
+    if (!question || initialMessageSentRef.current) return;
     initialMessageSentRef.current = true;
 
     // The conversation this question opens is its own: a session named in the
     // URL alongside the question is left behind rather than continued, matching
     // the restore this effect's counterpart skips.
     sessionIdRef.current = null;
-    void sendMessage(initialMessage);
+    void sendMessage(question);
     stripQueryParam(router, ASSISTANT_QUERY_PARAM.QUESTION);
-  }, [initialMessage, router, sendMessage]);
+  }, [question, router, sendMessage]);
 
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
