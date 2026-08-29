@@ -1449,27 +1449,48 @@ class AssistantAgent:
     async def fetch_logan_snapshot(self, job_id: str) -> LoganSnapshot:
         """Read a finished job's cached results into a snapshot.
 
-        Cache-only by design: the results page is the one place that pays
-        for aggregation. Status is checked first so a queued job is told
-        apart from an expired one.
+        Cache-first, and cache-only: the results page is the one place that
+        pays for aggregation. The merged aggregate is keyed by job id in
+        Redis and needs no Galaxy call to read, so a finished search opens
+        whoever ran it -- which matters, because a signed-in user's job runs
+        under their own credential while this reads with the service one and
+        may not be able to see their job at all.
+
+        Status is therefore only consulted to explain a miss: still running,
+        or gone. An unreadable status is itself an answer -- not ours to
+        see -- and reads as expired, which points at the results page rather
+        than failing the request.
         """
         if self.galaxy is None or not self.galaxy.is_available():
             raise AssistantUnavailableError("Logan search is not configured")
-        status = await self.galaxy.get_job_status(job_id)
-        if not status.is_complete:
-            raise LoganJobNotReadyError(job_id, "This search is still running")
-        if not status.is_successful:
-            raise LoganJobFailedError(job_id, "This search failed")
         page = await self.galaxy.get_cached_kmindex_results(
             job_id, limit=LOGAN_TOP_HITS, offset=0
         )
-        if page is None:
-            raise LoganJobNotFoundError(
-                job_id, "This search's results are not cached; re-run it"
+        if page is not None:
+            return build_logan_snapshot(
+                page, captured_at=datetime.now(timezone.utc).isoformat()
             )
-        return build_logan_snapshot(
-            page, captured_at=datetime.now(timezone.utc).isoformat()
+        raise await self._explain_logan_miss(job_id)
+
+    async def _explain_logan_miss(self, job_id: str) -> LoganJobError:
+        """Why the cache had nothing, as the error to raise."""
+        gone = LoganJobNotFoundError(
+            job_id, "This search's results are not cached; re-run it"
         )
+        try:
+            status = await self.galaxy.get_job_status(job_id)
+        except Exception:
+            logger.info(
+                "Logan job %s: status unreadable with the service credential; "
+                "reporting the uncached result as expired",
+                job_id,
+            )
+            return gone
+        if not status.is_complete:
+            return LoganJobNotReadyError(job_id, "This search is still running")
+        if not status.is_successful:
+            return LoganJobFailedError(job_id, "This search failed")
+        return gone
 
     async def create_logan_session_from_snapshot(
         self, snapshot: LoganSnapshot, owner_keycloak_sub: Optional[str]
