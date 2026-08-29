@@ -27,11 +27,21 @@ from app.models.assistant import (
     SchemaField,
     SessionState,
 )
+from app.models.galaxy import GalaxyJobState
 from app.services.assistant_agent import (
     MAX_HISTORY_MESSAGES,
     AssistantAgent,
     AssistantTimeoutError,
+    AssistantUnavailableError,
+    LoganJobFailedError,
+    LoganJobNotFoundError,
+    LoganJobNotReadyError,
 )
+from app.services.logan_snapshot import build_logan_snapshot
+from tests.test_logan_snapshot import JOB as LOGAN_JOB
+from tests.test_logan_snapshot import results as logan_results
+from tests.test_logan_tools import _galaxy as _logan_galaxy
+from tests.test_logan_tools import _status as _logan_status
 
 
 @pytest.fixture()
@@ -2742,3 +2752,119 @@ class TestDeriveSuggestionsLogan:
     def test_without_logan_unchanged(self, agent):
         chips = agent._derive_suggestions(AnalysisSchema())
         assert chips[0].label == "What organisms do you have?"
+
+
+class TestCreateLoganSession:
+    def _agent(self, galaxy):
+        inst = _extraction_agent("ok", {})
+        inst.galaxy = galaxy
+        inst.catalog.find_organism_exact = MagicMock(
+            return_value={"species": "Plasmodium falciparum", "taxonomy_id": "5833"}
+        )
+        inst.catalog.organisms = []
+        return inst
+
+    @pytest.mark.asyncio
+    async def test_fetch_snapshot_happy_path(self):
+        galaxy = _logan_galaxy(
+            cached=logan_results(), status=_logan_status(GalaxyJobState.OK, True, True)
+        )
+        snap = await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert snap.job_id == LOGAN_JOB
+        assert snap.cohort.in_mirror == 17629
+        galaxy.get_cached_kmindex_results.assert_awaited_once_with(
+            LOGAN_JOB, limit=25, offset=0
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_not_ready(self):
+        galaxy = _logan_galaxy(
+            status=_logan_status(GalaxyJobState.QUEUED, False, False)
+        )
+        with pytest.raises(LoganJobNotReadyError) as e:
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert e.value.results_url == f"/logan-search?job={LOGAN_JOB}"
+
+    @pytest.mark.asyncio
+    async def test_fetch_failed_job(self):
+        galaxy = _logan_galaxy(status=_logan_status(GalaxyJobState.ERROR, True, False))
+        with pytest.raises(LoganJobFailedError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+
+    @pytest.mark.asyncio
+    async def test_fetch_expired(self):
+        galaxy = _logan_galaxy(
+            cached=None, status=_logan_status(GalaxyJobState.OK, True, True)
+        )
+        with pytest.raises(LoganJobNotFoundError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        galaxy._aggregate_shards.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_fetch_unconfigured(self):
+        galaxy = _logan_galaxy()
+        galaxy.is_available.return_value = False
+        with pytest.raises(AssistantUnavailableError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+
+    @pytest.mark.asyncio
+    async def test_create_from_snapshot_builds_the_session(self):
+        inst = self._agent(_logan_galaxy())
+        created = {}
+
+        async def create_session(
+            owner_keycloak_sub=None, *, schema_state=None, messages=None, metadata=None
+        ):
+            state = SessionState(
+                session_id="s-logan",
+                owner_keycloak_sub=owner_keycloak_sub,
+                schema_state=schema_state,
+                messages=messages or [],
+                metadata=metadata or {},
+            )
+            created["state"] = state
+            return state
+
+        inst.session_service = SimpleNamespace(
+            create_session=AsyncMock(side_effect=create_session),
+            save_session=AsyncMock(),
+        )
+        snap = build_logan_snapshot(logan_results(), captured_at="t")
+        state = await inst.create_logan_session_from_snapshot(
+            snap, owner_keycloak_sub="u1"
+        )
+
+        assert state.session_id == "s-logan"
+        assert state.owner_keycloak_sub == "u1"
+        assert state.metadata["logan"]["job_id"] == LOGAN_JOB
+        assert state.schema_state.organism.value == "Plasmodium falciparum"
+        assert state.schema_state.organism.detail == "5833"
+        assert len(state.messages) == 1
+        assert state.messages[0].role == MessageRole.ASSISTANT
+        assert "17,629 runs" in state.messages[0].content
+        assert state.suggestions[0].label in (
+            "Use the reference assembly",
+            "Show me the available assemblies",
+        )
+        assert state.metadata["turn_count"] == 0
+        inst.session_service.save_session.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_chat_response_carries_logan_context(self):
+        inst = _extraction_agent("ok", {})
+        snap = build_logan_snapshot(logan_results(), captured_at="t").model_dump(
+            mode="json"
+        )
+        state = SessionState(session_id="s1", metadata={"logan": snap})
+        _wire_session(inst, state)
+        resp = await inst.chat("hi", session_id="s1")
+        assert resp.logan is not None
+        assert resp.logan.job_id == LOGAN_JOB
+        assert resp.logan.top_organism == "Plasmodium falciparum"
+
+    @pytest.mark.asyncio
+    async def test_chat_response_without_snapshot_has_no_context(self):
+        inst = _extraction_agent("ok", {})
+        _wire_session(inst, SessionState(session_id="s2"))
+        resp = await inst.chat("hi", session_id="s2")
+        assert resp.logan is None

@@ -29,6 +29,7 @@ class SessionService:
         *,
         schema_state: AnalysisSchema | None = None,
         messages: list[ChatMessage] | None = None,
+        metadata: dict | None = None,
     ) -> SessionState:
         session_id = uuid.uuid4().hex
         state = SessionState(
@@ -36,6 +37,7 @@ class SessionService:
             owner_keycloak_sub=owner_keycloak_sub,
             schema_state=schema_state or AnalysisSchema(),
             messages=messages or [],
+            metadata=dict(metadata or {}),
         )
         await self._save(state)
         logger.info(f"Created assistant session {session_id}")
