@@ -70,6 +70,14 @@ logger = logging.getLogger(__name__)
 # fence-break attempts in user text.
 _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
 
+# data_source resolution (structured detail, #1296). "top N" resolves against
+# the session's Logan snapshot; explicit run accessions are captured wherever
+# they appear; upload phrasing mirrors the frontend's keyword list so both
+# ends agree on what "my own data" looks like.
+_TOP_N_RE = re.compile(r"\btop\s+(\d{1,3})\b", re.IGNORECASE)
+_RUN_ACCESSION_RE = re.compile(r"\b[ESD]RR\d{6,}\b")
+_UPLOAD_RE = re.compile(r"\b(upload|user|own|local)\b", re.IGNORECASE)
+
 # Either structured-output trailer keyword. Used to bound a malformed marker's
 # excision so it can't reach past the next trailer -- the prompt places
 # SUGGESTIONS after SCHEMA_UPDATE, so a broken SCHEMA_UPDATE must not swallow it.
@@ -732,6 +740,39 @@ class AssistantAgent:
         return self._apply_schema_updates(schema, {})
 
     @staticmethod
+    def _data_source_detail(value: str, logan: Optional[dict]) -> Optional[str]:
+        """Structured detail for a free-text data_source value, or None.
+
+        The stepper needs accessions, not prose. This is where they get
+        determined -- server-side, once -- so the frontend stops regex-
+        scraping the value. "top N" only means something in a Logan session;
+        without a snapshot it is left alone rather than guessed at.
+        """
+        accessions: list[str] = []
+        payload: dict = {}
+        top = _TOP_N_RE.search(value)
+        hits = (logan or {}).get("top_hits") or []
+        if top and hits:
+            n = int(top.group(1))
+            accessions = [h["accession"] for h in hits[:n]]
+            payload.update(
+                source="logan",
+                job_id=logan.get("job_id"),
+                requested=n,
+                resolved=len(accessions),
+            )
+        for acc in dict.fromkeys(_RUN_ACCESSION_RE.findall(value)):
+            if acc not in accessions:
+                accessions.append(acc)
+        if accessions:
+            payload.setdefault("source", "ena")
+            payload["accessions"] = accessions
+            return json.dumps(payload)
+        if _UPLOAD_RE.search(value):
+            return json.dumps({"source": "upload"})
+        return None
+
+    @staticmethod
     def _sanitize_entity_id(entity_id: str) -> str:
         """Match frontend sanitizeEntityId: '.' -> '_' for use in route params."""
         return entity_id.replace(".", "_")
@@ -1163,7 +1204,9 @@ class AssistantAgent:
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
             )
-        schema_state = self._apply_schema_updates(state.schema_state, schema_updates)
+        schema_state = self._apply_schema_updates(
+            state.schema_state, schema_updates, logan=state.metadata.get("logan")
+        )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
         # LLM), so they're always consistent with the tracker and can't leak.
@@ -1612,6 +1655,7 @@ class AssistantAgent:
         self,
         current: AnalysisSchema,
         updates: Dict[str, Optional[str]],
+        logan: Optional[dict] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -1681,6 +1725,9 @@ class AssistantAgent:
                     # workflow (Codex).
                     setattr(schema, key, SchemaField())
                     continue
+
+            if key == "data_source":
+                field.detail = self._data_source_detail(str(value), logan)
 
             setattr(schema, key, field)
 
