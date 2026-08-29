@@ -137,3 +137,12 @@ async def test_eval_harness_cache_double_satisfies_session_service():
 
     assert loaded is not None
     assert loaded.messages[0].content == "hello"
+
+
+@pytest.mark.asyncio
+async def test_create_session_stores_metadata():
+    service = SessionService(FakeCache())
+    state = await service.create_session(metadata={"logan": {"job_id": "abc"}})
+    assert state.metadata == {"logan": {"job_id": "abc"}}
+    loaded = await service.get_session(state.session_id)
+    assert loaded.metadata == {"logan": {"job_id": "abc"}}

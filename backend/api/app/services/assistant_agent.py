@@ -6,6 +6,7 @@ import json
 import logging
 import re
 import time
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
@@ -38,7 +39,19 @@ from app.models.assistant import (
     TurnOutcome,
     TurnTelemetry,
 )
-from app.services.logan_prompt import LOGAN_TOOLS_PROMPT, render_logan_instructions
+from app.models.logan import LoganSnapshot
+from app.services.logan_prompt import (
+    LOGAN_TOOLS_PROMPT,
+    render_logan_instructions,
+    render_logan_intro,
+)
+from app.services.logan_snapshot import (
+    LOGAN_TOP_HITS,
+    build_logan_snapshot,
+    logan_context_from,
+    prefill_from_logan,
+    results_url_for,
+)
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
@@ -136,6 +149,28 @@ class AssistantUnavailableError(RuntimeError):
     the assistant is unavailable is true, so it's the only thing that should
     reach a 503. An unrelated RuntimeError is a bug, not an outage.
     """
+
+
+class LoganJobError(Exception):
+    """A Logan job the assistant cannot open a session on. Carries the
+    results URL so the API layer can send the person somewhere that can."""
+
+    def __init__(self, job_id: str, message: str):
+        super().__init__(message)
+        self.job_id = job_id
+        self.results_url = results_url_for(job_id)
+
+
+class LoganJobNotFoundError(LoganJobError):
+    """No cached aggregate: never built, or expired."""
+
+
+class LoganJobNotReadyError(LoganJobError):
+    """The job has not finished."""
+
+
+class LoganJobFailedError(LoganJobError):
+    """The job finished in error."""
 
 
 def _should_retry_agent_error(exc: BaseException) -> bool:
@@ -1291,6 +1326,7 @@ class AssistantAgent:
             is_complete=is_complete,
             handoff_url=handoff_url,
             token_usage=token_usage,
+            logan=logan_context_from(state.metadata),
         )
 
         transcript, truncated = self._build_transcript(
@@ -1369,6 +1405,63 @@ class AssistantAgent:
             owner_keycloak_sub=owner_keycloak_sub,
             schema_state=schema_state,
             messages=messages,
+        )
+
+    async def fetch_logan_snapshot(self, job_id: str) -> LoganSnapshot:
+        """Read a finished job's cached results into a snapshot.
+
+        Cache-only by design: the results page is the one place that pays
+        for aggregation. Status is checked first so a queued job is told
+        apart from an expired one.
+        """
+        if self.galaxy is None or not self.galaxy.is_available():
+            raise AssistantUnavailableError("Logan search is not configured")
+        status = await self.galaxy.get_job_status(job_id)
+        if not status.is_complete:
+            raise LoganJobNotReadyError(job_id, "This search is still running")
+        if not status.is_successful:
+            raise LoganJobFailedError(job_id, "This search failed")
+        page = await self.galaxy.get_cached_kmindex_results(
+            job_id, limit=LOGAN_TOP_HITS, offset=0
+        )
+        if page is None:
+            raise LoganJobNotFoundError(
+                job_id, "This search's results are not cached; re-run it"
+            )
+        return build_logan_snapshot(
+            page, captured_at=datetime.now(timezone.utc).isoformat()
+        )
+
+    async def create_logan_session_from_snapshot(
+        self, snapshot: LoganSnapshot, owner_keycloak_sub: Optional[str]
+    ) -> SessionState:
+        """Open a session bound to a snapshot: prefilled tracker, a stored
+        intro message, Logan chips. No model call. Split from
+        create_logan_session so evals can inject a fixture snapshot."""
+        schema = prefill_from_logan(AnalysisSchema(), snapshot, self.catalog)
+        intro = render_logan_intro(
+            snapshot,
+            schema.organism.value
+            if schema.organism.status == FieldStatus.FILLED
+            else None,
+        )
+        metadata = {"logan": snapshot.model_dump(mode="json"), "turn_count": 0}
+        state = await self.session_service.create_session(
+            owner_keycloak_sub=owner_keycloak_sub,
+            schema_state=schema,
+            messages=[ChatMessage(role=MessageRole.ASSISTANT, content=intro)],
+            metadata=metadata,
+        )
+        state.suggestions = self._derive_suggestions(schema, logan=metadata["logan"])
+        await self.session_service.save_session(state)
+        return state
+
+    async def create_logan_session(
+        self, job_id: str, owner_keycloak_sub: Optional[str]
+    ) -> SessionState:
+        snapshot = await self.fetch_logan_snapshot(job_id)
+        return await self.create_logan_session_from_snapshot(
+            snapshot, owner_keycloak_sub
         )
 
     @staticmethod

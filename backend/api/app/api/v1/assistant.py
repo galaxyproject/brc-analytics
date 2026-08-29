@@ -30,6 +30,7 @@ from app.services.assistant_agent import (
     AssistantTimeoutError,
     AssistantUnavailableError,
 )
+from app.services.logan_snapshot import logan_context_from
 
 logger = logging.getLogger(__name__)
 
@@ -208,6 +209,7 @@ async def restore_session(
         suggestions=suggestions,
         is_complete=is_complete,
         handoff_url=handoff_url,
+        logan=logan_context_from(state.metadata),
     )
 
 
