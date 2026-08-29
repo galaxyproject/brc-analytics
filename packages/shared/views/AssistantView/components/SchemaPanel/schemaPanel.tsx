@@ -119,7 +119,7 @@ export const SchemaPanel = ({
       entity: ENTITY_KEYS.ASSEMBLIES,
       inputs: {
         accessions: extractAccessions(schema.data_source),
-        sequencingSource: resolveSequencingSource(schema.data_source.value),
+        sequencingSource: resolveSequencingSource(schema.data_source),
       },
       // Normalise so the dispatch key matches the read site (useCurrentPath)
       // regardless of trailing slash / query / fragment from the backend.
