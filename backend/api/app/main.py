@@ -25,6 +25,7 @@ from app.core.dependencies import (
     get_cache_service,
     get_catalog_data,
     get_ena_service,
+    get_service_galaxy,
     get_sra_mirror_service,
     reset_all_services,
 )
@@ -55,6 +56,7 @@ def create_app() -> FastAPI:
         get_catalog_data(),
         get_ena_service(),
         sra_mirror=get_sra_mirror_service(),
+        galaxy=get_service_galaxy(),
     )
     mcp_app = mcp.http_app(path="/", stateless_http=True)
 

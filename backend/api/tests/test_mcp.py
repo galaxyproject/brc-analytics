@@ -294,3 +294,41 @@ class TestSRAMCPWiring:
             result = _mcp_post(client, "tools/list")
         names = {tool["name"] for tool in result["result"]["tools"]}
         assert not (SRA_TOOL_NAMES & names)
+
+
+LOGAN_TOOL_NAMES = {"logan_job_status", "logan_cohort", "logan_hits"}
+
+
+def _fake_galaxy(available=True, cached=None):
+    g = MagicMock()
+    g.is_available.return_value = available
+    g.get_cached_kmindex_results = AsyncMock(return_value=cached)
+    g.get_job_status = AsyncMock()
+    return g
+
+
+class TestLoganToolGating:
+    def test_absent_without_galaxy(self, tmp_path):
+        mcp = create_mcp_server(_catalog_data(tmp_path), MagicMock())
+        assert not (LOGAN_TOOL_NAMES & _tool_names(mcp))
+
+    def test_absent_when_galaxy_unconfigured(self, tmp_path):
+        mcp = create_mcp_server(
+            _catalog_data(tmp_path), MagicMock(), galaxy=_fake_galaxy(False)
+        )
+        assert not (LOGAN_TOOL_NAMES & _tool_names(mcp))
+
+    def test_registered_with_galaxy(self, tmp_path):
+        mcp = create_mcp_server(
+            _catalog_data(tmp_path), MagicMock(), galaxy=_fake_galaxy()
+        )
+        assert LOGAN_TOOL_NAMES <= _tool_names(mcp)
+        assert "logan_cohort" in mcp.instructions
+
+    def test_cohort_miss_is_a_dict(self, tmp_path):
+        galaxy = _fake_galaxy(cached=None)
+        galaxy.get_job_status = AsyncMock(return_value=MagicMock(is_complete=True))
+        mcp = create_mcp_server(_catalog_data(tmp_path), MagicMock(), galaxy=galaxy)
+        out = _call_tool(mcp, "logan_cohort", {"job_id": "fe6f66a714dcbec8"})
+        assert out["status"] == "expired"
+        assert out["results_url"] == "/logan-search?job=fe6f66a714dcbec8"

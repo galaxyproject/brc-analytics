@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import List, Optional
 
@@ -5,7 +6,10 @@ from fastmcp import FastMCP
 
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.galaxy_service import GalaxyService
 from app.services.sra_mirror import SRAMirrorService
+from app.services.tools import logan_tools
+from app.services.tools.catalog_tools import AssistantDeps
 
 logger = logging.getLogger(__name__)
 
@@ -16,11 +20,13 @@ def create_mcp_server(
     catalog_data: CatalogData,
     ena_service: ENAService,
     sra_mirror: Optional[SRAMirrorService] = None,
+    galaxy: Optional[GalaxyService] = None,
 ) -> FastMCP:
     # Opt-in: the SRA mirror tools only exist when a mirror file is configured
     # and openable. A default deploy (no SRA_MIRROR_PATH) advertises exactly
     # the tools it does today -- same discipline as the assistant prompt.
     sra_enabled = sra_mirror is not None and sra_mirror.is_available()
+    logan_enabled = galaxy is not None and galaxy.is_available()
 
     wf_count = sum(
         len(c.get("workflows", [])) for c in catalog_data.workflow_categories
@@ -46,6 +52,16 @@ def create_mcp_server(
             "pathogens; prefer the ENA tools (search_ena, search_ena_keywords) "
             "for the very latest submissions, non-BRC organisms, or free-text "
             "keyword search."
+        )
+    if logan_enabled:
+        instructions += (
+            "\n\nThis server also exposes read-only access to Logan sequence "
+            "searches (kmindex jobs run through BRC Analytics at "
+            "/logan-search): logan_job_status, logan_cohort (whole-match-set "
+            "counts and facets -- the only honest numbers for a search) and "
+            "logan_hits (a page of score-ranked hits with SRA metadata). "
+            "Results are cached for a day after the results page assembles "
+            "them; a tool that reports 'expired' means open that page first."
         )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
@@ -239,6 +255,51 @@ def create_mcp_server(
             return sra_mirror.get_study_runs(accession, limit=limit)
 
         logger.info("SRA mirror tools registered on MCP server")
+
+    if logan_enabled:
+        # The assistant-side tools return JSON strings; MCP returns dicts.
+        # Same functions, one decode -- the tool bodies stay in one place.
+        _deps = AssistantDeps(catalog=None, galaxy=galaxy)  # type: ignore[arg-type]
+
+        @mcp.tool()
+        async def logan_job_status(job_id: str) -> dict:
+            """Check whether a Logan sequence search (kmindex job) has finished.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results
+                    URL (/logan-search?job=<id>).
+            """
+            return json.loads(await logan_tools.logan_job_status(_deps, job_id))
+
+        @mcp.tool()
+        async def logan_cohort(job_id: str) -> dict:
+            """Whole-match-set summary of a finished Logan search: matched-run
+            count, organism/BioProject/study/country counts, the ten most
+            frequent organisms, and six metadata facets with 'other' and 'not
+            recorded' rows. These are the only numbers to describe a search
+            with; the pageable hit list is capped and not representative.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results URL.
+            """
+            return json.loads(await logan_tools.logan_cohort(_deps, job_id))
+
+        @mcp.tool()
+        async def logan_hits(job_id: str, offset: int = 0, limit: int = 25) -> dict:
+            """A page of score-ranked hits from a finished Logan search with SRA
+            run metadata where known. Never compute shares from a page; use
+            logan_cohort.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results URL.
+                offset: first hit to return (0-based).
+                limit: hits per page (default 25, capped at 100).
+            """
+            return json.loads(
+                await logan_tools.logan_hits(_deps, job_id, offset=offset, limit=limit)
+            )
+
+        logger.info("Logan search tools registered on MCP server")
 
     logger.info("MCP server created")
     return mcp
