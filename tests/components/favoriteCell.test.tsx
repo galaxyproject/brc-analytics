@@ -78,6 +78,26 @@ describe("FavoriteCell", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  test("the accessible name says sign-in when signed out", () => {
+    // The tooltip already said so, but aria-label overrides it for assistive
+    // tech -- so screen reader users heard "Save" for a button that logs in.
+    setFavorites();
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      isConfigured: true,
+      isLoading: false,
+      login: jest.fn(),
+    } as unknown as ReturnType<typeof useAuth>);
+
+    render(
+      <FavoriteCell entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />
+    );
+
+    expect(
+      screen.getByRole("button", { name: `Sign in to save ${ACCESSION}` })
+    ).toBeInTheDocument();
+  });
+
   test("toggles an assembly row", () => {
     const toggleFavorite = setFavorites();
 

@@ -36,16 +36,13 @@ export function FavoriteButton({
   if (isAuthLoading) return <CircularProgress size={20} />;
 
   if (!isAuthenticated) {
+    // Says it on the face of the button rather than in a tooltip: a tooltip is
+    // invisible to screen readers and to anyone on a touch device, both of whom
+    // would otherwise read this as a save control that silently signs them in.
     return (
-      <Tooltip title="Sign in to save">
-        <Button
-          onClick={login}
-          startIcon={<StarBorderIcon />}
-          variant="outlined"
-        >
-          Save
-        </Button>
-      </Tooltip>
+      <Button onClick={login} startIcon={<StarBorderIcon />} variant="outlined">
+        Sign in to save
+      </Button>
     );
   }
 

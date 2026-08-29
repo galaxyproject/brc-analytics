@@ -56,7 +56,12 @@ export const ChatPanel = ({
   onSend,
   suggestions,
 }: ChatPanelProps): JSX.Element => {
-  const { isAuthenticated, isConfigured, login } = useAuth();
+  const {
+    isAuthenticated,
+    isConfigured,
+    isLoading: isAuthLoading,
+    login,
+  } = useAuth();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -155,11 +160,17 @@ export const ChatPanel = ({
             Saved to your account
           </Typography>
         )}
-        {isConfigured && !isAuthenticated && messages.length >= 2 && (
-          <Button onClick={login} size="small" variant="text">
-            Sign in to keep this conversation
-          </Button>
-        )}
+        {/* Not while auth is still resolving: AuthProvider starts signed-out,
+        and the restore call can beat /auth/me, which would offer to save a
+        conversation that is already being saved. */}
+        {isConfigured &&
+          !isAuthLoading &&
+          !isAuthenticated &&
+          messages.length >= 2 && (
+            <Button onClick={login} size="small" variant="text">
+              Sign in to keep this conversation
+            </Button>
+          )}
         <TextField
           disabled={inputDisabled}
           fullWidth
