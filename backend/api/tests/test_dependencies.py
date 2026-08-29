@@ -105,3 +105,16 @@ class TestSubmitRateLimitDispatch:
         assert anon_limiter.check.await_args.args == (request,)
         assert anon_limiter.check.await_args.kwargs == {}
         user_limiter.check.assert_not_awaited()
+
+
+def test_get_service_galaxy_is_a_singleton_on_the_service_credential(monkeypatch):
+    from app.core import dependencies
+
+    monkeypatch.setenv("GALAXY_API_KEY", "k")
+    dependencies.reset_all_services()
+    a = dependencies.get_service_galaxy()
+    b = dependencies.get_service_galaxy()
+    assert a is b
+    assert a.credential is not None and a.credential.kind == "service"
+    dependencies.reset_all_services()
+    assert dependencies.get_service_galaxy() is not a

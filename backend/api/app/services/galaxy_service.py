@@ -452,6 +452,28 @@ class GalaxyService:
             self._page_kmindex(aggregate, job_id, limit, offset)
         )
 
+    async def get_cached_kmindex_results(
+        self, job_id: str, limit: int = 25, offset: int = 0
+    ) -> Optional[KmindexResults]:
+        """Page a job's aggregate if -- and only if -- it is already cached.
+
+        The assistant's read path. get_kmindex_results builds the aggregate on
+        a miss, which pulls every shard from Galaxy under the process-wide
+        lock and takes over a minute cold; a chat turn has 110 seconds and a
+        tool call far less. So this never aggregates: a miss is None and the
+        caller sends the user to the results page, which does.
+
+        Needs no Galaxy connection -- paging a cached aggregate is Redis plus
+        the mirror -- so it is deliberately not gated on is_available().
+        """
+        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
+        aggregate = await self.cache.get(cache_key)
+        if aggregate is None:
+            return None
+        return await self._annotate_with_sra(
+            self._page_kmindex(aggregate, job_id, limit, offset)
+        )
+
     async def _annotate_with_sra(self, results: KmindexResults) -> KmindexResults:
         """
         Join SRA mirror metadata onto the hits on this page.
