@@ -2975,3 +2975,35 @@ class TestDataSourceDetailFallsBackToTheUserMessage:
             "ERR662077",
             "SRR7590703",
         ]
+
+
+class TestFetchLoganSnapshotIsCacheFirst:
+    """A signed-in user's Logan job runs under their own Galaxy credential,
+    but the assistant reads with the service one -- so it may not be able to
+    see that job's status at all. The merged aggregate is job-id-keyed in
+    Redis and needs no Galaxy call, so the cache is consulted first and an
+    unreadable status can only ever change how a MISS is explained."""
+
+    def _agent(self, galaxy):
+        inst = _extraction_agent("ok", {})
+        inst.galaxy = galaxy
+        return inst
+
+    @pytest.mark.asyncio
+    async def test_cached_job_opens_without_asking_galaxy_anything(self):
+        galaxy = _logan_galaxy(cached=logan_results())
+        galaxy.get_job_status = AsyncMock(
+            side_effect=AssertionError("status must not gate a cache hit")
+        )
+        snap = await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert snap.job_id == LOGAN_JOB
+        galaxy.get_job_status.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_unreadable_status_on_a_miss_reads_as_expired(self):
+        # Not our job to see -- say so as "expired", which points the user at
+        # the results page, rather than blowing up into a 503.
+        galaxy = _logan_galaxy(cached=None)
+        galaxy.get_job_status = AsyncMock(side_effect=Exception("404 not found"))
+        with pytest.raises(LoganJobNotFoundError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
