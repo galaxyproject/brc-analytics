@@ -61,8 +61,13 @@ export function FavoriteCell({
         // would fire a create for an entity that may already be saved.
         // Only the rows in flight are disabled -- gating on the shared
         // isToggling flag would freeze every star in the table.
+        // Both gates are about favorites we might not have loaded yet, which
+        // is meaningless signed out: the click just opens login. The provider
+        // never reports loading to a signed-out user today, so this only stops
+        // the cell from depending on that staying true.
         disabled={
-          isLoading || togglingKeys.has(favoriteKey(entityType, entityId))
+          isAuthenticated &&
+          (isLoading || togglingKeys.has(favoriteKey(entityType, entityId)))
         }
         onClick={handleClick}
         size="small"

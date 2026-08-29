@@ -98,6 +98,28 @@ describe("FavoriteCell", () => {
     ).toBeInTheDocument();
   });
 
+  test("stays clickable for a signed-out user while favorites load", () => {
+    // A disabled IconButton fires no onClick, so this gate would swallow the
+    // login click too. The provider sets isLoading false synchronously for a
+    // signed-out user, so this combination doesn't arise today -- the test
+    // pins the component against a provider that stops doing that.
+    setFavorites({ isLoading: true });
+    const login = jest.fn();
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      isConfigured: true,
+      isLoading: false,
+      login,
+    } as unknown as ReturnType<typeof useAuth>);
+
+    render(
+      <FavoriteCell entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />
+    );
+    fireEvent.click(screen.getByRole("button"));
+
+    expect(login).toHaveBeenCalled();
+  });
+
   test("toggles an assembly row", () => {
     const toggleFavorite = setFavorites();
 
