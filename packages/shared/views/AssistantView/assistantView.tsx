@@ -17,6 +17,7 @@ import {
 } from "./assistantView.styles";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Headline } from "./components/Headline/headline";
+import { LoganCohortCard } from "./components/LoganCohortCard/loganCohortCard";
 import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
 interface Props {
@@ -39,6 +40,7 @@ export const AssistantView = ({
     handoffUrl,
     isRestoring,
     loading,
+    logan,
     messages,
     onRetry,
     resetSession,
@@ -127,6 +129,7 @@ export const AssistantView = ({
             />
           </ChatColumn>
           <SchemaColumn>
+            {logan && <LoganCohortCard logan={logan} />}
             <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
           </SchemaColumn>
         </TwoPanelLayout>
