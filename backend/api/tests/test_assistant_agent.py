@@ -2868,3 +2868,110 @@ class TestCreateLoganSession:
         _wire_session(inst, SessionState(session_id="s2"))
         resp = await inst.chat("hi", session_id="s2")
         assert resp.logan is None
+
+
+class TestDataSourceDetailIsSticky:
+    """A later turn that only rephrases the data source must not lose the
+    accessions an earlier turn resolved -- the extractor summarises freely,
+    and the stepper needs the ids."""
+
+    def _with_accessions(self):
+        return AnalysisSchema(
+            data_source=SchemaField(
+                value="Top 2 runs from Logan",
+                status=FieldStatus.FILLED,
+                detail=json.dumps(
+                    {
+                        "source": "logan",
+                        "accessions": ["ERR662077", "SRR7590703"],
+                    }
+                ),
+            )
+        )
+
+    def test_generic_rephrase_keeps_the_accessions(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(),
+            {"data_source": "ENA/SRA accessions"},
+            logan=LOGAN_META,
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
+        assert out.data_source.value == "ENA/SRA accessions"
+
+    def test_switching_to_upload_replaces_them(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(),
+            {"data_source": "actually I'll upload my own files"},
+            logan=LOGAN_META,
+        )
+        assert json.loads(out.data_source.detail) == {"source": "upload"}
+
+    def test_naming_new_accessions_replaces_them(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(), {"data_source": "DRR999999"}, logan=LOGAN_META
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == ["DRR999999"]
+
+    def test_nothing_to_carry_forward_stays_none(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "ENA/SRA accessions"}
+        )
+        assert out.data_source.detail is None
+
+    def test_a_prior_free_text_detail_is_not_carried(self, agent):
+        prior = AnalysisSchema(
+            data_source=SchemaField(
+                value="ENA", status=FieldStatus.FILLED, detail="some prose"
+            )
+        )
+        out = agent._apply_schema_updates(prior, {"data_source": "ENA/SRA"})
+        assert out.data_source.detail is None
+
+
+class TestDataSourceDetailFallsBackToTheUserMessage:
+    """The extractor paraphrases: asked for "the top 5 runs" it routinely
+    writes "ENA/SRA accessions". Resolving only its wording loses the ids on
+    the very turn that chose them, so the user's own words are the fallback."""
+
+    def test_user_message_resolves_when_the_extracted_value_does_not(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA/SRA accessions"},
+            logan=LOGAN_META,
+            user_message="Use the top 3 runs as my data.",
+        )
+        detail = json.loads(out.data_source.detail)
+        assert detail["source"] == "logan"
+        assert detail["accessions"] == ["ERR662077", "SRR7590703", "ERR450106"]
+
+    def test_the_extracted_value_still_wins(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "top 2 runs"},
+            logan=LOGAN_META,
+            user_message="actually use the top 4 runs",
+        )
+        assert len(json.loads(out.data_source.detail)["accessions"]) == 2
+
+    def test_no_signal_anywhere_stays_none(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA"},
+            logan=LOGAN_META,
+            user_message="what workflows are compatible?",
+        )
+        assert out.data_source.detail is None
+
+    def test_message_fallback_needs_no_snapshot_for_explicit_ids(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA/SRA accessions"},
+            user_message="use ERR662077 and SRR7590703 please",
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
