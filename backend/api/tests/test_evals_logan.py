@@ -81,3 +81,13 @@ def test_data_source_accessions_matches_the_fixture_top_n():
         == 0.0
     )
     assert _DataSourceAccessions().evaluate(_Ctx(_Out())) == 0.0
+
+
+def test_reply_matching_ignores_thousands_separators():
+    """A model that writes "17 629" has cited the number just as much as one
+    that writes "17,629" -- the first scored a miss until this was handled."""
+    from evals.datasets.logan_assistant import _ReplyMustMention
+
+    for rendering in ("17,629", "17 629", "17 629", "17629"):
+        ctx = _Ctx(_Out(reply=f"The search matched {rendering} runs."))
+        assert _ReplyMustMention(keywords=["17,629"]).evaluate(ctx) == 1.0

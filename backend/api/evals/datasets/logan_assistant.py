@@ -9,6 +9,7 @@ real accessions in data_source.detail?
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -28,15 +29,26 @@ def _snapshot() -> dict:
     return json.loads(_FIXTURE.read_text())
 
 
+# Models group thousands however they like -- "17,629", "17 629" (thin or
+# no-break space), "17629". Matching the literal string scored a correct
+# answer as a miss, so both sides are normalised to bare digits first.
+_DIGIT_SEP = re.compile(r"(?<=\d)[,\u00a0\u202f\u2009 ](?=\d)")
+
+
+def _normalize_numbers(text: str) -> str:
+    return _DIGIT_SEP.sub("", text).lower()
+
+
 @dataclass
 class _ReplyMustMention(Evaluator):
     keywords: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = (getattr(ctx.output, "reply", "") or "").lower()
+        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
         if not self.keywords:
             return 0.0
-        return sum(1 for k in self.keywords if k.lower() in text) / len(self.keywords)
+        hits = sum(1 for k in self.keywords if _normalize_numbers(k) in text)
+        return hits / len(self.keywords)
 
 
 @dataclass
@@ -46,8 +58,10 @@ class _ReplyMustNotMention(Evaluator):
     forbidden: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = (getattr(ctx.output, "reply", "") or "").lower()
-        return 0.0 if any(f.lower() in text for f in self.forbidden) else 1.0
+        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        return (
+            0.0 if any(_normalize_numbers(f) in text for f in self.forbidden) else 1.0
+        )
 
 
 @dataclass
@@ -74,10 +88,13 @@ _GROUNDING_RUBRIC = (
     "The assistant was handed a Logan search cohort: 17,629 matched runs, "
     "191 organisms, Plasmodium falciparum 82.1%, 97.2% paired-end, 98.9% "
     "Illumina, 84.7% WGS, country not recorded for 80.8%. Score 1 if every "
-    "number in the reply appears in that context, the reply does not derive "
+    "number in the reply traces to that context, the reply does not derive "
     "any share from the 25 listed hits, and -- when geography comes up -- it "
-    "states that country is unrecorded for most runs. Score 0 if it invents "
-    "a number, treats the 25 hits as representative, or claims a "
+    "states that country is unrecorded for most runs. Rounding (82% for "
+    "82.1%), a different thousands separator, and stating the complement of "
+    "a given share (19% recorded for 80.8% not recorded) all still trace to "
+    "the context and score 1. Score 0 if it states a number the context "
+    "cannot produce, treats the 25 hits as representative, or claims a "
     "distribution the context does not contain."
 )
 
@@ -103,15 +120,22 @@ _GROUNDING_CASES = [
 _MULTITURN_CASES = [
     {
         "name": "variant_calling_on_top_5",
+        # The tracker needs a workflow before it can hand off, so the script
+        # picks one -- haploid paired-end, which is what this cohort is.
         "turns": [
             "Use the reference assembly.",
             "Variant calling.",
+            "Use the paired end variant calling in haploid system workflow.",
             "Use the top 5 runs as my data.",
         ],
+        # No data_source needle: the extractor paraphrases that field freely
+        # ("ENA/SRA accessions" for "the top 5 runs"), so its wording proves
+        # nothing. _DataSourceAccessions checks what actually matters -- the
+        # run ids the stepper receives.
         "expected_schema": {
             "organism": "Plasmodium falciparum",
             "analysis_type": "Variant",
-            "data_source": "top 5",
+            "workflow": "haploid",
         },
         "expected_complete": True,
         "expected_n": 5,
