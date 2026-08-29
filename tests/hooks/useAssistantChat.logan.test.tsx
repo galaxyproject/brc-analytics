@@ -179,6 +179,27 @@ describe("useAssistantChat with initialLoganJobId", () => {
     expect(result.current.logan).toBeNull();
   });
 
+  it("does not restore over the session it just opened", async () => {
+    // Dropping ?loganJob= re-renders the page with initialLoganJobId gone,
+    // which would otherwise re-arm the restore effect against the id this
+    // mount just wrote to localStorage.
+    mockPost.mockReturnValue(resolves(SESSION));
+    const { rerender, result } = renderHook(
+      (props: { jobId?: string }) =>
+        useAssistantChat({
+          initialLoganJobId: props.jobId,
+          sessionKey: SESSION_KEY,
+        }),
+      { initialProps: { jobId: JOB_ID } as { jobId?: string } }
+    );
+    await waitFor(() => expect(result.current.logan).not.toBeNull());
+
+    rerender({ jobId: undefined });
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    expect(mockGet).not.toHaveBeenCalled();
+    expect(result.current.logan?.job_id).toBe(JOB_ID);
+  });
+
   it("without a job id the hook restores as before", async () => {
     mockQuery = {};
     localStorage.setItem(SESSION_KEY, "stored-session");
