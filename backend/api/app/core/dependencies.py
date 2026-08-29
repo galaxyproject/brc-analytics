@@ -17,6 +17,7 @@ from app.services.assistant_agent import AssistantAgent
 from app.services.auth_service import COOKIE_NAME, AuthService
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.galaxy_service import GalaxyService
 from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -59,6 +60,27 @@ def get_sra_mirror_service() -> Optional[SRAMirrorService]:
     service = SRAMirrorService(settings.SRA_MIRROR_PATH)
     logger.info(
         f"SRA mirror service initialized (singleton), available: {service.is_available()}"
+    )
+    return service
+
+
+@lru_cache(maxsize=1)
+def get_service_galaxy() -> GalaxyService:
+    """The assistant's and MCP server's Galaxy service, on the service
+    credential, one per process.
+
+    Not the router's: /api/v1/galaxy/* builds a GalaxyService per request
+    with the signed-in user's credential so searches run as them. The
+    assistant only reads -- the job-id-keyed aggregate in Redis, and job
+    status -- and neither needs a user's token. Keep this out of any
+    Depends() on a galaxy route.
+    """
+    service = GalaxyService(
+        get_cache_service(), sra_mirror=get_sra_mirror_service(), credential=None
+    )
+    logger.info(
+        "Service Galaxy client initialized (singleton), available: "
+        f"{service.is_available()}"
     )
     return service
 
@@ -232,6 +254,7 @@ def reset_all_services() -> None:
     get_catalog_data.cache_clear()
     get_ena_service.cache_clear()
     get_sra_mirror_service.cache_clear()
+    get_service_galaxy.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()
     get_submit_rate_limiter.cache_clear()

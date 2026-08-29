@@ -1565,3 +1565,46 @@ class TestExportEndpoint:
         assert client.get(
             "/galaxy/kmindex/jobs/job1/export?format=xlsx"
         ).status_code == (422)
+
+
+class TestCachedKmindexRead:
+    """The assistant's read path: a Redis hit or None, never an aggregation."""
+
+    @pytest.mark.asyncio
+    async def test_miss_returns_none_without_aggregating(self, service):
+        service.cache.get = AsyncMock(return_value=None)
+        service._aggregate_shards = AsyncMock(side_effect=AssertionError("cold path"))
+
+        assert await service.get_cached_kmindex_results("job1") is None
+        service._aggregate_shards.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_hit_pages_and_annotates(self, service):
+        aggregate = {
+            "hits": [
+                {"accession": "ERR1", "score": 1.0, "shard": "s"},
+                {"accession": "ERR2", "score": 0.9, "shard": "s"},
+            ],
+            "total_matches": 2,
+            "per_index": [],
+            "query_name": "q",
+        }
+        service.cache.get = AsyncMock(return_value=aggregate)
+        service._aggregate_shards = AsyncMock(side_effect=AssertionError("cold path"))
+        service._export_state = MagicMock(
+            return_value={"bytes": None, "rows": None, "status": "unavailable"}
+        )
+
+        page = await service.get_cached_kmindex_results("job1", limit=1, offset=0)
+
+        assert page is not None
+        assert page.total_hits == 2
+        assert [h.accession for h in page.hits] == ["ERR1"]
+        service._aggregate_shards.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_reads_even_when_galaxy_key_missing(self, service):
+        # A cached aggregate needs no Galaxy connection to page.
+        service._galaxy_available = False
+        service.cache.get = AsyncMock(return_value=None)
+        assert await service.get_cached_kmindex_results("job1") is None
