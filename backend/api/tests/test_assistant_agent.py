@@ -41,6 +41,7 @@ def agent():
     instance.catalog = MagicMock()
     instance.catalog.workflows_by_category = []
     instance.sra_mirror = None
+    instance.galaxy = None
     instance.query_con = None  # query_catalog degrades to "unavailable"
     instance.settings = get_settings()
     return instance
@@ -1564,11 +1565,12 @@ class TestSystemPrompts:
         assert "Carry EVERY prior value forward" in EXTRACT_PROMPT
 
 
-def _build_agent_via_init(sra_available):
+def _build_agent_via_init(sra_available, galaxy_available=None):
     """Drive the real _init_agent with an offline TestModel.
 
     sra_available: None -> no mirror injected; True/False -> mirror with
-    is_available() returning that value.
+    is_available() returning that value. galaxy_available reads the same way
+    for the Logan tools' Galaxy service.
     """
     from pydantic_ai.models.test import TestModel
 
@@ -1588,6 +1590,12 @@ def _build_agent_via_init(sra_available):
         mirror = MagicMock()
         mirror.is_available.return_value = sra_available
         instance.sra_mirror = mirror
+    if galaxy_available is None:
+        instance.galaxy = None
+    else:
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = galaxy_available
+        instance.galaxy = galaxy
     instance._build_model = lambda *a, **k: TestModel()
     instance._init_agent()
     return instance
@@ -1976,6 +1984,7 @@ def _extraction_agent(reply, state, catalog=None):
     # Real int: _build_transcript compares a serialized size against it.
     instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     instance.sra_mirror = None
+    instance.galaxy = None
     instance.query_con = None
     instance.catalog = catalog if catalog is not None else MagicMock()
     if catalog is None:
@@ -2625,3 +2634,75 @@ class TestApplySchemaUpdatesDataSource:
         out = agent._apply_schema_updates(AnalysisSchema(), {"data_source": "ENA"})
         assert out.data_source.status == FieldStatus.FILLED
         assert out.data_source.detail is None
+
+
+class TestWrapToolAwaitsCoroutines:
+    @pytest.mark.asyncio
+    async def test_async_tool_result_is_awaited(self):
+        from app.services.assistant_agent import _wrap_tool
+
+        async def tool(deps, x: int) -> str:
+            return json.dumps({"x": x})
+
+        wrapped = _wrap_tool(tool)
+        ctx = SimpleNamespace(deps=None)
+        assert await wrapped(ctx, x=3) == '{"x": 3}'
+
+
+class TestInitAgentLoganGating:
+    def test_no_galaxy_no_logan_tools_or_prompt(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=None)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert "logan_cohort" not in names
+        assert "logan_cohort" not in inst.system_prompt
+
+    def test_galaxy_available_registers_tools_and_prompt(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=True)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert {"logan_job_status", "logan_cohort", "logan_hits"} <= names
+        assert "`logan_cohort`" in inst.system_prompt
+
+    def test_galaxy_unconfigured_registers_nothing(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=False)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert "logan_cohort" not in names
+
+
+class TestLoganInstructions:
+    @pytest.mark.asyncio
+    async def test_snapshot_reaches_the_model_as_instructions(self):
+        """A session with a snapshot renders it into instructions; one without
+        renders none. Captured from the FunctionModel's view of the request."""
+        from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
+        from pydantic_ai.models.function import FunctionModel
+
+        from app.services.logan_snapshot import build_logan_snapshot
+        from tests.test_logan_snapshot import results as logan_page
+
+        seen: list = []
+
+        def model_fn(messages, info):
+            seen.append(getattr(messages[-1], "instructions", None))
+            if info.output_tools:
+                return ModelResponse(
+                    parts=[ToolCallPart(info.output_tools[0].name, {})]
+                )
+            return ModelResponse(parts=[TextPart("ok")])
+
+        inst = _extraction_agent("ok", {})
+        inst._build_model = lambda *a, **k: FunctionModel(model_fn)
+        inst._init_agent()
+        snap = build_logan_snapshot(logan_page(), captured_at="t").model_dump(
+            mode="json"
+        )
+
+        state = SessionState(session_id="s1", metadata={"logan": snap})
+        _wire_session(inst, state)
+        await inst.chat("what is this?", session_id="s1")
+        assert any(s and "## Logan search context" in s for s in seen)
+
+        seen.clear()
+        plain = SessionState(session_id="s2")
+        _wire_session(inst, plain)
+        await inst.chat("hello", session_id="s2")
+        assert not any(s and "## Logan search context" in s for s in seen)

@@ -89,7 +89,7 @@ def get_service_galaxy() -> GalaxyService:
 def get_assistant_agent() -> AssistantAgent:
     cache = get_cache_service()
     sra_mirror = get_sra_mirror_service()
-    agent = AssistantAgent(cache, sra_mirror=sra_mirror)
+    agent = AssistantAgent(cache, sra_mirror=sra_mirror, galaxy=get_service_galaxy())
     logger.info(
         f"Assistant agent initialized (singleton), available: {agent.is_available()}"
     )
