@@ -9,9 +9,12 @@ export const ASSISTANT_INPUT_PLACEHOLDER =
 /**
  * Query parameters read by an assistant page.
  * QUESTION carries a question asked elsewhere on the site, sent as the first
- * message of a new conversation; SESSION_ID names a conversation to restore.
+ * message of a new conversation; SESSION_ID names a conversation to restore;
+ * LOGAN_JOB names a finished Logan search to open a session against, and
+ * outranks SESSION_ID when both are present.
  */
 export const ASSISTANT_QUERY_PARAM = {
+  LOGAN_JOB: "loganJob",
   QUESTION: "q",
   SESSION_ID: "sessionId",
 } as const;

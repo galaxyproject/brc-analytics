@@ -19,9 +19,13 @@ const Page = (): JSX.Element => {
   const { query } = useRouter();
   const initialMessage = query[ASSISTANT_QUERY_PARAM.QUESTION];
   const initialSessionId = query[ASSISTANT_QUERY_PARAM.SESSION_ID];
+  const initialLoganJobId = query[ASSISTANT_QUERY_PARAM.LOGAN_JOB];
 
   return (
     <AssistantView
+      initialLoganJobId={
+        typeof initialLoganJobId === "string" ? initialLoganJobId : undefined
+      }
       initialMessage={
         typeof initialMessage === "string" ? initialMessage : undefined
       }
