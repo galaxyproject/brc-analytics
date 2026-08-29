@@ -1,42 +1,62 @@
 import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
-import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
+import type {
+  DataSourceDetail,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
 
 /**
- * Extract ENA/SRA/DDBJ run accessions from the free-text `data_source.value`.
- *
- * The backend doesn't structure accessions into `data_source.detail` (only
- * `assembly` and `workflow` get that treatment in `_apply_schema_updates`),
- * so the LLM stuffs them into `.value` with inconsistent formatting like
- * "ENA (ERR16655350)" or "ENA/SRA — SRR12345678". Regex is the only option
- * until the backend gains structured handling (related: #1296).
- * @param field - Free-text data-source field from the assistant schema.
- * @returns Run accessions found in the field value.
+ * Parse the backend's structured `data_source.detail`, when it is one.
+ * @param detail - Raw detail string from the assistant schema.
+ * @returns The parsed detail, or null when absent or not a JSON object.
+ */
+export function parseDataSourceDetail(
+  detail: string | null | undefined
+): DataSourceDetail | null {
+  if (!detail) return null;
+  try {
+    const parsed: unknown = JSON.parse(detail);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as DataSourceDetail;
+    }
+  } catch {
+    // Not JSON -- an older session's free-text detail. Fall through.
+  }
+  return null;
+}
+
+/**
+ * Run accessions for the handoff. The backend resolves them into
+ * `data_source.detail` (structured, #1296); the regex over `.value` stays as
+ * a fallback for sessions that predate that.
+ * @param field - Data-source field from the assistant schema.
+ * @returns Run accessions, de-duplicated.
  */
 export function extractAccessions(field: SchemaFieldState): string[] {
+  const structured = parseDataSourceDetail(field.detail)?.accessions;
+  if (structured && structured.length > 0) return [...new Set(structured)];
   if (!field.value) return [];
-  // Require ≥6 digits — real ENA/SRA/DDBJ run accessions are typically 6-8.
-  // Loose `\d+` would match "ERR12" mid-sentence, which then fails downstream.
-  // De-dup so a free-text mention of the same accession twice doesn't fan out
-  // into a distinct React Query cache key + duplicated fetch payload.
+  // Require ≥6 digits -- real run accessions are 6-8; loose `\d+` matched
+  // "ERR12" mid-sentence and failed downstream.
   return [...new Set(field.value.match(/[ESD]RR\d{6,}/g) ?? [])];
 }
 
-// Word-bound to avoid false positives like "own" matching "unknown". "user"
-// is included because the backend evals observe the LLM emitting that token
-// (e.g. "user upload", "user-provided FASTQs") for the upload path.
+// Word-bound to avoid "own" matching "unknown". "user" is included because the
+// backend evals observe the LLM emitting it for the upload path.
 const UPLOAD_KEYWORDS = /\b(upload|user|own|local)\b/i;
 
 /**
- * Normalise the LLM's free-text data-source string into a `SEQUENCING_SOURCE`.
- * Falls back to `SEQUENCING_SOURCE.ENA` for empty/unknown input — matches the
- * stepper's default toggle.
- * @param value - Free-text value from the assistant's `data_source.value`.
+ * Sequencing source for the handoff: the structured detail when present,
+ * else the value's keywords. Defaults to ENA, matching the stepper's toggle.
+ * @param field - Data-source field from the assistant schema.
  * @returns Normalised sequencing-source key.
  */
 export function resolveSequencingSource(
-  value: string | null | undefined
+  field: SchemaFieldState
 ): SEQUENCING_SOURCE {
-  if (!value) return SEQUENCING_SOURCE.ENA;
-  if (UPLOAD_KEYWORDS.test(value)) return SEQUENCING_SOURCE.UPLOAD;
+  const source = parseDataSourceDetail(field.detail)?.source;
+  if (source === "upload") return SEQUENCING_SOURCE.UPLOAD;
+  if (source === "ena" || source === "logan") return SEQUENCING_SOURCE.ENA;
+  if (!field.value) return SEQUENCING_SOURCE.ENA;
+  if (UPLOAD_KEYWORDS.test(field.value)) return SEQUENCING_SOURCE.UPLOAD;
   return SEQUENCING_SOURCE.ENA;
 }
