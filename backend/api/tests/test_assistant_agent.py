@@ -2537,3 +2537,91 @@ class TestDeriveSuggestions:
             setattr(schema, name, SchemaField(value="x", status=FieldStatus.FILLED))
         chips = agent._derive_suggestions(schema)
         assert [c.label for c in chips] == ["Continue to workflow setup"]
+
+
+LOGAN_META = {
+    "job_id": "fe6f66a714dcbec8",
+    "top_hits": [
+        {"rank": i + 1, "accession": acc, "score": 1.0}
+        for i, acc in enumerate(["ERR662077", "SRR7590703", "ERR450106", "ERR072010"])
+    ],
+}
+
+
+class TestDataSourceDetail:
+    def test_top_n_resolves_from_snapshot_in_rank_order(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("Top 3 runs from the Logan search", LOGAN_META)
+        )
+        assert detail == {
+            "source": "logan",
+            "job_id": "fe6f66a714dcbec8",
+            "requested": 3,
+            "resolved": 3,
+            "accessions": ["ERR662077", "SRR7590703", "ERR450106"],
+        }
+
+    def test_top_n_beyond_available_records_requested(self, agent):
+        detail = json.loads(agent._data_source_detail("top 50 runs", LOGAN_META))
+        assert detail["requested"] == 50
+        assert detail["resolved"] == 4
+        assert len(detail["accessions"]) == 4
+
+    def test_top_n_without_snapshot_is_ignored(self, agent):
+        assert agent._data_source_detail("top 5 runs", None) is None
+
+    def test_explicit_accessions(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("SRA runs SRR7590703 and ERR662077", None)
+        )
+        assert detail == {"source": "ena", "accessions": ["SRR7590703", "ERR662077"]}
+
+    def test_explicit_accessions_deduped_and_short_ids_ignored(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("ERR12 ERR662077 ERR662077", None)
+        )
+        assert detail["accessions"] == ["ERR662077"]
+
+    def test_top_n_and_explicit_merge_as_logan(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("top 2 plus DRR999999", LOGAN_META)
+        )
+        assert detail["source"] == "logan"
+        assert detail["accessions"] == ["ERR662077", "SRR7590703", "DRR999999"]
+
+    def test_upload_phrasing(self, agent):
+        assert json.loads(agent._data_source_detail("my own FASTQ files", None)) == {
+            "source": "upload"
+        }
+        assert json.loads(agent._data_source_detail("User upload", None)) == {
+            "source": "upload"
+        }
+
+    def test_no_signal(self, agent):
+        assert agent._data_source_detail("ENA", None) is None
+
+
+class TestApplySchemaUpdatesDataSource:
+    def test_writes_detail_from_snapshot(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "Top 2 runs from Logan"}, logan=LOGAN_META
+        )
+        assert out.data_source.status == FieldStatus.FILLED
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
+
+    def test_writes_detail_for_explicit_runs_without_snapshot(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "SRR7590703"}
+        )
+        assert json.loads(out.data_source.detail) == {
+            "source": "ena",
+            "accessions": ["SRR7590703"],
+        }
+
+    def test_detail_is_none_when_nothing_resolves(self, agent):
+        out = agent._apply_schema_updates(AnalysisSchema(), {"data_source": "ENA"})
+        assert out.data_source.status == FieldStatus.FILLED
+        assert out.data_source.detail is None
