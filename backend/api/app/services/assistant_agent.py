@@ -814,8 +814,44 @@ class AssistantAgent:
         return self._apply_schema_updates(schema, {})
 
     @staticmethod
-    def _data_source_detail(value: str, logan: Optional[dict]) -> Optional[str]:
-        """Structured detail for a free-text data_source value, or None.
+    def _carried_accessions(prior: SchemaField) -> Optional[str]:
+        """The prior turn's resolved accessions, when this turn resolved none.
+
+        The extractor restates the tracker every turn and paraphrases freely:
+        "top 5 runs" becomes "ENA/SRA accessions" once a later turn is about
+        something else. Re-deriving from that text finds nothing and the
+        stepper loses the run ids. Naming a different source, or new
+        accessions, still resolves and replaces this.
+        """
+        if prior.status != FieldStatus.FILLED or not prior.detail:
+            return None
+        try:
+            payload = json.loads(prior.detail)
+        except (TypeError, ValueError):
+            return None  # a pre-#1296 free-text detail
+        if isinstance(payload, dict) and payload.get("accessions"):
+            return prior.detail
+        return None
+
+    @staticmethod
+    def _data_source_detail(
+        value: str, logan: Optional[dict], user_message: Optional[str] = None
+    ) -> Optional[str]:
+        """Structured detail for this turn's data_source, or None.
+
+        The extracted value is authoritative when it resolves. It often does
+        not: asked for "the top 5 runs" the extractor routinely records
+        "ENA/SRA accessions", which names no ids at all -- so the user's own
+        words for the turn are the fallback.
+        """
+        detail = AssistantAgent._resolve_data_source(value, logan)
+        if detail is None and user_message:
+            detail = AssistantAgent._resolve_data_source(user_message, logan)
+        return detail
+
+    @staticmethod
+    def _resolve_data_source(value: str, logan: Optional[dict]) -> Optional[str]:
+        """Structured detail for one piece of free text, or None.
 
         The stepper needs accessions, not prose. This is where they get
         determined -- server-side, once -- so the frontend stops regex-
@@ -1281,7 +1317,10 @@ class AssistantAgent:
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
             )
         schema_state = self._apply_schema_updates(
-            state.schema_state, schema_updates, logan=state.metadata.get("logan")
+            state.schema_state,
+            schema_updates,
+            logan=state.metadata.get("logan"),
+            user_message=message,
         )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
@@ -1809,6 +1848,7 @@ class AssistantAgent:
         current: AnalysisSchema,
         updates: Dict[str, Optional[str]],
         logan: Optional[dict] = None,
+        user_message: Optional[str] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -1880,7 +1920,9 @@ class AssistantAgent:
                     continue
 
             if key == "data_source":
-                field.detail = self._data_source_detail(str(value), logan)
+                field.detail = self._data_source_detail(
+                    str(value), logan, user_message
+                ) or self._carried_accessions(current.data_source)
 
             setattr(schema, key, field)
 
