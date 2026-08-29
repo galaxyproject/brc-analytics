@@ -2,6 +2,7 @@ import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
+  LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
@@ -21,6 +22,7 @@ interface UseAssistantChatReturn {
   isComplete: boolean;
   isRestoring: boolean;
   loading: boolean;
+  logan: LoganContext | null;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
@@ -33,6 +35,7 @@ interface UseAssistantChatReturn {
 }
 
 interface UseAssistantChatOptions {
+  initialLoganJobId?: string;
   initialMessage?: string;
   initialSessionId?: string;
   sessionKey: string;
@@ -42,14 +45,19 @@ interface UseAssistantChatOptions {
  * Manages assistant chat state: messages, session, schema, and suggestions.
  * Persists session_id to localStorage and restores on mount; explicit
  * `initialSessionId` from URL params takes precedence over the stored value.
- * An `initialMessage` opens a new conversation with that question instead.
+ * An `initialMessage` opens a new conversation with that question instead, and
+ * `initialLoganJobId` outranks both -- it opens a new conversation bound to
+ * that search, which is the more specific intent when a person has just
+ * clicked through from a cohort.
  * @param root0 - Hook options.
+ * @param root0.initialLoganJobId - Logan job to open a new session from.
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
  * @returns Chat state, sendMessage, save/reset/retry functions.
  */
 export const useAssistantChat = ({
+  initialLoganJobId,
   initialMessage,
   initialSessionId,
   sessionKey,
@@ -59,6 +67,7 @@ export const useAssistantChat = ({
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
+  const [logan, setLogan] = useState<LoganContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +92,8 @@ export const useAssistantChat = ({
     // Until the query settles a handed-over question is invisible, and
     // restoring on that first pass would race the question to the message list.
     if (!router.isReady) return;
+    // A Logan job opens its own session below and outranks both sources.
+    if (initialLoganJobId) return;
     // A question handed over from elsewhere on the site opens a conversation of
     // its own; restoring here would graft it onto whatever came before.
     if (question) return;
@@ -114,6 +125,7 @@ export const useAssistantChat = ({
         setSuggestions(restored.suggestions);
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
+        setLogan(restored.logan ?? null);
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -152,7 +164,53 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-  }, [initialSessionId, question, router.isReady, sessionKey]);
+  }, [
+    initialLoganJobId,
+    initialSessionId,
+    question,
+    router.isReady,
+    sessionKey,
+  ]);
+
+  // Opening from a Logan search wins over a URL session id and localStorage:
+  // the person just clicked "ask the assistant about this cohort", so a new
+  // conversation bound to that job is what they meant. The prior session is
+  // not deleted -- it lives out its TTL and a saved analysis is unaffected.
+  useEffect(() => {
+    if (!initialLoganJobId) return;
+    let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setIsRestoring(true);
+    setError(null);
+
+    assistantAPIClient
+      .assistantCreateSession({ logan_job_id: initialLoganJobId })
+      .then((created) => {
+        if (cancelled) return;
+        sessionIdRef.current = created.session_id;
+        localStorage.setItem(sessionKey, created.session_id);
+        setMessages(created.messages);
+        setSchema(created.schema_state);
+        setSuggestions(created.suggestions);
+        setIsComplete(created.is_complete);
+        setHandoffUrl(created.handoff_url);
+        setLogan(created.logan ?? null);
+        stripQueryParam(router, [ASSISTANT_QUERY_PARAM.LOGAN_JOB]);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        sessionIdRef.current = null;
+        setError(loganSessionErrorMessage(error, initialLoganJobId));
+      })
+      .finally(() => {
+        if (!cancelled) setIsRestoring(false);
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- router is stable for the life of the page; listing it would re-run this effect on every shallow replace, including the one it performs itself
+  }, [initialLoganJobId, sessionKey]);
 
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
@@ -187,6 +245,7 @@ export const useAssistantChat = ({
         setSuggestions(response.suggestions);
         setIsComplete(response.is_complete);
         setHandoffUrl(response.handoff_url);
+        setLogan(response.logan ?? null);
       } catch (err) {
         const errorMessage = handleChatError(err);
         setError(errorMessage);
@@ -253,6 +312,7 @@ export const useAssistantChat = ({
     setSuggestions([]);
     setIsComplete(false);
     setHandoffUrl(null);
+    setLogan(null);
     setError(null);
     setLastFailedMessage(null);
     setSaveMessage(null);
@@ -284,6 +344,7 @@ export const useAssistantChat = ({
     isComplete,
     isRestoring,
     loading,
+    logan,
     messages,
     onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
@@ -310,6 +371,28 @@ function stripQueryParam(router: NextRouter, names: string[]): void {
     .catch(() => {
       // Cosmetic: whatever the parameter carried has already been consumed.
     });
+}
+
+/**
+ * Copy for a failed Logan session open. The error is a string today, so the
+ * results path is spelled out rather than linked.
+ * @param error - The thrown value.
+ * @param jobId - The Logan job that failed to open.
+ * @returns A user-facing error string.
+ */
+function loganSessionErrorMessage(error: unknown, jobId: string): string {
+  const status = httpStatus(error);
+  const resultsPath = `/logan-search?job=${jobId}`;
+  if (status === 404) {
+    return `That search's results have expired. Re-run it at ${resultsPath} to bring them back.`;
+  }
+  if (status === 409) {
+    return `That search is still running. Wait for it at ${resultsPath}, then try again.`;
+  }
+  if (status === 422) {
+    return `That search failed in Galaxy. Check it at ${resultsPath}.`;
+  }
+  return handleChatError(error);
 }
 
 /**
