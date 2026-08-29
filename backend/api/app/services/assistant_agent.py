@@ -1251,7 +1251,9 @@ class AssistantAgent:
 
         # 3) Suggestions are derived server-side from the new tracker state (no
         # LLM), so they're always consistent with the tracker and can't leak.
-        suggestions = self._derive_suggestions(schema_state)
+        suggestions = self._derive_suggestions(
+            schema_state, logan=state.metadata.get("logan")
+        )
 
         # Token usage across both calls (the extractor adds a little).
         token_usage = self._combine_usage(result.usage(), extract_usage)
@@ -1387,7 +1389,9 @@ class AssistantAgent:
             + g(extract_usage, "total_tokens"),
         )
 
-    def _derive_suggestions(self, schema: AnalysisSchema) -> List[SuggestionChip]:
+    def _derive_suggestions(
+        self, schema: AnalysisSchema, logan: Optional[dict] = None
+    ) -> List[SuggestionChip]:
         """Derive next-step chips from the tracker + catalog, deterministically.
 
         Suggestions are a pure function of state + catalog, so we compute them
@@ -1404,11 +1408,18 @@ class AssistantAgent:
         proposals: List[Dict[str, Any]] = []
         try:
             if not filled(schema.organism):
-                proposals = [
-                    {"label": "What organisms do you have?"},
-                    {"label": "Tell me about variant calling"},
-                    {"label": "Tell me about transcriptomics"},
-                ]
+                if logan:
+                    proposals = [
+                        {"label": "What is this cohort?"},
+                        {"label": "Which of these organisms are in BRC?"},
+                        {"label": "Set up an analysis on the top runs"},
+                    ]
+                else:
+                    proposals = [
+                        {"label": "What organisms do you have?"},
+                        {"label": "Tell me about variant calling"},
+                        {"label": "Tell me about transcriptomics"},
+                    ]
             elif not filled(schema.assembly):
                 ref = self._reference_assembly_for(schema.organism)
                 if ref:
@@ -1416,6 +1427,8 @@ class AssistantAgent:
                         {"label": "Use the reference assembly", "assembly": ref}
                     )
                 proposals.append({"label": "Show me the available assemblies"})
+                if logan:
+                    proposals.append({"label": "Use the top 5 runs as my data"})
             elif not filled(schema.analysis_type):
                 proposals = [
                     {"label": "Variant calling"},
@@ -1434,10 +1447,16 @@ class AssistantAgent:
                     {"label": "Show compatible workflows"},
                 ]
             elif not filled(schema.data_source):
-                proposals = [
-                    {"label": "I'll upload my own data"},
-                    {"label": "I'll pull data from ENA/SRA"},
-                ]
+                if logan:
+                    proposals = [
+                        {"label": "Use the top 5 runs as my data"},
+                        {"label": "I'll upload my own data"},
+                    ]
+                else:
+                    proposals = [
+                        {"label": "I'll upload my own data"},
+                        {"label": "I'll pull data from ENA/SRA"},
+                    ]
             else:
                 proposals = [{"label": "Continue to workflow setup"}]
         except Exception:

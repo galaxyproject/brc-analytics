@@ -2706,3 +2706,39 @@ class TestLoganInstructions:
         _wire_session(inst, plain)
         await inst.chat("hello", session_id="s2")
         assert not any(s and "## Logan search context" in s for s in seen)
+
+
+class TestDeriveSuggestionsLogan:
+    def test_logan_session_with_empty_organism(self, agent):
+        chips = agent._derive_suggestions(AnalysisSchema(), logan=LOGAN_META)
+        assert [c.label for c in chips] == [
+            "What is this cohort?",
+            "Which of these organisms are in BRC?",
+            "Set up an analysis on the top runs",
+        ]
+
+    def test_logan_session_with_organism_adds_top_runs_chip(self, agent):
+        agent._reference_assembly_for = lambda org: None
+        schema = AnalysisSchema(organism=_filled_field("Plasmodium falciparum", "5833"))
+        chips = agent._derive_suggestions(schema, logan=LOGAN_META)
+        labels = [c.label for c in chips]
+        assert "Show me the available assemblies" in labels
+        assert labels[-1] == "Use the top 5 runs as my data"
+
+    def test_logan_session_data_source_chips(self, agent):
+        agent.catalog.workflows_by_category = []
+        schema = AnalysisSchema(
+            organism=_filled_field("Plasmodium falciparum", "5833"),
+            assembly=_filled_field("GCF_000002765.6", "GCF_000002765.6"),
+            analysis_type=_filled_field("Variant Calling"),
+            workflow=_filled_field("wf", "trs"),
+        )
+        chips = agent._derive_suggestions(schema, logan=LOGAN_META)
+        assert [c.label for c in chips] == [
+            "Use the top 5 runs as my data",
+            "I'll upload my own data",
+        ]
+
+    def test_without_logan_unchanged(self, agent):
+        chips = agent._derive_suggestions(AnalysisSchema())
+        assert chips[0].label == "What organisms do you have?"

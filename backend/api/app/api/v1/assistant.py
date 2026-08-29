@@ -195,7 +195,9 @@ async def restore_session(
     # can be inconsistent with a schema that just lost a removed workflow (e.g. a
     # stale "continue to handoff" chip), which would steer the user down an
     # invalid path (Copilot). This is the same derivation the chat path runs.
-    suggestions = agent._derive_suggestions(schema_state)
+    suggestions = agent._derive_suggestions(
+        schema_state, logan=state.metadata.get("logan")
+    )
     is_complete, handoff_url = agent.compute_handoff(
         schema_state, session_id=state.session_id
     )
