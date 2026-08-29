@@ -1,9 +1,11 @@
 """Snapshot builder: the ~5 KB the assistant is handed for a Logan job."""
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
 
+from app.models.assistant import AnalysisSchema, FieldStatus
 from app.models.galaxy import (
     KmindexCohort,
     KmindexFacet,
@@ -15,15 +17,27 @@ from app.models.galaxy import (
 )
 from app.models.logan import LoganSnapshot
 from app.services.logan_snapshot import (
+    LOGAN_DOMINANT_SHARE,
     LOGAN_MAX_STRING,
     LOGAN_TOP_HITS,
     build_logan_snapshot,
     clean_text,
     logan_context_from,
+    prefill_from_logan,
     results_url_for,
 )
 
 JOB = "fe6f66a714dcbec8"
+
+
+def _catalog(resolves=True):
+    catalog = MagicMock()
+    catalog.find_organism_exact.return_value = (
+        {"species": "Plasmodium falciparum", "taxonomy_id": "5833"}
+        if resolves
+        else None
+    )
+    return catalog
 
 
 def facet(name, values, other=0, unknown=0) -> KmindexFacet:
@@ -219,3 +233,49 @@ class TestContext:
     def test_absent(self):
         assert logan_context_from({}) is None
         assert logan_context_from({"logan": "garbage"}) is None
+
+
+class TestPrefill:
+    def test_dominant_and_resolvable_fills_organism_with_taxid_detail(self):
+        snap = build_logan_snapshot(results(), captured_at="t")
+        out = prefill_from_logan(AnalysisSchema(), snap, _catalog())
+        assert out.organism.status == FieldStatus.FILLED
+        assert out.organism.value == "Plasmodium falciparum"
+        assert out.organism.detail == "5833"
+
+    def test_does_not_mutate_input(self):
+        schema = AnalysisSchema()
+        prefill_from_logan(
+            schema, build_logan_snapshot(results(), captured_at="t"), _catalog()
+        )
+        assert schema.organism.status == FieldStatus.EMPTY
+
+    def test_below_threshold_stays_empty(self):
+        cohort = eukaryote_cohort()
+        cohort.top_organisms[0].count = int(LOGAN_DOMINANT_SHARE * cohort.in_mirror) - 1
+        snap = build_logan_snapshot(results(cohort=cohort), captured_at="t")
+        out = prefill_from_logan(AnalysisSchema(), snap, _catalog())
+        assert out.organism.status == FieldStatus.EMPTY
+
+    def test_unresolvable_name_stays_empty(self):
+        snap = build_logan_snapshot(results(), captured_at="t")
+        out = prefill_from_logan(AnalysisSchema(), snap, _catalog(resolves=False))
+        assert out.organism.status == FieldStatus.EMPTY
+
+    def test_no_cohort_stays_empty(self):
+        snap = build_logan_snapshot(results(cohort=None), captured_at="t")
+        out = prefill_from_logan(AnalysisSchema(), snap, _catalog())
+        assert out.organism.status == FieldStatus.EMPTY
+
+    def test_nothing_else_is_touched(self):
+        snap = build_logan_snapshot(results(), captured_at="t")
+        out = prefill_from_logan(AnalysisSchema(), snap, _catalog())
+        for name in (
+            "assembly",
+            "analysis_type",
+            "workflow",
+            "data_source",
+            "data_characteristics",
+            "gene_annotation",
+        ):
+            assert getattr(out, name).status == FieldStatus.EMPTY

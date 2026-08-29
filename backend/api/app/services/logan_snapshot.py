@@ -3,6 +3,7 @@
 import re
 from typing import Any, Dict, Optional
 
+from app.models.assistant import AnalysisSchema, FieldStatus, SchemaField
 from app.models.galaxy import (
     KmindexCohort,
     KmindexFacet,
@@ -13,6 +14,11 @@ from app.models.logan import LoganContext, LoganSnapshot, LoganTopHit
 
 LOGAN_TOP_HITS = 25
 LOGAN_MAX_STRING = 80
+
+# The dominant organism must be at least this share of the mirrored runs
+# before the tracker commits to it. Below that the cohort is mixed and the
+# person decides.
+LOGAN_DOMINANT_SHARE = 0.5
 
 # Anything below space, plus DEL. Newlines included: every string here is
 # rendered into one line of the model's instructions, and SRA metadata is
@@ -131,3 +137,31 @@ def logan_context_from(metadata: Dict[str, Any]) -> Optional[LoganContext]:
         top_organism_share=share,
         results_url=snap.results_url,
     )
+
+
+def prefill_from_logan(
+    schema: AnalysisSchema, snapshot: LoganSnapshot, catalog: Any
+) -> AnalysisSchema:
+    """Fill what the cohort proves, and nothing else.
+
+    Organism only: the reflectors own data_characteristics and would wipe a
+    prefill, and everything else is a choice. detail is the taxonomy id --
+    _reference_assembly_for and the chip validator read it as one -- so the
+    provenance sentence lives in the intro, not here.
+    """
+    out = schema.model_copy(deep=True)
+    cohort = snapshot.cohort
+    if cohort is None or cohort.in_mirror <= 0 or not cohort.top_organisms:
+        return out
+    top = cohort.top_organisms[0]
+    if top.count / cohort.in_mirror < LOGAN_DOMINANT_SHARE:
+        return out
+    org = catalog.find_organism_exact(top.value)
+    if not org or not org.get("species"):
+        return out
+    out.organism = SchemaField(
+        value=str(org["species"]),
+        status=FieldStatus.FILLED,
+        detail=str(org.get("taxonomy_id") or "") or None,
+    )
+    return out
