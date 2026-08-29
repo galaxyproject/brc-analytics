@@ -55,6 +55,17 @@ function signedOut(): void {
   });
 }
 
+function authLoading(): void {
+  mockUseAuth.mockReturnValue({
+    isAuthenticated: false,
+    isConfigured: true,
+    isLoading: true,
+    login: jest.fn(),
+    logout: jest.fn(),
+    user: null,
+  });
+}
+
 const noop = (): void => undefined;
 
 const TURN = [
@@ -104,6 +115,31 @@ describe("ChatPanel", () => {
     );
 
     expect(screen.getByText("Saved to your account")).toBeInTheDocument();
+  });
+
+  test("does not offer sign-in before auth has resolved", () => {
+    // AuthProvider starts signed-out, and the session restore can land before
+    // /auth/me does -- which would offer to save a conversation that a
+    // signed-in user is already having saved for them.
+    authLoading();
+
+    render(
+      <ChatPanel
+        error={null}
+        introText="Ask away"
+        isSaved={false}
+        loading={false}
+        messages={TURN}
+        onSend={noop}
+        suggestions={[]}
+      />
+    );
+
+    expect(
+      screen.queryByRole("button", {
+        name: "Sign in to keep this conversation",
+      })
+    ).not.toBeInTheDocument();
   });
 
   test("offers to keep an anonymous conversation", () => {

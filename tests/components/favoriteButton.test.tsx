@@ -148,4 +148,25 @@ describe("FavoriteButton", () => {
     expect(login).toHaveBeenCalled();
     expect(toggleFavorite).not.toHaveBeenCalled();
   });
+
+  test("says what it does on its face when signed out", () => {
+    // Asserts the visible text, not the accessible name: MUI's Tooltip already
+    // supplied "Sign in to save" as the aria-label, so the name passes either
+    // way. What was wrong is what people actually see -- a button reading
+    // "Save" that signs you in, with the correction hidden in a tooltip that
+    // touch users never get.
+    setFavorites();
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      isConfigured: true,
+      isLoading: false,
+      login: jest.fn(),
+    } as unknown as ReturnType<typeof useAuth>);
+
+    render(
+      <FavoriteButton entityId={ACCESSION} entityType={ENTITY_TYPE.ASSEMBLY} />
+    );
+
+    expect(screen.getByRole("button")).toHaveTextContent("Sign in to save");
+  });
 });

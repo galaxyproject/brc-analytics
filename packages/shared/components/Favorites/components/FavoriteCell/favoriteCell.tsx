@@ -36,9 +36,13 @@ export function FavoriteCell({
   if (!isConfigured || isAuthLoading) return null;
 
   const favorited = isAuthenticated && isFavorited(entityType, entityId);
-  const label = favorited
+  // Signed out, this control signs you in -- so the accessible name has to say
+  // that. The tooltip already did, but aria-label overrides it for assistive
+  // tech, which left screen reader users hearing "Save" for a sign-in button.
+  const savedLabel = favorited
     ? `Remove ${entityId} from saved`
     : `Save ${entityId}`;
+  const label = isAuthenticated ? savedLabel : `Sign in to save ${entityId}`;
 
   function handleClick(): void {
     if (!isAuthenticated) {
