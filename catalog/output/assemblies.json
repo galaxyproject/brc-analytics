@@ -135225,7 +135225,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_018398765.1/",
     "gcPercent": 49,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/018/398/765/GCA_018398765.1/genes/GCA_018398765.1_ASM1839876v1.augustus.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 193672810,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -236756,10 +236756,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737332"
+      "2305859"
     ],
-    "ncbiTaxonomyId": "1737332",
+    "ncbiTaxonomyId": "2305859",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -236770,7 +236769,7 @@
     "scaffoldCount": 5716,
     "scaffoldL50": 639,
     "scaffoldN50": 44405,
-    "speciesTaxonomyId": "1737332",
+    "speciesTaxonomyId": "2305859",
     "strainName": "NIC534",
     "taxonomicGroup": [
       "Nematoda"
@@ -236785,8 +236784,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 21 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 21 LS-2015 strain NIC534",
+    "taxonomicLevelSpecies": "Caenorhabditis parvicauda",
+    "taxonomicLevelStrain": "Caenorhabditis parvicauda strain NIC534",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536235.3"
   },
   {
@@ -236883,10 +236882,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737333"
+      "2306312"
     ],
-    "ncbiTaxonomyId": "1737333",
+    "ncbiTaxonomyId": "2306312",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -236897,7 +236895,7 @@
     "scaffoldCount": 3127,
     "scaffoldL50": 328,
     "scaffoldN50": 91328,
-    "speciesTaxonomyId": "1737333",
+    "speciesTaxonomyId": "2306312",
     "strainName": "JU2190",
     "taxonomicGroup": [
       "Nematoda"
@@ -236912,8 +236910,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 26 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 26 LS-2015 strain JU2190",
+    "taxonomicLevelSpecies": "Caenorhabditis zanzibari",
+    "taxonomicLevelStrain": "Caenorhabditis zanzibari strain JU2190",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536285.3"
   },
   {
@@ -236947,10 +236945,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737334"
+      "2305860"
     ],
-    "ncbiTaxonomyId": "1737334",
+    "ncbiTaxonomyId": "2305860",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -236961,7 +236958,7 @@
     "scaffoldCount": 3222,
     "scaffoldL50": 145,
     "scaffoldN50": 177024,
-    "speciesTaxonomyId": "1737334",
+    "speciesTaxonomyId": "2305860",
     "strainName": "JU2585",
     "taxonomicGroup": [
       "Nematoda"
@@ -236976,8 +236973,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 31 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 31 LS-2015 strain JU2585",
+    "taxonomicLevelSpecies": "Caenorhabditis uteleia",
+    "taxonomicLevelStrain": "Caenorhabditis uteleia strain JU2585",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536295.3"
   },
   {
@@ -237011,10 +237008,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737337"
+      "2306311"
     ],
-    "ncbiTaxonomyId": "1737337",
+    "ncbiTaxonomyId": "2306311",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -237025,7 +237021,7 @@
     "scaffoldCount": 3276,
     "scaffoldL50": 129,
     "scaffoldN50": 224519,
-    "speciesTaxonomyId": "1737337",
+    "speciesTaxonomyId": "2306311",
     "strainName": "JU2818",
     "taxonomicGroup": [
       "Nematoda"
@@ -237040,8 +237036,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 40 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 40 LS-2015 strain JU2818",
+    "taxonomicLevelSpecies": "Caenorhabditis tribulationis",
+    "taxonomicLevelStrain": "Caenorhabditis tribulationis strain JU2818",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536305.3"
   },
   {
@@ -237138,10 +237134,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737335"
+      "2305862"
     ],
-    "ncbiTaxonomyId": "1737335",
+    "ncbiTaxonomyId": "2305862",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -237152,7 +237147,7 @@
     "scaffoldCount": 2044,
     "scaffoldL50": 139,
     "scaffoldN50": 136669,
-    "speciesTaxonomyId": "1737335",
+    "speciesTaxonomyId": "2305862",
     "strainName": "JU2788",
     "taxonomicGroup": [
       "Nematoda"
@@ -237167,8 +237162,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 32 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 32 LS-2015 strain JU2788",
+    "taxonomicLevelSpecies": "Caenorhabditis sulstoni",
+    "taxonomicLevelStrain": "Caenorhabditis sulstoni strain JU2788",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536325.3"
   },
   {
@@ -237202,10 +237197,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1737336"
+      "2305864"
     ],
-    "ncbiTaxonomyId": "1737336",
+    "ncbiTaxonomyId": "2305864",
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -237216,7 +237210,7 @@
     "scaffoldCount": 21203,
     "scaffoldL50": 1253,
     "scaffoldN50": 15123,
-    "speciesTaxonomyId": "1737336",
+    "speciesTaxonomyId": "2305864",
     "strainName": "NIC564",
     "taxonomicGroup": [
       "Nematoda"
@@ -237231,8 +237225,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 39 LS-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 39 LS-2015 strain NIC564",
+    "taxonomicLevelSpecies": "Caenorhabditis waitukubuli",
+    "taxonomicLevelStrain": "Caenorhabditis waitukubuli strain NIC564",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536345.3"
   },
   {
@@ -237266,10 +237260,9 @@
       "6243",
       "55885",
       "6237",
-      "2641029",
-      "1729975"
+      "2305861"
     ],
-    "ncbiTaxonomyId": "1729975",
+    "ncbiTaxonomyId": "2305861",
     "otherTaxa": null,
     "ploidy": [
       "DIPLOID"
@@ -237280,7 +237273,7 @@
     "scaffoldCount": 4890,
     "scaffoldL50": 184,
     "scaffoldN50": 139430,
-    "speciesTaxonomyId": "1729975",
+    "speciesTaxonomyId": "2305861",
     "strainName": "JU2809",
     "taxonomicGroup": [
       "Nematoda"
@@ -237295,8 +237288,8 @@
     "taxonomicLevelPhylum": "Nematoda",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 38 MB-2015",
-    "taxonomicLevelStrain": "Caenorhabditis sp. 38 MB-2015 strain JU2809",
+    "taxonomicLevelSpecies": "Caenorhabditis quiockensis",
+    "taxonomicLevelStrain": "Caenorhabditis quiockensis strain JU2809",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536415.3"
   },
   {
@@ -242222,7 +242215,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_904066235.2/",
     "gcPercent": 40.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/904/066/235/GCA_904066235.2/genes/GCA_904066235.2_BXYJv5.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 78274012,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -262025,7 +262018,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000245815.1/",
     "gcPercent": 39.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/245/815/GCF_000245815.1/genes/GCF_000245815.1_Dolo_pigr_ATCC_51524_V1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 1862135,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -264724,7 +264717,6 @@
     "chromosomes": 21,
     "commonNames": [
       "crab-eating macaque",
-      "crab eating macaque",
       "cynomolgus macaque",
       "cynomolgus monkey",
       "cynomolgus monkeys",
@@ -265880,7 +265872,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000500045.1/",
     "gcPercent": 29,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/500/045/GCF_000500045.1/genes/GCF_000500045.1_AB6.5.1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 1784977,
     "level": "Contig",
     "lineageTaxonomyIds": [
@@ -267816,7 +267808,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000804505.1/",
     "gcPercent": 32.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/804/505/GCF_000804505.1/genes/GCF_000804505.1_ASM80450v1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 1579101,
     "level": "Contig",
     "lineageTaxonomyIds": [
@@ -293726,7 +293718,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_002243135.1/",
     "gcPercent": 32,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/243/135/GCF_002243135.1/genes/GCF_002243135.1_ASM224313v1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 1838801,
     "level": "Contig",
     "lineageTaxonomyIds": [

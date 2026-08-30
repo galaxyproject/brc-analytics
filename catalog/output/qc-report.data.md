@@ -396,6 +396,7 @@ None
 ## Outdated assembly accessions
 
 - GCA_000855695.1 (current: GCA_000855695.2)
+- GCA_003336725.1 (current: GCA_003336725.2)
 - GCA_022627015.2 (current: GCA_022627015.3)
 - GCA_029168785.1 (current: GCA_029168785.2)
 - GCA_029168835.1 (current: GCA_029168835.2)
@@ -431,6 +432,7 @@ None
 - GCA_051996125.1 (current: GCA_051996125.2)
 - GCA_052058435.1 (current: GCA_052058435.2)
 - GCA_904845305.1 (current: GCA_904845305.2)
+- GCF_902374465.1 (current: GCF_902374465.2)
 - GCF_943734665.1 (current: GCF_943734665.2)
 
 ## Suppressed or retired genomes
