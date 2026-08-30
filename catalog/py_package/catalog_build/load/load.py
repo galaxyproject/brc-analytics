@@ -10,7 +10,6 @@ from .ncbi_taxonomy import load_ncbi_taxonomy
 @dataclass
 class LoadResult:
     ncbi_taxdump_md5: str
-    has_curated_synonyms: bool
 
 
 def do_dlt_load(
@@ -28,18 +27,17 @@ def do_dlt_load(
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column, and optionally a `synonyms` column)
+      organisms_df: DataFrame of source organisms (must include `taxonomy_id` and `synonyms` columns)
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
 
     Returns:
-      A LoadResult with the verified NCBI taxdump MD5 digest and whether any curated
-      organism synonyms were loaded
+      A LoadResult with the verified NCBI taxdump MD5 digest
     """
     ncbi_taxdump_md5 = load_ncbi_taxonomy(
         temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
     )
 
-    has_curated_synonyms = load_catalog_source_data(
+    load_catalog_source_data(
         temp_folder_path=temp_folder_path,
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_df=assemblies_df,
@@ -47,6 +45,4 @@ def do_dlt_load(
         outbreaks_df=outbreaks_df,
     )
 
-    return LoadResult(
-        ncbi_taxdump_md5=ncbi_taxdump_md5, has_curated_synonyms=has_curated_synonyms
-    )
+    return LoadResult(ncbi_taxdump_md5=ncbi_taxdump_md5)

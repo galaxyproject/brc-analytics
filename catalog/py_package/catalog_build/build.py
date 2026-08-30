@@ -1560,7 +1560,7 @@ def load_and_transform(
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       taxonomic_levels: Taxonomic levels to build columns for during transformation
       assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      organisms_df: DataFrame of source organisms (must include `taxonomy_id` and `synonyms` columns)
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
 
     Returns:
@@ -1591,7 +1591,6 @@ def load_and_transform(
         temp_folder_path,
         taxonomic_levels=taxonomic_levels,
         has_outbreaks=outbreaks_df is not None,
-        has_curated_synonyms=load_result.has_curated_synonyms,
     )
 
     # Get transformed data and return along with metadata
