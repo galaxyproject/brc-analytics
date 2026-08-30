@@ -2043,67 +2043,6 @@
                                                     "rank": "family"
                                                 },
                                                 {
-                                                    "assembly_count": 2,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Candoia aspera",
-                                                                    "ncbi_tax_id": "51853",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Candoia",
-                                                            "ncbi_tax_id": "51852",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Boidae",
-                                                    "ncbi_tax_id": "8572",
-                                                    "rank": "family"
-                                                },
-                                                {
-                                                    "assembly_count": 4,
-                                                    "children": [
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Natrix helvetica",
-                                                                    "ncbi_tax_id": "2025560",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Natrix",
-                                                            "ncbi_tax_id": "8583",
-                                                            "rank": "genus"
-                                                        },
-                                                        {
-                                                            "assembly_count": 2,
-                                                            "children": [
-                                                                {
-                                                                    "assembly_count": 2,
-                                                                    "children": [],
-                                                                    "name": "Thamnophis elegans",
-                                                                    "ncbi_tax_id": "35005",
-                                                                    "rank": "species"
-                                                                }
-                                                            ],
-                                                            "name": "Thamnophis",
-                                                            "ncbi_tax_id": "34999",
-                                                            "rank": "genus"
-                                                        }
-                                                    ],
-                                                    "name": "Colubridae",
-                                                    "ncbi_tax_id": "8578",
-                                                    "rank": "family"
-                                                },
-                                                {
                                                     "assembly_count": 6,
                                                     "children": [
                                                         {
@@ -2278,6 +2217,44 @@
                                                     "rank": "family"
                                                 },
                                                 {
+                                                    "assembly_count": 4,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Natrix helvetica",
+                                                                    "ncbi_tax_id": "2025560",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Natrix",
+                                                            "ncbi_tax_id": "8583",
+                                                            "rank": "genus"
+                                                        },
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
+                                                                    "name": "Thamnophis elegans",
+                                                                    "ncbi_tax_id": "35005",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Thamnophis",
+                                                            "ncbi_tax_id": "34999",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Natricidae",
+                                                    "ncbi_tax_id": "169862",
+                                                    "rank": "family"
+                                                },
+                                                {
                                                     "assembly_count": 2,
                                                     "children": [
                                                         {
@@ -2424,6 +2401,29 @@
                                                                 {
                                                                     "assembly_count": 2,
                                                                     "children": [],
+                                                                    "name": "Candoia aspera",
+                                                                    "ncbi_tax_id": "51853",
+                                                                    "rank": "species"
+                                                                }
+                                                            ],
+                                                            "name": "Candoia",
+                                                            "ncbi_tax_id": "51852",
+                                                            "rank": "genus"
+                                                        }
+                                                    ],
+                                                    "name": "Candoiidae",
+                                                    "ncbi_tax_id": "3843544",
+                                                    "rank": "family"
+                                                },
+                                                {
+                                                    "assembly_count": 2,
+                                                    "children": [
+                                                        {
+                                                            "assembly_count": 2,
+                                                            "children": [
+                                                                {
+                                                                    "assembly_count": 2,
+                                                                    "children": [],
                                                                     "name": "Anolis sagrei",
                                                                     "ncbi_tax_id": "38937",
                                                                     "rank": "species"
@@ -2434,8 +2434,8 @@
                                                             "rank": "genus"
                                                         }
                                                     ],
-                                                    "name": "Dactyloidae",
-                                                    "ncbi_tax_id": "2024747",
+                                                    "name": "Anolidae",
+                                                    "ncbi_tax_id": "3843548",
                                                     "rank": "family"
                                                 }
                                             ],
