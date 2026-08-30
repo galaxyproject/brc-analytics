@@ -19293,7 +19293,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_002243135.1/",
         "gcPercent": 32,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/002/243/135/GCF_002243135.1/genes/GCF_002243135.1_ASM224313v1.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 1838801,
         "level": "Contig",
         "lineageTaxonomyIds": [
@@ -42390,104 +42390,6 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
-      "1729975"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536415.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536415.3/",
-        "gcPercent": 35,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/415/GCA_900536415.3/genes/GCA_900536415.3_CQUIO_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 100371645,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1729975"
-        ],
-        "ncbiTaxonomyId": "1729975",
-        "otherTaxa": null,
-        "ploidy": [
-          "DIPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 4890,
-        "scaffoldL50": 184,
-        "scaffoldN50": 139430,
-        "speciesTaxonomyId": "1729975",
-        "strainName": "JU2809",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 38 MB-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 38 MB-2015 strain JU2809",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536415.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1729975",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 38 MB-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 38 MB-2015 strain JU2809"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
       "44275"
     ],
     "commonNames": [],
@@ -42572,594 +42474,6 @@
     "taxonomicLevelSpecies": "Leptospira interrogans",
     "taxonomicLevelStrain": [
       "Leptospira interrogans strain FDAARGOS_203"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737332"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536235.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536235.3/",
-        "gcPercent": 39.5,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/235/GCA_900536235.3/genes/GCA_900536235.3_CPARV_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 93733926,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737332"
-        ],
-        "ncbiTaxonomyId": "1737332",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 5716,
-        "scaffoldL50": 639,
-        "scaffoldN50": 44405,
-        "speciesTaxonomyId": "1737332",
-        "strainName": "NIC534",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 21 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 21 LS-2015 strain NIC534",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536235.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737332",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 21 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 21 LS-2015 strain NIC534"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737333"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536285.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536285.3/",
-        "gcPercent": 38.5,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/285/GCA_900536285.3/genes/GCA_900536285.3_CZANZ_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 101086038,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737333"
-        ],
-        "ncbiTaxonomyId": "1737333",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 3127,
-        "scaffoldL50": 328,
-        "scaffoldN50": 91328,
-        "speciesTaxonomyId": "1737333",
-        "strainName": "JU2190",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 26 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 26 LS-2015 strain JU2190",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536285.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737333",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 26 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 26 LS-2015 strain JU2190"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737334"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536295.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536295.3/",
-        "gcPercent": 36,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/295/GCA_900536295.3/genes/GCA_900536295.3_CUTEL_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 104046868,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737334"
-        ],
-        "ncbiTaxonomyId": "1737334",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 3222,
-        "scaffoldL50": 145,
-        "scaffoldN50": 177024,
-        "speciesTaxonomyId": "1737334",
-        "strainName": "JU2585",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 31 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 31 LS-2015 strain JU2585",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536295.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737334",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 31 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 31 LS-2015 strain JU2585"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737335"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536325.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536325.3/",
-        "gcPercent": 46.5,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/325/GCA_900536325.3/genes/GCA_900536325.3_CSULS_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 65098870,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737335"
-        ],
-        "ncbiTaxonomyId": "1737335",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 2044,
-        "scaffoldL50": 139,
-        "scaffoldN50": 136669,
-        "speciesTaxonomyId": "1737335",
-        "strainName": "JU2788",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 32 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 32 LS-2015 strain JU2788",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536325.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737335",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 32 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 32 LS-2015 strain JU2788"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737336"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536345.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536345.3/",
-        "gcPercent": 42,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/345/GCA_900536345.3/genes/GCA_900536345.3_CWAIT_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 91416478,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737336"
-        ],
-        "ncbiTaxonomyId": "1737336",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 21203,
-        "scaffoldL50": 1253,
-        "scaffoldN50": 15123,
-        "speciesTaxonomyId": "1737336",
-        "strainName": "NIC564",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 39 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 39 LS-2015 strain NIC564",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536345.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737336",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 39 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 39 LS-2015 strain NIC564"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
-      "1737337"
-    ],
-    "commonNames": [],
-    "genomes": [
-      {
-        "accession": "GCA_900536305.3",
-        "annotationStatus": null,
-        "chromosomes": null,
-        "commonNames": [],
-        "coverage": "200",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536305.3/",
-        "gcPercent": 41.5,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/305/GCA_900536305.3/genes/GCA_900536305.3_CTRIB_v1.augustus.gtf.gz",
-        "isRef": "No",
-        "length": 101228815,
-        "level": "Scaffold",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2759",
-          "33154",
-          "33208",
-          "6072",
-          "33213",
-          "33317",
-          "1206794",
-          "6231",
-          "119089",
-          "6236",
-          "2301116",
-          "2301119",
-          "55879",
-          "6243",
-          "55885",
-          "6237",
-          "2641029",
-          "1737337"
-        ],
-        "ncbiTaxonomyId": "1737337",
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2019-04-11",
-        "scaffoldCount": 3276,
-        "scaffoldL50": 129,
-        "scaffoldN50": 224519,
-        "speciesTaxonomyId": "1737337",
-        "strainName": "JU2818",
-        "taxonomicGroup": [
-          "Nematoda"
-        ],
-        "taxonomicLevelClass": "Chromadorea",
-        "taxonomicLevelDomain": "Eukaryota",
-        "taxonomicLevelFamily": "Rhabditidae",
-        "taxonomicLevelGenus": "Caenorhabditis",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Metazoa",
-        "taxonomicLevelOrder": "Rhabditida",
-        "taxonomicLevelPhylum": "Nematoda",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Caenorhabditis sp. 40 LS-2015",
-        "taxonomicLevelStrain": "Caenorhabditis sp. 40 LS-2015 strain JU2818",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536305.3"
-      }
-    ],
-    "ncbiTaxonomyId": "1737337",
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Nematoda"
-    ],
-    "taxonomicLevelClass": "Chromadorea",
-    "taxonomicLevelDomain": "Eukaryota",
-    "taxonomicLevelFamily": "Rhabditidae",
-    "taxonomicLevelGenus": "Caenorhabditis",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Metazoa",
-    "taxonomicLevelOrder": "Rhabditida",
-    "taxonomicLevelPhylum": "Nematoda",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Caenorhabditis sp. 40 LS-2015",
-    "taxonomicLevelStrain": [
-      "Caenorhabditis sp. 40 LS-2015 strain JU2818"
     ]
   },
   {
@@ -68257,6 +67571,685 @@
     "taxonomicLevelSpecies": "Caenorhabditis becei",
     "taxonomicLevelStrain": [
       "Caenorhabditis becei strain QG2083"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2305859"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536235.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536235.3/",
+        "gcPercent": 39.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/235/GCA_900536235.3/genes/GCA_900536235.3_CPARV_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 93733926,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2305859"
+        ],
+        "ncbiTaxonomyId": "2305859",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 5716,
+        "scaffoldL50": 639,
+        "scaffoldN50": 44405,
+        "speciesTaxonomyId": "2305859",
+        "strainName": "NIC534",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis parvicauda",
+        "taxonomicLevelStrain": "Caenorhabditis parvicauda strain NIC534",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536235.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2305859",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis parvicauda",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis parvicauda strain NIC534"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2305860"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536295.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536295.3/",
+        "gcPercent": 36,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/295/GCA_900536295.3/genes/GCA_900536295.3_CUTEL_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 104046868,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2305860"
+        ],
+        "ncbiTaxonomyId": "2305860",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 3222,
+        "scaffoldL50": 145,
+        "scaffoldN50": 177024,
+        "speciesTaxonomyId": "2305860",
+        "strainName": "JU2585",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis uteleia",
+        "taxonomicLevelStrain": "Caenorhabditis uteleia strain JU2585",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536295.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2305860",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis uteleia",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis uteleia strain JU2585"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2305861"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536415.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536415.3/",
+        "gcPercent": 35,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/415/GCA_900536415.3/genes/GCA_900536415.3_CQUIO_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 100371645,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2305861"
+        ],
+        "ncbiTaxonomyId": "2305861",
+        "otherTaxa": null,
+        "ploidy": [
+          "DIPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 4890,
+        "scaffoldL50": 184,
+        "scaffoldN50": 139430,
+        "speciesTaxonomyId": "2305861",
+        "strainName": "JU2809",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis quiockensis",
+        "taxonomicLevelStrain": "Caenorhabditis quiockensis strain JU2809",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536415.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2305861",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis quiockensis",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis quiockensis strain JU2809"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2305862"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536325.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536325.3/",
+        "gcPercent": 46.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/325/GCA_900536325.3/genes/GCA_900536325.3_CSULS_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 65098870,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2305862"
+        ],
+        "ncbiTaxonomyId": "2305862",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 2044,
+        "scaffoldL50": 139,
+        "scaffoldN50": 136669,
+        "speciesTaxonomyId": "2305862",
+        "strainName": "JU2788",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis sulstoni",
+        "taxonomicLevelStrain": "Caenorhabditis sulstoni strain JU2788",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536325.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2305862",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis sulstoni",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis sulstoni strain JU2788"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2305864"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536345.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536345.3/",
+        "gcPercent": 42,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/345/GCA_900536345.3/genes/GCA_900536345.3_CWAIT_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 91416478,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2305864"
+        ],
+        "ncbiTaxonomyId": "2305864",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 21203,
+        "scaffoldL50": 1253,
+        "scaffoldN50": 15123,
+        "speciesTaxonomyId": "2305864",
+        "strainName": "NIC564",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis waitukubuli",
+        "taxonomicLevelStrain": "Caenorhabditis waitukubuli strain NIC564",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536345.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2305864",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis waitukubuli",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis waitukubuli strain NIC564"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2306311"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536305.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536305.3/",
+        "gcPercent": 41.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/305/GCA_900536305.3/genes/GCA_900536305.3_CTRIB_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 101228815,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2306311"
+        ],
+        "ncbiTaxonomyId": "2306311",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 3276,
+        "scaffoldL50": 129,
+        "scaffoldN50": 224519,
+        "speciesTaxonomyId": "2306311",
+        "strainName": "JU2818",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis tribulationis",
+        "taxonomicLevelStrain": "Caenorhabditis tribulationis strain JU2818",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536305.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2306311",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis tribulationis",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis tribulationis strain JU2818"
+    ]
+  },
+  {
+    "assemblyCount": 1,
+    "assemblyTaxonomyIds": [
+      "2306312"
+    ],
+    "commonNames": [],
+    "genomes": [
+      {
+        "accession": "GCA_900536285.3",
+        "annotationStatus": null,
+        "chromosomes": null,
+        "commonNames": [],
+        "coverage": "200",
+        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900536285.3/",
+        "gcPercent": 38.5,
+        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/536/285/GCA_900536285.3/genes/GCA_900536285.3_CZANZ_v1.augustus.gtf.gz",
+        "isRef": "No",
+        "length": 101086038,
+        "level": "Scaffold",
+        "lineageTaxonomyIds": [
+          "1",
+          "131567",
+          "2759",
+          "33154",
+          "33208",
+          "6072",
+          "33213",
+          "33317",
+          "1206794",
+          "6231",
+          "119089",
+          "6236",
+          "2301116",
+          "2301119",
+          "55879",
+          "6243",
+          "55885",
+          "6237",
+          "2306312"
+        ],
+        "ncbiTaxonomyId": "2306312",
+        "otherTaxa": null,
+        "ploidy": [
+          "HAPLOID"
+        ],
+        "priority": null,
+        "priorityPathogenName": null,
+        "releaseDate": "2019-04-11",
+        "scaffoldCount": 3127,
+        "scaffoldL50": 328,
+        "scaffoldN50": 91328,
+        "speciesTaxonomyId": "2306312",
+        "strainName": "JU2190",
+        "taxonomicGroup": [
+          "Nematoda"
+        ],
+        "taxonomicLevelClass": "Chromadorea",
+        "taxonomicLevelDomain": "Eukaryota",
+        "taxonomicLevelFamily": "Rhabditidae",
+        "taxonomicLevelGenus": "Caenorhabditis",
+        "taxonomicLevelIsolate": "None",
+        "taxonomicLevelKingdom": "Metazoa",
+        "taxonomicLevelOrder": "Rhabditida",
+        "taxonomicLevelPhylum": "Nematoda",
+        "taxonomicLevelRealm": "None",
+        "taxonomicLevelSerotype": "None",
+        "taxonomicLevelSpecies": "Caenorhabditis zanzibari",
+        "taxonomicLevelStrain": "Caenorhabditis zanzibari strain JU2190",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_900536285.3"
+      }
+    ],
+    "ncbiTaxonomyId": "2306312",
+    "otherTaxa": null,
+    "priority": null,
+    "priorityPathogenName": null,
+    "taxonomicGroup": [
+      "Nematoda"
+    ],
+    "taxonomicLevelClass": "Chromadorea",
+    "taxonomicLevelDomain": "Eukaryota",
+    "taxonomicLevelFamily": "Rhabditidae",
+    "taxonomicLevelGenus": "Caenorhabditis",
+    "taxonomicLevelIsolate": [
+      "None"
+    ],
+    "taxonomicLevelKingdom": "Metazoa",
+    "taxonomicLevelOrder": "Rhabditida",
+    "taxonomicLevelPhylum": "Nematoda",
+    "taxonomicLevelRealm": "None",
+    "taxonomicLevelSerotype": [
+      "None"
+    ],
+    "taxonomicLevelSpecies": "Caenorhabditis zanzibari",
+    "taxonomicLevelStrain": [
+      "Caenorhabditis zanzibari strain JU2190"
     ]
   },
   {
@@ -102608,7 +102601,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000245815.1/",
         "gcPercent": 39.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/245/815/GCF_000245815.1/genes/GCF_000245815.1_Dolo_pigr_ATCC_51524_V1.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 1862135,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -178963,7 +178956,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000804505.1/",
         "gcPercent": 32.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/804/505/GCF_000804505.1/genes/GCF_000804505.1_ASM80450v1.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 1579101,
         "level": "Contig",
         "lineageTaxonomyIds": [
@@ -180651,7 +180644,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_000500045.1/",
         "gcPercent": 29,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/000/500/045/GCF_000500045.1/genes/GCF_000500045.1_AB6.5.1.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 1784977,
         "level": "Contig",
         "lineageTaxonomyIds": [
@@ -204763,7 +204756,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_018398765.1/",
         "gcPercent": 49,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/018/398/765/GCA_018398765.1/genes/GCA_018398765.1_ASM1839876v1.augustus.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 193672810,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -355973,7 +355966,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_904066235.2/",
         "gcPercent": 40.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/904/066/235/GCA_904066235.2/genes/GCA_904066235.2_BXYJv5.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 78274012,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -399758,7 +399751,6 @@
     ],
     "commonNames": [
       "crab-eating macaque",
-      "crab eating macaque",
       "cynomolgus macaque",
       "cynomolgus monkey",
       "cynomolgus monkeys",
@@ -399771,7 +399763,6 @@
         "chromosomes": 21,
         "commonNames": [
           "crab-eating macaque",
-          "crab eating macaque",
           "cynomolgus macaque",
           "cynomolgus monkey",
           "cynomolgus monkeys",

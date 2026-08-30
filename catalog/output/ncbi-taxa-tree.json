@@ -19109,55 +19109,6 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Caenorhabditis sp. 38 MB-2015",
-                                                                    "ncbi_tax_id": "1729975",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 21 LS-2015",
-                                                                    "ncbi_tax_id": "1737332",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 26 LS-2015",
-                                                                    "ncbi_tax_id": "1737333",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 31 LS-2015",
-                                                                    "ncbi_tax_id": "1737334",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 32 LS-2015",
-                                                                    "ncbi_tax_id": "1737335",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 39 LS-2015",
-                                                                    "ncbi_tax_id": "1737336",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Caenorhabditis sp. 40 LS-2015",
-                                                                    "ncbi_tax_id": "1737337",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
                                                                     "name": "Caenorhabditis panamensis",
                                                                     "ncbi_tax_id": "2301259",
                                                                     "rank": "species"
@@ -19167,6 +19118,55 @@
                                                                     "children": [],
                                                                     "name": "Caenorhabditis becei",
                                                                     "ncbi_tax_id": "2301260",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis parvicauda",
+                                                                    "ncbi_tax_id": "2305859",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis uteleia",
+                                                                    "ncbi_tax_id": "2305860",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis quiockensis",
+                                                                    "ncbi_tax_id": "2305861",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis sulstoni",
+                                                                    "ncbi_tax_id": "2305862",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis waitukubuli",
+                                                                    "ncbi_tax_id": "2305864",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis tribulationis",
+                                                                    "ncbi_tax_id": "2306311",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Caenorhabditis zanzibari",
+                                                                    "ncbi_tax_id": "2306312",
                                                                     "rank": "species"
                                                                 },
                                                                 {
