@@ -4999,18 +4999,15 @@ organisms:
   - taxonomy_id: 2304647
     ploidy:
       - HAPLOID
-  - taxonomy_id: 2305861
-    ploidy:
-      - DIPLOID
   - taxonomy_id: 2305859
-    ploidy:
-      - HAPLOID
-  - taxonomy_id: 2306312
     ploidy:
       - HAPLOID
   - taxonomy_id: 2305860
     ploidy:
       - HAPLOID
+  - taxonomy_id: 2305861
+    ploidy:
+      - DIPLOID
   - taxonomy_id: 2305862
     ploidy:
       - HAPLOID
@@ -5018,6 +5015,9 @@ organisms:
     ploidy:
       - HAPLOID
   - taxonomy_id: 2306311
+    ploidy:
+      - HAPLOID
+  - taxonomy_id: 2306312
     ploidy:
       - HAPLOID
   - taxonomy_id: 2306442
