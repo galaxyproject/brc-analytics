@@ -38,18 +38,14 @@ export const Arrows = styled.div`
 `;
 
 /**
- * Sized to the content column, which the cards bleed past to the right as the
- * design shows: the row overflows the viewport rather than stopping short, and
- * the section clips it at the edge of the page. Padding on both sides keeps the
- * last card off the edge of the screen once the row has been paged to its end.
- * The bleed is to the right only -- the clip closes the left of the column, so
- * a card paged past it leaves the section rather than sitting in the gutter.
+ * Sized to the content column, which the cards bleed past as the design shows:
+ * the row overflows the viewport rather than stopping short, and the section
+ * clips it at the edge of the page. Padding on both sides keeps the last card
+ * off the edge of the screen once the row has been paged to its end.
  */
 export const CardsViewport = styled.div`
-  --cards-inset: max(${GUTTER}px, calc((100% - ${CONTENT_WIDTH}px) / 2));
-  clip-path: inset(-100vh -100vw -100vh var(--cards-inset));
   margin-top: 32px;
-  padding-left: var(--cards-inset);
+  padding-left: max(${GUTTER}px, calc((100% - ${CONTENT_WIDTH}px) / 2));
   padding-right: ${GUTTER}px;
   /* Vertical scrolling and zooming stay with the browser; horizontal drags are
      swipes. */
