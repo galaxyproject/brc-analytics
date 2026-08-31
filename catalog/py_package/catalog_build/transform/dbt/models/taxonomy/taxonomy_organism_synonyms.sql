@@ -4,50 +4,33 @@
 -- names.dmp and the curated synonyms in the source organisms file. Includes a row
 -- for every catalog organism, with an empty list where no synonyms were found.
 
-with ncbi_synonyms as (
+with curated_synonyms as (
+  -- The curated synonyms are loaded as a JSON list, null where the organism
+  -- specifies none
   select
-    t.taxonomy_id,
-    n.name_txt as synonym,
-    -- Names from NCBI rank after the curated ones (see all_synonyms below)
-    1 as source_rank
-  from {{ source("catalog_source", "organism_taxa") }} t
-  join {{ source("ncbi", "taxonomy_names") }} n on n.tax_id = t.taxonomy_id
-  -- The synonym-like name classes: names that refer to the taxon itself, as
-  -- opposed to its common names, its children ('includes'), its type material,
-  -- or the nomenclatural authority strings
-  where n.name_class in ('synonym', 'equivalent name', 'genbank synonym')
-),
-
-curated_synonyms as (
-  select
-    t.taxonomy_id,
-    -- The curated synonyms are loaded as a JSON list; unnest yields no rows for the
-    -- organisms that specify none, whose value is null
-    unnest(from_json(t.synonyms, '["varchar"]')) as synonym,
-    0 as source_rank
-  from {{ source("catalog_source", "organism_taxa") }} t
-),
-
-all_synonyms as (
-  -- Deduplicate across the sources, keeping each synonym's lowest source rank so
-  -- that curated synonyms are listed first — they're the abbreviations and
-  -- colloquial names people are most likely to search by
-  select taxonomy_id, synonym, min(source_rank) as source_rank
-  from (
-    select taxonomy_id, synonym, source_rank from curated_synonyms
-    union all
-    select taxonomy_id, synonym, source_rank from ncbi_synonyms
-  )
-  group by taxonomy_id, synonym
+    taxonomy_id,
+    list_sort(list_distinct(coalesce(from_json(synonyms, '["varchar"]'), []))) as synonyms
+  from {{ source("catalog_source", "organism_taxa") }}
 )
 
 select
-  t.taxonomy_id,
-  -- Coalesce, since the aggregate is null for organisms with no synonyms at all
-  coalesce(
-    list(s.synonym order by s.source_rank, s.synonym) filter (s.synonym is not null),
-    []
+  c.taxonomy_id,
+  -- Curated synonyms come first — they're the abbreviations and colloquial names
+  -- people are most likely to search by — followed by the NCBI names not already
+  -- listed. Coalesce, since the aggregate is null for organisms with no NCBI names.
+  list_concat(
+    c.synonyms,
+    coalesce(
+      list(distinct n.name_txt order by n.name_txt)
+        filter (not list_contains(c.synonyms, n.name_txt)),
+      []
+    )
   ) as synonyms
-from {{ source("catalog_source", "organism_taxa") }} t
-left join all_synonyms s on s.taxonomy_id = t.taxonomy_id
-group by t.taxonomy_id
+from curated_synonyms c
+left join {{ source("ncbi", "taxonomy_names") }} n
+  on n.tax_id = c.taxonomy_id
+  -- The synonym-like name classes: names that refer to the taxon itself, as
+  -- opposed to its common names, its children ('includes'), its type material,
+  -- or the nomenclatural authority strings
+  and n.name_class in ('synonym', 'equivalent name', 'genbank synonym')
+group by c.taxonomy_id, c.synonyms
