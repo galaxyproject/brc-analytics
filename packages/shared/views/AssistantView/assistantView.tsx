@@ -20,12 +20,14 @@ import { Headline } from "./components/Headline/headline";
 import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
 
 interface Props {
+  initialMessage?: string;
   initialSessionId?: string;
   introText: string;
   sessionKey: string;
 }
 
 export const AssistantView = ({
+  initialMessage,
   initialSessionId,
   introText,
   sessionKey,
@@ -45,6 +47,7 @@ export const AssistantView = ({
     sendMessage,
     suggestions,
   } = useAssistantChat({
+    initialMessage,
     initialSessionId,
     sessionKey,
   });

@@ -3,6 +3,7 @@ import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles
 import type { ThemedPageProps } from "@repo/shared/meta/types";
 import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { AssistantView } from "@repo/shared/views/AssistantView/assistantView";
+import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
 import { type GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
@@ -16,12 +17,17 @@ const INTRO_TEXT =
 
 const Page = (): JSX.Element => {
   const { query } = useRouter();
-  const initialSessionId =
-    typeof query.sessionId === "string" ? query.sessionId : undefined;
+  const initialMessage = query[ASSISTANT_QUERY_PARAM.QUESTION];
+  const initialSessionId = query[ASSISTANT_QUERY_PARAM.SESSION_ID];
 
   return (
     <AssistantView
-      initialSessionId={initialSessionId}
+      initialMessage={
+        typeof initialMessage === "string" ? initialMessage : undefined
+      }
+      initialSessionId={
+        typeof initialSessionId === "string" ? initialSessionId : undefined
+      }
       introText={INTRO_TEXT}
       sessionKey={SESSION_KEY}
     />

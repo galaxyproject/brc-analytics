@@ -5,6 +5,8 @@ import type {
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
+import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
+import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -31,6 +33,7 @@ interface UseAssistantChatReturn {
 }
 
 interface UseAssistantChatOptions {
+  initialMessage?: string;
   initialSessionId?: string;
   sessionKey: string;
 }
@@ -39,12 +42,15 @@ interface UseAssistantChatOptions {
  * Manages assistant chat state: messages, session, schema, and suggestions.
  * Persists session_id to localStorage and restores on mount; explicit
  * `initialSessionId` from URL params takes precedence over the stored value.
+ * An `initialMessage` opens a new conversation with that question instead.
  * @param root0 - Hook options.
+ * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
  * @returns Chat state, sendMessage, save/reset/retry functions.
  */
 export const useAssistantChat = ({
+  initialMessage,
   initialSessionId,
   sessionKey,
 }: UseAssistantChatOptions): UseAssistantChatReturn => {
@@ -63,21 +69,38 @@ export const useAssistantChat = ({
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
+  const initialMessageSentRef = useRef(false);
   const router = useRouter();
+  // A question of whitespace is no question: it would neither be asked nor
+  // leave the conversation it displaced restorable.
+  const question = initialMessage?.trim();
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
   // Either way we call the restore endpoint so we get computed handoff state
   // (handoff_url, is_complete, suggestions), not just messages + schema.
   useEffect(() => {
-    const sourceId = initialSessionId ?? localStorage.getItem(sessionKey);
+    // Until the query settles a handed-over question is invisible, and
+    // restoring on that first pass would race the question to the message list.
+    if (!router.isReady) return;
+    // A question handed over from elsewhere on the site opens a conversation of
+    // its own; restoring here would graft it onto whatever came before.
+    if (question) return;
+
+    // Once that question has been asked, the stored pointer is the conversation
+    // it just opened -- restoring it would only re-fetch what is already on
+    // screen. A session the URL names is a different matter: it is somewhere the
+    // user has navigated to, and it still restores.
+    const storedId = initialMessageSentRef.current
+      ? null
+      : localStorage.getItem(sessionKey);
+    const sourceId = initialSessionId ?? storedId;
     if (!sourceId) return;
 
     let cancelled = false;
     // Adopt before the round trip: an unset ref sends session_id: undefined, so
     // a failed restore would open a new session and overwrite the kept pointer.
     sessionIdRef.current = sourceId;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setIsRestoring(true);
 
     assistantAPIClient
@@ -129,7 +152,7 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-  }, [initialSessionId, sessionKey]);
+  }, [initialSessionId, question, router.isReady, sessionKey]);
 
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
@@ -176,6 +199,33 @@ export const useAssistantChat = ({
     [sessionKey]
   );
 
+  // Ask the handed-over question once, then drop it from the URL: it outlives
+  // the send otherwise, and a reload would open a second conversation asking
+  // the same thing.
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (!question || initialMessageSentRef.current) return;
+    initialMessageSentRef.current = true;
+
+    // The conversation this question opens is its own: a session named in the
+    // URL alongside the question is left behind rather than continued, matching
+    // the restore this effect's counterpart skips. The stored pointer goes with
+    // the ref: a send that fails leaves it as the only trace of the displaced
+    // conversation, and the question -- stripped from the URL below -- would not
+    // be there to displace it again on a reload.
+    sessionIdRef.current = null;
+    localStorage.removeItem(sessionKey);
+    void sendMessage(question);
+    // Both parameters go: ?sessionId= outranks the stored pointer on mount, so
+    // leaving it behind means a reload restores the very conversation the
+    // question displaced and orphans the one it opened.
+    stripQueryParam(router, [
+      ASSISTANT_QUERY_PARAM.QUESTION,
+      ASSISTANT_QUERY_PARAM.SESSION_ID,
+    ]);
+  }, [question, router, sendMessage, sessionKey]);
+
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
     const msg = lastFailedMessage;
@@ -195,16 +245,8 @@ export const useAssistantChat = ({
     // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
     // means a reload restores the conversation we just walked away from and
     // orphans whatever replaced it.
-    if (router.query.sessionId) {
-      const query = { ...router.query };
-      delete query.sessionId;
-      router
-        .replace({ pathname: router.pathname, query }, undefined, {
-          shallow: true,
-        })
-        .catch(() => {
-          // Cosmetic: the session is already reset either way.
-        });
+    if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
+      stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
     setMessages([]);
     setSchema(null);
@@ -253,6 +295,22 @@ export const useAssistantChat = ({
     suggestions,
   };
 };
+
+/**
+ * Drops query parameters from the current URL, leaving the rest of the route
+ * untouched.
+ * @param router - Next router.
+ * @param names - Query parameters to drop.
+ */
+function stripQueryParam(router: NextRouter, names: string[]): void {
+  const query = { ...router.query };
+  for (const name of names) delete query[name];
+  router
+    .replace({ pathname: router.pathname, query }, undefined, { shallow: true })
+    .catch(() => {
+      // Cosmetic: whatever the parameter carried has already been consumed.
+    });
+}
 
 /**
  * Pull the HTTP status off a thrown request error, if it carries one.

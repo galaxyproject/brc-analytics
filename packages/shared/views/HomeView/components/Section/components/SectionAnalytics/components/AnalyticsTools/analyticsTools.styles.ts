@@ -19,6 +19,9 @@ export const StyledGrid = styled("div")<Props>`
     css`
       cursor: grab;
       user-select: none;
+      /* Horizontal drags are swipes; vertical scrolling and zooming stay with
+         the browser, which is the only place they can be claimed from. */
+      touch-action: pan-y pinch-zoom;
 
       &:active {
         cursor: grabbing;
