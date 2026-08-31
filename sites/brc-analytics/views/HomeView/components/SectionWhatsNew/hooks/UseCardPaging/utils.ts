@@ -126,7 +126,15 @@ export function getVisibleCount(viewportWidth: number): number {
  * @returns True where the focus is keyboard-driven.
  */
 export function isKeyboardFocus(target: Element): boolean {
-  return target.matches(":focus-visible");
+  try {
+    return target.matches(":focus-visible");
+  } catch {
+    // Where the selector is not understood, matching it throws rather than
+    // returning false. Read that as "not keyboard focus": the row then pages
+    // by its arrows alone, where throwing out of a focus handler would take
+    // the arrows with it.
+    return false;
+  }
 }
 
 /**
