@@ -1,4 +1,7 @@
-import { CARD_GAP } from "@brc/views/HomeView/components/SectionWhatsNew/components/Cards/constants";
+import {
+  CARD_GAP,
+  CONTENT_WIDTH,
+} from "@brc/views/HomeView/components/SectionWhatsNew/components/Cards/constants";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 import {
@@ -36,7 +39,7 @@ export const Arrows = styled.div`
  */
 export const CardsViewport = styled.div`
   margin-top: 32px;
-  padding-left: max(16px, calc((100% - 1136px) / 2));
+  padding-left: max(16px, calc((100% - ${CONTENT_WIDTH}px) / 2));
   padding-right: 16px;
   /* Vertical scrolling stays with the browser; horizontal drags are swipes. */
   touch-action: pan-y;

@@ -51,13 +51,18 @@ export function useSwipeGesture(
     [onSwipeEnd]
   );
 
+  // Only a swipe takes the touch from the browser. A tap that drifts a pixel or
+  // two reads as neither swipe nor scroll, and cancelling it there would cost
+  // the tap its click on whatever was tapped.
   const onTouchMove = useCallback((touchEvent: TouchEvent): void => {
     const action = calculateSwipeAction(
       startCoordsRef.current,
       getTouchCoords(touchEvent)
     );
-    /* Prevent scrolling when swipe action is not SCROLL. */
-    if (action !== SWIPE_ACTION.SCROLL && touchEvent.cancelable) {
+    const swiping =
+      action === SWIPE_ACTION.SWIPE_FORWARD ||
+      action === SWIPE_ACTION.SWIPE_BACKWARD;
+    if (swiping && touchEvent.cancelable) {
       touchEvent.preventDefault();
       touchEvent.stopPropagation();
     }
