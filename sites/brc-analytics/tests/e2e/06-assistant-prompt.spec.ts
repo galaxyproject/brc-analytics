@@ -20,9 +20,13 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     await page.goto("/");
 
     const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
-    await expect(prompt).toBeVisible();
-
     await prompt.fill(QUESTION);
+    // Waited for before pressing Enter. The button enables only once React has
+    // read the typed value, so it is the page reporting that it has hydrated:
+    // Enter submits through a handler that is not attached until then, and a
+    // key pressed before it is lost.
+    await expect(page.locator("form button[type='submit']")).toBeEnabled();
+
     await prompt.press("Enter");
 
     await page.waitForURL(/\/assistant/);
@@ -37,11 +41,10 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     await page.goto("/");
 
     const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
-    // Waited for before typing: Enter submits through a handler that is not
-    // attached until the page hydrates, and a key pressed before then is lost.
-    await expect(prompt).toBeVisible();
-
     await prompt.fill(QUESTION);
+    // Gates on hydration, as above.
+    await expect(page.locator("form button[type='submit']")).toBeEnabled();
+
     await prompt.press("Enter");
 
     await page.waitForURL(/\/assistant/);
