@@ -26,11 +26,13 @@ function inputEvent(value: string): FormEvent<HTMLFormElement> {
  * Builds a keydown event on a field inside a form.
  * @param key - Key pressed.
  * @param shiftKey - Whether shift was held.
+ * @param isComposing - Whether an IME is mid-composition.
  * @returns Keydown event and the form's requestSubmit spy.
  */
 function keyDownEvent(
   key: string,
-  shiftKey = false
+  shiftKey = false,
+  isComposing = false
 ): {
   event: KeyboardEvent<HTMLInputElement>;
   requestSubmit: jest.Mock;
@@ -45,6 +47,7 @@ function keyDownEvent(
     event: {
       currentTarget: field,
       key,
+      nativeEvent: { isComposing },
       preventDefault,
       shiftKey,
     } as unknown as KeyboardEvent<HTMLInputElement>,
@@ -107,6 +110,19 @@ describe("useAssistantPrompt", () => {
     act(() => result.current.onKeyDown(event));
 
     expect(requestSubmit).not.toHaveBeenCalled();
+  });
+
+  test("leaves an Enter that commits an IME candidate to the field", () => {
+    // Composing with an IME, Enter picks the candidate rather than submitting:
+    // the question is still mid-conversion, and submitting would ask the
+    // assistant the text as it stood before it.
+    const { result } = renderHook(() => useAssistantPrompt());
+    const { event, requestSubmit } = keyDownEvent("Enter", false, true);
+
+    act(() => result.current.onKeyDown(event));
+
+    expect(requestSubmit).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   test("leaves Escape and Tab to the browser", () => {

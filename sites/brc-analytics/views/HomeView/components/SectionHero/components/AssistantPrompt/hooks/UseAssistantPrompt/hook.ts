@@ -1,5 +1,6 @@
 import { getPayload } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Form/utils";
 import { KEY } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Input/hooks/UseKeyShortCuts/constants";
+import { handleEnterKey } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Input/hooks/UseKeyShortCuts/utils";
 import { useRouter } from "next/router";
 import {
   type FormEvent,
@@ -8,7 +9,7 @@ import {
   useState,
 } from "react";
 import type { UseAssistantPrompt } from "./types";
-import { getAssistantUrl, getInputValue } from "./utils";
+import { getAssistantHref, getAssistantUrl, getInputValue } from "./utils";
 
 /**
  * Opens the assistant with the submitted question, and tracks whether there is
@@ -30,9 +31,11 @@ export const useAssistantPrompt = (): UseAssistantPrompt => {
   // Enter-to-submit is kept.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>): void => {
-      if (event.key !== KEY.ENTER || event.shiftKey) return;
-      event.preventDefault();
-      event.currentTarget.form?.requestSubmit();
+      // An Enter that commits an IME candidate is not a submit: the question is
+      // still being composed, and sending it here would ask the assistant the
+      // text as it stood before conversion.
+      if (event.key !== KEY.ENTER || event.nativeEvent.isComposing) return;
+      handleEnterKey(event);
     },
     []
   );
@@ -42,7 +45,13 @@ export const useAssistantPrompt = (): UseAssistantPrompt => {
       event.preventDefault();
       const { query } = getPayload(event);
       if (!query) return;
-      router.push(getAssistantUrl(query));
+      // The submit is already prevented, so a client-side navigation that
+      // rejects -- a chunk that won't load, most likely -- would leave the
+      // question on a page that looks like it did nothing. Ask for the page
+      // itself instead.
+      router.push(getAssistantUrl(query)).catch(() => {
+        window.location.assign(getAssistantHref(query));
+      });
     },
     [router]
   );

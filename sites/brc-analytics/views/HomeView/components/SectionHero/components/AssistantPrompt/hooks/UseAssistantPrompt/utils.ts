@@ -17,6 +17,19 @@ export function getAssistantUrl(question: string): UrlObject {
 }
 
 /**
+ * Returns the assistant URL for the given question as a plain href, for a
+ * navigation the router can't make.
+ * @param question - Question to open the assistant with.
+ * @returns Assistant href.
+ */
+export function getAssistantHref(question: string): string {
+  const query = new URLSearchParams({
+    [ASSISTANT_QUERY_PARAM.QUESTION]: question,
+  });
+  return `${ROUTES.ASSISTANT}?${query}`;
+}
+
+/**
  * Returns the question currently typed into the form.
  * Read from the form rather than the field: the field is controlled inside the
  * library component, which exposes no value to read. Reuses the same extractor
