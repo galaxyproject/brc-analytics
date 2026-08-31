@@ -42,7 +42,7 @@ export const SectionWhatsNew = (): JSX.Element => {
         </Arrows>
       </Headline>
       <CardsViewport ref={viewportRef} {...swipeProps}>
-        <CardsRow offset={offset} onFocusCapture={onFocusCard}>
+        <CardsRow onFocusCapture={onFocusCard} shiftX={offset}>
           <Cards cards={WHATS_NEW_CARDS} />
         </CardsRow>
       </CardsViewport>

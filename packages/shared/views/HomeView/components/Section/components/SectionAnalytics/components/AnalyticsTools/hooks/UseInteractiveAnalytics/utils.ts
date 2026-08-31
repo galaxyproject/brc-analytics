@@ -1,11 +1,11 @@
-import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type AnalyticsCard } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/types";
 
 /**
  * Returns array of interactive indexes.
  * @param cards - Cards.
  * @returns a list of indexes that are interactive.
  */
-export function buildInteractiveIndexes(cards: DXCardProps[]): number[] {
+export function buildInteractiveIndexes(cards: AnalyticsCard[]): number[] {
   return [...Array(cards.length).keys()];
 }
 
@@ -17,10 +17,10 @@ export function buildInteractiveIndexes(cards: DXCardProps[]): number[] {
  * @returns rotated cards.
  */
 export function rotateCards(
-  cards: DXCardProps[],
+  cards: AnalyticsCard[],
   activeIndex: number,
   swipeEnabled: boolean
-): DXCardProps[] {
+): AnalyticsCard[] {
   if (!swipeEnabled) {
     return cards;
   }

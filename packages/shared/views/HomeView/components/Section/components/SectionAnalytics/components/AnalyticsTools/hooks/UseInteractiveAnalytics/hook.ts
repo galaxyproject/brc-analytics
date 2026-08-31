@@ -1,5 +1,5 @@
-import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 import { useIntersectionObserver } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/hooks/UseIntersectionObserver/hook";
+import { type AnalyticsCard } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/types";
 import { useSwipeInteraction } from "@repo/shared/views/HomeView/hooks/UseSwipeInteraction/hook";
 import { type RefObject, useEffect, useMemo } from "react";
 import { type UseInteractiveAnalytics } from "./types";
@@ -13,7 +13,7 @@ import { buildInteractiveIndexes, rotateCards } from "./utils";
  */
 export function useInteractiveAnalytics(
   ref: RefObject<HTMLElement | null>,
-  cards: DXCardProps[]
+  cards: AnalyticsCard[]
 ): UseInteractiveAnalytics {
   // Intersection observer for analytics cards intersecting the viewport.
   const { isIntersecting } = useIntersectionObserver(ref);

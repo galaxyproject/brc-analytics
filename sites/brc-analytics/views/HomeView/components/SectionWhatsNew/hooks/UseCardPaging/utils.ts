@@ -120,6 +120,16 @@ export function getVisibleCount(viewportWidth: number): number {
 }
 
 /**
+ * Returns whether an element took focus from the keyboard rather than a
+ * pointer.
+ * @param target - Element that took focus.
+ * @returns True where the focus is keyboard-driven.
+ */
+export function isKeyboardFocus(target: Element): boolean {
+  return target.matches(":focus-visible");
+}
+
+/**
  * Returns how far one page turn moves the row: a card and the gap after it.
  * @param viewportWidth - Width available to the cards.
  * @returns Step in pixels.
