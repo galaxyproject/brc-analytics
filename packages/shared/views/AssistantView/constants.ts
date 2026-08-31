@@ -6,4 +6,4 @@
 export const ASSISTANT_QUERY_PARAM = {
   QUESTION: "q",
   SESSION_ID: "sessionId",
-};
+} as const;
