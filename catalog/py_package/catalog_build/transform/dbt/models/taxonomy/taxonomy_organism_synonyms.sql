@@ -32,5 +32,5 @@ left join {{ source("ncbi", "taxonomy_names") }} n
   -- The synonym-like name classes: names that refer to the taxon itself, as
   -- opposed to its common names, its children ('includes'), its type material,
   -- or the nomenclatural authority strings
-  and n.name_class in ('synonym', 'equivalent name', 'genbank synonym')
+  and n.name_class in ('synonym', 'equivalent name')
 group by c.taxonomy_id, c.synonyms
