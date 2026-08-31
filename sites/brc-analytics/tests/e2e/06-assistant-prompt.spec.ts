@@ -1,3 +1,4 @@
+import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { expect, test } from "./utils/fixtures";
 
 const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
@@ -9,7 +10,7 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     const send = page.locator("form button[type='submit']");
     await expect(send).toBeDisabled();
 
-    await page.getByPlaceholder("Ask anything...").fill(QUESTION);
+    await page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER).fill(QUESTION);
     await expect(send).toBeEnabled();
   });
 
@@ -18,7 +19,7 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
   }) => {
     await page.goto("/");
 
-    const prompt = page.getByPlaceholder("Ask anything...");
+    const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
     await expect(prompt).toBeVisible();
 
     await prompt.fill(QUESTION);
@@ -35,7 +36,11 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
   }) => {
     await page.goto("/");
 
-    const prompt = page.getByPlaceholder("Ask anything...");
+    const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
+    // Waited for before typing: Enter submits through a handler that is not
+    // attached until the page hydrates, and a key pressed before then is lost.
+    await expect(prompt).toBeVisible();
+
     await prompt.fill(QUESTION);
     await prompt.press("Enter");
 
