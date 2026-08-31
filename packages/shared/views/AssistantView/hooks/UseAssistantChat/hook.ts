@@ -206,11 +206,15 @@ export const useAssistantChat = ({
 
     // The conversation this question opens is its own: a session named in the
     // URL alongside the question is left behind rather than continued, matching
-    // the restore this effect's counterpart skips.
+    // the restore this effect's counterpart skips. The stored pointer goes with
+    // the ref: a send that fails leaves it as the only trace of the displaced
+    // conversation, and the question -- stripped from the URL below -- would not
+    // be there to displace it again on a reload.
     sessionIdRef.current = null;
+    localStorage.removeItem(sessionKey);
     void sendMessage(question);
     stripQueryParam(router, ASSISTANT_QUERY_PARAM.QUESTION);
-  }, [question, router, sendMessage]);
+  }, [question, router, sendMessage, sessionKey]);
 
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
