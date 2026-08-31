@@ -59,6 +59,16 @@ function changedTouches(touchEvent: TouchEvent): Touch {
 }
 
 /**
+ * Returns whether more than one finger is on the surface, i.e. the gesture is a
+ * pinch rather than a swipe.
+ * @param touchEvent - Touch event.
+ * @returns True if the gesture involves more than one touch point.
+ */
+export function isMultiTouch(touchEvent: TouchEvent): boolean {
+  return touchEvent.touches.length > 1;
+}
+
+/**
  * Returns the mouse event clientX and clientY coordinates.
  * @param mouseEvent - Mouse event.
  * @returns x and y mouse event coordinates.

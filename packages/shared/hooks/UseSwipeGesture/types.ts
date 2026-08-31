@@ -22,7 +22,6 @@ export interface SwipeCoordinates {
 
 export interface TouchProps {
   onTouchEnd: (touchEvent: TouchEvent) => void;
-  onTouchMove: (touchEvent: TouchEvent) => void;
   onTouchStart: (touchEvent: TouchEvent) => void;
 }
 

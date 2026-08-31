@@ -1,5 +1,5 @@
 import { useSwipeGesture } from "@repo/shared/hooks/UseSwipeGesture/hook";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { DEFAULT_ACTIVE_INDEX } from "./constants";
 import { type UseSwipeInteraction } from "./types";
 
@@ -7,25 +7,14 @@ import { type UseSwipeInteraction } from "./types";
  * Swipe actions over swipe-able "views" i.e. cards etc.
  * @param indexCount - Number of swipe-able / interactive "views".
  * @param swipeEnabled - Swipe interaction is enabled.
- * @param swipeDelay - Timeout delay for auto-swipe.
  * @returns swipe actions and active swipe index.
  */
 export function useSwipeInteraction(
   indexCount: number,
-  swipeEnabled = true,
-  swipeDelay = 0
+  swipeEnabled = true
 ): UseSwipeInteraction {
-  const [interactiveDelay, setInteractiveDelay] = useState<number>(swipeDelay);
   const [activeIndex, setActiveIndex] = useState<number>(DEFAULT_ACTIVE_INDEX);
   const lastIndex = indexCount - 1;
-
-  const onMouseEnter = useCallback((): void => {
-    setInteractiveDelay(0);
-  }, []);
-
-  const onMouseLeave = useCallback((): void => {
-    setInteractiveDelay(swipeDelay);
-  }, [swipeDelay]);
 
   const onSetActiveIndex = useCallback((newIndex: number) => {
     setActiveIndex(newIndex);
@@ -65,14 +54,6 @@ export function useSwipeInteraction(
     onSwipeForward
   );
 
-  useEffect(() => {
-    if (interactiveDelay === 0) return;
-    const timeout = setTimeout(() => {
-      onSwipeToIndex(1);
-    }, interactiveDelay);
-    return (): void => clearTimeout(timeout);
-  }, [activeIndex, interactiveDelay, onSwipeToIndex]);
-
   if (!swipeEnabled) {
     return {
       activeIndex,
@@ -82,12 +63,7 @@ export function useSwipeInteraction(
 
   return {
     activeIndex,
-    interactiveAction: {
-      ...mouseProps,
-      ...touchProps,
-      onMouseEnter,
-      onMouseLeave,
-    },
+    interactiveAction: { ...mouseProps, ...touchProps },
     onSetActiveIndex,
   };
 }
