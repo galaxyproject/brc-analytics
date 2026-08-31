@@ -16,6 +16,9 @@ const PAGE_TURN_MS = 350;
  */
 async function pageToEnd(page: Page): Promise<void> {
   const forward = page.getByRole("button", { name: FORWARD });
+  // The row offers no page turn until it has been measured: the first render
+  // reports no width, so paging starts the moment the arrow comes alive.
+  await expect(forward).toBeEnabled();
   while (await forward.isEnabled()) {
     await forward.click();
     await page.waitForTimeout(PAGE_TURN_MS);
