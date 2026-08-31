@@ -5,4 +5,5 @@ export const ROUTES = {
   LEARN: "/learn",
   PRIORITY_PATHOGEN: "/data/priority-pathogens/[entityId]",
   PRIORITY_PATHOGENS: "/data/priority-pathogens",
+  ROADMAP: "/about/roadmap",
 };

@@ -19,7 +19,10 @@ export const StyledSection = styled.section`
   border-top: 1px solid ${PALETTE.SMOKE_MAIN};
   /* Clipped, not hidden: an "overflow: hidden" box is still scrollable, so
      focus landing on a card paged out of view would scroll the section sideways
-     with nothing to scroll it back. */
+     with nothing to scroll it back. "hidden" is the fallback for browsers
+     without "clip", which would otherwise leave the card row overflowing the
+     page. */
+  overflow: hidden;
   overflow: clip;
   padding: 64px 0 80px;
 `;
@@ -52,9 +55,11 @@ export const CardsViewport = styled.div`
   touch-action: pan-y pinch-zoom;
 `;
 
-export const CardsRow = styled.div<{ offset: number }>`
+// Shift named "shiftX" rather than "offset": "offset" is a valid SVG attribute,
+// so emotion forwards it and renders it onto the div.
+export const CardsRow = styled.div<{ shiftX: number }>`
   display: flex;
   gap: ${CARD_GAP}px;
-  transform: translateX(${({ offset }) => -offset}px);
+  transform: translateX(${({ shiftX }) => -shiftX}px);
   transition: transform 300ms ease-in-out;
 `;

@@ -32,11 +32,12 @@ export const AnalyticsTools = ({ cards }: Props): JSX.Element => {
         interactionEnabled={interactionEnabled}
         {...interactiveAction}
       >
-        {/* Keyed by title, not position: the cards rotate as they are swiped, and
-            an index key would swap one card's content into another's markup --
-            re-pointing the link under a finger that is mid-click on it. */}
-        {interactiveCards.map(({ cardActions, media, text, title }) => (
-          <StyledCard key={String(title)} component={RoundedPaper}>
+        {/* Keyed by identity, not position: the cards rotate as they are
+            swiped, and an index key would swap one card's content into
+            another's markup -- re-pointing the link under a finger that is
+            mid-click on it. */}
+        {interactiveCards.map(({ cardActions, id, media, text, title }) => (
+          <StyledCard key={id} component={RoundedPaper}>
             <CardSection>
               {media && <CardMedia media={media} />}
               <CardContent>

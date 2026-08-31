@@ -1,5 +1,5 @@
 import { URLS } from "@brc/views/HomeView/urls";
-import { type CardProps as DXCardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
+import { type AnalyticsCard } from "@repo/shared/views/HomeView/components/Section/components/SectionAnalytics/components/AnalyticsTools/types";
 
 const CARD_ACTION_LABEL = {
   LEARN_MORE: "Learn More",
@@ -13,7 +13,7 @@ const CARD_TEXT = {
     "A global platform for visualization and interpretation of genomic data",
 };
 
-export const ANALYTICS_TOOLS: DXCardProps[] = [
+export const ANALYTICS_TOOLS: AnalyticsCard[] = [
   {
     cardActions: [
       {
@@ -21,6 +21,7 @@ export const ANALYTICS_TOOLS: DXCardProps[] = [
         url: URLS.GALAXY_SYSTEM,
       },
     ],
+    id: "galaxy",
     media: {
       alt: "Galaxy",
       height: 40,
@@ -36,6 +37,7 @@ export const ANALYTICS_TOOLS: DXCardProps[] = [
         url: URLS.NCBI_DATASETS,
       },
     ],
+    id: "ncbi-datasets",
     media: {
       alt: "NCBI Datasets",
       height: 40,
@@ -51,6 +53,7 @@ export const ANALYTICS_TOOLS: DXCardProps[] = [
         url: URLS.UCSC_GENOME_BROWSER,
       },
     ],
+    id: "ucsc-genome-browser",
     media: {
       alt: "UCSC Genome Browser",
       height: 40,
@@ -66,6 +69,7 @@ export const ANALYTICS_TOOLS: DXCardProps[] = [
         url: URLS.TACC,
       },
     ],
+    id: "tacc",
     media: {
       alt: "TACC",
       height: 40,

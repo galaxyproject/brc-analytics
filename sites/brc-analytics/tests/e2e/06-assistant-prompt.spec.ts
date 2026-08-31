@@ -1,3 +1,4 @@
+import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { expect, test } from "./utils/fixtures";
 
 const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
@@ -9,7 +10,7 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     const send = page.locator("form button[type='submit']");
     await expect(send).toBeDisabled();
 
-    await page.getByPlaceholder("Ask anything...").fill(QUESTION);
+    await page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER).fill(QUESTION);
     await expect(send).toBeEnabled();
   });
 
@@ -18,10 +19,14 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
   }) => {
     await page.goto("/");
 
-    const prompt = page.getByPlaceholder("Ask anything...");
-    await expect(prompt).toBeVisible();
-
+    const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
     await prompt.fill(QUESTION);
+    // Waited for before pressing Enter. The button enables only once React has
+    // read the typed value, so it is the page reporting that it has hydrated:
+    // Enter submits through a handler that is not attached until then, and a
+    // key pressed before it is lost.
+    await expect(page.locator("form button[type='submit']")).toBeEnabled();
+
     await prompt.press("Enter");
 
     await page.waitForURL(/\/assistant/);
@@ -35,8 +40,11 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
   }) => {
     await page.goto("/");
 
-    const prompt = page.getByPlaceholder("Ask anything...");
+    const prompt = page.getByPlaceholder(ASSISTANT_INPUT_PLACEHOLDER);
     await prompt.fill(QUESTION);
+    // Gates on hydration, as above.
+    await expect(page.locator("form button[type='submit']")).toBeEnabled();
+
     await prompt.press("Enter");
 
     await page.waitForURL(/\/assistant/);

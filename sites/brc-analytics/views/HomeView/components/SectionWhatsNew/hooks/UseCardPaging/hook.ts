@@ -3,6 +3,7 @@ import {
   getIndexInView,
   getMaxIndex,
   getOffset,
+  isKeyboardFocus,
 } from "@brc/views/HomeView/components/SectionWhatsNew/hooks/UseCardPaging/utils";
 import {
   getContentRect,
@@ -46,8 +47,13 @@ export const useCardPaging = (cardCount: number): UseCardPaging => {
   // Tabbing reaches the links inside every card, paged into view or not, and a
   // card cannot be read where it cannot be seen: bring whichever card takes
   // focus into view, as the arrows would.
+  //
+  // Keyboard focus only. A click focuses the link it lands on before it opens
+  // it, so paging on that focus would slide the link out from under the
+  // pointer and the click would never reach it.
   const onFocusCard = useCallback(
     (event: FocusEvent<HTMLDivElement>): void => {
+      if (!isKeyboardFocus(event.target)) return;
       const cardIndex = getFocusedCardIndex(event.target);
       if (cardIndex === undefined) return;
       setIndex((prev) =>
