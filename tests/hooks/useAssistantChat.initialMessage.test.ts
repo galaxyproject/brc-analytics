@@ -178,6 +178,28 @@ describe("useAssistantChat initial message", () => {
     );
   });
 
+  test("takes ?sessionId= off the URL with the question", async () => {
+    // The session the question displaced outranks the stored pointer on mount,
+    // so leaving it in the URL means a reload restores the very conversation
+    // that was walked away from and orphans the one the question opened.
+    mockQuery = { q: QUESTION, sessionId: STORED_ID };
+
+    renderHook(() =>
+      useAssistantChat({
+        initialMessage: QUESTION,
+        initialSessionId: STORED_ID,
+        sessionKey: SESSION_KEY,
+      })
+    );
+
+    await waitFor(() => expect(mockReplace).toHaveBeenCalled());
+    expect(mockReplace).toHaveBeenCalledWith(
+      expect.objectContaining({ query: {} }),
+      undefined,
+      { shallow: true }
+    );
+  });
+
   test("treats a question of whitespace as no question at all", async () => {
     // It would never be asked (sending trims), so acting on it would strip the
     // param, abandon the stored session and leave a blank conversation behind.
