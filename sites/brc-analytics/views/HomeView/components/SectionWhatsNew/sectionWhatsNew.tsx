@@ -18,6 +18,7 @@ export const SectionWhatsNew = (): JSX.Element => {
     canPageBack,
     canPageForward,
     offset,
+    onFocusCard,
     onPageBack,
     onPageForward,
     swipeProps,
@@ -41,7 +42,7 @@ export const SectionWhatsNew = (): JSX.Element => {
         </Arrows>
       </Headline>
       <CardsViewport ref={viewportRef} {...swipeProps}>
-        <CardsRow offset={offset}>
+        <CardsRow offset={offset} onFocusCapture={onFocusCard}>
           <Cards cards={WHATS_NEW_CARDS} />
         </CardsRow>
       </CardsViewport>

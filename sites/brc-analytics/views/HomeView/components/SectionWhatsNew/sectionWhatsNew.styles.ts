@@ -9,12 +9,18 @@ import {
   sectionLayout,
 } from "@repo/shared/components/layout/Section/section.styles";
 
+/** Space kept between the content column and the edge of the screen. */
+const GUTTER = 16;
+
 export const StyledSection = styled.section`
   ${section};
   background-color: ${PALETTE.SMOKE_LIGHTEST};
   border-bottom: 1px solid ${PALETTE.SMOKE_MAIN};
   border-top: 1px solid ${PALETTE.SMOKE_MAIN};
-  overflow: hidden; /* clips the cards bleeding past the content column */
+  /* Clipped, not hidden: an "overflow: hidden" box is still scrollable, so
+     focus landing on a card paged out of view would scroll the section sideways
+     with nothing to scroll it back. */
+  overflow: clip;
   padding: 64px 0 80px;
 `;
 
@@ -23,7 +29,7 @@ export const Headline = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 ${GUTTER}px;
 `;
 
 export const Arrows = styled.div`
@@ -36,13 +42,18 @@ export const Arrows = styled.div`
  * design shows: the row overflows the viewport rather than stopping short, and
  * the section clips it at the edge of the page. Padding on both sides keeps the
  * last card off the edge of the screen once the row has been paged to its end.
+ * The bleed is to the right only -- the clip closes the left of the column, so
+ * a card paged past it leaves the section rather than sitting in the gutter.
  */
 export const CardsViewport = styled.div`
+  --cards-inset: max(${GUTTER}px, calc((100% - ${CONTENT_WIDTH}px) / 2));
+  clip-path: inset(-100vh -100vw -100vh var(--cards-inset));
   margin-top: 32px;
-  padding-left: max(16px, calc((100% - ${CONTENT_WIDTH}px) / 2));
-  padding-right: 16px;
-  /* Vertical scrolling stays with the browser; horizontal drags are swipes. */
-  touch-action: pan-y;
+  padding-left: var(--cards-inset);
+  padding-right: ${GUTTER}px;
+  /* Vertical scrolling and zooming stay with the browser; horizontal drags are
+     swipes. */
+  touch-action: pan-y pinch-zoom;
 `;
 
 export const CardsRow = styled.div<{ offset: number }>`

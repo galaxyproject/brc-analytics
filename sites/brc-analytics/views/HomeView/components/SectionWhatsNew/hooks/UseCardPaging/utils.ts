@@ -1,5 +1,6 @@
 import {
   CARD_GAP,
+  CARD_INDEX_ATTRIBUTE,
   CARD_WIDTH,
   CONTENT_WIDTH,
 } from "@brc/views/HomeView/components/SectionWhatsNew/components/Cards/constants";
@@ -22,6 +23,42 @@ export function getAreaWidth(viewportWidth: number): number {
  */
 export function getCardWidth(viewportWidth: number): number {
   return Math.min(CARD_WIDTH, getAreaWidth(viewportWidth));
+}
+
+/**
+ * Returns the index of the card the focus landed in.
+ * @param target - Element that took focus.
+ * @returns Index of the card, or undefined where the focus is outside them.
+ */
+export function getFocusedCardIndex(target: Element): number | undefined {
+  const card = target.closest(`[${CARD_INDEX_ATTRIBUTE}]`);
+  if (!card) return;
+  const index = Number(card.getAttribute(CARD_INDEX_ATTRIBUTE));
+  return Number.isInteger(index) ? index : undefined;
+}
+
+/**
+ * Returns the page that brings the given card into view, moving the row as
+ * little as it takes: a card already in view leaves it where it is.
+ * @param cardIndex - Index of the card to bring into view.
+ * @param pageIndex - Index of the first card currently in view.
+ * @param viewportWidth - Width available to the cards.
+ * @param cardCount - Number of cards.
+ * @returns Index of the first card to show.
+ */
+export function getIndexInView(
+  cardIndex: number,
+  pageIndex: number,
+  viewportWidth: number,
+  cardCount: number
+): number {
+  if (cardIndex < pageIndex) return cardIndex;
+  const visibleCount = getVisibleCount(viewportWidth);
+  if (cardIndex < pageIndex + visibleCount) return pageIndex;
+  return Math.min(
+    cardIndex - visibleCount + 1,
+    getMaxIndex(viewportWidth, cardCount)
+  );
 }
 
 /**
@@ -67,6 +104,19 @@ export function getOffset(
     index * getStep(viewportWidth),
     getMaxOffset(viewportWidth, cardCount)
   );
+}
+
+/**
+ * Returns how many cards the paging area holds at once. Counts whole cards
+ * only: one bleeding past the column is on its way in, not in view.
+ * @param viewportWidth - Width available to the cards.
+ * @returns Number of cards in view.
+ */
+export function getVisibleCount(viewportWidth: number): number {
+  const count = Math.floor(
+    (getAreaWidth(viewportWidth) + CARD_GAP) / getStep(viewportWidth)
+  );
+  return Math.max(1, count);
 }
 
 /**

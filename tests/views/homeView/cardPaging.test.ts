@@ -6,9 +6,11 @@ import {
 import {
   getAreaWidth,
   getCardWidth,
+  getIndexInView,
   getMaxIndex,
   getMaxOffset,
   getOffset,
+  getVisibleCount,
 } from "@brc/views/HomeView/components/SectionWhatsNew/hooks/UseCardPaging/utils";
 
 const CARD_COUNT = 5;
@@ -88,6 +90,39 @@ describe("getOffset", () => {
     );
     expect(getOffset(99, WIDE_VIEWPORT, CARD_COUNT)).toBe(
       ROW_WIDTH - CONTENT_WIDTH
+    );
+  });
+});
+
+describe("getVisibleCount", () => {
+  test("counts the whole cards the column holds", () => {
+    // 1136 fits 560 + 16 + 560; the next card starts outside the column.
+    expect(getVisibleCount(WIDE_VIEWPORT)).toBe(2);
+  });
+
+  test("always counts the card in view, however narrow the screen", () => {
+    expect(getVisibleCount(374)).toBe(1);
+  });
+});
+
+describe("getIndexInView", () => {
+  test("leaves the row where it is for a card already in view", () => {
+    expect(getIndexInView(1, 1, WIDE_VIEWPORT, CARD_COUNT)).toBe(1);
+    expect(getIndexInView(2, 1, WIDE_VIEWPORT, CARD_COUNT)).toBe(1);
+  });
+
+  test("pages back to a card left behind", () => {
+    expect(getIndexInView(0, 2, WIDE_VIEWPORT, CARD_COUNT)).toBe(0);
+  });
+
+  test("pages forward only as far as it takes to show the card", () => {
+    // Two cards are in view, so showing card 3 means starting at card 2.
+    expect(getIndexInView(3, 0, WIDE_VIEWPORT, CARD_COUNT)).toBe(2);
+  });
+
+  test("stops at the last page rather than paging into empty space", () => {
+    expect(getIndexInView(CARD_COUNT - 1, 0, WIDE_VIEWPORT, CARD_COUNT)).toBe(
+      getMaxIndex(WIDE_VIEWPORT, CARD_COUNT)
     );
   });
 });

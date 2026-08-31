@@ -1,4 +1,6 @@
 import {
+  getFocusedCardIndex,
+  getIndexInView,
   getMaxIndex,
   getOffset,
 } from "@brc/views/HomeView/components/SectionWhatsNew/hooks/UseCardPaging/utils";
@@ -7,7 +9,7 @@ import {
   useResizeObserver,
 } from "@databiosphere/findable-ui/lib/hooks/useResizeObserver";
 import { useSwipeGesture } from "@repo/shared/hooks/UseSwipeGesture/hook";
-import { useCallback, useRef, useState } from "react";
+import { type FocusEvent, useCallback, useRef, useState } from "react";
 import type { UseCardPaging } from "./types";
 
 /**
@@ -41,6 +43,20 @@ export const useCardPaging = (cardCount: number): UseCardPaging => {
     setIndex((prev) => Math.min(maxIndex, Math.min(prev, maxIndex) + 1));
   }, [maxIndex]);
 
+  // Tabbing reaches the links inside every card, paged into view or not, and a
+  // card cannot be read where it cannot be seen: bring whichever card takes
+  // focus into view, as the arrows would.
+  const onFocusCard = useCallback(
+    (event: FocusEvent<HTMLDivElement>): void => {
+      const cardIndex = getFocusedCardIndex(event.target);
+      if (cardIndex === undefined) return;
+      setIndex((prev) =>
+        getIndexInView(cardIndex, Math.min(prev, maxIndex), width, cardCount)
+      );
+    },
+    [cardCount, maxIndex, width]
+  );
+
   // Touch only: on a pointer device the arrows page the row, and a mouse drag
   // over the cards is a text selection rather than a swipe.
   const { touchProps } = useSwipeGesture(onPageBack, onPageForward);
@@ -49,6 +65,7 @@ export const useCardPaging = (cardCount: number): UseCardPaging => {
     canPageBack: pageIndex > 0,
     canPageForward: pageIndex < maxIndex,
     offset: getOffset(pageIndex, width, cardCount),
+    onFocusCard,
     onPageBack,
     onPageForward,
     swipeProps: touchProps,

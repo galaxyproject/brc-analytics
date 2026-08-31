@@ -1,8 +1,6 @@
 import { type Page } from "@playwright/test";
+import { SECTION_MAX_WIDTH } from "@repo/shared/components/layout/Section/constants";
 import { expect, test } from "./utils/fixtures";
-
-/** Width of the content column the cards page within. */
-const CONTENT_WIDTH = 1136;
 /** Matches the title however its apostrophe is written. */
 const TITLE = /What.s New/;
 const BACK = "Show previous updates";
@@ -72,10 +70,10 @@ test.describe("BRC Analytics - What's New", () => {
     const last = await cards.nth((await cards.count()) - 1).boundingBox();
     expect(last?.x).toBeGreaterThanOrEqual(headline?.x ?? 0);
     expect(last?.x ?? 0).toBeLessThanOrEqual(
-      (headline?.x ?? 0) + CONTENT_WIDTH
+      (headline?.x ?? 0) + SECTION_MAX_WIDTH
     );
     expect((last?.x ?? 0) + (last?.width ?? 0)).toBeLessThanOrEqual(
-      (headline?.x ?? 0) + CONTENT_WIDTH + 1
+      (headline?.x ?? 0) + SECTION_MAX_WIDTH + 1
     );
   });
 
