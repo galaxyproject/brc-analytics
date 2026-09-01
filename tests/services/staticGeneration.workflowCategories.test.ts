@@ -9,6 +9,7 @@ import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import {
   loadOrganismWorkflowCategories,
   loadWorkflowCategories,
+  makeWorkflowCategoriesAugmenter,
 } from "@repo/shared/services/staticGeneration/workflows/utils";
 import { promises as fsp } from "fs";
 
@@ -78,11 +79,11 @@ describe("loadOrganismWorkflowCategories", () => {
     readFile.mockReset();
   });
 
-  test("reads the workflows catalog the site config points at", async () => {
+  test("reads the workflows catalog it is given", async () => {
     readFile.mockResolvedValue(JSON.stringify([]));
     const staticLoadFile = uniquePath();
 
-    await loadOrganismWorkflowCategories(buildConfig(staticLoadFile), ORGANISM);
+    await loadOrganismWorkflowCategories(staticLoadFile, ORGANISM);
 
     expect(readFile).toHaveBeenCalledWith(staticLoadFile, "utf8");
   });
@@ -94,24 +95,64 @@ describe("loadOrganismWorkflowCategories", () => {
     ];
     readFile.mockResolvedValue(JSON.stringify(categories));
 
-    const result = await loadOrganismWorkflowCategories(
-      buildConfig(uniquePath()),
-      ORGANISM
-    );
+    const result = await loadOrganismWorkflowCategories(uniquePath(), ORGANISM);
 
     expect(result.map(({ category }) => category)).toEqual([
       WORKFLOW_CATEGORY_ID.VARIANT_CALLING,
       WORKFLOW_CATEGORY_ID.ASSEMBLY,
     ]);
   });
+});
+
+describe("makeWorkflowCategoriesAugmenter", () => {
+  beforeEach(() => {
+    readFile.mockReset();
+  });
+
+  test("attaches the organism's workflow categories to its record", async () => {
+    readFile.mockResolvedValue(
+      JSON.stringify([buildCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING)])
+    );
+
+    const augment = makeWorkflowCategoriesAugmenter(buildConfig(uniquePath()));
+
+    await expect(augment(ORGANISM)).resolves.toEqual({
+      ...ORGANISM,
+      workflowCategories: [
+        expect.objectContaining({
+          category: WORKFLOW_CATEGORY_ID.VARIANT_CALLING,
+        }),
+      ],
+    });
+  });
+
+  test("resolves the catalog path once, not once per page", async () => {
+    readFile.mockResolvedValue(JSON.stringify([]));
+    const entities = jest.fn(
+      () =>
+        ({
+          entities: [{ route: "workflows", staticLoadFile: uniquePath() }],
+        }) as Pick<SiteConfig, "entities">
+    );
+
+    const augment = makeWorkflowCategoriesAugmenter(entities);
+    await augment(ORGANISM);
+    await augment(ORGANISM);
+    await augment(ORGANISM);
+
+    // The entity configs don't change during a build, so scanning them for
+    // every generated page is pure waste.
+    expect(entities).toHaveBeenCalledTimes(1);
+  });
 
   test("throws when the site config has no workflows entity", async () => {
-    await expect(
-      loadOrganismWorkflowCategories(
-        () => ({ entities: [] }) as Pick<SiteConfig, "entities">,
-        ORGANISM
-      )
-    ).rejects.toThrow("Workflows staticLoadFile not found");
+    const augment = makeWorkflowCategoriesAugmenter(
+      () => ({ entities: [] }) as Pick<SiteConfig, "entities">
+    );
+
+    await expect(augment(ORGANISM)).rejects.toThrow(
+      "Workflows staticLoadFile not found"
+    );
   });
 });
 

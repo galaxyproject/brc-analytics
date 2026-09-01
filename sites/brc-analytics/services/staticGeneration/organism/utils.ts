@@ -1,8 +1,13 @@
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { config } from "@brc/config/config";
-import { augmentWithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/utils";
+import { makeWorkflowCategoriesAugmenter } from "@repo/shared/services/staticGeneration/workflows/utils";
 import { loadPangenomes } from "./pangenomes";
 import { type BRCOrganismDetail } from "./types";
+
+// Bound once: the augmenter resolves the workflows catalog path on first use
+// and keeps it, so the lookup doesn't re-run for every organism page.
+const augmentWorkflowCategories =
+  makeWorkflowCategoriesAugmenter<BRCDataCatalogOrganism>(config);
 
 /**
  * Attaches the build-computed fields the organism detail page renders — the
@@ -18,7 +23,7 @@ export async function augmentOrganismDetail(
   // organism page, so serializing them would add the pangenome read's latency
   // to every worker's first page for nothing.
   const [withWorkflowCategories, pangenomes] = await Promise.all([
-    augmentWithWorkflowCategories(config, organism),
+    augmentWorkflowCategories(organism),
     loadPangenomes(),
   ]);
   const pangenome = pangenomes.get(organism.ncbiTaxonomyId);

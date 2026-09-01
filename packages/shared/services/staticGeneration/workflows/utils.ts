@@ -8,38 +8,19 @@ import { promises as fsp } from "fs";
 const categoriesByFile = new Map<string, Promise<WorkflowCategory[]>>();
 
 /**
- * Attaches an organism's compatible workflow categories to its record, the
- * build-computed half of organism detail data that every site shares.
- * @param config - Site config accessor (provides the site's entity configs).
- * @param organism - Organism record.
- * @returns Organism record with its workflow categories.
- */
-export async function augmentWithWorkflowCategories<T extends OrganismContract>(
-  config: () => Pick<SiteConfig, "entities">,
-  organism: T
-): Promise<WithWorkflowCategories<T>> {
-  return {
-    ...organism,
-    workflowCategories: await loadOrganismWorkflowCategories(config, organism),
-  };
-}
-
-/**
  * Builds the organism's compatible workflow categories at build time. No
  * feature-flag gating is applied: flags are per-user runtime state, so the
  * prerendered data carries the flag-inclusive superset and the rendering
  * component applies the user's flags.
- * @param config - Site config accessor (provides the site's entity configs).
+ * @param staticLoadFile - Repo-root-relative path to the workflows catalog file.
  * @param organism - Organism record.
  * @returns Organism-compatible workflow categories.
  */
 export async function loadOrganismWorkflowCategories(
-  config: () => Pick<SiteConfig, "entities">,
+  staticLoadFile: string,
   organism: OrganismContract
 ): Promise<WorkflowCategory[]> {
-  const categories = await loadWorkflowCategories(
-    getWorkflowsStaticLoadFile(config)
-  );
+  const categories = await loadWorkflowCategories(staticLoadFile);
   return buildOrganismWorkflows(organism, categories);
 }
 
@@ -70,15 +51,30 @@ export function loadWorkflowCategories(
 }
 
 /**
- * Binds a site's config to the workflow-category augmenter, for a site whose
- * organism detail data is nothing more than that.
+ * Binds a site's config to a build-time augmenter that attaches an organism's
+ * compatible workflow categories to its record — the build-computed half of
+ * organism detail data that every site shares.
  * @param config - Site config accessor (provides the site's entity configs).
  * @returns Build-time augmenter for the site's organism records.
  */
 export function makeWorkflowCategoriesAugmenter<T extends OrganismContract>(
   config: () => Pick<SiteConfig, "entities">
 ): (organism: T) => Promise<WithWorkflowCategories<T>> {
-  return (organism) => augmentWithWorkflowCategories(config, organism);
+  // Resolved on first use rather than here, so binding the augmenter doesn't
+  // read the config at import time; kept afterwards, because the entity configs
+  // don't change during a build and the lookup scans the array once per page
+  // otherwise -- roughly once per generated organism.
+  let staticLoadFile: string | undefined;
+  return async (organism) => {
+    staticLoadFile ??= getWorkflowsStaticLoadFile(config);
+    return {
+      ...organism,
+      workflowCategories: await loadOrganismWorkflowCategories(
+        staticLoadFile,
+        organism
+      ),
+    };
+  };
 }
 
 /**
