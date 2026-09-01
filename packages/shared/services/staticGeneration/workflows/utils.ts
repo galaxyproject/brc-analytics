@@ -1,10 +1,28 @@
 import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-import { buildOrganismWorkflows } from "@repo/shared/views/OrganismView/components/Main/utils";
+import type { WithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/types";
+import { buildOrganismWorkflows } from "@repo/shared/workflow/organismWorkflows";
 import { promises as fsp } from "fs";
 
 const categoriesByFile = new Map<string, Promise<WorkflowCategory[]>>();
+
+/**
+ * Attaches an organism's compatible workflow categories to its record, the
+ * build-computed half of organism detail data that every site shares.
+ * @param config - Site config accessor (provides the site's entity configs).
+ * @param organism - Organism record.
+ * @returns Organism record with its workflow categories.
+ */
+export async function augmentWithWorkflowCategories<T extends OrganismContract>(
+  config: () => Pick<SiteConfig, "entities">,
+  organism: T
+): Promise<WithWorkflowCategories<T>> {
+  return {
+    ...organism,
+    workflowCategories: await loadOrganismWorkflowCategories(config, organism),
+  };
+}
 
 /**
  * Builds the organism's compatible workflow categories at build time. No
@@ -49,6 +67,18 @@ export function loadWorkflowCategories(
     categoriesByFile.set(staticLoadFile, promise);
   }
   return promise;
+}
+
+/**
+ * Binds a site's config to the workflow-category augmenter, for a site whose
+ * organism detail data is nothing more than that.
+ * @param config - Site config accessor (provides the site's entity configs).
+ * @returns Build-time augmenter for the site's organism records.
+ */
+export function makeWorkflowCategoriesAugmenter<T extends OrganismContract>(
+  config: () => Pick<SiteConfig, "entities">
+): (organism: T) => Promise<WithWorkflowCategories<T>> {
+  return (organism) => augmentWithWorkflowCategories(config, organism);
 }
 
 /**

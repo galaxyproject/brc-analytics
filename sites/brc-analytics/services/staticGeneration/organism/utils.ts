@@ -1,6 +1,6 @@
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { config } from "@brc/config/config";
-import { loadOrganismWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/utils";
+import { augmentWithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/utils";
 import { loadPangenomes } from "./pangenomes";
 import { type BRCOrganismDetail } from "./types";
 
@@ -14,16 +14,18 @@ import { type BRCOrganismDetail } from "./types";
 export async function augmentOrganismDetail(
   organism: BRCDataCatalogOrganism
 ): Promise<BRCOrganismDetail> {
-  const workflowCategories = await loadOrganismWorkflowCategories(
-    config,
-    organism
-  );
-  const pangenome = (await loadPangenomes()).get(organism.ncbiTaxonomyId);
+  // Read together: the two catalogs are independent, and this runs once per
+  // organism page, so serializing them would add the pangenome read's latency
+  // to every worker's first page for nothing.
+  const [withWorkflowCategories, pangenomes] = await Promise.all([
+    augmentWithWorkflowCategories(config, organism),
+    loadPangenomes(),
+  ]);
+  const pangenome = pangenomes.get(organism.ncbiTaxonomyId);
   // Spread the pangenome conditionally: getStaticProps output must be
   // JSON-serializable, and an explicit `undefined` field is not.
   return {
-    ...organism,
+    ...withWorkflowCategories,
     ...(pangenome ? { pangenome } : {}),
-    workflowCategories,
   };
 }

@@ -3,9 +3,10 @@ import {
   type ComponentConfig,
   type ComponentsConfig,
 } from "@databiosphere/findable-ui/lib/config/entities";
-import { type GA2OrganismDetail } from "@ga2/services/staticGeneration/organism/types";
+import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import * as V from "@ga2/viewModelBuilders/viewModelBuilders";
 import { Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
+import { type WithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/types";
 
 export const organismMainColumn: ComponentsConfig = [
   {
@@ -16,5 +17,8 @@ export const organismMainColumn: ComponentsConfig = [
       },
     ],
     component: BackPageContentSingleColumn,
-  } as ComponentConfig<typeof BackPageContentSingleColumn, GA2OrganismDetail>,
+  } as ComponentConfig<
+    typeof BackPageContentSingleColumn,
+    WithWorkflowCategories<GA2OrganismEntity>
+  >,
 ];

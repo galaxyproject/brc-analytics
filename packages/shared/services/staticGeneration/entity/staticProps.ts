@@ -6,40 +6,11 @@ import type { GetStaticProps } from "next";
 import type { EntityPageParams, EntityPageProps } from "./types";
 
 /**
- * Builds getStaticProps for a single entity type's detail page, serving the
- * entity record as-is.
- * @param config - Site config accessor (provides the site's entity configs).
- * @param entityListType - Entity list type (route segment) for the page.
- * @param meta - Page metadata (description and title).
- * @returns getStaticProps.
- */
-export function makeEntityStaticProps<R>(
-  config: () => Pick<SiteConfig, "entities">,
-  entityListType: string,
-  meta: PageMeta
-): GetStaticProps<EntityPageProps<R>, EntityPageParams>;
-/**
- * Builds getStaticProps for a single entity type's detail page, attaching
- * build-computed fields to the record via the augmenter (e.g. a pre-filtered
- * workflows slice) so the page can prerender fully. The overloads ensure an
- * augmented data type can only be claimed when the augmenter that produces it
- * is actually supplied.
- * @param config - Site config accessor (provides the site's entity configs).
- * @param entityListType - Entity list type (route segment) for the page.
- * @param meta - Page metadata (description and title).
- * @param augmentData - Build-time augmenter applied to the record.
- * @returns getStaticProps.
- */
-export function makeEntityStaticProps<R, D extends R>(
-  config: () => Pick<SiteConfig, "entities">,
-  entityListType: string,
-  meta: PageMeta,
-  augmentData: (data: R) => Promise<D>
-): GetStaticProps<EntityPageProps<D>, EntityPageParams>;
-/**
- * Implementation. The site is decoupled by injecting its config accessor;
- * when the entity's detail config opts into static loading, the entity record
- * is fetched into `data` and augmented when an augmenter is supplied.
+ * Builds getStaticProps for a single entity type's detail page. The site is
+ * decoupled by injecting its config accessor; when the entity's detail config
+ * opts into static loading, the entity record is fetched into `data` and, where
+ * an augmenter is supplied, given the build-computed fields the page renders
+ * (e.g. a pre-filtered workflows slice) so it can prerender fully.
  * @param config - Site config accessor (provides the site's entity configs).
  * @param entityListType - Entity list type (route segment) for the page.
  * @param meta - Page metadata (description and title).

@@ -1,8 +1,7 @@
 import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { type Pangenome } from "@brc/apis/pangenome";
-import { type WorkflowCategory } from "@repo/shared/apis/workflow";
+import { type WithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/types";
 
-export interface BRCOrganismDetail extends BRCDataCatalogOrganism {
+export interface BRCOrganismDetail extends WithWorkflowCategories<BRCDataCatalogOrganism> {
   pangenome?: Pangenome;
-  workflowCategories: WorkflowCategory[];
 }
