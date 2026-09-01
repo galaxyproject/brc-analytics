@@ -13,8 +13,8 @@ export type WorkflowCategoryFeatureFlag =
 
 /**
  * Enabled state of every feature flag that gates a workflow category.
- * Exhaustive by construction: adding a flag above is a compile error at every
- * site that resolves flag state, so no consumer can silently miss a new gate.
+ * Exhaustive by construction: adding a flag above is a compile error wherever
+ * this record is built, so a resolver cannot silently miss a new gate.
  */
 export type WorkflowCategoryFeatureFlags = Record<
   WorkflowCategoryFeatureFlag,
@@ -22,8 +22,14 @@ export type WorkflowCategoryFeatureFlags = Record<
 >;
 
 /**
- * The single owner of which feature flag gates which workflow category.
- * Categories absent from this map are never gated.
+ * Which feature flag gates which workflow category, for the views that resolve
+ * their flag state through `useWorkflowCategoryFeatureFlags`. Categories absent
+ * from this map are never gated.
+ *
+ * Not yet the only place the rule lives: `getWorkflows` and
+ * `buildAssemblyWorkflows` still carry their own inline checks, so a category
+ * added here is gated on the organism page alone until those views resolve
+ * their flags through this module too.
  */
 const FEATURE_FLAG_BY_CATEGORY: Partial<
   Record<WORKFLOW_CATEGORY_ID, WorkflowCategoryFeatureFlag>
@@ -54,7 +60,7 @@ export function filterFlagGatedWorkflowCategories(
  * @param featureFlags - Enabled state of every category-gating feature flag.
  * @returns True when the category is visible under the given flag state.
  */
-export function isWorkflowCategoryEnabled(
+function isWorkflowCategoryEnabled(
   category: string,
   featureFlags: WorkflowCategoryFeatureFlags
 ): boolean {
