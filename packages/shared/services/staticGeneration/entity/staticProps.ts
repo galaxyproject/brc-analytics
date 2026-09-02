@@ -1,7 +1,7 @@
 import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { seedDatabase } from "@databiosphere/findable-ui/lib/utils/seedDatabase";
 import type { PageMeta } from "@repo/shared/meta/types";
 import { getEntity } from "@repo/shared/services/staticGeneration/entities/utils";
-import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
 import type { GetStaticProps } from "next";
 import type { EntityPageParams, EntityPageProps } from "./types";
 
