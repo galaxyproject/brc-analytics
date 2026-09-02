@@ -16,6 +16,7 @@ import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/
 import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { type WithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/types";
 import { ORGANISM_SCOPED_TAG_LABELS } from "@repo/shared/viewModelBuilders/constants";
 import {
   buildAnalyzeGenome,
@@ -71,7 +72,7 @@ export const buildOrganismHero = (
  * @returns Props for the OrganismViewMain component.
  */
 export const buildOrganismViewMain = (
-  entity: GA2OrganismEntity
+  entity: WithWorkflowCategories<GA2OrganismEntity>
 ): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
@@ -79,7 +80,7 @@ export const buildOrganismViewMain = (
       tableOptions: buildOrganismGenomesTable(entity),
     },
     entityId: sanitizeEntityId(entity.ncbiTaxonomyId),
-    organism: entity,
+    workflowCategories: entity.workflowCategories,
   };
 };
 

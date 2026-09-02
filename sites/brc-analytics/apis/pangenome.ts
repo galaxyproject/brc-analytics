@@ -1,8 +1,7 @@
 /**
- * A pangenome bundle for a species, served from pangenomes.json and consumed by
- * the organism-page Pangenome section. Fetched through the entity store like
- * organisms/assemblies (see services/workflows). MOCK-backed until the real
- * pangenomes.json build lands (#1341).
+ * A pangenome bundle for a species, read from the pangenomes catalog at build
+ * time and embedded in the organism page's static props for the Pangenome
+ * section. MOCK-backed until the real pangenomes catalog build lands (#1341).
  */
 export interface Pangenome {
   bundleId: string;

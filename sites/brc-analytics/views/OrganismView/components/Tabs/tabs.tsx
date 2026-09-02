@@ -14,13 +14,13 @@ import { getActiveTab } from "./utils";
  * `pangenome` feature flag is enabled and the organism's species has a
  * pangenome bundle — matching the PangenomeSection's own gating.
  * @param props - Component props.
- * @param props.ncbiTaxonomyId - Organism's NCBI (species) taxonomy ID.
+ * @param props.pangenome - The species' pangenome bundle, when it has one.
  * @returns The organism-page tabs.
  */
-export const Tabs = ({ ncbiTaxonomyId }: Props): JSX.Element => {
+export const Tabs = ({ pangenome }: Props): JSX.Element => {
   const { hash } = useHash();
   const { push } = useRouter();
-  const showPangenome = Boolean(useShowPangenome(ncbiTaxonomyId));
+  const showPangenome = Boolean(useShowPangenome(pangenome));
   return (
     <BackPageTabs>
       <MTabs
