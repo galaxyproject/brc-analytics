@@ -47,22 +47,11 @@ describe("loadPangenomes", () => {
     );
   });
 
-  test("yields an empty map when the payload is not an array", async () => {
-    const { loadPangenomes, readFile, warn } = await freshModule();
-    readFile.mockResolvedValue(JSON.stringify({}));
-
-    await expect(loadPangenomes()).resolves.toEqual(new Map());
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining(PANGENOMES_STATIC_LOAD_FILE),
-      expect.objectContaining({
-        message: `Pangenomes catalog is not an array: ${PANGENOMES_STATIC_LOAD_FILE}`,
-      })
-    );
-  });
-
-  test("memoizes the degraded read rather than retrying every page", async () => {
+  test("memoizes the absent catalog rather than retrying every page", async () => {
     const { loadPangenomes, readFile } = await freshModule();
-    readFile.mockRejectedValue(new Error("read failed"));
+    const error: NodeJS.ErrnoException = new Error("no such file");
+    error.code = "ENOENT";
+    readFile.mockRejectedValue(error);
 
     await expect(loadPangenomes()).resolves.toEqual(new Map());
     await expect(loadPangenomes()).resolves.toEqual(new Map());
@@ -70,6 +59,44 @@ describe("loadPangenomes", () => {
     // An absent catalog stays absent for the build, so re-reading it once per
     // page would buy nothing but ~2K failed reads.
     expect(readFile).toHaveBeenCalledTimes(1);
+  });
+
+  test("fails when the payload is not an array", async () => {
+    const { loadPangenomes, readFile } = await freshModule();
+    readFile.mockResolvedValue(JSON.stringify({ pangenomes: [PANGENOME] }));
+
+    // A catalog that is present but the wrong shape is wrong data, not missing
+    // data -- degrading would ship every organism page without its section.
+    await expect(loadPangenomes()).rejects.toThrow(
+      `Pangenomes catalog is not an array: ${PANGENOMES_STATIC_LOAD_FILE}`
+    );
+  });
+
+  test("fails when the payload is not valid JSON", async () => {
+    const { loadPangenomes, readFile } = await freshModule();
+    readFile.mockResolvedValue("[{");
+
+    await expect(loadPangenomes()).rejects.toThrow();
+  });
+
+  test("fails when the catalog is unreadable for any other reason", async () => {
+    const { loadPangenomes, readFile } = await freshModule();
+    const error: NodeJS.ErrnoException = new Error("permission denied");
+    error.code = "EACCES";
+    readFile.mockRejectedValue(error);
+
+    await expect(loadPangenomes()).rejects.toThrow("permission denied");
+  });
+
+  test("evicts a failed read so a transient error doesn't poison the worker", async () => {
+    const { loadPangenomes, readFile } = await freshModule();
+    readFile.mockRejectedValueOnce(new Error("read failed"));
+    readFile.mockResolvedValue(JSON.stringify([PANGENOME]));
+
+    await expect(loadPangenomes()).rejects.toThrow("read failed");
+    await expect(loadPangenomes()).resolves.toEqual(
+      new Map([["5855", PANGENOME]])
+    );
   });
 });
 
