@@ -81,6 +81,15 @@ sources:
                   arguments:
                     to: ref('taxonomy_organisms')
                     field: taxonomy_id
+              - relationships:
+                  name: catalog_organism_taxa_in_organism_synonyms
+                  arguments:
+                    to: ref('taxonomy_organism_synonyms')
+                    field: taxonomy_id
+          - name: synonyms
+            description: >
+              JSON list of the curated synonyms specified for the organism in the
+              source organisms file, or null where none are specified.
       - name: outbreak_taxa
         # Only tested when the catalog has outbreaks
         columns:

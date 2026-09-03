@@ -27,7 +27,7 @@ def do_dlt_load(
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      organisms_df: DataFrame of source organisms (must include `taxonomy_id` and `synonyms` columns)
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
 
     Returns:

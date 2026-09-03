@@ -19,7 +19,7 @@ async function buildCatalog(): Promise<void> {
     );
 
     const genomes = await buildAssemblies(outbreaksByTaxonomyId);
-    const organisms = buildOrganisms(genomes);
+    const organisms = await buildOrganisms(genomes);
     const workflows = await buildWorkflows();
 
     console.log("Assemblies:", genomes.length);
