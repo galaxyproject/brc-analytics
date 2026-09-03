@@ -1158,6 +1158,88 @@ class TestGeographyForAccessions:
         assert not hasattr(SRAMirrorService.geography_for_accessions, "__wrapped__")
 
 
+class TestGeographyAgainstTheRealVocabulary:
+    """Shape the whole mirror's measured country distribution.
+
+    The fixtures above are deliberately small and deliberately awkward. This
+    one is the real thing: all 245 distinct values with their real run counts,
+    measured off the deployed schema_version 3 mirror, pushed through the same
+    shaping function the API uses. It is the closest a unit test gets to
+    "what would this actually render".
+    """
+
+    @pytest.fixture(scope="class")
+    def shaped(self):
+        from tests.test_country_iso import DISTINCT_COUNTRY_VALUES
+
+        # The mirror-wide NULL/'uncalculated' count, as one group, exactly as
+        # _geography_sql returns it.
+        counted = list(DISTINCT_COUNTRY_VALUES) + [(None, 18_110_322)]
+        return sra_mirror._shape_geography(counted)
+
+    def test_the_totals_are_the_measured_ones(self, shaped):
+        assert shaped["in_mirror"] == 43_522_611
+        assert shaped["recorded"] == 25_412_289
+        assert shaped["unknown"] == 18_110_322
+
+    def test_the_three_buckets_partition_the_mirror(self, shaped):
+        drawn = sum(c["count"] for c in shaped["countries"])
+        unplaceable = sum(c["count"] for c in shaped["unmapped_countries"])
+        assert drawn + unplaceable + shaped["unknown"] == shaped["in_mirror"]
+        assert drawn == 25_155_616
+        assert unplaceable == 256_673
+
+    def test_the_map_can_draw_99_percent_of_recorded_runs(self, shaped):
+        drawn = sum(c["count"] for c in shaped["countries"])
+        assert drawn / shaped["recorded"] > 0.98
+        # 168 of the 245 raw values are drawable, and Gaza Strip and West Bank
+        # collapse into PSE, so 167 shapes get coloured.
+        assert len(shaped["countries"]) == 167
+
+    def test_the_unplaceable_countries_are_named_and_counted(self, shaped):
+        unplaceable = {c["value"]: c["count"] for c in shaped["unmapped_countries"]}
+        # 65 with a code and no shape, plus the 12 that are not countries.
+        assert len(unplaceable) == 77
+        assert unplaceable["Hong Kong"] == 81_649
+        assert unplaceable["Singapore"] == 64_050
+        assert unplaceable["Borneo"] == 827
+
+    def test_the_top_of_the_map_is_what_the_mirror_says(self, shaped):
+        assert shaped["countries"][0] == {
+            "count": 9_242_738,
+            "iso_a3": "USA",
+            "iso_n3": "840",
+            "value": "United States of America",
+        }
+        assert [c["iso_a3"] for c in shaped["countries"][:5]] == [
+            "USA",
+            "GBR",
+            "CHN",
+            "DNK",
+            "CAN",
+        ]
+
+    def test_the_continent_rollup_is_derived_not_read(self, shaped):
+        # Derived from the ISO table, which is what makes phase 1 independent
+        # of a mirror rebuild -- the deployed file has no continent column.
+        continents = {c["value"]: c["count"] for c in shaped["continents"]}
+        assert set(continents) == {
+            "Africa",
+            "Asia",
+            "Europe",
+            "North America",
+            "Oceania",
+            "South America",
+        }
+        # Everything with a code, drawable or not; only the 12 non-countries
+        # (5,684 runs) have no continent to land in.
+        assert sum(continents.values()) == shaped["recorded"] - 5_684
+
+    def test_no_country_is_listed_that_the_asset_cannot_draw(self, shaped):
+        for entry in shaped["countries"]:
+            assert entry["iso_n3"] in country_iso.TOPOJSON_COUNTRY_IDS, entry
+
+
 @pytest.fixture()
 def exports(tmp_path):
     """A writable export directory of its own.
