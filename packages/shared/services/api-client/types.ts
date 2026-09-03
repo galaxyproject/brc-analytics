@@ -133,6 +133,9 @@ export interface WorkflowRunResponse {
   id: string;
   launch_source: string;
   parameters: Record<string, unknown>;
+  // On the wire but unread: crud.py hardcodes "handoff_created" and there is
+  // no endpoint to move it off that. Real invocation status needs per-user
+  // Galaxy bearer tokens.
   status: string;
   updated_at: string;
   workflow_id: string | null;
