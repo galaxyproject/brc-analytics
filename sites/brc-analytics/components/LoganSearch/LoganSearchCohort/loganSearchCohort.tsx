@@ -1,7 +1,9 @@
+import { CohortGeography } from "@brc/components/LoganSearch/CohortGeography/cohortGeography";
 import {
   CohortBarRow,
   CohortBarRows,
   CohortFacetGrid,
+  CohortGeographyLayout,
   CohortStat,
   CohortStats,
   ControlRow,
@@ -357,6 +359,28 @@ function CohortExport({
   );
 }
 
+/**
+ * One facet's heading, denominator and bars.
+ * @param props - Component props.
+ * @param props.facet - Facet as the API sends it.
+ * @returns The facet block.
+ */
+function CohortFacetBlock({ facet }: { facet: KmindexFacet }): JSX.Element {
+  const rows = facetBars(facet);
+  // The facet's own parts, so the shares are guaranteed to add up even if a
+  // facet ever counts a different set from in_mirror.
+  const facetTotal = sum(rows.map((row) => row.count));
+  return (
+    <div>
+      <Typography variant="subtitle2">{facetLabel(facet.name)}</Typography>
+      <Typography color="textSecondary" variant="caption">
+        {facetTotal.toLocaleString()} runs
+      </Typography>
+      <CohortBars rows={rows} total={facetTotal} />
+    </div>
+  );
+}
+
 export const LoganSearchCohort = ({
   search,
 }: LoganSearchCohortProps): JSX.Element | null => {
@@ -372,11 +396,36 @@ export const LoganSearchCohort = ({
   if (!results || !cohort || cohort.total <= 0) return null;
 
   const listed = results.total_hits ?? 0;
+  const geography = results.geography ?? null;
+  const facets = cohort.facets ?? [];
+  // The country facet is lifted out of the grid and set beside the map, but
+  // only when there is a map to set it beside. With no geography it stays
+  // where it has always been rather than leaving half a row empty.
+  const countryFacet = geography
+    ? (facets.find((facet) => facet.name === "country") ?? null)
+    : null;
+  const gridFacets = countryFacet
+    ? facets.filter((facet) => facet !== countryFacet)
+    : facets;
   // The two cards describe different sets whenever the cap bit. Derived from
   // the counts rather than the truncated flag because it is precisely the gap
   // between these two numbers that the reader has to be told about.
   const isTruncated = cohort.total > listed;
   const mirrorNote = describeMirrorCoverage(cohort);
+
+  // Full width above the facet grid rather than inside it. A grid cell is
+  // about 560px on a 1200px page, which is not enough for a world map to be
+  // worth drawing -- and the bars stay, because a choropleth cannot say "812
+  // runs from Malawi" and should not try.
+  const geographyBlock = geography ? (
+    <>
+      <Divider sx={{ my: 2 }} />
+      <CohortGeographyLayout>
+        <CohortGeography geography={geography} />
+        {countryFacet && <CohortFacetBlock facet={countryFacet} />}
+      </CohortGeographyLayout>
+    </>
+  ) : null;
 
   return (
     <Card sx={{ mt: 2 }}>
@@ -484,24 +533,12 @@ export const LoganSearchCohort = ({
           values, everything else, and the runs with nothing recorded -- so its
           shares add to 100%.
         </Typography>
+        {geographyBlock}
+
         <CohortFacetGrid>
-          {(cohort.facets ?? []).map((facet) => {
-            const rows = facetBars(facet);
-            // The facet's own parts, so the shares are guaranteed to add up
-            // even if a facet ever counts a different set from in_mirror.
-            const facetTotal = sum(rows.map((row) => row.count));
-            return (
-              <div key={facet.name}>
-                <Typography variant="subtitle2">
-                  {facetLabel(facet.name)}
-                </Typography>
-                <Typography color="textSecondary" variant="caption">
-                  {facetTotal.toLocaleString()} runs
-                </Typography>
-                <CohortBars rows={rows} total={facetTotal} />
-              </div>
-            );
-          })}
+          {gridFacets.map((facet) => (
+            <CohortFacetBlock facet={facet} key={facet.name} />
+          ))}
         </CohortFacetGrid>
 
         <Typography
