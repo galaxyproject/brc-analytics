@@ -1,7 +1,9 @@
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import { useFavorites } from "@repo/shared/providers/favorites/provider";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { FavoritesSection } from "@repo/shared/views/AccountView/components/FavoritesSection/favoritesSection";
 import { render, screen } from "@testing-library/react";
 // jest-dom matchers (toBeInTheDocument, toBeDisabled) aren't registered
@@ -71,6 +73,17 @@ function renderSection(
 describe("FavoritesSection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  test("builds the Open link from ROUTES, not a hand-rolled path", () => {
+    // Renaming a detail route updates ROUTES and every view-model builder; a
+    // path assembled here would keep linking at the old one.
+    renderSection();
+
+    expect(screen.getByRole("link", { name: "Open" })).toHaveAttribute(
+      "href",
+      ROUTES.GENOME.replace("{entityId}", sanitizeEntityId("GCF_000001405.40"))
+    );
   });
 
   test("disables Remove for the row currently toggling, using the shared favoriteKey format", () => {
