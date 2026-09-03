@@ -29,7 +29,7 @@ export function FavoriteCell({
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { isFavorited, isLoading, toggleFavorite, togglingKeys } =
+  const { hasLoaded, isFavorited, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
 
   // Login is off on this site -- a permanent state, not a loading one.
@@ -59,6 +59,8 @@ export function FavoriteCell({
         // isLoading covers the window before the initial GET /favorites
         // resolves, when isFavorited reads an empty set -- a click there
         // would fire a create for an entity that may already be saved.
+        // hasLoaded covers the same empty set after a load that failed,
+        // where isLoading is back to false and nothing else says so.
         // Only the rows in flight are disabled -- gating on the shared
         // isToggling flag would freeze every star in the table.
         // Both gates are about favorites we might not have loaded yet, which
@@ -67,7 +69,9 @@ export function FavoriteCell({
         // the cell from depending on that staying true.
         disabled={
           isAuthenticated &&
-          (isLoading || togglingKeys.has(favoriteKey(entityType, entityId)))
+          (isLoading ||
+            !hasLoaded ||
+            togglingKeys.has(favoriteKey(entityType, entityId)))
         }
         onClick={handleClick}
         size="small"

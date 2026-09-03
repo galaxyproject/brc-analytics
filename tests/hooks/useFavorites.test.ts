@@ -232,6 +232,40 @@ describe("useFavorites", () => {
     expect(result.current.error?.message).toBe("network down");
   });
 
+  test("a failed load is not mistaken for an empty one", async () => {
+    // The list stays empty either way, so nothing but this flag separates
+    // "you have saved nothing" from "we could not find out."
+    mockClient.getFavorites.mockRejectedValue(new Error("network down"));
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.hasLoaded).toBe(false);
+    expect(result.current.error?.message).toBe("network down");
+  });
+
+  test("a toggle against an unloaded set is refused, not guessed at", async () => {
+    // keysRef is empty because the load failed, so the star would read as
+    // "not favorited" and create one the user already has. The API is
+    // idempotent and returns that existing row, which this provider would
+    // then hold as the entire list -- every other favorite gone from the
+    // account page until a reload.
+    mockClient.getFavorites.mockRejectedValue(new Error("network down"));
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION);
+    });
+
+    expect(mockClient.createFavorite).not.toHaveBeenCalled();
+    // And the load failure is still the error being reported, not cleared by
+    // the refused toggle.
+    expect(result.current.error?.message).toBe("network down");
+    expect(result.current.favorites).toEqual([]);
+  });
+
   test("does not fetch when the user is signed out", async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,

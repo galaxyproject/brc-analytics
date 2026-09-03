@@ -41,6 +41,7 @@ function setFavorites(overrides = {}): jest.Mock {
   mockUseFavorites.mockReturnValue({
     error: null,
     favorites: [],
+    hasLoaded: true,
     isFavorited: () => false,
     isLoading: false,
     isToggling: false,

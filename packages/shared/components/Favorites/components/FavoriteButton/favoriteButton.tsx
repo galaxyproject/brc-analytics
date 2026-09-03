@@ -26,8 +26,14 @@ export function FavoriteButton({
     isLoading: isAuthLoading,
     login,
   } = useAuth();
-  const { error, isFavorited, isLoading, toggleFavorite, togglingKeys } =
-    useFavorites();
+  const {
+    error,
+    hasLoaded,
+    isFavorited,
+    isLoading,
+    toggleFavorite,
+    togglingKeys,
+  } = useFavorites();
 
   // Login is off on this site -- a permanent state, not a loading one -- so
   // the control cannot be offered and renders nothing.
@@ -51,8 +57,12 @@ export function FavoriteButton({
     <Button
       // Only this entity's own toggle disables it -- gating on the shared
       // isToggling flag would freeze every control on the page.
+      // !hasLoaded is the load-failed case: the set is unknown, so the
+      // button cannot say whether this entity is saved, let alone toggle it.
       disabled={
-        isLoading || togglingKeys.has(favoriteKey(entityType, entityId))
+        isLoading ||
+        !hasLoaded ||
+        togglingKeys.has(favoriteKey(entityType, entityId))
       }
       onClick={() => void toggleFavorite(entityType, entityId)}
       startIcon={favorited ? <StarIcon /> : <StarBorderIcon />}
@@ -62,11 +72,18 @@ export function FavoriteButton({
     </Button>
   );
 
-  // The toggle stays clickable on failure -- the next click clears the error
-  // and retries; the tooltip just reports the last attempt.
+  // A failed toggle stays clickable -- the next click clears the error and
+  // retries. A failed load does not: the button above is disabled, and saying
+  // "could not update" would misreport what went wrong.
   if (error) {
     return (
-      <Tooltip title={`Could not update: ${error.message}`}>
+      <Tooltip
+        title={
+          hasLoaded
+            ? `Could not update: ${error.message}`
+            : `Could not load your saved items: ${error.message}`
+        }
+      >
         <span>{button}</span>
       </Tooltip>
     );
