@@ -31,8 +31,10 @@ export function buildAssemblyWorkflows(
   )) {
     const { workflows: categoryWorkflows } = workflowCategory;
 
-    // Filter workflows to only include those that are compatible with the given assembly
-    // and have ASSEMBLY scope (or no scope specified, which defaults to ASSEMBLY).
+    // Filter workflows to only include those that are compatible with the given
+    // assembly and have ASSEMBLY scope. Every workflow carries a scope by the
+    // time it reaches here: the catalog build fills in ASSEMBLY for source
+    // entries that omit it, so this match never has an absent scope to handle.
     const compatibleWorkflows = categoryWorkflows.filter(
       (workflow) =>
         workflowIsCompatibleWithAssembly(workflow, assembly) &&
