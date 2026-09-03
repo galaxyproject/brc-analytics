@@ -254,6 +254,10 @@ class SessionRestoreResponse(BaseModel):
         default=None,
         description="Set when the session was opened from a Logan search",
     )
+    # Whether this conversation is already on disk. Without it the client can
+    # only infer saved-ness from being signed in, which is not the same
+    # question and costs a redundant save on every mount.
+    saved: bool = False
 
 
 class AssistantInfoResponse(BaseModel):

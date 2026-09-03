@@ -61,6 +61,7 @@ function restored(): Awaited<ReturnType<typeof mockClient.assistantRestore>> {
       { content: "hi", role: "user" },
       { content: "hello back", role: "assistant" },
     ],
+    saved: false,
     schema_state: null,
     session_id: STORED_ID,
     suggestions: [],
@@ -89,6 +90,26 @@ describe("useAssistantChat auto-save", () => {
 
     await waitFor(() => expect(result.current.isSaved).toBe(true));
     expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID);
+  });
+
+  test("a conversation the server already has is not saved again", async () => {
+    // Auth state answers "who is this", not "is this kept". Inferring the
+    // second from the first re-saved every signed-in session on every mount --
+    // which against a deployment with no database is three 503s and three
+    // exception logs a visit, and against one with a database is a third
+    // writer racing the turn that is already saving.
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.isSaved).toBe(true));
+    expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
   });
 
   test("a signed-out conversation is never sent to the account", async () => {

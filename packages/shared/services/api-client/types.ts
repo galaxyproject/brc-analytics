@@ -79,6 +79,7 @@ export interface SessionRestoreResponse {
   is_complete: boolean;
   logan?: LoganContext | null;
   messages: { content: string; role: "user" | "assistant" }[];
+  saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];

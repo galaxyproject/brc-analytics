@@ -47,14 +47,15 @@ def _build_title(state: SessionState) -> str:
     return "Saved analysis"
 
 
-async def record(state: SessionState) -> bool:
+async def record(state: SessionState) -> str | None:
     """Persist the current state of one conversation for its owner.
 
     Never raises. Every expression that touches `state` sits inside the
     try, so even a malformed session cannot cost the user their reply.
 
-    Returns whether the conversation is now on disk, so the UI can say it is
-    saved because it was told so rather than because it inferred it.
+    Returns the saved analysis id, so the UI can say a conversation is saved
+    because it was told so rather than because it inferred it, and so the
+    caller can stamp that id onto the session.
     """
     settings = get_settings()
     if not settings.DATABASE_URL:
@@ -62,28 +63,25 @@ async def record(state: SessionState) -> bool:
         # (get_optional_current_user), so a deployment with OIDC enabled and
         # DATABASE_URL unset is reachable -- without this, every authenticated
         # turn would log an exception and fire Sentry.
-        return False
+        return None
 
     try:
-        return (
-            await asyncio.wait_for(
-                _write(state),
-                timeout=settings.ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS,
-            )
-            is not None
+        return await asyncio.wait_for(
+            _write(state),
+            timeout=settings.ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS,
         )
     except asyncio.TimeoutError:
         # Reported, not just logged: a stalled write means the user's
         # conversation is quietly not being kept.
         logger.warning("Auto-save timed out for session %s", _session_label(state))
         sentry_sdk.capture_message("Assistant auto-save timed out", level="warning")
-        return False
+        return None
     except Exception:
         logger.exception(
             "Failed to auto-save analysis for session %s", _session_label(state)
         )
         sentry_sdk.capture_exception()
-        return False
+        return None
 
 
 async def persist(state: SessionState) -> str | None:
