@@ -755,8 +755,18 @@ class TestVersionedAggregateCacheKey:
             }
         }
 
+    @pytest.mark.parametrize(
+        "stale_key",
+        # Every prefix that has ever been written. v2 is the one that matters
+        # now: it carries a correct hit list and no geography at all, so
+        # reading it back would render an empty world map as a fact about the
+        # cohort rather than about the cache.
+        ["galaxy:kmindex_agg:job1", "galaxy:kmindex_agg:v2:job1"],
+    )
     @pytest.mark.asyncio
-    async def test_pre_version_entry_is_a_miss_and_is_recomputed(self, service):
+    async def test_pre_version_entry_is_a_miss_and_is_recomputed(
+        self, service, stale_key
+    ):
         stale = {
             "hits": [{"accession": "SRR9", "score": 0.9, "shard": "GENOMIC_BCT_2"}],
             "query_name": "q",
@@ -765,7 +775,7 @@ class TestVersionedAggregateCacheKey:
             "shards_with_hits": 1,
             "truncated": True,
         }
-        store = {"galaxy:kmindex_agg:job1": stale}
+        store = {stale_key: stale}
         service.cache.make_key = MagicMock(
             side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
         )
@@ -782,8 +792,8 @@ class TestVersionedAggregateCacheKey:
         results = await service.get_kmindex_results("job1")
 
         # The stale entry is untouched and the recomputed one lands beside it.
-        assert store["galaxy:kmindex_agg:job1"] is stale
-        assert "galaxy:kmindex_agg:v2:job1" in store
+        assert store[stale_key] is stale
+        assert "galaxy:kmindex_agg:v3:job1" in store
         # Recomputed, so the pre-cap count is real rather than the cap restated.
         assert results.total_matches == results.total_hits == 2
         assert results.truncated is False

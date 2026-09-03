@@ -103,7 +103,14 @@ KMINDEX_UNATTRIBUTED = "(unattributed)"
 # asserted more confidently than the bare count it replaced. They live a day and
 # clear_caches() does not reach this namespace (CACHE_KEY_PATTERNS in
 # app/core/cache.py), so the key itself is what has to change.
-KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v2"
+#
+# v3 adds geography. A v2 entry has no `geography` key, and .get() on it would
+# read as "this cohort has no recorded geography" rather than as "this entry
+# predates the map" -- an empty world map asserting something about the data
+# instead of about the cache. Every existing job pays one re-aggregation the
+# first time it is viewed after this deploys, and the assistant's cache-only
+# reads miss until that lands; that is a known one-time cliff, not a surprise.
+KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v3"
 
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
