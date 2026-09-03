@@ -4,7 +4,7 @@ import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureF
 
 /**
  * Returns the pangenome bundle to show for a species — the given bundle when
- * the `BRC_FEATURE_FLAGS.PANGENOME` feature flag is enabled, otherwise undefined.
+ * the pangenome feature is enabled, otherwise undefined.
  * The bundle itself is computed at build time and arrives via the organism
  * detail data. Single source of truth so the organism-page tab and the
  * Pangenome section gate identically and can't drift.
