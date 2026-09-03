@@ -13,7 +13,7 @@ from pathlib import Path
 import duckdb
 import pytest
 
-from app.services import sra_mirror
+from app.services import country_iso, sra_mirror
 from app.services.sra_mirror import SRAMirrorService
 
 
@@ -980,12 +980,9 @@ class TestGeographyForAccessions:
         geography = svc.geography_for_accessions(accessions)
 
         assert [c["value"] for c in geography["countries"]] == [
-            "USA",
+            "United States of America",
             "Malawi",
-            "Singapore",
-            "Borneo",
-            "Gaza Strip",
-            "West Bank",
+            "Palestine",
         ]
         assert geography["countries"][0]["count"] == 40
 
@@ -993,11 +990,87 @@ class TestGeographyForAccessions:
         svc, accessions = geography_mirror
         geography = svc.geography_for_accessions(accessions)
 
-        listed = sum(c["count"] for c in geography["countries"])
-        assert listed == geography["recorded"] == 69
+        drawn = sum(c["count"] for c in geography["countries"])
+        unplaceable = sum(c["count"] for c in geography["unmapped_countries"])
+        assert drawn + unplaceable == geography["recorded"] == 69
         assert geography["unknown"] == 11
         assert geography["in_mirror"] == len(accessions) == 80
-        assert listed + geography["unknown"] == geography["in_mirror"]
+        assert drawn + unplaceable + geography["unknown"] == geography["in_mirror"]
+
+    def test_every_emitted_country_carries_a_code_the_asset_can_draw(
+        self, geography_mirror
+    ):
+        # The second leg of the totality test, asserted on the wire this time
+        # rather than on the table: nothing reaches the frontend that joins to
+        # no shape.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        for entry in geography["countries"]:
+            assert entry["iso_n3"] in country_iso.TOPOJSON_COUNTRY_IDS, entry
+            assert len(entry["iso_a3"]) == 3
+
+    def test_a_country_with_no_shape_is_reported_not_dropped(self, geography_mirror):
+        # Singapore has an ISO code and no 1:110m outline. Dropping it would
+        # lose 64,050 runs mirror-wide with no error anywhere.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert {"count": 7, "value": "Singapore"} in geography["unmapped_countries"]
+        assert "SGP" not in [c["iso_a3"] for c in geography["countries"]]
+
+    def test_a_value_that_is_not_a_country_is_reported_not_guessed(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert {"count": 5, "value": "Borneo"} in geography["unmapped_countries"]
+
+    def test_unmapped_countries_keep_the_raw_string_the_reader_would_see(
+        self, geography_mirror
+    ):
+        # There is no canonical name to fall back on, and the raw value is
+        # what the country bars beside the map are showing.
+        svc, accessions = geography_mirror
+        values = [
+            c["value"]
+            for c in svc.geography_for_accessions(accessions)["unmapped_countries"]
+        ]
+        assert values == ["Singapore", "Borneo"]
+
+    def test_two_raw_values_sharing_a_code_are_merged_once(self, geography_mirror):
+        # Gaza Strip and West Bank are both PSE. Two rows with one code would
+        # have the choropleth colour from whichever it saw last and silently
+        # lose the other.
+        svc, accessions = geography_mirror
+        countries = svc.geography_for_accessions(accessions)["countries"]
+
+        palestine = [c for c in countries if c["iso_a3"] == "PSE"]
+        assert len(palestine) == 1
+        assert palestine[0]["count"] == 5
+        assert palestine[0]["value"] == "Palestine"
+
+    def test_codes_are_unique_so_the_choropleth_join_cannot_double_count(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        countries = svc.geography_for_accessions(accessions)["countries"]
+        assert len({c["iso_a3"] for c in countries}) == len(countries)
+        assert len({c["iso_n3"] for c in countries}) == len(countries)
+
+    def test_continents_roll_up_everything_with_a_code(self, geography_mirror):
+        # Including what the asset cannot draw: Singapore is in Asia whether
+        # or not there is an outline for it, so the continent totals are
+        # allowed to exceed what the map colours.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        continents = {c["value"]: c["count"] for c in geography["continents"]}
+        assert continents == {"North America": 40, "Africa": 12, "Asia": 12}
+        # Everything except Borneo, which has no continent because it has no
+        # code.
+        assert sum(continents.values()) == geography["recorded"] - 5
 
     def test_the_three_absences_all_count_as_unknown(self, geography_mirror):
         # NULL, '', and 'uncalculated' -- 4 + 1 + 6. The sentinel is the one
