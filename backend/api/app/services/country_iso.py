@@ -7,9 +7,24 @@ in the position of guessing what "Georgia" or "Borneo" means.
 
 Two things about this table are easy to get wrong and silent when you do.
 
-**Georgia is the country.** The INSDC vocabulary names countries, so the US
-state would arrive as `geo_loc_name` "USA: Georgia" and never as a country.
-19,855 runs ride on that call.
+**Georgia maps to the country, and that is a choice about the least-wrong
+answer rather than a clean one.** 19,855 runs carry it in the deployed mirror.
+NCBI's own calculation is contaminated: measured over the 19,999 Georgia-coded
+runs in the schema_version 5 builder output, which is the only file carrying
+`geo_loc_name`, 9,392 have a free-text location and **1,139 of those name the
+US state** -- `Georgia: Atlanta` 730, `Georgia: United States` 215,
+`Georgia: USA` 170, `Georgia: America` 10, plus a tail. That is 5.7% of all
+Georgia-coded runs and 12.1% of the labelled ones, and it is a floor: 4,702
+more are the bare string "Georgia" and say nothing either way. The cause is
+upstream -- NCBI read the "Georgia:" prefix of a US state locality as a
+country name.
+
+GEO is still the right mapping. 3,407 labelled runs are unambiguously the
+country (Tbilisi, Batumi, Kakheti, Kolkheti), it is the majority of what can
+be resolved, and no country-granularity table can undo a country-granularity
+error made upstream: the alternative is to drop 19,855 runs off the map to
+avoid misplacing roughly one in sixteen of them. So this propagates NCBI's
+assignment knowingly rather than pretending the column is clean.
 
 **The world-110m asset keys features by ISO *numeric* id, not alpha-3.** So
 every entry carries `iso_n3`, which is what the choropleth actually joins on,
