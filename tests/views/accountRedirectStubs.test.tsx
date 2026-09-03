@@ -1,3 +1,4 @@
+import PreferencesRedirectPage from "@brc/pages/account/preferences";
 import WorkflowRunsRedirectPage from "@brc/pages/account/workflow-runs";
 import SavedAnalysesRedirectPage from "@brc/pages/assistant/saved";
 import FavoritesRedirectPage from "@brc/pages/data/favorites";
@@ -17,6 +18,9 @@ describe.each([
   ["data/favorites", FavoritesRedirectPage, "/account#assemblies"],
   ["assistant/saved", SavedAnalysesRedirectPage, "/account#analyses"],
   ["account/workflow-runs", WorkflowRunsRedirectPage, "/account#launches"],
+  // Deleted rather than moved -- the old AuthButton menu linked here, so a
+  // bookmark would otherwise hit a static-export 404.
+  ["account/preferences", PreferencesRedirectPage, "/account"],
 ] as const)(
   "%s redirect stub",
   (_name, RedirectPage: () => JSX.Element, href) => {
