@@ -1,0 +1,68 @@
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
+import { filterFlagGatedWorkflowCategories } from "@repo/shared/workflow/featureFlags";
+import { WorkflowCategoryId } from "../../catalog/schema/generated/schema";
+
+describe("filterFlagGatedWorkflowCategories", () => {
+  const GATED = buildWorkflowCategory(WorkflowCategoryId.ASSEMBLY);
+  const UNGATED = buildWorkflowCategory(WorkflowCategoryId.VARIANT_CALLING);
+  // The catalog types `category` as a plain string, so a value outside the enum
+  // can reach the filter.
+  const UNKNOWN = buildWorkflowCategory("NOT_A_CATEGORY");
+
+  it("returns a gated category when its feature flag is enabled", () => {
+    expect(
+      filterFlagGatedWorkflowCategories([GATED], {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
+      })
+    ).toEqual([GATED]);
+  });
+
+  it("filters out a gated category when its feature flag is disabled", () => {
+    expect(
+      filterFlagGatedWorkflowCategories([GATED], {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
+      })
+    ).toEqual([]);
+  });
+
+  it("returns categories that no feature flag gates, whatever the flag state", () => {
+    expect(
+      filterFlagGatedWorkflowCategories([UNGATED, UNKNOWN], {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
+      })
+    ).toEqual([UNGATED, UNKNOWN]);
+  });
+
+  it("filters only the gated categories, preserving order", () => {
+    expect(
+      filterFlagGatedWorkflowCategories([UNGATED, GATED, UNKNOWN], {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
+      })
+    ).toEqual([UNGATED, UNKNOWN]);
+  });
+
+  it("returns an empty list unchanged", () => {
+    expect(
+      filterFlagGatedWorkflowCategories([], {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
+      })
+    ).toEqual([]);
+  });
+});
+
+/**
+ * Builds a workflow category with the given ID. Only `category` is read by the
+ * filter, so the remaining fields are placeholders.
+ * @param category - Workflow category ID.
+ * @returns Workflow category.
+ */
+function buildWorkflowCategory(category: string): WorkflowCategory {
+  return {
+    category,
+    description: "desc",
+    name: category.toLowerCase(),
+    showComingSoon: false,
+    workflows: [],
+  };
+}

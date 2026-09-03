@@ -1,25 +1,9 @@
 import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-
-/**
- * Feature flags that gate a workflow category's visibility.
- */
-export const WORKFLOW_CATEGORY_FEATURE_FLAG = {
-  ASSEMBLY_WORKFLOWS: "assembly-workflows",
-} as const;
-
-export type WorkflowCategoryFeatureFlag =
-  (typeof WORKFLOW_CATEGORY_FEATURE_FLAG)[keyof typeof WORKFLOW_CATEGORY_FEATURE_FLAG];
-
-/**
- * Enabled state of every feature flag that gates a workflow category.
- * Exhaustive by construction: adding a flag above is a compile error wherever
- * this record is built, so a resolver cannot silently miss a new gate.
- */
-export type WorkflowCategoryFeatureFlags = Record<
-  WorkflowCategoryFeatureFlag,
-  boolean
->;
+import {
+  FEATURE_FLAGS,
+  type FeatureFlag,
+} from "@repo/shared/config/featureFlags";
 
 /**
  * Which feature flag gates which workflow category, for the views that resolve
@@ -31,12 +15,26 @@ export type WorkflowCategoryFeatureFlags = Record<
  * added here is gated on the organism page alone until those views resolve
  * their flags through this module too.
  */
-const FEATURE_FLAG_BY_CATEGORY: Partial<
-  Record<WORKFLOW_CATEGORY_ID, WorkflowCategoryFeatureFlag>
-> = {
-  [WORKFLOW_CATEGORY_ID.ASSEMBLY]:
-    WORKFLOW_CATEGORY_FEATURE_FLAG.ASSEMBLY_WORKFLOWS,
-};
+const FEATURE_FLAG_BY_CATEGORY = {
+  [WORKFLOW_CATEGORY_ID.ASSEMBLY]: FEATURE_FLAGS.ASSEMBLY_WORKFLOWS,
+} as const satisfies Partial<Record<WORKFLOW_CATEGORY_ID, FeatureFlag>>;
+
+/**
+ * A feature flag that gates a workflow category, derived from the gating map so
+ * the set cannot drift from the flags actually in use there.
+ */
+export type WorkflowCategoryFeatureFlag =
+  (typeof FEATURE_FLAG_BY_CATEGORY)[keyof typeof FEATURE_FLAG_BY_CATEGORY];
+
+/**
+ * Enabled state of every feature flag that gates a workflow category.
+ * Exhaustive by construction: gating a category above is a compile error
+ * wherever this record is built, so a resolver cannot silently miss a new gate.
+ */
+export type WorkflowCategoryFeatureFlags = Record<
+  WorkflowCategoryFeatureFlag,
+  boolean
+>;
 
 /**
  * Filters out workflow categories whose gating feature flag is disabled.
@@ -64,9 +62,13 @@ function isWorkflowCategoryEnabled(
   category: string,
   featureFlags: WorkflowCategoryFeatureFlags
 ): boolean {
-  // The catalog types `category` as a plain string, so narrow for the lookup:
-  // a value outside the enum simply misses the map and is treated as ungated.
-  const featureFlag =
-    FEATURE_FLAG_BY_CATEGORY[category as WORKFLOW_CATEGORY_ID];
+  // The catalog types `category` as a plain string, so read the map widened to
+  // a string key: a category absent from it derives as undefined — treated as
+  // ungated — rather than being asserted into the enum by a cast.
+  const featureFlag = (
+    FEATURE_FLAG_BY_CATEGORY as Partial<
+      Record<string, WorkflowCategoryFeatureFlag>
+    >
+  )[category];
   return featureFlag === undefined || featureFlags[featureFlag];
 }
