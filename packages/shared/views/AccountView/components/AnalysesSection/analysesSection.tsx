@@ -2,6 +2,7 @@ import { Button, Typography } from "@mui/material";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { AccountCard } from "@repo/shared/views/AccountView/components/AccountCard/accountCard";
 import { AccountSection } from "@repo/shared/views/AccountView/components/AccountSection/accountSection";
+import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
 import { useRouter } from "next/router";
 import { type JSX, useCallback, useState } from "react";
 import type { Props } from "./types";
@@ -43,7 +44,7 @@ export function AnalysesSection({ resource }: Props): JSX.Element {
         const opened = await apiClient.openSavedAnalysis(id);
         await router.push({
           pathname: "/assistant",
-          query: { sessionId: opened.session_id },
+          query: { [ASSISTANT_QUERY_PARAM.SESSION_ID]: opened.session_id },
         });
       } catch (err) {
         setActionError(
