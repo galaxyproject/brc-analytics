@@ -830,6 +830,41 @@ def _cohort_payload(total: int, in_mirror: int) -> dict:
     }
 
 
+def _geography_payload(in_mirror: int) -> dict:
+    """Geography shaped like the mirror really returns it.
+
+    The parts reconcile the way the real query guarantees -- drawn +
+    unplaceable + unknown == in_mirror -- and both kinds of unplaceable are
+    present: Singapore, which is a country with no shape at 1:110m, and
+    Borneo, which is not a country.
+
+    @param in_mirror: matched accessions the mirror knows.
+    @returns: the geography dict as the mirror service hands it over.
+    """
+    drawn = in_mirror - 5
+    return {
+        "continents": [
+            {"count": drawn, "value": "North America"},
+            {"count": 3, "value": "Asia"},
+        ],
+        "countries": [
+            {
+                "count": drawn,
+                "iso_a3": "USA",
+                "iso_n3": "840",
+                "value": "United States of America",
+            }
+        ],
+        "in_mirror": in_mirror,
+        "recorded": in_mirror - 2,
+        "unknown": 2,
+        "unmapped_countries": [
+            {"count": 3, "value": "Singapore"},
+            {"count": 2, "value": "Borneo"},
+        ],
+    }
+
+
 def duckdb_binder_error() -> Exception:
     """The shape a mirror on an older schema fails with, every single call."""
     return RuntimeError(
@@ -885,8 +920,12 @@ class TestCohortOverTheFullHitSet:
         """
         mirror = MagicMock()
         mirror.is_available = MagicMock(return_value=True)
+        mirror.has_capability = MagicMock(return_value=True)
         mirror.cohort_for_accessions = MagicMock(
             return_value=cohort, side_effect=side_effect
+        )
+        mirror.geography_for_accessions = MagicMock(
+            return_value=_geography_payload(24) if cohort else None
         )
         service.sra_mirror = mirror
         return mirror
@@ -1083,6 +1122,107 @@ class TestCohortOverTheFullHitSet:
         assert results.total_matches == 1
 
 
+class TestGeographyInTheAggregationWindow:
+    """Geography is computed where the cohort and the export are, and for the
+    same reason: the pre-cap hit list exists in that window and nowhere else.
+
+    After aggregation returns, the aggregate holds 50,000 hits and the other
+    million are only recoverable by re-downloading 84-280 shard datasets from
+    a rate-limited Galaxy behind a process-wide lock.
+    """
+
+    _status = staticmethod(TestCohortOverTheFullHitSet._status)
+    _job = staticmethod(TestCohortOverTheFullHitSet._job)
+    _mirror = TestCohortOverTheFullHitSet._mirror
+    _wire = TestCohortOverTheFullHitSet._wire
+
+    @pytest.mark.asyncio
+    async def test_geography_is_computed_from_every_hit_not_the_capped_page(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_MAX_HITS", 10)
+        mirror = self._mirror(service, _cohort_payload(total=25, in_mirror=24))
+        self._wire(service, hits=25)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        (accessions,) = mirror.geography_for_accessions.call_args.args
+        assert len(accessions) == 25
+        assert aggregate["geography"]["in_mirror"] == 24
+
+    @pytest.mark.asyncio
+    async def test_no_mirror_yields_no_geography_and_still_caches(self, service):
+        service.sra_mirror = None
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["geography"] is None
+        service.cache.set.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_geography_closes_alone_when_the_mirror_is_behind(self, service):
+        # The live case for a phase 1 deploy that lands ahead of a mirror
+        # rebuild. Geography goes dark; the cohort and the export do not.
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        mirror.has_capability = MagicMock(
+            side_effect=lambda capability: capability != "geography"
+        )
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["geography"] is None
+        mirror.geography_for_accessions.assert_not_called()
+        assert aggregate["cohort"]["in_mirror"] == 5
+        mirror.cohort_for_accessions.assert_called_once()
+        # A steady state, so it is cached for a day rather than retried hourly.
+        _key, _value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_DAY
+
+    @pytest.mark.asyncio
+    async def test_a_broken_geography_read_shortens_the_ttl_like_the_cohort(
+        self, service
+    ):
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        mirror.geography_for_accessions = MagicMock(
+            side_effect=RuntimeError("geography read failed")
+        )
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        # The hit list and the cohort are both correct and both still served.
+        assert aggregate["geography"] is None
+        assert aggregate["cohort"]["in_mirror"] == 5
+        assert aggregate["total_matches"] == 5
+        service.cache.set.assert_called_once()
+        _key, _value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_HOUR
+
+    @pytest.mark.asyncio
+    async def test_geography_survives_the_cache_round_trip(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        self._wire(service, hits=5)
+
+        await service.get_kmindex_results("job1")
+        await service.get_kmindex_results("job1")
+
+        (cached,) = store.values()
+        assert cached["geography"] == mirror.geography_for_accessions.return_value
+        # Asked once: the second read comes off the cached aggregate, which is
+        # the only place geography still exists.
+        assert mirror.geography_for_accessions.call_count == 1
+
+
 class TestJobMetadataIsFetchedOnce:
     """
     One cold results request should make one show_job GET, not three.
@@ -1233,7 +1373,9 @@ class TestExportOfTheFullMatchSet:
         """
         mirror = MagicMock()
         mirror.is_available = MagicMock(return_value=True)
+        mirror.has_capability = MagicMock(return_value=True)
         mirror.cohort_for_accessions = MagicMock(return_value=None)
+        mirror.geography_for_accessions = MagicMock(return_value=None)
         mirror.export_hits = MagicMock(return_value=record, side_effect=side_effect)
         service.sra_mirror = mirror
         return mirror
