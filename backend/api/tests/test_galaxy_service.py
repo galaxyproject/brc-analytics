@@ -1213,6 +1213,81 @@ class TestGeographyInTheAggregationWindow:
         assert ttl == CacheTTL.ONE_HOUR
 
     @pytest.mark.asyncio
+    async def test_a_wider_mirror_invalidates_what_the_narrow_one_cached(self, service):
+        """The rollout this whole mechanism exists to serve.
+
+        A capability the mirror cannot answer is skipped, and the aggregate is
+        cached for a day -- right, while that process runs, since a file
+        cannot grow a column underneath it. But the window it is right in ends
+        with a restart onto the rebuilt mirror, and keyed on job id alone
+        every aggregate computed during the window would go on serving without
+        geography for up to 24 hours after the mirror that has it went live.
+        The mirror's capability fingerprint is in the key, so that restart is
+        a miss.
+        """
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: (
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+            )
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+
+        narrow = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        narrow.has_capability = MagicMock(
+            side_effect=lambda capability: capability != "geography"
+        )
+        narrow.capability_fingerprint = MagicMock(return_value="3:cohort+export")
+        self._wire(service, hits=5)
+
+        first = await service.get_kmindex_results("job1")
+        assert first.geography is None
+        # Cached for a day, because nothing about it is going to change while
+        # this process is up.
+        (_key, _value, ttl) = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_DAY
+
+        # The mirror is rebuilt and the backend restarts onto it.
+        wide = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        wide.capability_fingerprint = MagicMock(
+            return_value="6:cohort+export+geography"
+        )
+        second = await service.get_kmindex_results("job1")
+
+        assert second.geography is not None
+        assert wide.geography_for_accessions.called
+        # The old entry is left alone rather than overwritten -- a rollback to
+        # the narrow mirror finds its own aggregate still warm.
+        assert len(store) == 2
+
+    @pytest.mark.asyncio
+    async def test_the_same_mirror_keeps_serving_one_cached_aggregate(self, service):
+        # The fingerprint must not churn the key on its own; only a genuine
+        # change of mirror may cost a re-aggregation.
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: (
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+            )
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        mirror.capability_fingerprint = MagicMock(return_value="3:cohort+geography")
+        self._wire(service, hits=5)
+
+        await service.get_kmindex_results("job1")
+        await service.get_kmindex_results("job1")
+
+        assert len(store) == 1
+        assert service._download_shard.await_count == 1
+
+    @pytest.mark.asyncio
     async def test_geography_reaches_the_response_model_intact(self, service):
         mirror = self._mirror(service, _cohort_payload(total=25, in_mirror=24))
         self._wire(service, hits=25)

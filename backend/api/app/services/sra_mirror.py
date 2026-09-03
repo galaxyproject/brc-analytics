@@ -969,6 +969,26 @@ class SRAMirrorService:
             return False
         return capability not in self._missing_columns
 
+    def capability_fingerprint(self) -> str:
+        """A short stamp of which capabilities this mirror can serve.
+
+        Exists so a cached artifact can record the mirror it was computed
+        against. A capability set cannot change while the process runs -- the
+        columns are read once at startup -- so anything derived from it is
+        stable for the lifetime of the process and changes exactly when a new
+        file is picked up. That is the property a cache key wants.
+
+        Ordered and joined rather than hashed: it is short enough to read in a
+        Redis key, and a fingerprint you can eyeball beats one you have to
+        decode when a deploy goes sideways.
+        """
+        if self._con is None:
+            return "none"
+        available = sorted(
+            name for name in _CAPABILITY_COLUMNS if name not in self._missing_columns
+        )
+        return f"{self.schema_version or 'x'}:{'+'.join(available) or 'none'}"
+
     def missing_columns(self, capability: str) -> List[str]:
         """Columns `capability` needs that this mirror does not carry.
 

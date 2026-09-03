@@ -303,6 +303,28 @@ class TestCapabilityGating:
         assert mirror.is_available()
         assert mirror.has_capability("geography")
 
+    def test_the_fingerprint_changes_only_when_the_capabilities_do(
+        self, tmp_path, mirror
+    ):
+        # It goes in the aggregate cache key, so it has to be stable for one
+        # mirror and different for a mirror that can answer more.
+        assert mirror.capability_fingerprint() == mirror.capability_fingerprint()
+
+        narrow_path = str(tmp_path / "narrow.duckdb")
+        _build_mirror(narrow_path)
+        con = duckdb.connect(narrow_path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+        narrow = SRAMirrorService(narrow_path)
+
+        assert narrow.capability_fingerprint() != mirror.capability_fingerprint()
+        # Readable in a Redis key rather than a hash nobody can decode at 3am.
+        assert "geography" in narrow.capability_fingerprint()
+        assert "export" not in narrow.capability_fingerprint()
+
+    def test_an_unavailable_mirror_fingerprints_as_none(self):
+        assert SRAMirrorService("").capability_fingerprint() == "none"
+
     def test_unknown_capability_is_not_available(self, mirror):
         assert mirror.has_capability("teleportation") is False
 
