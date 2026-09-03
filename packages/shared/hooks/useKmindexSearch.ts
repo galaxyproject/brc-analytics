@@ -65,6 +65,44 @@ export interface KmindexCohort {
   total: number;
 }
 
+// One country the map can actually draw.
+export interface KmindexGeographyCountry {
+  count: number;
+  // ISO 3166-1 alpha-3.
+  iso_a3: string;
+  // ISO 3166-1 numeric, zero-padded. THIS is what the choropleth joins on:
+  // world-110m keys its features by numeric id, so a join on iso_a3 matches
+  // nothing and renders an empty map with no error.
+  iso_n3: string;
+  // Canonical name, not the raw SRA string -- several of those share a code
+  // (Gaza Strip and West Bank are both PSE) and the rollup is keyed by code.
+  value: string;
+}
+
+// Where the FULL pre-cap match set was sampled from, computed server-side
+// alongside the cohort. `countries`, `unmapped_countries` and `unknown`
+// partition the matched runs and sum to `in_mirror`, which is what lets the
+// card state its own denominator instead of implying one.
+export interface KmindexGeography {
+  // Derived from the backend's ISO table rather than read from the mirror,
+  // and it covers countries the map cannot draw too -- so this does not have
+  // to add up to the sum of `countries`.
+  continents: KmindexFacetValue[];
+  // Every drawable country in the match set, largest first. Not a top ten.
+  countries: KmindexGeographyCountry[];
+  // Matched runs the mirror knows; every count here is out of this.
+  in_mirror: number;
+  // Runs with a usable country, whether or not it can be placed on the map.
+  recorded: number;
+  // Runs with no country recorded at all. Over four fifths of the reference
+  // cohort, and the single most important number on the card.
+  unknown: number;
+  // Recorded countries the map cannot place, by raw SRA value: either not a
+  // country (Borneo) or a country with no shape at 1:110m (Hong Kong,
+  // Singapore). Displayed as a count, never dropped.
+  unmapped_countries: KmindexFacetValue[];
+}
+
 // Whether a search's full match set can be downloaded, and when it cannot,
 // why. "too_large" is a property of the query -- it matched more rows than
 // are worth materializing -- and the only one of the two a reader can act
@@ -92,6 +130,12 @@ export interface KmindexResults {
   // Optional for the same reason cohort is: a backend predating the export
   // omits it entirely.
   export_status?: KmindexExportStatus;
+  // Absent on a backend predating the map, on a job whose mirror was
+  // unavailable, and on one whose mirror predates the columns the geography
+  // query needs -- geography closes on its own so the rest of the mirror
+  // keeps serving. Absent is not the same as "no geography recorded", which
+  // is `recorded === 0`.
+  geography?: KmindexGeography | null;
   hits: KmindexHit[];
   job_id: string;
   limit: number;
