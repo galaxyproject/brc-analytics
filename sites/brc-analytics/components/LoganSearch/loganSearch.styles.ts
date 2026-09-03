@@ -99,3 +99,30 @@ export const CohortBarRow = styled.div`
     }
   }
 `;
+
+/* The choropleth's box. A fixed height rather than an aspect ratio because
+   the projection is fitted to the width and a world map at 1200px would
+   otherwise be tall enough to push the counts beside it off screen. */
+export const CohortMapContainer = styled.div`
+  min-height: 320px;
+  width: 100%;
+
+  /* vega-embed renders into a child div and adds its own action menu, which
+     we turn off; this keeps the SVG from overflowing a narrow column. */
+  svg {
+    max-width: 100%;
+  }
+`;
+
+/* Map left, the country bars right. Full width above the facet grid rather
+   than inside it: at repeat(2, 1fr) on a 1200px page a cell is ~560px, which
+   is too narrow for a world map to be worth drawing. */
+export const CohortGeographyLayout = styled.div`
+  display: grid;
+  gap: 24px 40px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
