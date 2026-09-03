@@ -11,8 +11,8 @@ import { getActiveTab } from "./utils";
 
 /**
  * Organism-page section tabs. The Pangenome tab is shown only when the
- * `pangenome` feature flag is enabled and the organism's species has a
- * pangenome bundle — matching the PangenomeSection's own gating.
+ * organism's species has a pangenome bundle to show — `useShowPangenome` owns
+ * that decision, so this and the PangenomeSection gate identically.
  * @param props - Component props.
  * @param props.pangenome - The species' pangenome bundle, when it has one.
  * @returns The organism-page tabs.
