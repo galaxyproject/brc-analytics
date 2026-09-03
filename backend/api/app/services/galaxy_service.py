@@ -32,6 +32,7 @@ from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
     CAPABILITY_COHORT,
     CAPABILITY_EXPORT,
+    CAPABILITY_GEOGRAPHY,
     EXPORT_AVAILABLE,
     EXPORT_TOO_LARGE,
     EXPORT_UNAVAILABLE,
@@ -555,6 +556,43 @@ class GalaxyService:
             return None, True
         return cohort, False
 
+    async def _geography_for(
+        self, job_id: str, hits: List[dict]
+    ) -> Tuple[Optional[dict], bool]:
+        """
+        Roll up where the complete hit set was sampled from.
+
+        Third call in the same window as the cohort and the export, for the
+        same reason: after this the hits are capped at 50,000 and the other
+        million are only recoverable by re-downloading every shard from a
+        rate-limited Galaxy.
+
+        Returns (geography, failed) on the cohort's contract. A mirror that
+        cannot answer -- unconfigured, or a file predating the columns this
+        needs -- is a steady state the aggregate is safe to cache without;
+        a read that started and broke is not, because it would freeze a map
+        that is only missing by accident.
+
+        @param job_id: the job being aggregated, for the log line.
+        @param hits: every hit, before the cap.
+        @returns: the geography payload, and whether the read failed.
+        """
+        if not self._mirror_can(CAPABILITY_GEOGRAPHY):
+            return None, False
+
+        try:
+            geography = await asyncio.to_thread(
+                self.sra_mirror.geography_for_accessions,
+                [hit["accession"] for hit in hits],
+            )
+        except Exception as e:
+            # Nothing partial is salvaged, for the cohort's reason: the
+            # denominator beside the map is the number that makes the map
+            # honest, and a half-filled one is worse than no map.
+            logger.warning(f"kmindex job {job_id}: geography query failed: {e}")
+            return None, True
+        return geography, False
+
     async def _export_for(
         self, job_id: str, hits: List[dict]
     ) -> Tuple[Optional[dict], bool]:
@@ -702,6 +740,12 @@ class GalaxyService:
         # hit list rather than two plus a summary.
         cohort, cohort_failed = await self._cohort_for(job_id, hits)
 
+        # Where those runs came from, off the same list and in the same
+        # window. Separate from the cohort's country facet because that one
+        # lists a head of ten -- 42 countries rendered as ten bars on the
+        # reference job -- and a choropleth needs all of them.
+        geography, geography_failed = await self._geography_for(job_id, hits)
+
         # Written from the same list, in the same window, for the same reason:
         # the capped list below has no metadata on it and is 4% of this one.
         export, export_failed = await self._export_for(job_id, hits)
@@ -732,6 +776,7 @@ class GalaxyService:
             # swept or the volume reset while this entry still claims it, so
             # _page_kmindex checks the disk before advertising a download.
             "export": export,
+            "geography": geography,
             "hits": hits,
             "per_index": per_index,
             "query_name": query_name,
@@ -791,6 +836,7 @@ class GalaxyService:
                 name
                 for name, failed in (
                     ("cohort query", cohort_failed),
+                    ("geography query", geography_failed),
                     ("export materialization", export_failed),
                 )
                 if failed
