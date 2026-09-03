@@ -105,11 +105,15 @@ function describeUnplaceable(geography: KmindexGeography): string | null {
     .join(", ");
   const rest = unplaceable.length - UNPLACEABLE_NAMED;
   const tail = rest > 0 ? `, and ${rest.toLocaleString()} more` : "";
+  const places =
+    unplaceable.length === 1
+      ? "one place"
+      : `${unplaceable.length.toLocaleString()} places`;
   return (
-    `${runs.toLocaleString()} of those runs come from ` +
-    `${unplaceable.length.toLocaleString()} places the map cannot draw -- the ` +
-    `world outline has no shape for them at this scale, or the recorded value ` +
-    `is not a country. They are counted here but not coloured: ${named}${tail}.`
+    `${runs.toLocaleString()} of those runs come from ${places} the map ` +
+    `cannot draw -- the world outline has no shape for them at this scale, ` +
+    `or the recorded value is not a country. They are counted here but not ` +
+    `coloured: ${named}${tail}.`
   );
 }
 
