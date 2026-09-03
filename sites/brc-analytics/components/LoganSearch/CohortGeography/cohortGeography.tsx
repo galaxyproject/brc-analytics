@@ -207,10 +207,18 @@ function buildSpec(countries: KmindexGeographyCountry[]): TopLevelSpec {
  *
  * Follows the embedding pattern in packages/shared/components/mdx/VegaEmbed:
  * "use client", a container ref, embed() in an effect, and finalize() in the
- * cleanup, which vega-embed leaks without. vega is imported dynamically so it
- * lands in its own chunk rather than in the /logan-search entry -- it is the
- * heaviest thing on this page by a wide margin and most visitors never scroll
- * to it.
+ * cleanup, which vega-embed leaks without.
+ *
+ * vega is imported dynamically rather than at module scope, and the reason is
+ * measured. Production build of sites/brc-analytics, before and after this
+ * whole feature: /logan-search first-load JS goes from 1,266.4 kB to
+ * 1,271.6 kB, +5.2 kB, of which 3.6 kB is the page chunk and the rest is
+ * _app. vega and vega-lite are 727.8 kB across two chunks and neither is in
+ * that first load -- they are fetched when this component mounts. A static
+ * import would have put all of it on every visit to the page, and most
+ * visitors never scroll this far. That is also why there is no next/dynamic
+ * here: a plain dynamic import already splits the chunk, so the repo does not
+ * need its first one for this.
  * @param props - Component props.
  * @param props.countries - Drawable countries with their run counts.
  * @returns The map, or a note in place of it if the render failed.
