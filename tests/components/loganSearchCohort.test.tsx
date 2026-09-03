@@ -13,6 +13,13 @@ import { render, screen } from "@testing-library/react";
 // imports ky, which ships ESM only and Jest cannot parse.
 jest.mock("ky", () => ({ __esModule: true, default: {} }));
 
+// The geography block imports vega-embed dynamically. jsdom cannot render an
+// SVG projection, and the spec itself is covered in cohortGeography.test.tsx.
+jest.mock("vega-embed", () => ({
+  __esModule: true,
+  default: jest.fn(async () => ({ finalize: jest.fn() })),
+}));
+
 type Search = ReturnType<typeof useKmindexSearch>;
 
 // Every number below is from one real kmindex job -- a bacterial 16S fragment
@@ -120,6 +127,37 @@ const WITH_EXPORT: KmindexResults = {
 };
 
 const EXPORT_URL = `${API_BASE_URL}/galaxy/kmindex/jobs/${BASE_RESULTS.job_id}/export`;
+
+// Geography over the same 1,133,516-hit job. `unknown` is deliberately the
+// country facet's own 244,011 -- the two are computed from one column with
+// the same sentinel handling, so they cannot be allowed to disagree on the
+// card they share. The rest is split so the parts reconcile: 661,540 runs in
+// two drawable countries, 222,921 in one the map cannot place.
+const GEOGRAPHY_UNKNOWN = 244011;
+const GEOGRAPHY = {
+  continents: [
+    { count: 546121, value: "North America" },
+    { count: 338340, value: "Europe" },
+  ],
+  countries: [
+    {
+      count: 546121,
+      iso_a3: "USA",
+      iso_n3: "840",
+      value: "United States of America",
+    },
+    { count: 115419, iso_a3: "GBR", iso_n3: "826", value: "United Kingdom" },
+  ],
+  in_mirror: IN_MIRROR,
+  recorded: IN_MIRROR - GEOGRAPHY_UNKNOWN,
+  unknown: GEOGRAPHY_UNKNOWN,
+  unmapped_countries: [{ count: 222921, value: "Hong Kong" }],
+};
+
+const WITH_GEOGRAPHY: KmindexResults = {
+  ...BASE_RESULTS,
+  geography: GEOGRAPHY,
+};
 
 /**
  * Render the cohort card around a payload; the component reads only results,
@@ -530,6 +568,93 @@ describe("LoganSearchCohort", () => {
     // greater weight; this only says what it means for the file.
     expect(container.textContent).toContain(
       "The 5,044 runs the mirror does not know are in it too, carrying their hit with the metadata columns left empty."
+    );
+  });
+});
+
+describe("the geography block", () => {
+  test("is absent entirely when the backend sent no geography", () => {
+    const { container } = renderCohort(BASE_RESULTS);
+
+    expect(container.textContent).not.toContain("Where these runs came from");
+    // And the country facet stays where it has always been rather than
+    // leaving half a row empty.
+    expect(container.textContent).toContain("Country of origin");
+  });
+
+  test("states the recorded/unknown split beside the map", () => {
+    const { container } = renderCohort(WITH_GEOGRAPHY);
+
+    expect(container.textContent).toContain("Where these runs came from");
+    expect(container.textContent).toContain(
+      "Geography recorded for 884,461 of 1,128,472 runs (78.4%)"
+    );
+    expect(container.textContent).toContain(
+      "244,011 matched the query with no country recorded"
+    );
+  });
+
+  test("displays the countries the map cannot place rather than dropping them", () => {
+    const { container } = renderCohort(WITH_GEOGRAPHY);
+
+    expect(container.textContent).toContain(
+      "222,921 of those runs come from 1 places the map cannot draw"
+    );
+    expect(container.textContent).toContain("Hong Kong (222,921)");
+  });
+
+  test("keeps the country bars, once, beside the map rather than in the grid", () => {
+    const { container } = renderCohort(WITH_GEOGRAPHY);
+
+    // The bars answer a question the choropleth cannot -- "812 runs from
+    // Malawi" -- so they stay. But they must not be rendered twice.
+    const headings = container.textContent?.match(/Country of origin/g) ?? [];
+    expect(headings).toHaveLength(1);
+    // And the other facets are still in the grid below.
+    expect(container.textContent).toContain("Library layout");
+  });
+
+  test("agrees with the country facet about how much is unrecorded", () => {
+    // Both are computed from geo_loc_name_country_calc with the same sentinel
+    // handling, and they render side by side. Two different numbers for "not
+    // recorded" on one card would make both of them worthless.
+    const { container } = renderCohort(WITH_GEOGRAPHY);
+
+    expect(GEOGRAPHY.unknown).toBe(COUNTRY_FACET.unknown);
+    expect(container.textContent).toContain("Not recorded244,011");
+    expect(container.textContent).toContain(
+      "244,011 matched the query with no country recorded"
+    );
+  });
+
+  test("does not turn the map into a filter", () => {
+    const { container } = renderCohort(WITH_GEOGRAPHY);
+
+    // The card's standing contract. Narrowing by a country would have to run
+    // over the whole match set to stay honest.
+    expect(container.textContent).toContain(
+      "Counts only -- these values are not filters."
+    );
+  });
+
+  test("renders an explicit empty state rather than a blank world", () => {
+    const { container } = renderCohort({
+      ...BASE_RESULTS,
+      geography: {
+        ...GEOGRAPHY,
+        continents: [],
+        countries: [],
+        recorded: 0,
+        unknown: IN_MIRROR,
+        unmapped_countries: [],
+      },
+    });
+
+    expect(container.textContent).toContain(
+      "No country is recorded for any of the 1,128,472"
+    );
+    expect(container.textContent).toContain(
+      "not one matched run has a country recorded"
     );
   });
 });
