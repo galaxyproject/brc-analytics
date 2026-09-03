@@ -366,35 +366,47 @@ COUNTRIES.update(
     }
 )
 
-# Values that are real and counted but are not a country, so no alpha-3
-# honestly describes them. They ship to the UI in `unmapped_countries` with
-# their run counts; they are never folded into a neighbour.
+# Values that are real and counted but that this table refuses to place. They
+# ship to the UI in `unmapped_countries` with their run counts; they are never
+# folded into a neighbour.
 #
-# The rule, applied uniformly: a value maps only when some ISO 3166-1 code
-# covers that entity, possibly aggregated with its siblings -- which is why
-# Gaza Strip and West Bank both map to PSE, the five US minor outlying
-# islands to UMI, and Svalbard and Jan Mayen to SJM, while the entries below
-# do not map at all. Mapping Coral Sea Islands to AUS would colour a
-# continent for a reef survey.
+# **The rule has two halves and both do work.** A value maps only when (a)
+# some ISO 3166-1 code covers that entity, possibly aggregating it with its
+# siblings, AND (b) mapping it would not put the runs somewhere they plainly
+# are not. Half (a) is why Gaza Strip and West Bank both go to PSE, the five
+# US minor outlying islands to UMI, and Svalbard and Jan Mayen to SJM.
+#
+# Half (b) is the half that is easy to lose, and stating only (a) would make
+# three of the entries below look like mistakes. ISO 3166-1 does cover
+# Clipperton and the Iles Eparses (FR and TF respectively), and it does cover
+# Coral Sea Islands under AU -- so a rule about ISO coverage alone would map
+# all of them. Each would then land somewhere false: a Pacific atoll counted
+# into metropolitan France, four Mozambique Channel islets drawn on
+# Kerguelen, and an uninhabited Queensland reef survey colouring the whole
+# Australian mainland. Refusing to place them costs 1,942 runs of 25.4M and
+# says so on screen, which is the cheaper error.
+#
+# Each entry's reason states which half it failed.
 UNMAPPED: Dict[str, str] = {
-    "Borneo": "an island shared by Indonesia, Malaysia and Brunei",
-    "Clipperton Island": "no ISO 3166-1 code; CP/CPT is only reserved",
-    "Coral Sea Islands": "Australian territory with no code of its own",
-    # The four Iles Eparses. ATF exists and would take them administratively,
-    # but the ATF shape at 110m is Kerguelen and Adelie Land -- a Mozambique
-    # Channel islet drawn in the southern Indian Ocean is worse than absent.
-    "Europa Island": "Iles Eparses; ATF's 110m shape is thousands of km away",
-    "Glorioso Islands": "Iles Eparses; ATF's 110m shape is thousands of km away",
-    "Juan de Nova Island": "Iles Eparses; ATF's 110m shape is thousands of km away",
-    "Tromelin Island": "Iles Eparses; ATF's 110m shape is thousands of km away",
-    # Dissolved states. ISO 3166-3 records them, ISO 3166-1 does not, and
+    # (a): no ISO 3166-1 code exists for the entity.
+    "Borneo": "not a country -- an island shared by Indonesia, Malaysia and Brunei",
+    "Paracel Islands": "disputed; no ISO 3166-1 code",
+    "Spratly Islands": "disputed; no ISO 3166-1 code",
+    # (a): dissolved states. ISO 3166-3 records them, ISO 3166-1 does not, and
     # each split into successors no single code stands for.
     "Netherlands Antilles": "dissolved 2010 into CUW, SXM and BES",
     "Serbia and Montenegro": "dissolved 2006 into SRB and MNE",
     "Yugoslavia": "dissolved; no single successor",
-    # Disputed, claimed by several states, no ISO code.
-    "Paracel Islands": "disputed; no ISO 3166-1 code",
-    "Spratly Islands": "disputed; no ISO 3166-1 code",
+    # (b): ISO covers these, and the code it covers them with is somewhere
+    # else. Clipperton is FR; the four Iles Eparses are TF, whose 110m shape
+    # is Kerguelen and Adelie Land, thousands of km from the Mozambique
+    # Channel. Coral Sea Islands is AU, i.e. the whole mainland.
+    "Clipperton Island": "ISO folds it into FR; a Pacific atoll is not France",
+    "Coral Sea Islands": "ISO folds it into AU; a reef survey is not the mainland",
+    "Europa Island": "Iles Eparses; ISO's TF is Kerguelen, an ocean away",
+    "Glorioso Islands": "Iles Eparses; ISO's TF is Kerguelen, an ocean away",
+    "Juan de Nova Island": "Iles Eparses; ISO's TF is Kerguelen, an ocean away",
+    "Tromelin Island": "Iles Eparses; ISO's TF is Kerguelen, an ocean away",
 }
 
 # ISO numeric ids present in the committed world-110m asset
