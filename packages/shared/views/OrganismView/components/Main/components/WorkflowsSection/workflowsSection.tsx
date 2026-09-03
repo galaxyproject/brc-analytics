@@ -1,11 +1,10 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
 import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
-import { useWorkflowCategoryFeatureFlags } from "@repo/shared/hooks/UseWorkflowCategoryFeatureFlags/hook";
+import { useWorkflowFeatureFlags } from "@repo/shared/hooks/UseWorkflowFeatureFlags/hook";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { EmptyState } from "@repo/shared/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@repo/shared/views/OrganismView/components/Main/main.styles";
-import { filterFlagGatedWorkflowCategories } from "@repo/shared/workflow/featureFlags";
 import { type JSX } from "react";
 import { type Props } from "./types";
 
@@ -25,11 +24,8 @@ export const WorkflowsSection = ({
   entityId,
   workflowCategories: allWorkflowCategories,
 }: Props): JSX.Element => {
-  const featureFlags = useWorkflowCategoryFeatureFlags();
-  const workflowCategories = filterFlagGatedWorkflowCategories(
-    allWorkflowCategories,
-    featureFlags
-  );
+  const { filterCategories } = useWorkflowFeatureFlags();
+  const workflowCategories = filterCategories(allWorkflowCategories);
   return (
     <Stack spacing={4} useFlexGap>
       <StyledSectionTitle
