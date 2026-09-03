@@ -851,7 +851,9 @@ def _geography_payload(in_mirror: int) -> dict:
     @param in_mirror: matched accessions the mirror knows.
     @returns: the geography dict as the mirror service hands it over.
     """
-    drawn = in_mirror - 5
+    # 2 runs with no country, 3 from Singapore (a country with no shape at
+    # 1:110m) and 2 from Borneo (not a country at all); the rest drawable.
+    drawn = in_mirror - 7
     return {
         "continents": [
             {"count": drawn, "value": "North America"},
@@ -1209,6 +1211,43 @@ class TestGeographyInTheAggregationWindow:
         service.cache.set.assert_called_once()
         _key, _value, ttl = service.cache.set.call_args.args
         assert ttl == CacheTTL.ONE_HOUR
+
+    @pytest.mark.asyncio
+    async def test_geography_reaches_the_response_model_intact(self, service):
+        mirror = self._mirror(service, _cohort_payload(total=25, in_mirror=24))
+        self._wire(service, hits=25)
+
+        aggregate = await service._aggregate_shards("job1")
+        results = service._page_kmindex(aggregate, "job1", 5, 0)
+
+        assert results.geography is not None
+        assert results.geography.in_mirror == results.cohort.in_mirror == 24
+        drawn = sum(c.count for c in results.geography.countries)
+        unplaceable = sum(c.count for c in results.geography.unmapped_countries)
+        assert drawn + unplaceable + results.geography.unknown == 24
+        # The numeric id is what the choropleth joins on, so it has to survive
+        # serialization rather than being reconstructed in the browser.
+        assert results.geography.countries[0].iso_n3 == "840"
+        assert mirror.geography_for_accessions.called
+
+    @pytest.mark.asyncio
+    async def test_an_aggregate_without_geography_reads_as_absent(self, service):
+        # Belt and braces behind the v3 prefix: even if such an entry existed,
+        # it must read as "no geography here", not as a shell of zeroes.
+        aggregate = {
+            "hits": [{"accession": "SRR9", "score": 0.9, "shard": "GENOMIC_BCT_2"}],
+            "per_index": [
+                {"hits_after_cap": 1, "hits_before_cap": 1, "index": "GENOMIC_BCT"}
+            ],
+            "query_name": "q",
+            "shards_failed": 0,
+            "shards_searched": 1,
+            "shards_with_hits": 1,
+            "total_matches": 1,
+            "truncated": False,
+        }
+
+        assert service._page_kmindex(aggregate, "job1", 5, 0).geography is None
 
     @pytest.mark.asyncio
     async def test_geography_survives_the_cache_round_trip(self, service):

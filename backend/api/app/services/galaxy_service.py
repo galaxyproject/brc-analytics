@@ -973,6 +973,9 @@ class GalaxyService:
             # built while the mirror was unavailable. Absent is the honest
             # answer in both cases: there is no partial cohort to render.
             cohort=aggregate.get("cohort"),
+            # Same posture, and the cache prefix went to v3 so a pre-geography
+            # entry reads as a miss rather than as a cohort with no geography.
+            geography=aggregate.get("geography"),
             export_bytes=export["bytes"],
             export_rows=export["rows"],
             export_status=export["status"],

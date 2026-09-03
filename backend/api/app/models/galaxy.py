@@ -225,6 +225,78 @@ class KmindexCohort(BaseModel):
     total: int = Field(..., description="Hits before the cap; equals total_matches")
 
 
+class KmindexGeographyCountry(BaseModel):
+    """One country the map can draw, with how many matched runs came from it."""
+
+    count: int
+    iso_a3: str = Field(..., description="ISO 3166-1 alpha-3")
+    iso_n3: str = Field(
+        ...,
+        description="ISO 3166-1 numeric, zero-padded. This is what the "
+        "choropleth joins on -- world-110m keys its features by numeric id, "
+        "not by alpha-3, so joining on the code above would match nothing",
+    )
+    value: str = Field(
+        ...,
+        description="Canonical country name. Not the raw SRA string: several "
+        "of those share one code (Gaza Strip and West Bank are both PSE) and "
+        "the rollup is keyed by code",
+    )
+
+
+class KmindexGeography(BaseModel):
+    """
+    Where the complete pre-cap hit set was sampled from.
+
+    Separate from the cohort's country facet, which lists a head of ten and
+    rolls the rest into `other` -- that renders the reference job's 42
+    countries as ten bars. This carries all of them.
+
+    `countries`, `unmapped_countries` and `unknown` partition the matched runs
+    and sum to `in_mirror`, so the map can be reconciled rather than trusted.
+    That matters more here than anywhere else on the card: a cohort where
+    geography is recorded for a fifth of the runs is the normal case, not the
+    edge case, and a map that draws 42 countries without saying so is the
+    defect this exists to fix.
+    """
+
+    continents: List[KmindexFacetValue] = Field(
+        default=[],
+        description="Continent rollup, derived from the ISO table rather than "
+        "read from the mirror -- the deployed schema_version 3 file has no "
+        "continent column. Covers every run with a country code, including "
+        "ones the map cannot draw, so these totals are allowed to exceed the "
+        "sum of `countries`",
+    )
+    countries: List[KmindexGeographyCountry] = Field(
+        default=[],
+        description="Every country in the match set that the committed "
+        "boundary asset can draw, largest first. Not a top ten",
+    )
+    in_mirror: int = Field(
+        ...,
+        description="Matched accessions the mirror knows about; every count "
+        "here is out of this, and equals the cohort's in_mirror",
+    )
+    recorded: int = Field(
+        ..., description="Matched runs with a usable country, drawable or not"
+    )
+    unknown: int = Field(
+        ...,
+        description="Matched runs with no country recorded -- NULL, empty, or "
+        "SRA's 'uncalculated' sentinel, folded together exactly as the "
+        "cohort's country facet does so the two cannot disagree on screen",
+    )
+    unmapped_countries: List[KmindexFacetValue] = Field(
+        default=[],
+        description="Recorded countries the map cannot place, by raw SRA "
+        "value. Two causes, deliberately not distinguished: the value is not "
+        "a country (Borneo, the dissolved states), or it is one with no shape "
+        "at 1:110m -- which is 65 of the mirror's 245 values, Hong Kong and "
+        "Singapore included. Displayed, never silently dropped",
+    )
+
+
 class KmindexResults(BaseModel):
     """Hits from a kmindex query, merged across every index shard."""
 
@@ -260,6 +332,14 @@ class KmindexResults(BaseModel):
         description="Counts over every hit the query matched, before the cap. "
         "Absent when the mirror could not answer -- never partially filled, "
         "since the point of it is to be the trustworthy number",
+    )
+    geography: Optional[KmindexGeography] = Field(
+        default=None,
+        description="Where every matched run was sampled from, before the "
+        "cap. Absent on the same terms as the cohort, and additionally when "
+        "the deployed mirror predates the columns the query needs -- "
+        "geography fails closed on its own so the rest of the mirror keeps "
+        "serving",
     )
     export_bytes: Optional[int] = Field(
         default=None,
