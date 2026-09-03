@@ -958,6 +958,27 @@ class TestCohortOverTheFullHitSet:
         mirror.cohort_for_accessions.assert_not_called()
 
     @pytest.mark.asyncio
+    async def test_capability_the_mirror_cannot_serve_is_skipped_not_attempted(
+        self, service
+    ):
+        # A mirror older than the query is a steady state, not a transient
+        # failure: the columns are not going to appear between polls. Skip the
+        # read, cache for a day, and do not spend an hourly re-aggregation on
+        # a query that cannot succeed.
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        mirror.has_capability = MagicMock(
+            side_effect=lambda capability: capability != "cohort"
+        )
+        self._wire(service, hits=5)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service._page_kmindex(aggregate, "job1", 5, 0).cohort is None
+        mirror.cohort_for_accessions.assert_not_called()
+        _key, _value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_DAY
+
+    @pytest.mark.asyncio
     async def test_failed_cohort_read_still_caches_the_correct_hit_list(self, service):
         self._mirror(service, side_effect=RuntimeError("mirror read failed"))
         self._wire(service, hits=5)
@@ -983,13 +1004,14 @@ class TestCohortOverTheFullHitSet:
         """A cohort read that fails the same way every time must not re-download
         every shard on every poll.
 
-        Deterministic causes are reachable: is_available() is only
-        `self._con is not None`, and _initialize validates that mirror_meta and
-        runs exist but never the columns this query needs -- so a mirror on an
-        older schema reports available and raises on every call. Every results
-        poll and every page click would then re-download all 84 shard datasets
-        from a rate-limited Galaxy, serialized against every other kmindex user
-        on the process-wide aggregation lock.
+        Deterministic causes are reachable. The one that produced this test --
+        a mirror whose schema predates a column the query names -- is now
+        caught at startup by the per-capability column check, so it never
+        reaches the query. What that check cannot see remains: a corrupt page,
+        a revoked file handle, a duckdb version disagreement. Every results
+        poll and every page click would otherwise re-download all 84 shard
+        datasets from a rate-limited Galaxy, serialized against every other
+        kmindex user on the process-wide aggregation lock.
         """
         store = {}
         service.cache.make_key = MagicMock(
