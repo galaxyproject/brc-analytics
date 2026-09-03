@@ -6,7 +6,6 @@ import type {
   SavedAnalysisRestoreResponse,
   SavedAnalysisSummary,
   UserMeResponse,
-  UserPreferences,
   WorkflowRunCreateRequest,
   WorkflowRunResponse,
 } from "./types";
@@ -64,10 +63,6 @@ export const apiClient = {
       .json();
   },
 
-  getPreferences: async (): Promise<UserPreferences> => {
-    return httpClient.get("user/preferences").json();
-  },
-
   getSavedAnalyses: async (): Promise<SavedAnalysisSummary[]> => {
     return httpClient.get("saved_analyses").json();
   },
@@ -88,11 +83,5 @@ export const apiClient = {
     id: string
   ): Promise<SavedAnalysisRestoreResponse> => {
     return httpClient.post(`saved_analyses/${id}/open`).json();
-  },
-
-  updatePreferences: async (
-    preferences: UserPreferences
-  ): Promise<UserPreferences> => {
-    return httpClient.put("user/preferences", { json: preferences }).json();
   },
 };
