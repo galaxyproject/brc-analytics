@@ -45,6 +45,77 @@ _CACHE_MAX_ENTRIES = 512
 # runs_by_accession, which loops rather than truncating.
 _ACCESSION_BATCH_SIZE = 500
 
+# What each serving path reads off `runs`, keyed by the capability it backs.
+#
+# The mirror is built and copied to the host out of band -- it lives outside
+# the release trees precisely so a deploy does not have to move 5-10 GB -- so
+# the backend routinely runs against a file older than itself. `_initialize`
+# only ever checked that `runs` was queryable, which means a query naming a
+# column the file does not have raises at query time, once per request.
+#
+# The remedy has to be per capability rather than per service. Marking the
+# whole mirror unavailable to protect one query would take cohort, per-hit
+# annotation, the parquet export and the MCP tools down with it, which is a
+# far worse failure than the missing feature. So each capability is checked
+# on its own and reports itself unavailable on its own.
+#
+# Kept by hand in step with the queries below; the union is asserted against
+# the fixture schema in tests, so a column added to a query without being
+# named here shows up as a test failure rather than as a 500.
+CAPABILITY_ANNOTATION = "annotation"
+CAPABILITY_COHORT = "cohort"
+CAPABILITY_EXPORT = "export"
+CAPABILITY_GEOGRAPHY = "geography"
+CAPABILITY_SEARCH = "search"
+CAPABILITY_STUDY = "study"
+CAPABILITY_SUMMARY = "summary"
+
+_RUN_DETAIL_COLUMNS: Tuple[str, ...] = (
+    "acc",
+    "sra_study",
+    "bioproject",
+    "organism",
+    "assay_type",
+    "platform",
+    "instrument",
+    "librarylayout",
+    "releasedate",
+    "geo_loc_name_country_calc",
+    "mbases",
+)
+
+_CAPABILITY_COLUMNS: Dict[str, Tuple[str, ...]] = {
+    CAPABILITY_ANNOTATION: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_COHORT: (
+        "acc",
+        "assay_type",
+        "platform",
+        "librarylayout",
+        "instrument",
+        "geo_loc_name_country_calc",
+        "releasedate",
+        "organism",
+        "bioproject",
+        "sra_study",
+    ),
+    CAPABILITY_EXPORT: _RUN_DETAIL_COLUMNS,
+    # Two columns, and that is the point: geography must not be able to take
+    # anything else down with it, and nothing else must be able to take it
+    # down either.
+    CAPABILITY_GEOGRAPHY: ("acc", "geo_loc_name_country_calc"),
+    CAPABILITY_SEARCH: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_STUDY: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_SUMMARY: (
+        "organism",
+        "bioproject",
+        "sra_study",
+        "releasedate",
+        "platform",
+        "assay_type",
+        "geo_loc_name_country_calc",
+    ),
+}
+
 # Facets computed over a whole pre-cap hit set, as (name, expression over
 # `runs`). Which columns earn a facet is a property of the data, measured
 # mirror-wide over all 43,522,611 runs rather than guessed: librarylayout (2
@@ -623,6 +694,10 @@ class SRAMirrorService:
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         self._meta: Dict[str, str] = {}
         self._total_runs: Optional[int] = None
+        # capability -> the columns it needs that this file does not have.
+        # Empty until _initialize has looked, and a capability is absent from
+        # it exactly when it can be served.
+        self._missing_columns: Dict[str, List[str]] = {}
         self._cache: Dict[Tuple, Tuple[float, Any]] = {}
         # Guards the shared DuckDB connection and the cache dict: the MCP
         # tools execute in FastMCP's worker threadpool, so both are touched
@@ -696,6 +771,9 @@ class SRAMirrorService:
             )
             meta = dict(con.execute("SELECT key, value FROM mirror_meta").fetchall())
             total_runs = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+            columns = {
+                row[1] for row in con.execute("PRAGMA table_info('runs')").fetchall()
+            }
         except duckdb.IOException as exc:
             logger.error("Could not open SRA mirror at %s: %s", self.mirror_path, exc)
         except duckdb.CatalogException as exc:
@@ -710,11 +788,22 @@ class SRAMirrorService:
             self._con = con
             self._meta = meta
             self._total_runs = total_runs
+            self._missing_columns = {
+                capability: sorted(set(needed) - columns)
+                for capability, needed in _CAPABILITY_COLUMNS.items()
+                if not set(needed) <= columns
+            }
             logger.info(
                 "SRA mirror loaded: %s rows, built %s",
                 f"{total_runs:,}",
                 meta.get("mirror_built_at", "unknown"),
             )
+            for capability, missing in sorted(self._missing_columns.items()):
+                logger.warning(
+                    "SRA mirror capability %r unavailable: runs is missing %s",
+                    capability,
+                    ", ".join(missing),
+                )
             return
 
         # Reached only on a caught failure: close the opened handle so the
@@ -725,6 +814,31 @@ class SRAMirrorService:
 
     def is_available(self) -> bool:
         return self._con is not None
+
+    def has_capability(self, capability: str) -> bool:
+        """Whether the mirror this process opened can answer for `capability`.
+
+        Deliberately narrower than `is_available`. A file that predates a
+        column answers everything else perfectly well, and a caller that has
+        to know about one query's columns should ask about that query rather
+        than being told the mirror is gone.
+
+        An unknown capability name reads as unavailable rather than as
+        available: a typo must not silently enable a query nobody checked.
+        """
+        if self._con is None:
+            return False
+        if capability not in _CAPABILITY_COLUMNS:
+            return False
+        return capability not in self._missing_columns
+
+    def missing_columns(self, capability: str) -> List[str]:
+        """Columns `capability` needs that this mirror does not carry.
+
+        Empty when the capability is serving, and empty when the whole mirror
+        is unavailable -- `is_available` is the question to ask about that.
+        """
+        return list(self._missing_columns.get(capability, ()))
 
     def _provenance(self, resolved_names: List[str]) -> Dict[str, Any]:
         # Both spellings, because the two mirrors in circulation disagree. The

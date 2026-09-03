@@ -29,6 +29,9 @@ from app.models.galaxy import (
     SraRunMetadata,
 )
 from app.services.sra_mirror import (
+    CAPABILITY_ANNOTATION,
+    CAPABILITY_COHORT,
+    CAPABILITY_EXPORT,
     EXPORT_AVAILABLE,
     EXPORT_TOO_LARGE,
     EXPORT_UNAVAILABLE,
@@ -474,6 +477,21 @@ class GalaxyService:
             self._page_kmindex(aggregate, job_id, limit, offset)
         )
 
+    def _mirror_can(self, capability: str) -> bool:
+        """Whether the mirror can answer for one serving path.
+
+        Narrower than is_available on purpose. The mirror is copied to the
+        host out of band, so the backend routinely runs against a file older
+        than itself; asking per capability keeps a query that is ahead of the
+        file from taking the rest of the mirror down with it, and turns what
+        used to be a per-request exception into one startup warning.
+        """
+        return bool(
+            self.sra_mirror
+            and self.sra_mirror.is_available()
+            and self.sra_mirror.has_capability(capability)
+        )
+
     async def _annotate_with_sra(self, results: KmindexResults) -> KmindexResults:
         """
         Join SRA mirror metadata onto the hits on this page.
@@ -483,7 +501,7 @@ class GalaxyService:
         aren't looking at. Misses are expected and left as None: the mirror
         covers BRC-relevant organisms, while Logan indexes all of SRA.
         """
-        if not self.sra_mirror or not self.sra_mirror.is_available():
+        if not self._mirror_can(CAPABILITY_ANNOTATION):
             return results
 
         try:
@@ -521,7 +539,7 @@ class GalaxyService:
         takes about a second on a million-hit job, which is far too long to
         spend on the event loop.
         """
-        if not self.sra_mirror or not self.sra_mirror.is_available():
+        if not self._mirror_can(CAPABILITY_COHORT):
             return None, False
 
         try:
@@ -560,7 +578,7 @@ class GalaxyService:
             write failed.
         """
         export_dir = self.settings.KMINDEX_EXPORT_DIR
-        if not export_dir or not self.sra_mirror or not self.sra_mirror.is_available():
+        if not export_dir or not self._mirror_can(CAPABILITY_EXPORT):
             return None, False
 
         try:

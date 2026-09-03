@@ -197,6 +197,96 @@ class TestResolvedFlagAcrossOutputs:
         assert result["resolved"] is True
 
 
+class TestCapabilityGating:
+    """A mirror older than the backend must degrade one query at a time.
+
+    `_initialize` used to check only that `runs` was queryable, so a query
+    naming a column the file did not have raised at query time. Marking the
+    whole service unavailable instead would be worse than the bug: cohort,
+    per-hit annotation, export and the MCP tools would all go down to protect
+    whichever query was ahead of the file.
+
+    The fixture's `runs` is the deployed schema_version 3 column set exactly,
+    so "everything serves against the fixture" is the live case, not a
+    hypothetical.
+    """
+
+    def test_deployed_column_set_serves_every_capability(self, mirror):
+        for capability in sra_mirror._CAPABILITY_COLUMNS:
+            assert mirror.has_capability(capability), capability
+            assert mirror.missing_columns(capability) == []
+
+    def test_geography_needs_nothing_the_deployed_mirror_lacks(self, mirror):
+        # The whole reason phase 1 can ship ahead of a mirror rebuild.
+        assert set(sra_mirror._CAPABILITY_COLUMNS["geography"]) <= {
+            "acc",
+            "sra_study",
+            "bioproject",
+            "organism",
+            "assay_type",
+            "platform",
+            "instrument",
+            "librarylayout",
+            "releasedate",
+            "geo_loc_name_country_calc",
+            "mbases",
+        }
+
+    def test_a_missing_column_only_closes_the_capabilities_that_read_it(
+        self, tmp_path, caplog
+    ):
+        path = str(tmp_path / "no-mbases.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+
+        with caplog.at_level(logging.WARNING):
+            svc = SRAMirrorService(path)
+
+        assert svc.is_available()
+        # mbases is in the run-detail projection and nowhere else.
+        for closed in ("annotation", "export", "search", "study"):
+            assert not svc.has_capability(closed), closed
+            assert svc.missing_columns(closed) == ["mbases"]
+        for open_ in ("cohort", "geography", "summary"):
+            assert svc.has_capability(open_), open_
+            assert svc.missing_columns(open_) == []
+        # And it says which column, so the fix is legible from the log alone.
+        assert any("mbases" in r.getMessage() for r in caplog.records)
+
+    def test_geography_can_close_without_taking_anything_else_with_it(
+        self, tmp_path, monkeypatch
+    ):
+        # Phase 2 adds lat/lon to the geography query, and the mirror rebuild
+        # that carries them will land after the code that reads them. Simulate
+        # that ordering rather than wait for it: geography goes dark, and
+        # everything else still answers with real numbers.
+        monkeypatch.setitem(
+            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
+        )
+        path = str(tmp_path / "phase2-ahead-of-mirror.duckdb")
+        _build_mirror(path)
+        svc = SRAMirrorService(path)
+
+        assert svc.has_capability("geography") is False
+        assert svc.missing_columns("geography") == ["lat", "lon"]
+        for still_serving in ("annotation", "cohort", "export", "search", "study"):
+            assert svc.has_capability(still_serving), still_serving
+        cohort = svc.cohort_for_accessions(["SRR001", "SRR002", "SRR003"])
+        assert cohort is not None and cohort["in_mirror"] == 3
+        assert svc.runs_by_accession(["SRR001"])["SRR001"]["country"] == "Kenya"
+
+    def test_unknown_capability_is_not_available(self, mirror):
+        assert mirror.has_capability("teleportation") is False
+
+    def test_unavailable_mirror_has_no_capabilities(self):
+        svc = SRAMirrorService("")
+        assert svc.is_available() is False
+        for capability in sra_mirror._CAPABILITY_COLUMNS:
+            assert svc.has_capability(capability) is False
+
+
 class TestProvenanceTaxdumpVersion:
     """The builder renamed the key at schema_version 5 and the service was
     never told. `_provenance` read 'taxdump_version'; anything the current
