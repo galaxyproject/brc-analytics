@@ -219,6 +219,19 @@ export const useAssistantChat = ({
     messages.length,
   ]);
 
+  // Signing out doesn't unsave anything server-side, but it ends this
+  // browser's claim to the conversation: AuthProvider.logout only clears the
+  // user, with no reload, so the panel was left rendering "Saved to your
+  // account" and "Sign in to keep this conversation" side by side. The latch
+  // goes too, or signing back in would find the session already attempted and
+  // never re-save it.
+  useEffect(() => {
+    if (isAuthLoading || !isConfigured || isAuthenticated) return;
+    saveAttemptRef.current = null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setIsSaved(false);
+  }, [isAuthLoading, isAuthenticated, isConfigured]);
+
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
       if (!message.trim() || sendingRef.current) return;

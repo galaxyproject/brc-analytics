@@ -138,6 +138,37 @@ describe("useAssistantChat auto-save", () => {
     expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
   });
 
+  test("signing out drops the saved label and lets a re-sign-in save again", async () => {
+    // logout only clears the user -- no reload, no redirect -- so a latched
+    // isSaved left the panel offering to save a conversation it was calling
+    // saved in the same row.
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.isSaved).toBe(true));
+
+    auth(false);
+    rerender();
+
+    await waitFor(() => expect(result.current.isSaved).toBe(false));
+
+    // And the latch went with it: signing back in re-saves rather than
+    // finding this session already attempted.
+    mockClient.assistantRestore.mockResolvedValue(restored());
+    auth(true);
+    rerender();
+
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+    );
+  });
+
   test("a signed-out conversation is never sent to the account", async () => {
     auth(false);
 
