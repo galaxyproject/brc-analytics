@@ -71,6 +71,44 @@ async def test_skips_sessions_with_no_user_turn():
 
 
 @pytest.mark.asyncio
+async def test_a_missing_user_row_is_reported_rather_than_shrugged_off(caplog):
+    """A valid session whose users row is gone -- a DB restore, a manual
+    cleanup -- used to return None from the same branch as an empty
+    conversation: no log, no Sentry event, and nothing kept for that user on
+    any turn, forever."""
+    with (
+        patch.object(
+            analysis_store, "get_user_by_keycloak_sub", AsyncMock(return_value=None)
+        ),
+        patch.object(analysis_store, "upsert_saved_analysis", AsyncMock()) as upsert,
+        patch.object(analysis_store, "db_session"),
+        patch.object(analysis_store, "sentry_sdk") as sentry,
+        caplog.at_level(logging.ERROR),
+    ):
+        saved_analysis_id = await analysis_store.record(_state())
+
+    # Still fail-open: the turn's reply is never at risk.
+    assert saved_analysis_id is None
+    upsert.assert_not_called()
+    sentry.capture_exception.assert_called_once()
+    assert any(record.levelno >= logging.ERROR for record in caplog.records)
+
+
+@pytest.mark.asyncio
+async def test_persist_surfaces_a_missing_user_row_to_its_caller():
+    """persist() reports what record() swallows, and the endpoint needs to
+    tell this apart from an empty conversation -- the two answered alike."""
+    with (
+        patch.object(
+            analysis_store, "get_user_by_keycloak_sub", AsyncMock(return_value=None)
+        ),
+        patch.object(analysis_store, "db_session"),
+    ):
+        with pytest.raises(analysis_store.UnprovisionedUserError):
+            await analysis_store.persist(_state())
+
+
+@pytest.mark.asyncio
 async def test_titles_from_the_first_user_message():
     captured = {}
 
