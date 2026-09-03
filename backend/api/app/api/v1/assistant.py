@@ -11,7 +11,7 @@ from pydantic_ai.exceptions import (
     UsageLimitExceeded,
 )
 
-from app.core.config import SESSION_COOKIE_NAME
+from app.core.config import SESSION_COOKIE_NAME, get_settings
 from app.core.dependencies import (
     check_rate_limit,
     get_assistant_agent,
@@ -263,6 +263,16 @@ async def save_session_to_account(
     unlike the per-turn write it reports failure rather than swallowing it.
     """
     require_session_cookie(session_id, session_cookie)
+
+    if not get_settings().DATABASE_URL:
+        # A deployment can have OIDC on and no database -- the chat endpoint
+        # authenticates on the JWT alone. Answering 503 there made every
+        # signed-in visit three retried failures and three exception logs, for
+        # a condition no retry can change. 501 says so plainly, and the client
+        # can stop asking.
+        raise HTTPException(
+            status_code=501, detail="Saving conversations is not configured"
+        )
 
     try:
         state = await agent.session_service.claim_session(session_id, current_user.sub)

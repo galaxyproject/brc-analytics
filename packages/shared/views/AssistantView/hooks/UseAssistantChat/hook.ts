@@ -10,6 +10,23 @@ import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// A save that failed for one of these will fail the same way next time: the
+// deployment cannot save at all, there is nothing to save, the session is not
+// ours, or it is gone. Anything else -- a network drop, a 500 -- is worth
+// another attempt when the effect next runs.
+const PERMANENT_SAVE_FAILURES = new Set([403, 404, 409, 501]);
+
+/**
+ * Whether a failed save is worth attempting again.
+ * @param error - Rejection from the save request.
+ * @returns true when a later attempt could succeed.
+ */
+function isRetryableSaveFailure(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } })?.response
+    ?.status;
+  return status === undefined || !PERMANENT_SAVE_FAILURES.has(status);
+}
+
 interface ChatMessageDisplay {
   content: string;
   role: "user" | "assistant";
@@ -180,9 +197,13 @@ export const useAssistantChat = ({
       .then(() => {
         if (!cancelled) setIsSaved(true);
       })
-      .catch(() => {
-        // The label stays off, which is the honest reading. The next turn's
-        // auto-save is the retry.
+      .catch((error: unknown) => {
+        // The label stays off, which is the honest reading. But the latch was
+        // set before the request went out, so leaving it set after a failure
+        // that a retry could fix means this session is never saved again --
+        // and this effect exists for the user who signs in to keep what is on
+        // screen and then sends nothing more.
+        if (isRetryableSaveFailure(error)) saveAttemptRef.current = null;
       });
 
     return (): void => {

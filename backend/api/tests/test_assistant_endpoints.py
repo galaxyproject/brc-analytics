@@ -295,3 +295,31 @@ class TestAnonymousSessionClaim:
 
         assert resp.status_code == 200, resp.text
         agent.session_service.claim_session.assert_not_awaited()
+
+
+class TestSaveWithoutADatabase:
+    """A deployment can have OIDC on and no DATABASE_URL: /chat authenticates
+    on the JWT alone. The save endpoint has to answer that plainly rather than
+    raising into a 503 the client will retry."""
+
+    def test_save_is_not_implemented_without_a_database(
+        self, app_with_stubbed_agent, client, caplog
+    ):
+        from app.core.dependencies import get_assistant_agent, get_current_user
+
+        agent = app_with_stubbed_agent.dependency_overrides[get_assistant_agent]()
+        agent.session_service.claim_session = AsyncMock()
+
+        async def _current_user():
+            return UserMeResponse(sub="user-a")
+
+        app_with_stubbed_agent.dependency_overrides[get_current_user] = _current_user
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+
+        resp = client.post("/api/v1/assistant/session/sess-abc/save")
+
+        assert resp.status_code == 501
+        # Nothing was claimed for a save that could never happen, and the
+        # refusal is not an exception -- both of those were the spam.
+        agent.session_service.claim_session.assert_not_awaited()
+        assert not [record for record in caplog.records if record.exc_info]
