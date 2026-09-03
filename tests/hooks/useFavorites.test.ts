@@ -266,6 +266,51 @@ describe("useFavorites", () => {
     expect(result.current.favorites).toEqual([]);
   });
 
+  test("waits for auth rather than reading unresolved as signed out", async () => {
+    // isAuthenticated is false while /auth/me is in flight without meaning it.
+    // Calling the set known-empty there leaves one committed render, after
+    // auth resolves but before this provider refetches, where every control
+    // is enabled and unfilled -- and a click in that frame creates a favorite
+    // the user already has.
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      isConfigured: true,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useAuth>);
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+
+    expect(mockClient.getFavorites).not.toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.hasLoaded).toBe(false);
+
+    await act(async () => {
+      await result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION);
+    });
+
+    expect(mockClient.createFavorite).not.toHaveBeenCalled();
+  });
+
+  test("loads once auth resolves as signed in", async () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      isConfigured: true,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useAuth>);
+
+    const { rerender, result } = renderHook(() => useFavorites(), { wrapper });
+
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      isConfigured: true,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useAuth>);
+    rerender();
+
+    await waitFor(() => expect(result.current.hasLoaded).toBe(true));
+    expect(mockClient.getFavorites).toHaveBeenCalledTimes(1);
+  });
+
   test("does not fetch when the user is signed out", async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,

@@ -57,7 +57,7 @@ export function FavoritesProvider({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  const { isAuthenticated, isConfigured } = useAuth();
+  const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   // Whether the favorites set is known. A load that failed leaves it empty
@@ -106,8 +106,20 @@ export function FavoritesProvider({
   }, [hasLoaded]);
 
   useEffect(() => {
-    if (!isAuthenticated || !isConfigured) {
+    // Until /auth/me answers, isAuthenticated is false without meaning it.
+    // Taking the signed-out branch here would call the set known-empty, and
+    // when auth resolves setUser and its own setIsLoading(false) batch into
+    // one committed render where this provider hasn't started fetching yet --
+    // one frame with every control enabled and unfilled, where a click
+    // creates a favorite the user already has and lists it twice.
+    if (isAuthLoading) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+      setIsLoading(true);
+      setHasLoaded(false);
+      return;
+    }
+
+    if (!isAuthenticated || !isConfigured) {
       setFavorites([]);
       setError(null);
       setIsLoading(false);
@@ -143,7 +155,7 @@ export function FavoritesProvider({
     return (): void => {
       isMounted = false;
     };
-  }, [isAuthenticated, isConfigured]);
+  }, [isAuthLoading, isAuthenticated, isConfigured]);
 
   const toggleFavorite = useCallback(
     async (entityType: FavoriteEntityType, entityId: string): Promise<void> => {
