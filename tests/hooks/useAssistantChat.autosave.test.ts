@@ -15,9 +15,16 @@ jest.mock("@repo/shared/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
 }));
 jest.mock("next/router", () => ({
-  useRouter: (): { pathname: string; query: Record<string, string> } => ({
+  useRouter: (): {
+    isReady: boolean;
+    pathname: string;
+    query: Record<string, string>;
+    replace: jest.Mock;
+  } => ({
+    isReady: true,
     pathname: "/assistant",
     query: {},
+    replace: jest.fn().mockResolvedValue(true),
   }),
 }));
 
