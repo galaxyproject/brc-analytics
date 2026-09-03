@@ -61,6 +61,12 @@ _ACCESSION_BATCH_SIZE = 500
 # far worse failure than the missing feature. So each capability is checked
 # on its own and reports itself unavailable on its own.
 #
+# Every capability named here gates a real call site -- annotation, cohort,
+# export and geography through galaxy_service, and search, study and summary
+# on the tool-facing methods themselves. That is not decoration: a startup
+# warning saying a capability is unavailable, in front of a path that queries
+# anyway, promises a guard that is not there.
+#
 # Kept by hand in step with the queries below; the union is asserted against
 # the fixture schema in tests, so a column added to a query without being
 # named here shows up as a test failure rather than as a 500.
@@ -985,6 +991,26 @@ class SRAMirrorService:
         )
         return f"{self.schema_version or 'x'}:{'+'.join(available) or 'none'}"
 
+    def _unavailable(self, capability: str) -> Optional[Dict[str, Any]]:
+        """An error payload when `capability` cannot be served, else None.
+
+        The tool-facing methods all answer with a dict rather than raising, so
+        the model gets a sentence instead of a stack trace. Which columns are
+        missing goes in it, because the person reading the log is the person
+        who has to go copy a newer mirror onto the host.
+        """
+        if self._con is None:
+            return {"error": "SRA mirror not available"}
+        missing = self._missing_columns.get(capability)
+        if not missing:
+            return None
+        return {
+            "error": (
+                f"The SRA mirror on this host cannot answer {capability} "
+                f"queries: it is missing {', '.join(missing)} on `runs`."
+            )
+        }
+
     def missing_columns(self, capability: str) -> List[str]:
         """Columns `capability` needs that this mirror does not carry.
 
@@ -1077,6 +1103,9 @@ class SRAMirrorService:
         """
         if not self._con:
             return {"error": "SRA mirror not available"}
+
+        if (unavailable := self._unavailable(CAPABILITY_SUMMARY)) is not None:
+            return unavailable
 
         cache_key = ("summary", _norm_organism(organism))
         if (cached := self._cache_get(cache_key)) is not None:
@@ -1217,6 +1246,9 @@ class SRAMirrorService:
         # can't request an unbounded result set.
         limit = max(1, min(limit, 200))
 
+        if (unavailable := self._unavailable(CAPABILITY_SEARCH)) is not None:
+            return unavailable
+
         cache_key = (
             "search",
             _norm_organism(organism),
@@ -1328,6 +1360,9 @@ class SRAMirrorService:
             return {"error": "SRA mirror not available"}
 
         limit = max(1, min(limit, 100))
+
+        if (unavailable := self._unavailable(CAPABILITY_SUMMARY)) is not None:
+            return unavailable
 
         cache_key = ("top_bioprojects", _norm_organism(organism), limit)
         if (cached := self._cache_get(cache_key)) is not None:
@@ -1723,6 +1758,9 @@ class SRAMirrorService:
         # bioproject column instead of silently missing on sra_study.
         accession = accession.strip().upper()
         limit = max(1, min(limit, 500))
+
+        if (unavailable := self._unavailable(CAPABILITY_STUDY)) is not None:
+            return unavailable
 
         cache_key = ("study_runs", accession, limit)
         if (cached := self._cache_get(cache_key)) is not None:

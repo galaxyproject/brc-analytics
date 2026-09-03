@@ -303,6 +303,54 @@ class TestCapabilityGating:
         assert mirror.is_available()
         assert mirror.has_capability("geography")
 
+    def test_every_declared_capability_actually_gates_something(self, tmp_path):
+        """A startup warning that protects nothing is worse than no warning.
+
+        The check reports seven capabilities unavailable when their columns
+        are missing. If a path named there went on querying regardless, the
+        warning would promise a guard that is not present -- so each one has
+        to refuse. Driven off a mirror with mbases dropped, which closes the
+        four run-detail capabilities and leaves the other three open.
+        """
+        path = str(tmp_path / "gating.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+        svc = SRAMirrorService(path)
+
+        closed = {
+            "search": lambda: svc.search_runs("Plasmodium falciparum"),
+            "study": lambda: svc.get_study_runs("PRJNA12345"),
+        }
+        for capability, call in closed.items():
+            assert not svc.has_capability(capability)
+            result = call()
+            assert "error" in result, capability
+            # The message names the column, because whoever reads it is the
+            # person who has to go copy a newer mirror onto the host.
+            assert "mbases" in result["error"], capability
+
+        # And the ones the file can still answer are untouched.
+        assert svc.has_capability("summary")
+        assert svc.summary_for_organism("Plasmodium falciparum")["n_runs"] == 2
+        assert svc.top_bioprojects_for_organism("Plasmodium falciparum")["resolved"]
+        assert svc.geography_for_accessions(["SRR001"])["in_mirror"] == 1
+
+    def test_summary_closes_when_its_own_columns_go(self, tmp_path):
+        path = str(tmp_path / "no-platform.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN platform")
+        con.close()
+        svc = SRAMirrorService(path)
+
+        assert not svc.has_capability("summary")
+        assert "platform" in svc.summary_for_organism("Plasmodium falciparum")["error"]
+        assert "platform" in svc.top_bioprojects_for_organism("P. falciparum")["error"]
+        # geography does not read platform, so it keeps answering.
+        assert svc.geography_for_accessions(["SRR001"]) is not None
+
     def test_the_fingerprint_changes_only_when_the_capabilities_do(
         self, tmp_path, mirror
     ):
