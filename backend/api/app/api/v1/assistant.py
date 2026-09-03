@@ -25,6 +25,7 @@ from app.models.assistant import (
     ChatResponse,
     SessionRestoreResponse,
     SessionSaveResponse,
+    SessionState,
 )
 from app.models.user_data import UserMeResponse
 from app.services import analysis_store, turn_log
@@ -177,7 +178,9 @@ async def assistant_chat(
             if state is not None:
                 # Reported back so the UI can say "saved" on an acknowledgement
                 # rather than on the assumption that being signed in means kept.
-                chat_response.saved = await analysis_store.record(state)
+                saved_analysis_id = await analysis_store.record(state)
+                chat_response.saved = saved_analysis_id is not None
+                await _stamp_analysis_id(agent, state, saved_analysis_id)
         except Exception:
             # get_session reads Redis strictly and raises on a blip, so
             # without this a cache hiccup would 500 a turn whose reply already
@@ -186,6 +189,22 @@ async def assistant_chat(
 
     set_session_cookie(response, chat_response.session_id)
     return chat_response
+
+
+async def _stamp_analysis_id(
+    agent, state: SessionState, saved_analysis_id: Optional[str]
+) -> None:
+    """Teach a session which analysis it was just written to.
+
+    The session id is a mutable pointer and the analysis id is the durable
+    one, so a session that does not know its own analysis cannot answer
+    "is this already saved?" on restore -- which leaves the client saving it
+    again on every mount to find out.
+    """
+    if saved_analysis_id is None or state.saved_analysis_id == saved_analysis_id:
+        return
+    state.saved_analysis_id = saved_analysis_id
+    await agent.session_service.save_session(state)
 
 
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
@@ -224,6 +243,7 @@ async def restore_session(
         suggestions=suggestions,
         is_complete=is_complete,
         handoff_url=handoff_url,
+        saved=state.saved_analysis_id is not None,
     )
 
 
@@ -267,6 +287,13 @@ async def save_session_to_account(
         # An empty conversation has nothing worth listing. Not an error, but
         # the caller must not be told it was saved.
         raise HTTPException(status_code=409, detail="Nothing to save yet")
+
+    try:
+        await _stamp_analysis_id(agent, state, saved_analysis_id)
+    except Exception:
+        # The row is written; only the session's memory of it is missing, and
+        # the cost of that is one redundant (idempotent) save later.
+        logger.exception("Failed to stamp analysis id onto session %s", session_id)
 
     return SessionSaveResponse(saved_analysis_id=saved_analysis_id)
 

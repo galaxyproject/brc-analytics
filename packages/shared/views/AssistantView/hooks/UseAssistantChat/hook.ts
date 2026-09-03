@@ -113,6 +113,10 @@ export const useAssistantChat = ({
         setSuggestions(restored.suggestions);
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
+        // Whether this is already on disk is the server's to answer. Inferring
+        // it from auth state instead would re-save every signed-in session on
+        // every mount just to find out.
+        setIsSaved(restored.saved);
       })
       .catch((error: unknown) => {
         if (cancelled) return;

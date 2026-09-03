@@ -56,6 +56,7 @@ export interface SessionRestoreResponse {
   handoff_url: string | null;
   is_complete: boolean;
   messages: { content: string; role: "user" | "assistant" }[];
+  saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];

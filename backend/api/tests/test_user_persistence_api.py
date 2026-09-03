@@ -72,6 +72,17 @@ class FakeAssistantAgent:
     def is_available(self) -> bool:
         return True
 
+    # The three the restore endpoint calls to re-derive state from the stored
+    # schema. Nothing here is testing that derivation, so they pass it through.
+    def reconcile_schema(self, schema_state: AnalysisSchema) -> AnalysisSchema:
+        return schema_state
+
+    def _derive_suggestions(self, schema_state: AnalysisSchema) -> list:
+        return []
+
+    def compute_handoff(self, schema_state, *, session_id: str):
+        return False, None
+
     async def chat_with_telemetry(
         self,
         message: str,
@@ -457,15 +468,32 @@ def test_open_reuses_the_live_session(persistence_client):
     assert listed[0]["source_session"] == session_id
 
 
-def test_open_carries_the_analysis_id_onto_the_live_session(persistence_client):
-    """A conversation saved but never reopened has a session older than its
-    row, so it does not know its own analysis id until someone opens it."""
+def test_autosave_carries_the_analysis_id_onto_the_session(persistence_client):
+    """The session id is a mutable pointer; the analysis id is the durable one.
+
+    A session that does not know its own analysis cannot answer "am I already
+    saved?" on restore, which leaves the client saving it again every mount to
+    find out.
+    """
     client, _session_factory, _current_sub, agent = persistence_client
 
     chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
     session_id = chat.json()["session_id"]
-    assert agent.session_service.sessions[session_id].saved_analysis_id is None
     analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    assert agent.session_service.sessions[session_id].saved_analysis_id == analysis_id
+
+
+def test_open_carries_the_analysis_id_onto_the_live_session(persistence_client):
+    """A session saved before the stamp existed still doesn't know its own
+    analysis id, so opening it has to teach it -- otherwise a later reopen
+    elsewhere orphans the row."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    agent.session_service.sessions[session_id].saved_analysis_id = None
 
     client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
 
@@ -576,6 +604,30 @@ def test_signing_in_saves_the_conversation_without_another_turn(persistence_clie
     listed = client.get("/api/v1/saved_analyses").json()
     assert len(listed) == 1
     assert saved.json()["saved_analysis_id"] == listed[0]["id"]
+
+
+def test_restore_reports_whether_the_conversation_is_already_saved(
+    persistence_client,
+):
+    """Otherwise the client has to save it again to find out -- on every mount
+    of every signed-in session, against a deployment that may have no database
+    to save to."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+
+    saved = client.get(f"/api/v1/assistant/session/{session_id}")
+    assert saved.json()["saved"] is True
+
+    unsaved_id = uuid4().hex
+    agent.session_service.sessions[unsaved_id] = SessionState(
+        session_id=unsaved_id,
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+    )
+
+    unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
+    assert unsaved.json()["saved"] is False
 
 
 def test_saving_twice_keeps_one_analysis(persistence_client):

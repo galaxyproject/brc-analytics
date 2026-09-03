@@ -244,6 +244,10 @@ class SessionRestoreResponse(BaseModel):
     suggestions: List[SuggestionChip] = Field(default_factory=list)
     is_complete: bool = False
     handoff_url: Optional[str] = None
+    # Whether this conversation is already on disk. Without it the client can
+    # only infer saved-ness from being signed in, which is not the same
+    # question and costs a redundant save on every mount.
+    saved: bool = False
 
 
 class AssistantInfoResponse(BaseModel):
