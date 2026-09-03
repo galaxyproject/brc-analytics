@@ -862,17 +862,21 @@ class GalaxyService:
             # cohort is an optional enrichment over a hit list that is correct,
             # and letting it block the cache inverts the cost. Re-aggregation
             # is 84-280 shard downloads from a rate-limited Galaxy behind a
-            # process-wide lock, and the failure need not be transient:
-            # is_available() only checks that a connection exists and
-            # _initialize never validates the columns this query needs, so a
-            # mirror on an older schema reports available and raises every
-            # time -- which made every results poll and every page click
-            # re-download every shard, forever. A short TTL bounds the retry
-            # instead of removing it: one re-aggregation per hour rather than
-            # one per request, and a genuinely transient failure still heals
-            # on its own. The export is treated identically and for the same
-            # reason: it can only be written while the full hit list is alive,
-            # so caching a failed one for a day means no download for a day.
+            # process-wide lock, and the failure need not be transient.
+            #
+            # The cause that produced this TTL -- a mirror on an older schema
+            # reporting available and raising on every call, so every results
+            # poll and every page click re-downloaded every shard -- no longer
+            # reaches here: _initialize now checks the columns each capability
+            # names, and a mirror that cannot answer is skipped rather than
+            # attempted (see _mirror_can and _agg_cache_key). What is left is
+            # the genuinely unpredictable: a corrupt page, a revoked handle, a
+            # duckdb disagreement. A short TTL bounds the retry instead of
+            # removing it -- one re-aggregation per hour rather than one per
+            # request, and a transient failure still heals on its own. The
+            # export is treated identically and for the same reason: it can
+            # only be written while the full hit list is alive, so caching a
+            # failed one for a day means no download for a day.
             ttl = CacheTTL.ONE_DAY
             degraded = [
                 name
