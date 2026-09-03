@@ -24,10 +24,14 @@ const mockReplace = jest.fn().mockResolvedValue(true);
 let mockQuery: Record<string, string> = {};
 jest.mock("next/router", () => ({
   useRouter: (): {
+    isReady: boolean;
     pathname: string;
     query: Record<string, string>;
     replace: jest.Mock;
   } => ({
+    // The restore effect waits for the router to settle before reading the
+    // query, so a stub without this never restores.
+    isReady: true,
     pathname: "/assistant",
     query: mockQuery,
     replace: mockReplace,
