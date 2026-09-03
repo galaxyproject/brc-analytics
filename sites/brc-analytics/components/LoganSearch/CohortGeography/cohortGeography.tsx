@@ -2,7 +2,7 @@
 
 import { CohortMapContainer } from "@brc/components/LoganSearch/loganSearch.styles";
 import { formatShare } from "@brc/components/LoganSearch/utils";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   type KmindexGeography,
   type KmindexGeographyCountry,
@@ -11,7 +11,12 @@ import { type JSX, useEffect, useRef, useState } from "react";
 import type { TopLevelSpec } from "vega-lite";
 
 interface CohortGeographyProps {
-  geography: KmindexGeography;
+  // Nullable on purpose. Absent means the backend could not answer -- an
+  // unconfigured mirror, or one that predates the columns the geography query
+  // needs and closed that capability on its own. That is a statement about
+  // our deployment, not about the cohort, so it renders as nothing rather
+  // than as "no geography recorded".
+  geography?: KmindexGeography | null;
 }
 
 // Committed under sites/brc-analytics/public, so it is same-origin and there
@@ -274,16 +279,49 @@ function GeographyMap({
  */
 export const CohortGeography = ({
   geography,
-}: CohortGeographyProps): JSX.Element => {
-  const unplaceable = describeUnplaceable(geography);
+}: CohortGeographyProps): JSX.Element | null => {
+  // Same posture as LoganSearchCohort on an absent cohort: say nothing rather
+  // than render a shell. A world map with no countries coloured is not an
+  // empty state, it is an assertion that the query matched nowhere.
+  if (!geography) return null;
+
   const countries = geography.countries ?? [];
+  const unplaceable = describeUnplaceable(geography);
   return (
     <div>
       <Typography variant="subtitle2">Where these runs came from</Typography>
       <Typography color="textSecondary" component="div" variant="caption">
         {describeCoverage(geography)}
       </Typography>
-      {countries.length > 0 && <GeographyMap countries={countries} />}
+      {countries.length > 0 ? (
+        <GeographyMap countries={countries} />
+      ) : (
+        // Nothing to draw, for one of two reasons: no run in the cohort has a
+        // country at all, or every country it does have is one the outline
+        // cannot place. Either way the map is replaced by a sentence rather
+        // than left as an empty world, which would read as a finding.
+        <Box
+          sx={{
+            alignItems: "center",
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+            borderStyle: "dashed",
+            display: "flex",
+            justifyContent: "center",
+            minHeight: 160,
+            mt: 1,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
+          <Typography color="textSecondary" variant="body2">
+            {geography.recorded === 0
+              ? "No map: not one matched run has a country recorded."
+              : "No map: none of the recorded countries can be placed on it."}
+          </Typography>
+        </Box>
+      )}
       {unplaceable && (
         <Typography
           color="textSecondary"
