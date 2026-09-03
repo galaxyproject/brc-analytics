@@ -114,7 +114,7 @@ async def test_saved_analysis_crud_round_trip():
 
         saved_analysis = await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[],
             messages=[{"role": "user", "content": "Help me analyze influenza"}],
             schema={
@@ -193,7 +193,7 @@ async def test_upsert_saved_analysis_updates_in_place(db_session_factory):
 
         first = await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[{"kind": "request"}],
             messages=[{"content": "hi", "role": "user"}],
             schema={},
@@ -202,7 +202,7 @@ async def test_upsert_saved_analysis_updates_in_place(db_session_factory):
         )
         second = await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[{"kind": "request"}, {"kind": "response"}],
             messages=[
                 {"content": "hi", "role": "user"},
@@ -233,7 +233,7 @@ async def test_upsert_saved_analysis_separates_distinct_sessions(db_session_fact
 
         await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[],
             messages=[],
             schema={},
@@ -242,7 +242,7 @@ async def test_upsert_saved_analysis_separates_distinct_sessions(db_session_fact
         )
         await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[],
             messages=[],
             schema={},
@@ -263,7 +263,7 @@ async def test_repoint_saved_analysis_session(db_session_factory):
         )
         analysis = await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[],
             messages=[],
             schema={},
@@ -293,7 +293,7 @@ async def test_upsert_saved_analysis_rejects_a_missing_source_session(
         with pytest.raises(ValueError):
             await upsert_saved_analysis(
                 session,
-                user,
+                user.id,
                 agent_message_history=[],
                 messages=[],
                 schema={},
@@ -390,7 +390,7 @@ async def test_upsert_saved_analysis_recovers_from_a_concurrent_insert(
         user = await get_user_by_keycloak_sub(session, "sub-race")
         result = await upsert_saved_analysis(
             session,
-            user,
+            user.id,
             agent_message_history=[{"kind": "response"}],
             messages=[{"content": "ours", "role": "user"}],
             schema={"organism": "ours"},

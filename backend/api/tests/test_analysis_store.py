@@ -78,7 +78,7 @@ async def test_a_missing_user_row_is_reported_rather_than_shrugged_off(caplog):
     any turn, forever."""
     with (
         patch.object(
-            analysis_store, "get_user_by_keycloak_sub", AsyncMock(return_value=None)
+            analysis_store, "get_user_id_by_keycloak_sub", AsyncMock(return_value=None)
         ),
         patch.object(analysis_store, "upsert_saved_analysis", AsyncMock()) as upsert,
         patch.object(analysis_store, "db_session"),
@@ -100,7 +100,7 @@ async def test_persist_surfaces_a_missing_user_row_to_its_caller():
     tell this apart from an empty conversation -- the two answered alike."""
     with (
         patch.object(
-            analysis_store, "get_user_by_keycloak_sub", AsyncMock(return_value=None)
+            analysis_store, "get_user_id_by_keycloak_sub", AsyncMock(return_value=None)
         ),
         patch.object(analysis_store, "db_session"),
     ):
@@ -117,7 +117,7 @@ async def test_titles_from_the_first_user_message():
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", fake_upsert),
-        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
         patch.object(analysis_store, "db_session"),
     ):
         await analysis_store.record(_state())
@@ -138,7 +138,7 @@ async def test_truncates_a_long_title():
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", fake_upsert),
-        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
         patch.object(analysis_store, "db_session"),
     ):
         await analysis_store.record(state)
@@ -172,7 +172,7 @@ async def test_nul_bytes_are_scrubbed_on_every_persisted_field():
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", fake_upsert),
-        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
         patch.object(analysis_store, "db_session"),
     ):
         await analysis_store.record(state)
@@ -196,7 +196,7 @@ async def test_a_write_failure_never_propagates(caplog):
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", boom),
-        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
         patch.object(analysis_store, "db_session"),
         patch.object(analysis_store, "sentry_sdk") as sentry,
         caplog.at_level(logging.ERROR, logger=analysis_store.__name__),
@@ -243,7 +243,7 @@ async def test_a_slow_write_is_abandoned_not_awaited():
 
     with (
         patch.object(analysis_store, "upsert_saved_analysis", never_finishes),
-        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
         patch.object(analysis_store, "db_session"),
         patch.object(analysis_store, "get_settings", return_value=settings),
         patch.object(analysis_store, "sentry_sdk") as sentry,

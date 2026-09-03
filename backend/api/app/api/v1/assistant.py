@@ -107,7 +107,7 @@ async def assistant_chat(
     sentry_sdk.set_tag("assistant.turn_id", str(turn_id))
 
     try:
-        chat_response, _telemetry = await agent.chat_with_telemetry(
+        chat_response, _telemetry, turn_state = await agent.chat_with_telemetry(
             request.message,
             request.session_id,
             current_user.sub if current_user else None,
@@ -174,17 +174,19 @@ async def assistant_chat(
     # read back is guarded, so nothing here can cost the user their reply.
     if current_user:
         try:
-            state = await agent.session_service.get_session(chat_response.session_id)
-            if state is not None:
-                # Reported back so the UI can say "saved" on an acknowledgement
-                # rather than on the assumption that being signed in means kept.
-                saved_analysis_id = await analysis_store.record(state)
-                chat_response.saved = saved_analysis_id is not None
-                await _stamp_analysis_id(agent, state, saved_analysis_id)
+            # The state the turn just wrote, handed back rather than re-read:
+            # a get_session here was a third Redis round trip and a full
+            # re-validation of the history, milliseconds after the agent
+            # stored it.
+            # Reported back so the UI can say "saved" on an acknowledgement
+            # rather than on the assumption that being signed in means kept.
+            saved_analysis_id = await analysis_store.record(turn_state)
+            chat_response.saved = saved_analysis_id is not None
+            await _stamp_analysis_id(agent, turn_state, saved_analysis_id)
         except Exception:
-            # get_session reads Redis strictly and raises on a blip, so
-            # without this a cache hiccup would 500 a turn whose reply already
-            # succeeded -- the one thing the auto-save must never do.
+            # record() is fail-open, but the stamp writes to Redis and that
+            # can blip -- without this a cache hiccup would 500 a turn whose
+            # reply already succeeded, the one thing auto-save must never do.
             logger.exception("Failed to auto-save session %s", chat_response.session_id)
 
     set_session_cookie(response, chat_response.session_id)

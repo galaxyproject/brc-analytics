@@ -153,18 +153,9 @@ async def list_saved_analyses_for_user(
 async def get_saved_analysis(
     session: AsyncSession, user: User, saved_analysis_id: str
 ) -> SavedAnalysis | None:
-    try:
-        saved_analysis_uuid = uuid.UUID(saved_analysis_id)
-    except ValueError:
-        return None
-
-    result = await session.execute(
-        select(SavedAnalysis).where(
-            SavedAnalysis.user_id == user.id,
-            SavedAnalysis.id == saved_analysis_uuid,
-        )
-    )
-    return result.scalar_one_or_none()
+    """One analysis of the user's, by id. Takes the User the routes already
+    hold; the id-taking form below is the same query."""
+    return await _get_saved_analysis_by_id(session, user.id, saved_analysis_id)
 
 
 async def _get_saved_analysis_by_session(
@@ -183,7 +174,8 @@ async def _get_saved_analysis_by_session(
 async def _get_saved_analysis_by_id(
     session: AsyncSession, user_id: uuid.UUID, saved_analysis_id: str
 ) -> SavedAnalysis | None:
-    """Same user-id-not-User contract as the by-session lookup above."""
+    """Same user-id-not-User contract as the by-session lookup above, and the
+    single implementation behind get_saved_analysis."""
     try:
         saved_analysis_uuid = uuid.UUID(saved_analysis_id)
     except ValueError:
@@ -199,7 +191,7 @@ async def _get_saved_analysis_by_id(
 
 async def upsert_saved_analysis(
     session: AsyncSession,
-    user: User,
+    user_id: uuid.UUID,
     *,
     agent_message_history: list[dict[str, Any]],
     messages: list[dict[str, Any]],
@@ -225,7 +217,6 @@ async def upsert_saved_analysis(
         # rather than the loud failure you'd want.
         raise ValueError("upsert_saved_analysis requires a source_session")
 
-    user_id = user.id
     by_session = await _get_saved_analysis_by_session(session, user_id, source_session)
     by_id = (
         await _get_saved_analysis_by_id(session, user_id, saved_analysis_id)
@@ -258,7 +249,9 @@ async def upsert_saved_analysis(
             if existing is None:
                 raise
         else:
-            await session.refresh(created)
+            # No refresh: the factory sets expire_on_commit=False and every
+            # value here is Python-side (uuid4, utcnow), so a re-SELECT of
+            # three JSON columns on every turn buys nothing.
             return created
 
     existing.agent_message_history = agent_message_history
@@ -271,7 +264,6 @@ async def upsert_saved_analysis(
         # write here costs the user the turn's auto-save.
         existing.source_session = source_session
     await session.commit()
-    await session.refresh(existing)
     return existing
 
 

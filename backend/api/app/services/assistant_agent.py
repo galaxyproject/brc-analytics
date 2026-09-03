@@ -1001,7 +1001,7 @@ class AssistantAgent:
 
         Creates a new session if session_id is None or not found.
         """
-        response, _telemetry = await self.chat_with_telemetry(
+        response, _telemetry, _state = await self.chat_with_telemetry(
             message, session_id, owner_keycloak_sub
         )
         return response
@@ -1013,8 +1013,9 @@ class AssistantAgent:
         owner_keycloak_sub: Optional[str] = None,
         turn_id: Optional[UUID] = None,
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]] = None,
-    ) -> tuple[ChatResponse, TurnTelemetry]:
-        """Same as chat(), plus the per-turn record the API layer logs.
+    ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
+        """Same as chat(), plus the per-turn record the API layer logs and the
+        session state this turn left behind.
 
         Split out so the agent stays DB-agnostic: it hands back what happened
         and the endpoint decides whether to persist it. turn_id is passed in
@@ -1070,7 +1071,7 @@ class AssistantAgent:
         turn_start: float,
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]],
         progress: dict,
-    ) -> tuple[ChatResponse, TurnTelemetry]:
+    ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         if not self.is_available():
             raise AssistantUnavailableError(
                 "Assistant agent is not available (check AI_API_KEY)"
@@ -1230,7 +1231,12 @@ class AssistantAgent:
 
         if on_turn is not None:
             await _safe_record(on_turn, telemetry)
-        return response, telemetry
+        # The state goes back with the response: it was just written to Redis
+        # here, and the endpoint's auto-save would otherwise re-read and
+        # re-validate the whole history milliseconds later. Handing it over is
+        # still DB-agnostic -- what keeps this layer out of the database is
+        # that it doesn't write to one, not that it withholds what it has.
+        return response, telemetry, state
 
     def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:
         """Take this turn's messages off the already-serialized history.

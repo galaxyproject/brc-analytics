@@ -18,10 +18,9 @@ import asyncio
 import logging
 
 import sentry_sdk
-from pydantic_core import to_jsonable_python
 
 from app.core.config import get_settings
-from app.db.crud import get_user_by_keycloak_sub, upsert_saved_analysis
+from app.db.crud import get_user_id_by_keycloak_sub, upsert_saved_analysis
 from app.db.session import db_session
 from app.models.assistant import MessageRole, SessionState
 from app.services.sanitize import strip_nuls
@@ -128,18 +127,21 @@ async def _write(state: SessionState) -> str | None:
         return None
 
     async with db_session() as session:
-        user = await get_user_by_keycloak_sub(session, state.owner_keycloak_sub)
-        if user is None:
+        # The id, not the row: nothing here reads anything else off the user,
+        # and this runs on every turn.
+        user_id = await get_user_id_by_keycloak_sub(session, state.owner_keycloak_sub)
+        if user_id is None:
             raise UnprovisionedUserError(state.owner_keycloak_sub)
         saved = await upsert_saved_analysis(
             session,
-            user,
+            user_id,
             # Every field here is rewritten in full on every turn, so one
             # unscrubbed NUL would poison all future auto-saves for this
             # conversation, not just the turn it arrived on.
-            agent_message_history=strip_nuls(
-                to_jsonable_python(state.agent_message_history)
-            ),
+            # Already JSON-safe dicts (the agent stores it as
+            # to_jsonable_python(result.all_messages())), so this is one
+            # traversal of the largest per-session blob rather than two.
+            agent_message_history=strip_nuls(state.agent_message_history),
             messages=strip_nuls(
                 [message.model_dump(mode="json") for message in state.messages]
             ),

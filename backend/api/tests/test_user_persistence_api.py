@@ -36,6 +36,7 @@ from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 class FakeSessionService:
     def __init__(self):
         self.sessions: dict[str, SessionState] = {}
+        self.get_session_calls = 0
 
     async def require_session(
         self, session_id: str, owner_keycloak_sub: str | None
@@ -60,6 +61,7 @@ class FakeSessionService:
         return state
 
     async def get_session(self, session_id: str) -> SessionState | None:
+        self.get_session_calls += 1
         return self.sessions.get(session_id)
 
     async def save_session(self, state: SessionState) -> None:
@@ -92,8 +94,8 @@ class FakeAssistantAgent:
         *,
         turn_id=None,
         on_turn=None,
-    ) -> tuple[ChatResponse, TurnTelemetry]:
-        """Stub a turn, leaving behind the session state auto-save reads back."""
+    ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
+        """Stub a turn, handing back the state auto-save writes from."""
         state = self.session_service.sessions.get(session_id or "")
         if state is None:
             state = SessionState(session_id=uuid4().hex)
@@ -109,6 +111,7 @@ class FakeAssistantAgent:
                 session_id=state.session_id,
             ),
             TurnTelemetry(session_id=state.session_id, user_message=message),
+            state,
         )
 
     async def restore_saved_session(
@@ -269,7 +272,7 @@ def test_saved_analyses_are_scoped_to_current_user(persistence_client):
             assert user_a is not None
             saved_analysis = await upsert_saved_analysis(
                 session,
-                user_a,
+                user_a.id,
                 agent_message_history=[],
                 messages=[
                     ChatMessage(
@@ -629,6 +632,20 @@ def test_restore_reports_whether_the_conversation_is_already_saved(
 
     unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
     assert unsaved.json()["saved"] is False
+
+
+def test_autosave_writes_from_the_turn_rather_than_rereading_redis(
+    persistence_client,
+):
+    """The agent hands back the state it just stored. Re-reading it here was a
+    third Redis round trip and a full re-validation of the message history on
+    every signed-in turn."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+
+    assert chat.json()["saved"] is True
+    assert agent.session_service.get_session_calls == 0
 
 
 def test_saving_twice_keeps_one_analysis(persistence_client):
