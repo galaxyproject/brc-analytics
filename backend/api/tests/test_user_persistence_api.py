@@ -10,7 +10,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.core.config import get_settings
+from app.core.config import SESSION_COOKIE_NAME, get_settings
+from app.core.session_signing import sign_session_id
 from app.db.crud import (
     get_user_by_keycloak_sub,
     repoint_saved_analysis_session,
@@ -639,6 +640,51 @@ def test_saving_twice_keeps_one_analysis(persistence_client):
     client.post(f"/api/v1/assistant/session/{session_id}/save")
     client.post(f"/api/v1/assistant/session/{session_id}/save")
 
+    assert len(client.get("/api/v1/saved_analyses").json()) == 1
+
+
+def test_saving_enforces_the_session_cookie_when_secret_set(
+    persistence_client, monkeypatch
+):
+    """With SESSION_COOKIE_SECRET configured, saving an anonymous session
+    requires a valid signed cookie -- knowing the session_id is not enough.
+
+    The other save tests here succeed cookieless only because the fixture
+    leaves the secret unset; this one pins the gate so it cannot be silently
+    dropped. Without it, any authenticated user who learns an anonymous
+    session id could claim and persist someone else's conversation.
+    """
+    client, _session_factory, current_sub, agent = persistence_client
+
+    secret = "test-cookie-secret"
+    monkeypatch.setenv("SESSION_COOKIE_SECRET", secret)
+    get_settings.cache_clear()
+
+    agent.session_service.sessions["session-anon"] = SessionState(
+        session_id="session-anon",
+        owner_keycloak_sub=None,
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+        schema_state=AnalysisSchema(),
+    )
+    current_sub["value"] = "user-a"
+    save_url = "/api/v1/assistant/session/session-anon/save"
+
+    # No cookie -> rejected, session stays anonymous (gate runs before claim).
+    missing = client.post(save_url)
+    assert missing.status_code == 403
+    assert agent.session_service.sessions["session-anon"].owner_keycloak_sub is None
+
+    # Wrong signature -> rejected.
+    client.cookies.set(SESSION_COOKIE_NAME, "not-a-valid-signature")
+    wrong = client.post(save_url)
+    assert wrong.status_code == 403
+    client.cookies.clear()
+
+    # Valid signed cookie -> the session is claimed and saved.
+    client.cookies.set(SESSION_COOKIE_NAME, sign_session_id("session-anon", secret))
+    ok = client.post(save_url)
+    assert ok.status_code == 200, ok.text
+    assert agent.session_service.sessions["session-anon"].owner_keycloak_sub == "user-a"
     assert len(client.get("/api/v1/saved_analyses").json()) == 1
 
 
