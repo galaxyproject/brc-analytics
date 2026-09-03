@@ -68,6 +68,7 @@ function setFavorites(favorites: unknown[] = []): void {
   mockUseFavorites.mockReturnValue({
     error: null,
     favorites,
+    hasLoaded: true,
     isFavorited: () => false,
     isLoading: false,
     isToggling: false,
@@ -149,6 +150,31 @@ describe("AccountView", () => {
     expect(
       screen.getByRole("region", { name: "Launches" })
     ).toBeInTheDocument();
+  });
+
+  test("scrolls to a hash target once the sections it names exist", async () => {
+    // The retired routes land here as /account#analyses, #assemblies and
+    // #launches. The browser resolves that hash while this page is still a
+    // spinner, and mounting the sections afterwards does not re-trigger it.
+    const scrollIntoView = jest.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    window.location.hash = "#launches";
+    mockClient.getSavedAnalyses.mockResolvedValue([
+      {
+        created_at: "2026-08-01T00:00:00Z",
+        id: "1",
+        title: "Plasmodium run",
+        updated_at: "2026-08-01T00:00:00Z",
+      },
+    ] as never);
+
+    renderAccountView();
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
+    expect((scrollIntoView.mock.instances[0] as HTMLElement).id).toBe(
+      "launches"
+    );
+    window.location.hash = "";
   });
 
   test("splits favorites into their own section by entity type", async () => {

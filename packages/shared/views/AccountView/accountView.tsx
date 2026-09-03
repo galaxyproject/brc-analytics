@@ -62,6 +62,18 @@ export function AccountView(): JSX.Element {
     }
   }, [isLoading]);
 
+  // The three retired routes redirect to /account#analyses, #assemblies and
+  // #launches, and the browser scrolls to a hash the moment it lands -- while
+  // this page is still a spinner and none of those ids exist yet. Mounting the
+  // sections later does not re-trigger that scroll, so without this every old
+  // deep link quietly arrives at the top of the workspace.
+  useEffect(() => {
+    if (!hasResolvedOnce) return;
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView();
+  }, [hasResolvedOnce]);
+
   /**
    * The workspace body: a single loading state until the first load
    * resolves, then either the getting-started panel or the four sections.
