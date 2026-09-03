@@ -110,6 +110,10 @@ KMINDEX_UNATTRIBUTED = "(unattributed)"
 # instead of about the cache. Every existing job pays one re-aggregation the
 # first time it is viewed after this deploys, and the assistant's cache-only
 # reads miss until that lands; that is a known one-time cliff, not a surprise.
+#
+# The version is only half the key. The mirror's capability fingerprint is the
+# other half -- see _agg_cache_key, which is what every read and write of this
+# namespace goes through.
 KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v3"
 
 # Aggregation is process-wide serialized: it is I/O bound against a service that
@@ -441,7 +445,7 @@ class GalaxyService:
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
+        cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
 
         if aggregate is None:
@@ -477,12 +481,43 @@ class GalaxyService:
         Needs no Galaxy connection -- paging a cached aggregate is Redis plus
         the mirror -- so it is deliberately not gated on is_available().
         """
-        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
+        cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
         if aggregate is None:
             return None
         return await self._annotate_with_sra(
             self._page_kmindex(aggregate, job_id, limit, offset)
+        )
+
+    def _agg_cache_key(self, job_id: str) -> str:
+        """Where a job's aggregate lives, for the mirror we are serving from.
+
+        The mirror's capability set is part of the key, not just of the value.
+        A capability the mirror cannot serve is skipped rather than attempted,
+        and the result is a steady state worth caching for a day -- correct
+        while the process runs, because a file cannot grow a column underneath
+        it. But the whole point of the per-capability check is the window
+        where the backend is deployed ahead of a mirror rebuild, and that
+        window ends with a restart onto a wider file. Keyed on job id alone,
+        every aggregate computed during the window would keep serving without
+        geography for up to a day after the mirror that has it is live.
+
+        Folding the fingerprint in makes that restart a clean miss instead: one
+        re-aggregation per job at the moment the capability set actually
+        changes, and full-day caching either side of it. The alternative --
+        shortening the TTL whenever a capability was skipped -- would pay an
+        hourly re-aggregation for the entire deploy-ahead window rather than
+        one at the end of it, which is the cost the one-hour TTL exists to
+        bound in the first place.
+
+        @param job_id: the kmindex job.
+        @returns: the cache key.
+        """
+        fingerprint = (
+            self.sra_mirror.capability_fingerprint() if self.sra_mirror else "none"
+        )
+        return self.cache.make_key(
+            KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id, "mirror": fingerprint}
         )
 
     def _mirror_can(self, capability: str) -> bool:
@@ -637,7 +672,7 @@ class GalaxyService:
 
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
-        cache_key = self.cache.make_key(KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id})
+        cache_key = self._agg_cache_key(job_id)
 
         status = await self.get_job_status(job_id)
         if not status.is_complete:
