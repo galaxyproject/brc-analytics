@@ -35,6 +35,32 @@ const SESSION_KEY = "brc-assistant-session-id";
 const STORED_ID = "stored1111222233334444555566667777";
 
 /**
+ * Shaped like the ky HTTPError the client throws -- the hook reads
+ * `.response.status` to tell a permanent refusal from a transient one.
+ * @param status - HTTP status to attach
+ * @returns An error carrying that status
+ */
+function httpError(status: number): Error & { response: { status: number } } {
+  return Object.assign(new Error(`${status}`), { response: { status } });
+}
+
+/**
+ * A chat response for the turn that re-runs the auto-save effect.
+ * @returns The payload assistantChat resolves with
+ */
+function chatReply(): Awaited<ReturnType<typeof mockClient.assistantChat>> {
+  return {
+    handoff_url: null,
+    is_complete: false,
+    reply: "ok",
+    saved: false,
+    schema_state: null,
+    session_id: STORED_ID,
+    suggestions: [],
+  } as unknown as Awaited<ReturnType<typeof mockClient.assistantChat>>;
+}
+
+/**
  * Put the hook in a given auth state.
  * @param isAuthenticated - Whether someone is signed in
  */
@@ -138,6 +164,54 @@ describe("useAssistantChat auto-save", () => {
     expect(result.current.isSaved).toBe(false);
   });
 
+  test("a save that could succeed later is tried again", async () => {
+    // The latch goes down before the request goes out, so leaving it down
+    // after a transient failure means this session is never saved again --
+    // and this effect exists for the user who signed in to keep what is on
+    // screen and then sends nothing more.
+    auth(true);
+    mockClient.assistantSaveSession.mockRejectedValue(
+      new Error("network down")
+    );
+    mockClient.assistantChat.mockResolvedValue(chatReply());
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+    );
+
+    await act(async () => {
+      await result.current.sendMessage("still here");
+    });
+
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(2)
+    );
+  });
+
+  test("a deployment that cannot save is not asked twice", async () => {
+    // 501 is the answer for a deployment with OIDC on and no database. No
+    // retry changes it, so the latch stays down and the requests stop.
+    auth(true);
+    mockClient.assistantSaveSession.mockRejectedValue(httpError(501));
+    mockClient.assistantChat.mockResolvedValue(chatReply());
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+    );
+
+    await act(async () => {
+      await result.current.sendMessage("still here");
+    });
+
+    expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1);
+  });
+
   test("a turn is only called saved when the backend says it wrote it", async () => {
     auth(true);
     localStorage.clear();
@@ -180,10 +254,8 @@ describe("useAssistantChat auto-save", () => {
   });
 
   test("the save is attempted once per session, not once per render", async () => {
-    // A deployment with no database configured refuses every one of these.
-    // Retrying on each state change would turn that into a request per turn.
     auth(true);
-    mockClient.assistantSaveSession.mockRejectedValue(new Error("no database"));
+    mockClient.assistantSaveSession.mockRejectedValue(httpError(501));
 
     const { rerender, result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
