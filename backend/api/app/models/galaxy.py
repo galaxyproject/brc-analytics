@@ -260,14 +260,6 @@ class KmindexGeography(BaseModel):
     defect this exists to fix.
     """
 
-    continents: List[KmindexFacetValue] = Field(
-        default=[],
-        description="Continent rollup, derived from the ISO table rather than "
-        "read from the mirror -- the deployed schema_version 3 file has no "
-        "continent column. Covers every run with a country code, including "
-        "ones the map cannot draw, so these totals are allowed to exceed the "
-        "sum of `countries`",
-    )
     countries: List[KmindexGeographyCountry] = Field(
         default=[],
         description="Every country in the match set that the committed "
