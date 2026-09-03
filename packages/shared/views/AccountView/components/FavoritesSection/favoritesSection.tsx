@@ -1,3 +1,4 @@
+import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { Button, Typography } from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import {
@@ -24,7 +25,8 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
   // AccountSection's own error prop (that would render a second alert here).
   const { error, favorites, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
-  const { emptyState, entityRoute, title } = ENTITY_TYPE_DISPLAY[entityType];
+  const { emptyState, route, sectionId, title } =
+    ENTITY_TYPE_DISPLAY[entityType];
 
   const items = useMemo(
     () => favorites.filter((favorite) => favorite.entity_type === entityType),
@@ -43,7 +45,7 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
           </Typography>
         )
       }
-      id={entityRoute}
+      id={sectionId}
       isLoading={isLoading}
       title={title}
     >
@@ -54,7 +56,11 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
                 <>
                   <Button
                     LinkComponent={Link}
-                    href={`/data/${entityRoute}/${sanitizeEntityId(favorite.entity_id)}`}
+                    href={replaceParameters(route, {
+                      entityId: encodeURIComponent(
+                        sanitizeEntityId(favorite.entity_id)
+                      ),
+                    })}
                     variant="outlined"
                   >
                     Open

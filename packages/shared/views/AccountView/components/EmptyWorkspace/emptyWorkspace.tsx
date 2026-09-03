@@ -1,4 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { type JSX } from "react";
 
@@ -19,17 +20,13 @@ export function EmptyWorkspace(): JSX.Element {
         here yet -- start anywhere.
       </Typography>
       <Stack direction={{ sm: "row", xs: "column" }} spacing={2}>
-        <Button
-          LinkComponent={Link}
-          href="/data/assemblies"
-          variant="contained"
-        >
+        <Button LinkComponent={Link} href={ROUTES.GENOMES} variant="contained">
           Browse assemblies
         </Button>
         <Button LinkComponent={Link} href="/assistant" variant="outlined">
           Ask the assistant
         </Button>
-        <Button LinkComponent={Link} href="/data/workflows" variant="outlined">
+        <Button LinkComponent={Link} href={ROUTES.WORKFLOWS} variant="outlined">
           Explore workflows
         </Button>
       </Stack>
