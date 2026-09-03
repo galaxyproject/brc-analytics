@@ -277,6 +277,32 @@ class TestCapabilityGating:
         assert cohort is not None and cohort["in_mirror"] == 3
         assert svc.runs_by_accession(["SRR001"])["SRR001"]["country"] == "Kenya"
 
+    def test_schema_version_is_read_and_reported(self, tmp_path, caplog):
+        path = str(tmp_path / "stamped.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("INSERT INTO mirror_meta VALUES ('schema_version', '3')")
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+
+        with caplog.at_level(logging.INFO):
+            svc = SRAMirrorService(path)
+
+        assert svc.schema_version == "3"
+        assert svc._provenance([])["mirror_schema_version"] == "3"
+        # The version is on the line that says what is missing, because that
+        # is the line an operator has to act on.
+        warning = next(
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING
+        )
+        assert "3" in warning and "mbases" in warning
+
+    def test_unstamped_mirror_still_loads(self, mirror):
+        # The stamp is reported, never enforced -- the column check decides.
+        assert mirror.schema_version is None
+        assert mirror.is_available()
+        assert mirror.has_capability("geography")
+
     def test_unknown_capability_is_not_available(self, mirror):
         assert mirror.has_capability("teleportation") is False
 

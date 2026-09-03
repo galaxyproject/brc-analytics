@@ -794,14 +794,17 @@ class SRAMirrorService:
                 if not set(needed) <= columns
             }
             logger.info(
-                "SRA mirror loaded: %s rows, built %s",
+                "SRA mirror loaded: %s rows, schema_version %s, built %s",
                 f"{total_runs:,}",
+                self.schema_version or "unknown",
                 meta.get("mirror_built_at", "unknown"),
             )
             for capability, missing in sorted(self._missing_columns.items()):
                 logger.warning(
-                    "SRA mirror capability %r unavailable: runs is missing %s",
+                    "SRA mirror capability %r unavailable: schema_version %s "
+                    "is missing %s on runs",
                     capability,
+                    self.schema_version or "unknown",
                     ", ".join(missing),
                 )
             return
@@ -814,6 +817,19 @@ class SRAMirrorService:
 
     def is_available(self) -> bool:
         return self._con is not None
+
+    @property
+    def schema_version(self) -> Optional[str]:
+        """The mirror's own stamp of what shape it is, or None.
+
+        The builder has written this since it was introduced and nothing has
+        ever read it, so the drift it exists to reveal -- a deployed file at 3
+        against a builder stamping 5 -- has only ever been discoverable by
+        opening the file by hand. It is reported rather than enforced: the
+        column check above is what decides whether a query can run, and a
+        version gate on top of it would fail files that are actually fine.
+        """
+        return self._meta.get("schema_version")
 
     def has_capability(self, capability: str) -> bool:
         """Whether the mirror this process opened can answer for `capability`.
@@ -848,6 +864,7 @@ class SRAMirrorService:
         # release as unknown against half the files we might be pointed at.
         return {
             "mirror_built_at": self._meta.get("mirror_built_at"),
+            "mirror_schema_version": self.schema_version,
             "taxdump_version": self._meta.get("ncbi_taxdump_version")
             or self._meta.get("taxdump_version"),
             "total_runs_in_mirror": self._total_runs,
