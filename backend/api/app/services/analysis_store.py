@@ -31,6 +31,16 @@ logger = logging.getLogger(__name__)
 TITLE_MAX_LENGTH = 80
 
 
+class UnprovisionedUserError(Exception):
+    """The session's owner has no users row.
+
+    Distinct from "nothing to save": the conversation is fine and the caller
+    is authenticated, but there is no account to hang the row on -- a DB
+    restore or a manual cleanup, which `get_current_user_db` already treats as
+    reachable. Without this it looked identical to an empty conversation.
+    """
+
+
 def _session_label(state: SessionState) -> str | None:
     """Best-effort session id for the error paths, which must not raise."""
     try:
@@ -76,6 +86,15 @@ async def record(state: SessionState) -> str | None:
         logger.warning("Auto-save timed out for session %s", _session_label(state))
         sentry_sdk.capture_message("Assistant auto-save timed out", level="warning")
         return None
+    except UnprovisionedUserError:
+        # Every turn of this conversation will fail the same way, and silently
+        # before now: the user is authenticated against a users row that is
+        # gone, so nothing is being kept for them at all.
+        logger.exception(
+            "Auto-save found no user row for session %s", _session_label(state)
+        )
+        sentry_sdk.capture_exception()
+        return None
     except Exception:
         logger.exception(
             "Failed to auto-save analysis for session %s", _session_label(state)
@@ -111,7 +130,7 @@ async def _write(state: SessionState) -> str | None:
     async with db_session() as session:
         user = await get_user_by_keycloak_sub(session, state.owner_keycloak_sub)
         if user is None:
-            return None
+            raise UnprovisionedUserError(state.owner_keycloak_sub)
         saved = await upsert_saved_analysis(
             session,
             user,

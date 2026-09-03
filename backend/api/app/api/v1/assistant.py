@@ -287,6 +287,14 @@ async def save_session_to_account(
 
     try:
         saved_analysis_id = await analysis_store.persist(state)
+    except analysis_store.UnprovisionedUserError as e:
+        # Not "nothing to save" -- there is a conversation and a caller, but no
+        # account row to hang it on. Same answer get_current_user_db gives for
+        # the same condition.
+        logger.exception("No user row to save session %s against", session_id)
+        raise HTTPException(
+            status_code=503, detail="Authenticated user is not provisioned"
+        ) from e
     except Exception as e:
         logger.exception("Failed to save session %s to account", session_id)
         raise HTTPException(

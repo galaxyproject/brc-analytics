@@ -701,6 +701,30 @@ def test_saving_an_empty_session_is_not_reported_as_saved(persistence_client):
     assert client.get("/api/v1/saved_analyses").json() == []
 
 
+def test_saving_without_a_user_row_is_not_reported_as_nothing_to_save(
+    persistence_client,
+):
+    """Both used to return None from persist() and land on 409 "Nothing to
+    save yet" -- which reads as "your conversation is empty" to a user whose
+    account row is simply gone."""
+    client, _session_factory, current_sub, agent = persistence_client
+
+    session_id = uuid4().hex
+    agent.session_service.sessions[session_id] = SessionState(
+        session_id=session_id,
+        owner_keycloak_sub="user-gone",
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+    )
+    # Authenticated as the session's own owner -- the JWT is valid, the users
+    # row it names is not there.
+    current_sub["value"] = "user-gone"
+
+    response = client.post(f"/api/v1/assistant/session/{session_id}/save")
+
+    assert response.status_code == 503
+    assert "not provisioned" in response.json()["detail"]
+
+
 def test_saving_an_expired_session_is_a_404(persistence_client):
     client, _session_factory, _current_sub, _agent = persistence_client
 
