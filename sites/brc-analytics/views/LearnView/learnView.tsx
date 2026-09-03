@@ -1,11 +1,12 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { SectionContentCards } from "@repo/shared/views/docs/components/SectionContentCards/sectionContentCards";
 import { ContentIndexView } from "@repo/shared/views/docs/ContentIndexView/contentIndexView";
 import { type JSX } from "react";
 import { getFilteredCards } from "./utils";
 
 export const LearnView = (): JSX.Element => {
-  const isLmlsEnabled = useFeatureFlag("lmls");
+  const isLmlsEnabled = useFeatureFlag(FEATURE_FLAGS.LMLS);
   const cards = getFilteredCards(isLmlsEnabled);
   return (
     <ContentIndexView
