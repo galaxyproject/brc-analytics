@@ -598,7 +598,7 @@ describe("the geography block", () => {
     const { container } = renderCohort(WITH_GEOGRAPHY);
 
     expect(container.textContent).toContain(
-      "222,921 of those runs come from one place the map cannot draw"
+      "222,921 of those runs come from one place the map cannot colour"
     );
     expect(container.textContent).toContain("Hong Kong (222,921)");
   });
