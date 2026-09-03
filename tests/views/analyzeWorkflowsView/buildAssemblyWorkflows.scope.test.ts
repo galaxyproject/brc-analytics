@@ -8,6 +8,7 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
+import { buildWorkflowGates } from "../../workflow/gates";
 
 describe("buildAssemblyWorkflows - scope filtering", () => {
   const ASSEMBLY: BRCDataCatalogGenome = {
@@ -74,7 +75,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0].workflows).toHaveLength(1);
@@ -105,7 +110,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0].workflows).toHaveLength(1);
@@ -136,7 +145,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     // Category should be omitted because it has no compatible workflows
     expect(result).toHaveLength(0);
@@ -166,7 +179,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     // Category should be omitted because it has no compatible workflows
     expect(result).toHaveLength(0);
@@ -220,7 +237,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0].workflows).toHaveLength(1);
@@ -258,7 +279,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     const transcriptomics = result.find(
       ({ category }) => category === WorkflowCategoryId.TRANSCRIPTOMICS
@@ -296,7 +321,11 @@ describe("buildAssemblyWorkflows - scope filtering", () => {
       },
     ];
 
-    const result = buildAssemblyWorkflows(ASSEMBLY, categories);
+    const result = buildAssemblyWorkflows(
+      ASSEMBLY,
+      categories,
+      buildWorkflowGates()
+    );
 
     // Category should be included because showComingSoon is true
     expect(result).toHaveLength(1);

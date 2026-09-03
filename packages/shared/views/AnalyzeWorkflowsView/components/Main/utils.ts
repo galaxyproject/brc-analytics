@@ -5,6 +5,7 @@ import {
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import type { WorkflowGates } from "@repo/shared/workflow/featureFlags";
 import {
   workflowPloidyMatchesOrganismPloidy,
   workflowRequiresAssemblyId,
@@ -15,29 +16,26 @@ import {
  * Differential Expression Analysis is added to the Transcriptomics category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
- * @param isAssemblyWorkflowsEnabled - Whether assembly workflows are enabled.
+ * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(
   assembly: AssemblyContract,
   allWorkflowCategories: WorkflowCategory[],
-  isAssemblyWorkflowsEnabled = false
+  workflowGates: WorkflowGates
 ): WorkflowCategory[] {
   const workflowCategories: WorkflowCategory[] = [];
 
-  for (const workflowCategory of allWorkflowCategories) {
-    if (
-      workflowCategory.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
-      !isAssemblyWorkflowsEnabled
-    )
-      continue;
-
+  for (const workflowCategory of workflowGates.filterCategories(
+    allWorkflowCategories
+  )) {
     const { workflows: categoryWorkflows } = workflowCategory;
 
     // Filter workflows to only include those that are compatible with the given assembly
     // and have ASSEMBLY scope (or no scope specified, which defaults to ASSEMBLY).
     const compatibleWorkflows = categoryWorkflows.filter(
       (workflow) =>
+        workflowGates.isWorkflowAllowed(workflow) &&
         workflowIsCompatibleWithAssembly(workflow, assembly) &&
         workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );

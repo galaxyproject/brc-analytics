@@ -2,6 +2,7 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { filterFlagGatedWorkflowCategories } from "@repo/shared/workflow/featureFlags";
 import { WorkflowCategoryId } from "../../catalog/schema/generated/schema";
+import { buildWorkflowFeatureFlags } from "./gates";
 
 describe("filterFlagGatedWorkflowCategories", () => {
   const GATED = buildWorkflowCategory(WorkflowCategoryId.ASSEMBLY);
@@ -12,17 +13,18 @@ describe("filterFlagGatedWorkflowCategories", () => {
 
   it("returns a gated category when its feature flag is enabled", () => {
     expect(
-      filterFlagGatedWorkflowCategories([GATED], {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-      })
+      filterFlagGatedWorkflowCategories(
+        [GATED],
+        buildWorkflowFeatureFlags({
+          [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
+        })
+      )
     ).toEqual([GATED]);
   });
 
   it("filters out a gated category when its feature flag is disabled", () => {
     expect(
-      filterFlagGatedWorkflowCategories([GATED], {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
-      })
+      filterFlagGatedWorkflowCategories([GATED], buildWorkflowFeatureFlags())
     ).toEqual([]);
   });
 
@@ -33,33 +35,36 @@ describe("filterFlagGatedWorkflowCategories", () => {
       buildWorkflowCategory
     );
     expect(
-      filterFlagGatedWorkflowCategories(inherited, {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
-      })
+      filterFlagGatedWorkflowCategories(inherited, buildWorkflowFeatureFlags())
     ).toEqual(inherited);
   });
 
   it("returns categories that no feature flag gates, whatever the flag state", () => {
     expect(
-      filterFlagGatedWorkflowCategories([UNGATED, UNKNOWN], {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
-      })
+      filterFlagGatedWorkflowCategories(
+        [UNGATED, UNKNOWN],
+        buildWorkflowFeatureFlags()
+      )
     ).toEqual([UNGATED, UNKNOWN]);
   });
 
   it("filters only the gated categories, preserving order", () => {
     expect(
-      filterFlagGatedWorkflowCategories([UNGATED, GATED, UNKNOWN], {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
-      })
+      filterFlagGatedWorkflowCategories(
+        [UNGATED, GATED, UNKNOWN],
+        buildWorkflowFeatureFlags()
+      )
     ).toEqual([UNGATED, UNKNOWN]);
   });
 
   it("returns an empty list unchanged", () => {
     expect(
-      filterFlagGatedWorkflowCategories([], {
-        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-      })
+      filterFlagGatedWorkflowCategories(
+        [],
+        buildWorkflowFeatureFlags({
+          [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
+        })
+      )
     ).toEqual([]);
   });
 });
