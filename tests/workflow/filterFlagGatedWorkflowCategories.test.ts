@@ -26,6 +26,19 @@ describe("filterFlagGatedWorkflowCategories", () => {
     ).toEqual([]);
   });
 
+  it("returns categories named after an inherited object member", () => {
+    // Nothing in the schema produces these, but the lookup must miss rather
+    // than resolve `Object.prototype` and report the category as gated.
+    const inherited = ["toString", "constructor", "__proto__"].map(
+      buildWorkflowCategory
+    );
+    expect(
+      filterFlagGatedWorkflowCategories(inherited, {
+        [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
+      })
+    ).toEqual(inherited);
+  });
+
   it("returns categories that no feature flag gates, whatever the flag state", () => {
     expect(
       filterFlagGatedWorkflowCategories([UNGATED, UNKNOWN], {
