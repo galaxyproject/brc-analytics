@@ -1,3 +1,4 @@
+import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import {
   bindWorkflowFeatureFlags,
@@ -17,15 +18,23 @@ const ALL_DISABLED: WorkflowFeatureFlags = {
 };
 
 /**
- * Builds a complete flag state for a test, with every flag disabled unless the
- * test names it.
- * @param featureFlags - Flags to enable for this test.
- * @returns Enabled state of every workflow-gating feature flag.
+ * Builds a workflow category with the given ID and workflows. Only `category`
+ * and `workflows` are read by the gating rules, so the rest are placeholders.
+ * @param category - Workflow category ID.
+ * @param trsIds - TRS IDs of the category's workflows.
+ * @returns Workflow category.
  */
-export function buildWorkflowFeatureFlags(
-  featureFlags: Partial<WorkflowFeatureFlags> = {}
-): WorkflowFeatureFlags {
-  return { ...ALL_DISABLED, ...featureFlags };
+export function buildWorkflowCategory(
+  category: string,
+  trsIds: string[] = []
+): WorkflowCategory {
+  return {
+    category,
+    description: "desc",
+    name: category.toLowerCase(),
+    showComingSoon: false,
+    workflows: trsIds.map((trsId) => ({ trsId })),
+  } as WorkflowCategory;
 }
 
 /**
@@ -37,5 +46,5 @@ export function buildWorkflowFeatureFlags(
 export function buildWorkflowGates(
   featureFlags: Partial<WorkflowFeatureFlags> = {}
 ): WorkflowGates {
-  return bindWorkflowFeatureFlags(buildWorkflowFeatureFlags(featureFlags));
+  return bindWorkflowFeatureFlags({ ...ALL_DISABLED, ...featureFlags });
 }
