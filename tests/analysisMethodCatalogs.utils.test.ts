@@ -8,6 +8,7 @@ import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
 import type { BRCDataCatalogGenome } from "../sites/brc-analytics/apis/assembly";
+import { buildWorkflowGates } from "./workflow/gates";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [
@@ -148,7 +149,8 @@ describe("buildAssemblyWorkflows", () => {
   test("filters and sorts workflow categories", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES
+      WORKFLOW_CATEGORIES,
+      buildWorkflowGates()
     );
 
     expect(result.map((c) => c.category)).toEqual([
@@ -165,7 +167,8 @@ describe("buildAssemblyWorkflows", () => {
   test("includes differential expression workflow as first in transcriptomics", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES
+      WORKFLOW_CATEGORIES,
+      buildWorkflowGates()
     );
 
     const transcriptomics = result.find(

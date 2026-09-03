@@ -1,4 +1,3 @@
-import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
 import type {
   AssemblyContract,
   OrganismContract,
@@ -9,8 +8,8 @@ import type {
 } from "@repo/shared/apis/workflow";
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import type { WorkflowGates } from "@repo/shared/workflow/featureFlags";
+import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
@@ -56,46 +55,23 @@ function getTaxonomicLevelRealm(
 }
 
 /**
- * Checks if a workflow should be included based on feature flags.
- * @param workflow - Workflow to check.
- * @param workflow.trsId - TRS ID of the workflow.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
- * @returns True if the workflow should be included, false otherwise.
- */
-function shouldIncludeWorkflow(
-  workflow: { trsId: string },
-  isHyphyEnabled: boolean
-): boolean {
-  const isHyphyWorkflow = workflow.trsId.startsWith(
-    "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/"
-  );
-
-  return !isHyphyWorkflow || isHyphyEnabled;
-}
-
-/**
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
  * Differential Expression Analysis is always included as an interim measure.
- * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
- * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
- * Assembly workflows are conditionally included based on the 'assembly-workflows' feature flag.
+ * Sequence Analysis workflows (Logan Search and Lexicmap) are appended rather
+ * than sourced from the catalog, and gate through the same rules as the rest.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
- * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
- * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
+ * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
  * @returns An array of workflows, where each workflow is a combination of a workflow and its category name.
  */
 export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
   organisms: OrganismContract[],
-  isAssemblyWorkflowsEnabled = false,
-  isLmlsEnabled = false,
-  isHyphyEnabled = false
+  workflowGates: WorkflowGates
 ): WorkflowEntity[] {
   const workflows: WorkflowEntity[] = [];
 
@@ -106,19 +82,9 @@ export function getWorkflows(
     mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
-  for (const category of workflowCategories) {
+  for (const category of workflowGates.filterCategories(workflowCategories)) {
     if (!category.workflows) continue;
-    if (
-      category.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
-      !isAssemblyWorkflowsEnabled
-    )
-      continue;
     for (const workflow of category.workflows) {
-      // Skip workflows based on feature flags.
-      if (!shouldIncludeWorkflow(workflow, isHyphyEnabled)) {
-        continue;
-      }
-
       // Skip workflows whose minimum assembly requirement cannot be met.
       const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;
       if (!workflowMeetsAssemblyMinimum(workflow.assemblyCountMin, count)) {
@@ -146,21 +112,15 @@ export function getWorkflows(
     taxonomyId: TAXON_ANY,
   } as WorkflowEntity);
 
-  // Add LMLS workflows if feature flag is enabled.
-  if (isLmlsEnabled) {
+  // Sequence Analysis workflows aren't in the catalog, so they're appended
+  // here — through the same gate as every catalog workflow above.
+  for (const workflow of LMLS_WORKFLOWS) {
+    if (!workflowGates.isWorkflowAllowed(workflow)) continue;
     workflows.push({
-      ...LOGAN_SEARCH,
+      ...workflow,
       assembly: mapAssembly(undefined),
       category: "Sequence Analysis",
-      scope: String(LOGAN_SEARCH.scope),
-      taxonomyId: TAXON_ANY,
-    } as WorkflowEntity);
-
-    workflows.push({
-      ...LEXICMAP,
-      assembly: mapAssembly(undefined),
-      category: "Sequence Analysis",
-      scope: String(LEXICMAP.scope),
+      scope: String(workflow.scope),
       taxonomyId: TAXON_ANY,
     } as WorkflowEntity);
   }

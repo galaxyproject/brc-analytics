@@ -1,6 +1,6 @@
-import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { type OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
+import { useWorkflowFeatureFlags } from "@repo/shared/hooks/UseWorkflowFeatureFlags/hook";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
@@ -19,9 +19,7 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<OrganismContract>();
-  const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
-  const isHyphyEnabled = useFeatureFlag("hyphy");
-  const isLmlsEnabled = useFeatureFlag("lmls");
+  const workflowGates = useWorkflowFeatureFlags();
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
   );
@@ -42,23 +40,9 @@ export const WorkflowsView = (): JSX.Element => {
   const workflows = useMemo(
     () =>
       mappings
-        ? getWorkflows(
-            workflowCategories,
-            mappings,
-            organisms,
-            isAssemblyWorkflowsEnabled,
-            isLmlsEnabled,
-            isHyphyEnabled
-          )
+        ? getWorkflows(workflowCategories, mappings, organisms, workflowGates)
         : [],
-    [
-      isAssemblyWorkflowsEnabled,
-      isHyphyEnabled,
-      isLmlsEnabled,
-      mappings,
-      organisms,
-      workflowCategories,
-    ]
+    [mappings, organisms, workflowCategories, workflowGates]
   );
 
   return <ExploreView data={workflows} Component={Workflows} />;
