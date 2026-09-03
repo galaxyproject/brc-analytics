@@ -915,6 +915,176 @@ class TestCohortForAccessions:
         assert hasattr(SRAMirrorService.runs_by_accession, "__wrapped__")
 
 
+def _build_geography_mirror(path: str) -> list:
+    """A mirror carrying every shape of country value the map has to handle.
+
+    Not a realistic distribution -- a deliberate one. It has a country the
+    committed asset can draw, one it cannot (Singapore has an ISO code and no
+    shape at 1:110m), one that is not a country at all (Borneo), two raw
+    values that share a code (Gaza Strip and West Bank are both PSE), and all
+    three ways a run can have no country: NULL, empty string, and SRA's
+    'uncalculated' sentinel.
+
+    Returns every accession inserted.
+    """
+    _build_mirror(path)
+    con = duckdb.connect(path)
+    con.execute("DELETE FROM runs")
+
+    rows = []
+
+    def add(n, country):
+        for _ in range(n):
+            rows.append((f"SRRG{len(rows):05d}", country))
+
+    add(40, "USA")
+    add(12, "Malawi")
+    add(7, "Singapore")
+    add(5, "Borneo")
+    add(3, "Gaza Strip")
+    add(2, "West Bank")
+    add(6, "uncalculated")
+    add(4, None)
+    add(1, "")
+
+    con.executemany(
+        "INSERT INTO runs VALUES (?,'SRP1','PRJNA1','Escherichia coli','WGS',"
+        "'ILLUMINA','Illumina MiSeq','PAIRED', DATE '2020-06-01', ?, 1)",
+        [(acc, country) for acc, country in rows],
+    )
+    con.close()
+    return [acc for acc, _country in rows]
+
+
+@pytest.fixture()
+def geography_mirror(tmp_path):
+    path = str(tmp_path / "geography-mirror.duckdb")
+    accessions = _build_geography_mirror(path)
+    svc = SRAMirrorService(path)
+    assert svc.is_available()
+    return svc, accessions
+
+
+class TestGeographyForAccessions:
+    """Every country in the match set, and the runs that recorded none.
+
+    The cohort's country facet lists ten values and rolls the rest into
+    `other`, which renders the reference job's 42 countries as ten bars. A
+    choropleth needs all of them. And it needs the unrecorded share as a
+    number of its own: 80.8% of that cohort has no country, and a map drawing
+    42 countries without saying so is the failure this feature exists to fix.
+    """
+
+    def test_every_country_is_listed_not_just_a_head(self, geography_mirror):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert [c["value"] for c in geography["countries"]] == [
+            "USA",
+            "Malawi",
+            "Singapore",
+            "Borneo",
+            "Gaza Strip",
+            "West Bank",
+        ]
+        assert geography["countries"][0]["count"] == 40
+
+    def test_the_parts_reconcile_against_in_mirror(self, geography_mirror):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        listed = sum(c["count"] for c in geography["countries"])
+        assert listed == geography["recorded"] == 69
+        assert geography["unknown"] == 11
+        assert geography["in_mirror"] == len(accessions) == 80
+        assert listed + geography["unknown"] == geography["in_mirror"]
+
+    def test_the_three_absences_all_count_as_unknown(self, geography_mirror):
+        # NULL, '', and 'uncalculated' -- 4 + 1 + 6. The sentinel is the one
+        # that matters: counted as a value it would invent a country, and it
+        # would also disagree with the country bars on the same card, which
+        # fold it into `unknown` too.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert geography["unknown"] == 11
+        assert "uncalculated" not in [c["value"] for c in geography["countries"]]
+        assert "" not in [c["value"] for c in geography["countries"]]
+
+    def test_it_agrees_with_the_cohort_facet_on_the_same_hits(self, geography_mirror):
+        # The two render side by side. If they disagreed about how much
+        # geography a cohort has, one of them would be lying on screen.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+        cohort = svc.cohort_for_accessions(accessions)
+        country_facet = next(f for f in cohort["facets"] if f["name"] == "country")
+
+        assert country_facet["unknown"] == geography["unknown"]
+        listed = sum(v["count"] for v in country_facet["values"])
+        assert listed + country_facet["other"] == geography["recorded"]
+
+    def test_counts_are_over_every_accession_not_a_page(self, geography_mirror):
+        svc, accessions = geography_mirror
+        head = svc.geography_for_accessions(accessions[:10])
+        whole = svc.geography_for_accessions(accessions)
+
+        assert head["in_mirror"] == 10
+        assert whole["in_mirror"] == 80
+
+    def test_duplicate_and_scruffy_accessions_are_deduplicated(self, geography_mirror):
+        svc, accessions = geography_mirror
+        messy = [f"  {a.lower()}  " for a in accessions] + accessions
+        assert svc.geography_for_accessions(messy)["in_mirror"] == 80
+
+    def test_accessions_the_mirror_does_not_know_are_simply_absent(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions + ["SRR_NOT_HERE"])
+        # in_mirror counts mirrored rows, so a Logan hit the mirror was never
+        # built to carry lowers the denominator rather than becoming unknown.
+        assert geography["in_mirror"] == 80
+
+    def test_no_accessions_is_none_not_a_shell_of_zeroes(self, geography_mirror):
+        svc, _accessions = geography_mirror
+        assert svc.geography_for_accessions([]) is None
+        assert svc.geography_for_accessions(["", "   "]) is None
+
+    def test_an_unavailable_mirror_answers_none(self):
+        svc = SRAMirrorService("")
+        assert svc.geography_for_accessions(["SRR001"]) is None
+
+    def test_a_mirror_without_the_columns_answers_none_without_querying(
+        self, tmp_path, monkeypatch
+    ):
+        # Fails closed on geography alone. The cohort on the same file still
+        # answers, which is the whole point of the per-capability check.
+        monkeypatch.setitem(
+            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
+        )
+        path = str(tmp_path / "geography-behind.duckdb")
+        accessions = _build_geography_mirror(path)
+        svc = SRAMirrorService(path)
+
+        assert svc.geography_for_accessions(accessions) is None
+        assert svc.cohort_for_accessions(accessions)["in_mirror"] == 80
+
+    def test_the_cached_payload_cannot_be_mutated_by_a_caller(self, geography_mirror):
+        svc, accessions = geography_mirror
+        first = svc.geography_for_accessions(accessions)
+        first["recorded"] = -1
+        first["countries"].append({"count": 1, "value": "BOGUS"})
+
+        second = svc.geography_for_accessions(accessions)
+        assert second["recorded"] == 69
+        assert all(c["value"] != "BOGUS" for c in second["countries"])
+
+    def test_geography_method_is_not_wrapped_in_the_lock_decorator(self):
+        # Same shape of query as the cohort over the same 43.5M-row table, so
+        # it must not hold the instance lock either.
+        assert not hasattr(SRAMirrorService.geography_for_accessions, "__wrapped__")
+
+
 @pytest.fixture()
 def exports(tmp_path):
     """A writable export directory of its own.
