@@ -4,23 +4,27 @@ import {
   FEATURE_FLAGS,
   type FeatureFlag,
 } from "@repo/shared/config/featureFlags";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import { isLmlsWorkflow } from "@repo/shared/workflow/lmls";
 
 /**
  * A workflow whose visibility can be decided from its TRS ID alone — the only
  * field the gating rules read, so callers can pass a full workflow or a stub.
  */
-interface GatedWorkflow {
+export interface GatedWorkflow {
   trsId: string;
 }
 
 /**
- * Rule matching the workflows a single feature flag gates.
+ * The gating rules bound to a resolved flag state — the single answer to "may
+ * this be shown". Each method is complete for what it takes: `filterCategories`
+ * applies the category and the workflow rules together, so a caller holding
+ * categories cannot apply half the rule.
  */
-interface WorkflowGate {
-  featureFlag: FeatureFlag;
-  matches: (trsId: string) => boolean;
+export interface WorkflowGates {
+  filterCategories: (
+    workflowCategories: WorkflowCategory[]
+  ) => WorkflowCategory[];
+  isWorkflowAllowed: (workflow: GatedWorkflow) => boolean;
 }
 
 /**
@@ -30,16 +34,6 @@ interface WorkflowGate {
 const FEATURE_FLAG_BY_CATEGORY = {
   [WORKFLOW_CATEGORY_ID.ASSEMBLY]: FEATURE_FLAGS.ASSEMBLY_WORKFLOWS,
 } as const satisfies Partial<Record<WORKFLOW_CATEGORY_ID, FeatureFlag>>;
-
-/**
- * Lookup view of the gating map. A Map because the catalog types `category` as
- * a plain string: `get` misses cleanly for any category the map doesn't hold,
- * where indexing an object would resolve inherited members such as `toString`
- * and report a category as gated.
- */
-const featureFlagByCategory = new Map<string, WorkflowCategoryFeatureFlag>(
-  Object.entries(FEATURE_FLAG_BY_CATEGORY)
-);
 
 /**
  * TRS ID prefix identifying the Hyphy workflow. A prefix rather than an exact
@@ -52,31 +46,24 @@ const HYPHY_TRS_ID_PREFIX =
  * Which feature flag gates which individual workflows. Workflows matched by no
  * gate are never gated.
  */
-const WORKFLOW_GATES = [
-  {
-    featureFlag: FEATURE_FLAGS.HYPHY,
-    matches: (trsId: string): boolean => trsId.startsWith(HYPHY_TRS_ID_PREFIX),
-  },
-  {
-    featureFlag: FEATURE_FLAGS.LMLS,
-    matches: (trsId: string): boolean =>
-      trsId === LEXICMAP.trsId || trsId === LOGAN_SEARCH.trsId,
-  },
-] as const satisfies readonly WorkflowGate[];
+const WORKFLOW_GATES = {
+  [FEATURE_FLAGS.HYPHY]: (trsId: string): boolean =>
+    trsId.startsWith(HYPHY_TRS_ID_PREFIX),
+  [FEATURE_FLAGS.LMLS]: isLmlsWorkflow,
+} as const satisfies Partial<Record<FeatureFlag, (trsId: string) => boolean>>;
 
 /**
  * A feature flag that gates a workflow category, derived from the gating map so
  * the set cannot drift from the flags actually in use there.
  */
-export type WorkflowCategoryFeatureFlag =
+type WorkflowCategoryFeatureFlag =
   (typeof FEATURE_FLAG_BY_CATEGORY)[keyof typeof FEATURE_FLAG_BY_CATEGORY];
 
 /**
  * A feature flag that gates individual workflows, derived from the gates so the
  * set cannot drift from the flags actually in use there.
  */
-export type WorkflowFeatureFlag =
-  (typeof WORKFLOW_GATES)[number]["featureFlag"];
+type WorkflowFeatureFlag = keyof typeof WORKFLOW_GATES;
 
 /**
  * Enabled state of every feature flag that gates workflow content, at either
@@ -90,15 +77,23 @@ export type WorkflowFeatureFlags = Record<
 >;
 
 /**
- * The gating rules bound to a resolved flag state — the single answer to "may
- * this content be shown", at both the category and the workflow level.
+ * Lookup view of the category gating map. A Map because the catalog types
+ * `category` as a plain string: `get` misses cleanly for any category the map
+ * doesn't hold, where indexing an object would resolve inherited members such
+ * as `toString` and report a category as gated.
  */
-export interface WorkflowGates {
-  filterCategories: (
-    workflowCategories: WorkflowCategory[]
-  ) => WorkflowCategory[];
-  isWorkflowAllowed: (workflow: GatedWorkflow) => boolean;
-}
+const featureFlagByCategory = new Map<string, WorkflowCategoryFeatureFlag>(
+  Object.entries(FEATURE_FLAG_BY_CATEGORY)
+);
+
+/**
+ * Lookup view of the workflow gates, typed by the flags they belong to — the
+ * one place the record's keys are named, so the checks below stay cast-free.
+ */
+const workflowGateEntries = Object.entries(WORKFLOW_GATES) as [
+  WorkflowFeatureFlag,
+  (trsId: string) => boolean,
+][];
 
 /**
  * Binds the gating rules to a resolved flag state. Pure, so build-time code and
@@ -118,18 +113,36 @@ export function bindWorkflowFeatureFlags(
 }
 
 /**
- * Filters out workflow categories whose gating feature flag is disabled.
+ * Applies both gating levels to workflow categories: drops categories whose own
+ * feature flag is disabled, and drops the gated workflows within those that
+ * remain.
  * @param workflowCategories - Workflow categories.
  * @param featureFlags - Enabled state of every workflow-gating feature flag.
  * @returns Workflow categories visible under the given flag state.
  */
-export function filterFlagGatedWorkflowCategories(
+function filterFlagGatedWorkflowCategories(
   workflowCategories: WorkflowCategory[],
   featureFlags: WorkflowFeatureFlags
 ): WorkflowCategory[] {
-  return workflowCategories.filter(({ category }) =>
-    isWorkflowCategoryEnabled(category, featureFlags)
-  );
+  const visibleCategories: WorkflowCategory[] = [];
+  for (const workflowCategory of workflowCategories) {
+    if (!isWorkflowCategoryEnabled(workflowCategory.category, featureFlags))
+      continue;
+    const workflows = workflowCategory.workflows ?? [];
+    const visibleWorkflows = workflows.filter((workflow) =>
+      isWorkflowEnabled(workflow, featureFlags)
+    );
+    // A category left empty by its workflows' own gates is gated in effect, so
+    // it goes too. One that arrived empty is a "coming soon" placeholder the
+    // views render deliberately, so it stays for them to decide on.
+    if (workflows.length > 0 && visibleWorkflows.length === 0) continue;
+    visibleCategories.push(
+      visibleWorkflows.length === workflows.length
+        ? workflowCategory
+        : { ...workflowCategory, workflows: visibleWorkflows }
+    );
+  }
+  return visibleCategories;
 }
 
 /**
@@ -157,11 +170,11 @@ function isWorkflowCategoryEnabled(
  * @param featureFlags - Enabled state of every workflow-gating feature flag.
  * @returns True when the workflow is visible under the given flag state.
  */
-export function isWorkflowEnabled(
+function isWorkflowEnabled(
   { trsId }: GatedWorkflow,
   featureFlags: WorkflowFeatureFlags
 ): boolean {
-  return WORKFLOW_GATES.every(
-    ({ featureFlag, matches }) => !matches(trsId) || featureFlags[featureFlag]
+  return workflowGateEntries.every(
+    ([featureFlag, matches]) => !matches(trsId) || featureFlags[featureFlag]
   );
 }

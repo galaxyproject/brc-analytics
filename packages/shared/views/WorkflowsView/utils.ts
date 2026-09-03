@@ -9,8 +9,7 @@ import type {
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { WorkflowGates } from "@repo/shared/workflow/featureFlags";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
@@ -86,8 +85,6 @@ export function getWorkflows(
   for (const category of workflowGates.filterCategories(workflowCategories)) {
     if (!category.workflows) continue;
     for (const workflow of category.workflows) {
-      if (!workflowGates.isWorkflowAllowed(workflow)) continue;
-
       // Skip workflows whose minimum assembly requirement cannot be met.
       const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;
       if (!workflowMeetsAssemblyMinimum(workflow.assemblyCountMin, count)) {
@@ -117,7 +114,7 @@ export function getWorkflows(
 
   // Sequence Analysis workflows aren't in the catalog, so they're appended
   // here — through the same gate as every catalog workflow above.
-  for (const workflow of [LOGAN_SEARCH, LEXICMAP]) {
+  for (const workflow of LMLS_WORKFLOWS) {
     if (!workflowGates.isWorkflowAllowed(workflow)) continue;
     workflows.push({
       ...workflow,

@@ -35,7 +35,6 @@ export function buildAssemblyWorkflows(
     // and have ASSEMBLY scope (or no scope specified, which defaults to ASSEMBLY).
     const compatibleWorkflows = categoryWorkflows.filter(
       (workflow) =>
-        workflowGates.isWorkflowAllowed(workflow) &&
         workflowIsCompatibleWithAssembly(workflow, assembly) &&
         workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );

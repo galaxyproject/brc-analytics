@@ -6,7 +6,8 @@ import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
  * Builds workflow categories for the given organism.
  * Filters workflows to include only ORGANISM-scoped workflows compatible with the organism's taxonomy.
  * Feature-flag gating is not applied here — flags are per-user runtime state,
- * so callers apply `filterFlagGatedWorkflowCategories` where the flags are known.
+ * so callers gate the result where the flags are known, via the bound rules
+ * from `useWorkflowFeatureFlags`.
  * @param organism - Organism.
  * @param allWorkflowCategories - Workflow categories.
  * @returns Workflow categories compatible with the given organism.
