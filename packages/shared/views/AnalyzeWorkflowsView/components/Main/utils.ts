@@ -15,7 +15,7 @@ import {
  * Differential Expression Analysis is added to the Transcriptomics category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
- * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
+ * @param isAssemblyWorkflowsEnabled - Whether assembly workflows are enabled.
  * @returns Workflow categories compatible with the given assembly.
  */
 export function buildAssemblyWorkflows(

@@ -59,7 +59,7 @@ function getTaxonomicLevelRealm(
  * Checks if a workflow should be included based on feature flags.
  * @param workflow - Workflow to check.
  * @param workflow.trsId - TRS ID of the workflow.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
+ * @param isHyphyEnabled - Whether Hyphy workflows are enabled.
  * @returns True if the workflow should be included, false otherwise.
  */
 function shouldIncludeWorkflow(
@@ -77,16 +77,15 @@ function shouldIncludeWorkflow(
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
  * Differential Expression Analysis is always included as an interim measure.
- * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
- * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
- * Assembly workflows are conditionally included based on the 'assembly-workflows' feature flag.
+ * LMLS workflows (Logan Search and Lexicmap), the Hyphy workflow and assembly
+ * workflows are each included only when enabled.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
- * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
- * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
+ * @param isAssemblyWorkflowsEnabled - Whether assembly workflows are enabled.
+ * @param isLmlsEnabled - Whether LMLS workflows are enabled.
+ * @param isHyphyEnabled - Whether Hyphy workflows are enabled.
  * @returns An array of workflows, where each workflow is a combination of a workflow and its category name.
  */
 export function getWorkflows(

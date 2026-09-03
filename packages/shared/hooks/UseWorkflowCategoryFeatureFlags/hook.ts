@@ -1,8 +1,6 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import {
-  WORKFLOW_CATEGORY_FEATURE_FLAG,
-  type WorkflowCategoryFeatureFlags,
-} from "@repo/shared/workflow/featureFlags";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
+import type { WorkflowCategoryFeatureFlags } from "@repo/shared/workflow/featureFlags";
 
 /**
  * Resolves the current user's enabled state for every feature flag that gates a
@@ -14,7 +12,7 @@ import {
  */
 export const useWorkflowCategoryFeatureFlags =
   (): WorkflowCategoryFeatureFlags => ({
-    [WORKFLOW_CATEGORY_FEATURE_FLAG.ASSEMBLY_WORKFLOWS]: useFeatureFlag(
-      WORKFLOW_CATEGORY_FEATURE_FLAG.ASSEMBLY_WORKFLOWS
+    [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: useFeatureFlag(
+      FEATURE_FLAGS.ASSEMBLY_WORKFLOWS
     ),
   });
