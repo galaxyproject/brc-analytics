@@ -197,6 +197,32 @@ class TestResolvedFlagAcrossOutputs:
         assert result["resolved"] is True
 
 
+class TestProvenanceTaxdumpVersion:
+    """The builder renamed the key at schema_version 5 and the service was
+    never told. `_provenance` read 'taxdump_version'; anything the current
+    builder produces writes 'ncbi_taxdump_version', so the taxonomy release
+    reported itself as unknown against a freshly built mirror while looking
+    fine against the deployed schema_version 3 file."""
+
+    def test_legacy_key_is_read(self, mirror):
+        # The `mirror` fixture writes the pre-v5 spelling, as the deployed
+        # file does.
+        meta = mirror.summary_for_organism("Plasmodium falciparum")["_meta"]
+        assert meta["taxdump_version"] == "2026-05-01"
+
+    def test_builder_key_is_read(self, tmp_path):
+        path = str(tmp_path / "v5-meta.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("DELETE FROM mirror_meta WHERE key = 'taxdump_version'")
+        con.execute(
+            "INSERT INTO mirror_meta VALUES ('ncbi_taxdump_version', '2026-08-24')"
+        )
+        con.close()
+        svc = SRAMirrorService(path)
+        assert svc._provenance([])["taxdump_version"] == "2026-08-24"
+
+
 class TestSinceValidation:
     """F7: a malformed `since` must come back as a polite message, not crash
     the tool turn with a DuckDB conversion/binder error."""

@@ -727,9 +727,15 @@ class SRAMirrorService:
         return self._con is not None
 
     def _provenance(self, resolved_names: List[str]) -> Dict[str, Any]:
+        # Both spellings, because the two mirrors in circulation disagree. The
+        # builder has written 'ncbi_taxdump_version' since schema_version 5;
+        # the deployed schema_version 3 file predates the rename and carries
+        # 'taxdump_version'. Reading only one of them reports the taxonomy
+        # release as unknown against half the files we might be pointed at.
         return {
             "mirror_built_at": self._meta.get("mirror_built_at"),
-            "taxdump_version": self._meta.get("taxdump_version"),
+            "taxdump_version": self._meta.get("ncbi_taxdump_version")
+            or self._meta.get("taxdump_version"),
             "total_runs_in_mirror": self._total_runs,
             "resolved_names_for_query": resolved_names,
         }
