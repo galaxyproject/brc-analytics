@@ -29,9 +29,9 @@ assignment knowingly rather than pretending the column is clean.
 **The world-110m asset keys features by ISO *numeric* id, not alpha-3.** So
 every entry carries `iso_n3`, which is what the choropleth actually joins on,
 and `drawable` says whether the committed asset has a shape for it at all. It
-often does not: 169 of the 229 codes here have a shape at 1:110m, and the 60
-that do not include Hong Kong (81,649 runs) and Singapore (64,050). Those
-runs must be *reported* as unplaceable, not dropped -- see
+often does not: of the 234 distinct codes here, 174 have a shape at 1:110m
+and 60 do not, and the 60 include Hong Kong (81,649 runs) and Singapore
+(64,050). Those runs must be *reported* as unplaceable, not dropped -- see
 `geography_for_accessions`, which routes them to `unmapped_countries`.
 
 Deliberately not `_COUNTRY_SYNONYMS` in sra_mirror. That table maps a user's
