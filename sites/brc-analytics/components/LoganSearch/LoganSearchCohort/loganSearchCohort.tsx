@@ -6,6 +6,7 @@ import {
   CohortStats,
   ControlRow,
 } from "@brc/components/LoganSearch/loganSearch.styles";
+import { formatShare } from "@brc/components/LoganSearch/utils";
 import { Download } from "@mui/icons-material";
 import {
   Alert,
@@ -91,28 +92,6 @@ function facetLabel(name: string): string {
   if (FACET_LABELS[name]) return FACET_LABELS[name];
   const spaced = name.replace(/_/g, " ");
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-}
-
-/**
- * A count as a share of its denominator.
- *
- * Both ends of the scale round into a claim the count contradicts. "0.0%"
- * reports a value that matched as one that did not; "100.0%" short of the
- * total reports a remainder that exists as one that does not -- and the
- * sentence next to it names that remainder, or the row under it shows it as
- * "<0.1%" and the column sums past 100%. So neither rounding is allowed to
- * reach its limit unless the count actually does.
- * @param count - Rows with this value.
- * @param total - Rows the facet counted in all.
- * @returns Percentage string.
- */
-function formatShare(count: number, total: number): string {
-  if (total <= 0) return "--";
-  if (count === 0) return "0%";
-  const share = (count / total) * 100;
-  if (share < 0.1) return "<0.1%";
-  if (count < total && share > 99.9) return ">99.9%";
-  return `${share.toFixed(1)}%`;
 }
 
 /**
