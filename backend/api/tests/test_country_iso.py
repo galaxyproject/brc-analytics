@@ -469,9 +469,15 @@ class TestCodeIntegrity:
 class TestHandCheckedEntries:
     """The hand-checked calls, named so a later edit has to argue with them."""
 
-    def test_georgia_is_the_country_not_the_us_state(self):
-        # 19,855 runs. The INSDC vocabulary names countries; the US state
-        # arrives as geo_loc_name "USA: Georgia" and never lands here.
+    def test_georgia_maps_to_the_country_knowing_it_is_contaminated(self):
+        # 19,855 runs, and NCBI's calculation is not clean: measured over the
+        # schema_version 5 file, which is the only one carrying geo_loc_name,
+        # 1,139 of the 9,392 labelled Georgia-coded runs name the US state
+        # (Atlanta 730, United States 215, USA 170, America 10, tail) -- 5.7%
+        # of all of them, 12.1% of the labelled ones, and a floor rather than
+        # an estimate. GEO is still right: the country is the resolvable
+        # majority, and a country-granularity table cannot undo a
+        # country-granularity error made upstream. See the module docstring.
         assert country_iso.lookup("Georgia").iso_a3 == "GEO"
         assert country_iso.lookup("Georgia").continent == "Asia"
 
