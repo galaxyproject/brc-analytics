@@ -33,6 +33,7 @@ export function favoriteKey(
 const FavoritesContext = createContext<FavoritesContextValue>({
   error: null,
   favorites: [],
+  hasLoaded: false,
   isFavorited: () => false,
   isLoading: false,
   isToggling: false,
@@ -59,6 +60,12 @@ export function FavoritesProvider({
   const { isAuthenticated, isConfigured } = useAuth();
   const [favorites, setFavorites] = useState<FavoriteResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Whether the favorites set is known. A load that failed leaves it empty
+  // without that being the truth, and a toggle read against an empty-but-
+  // unknown set creates a favorite the user already has: the idempotent API
+  // hands back the existing row, and this provider then treats that one row
+  // as the whole list.
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [togglingKeys, setTogglingKeys] = useState<Set<string>>(
     () => new Set()
   );
@@ -70,6 +77,9 @@ export function FavoritesProvider({
   // Read inside toggleFavorite so the callback identity never changes -- a
   // changing identity would re-render every row of both tables.
   const keysRef = useRef<Set<string>>(new Set());
+  // Same reason keysRef exists: toggleFavorite is stable by design, so it
+  // cannot read hasLoaded from a closure.
+  const hasLoadedRef = useRef(false);
 
   const keys = useMemo(
     () =>
@@ -92,23 +102,32 @@ export function FavoritesProvider({
   }, [keys]);
 
   useEffect(() => {
+    hasLoadedRef.current = hasLoaded;
+  }, [hasLoaded]);
+
+  useEffect(() => {
     if (!isAuthenticated || !isConfigured) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
       setFavorites([]);
       setError(null);
       setIsLoading(false);
+      // Signed out or unconfigured, empty is the whole truth.
+      setHasLoaded(true);
       return;
     }
 
     let isMounted = true;
     setIsLoading(true);
     setError(null);
+    setHasLoaded(false);
 
     // Unfiltered: one call covers both entity types.
     apiClient
       .getFavorites()
       .then((response) => {
-        if (isMounted) setFavorites(response);
+        if (!isMounted) return;
+        setFavorites(response);
+        setHasLoaded(true);
       })
       .catch((err) => {
         // Surface the failure so consumers render an error state instead of
@@ -133,6 +152,10 @@ export function FavoritesProvider({
       // disabled, so toggling a second row re-enables the first while its
       // request is still outstanding -- and a click then would fire a second
       // create off the same pre-toggle snapshot and list the favorite twice.
+      // Without a loaded set there is nothing to toggle against: `keysRef` is
+      // empty because the load failed, not because the user has nothing saved,
+      // so every star here would read as "not favorited" and create.
+      if (!hasLoadedRef.current) return;
       if (pendingRef.current.has(key)) return;
       pendingRef.current.add(key);
       setError(null);
@@ -177,13 +200,22 @@ export function FavoritesProvider({
     (): FavoritesContextValue => ({
       error,
       favorites,
+      hasLoaded,
       isFavorited,
       isLoading,
       isToggling: togglingKeys.size > 0,
       toggleFavorite,
       togglingKeys,
     }),
-    [error, favorites, isFavorited, isLoading, toggleFavorite, togglingKeys]
+    [
+      error,
+      favorites,
+      hasLoaded,
+      isFavorited,
+      isLoading,
+      toggleFavorite,
+      togglingKeys,
+    ]
   );
 
   return (
