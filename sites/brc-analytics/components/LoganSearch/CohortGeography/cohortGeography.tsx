@@ -85,13 +85,22 @@ function describeCoverage(geography: KmindexGeography): string {
 }
 
 /**
- * What is counted but cannot be drawn, and why.
+ * What is counted but not coloured, and why.
  *
  * Two causes, deliberately given one sentence rather than two: the recorded
  * value is not a country, or it is a country the 1:110m outline has no shape
- * for. Neither changes what the reader should do about it, and both are the
- * same failure if left unsaid -- runs vanishing off the map with nothing on
- * screen admitting it.
+ * of its own for. Neither changes what the reader should do about it, and
+ * both are the same failure if left unsaid -- runs vanishing off the map with
+ * nothing on screen admitting it.
+ *
+ * "of its own" is doing real work and is not hedging. Several of these
+ * territories are drawn, just inside somebody else's feature: probing the
+ * committed asset, Cayenne falls inside France's polygon, Longyearbyen inside
+ * Norway's, Hong Kong inside China's and Singapore inside Malaysia's. Those
+ * four alone are 168,340 of the 250,989 unplaceable runs mirror-wide. Saying
+ * "the outline has no shape for them" in front of a map that visibly draws
+ * their territory -- coloured with the parent's count, not theirs -- is the
+ * kind of small false note that makes a reader stop trusting the rest.
  * @param geography - Geography rollup over the whole match set.
  * @returns A sentence, or null when everything recorded could be placed.
  */
@@ -111,9 +120,9 @@ function describeUnplaceable(geography: KmindexGeography): string | null {
       : `${unplaceable.length.toLocaleString()} places`;
   return (
     `${runs.toLocaleString()} of those runs come from ${places} the map ` +
-    `cannot draw -- the world outline has no shape for them at this scale, ` +
-    `or the recorded value is not a country. They are counted here but not ` +
-    `coloured: ${named}${tail}.`
+    `cannot colour -- the world outline has no shape of its own for them at ` +
+    `this scale, or the recorded value is not a country. They are counted ` +
+    `here but not on the map: ${named}${tail}.`
   );
 }
 

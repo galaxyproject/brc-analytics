@@ -124,7 +124,7 @@ describe("countries the map cannot place", () => {
   it("reports them as a count and names the largest", async () => {
     render(<CohortGeography geography={geography()} />);
 
-    const note = (await screen.findByText(/places the map cannot draw/))
+    const note = (await screen.findByText(/places the map cannot colour/))
       .textContent;
     // 4 places, 268 runs -- counted in `recorded` above and drawn nowhere.
     expect(note).toContain("268 of those runs come from 4 places");
@@ -138,7 +138,7 @@ describe("countries the map cannot place", () => {
       <CohortGeography geography={geography({ unmapped_countries: [] })} />
     );
 
-    expect(screen.queryByText(/places the map cannot draw/)).toBeNull();
+    expect(screen.queryByText(/places the map cannot colour/)).toBeNull();
   });
 
   it("does not silently drop them from the reconciliation", () => {
