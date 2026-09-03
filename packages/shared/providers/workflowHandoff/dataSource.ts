@@ -1,8 +1,16 @@
-import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
+/**
+ * Maps the assistant's `data_source` schema field onto handoff inputs.
+ *
+ * Lives with the provider rather than either view because both sides need it:
+ * the assistant's SchemaPanel to dispatch a handoff, and the stepper to
+ * rehydrate one from a session id in the URL. Keeping it here points both
+ * views at the provider instead of at each other.
+ */
 import type {
   DataSourceDetail,
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
+import { SEQUENCING_SOURCE } from "./constants";
 
 /**
  * Parse the backend's structured `data_source.detail`, when it is one.

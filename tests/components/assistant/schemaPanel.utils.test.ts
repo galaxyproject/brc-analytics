@@ -1,10 +1,10 @@
 import { SEQUENCING_SOURCE } from "@repo/shared/providers/workflowHandoff/constants";
-import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
 import {
   extractAccessions,
   parseDataSourceDetail,
   resolveSequencingSource,
-} from "@repo/shared/views/AssistantView/components/SchemaPanel/utils";
+} from "@repo/shared/providers/workflowHandoff/dataSource";
+import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
 
 function field(
   value: string | null,
