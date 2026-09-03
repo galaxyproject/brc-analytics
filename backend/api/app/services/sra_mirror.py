@@ -460,6 +460,69 @@ def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[st
     }
 
 
+def _geography_sql() -> str:
+    """Every country in a hit set, with the unrecorded runs counted alongside.
+
+    Not the cohort's country facet: that lists a head of ten and rolls the
+    rest into `other`, which on the reference job renders 42 countries as ten
+    bars. A choropleth needs all of them, and the map's own honesty line needs
+    `recorded` and `unknown` as first-class numbers rather than as a facet's
+    leftovers.
+
+    Staged accessions read inline, for the reasons _cohort_sql spells out --
+    `IN (SELECT UNNEST(?))` does not finish at a million accessions, the
+    mirror is opened read_only so there is no temp table, and quoting is
+    turned off so a stray quote cannot silently drop or rewrite rows.
+
+    The sentinel handling is copied from _COHORT_FACETS deliberately, not
+    coincidentally. The map and the country bars sit on the same card, so if
+    one of them counted 'uncalculated' as a place they would disagree on
+    screen about how much geography this cohort has.
+
+    NULL comes back as its own group rather than being filtered out, because
+    the unrecorded share is the point: on the reference P. falciparum cohort
+    it is 80.8%, and a map that draws 42 countries without saying so tells the
+    same kind of lie as a mislabelled dot.
+    """
+    return """
+        WITH q AS (SELECT column0 AS acc FROM read_csv(?, header=false,
+                       quote='', escape='',
+                       columns={'column0':'VARCHAR'})),
+             m AS (
+               SELECT nullif(nullif(geo_loc_name_country_calc, ''),
+                             'uncalculated') AS country
+               FROM runs r SEMI JOIN q ON r.acc = q.acc)
+        SELECT country, count(*) AS n FROM m GROUP BY 1
+    """
+
+
+def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+    """Split the grouped country counts into the map's payload.
+
+    Every matched row lands in exactly one of `countries` and `unknown`, and
+    the two sum to `in_mirror`, so a reader can reconcile the map against the
+    cohort card beside it instead of having to trust it.
+
+    @param counted: (country or None, runs) straight off _geography_sql.
+    @returns: the geography payload.
+    """
+    unknown = sum(n for value, n in counted if value is None)
+    # Ties broken by name so the order is stable across runs -- the frontend
+    # renders this list as-is and "the order changed" is a bad way to learn
+    # that the counts did not.
+    known = sorted(
+        ((value, n) for value, n in counted if value is not None),
+        key=lambda vn: (-vn[1], vn[0]),
+    )
+    recorded = sum(n for _value, n in known)
+    return {
+        "countries": [{"count": n, "value": value} for value, n in known],
+        "in_mirror": recorded + unknown,
+        "recorded": recorded,
+        "unknown": unknown,
+    }
+
+
 def _export_sql() -> str:
     """Materialize a complete hit list, joined to the mirror, as one parquet.
 
@@ -1407,6 +1470,72 @@ class SRAMirrorService:
         with self._lock:
             self._cache_put(cache_key, cohort)
         return cohort
+
+    # Not @_synchronized, for the same reason as cohort_for_accessions above:
+    # this runs the same shape of query over the same 43.5M-row table, so the
+    # instance lock is held only for the cache reads/writes and the cursor
+    # handoff rather than across the query.
+    def geography_for_accessions(
+        self, accessions: List[str]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Every country a complete hit set was recorded from, plus the runs that
+        recorded none.
+
+        Same window and the same argument as cohort_for_accessions: computed
+        over the pre-cap hit list, because counting the surviving 50,000 counts
+        the cap rather than the query.
+
+        Returns None when the mirror cannot answer -- unconfigured, or on a
+        file that predates the columns this needs. That is a steady state, not
+        a failure: the caller caches the result without geography and nothing
+        retries. A query that starts and then breaks raises instead, so the
+        caller can tell the two apart.
+
+        @param accessions: every hit the query matched, before the cap.
+        @returns: the geography dict, or None if there is nothing to say.
+        """
+        if not self._con or not self.has_capability(CAPABILITY_GEOGRAPHY):
+            return None
+        if not accessions:
+            return None
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return None
+
+        payload = "\n".join(wanted)
+        # Digest-keyed like the cohort, and for the same reason: at a million
+        # accessions the tuple would cost more to build and hold than the
+        # query it saves.
+        cache_key = (
+            "geography",
+            hashlib.md5(payload.encode()).hexdigest(),
+            len(accessions),
+        )
+        with self._lock:
+            if (cached := self._cache_get(cache_key)) is not None:
+                return cached
+            cursor = self._con.cursor()
+
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".txt", prefix="geography-", delete=False
+            )
+            staging.write(payload)
+            staging.close()
+            rows = cursor.execute(_geography_sql(), [staging.name]).fetchall()
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        geography = _shape_geography(rows)
+        with self._lock:
+            self._cache_put(cache_key, geography)
+        return geography
 
     # Not @_synchronized, for the reason spelled out above cohort_for_accessions:
     # this is a ~1.5s stage-and-write against a 43.5M-row table, and holding the
