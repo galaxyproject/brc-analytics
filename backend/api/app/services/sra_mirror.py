@@ -24,6 +24,8 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import duckdb
 
+from app.services import country_iso
+
 logger = logging.getLogger(__name__)
 
 # In-process per-call TTL for repeated reads (e.g. the assistant chatting
@@ -496,30 +498,86 @@ def _geography_sql() -> str:
     """
 
 
-def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
-    """Split the grouped country counts into the map's payload.
+def _ranked(counts: Dict[str, int]) -> List[Dict[str, Any]]:
+    """Counted values, largest first, ties broken by name.
 
-    Every matched row lands in exactly one of `countries` and `unknown`, and
-    the two sum to `in_mirror`, so a reader can reconcile the map against the
-    cohort card beside it instead of having to trust it.
+    Stable ordering matters more than it looks: the frontend renders these
+    lists in the order they arrive, and "the order changed" is a bad way to
+    learn that the counts did not.
+    """
+    return [
+        {"count": n, "value": value}
+        for value, n in sorted(counts.items(), key=lambda vn: (-vn[1], vn[0]))
+    ]
+
+
+def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+    """Attach ISO codes to the grouped country counts and split out what the
+    map cannot draw.
+
+    Three buckets, and every matched row lands in exactly one of them:
+    `countries` (drawn), `unmapped_countries` (recorded but unplaceable) and
+    `unknown` (no country recorded at all). countries + unmapped + unknown ==
+    in_mirror, so the card can be reconciled rather than trusted.
+
+    A value is unplaceable for either of two reasons, and the API does not
+    distinguish them because the reader does not care: it is not a country
+    (Borneo, the dissolved states), or it is a country the committed
+    world-110m asset has no shape for at 1:110m -- which is 65 of the mirror's
+    245 values, Hong Kong and Singapore included. Silently dropping the second
+    kind is the failure this bucket exists to prevent.
+
+    `countries` is keyed by ISO code, not by the raw string, because several
+    raw values share a code -- Gaza Strip and West Bank are both PSE -- and
+    two rows with the same code would have the choropleth pick one and lose
+    the other. The label is the ISO table's canonical name for the same
+    reason.
+
+    Continents roll up everything with a code, drawable or not: Singapore is
+    in Asia whether or not this asset can draw it, so the continent totals do
+    not have to agree with `countries`.
 
     @param counted: (country or None, runs) straight off _geography_sql.
     @returns: the geography payload.
     """
     unknown = sum(n for value, n in counted if value is None)
-    # Ties broken by name so the order is stable across runs -- the frontend
-    # renders this list as-is and "the order changed" is a bad way to learn
-    # that the counts did not.
-    known = sorted(
-        ((value, n) for value, n in counted if value is not None),
-        key=lambda vn: (-vn[1], vn[0]),
-    )
-    recorded = sum(n for _value, n in known)
+    recorded = 0
+    countries: Dict[str, Dict[str, Any]] = {}
+    continents: Dict[str, int] = {}
+    unmapped: Dict[str, int] = {}
+
+    for value, n in counted:
+        if value is None:
+            continue
+        recorded += n
+        country = country_iso.lookup(value)
+        if country is None:
+            unmapped[value] = unmapped.get(value, 0) + n
+            continue
+        continents[country.continent] = continents.get(country.continent, 0) + n
+        if not country.drawable:
+            unmapped[value] = unmapped.get(value, 0) + n
+            continue
+        entry = countries.setdefault(
+            country.iso_a3,
+            {
+                "count": 0,
+                "iso_a3": country.iso_a3,
+                "iso_n3": country.iso_n3,
+                "value": country.name,
+            },
+        )
+        entry["count"] += n
+
     return {
-        "countries": [{"count": n, "value": value} for value, n in known],
+        "continents": _ranked(continents),
+        "countries": sorted(
+            countries.values(), key=lambda c: (-c["count"], c["value"])
+        ),
         "in_mirror": recorded + unknown,
         "recorded": recorded,
         "unknown": unknown,
+        "unmapped_countries": _ranked(unmapped),
     }
 
 
