@@ -135,10 +135,6 @@ const EXPORT_URL = `${API_BASE_URL}/galaxy/kmindex/jobs/${BASE_RESULTS.job_id}/e
 // two drawable countries, 222,921 in one the map cannot place.
 const GEOGRAPHY_UNKNOWN = 244011;
 const GEOGRAPHY = {
-  continents: [
-    { count: 546121, value: "North America" },
-    { count: 338340, value: "Europe" },
-  ],
   countries: [
     {
       count: 546121,
@@ -642,7 +638,6 @@ describe("the geography block", () => {
       ...BASE_RESULTS,
       geography: {
         ...GEOGRAPHY,
-        continents: [],
         countries: [],
         recorded: 0,
         unknown: IN_MIRROR,

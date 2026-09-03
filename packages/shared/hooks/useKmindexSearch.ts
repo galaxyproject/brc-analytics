@@ -84,10 +84,6 @@ export interface KmindexGeographyCountry {
 // partition the matched runs and sum to `in_mirror`, which is what lets the
 // card state its own denominator instead of implying one.
 export interface KmindexGeography {
-  // Derived from the backend's ISO table rather than read from the mirror,
-  // and it covers countries the map cannot draw too -- so this does not have
-  // to add up to the sum of `countries`.
-  continents: KmindexFacetValue[];
   // Every drawable country in the match set, largest first. Not a top ten.
   countries: KmindexGeographyCountry[];
   // Matched runs the mirror knows; every count here is out of this.

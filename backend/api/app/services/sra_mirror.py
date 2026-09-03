@@ -523,9 +523,9 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
     A value is unplaceable for either of two reasons, and the API does not
     distinguish them because the reader does not care: it is not a country
     (Borneo, the dissolved states), or it is a country the committed
-    world-110m asset has no shape for at 1:110m -- which is 65 of the mirror's
-    245 values, Hong Kong and Singapore included. Silently dropping the second
-    kind is the failure this bucket exists to prevent.
+    world-110m asset has no shape of its own for -- which is 65 of the
+    mirror's 245 values, Hong Kong and Singapore included. Silently dropping
+    the second kind is the failure this bucket exists to prevent.
 
     `countries` is keyed by ISO code, not by the raw string, because several
     raw values share a code -- Gaza Strip and West Bank are both PSE -- and
@@ -533,9 +533,11 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
     the other. The label is the ISO table's canonical name for the same
     reason.
 
-    Continents roll up everything with a code, drawable or not: Singapore is
-    in Asia whether or not this asset can draw it, so the continent totals do
-    not have to agree with `countries`.
+    The ISO table also carries continent and this deliberately does not roll
+    it up. Nothing renders a continent breakdown, and a fourth list whose
+    total is neither `recorded` nor the sum of `countries` -- Singapore counts
+    toward Asia and toward no shape -- is a reconciliation trap for whoever
+    reads this next. Phase 2 can add it back in the commit that draws it.
 
     @param counted: (country or None, runs) straight off _geography_sql.
     @returns: the geography payload.
@@ -543,7 +545,6 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
     unknown = sum(n for value, n in counted if value is None)
     recorded = 0
     countries: Dict[str, Dict[str, Any]] = {}
-    continents: Dict[str, int] = {}
     unmapped: Dict[str, int] = {}
 
     for value, n in counted:
@@ -551,11 +552,7 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
             continue
         recorded += n
         country = country_iso.lookup(value)
-        if country is None:
-            unmapped[value] = unmapped.get(value, 0) + n
-            continue
-        continents[country.continent] = continents.get(country.continent, 0) + n
-        if not country.drawable:
+        if country is None or not country.drawable:
             unmapped[value] = unmapped.get(value, 0) + n
             continue
         entry = countries.setdefault(
@@ -570,7 +567,6 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
         entry["count"] += n
 
     return {
-        "continents": _ranked(continents),
         "countries": sorted(
             countries.values(), key=lambda c: (-c["count"], c["value"])
         ),

@@ -71,10 +71,6 @@ function geography(
 ): KmindexGeography {
   const drawn = COUNTRIES.reduce((total, { count }) => total + count, 0);
   return {
-    continents: [
-      { count: 2717, value: "Africa" },
-      { count: 670, value: "Asia" },
-    ],
     countries: COUNTRIES,
     in_mirror: IN_MIRROR,
     recorded: RECORDED,
@@ -105,7 +101,6 @@ describe("the recorded/unknown split", () => {
     render(
       <CohortGeography
         geography={geography({
-          continents: [],
           countries: [],
           recorded: 0,
           unknown: IN_MIRROR,

@@ -855,10 +855,6 @@ def _geography_payload(in_mirror: int) -> dict:
     # 1:110m) and 2 from Borneo (not a country at all); the rest drawable.
     drawn = in_mirror - 7
     return {
-        "continents": [
-            {"count": drawn, "value": "North America"},
-            {"count": 3, "value": "Asia"},
-        ],
         "countries": [
             {
                 "count": drawn,

@@ -1081,18 +1081,20 @@ class TestGeographyForAccessions:
         assert len({c["iso_a3"] for c in countries}) == len(countries)
         assert len({c["iso_n3"] for c in countries}) == len(countries)
 
-    def test_continents_roll_up_everything_with_a_code(self, geography_mirror):
-        # Including what the asset cannot draw: Singapore is in Asia whether
-        # or not there is an outline for it, so the continent totals are
-        # allowed to exceed what the map colours.
+    def test_the_payload_carries_only_what_is_rendered(self, geography_mirror):
+        # No continent rollup. The ISO table has continents and nothing draws
+        # them, and a fourth list reconciling against neither `recorded` nor
+        # the sum of `countries` is a trap rather than a feature.
         svc, accessions = geography_mirror
         geography = svc.geography_for_accessions(accessions)
 
-        continents = {c["value"]: c["count"] for c in geography["continents"]}
-        assert continents == {"North America": 40, "Africa": 12, "Asia": 12}
-        # Everything except Borneo, which has no continent because it has no
-        # code.
-        assert sum(continents.values()) == geography["recorded"] - 5
+        assert set(geography) == {
+            "countries",
+            "in_mirror",
+            "recorded",
+            "unknown",
+            "unmapped_countries",
+        }
 
     def test_the_three_absences_all_count_as_unknown(self, geography_mirror):
         # NULL, '', and 'uncalculated' -- 4 + 1 + 6. The sentinel is the one
@@ -1240,22 +1242,6 @@ class TestGeographyAgainstTheRealVocabulary:
             "DNK",
             "CAN",
         ]
-
-    def test_the_continent_rollup_is_derived_not_read(self, shaped):
-        # Derived from the ISO table, which is what makes phase 1 independent
-        # of a mirror rebuild -- the deployed file has no continent column.
-        continents = {c["value"]: c["count"] for c in shaped["continents"]}
-        assert set(continents) == {
-            "Africa",
-            "Asia",
-            "Europe",
-            "North America",
-            "Oceania",
-            "South America",
-        }
-        # Everything with a code, drawable or not; only the 12 non-countries
-        # (5,684 runs) have no continent to land in.
-        assert sum(continents.values()) == shaped["recorded"] - 5_684
 
     def test_no_country_is_listed_that_the_asset_cannot_draw(self, shaped):
         for entry in shaped["countries"]:
