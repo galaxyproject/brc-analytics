@@ -169,9 +169,10 @@ async def assistant_chat(
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
-    # Auto-save for signed-in users. Read back rather than threading state out
-    # of the agent, which stays DB-agnostic; the store is fail-open and the
-    # read back is guarded, so nothing here can cost the user their reply.
+    # Auto-save for signed-in users, from the state the turn handed back. The
+    # agent stays DB-agnostic because it doesn't write to one, not because it
+    # withholds what it has; the store is fail-open and the block is guarded,
+    # so nothing here can cost the user their reply.
     if current_user:
         try:
             # The state the turn just wrote, handed back rather than re-read:

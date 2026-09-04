@@ -279,7 +279,8 @@ async def repoint_saved_analysis_session(
         return None
     analysis.source_session = source_session
     await session.commit()
-    await session.refresh(analysis)
+    # No refresh, for the same reason as the upsert above: expire_on_commit is
+    # off and the one caller ignores the return entirely.
     return analysis
 
 
