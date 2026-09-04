@@ -108,3 +108,37 @@ def test_galaxy_jobs_params_defaults_to_an_empty_object(migrated_db):
         assert "{}" in str(params["default"])
     finally:
         engine.dispose()
+
+
+def test_orm_json_columns_match_what_the_migrations_create():
+    """The models and the migrations must agree on JSON vs JSONB.
+
+    Every migration types its JSON columns through an identical `_json_type()`
+    helper -- JSONB on PostgreSQL, plain JSON elsewhere -- while the models
+    declared bare JSON. On Postgres that put the ORM and the live schema in
+    disagreement on all seven columns, which surfaces as autogenerate
+    proposing a migration that changes nothing anybody asked for, and as the
+    wrong answer whenever someone reads the metadata to find out what a column
+    actually is.
+
+    Driven off the metadata rather than a hand-written list so a JSON column
+    added later is covered without anyone remembering to add it here.
+    """
+    from sqlalchemy.dialects import postgresql, sqlite
+
+    from app.db.models import Base
+
+    json_columns = [
+        (table.name, column)
+        for table in Base.metadata.sorted_tables
+        for column in table.c
+        if "JSON" in column.type.compile(postgresql.dialect()).upper()
+    ]
+    # Seven today. The assertion is the shape, not the number, but a count of
+    # zero would pass every check below while testing nothing.
+    assert len(json_columns) == 7
+
+    for name, column in json_columns:
+        where = f"{name}.{column.name}"
+        assert column.type.compile(postgresql.dialect()) == "JSONB", where
+        assert column.type.compile(sqlite.dialect()) == "JSON", where
