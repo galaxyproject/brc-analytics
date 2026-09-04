@@ -25,6 +25,7 @@ import { type AppSiteConfig } from "@repo/shared/config/types";
 import type { PageMeta } from "@repo/shared/meta/types";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
 import { EntitiesProvider } from "@repo/shared/providers/entities/provider";
+import { FavoritesProvider } from "@repo/shared/providers/favorites/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
 import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
 import { type EntitiesLoader } from "@repo/shared/services/workflows/hooks/UseEntities/types";
@@ -111,39 +112,43 @@ export function AppProviders({
               <ServicesProvider>
                 <SystemStatusProvider>
                   <AuthProvider loginEnabled={appConfig.loginEnabled}>
-                    <LayoutDimensionsProvider>
-                      <AppLayout>
-                        <DXHeader {...header} />
-                        <ExploreStateProvider entityListType={entityListType}>
-                          <WorkflowHandoffProvider>
-                            <Main>
-                              <ErrorBoundary
-                                fallbackRender={({
-                                  error,
-                                  reset,
-                                }: {
-                                  error: DataExplorerError;
-                                  reset: () => void;
-                                }): JSX.Element => (
-                                  <Error
-                                    errorMessage={error.message}
-                                    requestUrlMessage={error.requestUrlMessage}
-                                    rootPath={redirectRootToPath}
-                                    onReset={reset}
-                                  />
-                                )}
-                              >
-                                <EntitiesProvider value={entities}>
-                                  <Component {...pageProps} />
-                                  <Floating {...floating} />
-                                </EntitiesProvider>
-                              </ErrorBoundary>
-                            </Main>
-                          </WorkflowHandoffProvider>
-                        </ExploreStateProvider>
-                        <StyledFooter {...footer} />
-                      </AppLayout>
-                    </LayoutDimensionsProvider>
+                    <FavoritesProvider>
+                      <LayoutDimensionsProvider>
+                        <AppLayout>
+                          <DXHeader {...header} />
+                          <ExploreStateProvider entityListType={entityListType}>
+                            <WorkflowHandoffProvider>
+                              <Main>
+                                <ErrorBoundary
+                                  fallbackRender={({
+                                    error,
+                                    reset,
+                                  }: {
+                                    error: DataExplorerError;
+                                    reset: () => void;
+                                  }): JSX.Element => (
+                                    <Error
+                                      errorMessage={error.message}
+                                      requestUrlMessage={
+                                        error.requestUrlMessage
+                                      }
+                                      rootPath={redirectRootToPath}
+                                      onReset={reset}
+                                    />
+                                  )}
+                                >
+                                  <EntitiesProvider value={entities}>
+                                    <Component {...pageProps} />
+                                    <Floating {...floating} />
+                                  </EntitiesProvider>
+                                </ErrorBoundary>
+                              </Main>
+                            </WorkflowHandoffProvider>
+                          </ExploreStateProvider>
+                          <StyledFooter {...footer} />
+                        </AppLayout>
+                      </LayoutDimensionsProvider>
+                    </FavoritesProvider>
                   </AuthProvider>
                 </SystemStatusProvider>
               </ServicesProvider>
