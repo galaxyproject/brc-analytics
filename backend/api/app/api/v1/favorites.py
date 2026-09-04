@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[FavoriteResponse])
 async def get_favorites(
-    entity_type: str = Query(default="assembly"),
+    entity_type: str | None = Query(default=None),
     current_user_db: User = Depends(get_current_user_db),
     session: AsyncSession = Depends(get_db_session),
 ) -> list[FavoriteResponse]:
