@@ -84,6 +84,10 @@ export function makeConfig(
         ],
       },
     },
+    // GA2 has no account UI wired up; state that explicitly rather than
+    // leaving the key absent, which reads as an oversight rather than a
+    // decision.
+    loginEnabled: false,
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",
     supportUrl: SUPPORT_URL,
