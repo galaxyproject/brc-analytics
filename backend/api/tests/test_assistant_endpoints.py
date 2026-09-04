@@ -303,9 +303,16 @@ class TestSaveWithoutADatabase:
     raising into a 503 the client will retry."""
 
     def test_save_is_not_implemented_without_a_database(
-        self, app_with_stubbed_agent, client, caplog
+        self, app_with_stubbed_agent, client, caplog, monkeypatch
     ):
+        from app.core.config import get_settings
         from app.core.dependencies import get_assistant_agent, get_current_user
+
+        # Say so rather than inheriting it: CI runs this suite alongside a
+        # Postgres container with DATABASE_URL exported, so a test that only
+        # passes on a laptop without one is a test that passes by accident.
+        monkeypatch.delenv("DATABASE_URL", raising=False)
+        get_settings.cache_clear()
 
         agent = app_with_stubbed_agent.dependency_overrides[get_assistant_agent]()
         agent.session_service.claim_session = AsyncMock()
