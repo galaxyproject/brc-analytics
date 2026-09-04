@@ -32,7 +32,7 @@ const httpClient = ky.create({
 export const apiClient = {
   createFavorite: async (
     entity_id: string,
-    entity_type = "assembly"
+    entity_type: string
   ): Promise<FavoriteResponse> => {
     return httpClient
       .post("favorites", { json: { entity_id, entity_type } })
@@ -47,7 +47,7 @@ export const apiClient = {
 
   deleteFavorite: async (
     entity_id: string,
-    entity_type = "assembly"
+    entity_type: string
   ): Promise<void> => {
     await httpClient.delete(`favorites/${entity_type}/${entity_id}`);
   },
@@ -56,11 +56,11 @@ export const apiClient = {
     await httpClient.delete(`saved_analyses/${id}`);
   },
 
-  getFavorites: async (
-    entity_type = "assembly"
-  ): Promise<FavoriteResponse[]> => {
+  getFavorites: async (entity_type?: string): Promise<FavoriteResponse[]> => {
     return httpClient
-      .get("favorites", { searchParams: { entity_type } })
+      .get("favorites", {
+        searchParams: entity_type ? { entity_type } : undefined,
+      })
       .json();
   },
 
@@ -84,19 +84,10 @@ export const apiClient = {
     return httpClient.get("workflow_runs").json();
   },
 
-  restoreSavedAnalysis: async (
+  openSavedAnalysis: async (
     id: string
   ): Promise<SavedAnalysisRestoreResponse> => {
-    return httpClient.post(`saved_analyses/${id}/restore`).json();
-  },
-
-  saveAnalysis: async (
-    session_id: string,
-    title?: string
-  ): Promise<SavedAnalysisSummary> => {
-    return httpClient
-      .post("saved_analyses", { json: { session_id, title } })
-      .json();
+    return httpClient.post(`saved_analyses/${id}/open`).json();
   },
 
   updatePreferences: async (
