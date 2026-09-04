@@ -62,6 +62,62 @@ describe("extractAccessions", () => {
     ).toEqual(["SRR7590703"]);
   });
 
+  // The cast in parseDataSourceDetail is a promise TypeScript cannot keep:
+  // it proves the payload is a JSON object and nothing about the fields
+  // inside it. Every shape below reached the stepper as "accessions" before
+  // the guard, and none of them errored on the way.
+  describe("a detail whose accessions are the wrong shape", () => {
+    test("a bare string is not spread into single characters", () => {
+      // The one that would have shipped: "ERR662077" passed both the
+      // truthiness and the .length > 0 check, and spreading a string into a
+      // Set produced ["E","R","6","2","0","7"].
+      expect(
+        extractAccessions(
+          field(
+            "Top run ERR662077 from Logan",
+            '{"source":"logan","accessions":"ERR662077"}'
+          )
+        )
+      ).toEqual(["ERR662077"]);
+    });
+
+    test("a string with no accession in the value yields nothing", () => {
+      expect(
+        extractAccessions(field("User upload", '{"accessions":"ERR662077"}'))
+      ).toEqual([]);
+    });
+
+    test("an array of numbers does not pass them off as accessions", () => {
+      expect(
+        extractAccessions(field("ERR16655350", '{"accessions":[123,456]}'))
+      ).toEqual(["ERR16655350"]);
+    });
+
+    test("one bad member discards the whole list", () => {
+      // All-or-nothing: a partly-broken list means the producer is broken,
+      // and half of it is a worse fetch input than the model's own text.
+      expect(
+        extractAccessions(
+          field("ERR16655350", '{"accessions":["ERR662077",null]}')
+        )
+      ).toEqual(["ERR16655350"]);
+    });
+
+    test("a nested object falls through to the value", () => {
+      expect(
+        extractAccessions(
+          field("ERR16655350", '{"accessions":{"0":"ERR662077"}}')
+        )
+      ).toEqual(["ERR16655350"]);
+    });
+
+    test("a null accessions field falls through to the value", () => {
+      expect(
+        extractAccessions(field("ERR16655350", '{"accessions":null}'))
+      ).toEqual(["ERR16655350"]);
+    });
+  });
+
   test("null value returns empty array", () => {
     expect(extractAccessions(field(null))).toEqual([]);
   });

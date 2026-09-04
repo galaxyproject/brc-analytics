@@ -33,15 +33,44 @@ export function parseDataSourceDetail(
 }
 
 /**
+ * Whether a parsed value is really a list of strings.
+ *
+ * `parseDataSourceDetail` only proves the payload is a JSON object; the
+ * fields inside it are whatever the backend sent, and the cast to
+ * DataSourceDetail is a promise TypeScript cannot keep at runtime.
+ *
+ * All-or-nothing rather than filtering the bad members out. A list that is
+ * partly not accessions means the producer is broken, and half of a broken
+ * list is a worse input to a data fetch than falling back to the text the
+ * model actually wrote.
+ * @param value - Candidate `accessions` field.
+ * @returns True when every member is a string.
+ */
+function isStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === "string")
+  );
+}
+
+/**
  * Run accessions for the handoff. The backend resolves them into
  * `data_source.detail` (structured, #1296); the regex over `.value` stays as
- * a fallback for sessions that predate that.
+ * a fallback for sessions that predate that -- and now also for a detail
+ * whose `accessions` is not a list of strings.
+ *
+ * That guard is not hypothetical tidiness. Without it a detail of
+ * `{"accessions": "ERR662077"}` passed both the truthiness and the
+ * `.length > 0` check, and spreading a string into a Set handed the stepper
+ * `["E","R","6","2","0","7"]` -- six single characters, presented as run
+ * accessions, with no error anywhere.
  * @param field - Data-source field from the assistant schema.
  * @returns Run accessions, de-duplicated.
  */
 export function extractAccessions(field: SchemaFieldState): string[] {
   const structured = parseDataSourceDetail(field.detail)?.accessions;
-  if (structured && structured.length > 0) return [...new Set(structured)];
+  if (isStringArray(structured) && structured.length > 0) {
+    return [...new Set(structured)];
+  }
   if (!field.value) return [];
   // Require ≥6 digits -- real run accessions are 6-8; loose `\d+` matched
   // "ERR12" mid-sentence and failed downstream.
