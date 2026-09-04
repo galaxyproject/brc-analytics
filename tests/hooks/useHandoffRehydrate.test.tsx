@@ -99,17 +99,25 @@ function makeClient(): QueryClient {
 }
 
 /**
- * Render the hook under both providers it needs.
- * @param props - Props.
- * @param props.children - Children.
- * @returns A renderHook wrapper component.
+ * A wrapper holding one QueryClient for as long as it is mounted.
+ *
+ * A factory rather than a component, because a component that calls
+ * makeClient() in its body builds a new client on every render -- so any
+ * rerender silently swaps the provider's client and empties the React Query
+ * cache underneath the hook. React Query's own guidance is that the client
+ * be stable for the provider's lifetime, and a cache that resets when React
+ * happens to re-render is a flaky test waiting for a slow machine.
+ * @returns A renderHook wrapper component with its own client.
  */
-function wrapper({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <QueryClientProvider client={makeClient()}>
-      <WorkflowHandoffProvider>{children}</WorkflowHandoffProvider>
-    </QueryClientProvider>
-  );
+function makeWrapper(): ({ children }: { children: ReactNode }) => JSX.Element {
+  const client = makeClient();
+  return function Wrapper({ children }: { children: ReactNode }): JSX.Element {
+    return (
+      <QueryClientProvider client={client}>
+        <WorkflowHandoffProvider>{children}</WorkflowHandoffProvider>
+      </QueryClientProvider>
+    );
+  };
 }
 
 /**
@@ -143,7 +151,7 @@ describe("useHandoffRehydrate", () => {
 
   it("restores accessions from the session id in the URL", async () => {
     mockGet.mockReturnValue(resolves(session(ENA_DETAIL)));
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(result.current.accessions.length).toBe(2));
     expect(mockGet).toHaveBeenCalledWith(
@@ -157,7 +165,7 @@ describe("useHandoffRehydrate", () => {
   it("does not fetch without a session id in the URL", async () => {
     mockQuery = { trsId: "wf" };
     mockAsPath = `${PATH}?trsId=wf`;
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(result.current.accessions).toEqual([]));
     expect(mockGet).not.toHaveBeenCalled();
@@ -224,7 +232,7 @@ describe("useHandoffRehydrate", () => {
 
   it("ignores an upload handoff -- the files were never ours", async () => {
     mockGet.mockReturnValue(resolves(session('{"source":"upload"}')));
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(mockGet).toHaveBeenCalled());
     expect(result.current.accessions).toEqual([]);
@@ -233,7 +241,7 @@ describe("useHandoffRehydrate", () => {
 
   it("survives a 403 from someone else's session cookie", async () => {
     mockGet.mockReturnValue(rejects(403));
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(mockGet).toHaveBeenCalled());
     expect(result.current.accessions).toEqual([]);
@@ -243,7 +251,7 @@ describe("useHandoffRehydrate", () => {
     // useHandoffSync clears once applied; an empty cell then looks identical
     // to "never had one", which without the guard restores in a loop.
     mockGet.mockReturnValue(resolves(session(ENA_DETAIL)));
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(result.current.accessions.length).toBe(2));
     act(() => result.current.clear());
@@ -254,7 +262,7 @@ describe("useHandoffRehydrate", () => {
 
   it("falls back to accessions in the value for a pre-#1296 session", async () => {
     mockGet.mockReturnValue(resolves(session(null, "ENA/SRA: ERR16655350")));
-    const { result } = renderHook(useSubject, { wrapper });
+    const { result } = renderHook(useSubject, { wrapper: makeWrapper() });
 
     await waitFor(() => expect(result.current.accessions.length).toBe(1));
     expect(result.current.accessions).toEqual(["ERR16655350"]);
