@@ -11,10 +11,11 @@ from pydantic_ai.exceptions import (
     UsageLimitExceeded,
 )
 
-from app.core.config import SESSION_COOKIE_NAME
+from app.core.config import SESSION_COOKIE_NAME, get_settings
 from app.core.dependencies import (
     check_rate_limit,
     get_assistant_agent,
+    get_current_user,
     get_optional_current_user,
 )
 from app.core.session_signing import require_session_cookie, set_session_cookie
@@ -23,9 +24,11 @@ from app.models.assistant import (
     ChatRequest,
     ChatResponse,
     SessionRestoreResponse,
+    SessionSaveResponse,
+    SessionState,
 )
 from app.models.user_data import UserMeResponse
-from app.services import turn_log
+from app.services import analysis_store, turn_log
 from app.services.assistant_agent import (
     AssistantTimeoutError,
     AssistantUnavailableError,
@@ -166,8 +169,42 @@ async def assistant_chat(
         logger.exception("Assistant chat error")
         raise HTTPException(status_code=500, detail="Internal assistant error") from e
 
+    # Auto-save for signed-in users. Read back rather than threading state out
+    # of the agent, which stays DB-agnostic; the store is fail-open and the
+    # read back is guarded, so nothing here can cost the user their reply.
+    if current_user:
+        try:
+            state = await agent.session_service.get_session(chat_response.session_id)
+            if state is not None:
+                # Reported back so the UI can say "saved" on an acknowledgement
+                # rather than on the assumption that being signed in means kept.
+                saved_analysis_id = await analysis_store.record(state)
+                chat_response.saved = saved_analysis_id is not None
+                await _stamp_analysis_id(agent, state, saved_analysis_id)
+        except Exception:
+            # get_session reads Redis strictly and raises on a blip, so
+            # without this a cache hiccup would 500 a turn whose reply already
+            # succeeded -- the one thing the auto-save must never do.
+            logger.exception("Failed to auto-save session %s", chat_response.session_id)
+
     set_session_cookie(response, chat_response.session_id)
     return chat_response
+
+
+async def _stamp_analysis_id(
+    agent, state: SessionState, saved_analysis_id: Optional[str]
+) -> None:
+    """Teach a session which analysis it was just written to.
+
+    The session id is a mutable pointer and the analysis id is the durable
+    one, so a session that does not know its own analysis cannot answer
+    "is this already saved?" on restore -- which leaves the client saving it
+    again on every mount to find out.
+    """
+    if saved_analysis_id is None or state.saved_analysis_id == saved_analysis_id:
+        return
+    state.saved_analysis_id = saved_analysis_id
+    await agent.session_service.save_session(state)
 
 
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
@@ -206,7 +243,69 @@ async def restore_session(
         suggestions=suggestions,
         is_complete=is_complete,
         handoff_url=handoff_url,
+        saved=state.saved_analysis_id is not None,
     )
+
+
+@router.post("/session/{session_id}/save", response_model=SessionSaveResponse)
+async def save_session_to_account(
+    session_id: str,
+    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    current_user: UserMeResponse = Depends(get_current_user),
+    agent=Depends(get_assistant_agent),
+) -> SessionSaveResponse:
+    """Claim this conversation for the signed-in user and save it now.
+
+    Auto-save rides on chat turns, which leaves a gap the UI cannot honestly
+    paper over: a user who signs in *because* we offered to keep the
+    conversation has not sent a turn since, so nothing has been written and
+    the session dies with its two-hour Redis TTL. This closes that gap, and
+    unlike the per-turn write it reports failure rather than swallowing it.
+    """
+    require_session_cookie(session_id, session_cookie)
+
+    if not get_settings().DATABASE_URL:
+        # A deployment can have OIDC on and no database -- the chat endpoint
+        # authenticates on the JWT alone. Answering 503 there made every
+        # signed-in visit three retried failures and three exception logs, for
+        # a condition no retry can change. 501 says so plainly, and the client
+        # can stop asking.
+        raise HTTPException(
+            status_code=501, detail="Saving conversations is not configured"
+        )
+
+    try:
+        state = await agent.session_service.claim_session(session_id, current_user.sub)
+    except KeyError as e:
+        raise HTTPException(
+            status_code=404, detail="Session not found or expired"
+        ) from e
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=403, detail="Assistant session belongs to another user"
+        ) from e
+
+    try:
+        saved_analysis_id = await analysis_store.persist(state)
+    except Exception as e:
+        logger.exception("Failed to save session %s to account", session_id)
+        raise HTTPException(
+            status_code=503, detail="Could not save this conversation"
+        ) from e
+
+    if saved_analysis_id is None:
+        # An empty conversation has nothing worth listing. Not an error, but
+        # the caller must not be told it was saved.
+        raise HTTPException(status_code=409, detail="Nothing to save yet")
+
+    try:
+        await _stamp_analysis_id(agent, state, saved_analysis_id)
+    except Exception:
+        # The row is written; only the session's memory of it is missing, and
+        # the cost of that is one redundant (idempotent) save later.
+        logger.exception("Failed to stamp analysis id onto session %s", session_id)
+
+    return SessionSaveResponse(saved_analysis_id=saved_analysis_id)
 
 
 @router.delete("/session/{session_id}", status_code=204)
