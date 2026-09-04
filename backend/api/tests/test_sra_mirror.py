@@ -6,10 +6,14 @@ built at a temp path so the service's real read-only queries run against it.
 """
 
 import logging
+import os
+import time
+from pathlib import Path
 
 import duckdb
 import pytest
 
+from app.services import country_iso, sra_mirror
 from app.services.sra_mirror import SRAMirrorService
 
 
@@ -191,6 +195,218 @@ class TestResolvedFlagAcrossOutputs:
     def test_top_bioprojects_resolved_true_when_found(self, mirror):
         result = mirror.top_bioprojects_for_organism("Plasmodium falciparum")
         assert result["resolved"] is True
+
+
+class TestCapabilityGating:
+    """A mirror older than the backend must degrade one query at a time.
+
+    `_initialize` used to check only that `runs` was queryable, so a query
+    naming a column the file did not have raised at query time. Marking the
+    whole service unavailable instead would be worse than the bug: cohort,
+    per-hit annotation, export and the MCP tools would all go down to protect
+    whichever query was ahead of the file.
+
+    The fixture's `runs` is the deployed schema_version 3 column set exactly,
+    so "everything serves against the fixture" is the live case, not a
+    hypothetical.
+    """
+
+    def test_deployed_column_set_serves_every_capability(self, mirror):
+        for capability in sra_mirror._CAPABILITY_COLUMNS:
+            assert mirror.has_capability(capability), capability
+            assert mirror.missing_columns(capability) == []
+
+    def test_geography_needs_nothing_the_deployed_mirror_lacks(self, mirror):
+        # The whole reason phase 1 can ship ahead of a mirror rebuild.
+        assert set(sra_mirror._CAPABILITY_COLUMNS["geography"]) <= {
+            "acc",
+            "sra_study",
+            "bioproject",
+            "organism",
+            "assay_type",
+            "platform",
+            "instrument",
+            "librarylayout",
+            "releasedate",
+            "geo_loc_name_country_calc",
+            "mbases",
+        }
+
+    def test_a_missing_column_only_closes_the_capabilities_that_read_it(
+        self, tmp_path, caplog
+    ):
+        path = str(tmp_path / "no-mbases.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+
+        with caplog.at_level(logging.WARNING):
+            svc = SRAMirrorService(path)
+
+        assert svc.is_available()
+        # mbases is in the run-detail projection and nowhere else.
+        for closed in ("annotation", "export", "search", "study"):
+            assert not svc.has_capability(closed), closed
+            assert svc.missing_columns(closed) == ["mbases"]
+        for open_ in ("cohort", "geography", "summary"):
+            assert svc.has_capability(open_), open_
+            assert svc.missing_columns(open_) == []
+        # And it says which column, so the fix is legible from the log alone.
+        assert any("mbases" in r.getMessage() for r in caplog.records)
+
+    def test_geography_can_close_without_taking_anything_else_with_it(
+        self, tmp_path, monkeypatch
+    ):
+        # Phase 2 adds lat/lon to the geography query, and the mirror rebuild
+        # that carries them will land after the code that reads them. Simulate
+        # that ordering rather than wait for it: geography goes dark, and
+        # everything else still answers with real numbers.
+        monkeypatch.setitem(
+            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
+        )
+        path = str(tmp_path / "phase2-ahead-of-mirror.duckdb")
+        _build_mirror(path)
+        svc = SRAMirrorService(path)
+
+        assert svc.has_capability("geography") is False
+        assert svc.missing_columns("geography") == ["lat", "lon"]
+        for still_serving in ("annotation", "cohort", "export", "search", "study"):
+            assert svc.has_capability(still_serving), still_serving
+        cohort = svc.cohort_for_accessions(["SRR001", "SRR002", "SRR003"])
+        assert cohort is not None and cohort["in_mirror"] == 3
+        assert svc.runs_by_accession(["SRR001"])["SRR001"]["country"] == "Kenya"
+
+    def test_schema_version_is_read_and_reported(self, tmp_path, caplog):
+        path = str(tmp_path / "stamped.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("INSERT INTO mirror_meta VALUES ('schema_version', '3')")
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+
+        with caplog.at_level(logging.INFO):
+            svc = SRAMirrorService(path)
+
+        assert svc.schema_version == "3"
+        assert svc._provenance([])["mirror_schema_version"] == "3"
+        # The version is on the line that says what is missing, because that
+        # is the line an operator has to act on.
+        warning = next(
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING
+        )
+        assert "3" in warning and "mbases" in warning
+
+    def test_unstamped_mirror_still_loads(self, mirror):
+        # The stamp is reported, never enforced -- the column check decides.
+        assert mirror.schema_version is None
+        assert mirror.is_available()
+        assert mirror.has_capability("geography")
+
+    def test_every_declared_capability_actually_gates_something(self, tmp_path):
+        """A startup warning that protects nothing is worse than no warning.
+
+        The check reports seven capabilities unavailable when their columns
+        are missing. If a path named there went on querying regardless, the
+        warning would promise a guard that is not present -- so each one has
+        to refuse. Driven off a mirror with mbases dropped, which closes the
+        four run-detail capabilities and leaves the other three open.
+        """
+        path = str(tmp_path / "gating.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+        svc = SRAMirrorService(path)
+
+        closed = {
+            "search": lambda: svc.search_runs("Plasmodium falciparum"),
+            "study": lambda: svc.get_study_runs("PRJNA12345"),
+        }
+        for capability, call in closed.items():
+            assert not svc.has_capability(capability)
+            result = call()
+            assert "error" in result, capability
+            # The message names the column, because whoever reads it is the
+            # person who has to go copy a newer mirror onto the host.
+            assert "mbases" in result["error"], capability
+
+        # And the ones the file can still answer are untouched.
+        assert svc.has_capability("summary")
+        assert svc.summary_for_organism("Plasmodium falciparum")["n_runs"] == 2
+        assert svc.top_bioprojects_for_organism("Plasmodium falciparum")["resolved"]
+        assert svc.geography_for_accessions(["SRR001"])["in_mirror"] == 1
+
+    def test_summary_closes_when_its_own_columns_go(self, tmp_path):
+        path = str(tmp_path / "no-platform.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("ALTER TABLE runs DROP COLUMN platform")
+        con.close()
+        svc = SRAMirrorService(path)
+
+        assert not svc.has_capability("summary")
+        assert "platform" in svc.summary_for_organism("Plasmodium falciparum")["error"]
+        assert "platform" in svc.top_bioprojects_for_organism("P. falciparum")["error"]
+        # geography does not read platform, so it keeps answering.
+        assert svc.geography_for_accessions(["SRR001"]) is not None
+
+    def test_the_fingerprint_changes_only_when_the_capabilities_do(
+        self, tmp_path, mirror
+    ):
+        # It goes in the aggregate cache key, so it has to be stable for one
+        # mirror and different for a mirror that can answer more.
+        assert mirror.capability_fingerprint() == mirror.capability_fingerprint()
+
+        narrow_path = str(tmp_path / "narrow.duckdb")
+        _build_mirror(narrow_path)
+        con = duckdb.connect(narrow_path)
+        con.execute("ALTER TABLE runs DROP COLUMN mbases")
+        con.close()
+        narrow = SRAMirrorService(narrow_path)
+
+        assert narrow.capability_fingerprint() != mirror.capability_fingerprint()
+        # Readable in a Redis key rather than a hash nobody can decode at 3am.
+        assert "geography" in narrow.capability_fingerprint()
+        assert "export" not in narrow.capability_fingerprint()
+
+    def test_an_unavailable_mirror_fingerprints_as_none(self):
+        assert SRAMirrorService("").capability_fingerprint() == "none"
+
+    def test_unknown_capability_is_not_available(self, mirror):
+        assert mirror.has_capability("teleportation") is False
+
+    def test_unavailable_mirror_has_no_capabilities(self):
+        svc = SRAMirrorService("")
+        assert svc.is_available() is False
+        for capability in sra_mirror._CAPABILITY_COLUMNS:
+            assert svc.has_capability(capability) is False
+
+
+class TestProvenanceTaxdumpVersion:
+    """The builder renamed the key at schema_version 5 and the service was
+    never told. `_provenance` read 'taxdump_version'; anything the current
+    builder produces writes 'ncbi_taxdump_version', so the taxonomy release
+    reported itself as unknown against a freshly built mirror while looking
+    fine against the deployed schema_version 3 file."""
+
+    def test_legacy_key_is_read(self, mirror):
+        # The `mirror` fixture writes the pre-v5 spelling, as the deployed
+        # file does.
+        meta = mirror.summary_for_organism("Plasmodium falciparum")["_meta"]
+        assert meta["taxdump_version"] == "2026-05-01"
+
+    def test_builder_key_is_read(self, tmp_path):
+        path = str(tmp_path / "v5-meta.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute("DELETE FROM mirror_meta WHERE key = 'taxdump_version'")
+        con.execute(
+            "INSERT INTO mirror_meta VALUES ('ncbi_taxdump_version', '2026-08-24')"
+        )
+        con.close()
+        svc = SRAMirrorService(path)
+        assert svc._provenance([])["taxdump_version"] == "2026-08-24"
 
 
 class TestSinceValidation:
@@ -390,3 +606,1088 @@ class TestConcurrentAccess:
             list(pool.map(hammer, range(n_iter)))
 
         assert not errors, errors[:5]
+
+
+class TestAccessionBatching:
+    """A page larger than the batch size must not lose annotations.
+
+    The lookup used to slice to the batch size, which dropped rows silently --
+    and since the accession list is sorted before slicing, it dropped them by
+    accession rather than by score, so what survived wasn't the ranked subset
+    either.
+    """
+
+    @staticmethod
+    def _mirror_with(n: int, tmp_path):
+        """Build a mirror holding `n` synthetic runs.
+
+        @param n: how many runs to insert.
+        @param tmp_path: pytest tmp dir.
+        @returns: (service, list of every accession inserted).
+        """
+        path = str(tmp_path / f"batch-{n}.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        accs = [f"SRRB{i:06d}" for i in range(n)]
+        con.executemany(
+            "INSERT INTO runs VALUES (?,'SRPX','PRJNAX','Batch organism','WGS',"
+            "'ILLUMINA','X','PAIRED', DATE '2023-01-01','Kenya', 1)",
+            [(a,) for a in accs],
+        )
+        con.close()
+        svc = SRAMirrorService(path)
+        assert svc.is_available()
+        return svc, accs
+
+    def test_page_larger_than_batch_size_annotates_every_row(self, tmp_path):
+        from app.services.sra_mirror import _ACCESSION_BATCH_SIZE
+
+        n = _ACCESSION_BATCH_SIZE * 2 + 37  # spans three batches, last partial
+        svc, accs = self._mirror_with(n, tmp_path)
+        found = svc.runs_by_accession(accs)
+        assert len(found) == n
+        assert set(found) == set(accs)
+
+    def test_exact_batch_multiple_has_no_off_by_one(self, tmp_path):
+        from app.services.sra_mirror import _ACCESSION_BATCH_SIZE
+
+        svc, accs = self._mirror_with(_ACCESSION_BATCH_SIZE * 2, tmp_path)
+        assert len(svc.runs_by_accession(accs)) == _ACCESSION_BATCH_SIZE * 2
+
+    def test_unknown_accessions_are_simply_absent(self, tmp_path):
+        svc, accs = self._mirror_with(10, tmp_path)
+        found = svc.runs_by_accession(accs + ["SRR_NOT_IN_MIRROR"])
+        assert len(found) == 10
+        assert "SRR_NOT_IN_MIRROR" not in found
+
+
+def _build_cohort_mirror(path: str) -> list:
+    """Create a mirror shaped like the real one's awkward parts.
+
+    Carries what the cohort query has to get right and a small fixture
+    otherwise wouldn't exercise: the literal 'uncalculated' country sentinel
+    beside genuinely NULL countries, the literal 'unspecified' instrument
+    sentinel in a column that has no NULLs or blanks at all, an instrument
+    tail longer than the listed head, a run with no release date, and an
+    empty-string assay type. Returns every accession inserted.
+    """
+    _build_mirror(path)
+    con = duckdb.connect(path)
+    con.execute("DELETE FROM runs")
+
+    rows = []
+
+    def add(n, organism, country, instrument, **kw):
+        for _ in range(n):
+            acc = f"SRRC{len(rows):05d}"
+            rows.append(
+                (
+                    acc,
+                    kw.get("study", "SRP1"),
+                    kw.get("project", "PRJNA1"),
+                    organism,
+                    kw.get("assay", "WGS"),
+                    kw.get("platform", "ILLUMINA"),
+                    instrument,
+                    kw.get("layout", "PAIRED"),
+                    kw.get("date", "2020-06-01"),
+                    country,
+                )
+            )
+
+    # A dominant organism plus a runner-up, so top_organisms has an order to
+    # get wrong, and a second study/project so the distinct counts aren't 1.
+    add(20, "Salmonella enterica", "USA", "Illumina MiSeq")
+    add(12, "Escherichia coli", "United Kingdom", "Illumina MiSeq", study="SRP2")
+    add(3, "Shigella sonnei", "Kenya", "Illumina MiSeq", project="PRJNA2")
+    # The sentinel and real NULLs: both belong in `unknown`, and neither may
+    # count toward `countries`.
+    add(5, "Salmonella enterica", "uncalculated", "Illumina MiSeq")
+    add(4, "Salmonella enterica", None, "Illumina MiSeq")
+    # The instrument sentinel. Unlike country, this column has no NULLs and
+    # no empty strings, so 'unspecified' is the only thing that can put a row
+    # in `unknown` -- and at 6 rows it outranks every instrument below MiSeq,
+    # so an unfixed facet lists it second rather than hiding it in `other`.
+    # Parked on Shigella so the top-organism ranking below is untouched.
+    add(6, "Shigella sonnei", "USA", "unspecified")
+    # Fourteen one-run instruments: more distinct values than a facet lists,
+    # so the tail has to roll into `other` rather than vanish.
+    for i in range(14):
+        add(1, "Escherichia coli", "USA", f"Instrument {i:02d}")
+    # A run with no release date and one with a blank assay type -- both read
+    # as unknown, not as a value.
+    add(1, "Salmonella enterica", "USA", "Illumina MiSeq", date=None)
+    add(1, "Salmonella enterica", "USA", "Illumina MiSeq", assay="")
+    add(
+        2,
+        "Salmonella enterica",
+        "USA",
+        "MinION",
+        platform="OXFORD_NANOPORE",
+        layout="SINGLE",
+        date="2023-06-01",
+    )
+    # An organism the mirror knows nothing about would simply be absent; this
+    # one has an empty name, which must not become a top organism.
+    add(1, "", "USA", "Illumina MiSeq")
+
+    con.executemany(
+        "INSERT INTO runs VALUES (?,?,?,?,?,?,?,?,?,?,1)",
+        rows,
+    )
+    con.close()
+    return [r[0] for r in rows]
+
+
+@pytest.fixture()
+def cohort_mirror(tmp_path):
+    path = str(tmp_path / "cohort-mirror.duckdb")
+    accessions = _build_cohort_mirror(path)
+    svc = SRAMirrorService(path)
+    assert svc.is_available()
+    return svc, accessions
+
+
+class TestCohortForAccessions:
+    """Counts over a complete pre-cap hit set.
+
+    The paged hit list is the top of a global score sort, so summarizing it
+    summarizes the cap: on the measured 1,133,516-hit job the surviving 50,000
+    put E. coli first at 70% and dropped Salmonella enterica, the real leader,
+    out of the top five. These cover the properties that make the pre-cap
+    numbers worth trusting instead.
+    """
+
+    def test_total_is_the_hit_count_the_caller_passed(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        # Unmirrored accessions are the norm -- Logan indexes all of SRA and
+        # the mirror doesn't -- so `total` has to stay the caller's hit count
+        # (it is shown as total_matches) while `in_mirror` carries the join.
+        cohort = svc.cohort_for_accessions(accessions + ["SRR_NOT_MIRRORED"])
+        assert cohort["total"] == len(accessions) + 1
+        assert cohort["in_mirror"] == len(accessions)
+
+    def test_distinct_counts_come_from_the_whole_set(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        # Salmonella, E. coli, Shigella -- the blank-named run is not a fourth.
+        assert cohort["organisms"] == 3
+        assert cohort["bioprojects"] == 2
+        assert cohort["studies"] == 2
+        # USA, United Kingdom, Kenya. Not 'uncalculated', not NULL.
+        assert cohort["countries"] == 3
+
+    def test_uncalculated_sentinel_is_unknown_not_a_country(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        country = next(f for f in cohort["facets"] if f["name"] == "country")
+
+        assert "uncalculated" not in [v["value"] for v in country["values"]]
+        # Five sentinel rows plus four genuinely NULL ones.
+        assert country["unknown"] == 9
+
+    def test_unspecified_sentinel_is_unknown_not_an_instrument(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        instrument = next(f for f in cohort["facets"] if f["name"] == "instrument")
+
+        assert "unspecified" not in [v["value"] for v in instrument["values"]]
+        # instrument carries no NULLs and no blanks -- mirror-wide, not just
+        # here -- so the sentinel is the only thing that can make `unknown`
+        # non-zero. Without this it is structurally 0, which claims every
+        # matched run has a recorded instrument.
+        assert instrument["unknown"] == 6
+        # And it is genuinely excluded rather than swallowed by the tail: at 6
+        # rows it outranks every listed instrument but MiSeq, so an unfixed
+        # facet would have named it, not rolled it into `other`.
+        assert min(v["count"] for v in instrument["values"]) < 6
+
+    def test_every_facet_reconciles_to_in_mirror(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        # Every matched row lands in exactly one of values/other/unknown, which
+        # is what lets a reader check the facet rather than take it on faith.
+        for facet in cohort["facets"]:
+            listed = sum(v["count"] for v in facet["values"])
+            assert listed + facet["other"] + facet["unknown"] == cohort["in_mirror"], (
+                facet["name"]
+            )
+
+    def test_long_tail_rolls_into_other(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        instrument = next(f for f in cohort["facets"] if f["name"] == "instrument")
+
+        from app.services.sra_mirror import _COHORT_FACET_VALUES
+
+        assert len(instrument["values"]) == _COHORT_FACET_VALUES
+        # Sixteen distinct instruments, ten listed, so the rest are counted.
+        assert instrument["other"] > 0
+
+    def test_short_facets_list_every_value_with_no_other(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        layout = next(f for f in cohort["facets"] if f["name"] == "librarylayout")
+
+        assert {v["value"] for v in layout["values"]} == {"PAIRED", "SINGLE"}
+        assert layout["other"] == 0
+
+    def test_blank_values_are_unknown_rather_than_a_value(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        assay = next(f for f in cohort["facets"] if f["name"] == "assay_type")
+
+        assert assay["unknown"] == 1
+        assert all(v["value"] for v in assay["values"])
+
+    def test_release_year_buckets_by_year_and_nulls_are_unknown(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        years = next(f for f in cohort["facets"] if f["name"] == "release_year")
+
+        assert {v["value"] for v in years["values"]} == {"2020", "2023"}
+        # The one run with no release date.
+        assert years["unknown"] == 1
+
+    def test_top_organisms_are_ranked_and_exclude_blanks(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        cohort = svc.cohort_for_accessions(accessions)
+        names = [o["value"] for o in cohort["top_organisms"]]
+
+        assert names == ["Salmonella enterica", "Escherichia coli", "Shigella sonnei"]
+        # 20 + 5 sentinel-country + 4 null-country + 2 nanopore + 2 odd rows.
+        assert cohort["top_organisms"][0]["count"] == 33
+
+    def test_hit_set_larger_than_the_accession_batch_size(self, cohort_mirror):
+        # runs_by_accession chunks at 500 because it serves a page; the cohort
+        # cannot chunk at all, since count(DISTINCT ...) does not merge across
+        # batches. This proves it takes the whole set in one pass.
+        from app.services.sra_mirror import _ACCESSION_BATCH_SIZE
+
+        svc, accessions = cohort_mirror
+        padding = [f"SRRPAD{i:06d}" for i in range(_ACCESSION_BATCH_SIZE * 3)]
+        cohort = svc.cohort_for_accessions(accessions + padding)
+
+        assert cohort["total"] == len(accessions) + len(padding)
+        assert cohort["in_mirror"] == len(accessions)
+        assert cohort["organisms"] == 3
+
+    def test_unavailable_mirror_returns_none(self):
+        svc = SRAMirrorService("")
+        assert svc.is_available() is False
+        assert svc.cohort_for_accessions(["SRR001"]) is None
+
+    def test_empty_hit_set_returns_none(self, cohort_mirror):
+        svc, _accessions = cohort_mirror
+        assert svc.cohort_for_accessions([]) is None
+        assert svc.cohort_for_accessions(["", "  "]) is None
+
+    def test_query_failure_raises_rather_than_returning_a_partial_cohort(
+        self, cohort_mirror, monkeypatch
+    ):
+        # The caller has to be able to tell a broken read from an absent
+        # mirror, because only one of the two is worth retrying -- and a
+        # half-filled cohort would undermine the one thing it is for.
+        from app.services import sra_mirror as sra_mod
+
+        svc, accessions = cohort_mirror
+        monkeypatch.setattr(sra_mod, "_cohort_sql", lambda: "SELECT * FROM no_such")
+        with pytest.raises(duckdb.Error):
+            svc.cohort_for_accessions(accessions)
+
+    def test_staging_file_is_removed_even_when_the_query_fails(
+        self, cohort_mirror, monkeypatch, tmp_path
+    ):
+        import tempfile
+
+        from app.services import sra_mirror as sra_mod
+
+        svc, accessions = cohort_mirror
+        staging_dir = tmp_path / "staging"
+        staging_dir.mkdir()
+        monkeypatch.setattr(tempfile, "tempdir", str(staging_dir))
+
+        svc.cohort_for_accessions(accessions)
+        assert list(staging_dir.iterdir()) == []
+
+        monkeypatch.setattr(sra_mod, "_cohort_sql", lambda: "SELECT * FROM no_such")
+        with pytest.raises(duckdb.Error):
+            svc.cohort_for_accessions([a + "X" for a in accessions])
+        assert list(staging_dir.iterdir()) == []
+
+    def test_repeat_call_is_served_from_the_cache(self, cohort_mirror, monkeypatch):
+        from app.services import sra_mirror as sra_mod
+
+        svc, accessions = cohort_mirror
+        first = svc.cohort_for_accessions(accessions)
+        # Any second trip to DuckDB would now fail, so an equal result proves
+        # the cache answered.
+        monkeypatch.setattr(sra_mod, "_cohort_sql", lambda: "SELECT * FROM no_such")
+        assert svc.cohort_for_accessions(accessions) == first
+
+    def test_cached_cohort_is_not_mutated_by_a_caller(self, cohort_mirror):
+        svc, accessions = cohort_mirror
+        first = svc.cohort_for_accessions(accessions)
+        first["in_mirror"] = -1
+        first["facets"][0]["values"].append({"count": 1, "value": "BOGUS"})
+
+        second = svc.cohort_for_accessions(accessions)
+        assert second["in_mirror"] == len(accessions)
+        assert all(v["value"] != "BOGUS" for v in second["facets"][0]["values"])
+
+    def test_cohort_does_not_serialize_on_the_shared_lock(self, cohort_mirror):
+        """The heavy query must run off the instance lock.
+
+        @_synchronized holds it for a whole call and justifies that with
+        "queries are sub-200ms"; this one is ~1s on a real hit set, so holding
+        the lock would park every MCP tool call behind one user's search. The
+        probe below calls a @_synchronized method from another thread while
+        the cohort query is in flight: if the lock were held, it would block
+        until the query finished and `probed` would still be clear.
+        """
+        import threading
+
+        from app.services import sra_mirror as sra_mod
+
+        svc, accessions = cohort_mirror
+        real_sql = sra_mod._cohort_sql()
+        in_query = threading.Event()
+        probed = threading.Event()
+
+        def probing_sql() -> str:
+            # Called after the cursor is taken and before execute(), i.e. from
+            # exactly the stretch that must not hold the lock.
+            in_query.set()
+            probed.wait(timeout=5)
+            return real_sql
+
+        def probe():
+            in_query.wait(timeout=5)
+            svc.search_runs("Plasmodium falciparum", limit=1)
+            probed.set()
+
+        thread = threading.Thread(target=probe)
+        thread.start()
+        try:
+            with pytest.MonkeyPatch.context() as patch:
+                patch.setattr(sra_mod, "_cohort_sql", probing_sql)
+                cohort = svc.cohort_for_accessions(accessions)
+        finally:
+            probed.set()
+            thread.join(timeout=5)
+
+        assert probed.is_set(), "a synchronized call blocked on the cohort query"
+        assert cohort["in_mirror"] == len(accessions)
+
+    def test_cohort_method_is_not_wrapped_in_the_lock_decorator(self):
+        # Structural guard for the same thing: @_synchronized would wrap it.
+        assert not hasattr(SRAMirrorService.cohort_for_accessions, "__wrapped__")
+        assert hasattr(SRAMirrorService.runs_by_accession, "__wrapped__")
+
+
+def _build_geography_mirror(path: str) -> list:
+    """A mirror carrying every shape of country value the map has to handle.
+
+    Not a realistic distribution -- a deliberate one. It has a country the
+    committed asset can draw, one it cannot (Singapore has an ISO code and no
+    shape at 1:110m), one that is not a country at all (Borneo), two raw
+    values that share a code (Gaza Strip and West Bank are both PSE), and all
+    three ways a run can have no country: NULL, empty string, and SRA's
+    'uncalculated' sentinel.
+
+    Returns every accession inserted.
+    """
+    _build_mirror(path)
+    con = duckdb.connect(path)
+    con.execute("DELETE FROM runs")
+
+    rows = []
+
+    def add(n, country):
+        for _ in range(n):
+            rows.append((f"SRRG{len(rows):05d}", country))
+
+    add(40, "USA")
+    add(12, "Malawi")
+    add(7, "Singapore")
+    add(5, "Borneo")
+    add(3, "Gaza Strip")
+    add(2, "West Bank")
+    add(6, "uncalculated")
+    add(4, None)
+    add(1, "")
+
+    con.executemany(
+        "INSERT INTO runs VALUES (?,'SRP1','PRJNA1','Escherichia coli','WGS',"
+        "'ILLUMINA','Illumina MiSeq','PAIRED', DATE '2020-06-01', ?, 1)",
+        [(acc, country) for acc, country in rows],
+    )
+    con.close()
+    return [acc for acc, _country in rows]
+
+
+@pytest.fixture()
+def geography_mirror(tmp_path):
+    path = str(tmp_path / "geography-mirror.duckdb")
+    accessions = _build_geography_mirror(path)
+    svc = SRAMirrorService(path)
+    assert svc.is_available()
+    return svc, accessions
+
+
+class TestGeographyForAccessions:
+    """Every country in the match set, and the runs that recorded none.
+
+    The cohort's country facet lists ten values and rolls the rest into
+    `other`, which renders the reference job's 42 countries as ten bars. A
+    choropleth needs all of them. And it needs the unrecorded share as a
+    number of its own: 80.8% of that cohort has no country, and a map drawing
+    42 countries without saying so is the failure this feature exists to fix.
+    """
+
+    def test_every_country_is_listed_not_just_a_head(self, geography_mirror):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert [c["value"] for c in geography["countries"]] == [
+            "United States of America",
+            "Malawi",
+            "Palestine",
+        ]
+        assert geography["countries"][0]["count"] == 40
+
+    def test_the_parts_reconcile_against_in_mirror(self, geography_mirror):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        drawn = sum(c["count"] for c in geography["countries"])
+        unplaceable = sum(c["count"] for c in geography["unmapped_countries"])
+        assert drawn + unplaceable == geography["recorded"] == 69
+        assert geography["unknown"] == 11
+        assert geography["in_mirror"] == len(accessions) == 80
+        assert drawn + unplaceable + geography["unknown"] == geography["in_mirror"]
+
+    def test_every_emitted_country_carries_a_code_the_asset_can_draw(
+        self, geography_mirror
+    ):
+        # The second leg of the totality test, asserted on the wire this time
+        # rather than on the table: nothing reaches the frontend that joins to
+        # no shape.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        for entry in geography["countries"]:
+            assert entry["iso_n3"] in country_iso.TOPOJSON_COUNTRY_IDS, entry
+            assert len(entry["iso_a3"]) == 3
+
+    def test_a_country_with_no_shape_is_reported_not_dropped(self, geography_mirror):
+        # Singapore has an ISO code and no 1:110m outline. Dropping it would
+        # lose 64,050 runs mirror-wide with no error anywhere.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert {"count": 7, "value": "Singapore"} in geography["unmapped_countries"]
+        assert "SGP" not in [c["iso_a3"] for c in geography["countries"]]
+
+    def test_a_value_that_is_not_a_country_is_reported_not_guessed(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert {"count": 5, "value": "Borneo"} in geography["unmapped_countries"]
+
+    def test_unmapped_countries_keep_the_raw_string_the_reader_would_see(
+        self, geography_mirror
+    ):
+        # There is no canonical name to fall back on, and the raw value is
+        # what the country bars beside the map are showing.
+        svc, accessions = geography_mirror
+        values = [
+            c["value"]
+            for c in svc.geography_for_accessions(accessions)["unmapped_countries"]
+        ]
+        assert values == ["Singapore", "Borneo"]
+
+    def test_two_raw_values_sharing_a_code_are_merged_once(self, geography_mirror):
+        # Gaza Strip and West Bank are both PSE. Two rows with one code would
+        # have the choropleth colour from whichever it saw last and silently
+        # lose the other.
+        svc, accessions = geography_mirror
+        countries = svc.geography_for_accessions(accessions)["countries"]
+
+        palestine = [c for c in countries if c["iso_a3"] == "PSE"]
+        assert len(palestine) == 1
+        assert palestine[0]["count"] == 5
+        assert palestine[0]["value"] == "Palestine"
+
+    def test_codes_are_unique_so_the_choropleth_join_cannot_double_count(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        countries = svc.geography_for_accessions(accessions)["countries"]
+        assert len({c["iso_a3"] for c in countries}) == len(countries)
+        assert len({c["iso_n3"] for c in countries}) == len(countries)
+
+    def test_the_payload_carries_only_what_is_rendered(self, geography_mirror):
+        # No continent rollup. The ISO table has continents and nothing draws
+        # them, and a fourth list reconciling against neither `recorded` nor
+        # the sum of `countries` is a trap rather than a feature.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert set(geography) == {
+            "countries",
+            "in_mirror",
+            "recorded",
+            "unknown",
+            "unmapped_countries",
+        }
+
+    def test_the_three_absences_all_count_as_unknown(self, geography_mirror):
+        # NULL, '', and 'uncalculated' -- 4 + 1 + 6. The sentinel is the one
+        # that matters: counted as a value it would invent a country, and it
+        # would also disagree with the country bars on the same card, which
+        # fold it into `unknown` too.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+
+        assert geography["unknown"] == 11
+        assert "uncalculated" not in [c["value"] for c in geography["countries"]]
+        assert "" not in [c["value"] for c in geography["countries"]]
+
+    def test_it_agrees_with_the_cohort_facet_on_the_same_hits(self, geography_mirror):
+        # The two render side by side. If they disagreed about how much
+        # geography a cohort has, one of them would be lying on screen.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions)
+        cohort = svc.cohort_for_accessions(accessions)
+        country_facet = next(f for f in cohort["facets"] if f["name"] == "country")
+
+        assert country_facet["unknown"] == geography["unknown"]
+        listed = sum(v["count"] for v in country_facet["values"])
+        assert listed + country_facet["other"] == geography["recorded"]
+
+    def test_counts_are_over_every_accession_not_a_page(self, geography_mirror):
+        svc, accessions = geography_mirror
+        head = svc.geography_for_accessions(accessions[:10])
+        whole = svc.geography_for_accessions(accessions)
+
+        assert head["in_mirror"] == 10
+        assert whole["in_mirror"] == 80
+
+    def test_duplicate_and_scruffy_accessions_are_deduplicated(self, geography_mirror):
+        svc, accessions = geography_mirror
+        messy = [f"  {a.lower()}  " for a in accessions] + accessions
+        assert svc.geography_for_accessions(messy)["in_mirror"] == 80
+
+    def test_accessions_the_mirror_does_not_know_are_simply_absent(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_accessions(accessions + ["SRR_NOT_HERE"])
+        # in_mirror counts mirrored rows, so a Logan hit the mirror was never
+        # built to carry lowers the denominator rather than becoming unknown.
+        assert geography["in_mirror"] == 80
+
+    def test_no_accessions_is_none_not_a_shell_of_zeroes(self, geography_mirror):
+        svc, _accessions = geography_mirror
+        assert svc.geography_for_accessions([]) is None
+        assert svc.geography_for_accessions(["", "   "]) is None
+
+    def test_an_unavailable_mirror_answers_none(self):
+        svc = SRAMirrorService("")
+        assert svc.geography_for_accessions(["SRR001"]) is None
+
+    def test_a_mirror_without_the_columns_answers_none_without_querying(
+        self, tmp_path, monkeypatch
+    ):
+        # Fails closed on geography alone. The cohort on the same file still
+        # answers, which is the whole point of the per-capability check.
+        monkeypatch.setitem(
+            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
+        )
+        path = str(tmp_path / "geography-behind.duckdb")
+        accessions = _build_geography_mirror(path)
+        svc = SRAMirrorService(path)
+
+        assert svc.geography_for_accessions(accessions) is None
+        assert svc.cohort_for_accessions(accessions)["in_mirror"] == 80
+
+    def test_the_cached_payload_cannot_be_mutated_by_a_caller(self, geography_mirror):
+        svc, accessions = geography_mirror
+        first = svc.geography_for_accessions(accessions)
+        first["recorded"] = -1
+        first["countries"].append({"count": 1, "value": "BOGUS"})
+
+        second = svc.geography_for_accessions(accessions)
+        assert second["recorded"] == 69
+        assert all(c["value"] != "BOGUS" for c in second["countries"])
+
+    def test_geography_method_is_not_wrapped_in_the_lock_decorator(self):
+        # Same shape of query as the cohort over the same 43.5M-row table, so
+        # it must not hold the instance lock either.
+        assert not hasattr(SRAMirrorService.geography_for_accessions, "__wrapped__")
+
+
+class TestGeographyAgainstTheRealVocabulary:
+    """Shape the whole mirror's measured country distribution.
+
+    The fixtures above are deliberately small and deliberately awkward. This
+    one is the real thing: all 245 distinct values with their real run counts,
+    measured off the deployed schema_version 3 mirror, pushed through the same
+    shaping function the API uses. It is the closest a unit test gets to
+    "what would this actually render".
+    """
+
+    @pytest.fixture(scope="class")
+    def shaped(self):
+        from tests.test_country_iso import DISTINCT_COUNTRY_VALUES
+
+        # The mirror-wide NULL/'uncalculated' count, as one group, exactly as
+        # _geography_sql returns it.
+        counted = list(DISTINCT_COUNTRY_VALUES) + [(None, 18_110_322)]
+        return sra_mirror._shape_geography(counted)
+
+    def test_the_totals_are_the_measured_ones(self, shaped):
+        assert shaped["in_mirror"] == 43_522_611
+        assert shaped["recorded"] == 25_412_289
+        assert shaped["unknown"] == 18_110_322
+
+    def test_the_three_buckets_partition_the_mirror(self, shaped):
+        drawn = sum(c["count"] for c in shaped["countries"])
+        unplaceable = sum(c["count"] for c in shaped["unmapped_countries"])
+        assert drawn + unplaceable + shaped["unknown"] == shaped["in_mirror"]
+        assert drawn == 25_155_616
+        assert unplaceable == 256_673
+
+    def test_the_map_can_draw_99_percent_of_recorded_runs(self, shaped):
+        drawn = sum(c["count"] for c in shaped["countries"])
+        assert drawn / shaped["recorded"] > 0.98
+        # 168 of the 245 raw values are drawable, and Gaza Strip and West Bank
+        # collapse into PSE, so 167 shapes get coloured.
+        assert len(shaped["countries"]) == 167
+
+    def test_the_unplaceable_countries_are_named_and_counted(self, shaped):
+        unplaceable = {c["value"]: c["count"] for c in shaped["unmapped_countries"]}
+        # 65 with a code and no shape, plus the 12 that are not countries.
+        assert len(unplaceable) == 77
+        assert unplaceable["Hong Kong"] == 81_649
+        assert unplaceable["Singapore"] == 64_050
+        assert unplaceable["Borneo"] == 827
+
+    def test_the_top_of_the_map_is_what_the_mirror_says(self, shaped):
+        assert shaped["countries"][0] == {
+            "count": 9_242_738,
+            "iso_a3": "USA",
+            "iso_n3": "840",
+            "value": "United States of America",
+        }
+        assert [c["iso_a3"] for c in shaped["countries"][:5]] == [
+            "USA",
+            "GBR",
+            "CHN",
+            "DNK",
+            "CAN",
+        ]
+
+    def test_no_country_is_listed_that_the_asset_cannot_draw(self, shaped):
+        for entry in shaped["countries"]:
+            assert entry["iso_n3"] in country_iso.TOPOJSON_COUNTRY_IDS, entry
+
+
+@pytest.fixture()
+def exports(tmp_path):
+    """A writable export directory of its own.
+
+    Separate from tmp_path because the mirror fixtures put their .duckdb file
+    there, and half of these assert that nothing was written.
+    """
+    path = tmp_path / "exports"
+    path.mkdir()
+    return path
+
+
+def _hits(accessions: list, shard: str = "GENOMIC_BCT_10_null") -> list:
+    """Shape a list of accessions like the hit dicts aggregation hands over.
+
+    Descending scores, so the staged rank is not the same as accession order
+    and a query that lost the ranking would be visible.
+    """
+    return [
+        {"accession": acc, "score": 1.0 - index / 10000, "shard": shard}
+        for index, acc in enumerate(accessions)
+    ]
+
+
+def _read_export(path) -> list:
+    """Read a materialized export back, in file order."""
+    con = duckdb.connect()
+    try:
+        return con.execute(f"SELECT * FROM read_parquet('{path}')").fetchall()
+    finally:
+        con.close()
+
+
+class TestExportHits:
+    """Materializing the complete match set while it is still alive.
+
+    Aggregation keeps 50,000 hits and discards the rest, and joins metadata
+    onto the 25 rows on screen -- so the enriched full match set exists for
+    exactly the span this runs in. These cover what the file has to get right
+    to be worth writing: every hit in it, the ones the mirror has never heard
+    of included, counted and spelled the same way the cohort beside it counts
+    and spells them.
+    """
+
+    def test_unset_directory_writes_nothing(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        assert svc.export_hits("job1", _hits(accessions), "") is None
+        assert list(exports.glob("*.parquet")) == []
+
+    def test_unavailable_mirror_writes_nothing(self, exports):
+        svc = SRAMirrorService("")
+        assert svc.is_available() is False
+        assert svc.export_hits("job1", _hits(["SRR001"]), str(exports)) is None
+        assert list(exports.iterdir()) == []
+
+    def test_empty_hit_list_writes_nothing(self, cohort_mirror, exports):
+        svc, _accessions = cohort_mirror
+        assert svc.export_hits("job1", [], str(exports)) is None
+        assert list(exports.iterdir()) == []
+
+    def test_rows_the_mirror_does_not_know_keep_their_hit_data(
+        self, cohort_mirror, exports
+    ):
+        # 0.44% of a real job's hits are runs the mirror was not built to
+        # carry. An inner join would drop 5,044 real matches out of the file
+        # that exists to be the complete match set, and leave its row count
+        # disagreeing with the total_matches shown beside it.
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions + ["SRR_NOT_MIRRORED"])
+
+        record = svc.export_hits("job1", hits, str(exports))
+
+        assert record == {"rows": len(hits), "status": sra_mirror.EXPORT_AVAILABLE}
+        rows = _read_export(exports / "job1.parquet")
+        assert len(rows) == len(hits)
+        unmirrored = next(r for r in rows if r[0] == "SRR_NOT_MIRRORED")
+        # Hit data kept...
+        assert unmirrored[2] == "GENOMIC_BCT_10_null"
+        assert unmirrored[1] == pytest.approx(hits[-1]["score"])
+        # ...metadata simply absent, rather than the row being absent.
+        assert all(value is None for value in unmirrored[3:])
+
+    def test_country_sentinel_is_normalised_the_same_way_as_the_cohort(
+        self, cohort_mirror, exports
+    ):
+        # 'uncalculated' is SRA's "no country could be derived", not a place.
+        # If the file spells it as a value while the cohort counts it as
+        # unknown, the two disagree about the same rows -- and the file is the
+        # one someone will tally themselves.
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        country_column = sra_mirror.EXPORT_COLUMNS.index("country")
+        rows = _read_export(exports / "job1.parquet")
+        blank = sum(1 for r in rows if r[country_column] is None)
+        assert "uncalculated" not in {r[country_column] for r in rows}
+
+        cohort = svc.cohort_for_accessions(accessions)
+        facet = next(f for f in cohort["facets"] if f["name"] == "country")
+        assert blank == facet["unknown"] == 9
+
+    def test_instrument_sentinel_is_normalised_the_same_way_too(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        instrument = sra_mirror.EXPORT_COLUMNS.index("instrument")
+        rows = _read_export(exports / "job1.parquet")
+        blank = sum(1 for r in rows if r[instrument] is None)
+
+        cohort = svc.cohort_for_accessions(accessions)
+        facet = next(f for f in cohort["facets"] if f["name"] == "instrument")
+        assert blank == facet["unknown"] == 6
+
+    def test_columns_are_the_declared_export_columns(self, cohort_mirror, exports):
+        # EXPORT_COLUMNS is the TSV header; if the parquet drifts from it the
+        # header would label the wrong columns and nothing else would notice.
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        con = duckdb.connect()
+        try:
+            described = con.execute(
+                f"DESCRIBE SELECT * FROM read_parquet('{exports / 'job1.parquet'}')"
+            ).fetchall()
+        finally:
+            con.close()
+        assert tuple(row[0] for row in described) == sra_mirror.EXPORT_COLUMNS
+
+    def test_rows_are_written_in_the_order_the_app_ranked_them(
+        self, cohort_mirror, exports
+    ):
+        # The tie-break is an md5 the SQL cannot reproduce, so the rank is
+        # staged and ordered on. Without it the join returns hash order and
+        # the file's first row is not the best hit.
+        svc, accessions = cohort_mirror
+        hits = _hits(sorted(accessions, reverse=True))
+
+        svc.export_hits("job1", hits, str(exports))
+
+        rows = _read_export(exports / "job1.parquet")
+        assert [r[0] for r in rows] == [h["accession"] for h in hits]
+
+    def test_row_ceiling_skips_the_write_and_names_the_reason(
+        self, cohort_mirror, exports, monkeypatch, caplog
+    ):
+        # Index sizes are skewed enough that a pathological selection is an
+        # order of magnitude past anything measured, so the ceiling decides
+        # what happens rather than production discovering it.
+        svc, accessions = cohort_mirror
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_ROWS", 5)
+
+        with caplog.at_level(logging.WARNING):
+            record = svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert record == {"rows": None, "status": sra_mirror.EXPORT_TOO_LARGE}
+        assert list(exports.iterdir()) == []
+        assert "export ceiling" in caplog.text
+
+    def test_a_hit_set_at_the_ceiling_is_still_written(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions)
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_ROWS", len(hits))
+
+        record = svc.export_hits("job1", hits, str(exports))
+
+        assert record["status"] == sra_mirror.EXPORT_AVAILABLE
+
+    def test_a_failed_write_leaves_nothing_that_reads_as_an_export(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        # The COPY writes a partial name and renames it into place, so a write
+        # that dies partway through cannot leave a truncated file the endpoint
+        # would happily serve as the complete match set.
+        svc, accessions = cohort_mirror
+        monkeypatch.setattr(
+            sra_mirror,
+            "_export_sql",
+            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+        )
+
+        with pytest.raises(duckdb.Error):
+            svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert list(exports.iterdir()) == []
+
+    def test_staging_file_is_removed_even_when_the_write_fails(
+        self, cohort_mirror, exports, monkeypatch, tmp_path
+    ):
+        import tempfile
+
+        svc, accessions = cohort_mirror
+        staging_dir = tmp_path / "staging"
+        staging_dir.mkdir()
+        monkeypatch.setattr(tempfile, "tempdir", str(staging_dir))
+
+        svc.export_hits("job1", _hits(accessions), str(exports))
+        assert list(staging_dir.iterdir()) == []
+
+        monkeypatch.setattr(
+            sra_mirror,
+            "_export_sql",
+            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+        )
+        with pytest.raises(duckdb.Error):
+            svc.export_hits("job2", _hits(accessions), str(exports))
+        assert list(staging_dir.iterdir()) == []
+
+    def test_re_running_a_job_replaces_its_file(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+        svc.export_hits("job1", _hits(accessions[:3]), str(exports))
+
+        assert [p.name for p in exports.iterdir()] == ["job1.parquet"]
+        assert len(_read_export(exports / "job1.parquet")) == 3
+
+    def test_export_is_not_wrapped_in_the_lock_decorator(self):
+        # Same structural guard as the cohort: @_synchronized holds the
+        # instance lock for the whole call and premises itself on sub-200ms
+        # queries, and this one is a ~1.5s write.
+        assert not hasattr(SRAMirrorService.export_hits, "__wrapped__")
+
+
+def _touch_export(directory: Path, name: str, size: int, age: float) -> Path:
+    """Put a file of a given size and age in the export directory."""
+    path = directory / name
+    path.write_bytes(b"x" * size)
+    stamp = time.time() - age
+    os.utime(path, (stamp, stamp))
+    return path
+
+
+class TestExportRetention:
+    """Exports are ~16 MB each and nothing else ever deletes them.
+
+    The sweep runs at write time rather than on a background task, which means
+    it runs in a directory it does not own exclusively -- so what it will not
+    touch matters as much as what it will.
+    """
+
+    def test_age_ceiling_is_the_aggregate_cache_ttl(self):
+        # Not a coincidence to be maintained by hand: the aggregate is what
+        # carries the "there is an export" claim, so once it expires nothing
+        # can still be pointing at the file.
+        from app.core.cache import CacheTTL
+
+        assert sra_mirror.EXPORT_MAX_AGE_SECONDS == CacheTTL.ONE_DAY
+
+    def test_deletes_exports_past_the_age_ceiling(self, exports):
+        stale = _touch_export(exports, "old.parquet", 10, 86400 * 2)
+        fresh = _touch_export(exports, "new.parquet", 10, 60)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not stale.exists()
+        assert fresh.exists()
+
+    def test_leaves_files_it_did_not_write(self, exports):
+        # The volume may hold anything; retention must not reach it.
+        others = [
+            _touch_export(exports, "notes.txt", 10, 86400 * 5),
+            _touch_export(exports, "sra-mirror.duckdb", 10, 86400 * 5),
+            _touch_export(exports, "job one.parquet", 10, 86400 * 5),
+            _touch_export(exports, "job1.parquet.bak", 10, 86400 * 5),
+        ]
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert all(path.exists() for path in others)
+
+    def test_does_not_follow_a_symlink_out_of_the_directory(self, exports, tmp_path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        target = _touch_export(outside, "precious.parquet", 10, 86400 * 5)
+        (exports / "job1.parquet").symlink_to(target)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert target.exists()
+        assert (exports / "job1.parquet").is_symlink()
+
+    def test_byte_budget_deletes_oldest_first(self, exports, monkeypatch):
+        # The age rule alone is unbounded: a day's worth of searches can fill
+        # a volume without any single file being old enough to sweep.
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_TOTAL_BYTES", 250)
+        oldest = _touch_export(exports, "a.parquet", 100, 3000)
+        middle = _touch_export(exports, "b.parquet", 100, 2000)
+        newest = _touch_export(exports, "c.parquet", 100, 1000)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not oldest.exists()
+        assert middle.exists() and newest.exists()
+
+    def test_budget_stops_as_soon_as_it_fits(self, exports, monkeypatch):
+        monkeypatch.setattr(sra_mirror, "EXPORT_MAX_TOTAL_BYTES", 300)
+        kept = [
+            _touch_export(exports, "a.parquet", 100, 3000),
+            _touch_export(exports, "b.parquet", 100, 2000),
+            _touch_export(exports, "c.parquet", 100, 1000),
+        ]
+
+        assert sra_mirror.sweep_exports(str(exports)) == 0
+        assert all(path.exists() for path in kept)
+
+    def test_orphaned_partials_go_sooner_than_finished_exports(self, exports):
+        # An in-flight write is seconds; one wearing the partial suffix hours
+        # later is a crash, and it is not a file anyone can be served.
+        orphan = _touch_export(exports, "job1.parquet.partial", 10, 7200)
+        inflight = _touch_export(exports, "job2.parquet.partial", 10, 5)
+        finished = _touch_export(exports, "job3.parquet", 10, 7200)
+
+        assert sra_mirror.sweep_exports(str(exports)) == 1
+        assert not orphan.exists()
+        assert inflight.exists() and finished.exists()
+
+    def test_a_missing_directory_is_not_an_error(self, exports):
+        assert sra_mirror.sweep_exports(str(exports / "nope")) == 0
+
+    def test_the_write_sweeps_before_it_lands(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        stale = _touch_export(exports, "old.parquet", 10, 86400 * 2)
+
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert not stale.exists()
+        assert (exports / "job1.parquet").exists()
+
+
+class TestExportServing:
+    """Reading a materialized export back out, which the mirror is not needed
+    for -- the file is a finished artifact and outlives the service that
+    wrote it."""
+
+    def test_path_is_none_when_the_feature_is_off(self):
+        assert sra_mirror.export_file_path("", "job1") is None
+
+    def test_path_refuses_anything_that_is_not_an_identifier(self, exports):
+        # The job id arrives in a request path and becomes a filename here,
+        # which is the only place that happens.
+        for job_id in ("../etc/passwd", "a/b", "job.1", "", "x" * 65, "job\x00"):
+            assert sra_mirror.export_file_path(str(exports), job_id) is None
+
+    def test_download_name_states_the_job_and_the_row_count(self):
+        # Once downloaded this is the only description that travels with the
+        # file.
+        assert (
+            sra_mirror.export_download_name("7c937baf0758a668", 1133516, "tsv")
+            == "logan-7c937baf0758a668-1133516-runs.tsv"
+        )
+
+    def test_row_count_comes_from_the_file_not_from_a_caller(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert sra_mirror.export_row_count(exports / "job1.parquet") == len(accessions)
+
+    def test_tsv_has_the_declared_header_and_one_row_per_hit(
+        self, cohort_mirror, exports
+    ):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions + ["SRR_NOT_MIRRORED"])
+        svc.export_hits("job1", hits, str(exports))
+
+        text = b"".join(sra_mirror.iter_export_tsv(exports / "job1.parquet")).decode()
+        lines = text.splitlines()
+
+        assert lines[0] == "\t".join(sra_mirror.EXPORT_COLUMNS)
+        assert len(lines) == len(hits) + 1
+        # The unmirrored row is present with empty metadata cells, not missing.
+        unmirrored = next(ln for ln in lines if ln.startswith("SRR_NOT_MIRRORED\t"))
+        assert unmirrored.split("\t")[3:] == [""] * 10
+
+    def test_a_value_that_would_break_the_row_is_quoted(self, exports):
+        # Nothing in the mirror carries a tab today, but a TSV that silently
+        # shifts every column after one is worse than a quoted field.
+        path = exports / "job1.parquet"
+        con = duckdb.connect()
+        try:
+            columns = ", ".join(
+                f"NULL AS {name}" for name in sra_mirror.EXPORT_COLUMNS[3:]
+            )
+            con.execute(
+                f"""COPY (SELECT 'SRR1' AS accession, 1.0 AS score,
+                    e'IDX\\t"x"' AS shard, {columns})
+                    TO '{path}' (FORMAT parquet)"""
+            )
+        finally:
+            con.close()
+
+        rows = b"".join(sra_mirror.iter_export_tsv(path)).decode().splitlines()
+
+        assert rows[1].split("\t")[0] == "SRR1"
+        assert '"IDX\t""x"""' in rows[1]

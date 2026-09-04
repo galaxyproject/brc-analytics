@@ -12,13 +12,19 @@ from __future__ import annotations
 import copy
 import datetime
 import functools
+import hashlib
 import logging
+import os
+import re
+import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import duckdb
+
+from app.services import country_iso
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +40,211 @@ _CACHE_TTL_SECONDS = 300
 # Cap the entry count so a long-lived worker can't grow the cache without
 # bound -- the search key is a 7-tuple, so the keyspace is effectively open.
 _CACHE_MAX_ENTRIES = 512
+
+# Batch size for accession lookups. Callers annotate one page of search hits
+# at a time; this keeps any single IN list bounded. It is a chunk size, not a
+# ceiling on how many accessions a caller may ask about -- see
+# runs_by_accession, which loops rather than truncating.
+_ACCESSION_BATCH_SIZE = 500
+
+# What each serving path reads off `runs`, keyed by the capability it backs.
+#
+# The mirror is built and copied to the host out of band -- it lives outside
+# the release trees precisely so a deploy does not have to move 5-10 GB -- so
+# the backend routinely runs against a file older than itself. `_initialize`
+# only ever checked that `runs` was queryable, which means a query naming a
+# column the file does not have raises at query time, once per request.
+#
+# The remedy has to be per capability rather than per service. Marking the
+# whole mirror unavailable to protect one query would take cohort, per-hit
+# annotation, the parquet export and the MCP tools down with it, which is a
+# far worse failure than the missing feature. So each capability is checked
+# on its own and reports itself unavailable on its own.
+#
+# Every capability named here gates a real call site -- annotation, cohort,
+# export and geography through galaxy_service, and search, study and summary
+# on the tool-facing methods themselves. That is not decoration: a startup
+# warning saying a capability is unavailable, in front of a path that queries
+# anyway, promises a guard that is not there.
+#
+# Kept by hand in step with the queries below; the union is asserted against
+# the fixture schema in tests, so a column added to a query without being
+# named here shows up as a test failure rather than as a 500.
+CAPABILITY_ANNOTATION = "annotation"
+CAPABILITY_COHORT = "cohort"
+CAPABILITY_EXPORT = "export"
+CAPABILITY_GEOGRAPHY = "geography"
+CAPABILITY_SEARCH = "search"
+CAPABILITY_STUDY = "study"
+CAPABILITY_SUMMARY = "summary"
+
+_RUN_DETAIL_COLUMNS: Tuple[str, ...] = (
+    "acc",
+    "sra_study",
+    "bioproject",
+    "organism",
+    "assay_type",
+    "platform",
+    "instrument",
+    "librarylayout",
+    "releasedate",
+    "geo_loc_name_country_calc",
+    "mbases",
+)
+
+_CAPABILITY_COLUMNS: Dict[str, Tuple[str, ...]] = {
+    CAPABILITY_ANNOTATION: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_COHORT: (
+        "acc",
+        "assay_type",
+        "platform",
+        "librarylayout",
+        "instrument",
+        "geo_loc_name_country_calc",
+        "releasedate",
+        "organism",
+        "bioproject",
+        "sra_study",
+    ),
+    CAPABILITY_EXPORT: _RUN_DETAIL_COLUMNS,
+    # Two columns, and that is the point: geography must not be able to take
+    # anything else down with it, and nothing else must be able to take it
+    # down either.
+    CAPABILITY_GEOGRAPHY: ("acc", "geo_loc_name_country_calc"),
+    CAPABILITY_SEARCH: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_STUDY: _RUN_DETAIL_COLUMNS,
+    CAPABILITY_SUMMARY: (
+        "organism",
+        "bioproject",
+        "sra_study",
+        "releasedate",
+        "platform",
+        "assay_type",
+        "geo_loc_name_country_calc",
+    ),
+}
+
+# Facets computed over a whole pre-cap hit set, as (name, expression over
+# `runs`). Which columns earn a facet is a property of the data, measured
+# mirror-wide over all 43,522,611 runs rather than guessed: librarylayout (2
+# distinct) is the only one that lists in full; assay_type (44), platform
+# (21), instrument (110) and country (246) list a head and roll the tail into
+# `other`. Cardinality alone does not say how much that tail hides -- a head
+# of ten covers 99.95% of mirror rows for platform but only 85.87% for
+# instrument -- which is why `other` is always emitted and always reconciles
+# against in_mirror instead of being dropped. organism is deliberately not
+# here: 296,175 distinct values, 453 of them needed to reach 90%, and `runs`
+# carries no taxid to roll them up with, so it ships as a distinct count plus
+# a top-10 list instead. Same for bioproject and sra_study, drill-downs at
+# ~688,000 and ~702,000 values.
+_COHORT_FACETS: Tuple[Tuple[str, str], ...] = (
+    ("assay_type", "nullif(assay_type, '')"),
+    ("platform", "nullif(platform, '')"),
+    ("librarylayout", "nullif(librarylayout, '')"),
+    # 'unspecified' is SRA's literal sentinel for "no instrument was
+    # recorded", not a machine -- the same mistake as 'uncalculated' below.
+    # instrument carries no NULLs and no empty strings anywhere in the mirror,
+    # so without this the facet's `unknown` is structurally always 0, which
+    # asserts every matched run has a recorded instrument. The sentinel is
+    # 245,944 rows mirror-wide and 9,913 on the measured job, where it
+    # rendered as the 9th most common sequencing instrument.
+    ("instrument", "nullif(nullif(instrument, ''), 'unspecified')"),
+    # 'uncalculated' is SRA's literal sentinel for "no country could be
+    # derived", not a place. It is 46,248 rows on the measured job -- third
+    # place, ahead of Canada -- so treating it as a value would invent a
+    # country. It belongs in `unknown` alongside the NULLs.
+    ("country", "nullif(nullif(geo_loc_name_country_calc, ''), 'uncalculated')"),
+    ("release_year", "CAST(year(releasedate) AS VARCHAR)"),
+)
+
+# Values each facet names before the rest become `other`, and how many
+# organisms the cohort lists. Ten of each keeps the whole cohort ~3 KB on
+# the wire, against the 50,000 hit rows it is describing.
+_COHORT_FACET_VALUES = 10
+_COHORT_TOP_ORGANISMS = 10
+
+# Tag on the scalar rows of the cohort query, which shares its result set with
+# the facet rows. Empty rather than a name so it cannot collide with a facet.
+_COHORT_SCALAR_TAG = ""
+
+# Status of a search's materialized export, recorded on the cached aggregate.
+# The two failing states are kept apart all the way to the UI because they mean
+# different things to whoever is looking at it: the mirror or the export
+# directory being unconfigured is our deployment and nobody's business, while
+# the row ceiling is a property of their query and the one they can act on.
+EXPORT_AVAILABLE = "available"
+EXPORT_TOO_LARGE = "too_large"
+EXPORT_UNAVAILABLE = "unavailable"
+
+# Ceiling on what will be materialized, in hit rows. Above it the export is
+# skipped and the search says so, rather than the cost being discovered in
+# production.
+#
+# Measured against the real mirror: the 1,133,516-hit job is 13.8 B/row
+# parquet and 148 B/row TSV, 1.4s to stage and write, 2.9s of CPU to stream
+# the TSV back; the eight-index probe at 1,514,202 rows is 15.1 B/row, 2.0s
+# and 3.8s. Index sizes are enormously skewed -- AMPLICON alone is ~17.9M SRA
+# runs -- so a pathological selection is an order of magnitude past that. 5M
+# is ~3.3x the largest measured probe and holds the artifact to ~75 MB parquet
+# / ~740 MB TSV and the write to ~7s, which matters because the write happens
+# inside the process-wide aggregation lock where it delays every other user's
+# search. Past that a browser download stops being a useful way to move the
+# data anyway.
+EXPORT_MAX_ROWS = 5_000_000
+
+# Retention. Exports are ~16 MB each and nothing else ever deletes them.
+#
+# The age rule is the correctness anchor, not a guess: it is CacheTTL.ONE_DAY,
+# the TTL on the aggregate that carries the "there is an export" claim. Once
+# that entry expires nothing can still be pointing at the file, and the next
+# request re-aggregates and writes a fresh one. The byte budget is the disk
+# bound the age rule does not give -- a burst of searches inside one day would
+# otherwise fill the volume -- and it is expressed in bytes rather than files
+# because file size varies 5x with the row ceiling.
+EXPORT_MAX_AGE_SECONDS = 86400
+EXPORT_MAX_TOTAL_BYTES = 5 * 1024**3
+
+# Columns in a materialized export, in order. The parquet carries its own
+# names; this is the TSV header and the structural check that the two agree.
+EXPORT_COLUMNS: Tuple[str, ...] = (
+    "accession",
+    "score",
+    "shard",
+    "organism",
+    "assay_type",
+    "platform",
+    "instrument",
+    "library_layout",
+    "release_date",
+    "country",
+    "bioproject",
+    "study",
+    "mbases",
+)
+
+_EXPORT_SUFFIX = ".parquet"
+# A destination is written under this and renamed into place, so a COPY that
+# dies partway through cannot leave something that reads as a finished export.
+_EXPORT_PARTIAL_SUFFIX = ".partial"
+# Job ids arrive in a request path and become a filename here, which is the
+# only place that happens -- so constrain the shape rather than trust it.
+_EXPORT_JOB_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+# What the sweep is allowed to delete. The export directory may hold files
+# nobody here wrote, and retention must not reach them.
+_EXPORT_OWNED = re.compile(
+    r"^[A-Za-z0-9_-]{1,64}"
+    rf"{re.escape(_EXPORT_SUFFIX)}({re.escape(_EXPORT_PARTIAL_SUFFIX)})?$"
+)
+# An in-flight write is seconds, so anything wearing the partial suffix an hour
+# later is an orphan from a crash rather than a rename that has not happened.
+_EXPORT_PARTIAL_MAX_AGE_SECONDS = 3600
+# Rows pulled out of the parquet per step while streaming a TSV back. Bounds
+# the memory the conversion holds regardless of how many rows it is converting.
+_EXPORT_TSV_BATCH = 20000
+# A TSV field needs quoting only if it carries the delimiter, a line break or a
+# quote. One compiled scan per field rather than five `in` tests: measured 3.0s
+# against 4.9s over 14.7M fields.
+_EXPORT_TSV_QUOTE = re.compile(r'[\t\n\r"]')
 
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
@@ -169,6 +380,410 @@ def _normalize_since(value: str) -> Optional[str]:
     return s
 
 
+def _cohort_sql() -> str:
+    """The whole cohort -- six facets, four distinct counts, a row count and a
+    top-organism list -- as one statement over one join.
+
+    One statement rather than ten because the join is the expensive part: the
+    same work split across separate statements measured 1.44s against 0.34s
+    for this, on the real 1,133,516-accession job. The accession set arrives
+    as a staging file read inline, not as a bound list: `acc IN (SELECT
+    UNNEST(?))` is fine for the 25-row page runs_by_accession serves but
+    degrades badly with size -- 2.3s at 50,000 and still running after two
+    minutes at 1.13M, where read_csv is 0.32s. read_csv also keeps the whole
+    statement a pure read, which matters because the mirror is opened
+    read_only and CREATE TEMP TABLE is therefore unavailable (and there is no
+    pyarrow/pandas to register a frame with either).
+
+    Distinct counts are the other reason this cannot be batched: they do not
+    merge across chunks, so a chunked count(DISTINCT organism) would be
+    plausible and wrong.
+
+    Quote and escape handling is turned off so every staged line is one value
+    verbatim. Accessions never contain a quote character, but if one ever did
+    the default reader would not error -- it would quietly answer a different
+    question. Measured on duckdb 1.5.4: a quote paired with another one d
+    lines later reads the span between them as a single field and drops
+    exactly d accessions (60,000 staged lines with quotes 100 apart read back
+    59,900), and a value the reader does keep can still be rewritten, with
+    "SRR1" read as SRR1 and "" as NULL. Whether the drop happens depends on
+    where in the file the quotes fall -- the same pair 10,000 lines apart in a
+    20,000-line file read back intact -- so this is hardening against a silent
+    and position-dependent failure, not a certain one. Cheap either way, and
+    the one failure mode a trustworthy count cannot have.
+    """
+    projection = ",\n                   ".join(
+        f"{expr} AS {name}" for name, expr in _COHORT_FACETS
+    )
+    facet_selects = "\n        ".join(
+        f"UNION ALL SELECT '{name}', {name}, count(*) FROM m GROUP BY 2"
+        for name, _expr in _COHORT_FACETS
+    )
+    tag = _COHORT_SCALAR_TAG
+    return f"""
+        WITH q AS (SELECT column0 AS acc FROM read_csv(?, header=false,
+                       quote='', escape='',
+                       columns={{'column0':'VARCHAR'}})),
+             m AS (
+               SELECT {projection},
+                      nullif(organism, '') AS organism, bioproject, sra_study
+               FROM runs r SEMI JOIN q ON r.acc = q.acc)
+        SELECT '{tag}' AS facet, 'in_mirror' AS value, count(*) AS n FROM m
+        UNION ALL SELECT '{tag}', 'organisms', count(DISTINCT organism) FROM m
+        UNION ALL SELECT '{tag}', 'bioprojects', count(DISTINCT bioproject) FROM m
+        UNION ALL SELECT '{tag}', 'studies', count(DISTINCT sra_study) FROM m
+        UNION ALL SELECT '{tag}', 'countries', count(DISTINCT country) FROM m
+        {facet_selects}
+        UNION ALL SELECT 'organism', organism, n FROM (
+            SELECT organism, count(*) AS n FROM m WHERE organism IS NOT NULL
+            GROUP BY 1 ORDER BY n DESC, organism LIMIT {_COHORT_TOP_ORGANISMS})
+    """
+
+
+def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+    """Split one facet's grouped counts into listed values, `other` and
+    `unknown`.
+
+    Every matched row lands in exactly one of the three, so a reader can
+    reconcile the facet against in_mirror rather than having to trust it. NULL
+    is `unknown` -- the facet expressions have already folded empty strings and
+    the 'uncalculated' country sentinel into NULL, because a blank rendered as
+    a value is a claim the data does not make.
+    """
+    unknown = sum(n for value, n in counted if value is None)
+    # Ties are broken by value so the listed head is stable across runs; with
+    # 1.1M rows they are rare, but "the top 10 changed" is a bad way to learn
+    # that the underlying counts did not.
+    known = sorted(
+        ((value, n) for value, n in counted if value is not None),
+        key=lambda vn: (-vn[1], vn[0]),
+    )
+    return {
+        "name": name,
+        "other": sum(n for _value, n in known[_COHORT_FACET_VALUES:]),
+        "unknown": unknown,
+        "values": [
+            {"count": n, "value": value} for value, n in known[:_COHORT_FACET_VALUES]
+        ],
+    }
+
+
+def _geography_sql() -> str:
+    """Every country in a hit set, with the unrecorded runs counted alongside.
+
+    Not the cohort's country facet: that lists a head of ten and rolls the
+    rest into `other`, which on the reference job renders 42 countries as ten
+    bars. A choropleth needs all of them, and the map's own honesty line needs
+    `recorded` and `unknown` as first-class numbers rather than as a facet's
+    leftovers.
+
+    Staged accessions read inline, for the reasons _cohort_sql spells out --
+    `IN (SELECT UNNEST(?))` does not finish at a million accessions, the
+    mirror is opened read_only so there is no temp table, and quoting is
+    turned off so a stray quote cannot silently drop or rewrite rows.
+
+    The sentinel handling is copied from _COHORT_FACETS deliberately, not
+    coincidentally. The map and the country bars sit on the same card, so if
+    one of them counted 'uncalculated' as a place they would disagree on
+    screen about how much geography this cohort has.
+
+    NULL comes back as its own group rather than being filtered out, because
+    the unrecorded share is the point: on the reference P. falciparum cohort
+    it is 80.8%, and a map that draws 42 countries without saying so tells the
+    same kind of lie as a mislabelled dot.
+    """
+    return """
+        WITH q AS (SELECT column0 AS acc FROM read_csv(?, header=false,
+                       quote='', escape='',
+                       columns={'column0':'VARCHAR'})),
+             m AS (
+               SELECT nullif(nullif(geo_loc_name_country_calc, ''),
+                             'uncalculated') AS country
+               FROM runs r SEMI JOIN q ON r.acc = q.acc)
+        SELECT country, count(*) AS n FROM m GROUP BY 1
+    """
+
+
+def _ranked(counts: Dict[str, int]) -> List[Dict[str, Any]]:
+    """Counted values, largest first, ties broken by name.
+
+    Stable ordering matters more than it looks: the frontend renders these
+    lists in the order they arrive, and "the order changed" is a bad way to
+    learn that the counts did not.
+    """
+    return [
+        {"count": n, "value": value}
+        for value, n in sorted(counts.items(), key=lambda vn: (-vn[1], vn[0]))
+    ]
+
+
+def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+    """Attach ISO codes to the grouped country counts and split out what the
+    map cannot draw.
+
+    Three buckets, and every matched row lands in exactly one of them:
+    `countries` (drawn), `unmapped_countries` (recorded but unplaceable) and
+    `unknown` (no country recorded at all). countries + unmapped + unknown ==
+    in_mirror, so the card can be reconciled rather than trusted.
+
+    A value is unplaceable for either of two reasons, and the API does not
+    distinguish them because the reader does not care: it is not a country
+    (Borneo, the dissolved states), or it is a country the committed
+    world-110m asset has no shape of its own for -- which is 65 of the
+    mirror's 245 values, Hong Kong and Singapore included. Silently dropping
+    the second kind is the failure this bucket exists to prevent.
+
+    `countries` is keyed by ISO code, not by the raw string, because several
+    raw values share a code -- Gaza Strip and West Bank are both PSE -- and
+    two rows with the same code would have the choropleth pick one and lose
+    the other. The label is the ISO table's canonical name for the same
+    reason.
+
+    The ISO table also carries continent and this deliberately does not roll
+    it up. Nothing renders a continent breakdown, and a fourth list whose
+    total is neither `recorded` nor the sum of `countries` -- Singapore counts
+    toward Asia and toward no shape -- is a reconciliation trap for whoever
+    reads this next. Phase 2 can add it back in the commit that draws it.
+
+    @param counted: (country or None, runs) straight off _geography_sql.
+    @returns: the geography payload.
+    """
+    unknown = sum(n for value, n in counted if value is None)
+    recorded = 0
+    countries: Dict[str, Dict[str, Any]] = {}
+    unmapped: Dict[str, int] = {}
+
+    for value, n in counted:
+        if value is None:
+            continue
+        recorded += n
+        country = country_iso.lookup(value)
+        if country is None or not country.drawable:
+            unmapped[value] = unmapped.get(value, 0) + n
+            continue
+        entry = countries.setdefault(
+            country.iso_a3,
+            {
+                "count": 0,
+                "iso_a3": country.iso_a3,
+                "iso_n3": country.iso_n3,
+                "value": country.name,
+            },
+        )
+        entry["count"] += n
+
+    return {
+        "countries": sorted(
+            countries.values(), key=lambda c: (-c["count"], c["value"])
+        ),
+        "in_mirror": recorded + unknown,
+        "recorded": recorded,
+        "unknown": unknown,
+        "unmapped_countries": _ranked(unmapped),
+    }
+
+
+def _export_sql() -> str:
+    """Materialize a complete hit list, joined to the mirror, as one parquet.
+
+    The hits arrive as a staging file read inline for the same reason
+    _cohort_sql stages its accessions: `IN (SELECT UNNEST(?))` degrades badly
+    with size and does not finish in two minutes at a million rows, and the
+    mirror is opened read_only so there is no temp table to load them into.
+    Same quote and escape handling, for the same reason -- a stray quote must
+    not silently rewrite or drop rows.
+
+    LEFT, not SEMI or INNER: about 0.44% of a real job's hits are runs the
+    mirror was not built to carry (1,133,516 hits, 1,128,472 of them known),
+    and those rows keep their accession, score and shard with NULL metadata.
+    Inner-joining would drop 5,044 real matches out of the file that exists to
+    be the complete match set.
+
+    Sentinel handling matches _COHORT_FACETS exactly, so a user tallying the
+    downloaded file gets the same answer as the cohort shown on screen. SRA
+    writes 'uncalculated' where no country could be derived and 'unspecified'
+    where no instrument was recorded; both are absences, and a file that spells
+    them as values invents a country and a sequencer.
+
+    Rows come back in the order the app ranked them. The tie-break is an md5 of
+    the accession, which SQL cannot reproduce, so the rank is staged as a
+    column and ordered on -- and it costs nothing: measured 0.63s ordered
+    against 0.87s unordered, and 15.6 MB against 16.1 MB, because sorting by
+    score groups equal values for the compressor.
+
+    The two paths are numbered rather than left as bare `?`: duckdb binds a
+    COPY's destination ahead of the query's own parameters, so positional
+    markers hand the staging path to TO and the destination to read_csv.
+    """
+    return """
+        COPY (
+          SELECT h.accession, h.score, h.shard,
+                 nullif(r.organism, '') AS organism,
+                 nullif(r.assay_type, '') AS assay_type,
+                 nullif(r.platform, '') AS platform,
+                 nullif(nullif(r.instrument, ''), 'unspecified') AS instrument,
+                 nullif(r.librarylayout, '') AS library_layout,
+                 r.releasedate AS release_date,
+                 nullif(nullif(r.geo_loc_name_country_calc, ''),
+                        'uncalculated') AS country,
+                 r.bioproject, r.sra_study AS study, r.mbases
+          FROM read_csv($1, delim='\t', header=false, quote='', escape='',
+                   columns={'ordinal':'BIGINT','accession':'VARCHAR',
+                            'score':'DOUBLE','shard':'VARCHAR'}) h
+          LEFT JOIN runs r ON r.acc = h.accession
+          ORDER BY h.ordinal
+        ) TO $2 (FORMAT parquet, COMPRESSION zstd)
+    """
+
+
+def export_file_path(export_dir: str, job_id: str) -> Optional[Path]:
+    """Where a job's materialized export lives.
+
+    @param export_dir: configured export directory; empty means the feature
+        is off.
+    @param job_id: Galaxy job id, as it arrived in the request path.
+    @returns: the path, or None when there cannot be one -- the feature is off,
+        or the id is not a plain identifier and so must never become a path.
+    """
+    if not export_dir or not _EXPORT_JOB_ID.match(job_id):
+        return None
+    return Path(export_dir) / f"{job_id}{_EXPORT_SUFFIX}"
+
+
+def export_download_name(job_id: str, rows: int, extension: str) -> str:
+    """Filename for a downloaded export.
+
+    Once the file is on someone's disk this name is the only description that
+    travels with it, so it carries which search produced it and how many rows
+    it should hold.
+
+    @param job_id: Galaxy job the export was materialized from.
+    @param rows: rows in the file.
+    @param extension: file extension, without the dot.
+    @returns: e.g. logan-7c937baf0758a668-1133516-runs.tsv.
+    """
+    return f"logan-{job_id}-{rows}-runs.{extension}"
+
+
+def export_row_count(path: Path) -> int:
+    """Count the rows in a materialized export.
+
+    Read from the parquet footer rather than from the aggregate that claims the
+    file exists, so the row count in a download's name describes the bytes
+    being served and not a cache entry that may have outlived them.
+
+    @param path: the export parquet.
+    @returns: its row count.
+    """
+    con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
+    try:
+        return con.execute(
+            "SELECT count(*) FROM read_parquet(?)", [str(path)]
+        ).fetchone()[0]
+    finally:
+        con.close()
+
+
+def _tsv_field(value: Any) -> str:
+    """Render one value as a TSV field, quoting it if it would break the row."""
+    if value is None:
+        return ""
+    text = value if type(value) is str else str(value)
+    if _EXPORT_TSV_QUOTE.search(text):
+        return '"' + text.replace('"', '""') + '"'
+    return text
+
+
+def iter_export_tsv(path: Path) -> Iterator[bytes]:
+    """Stream a materialized export back as TSV, a batch of rows at a time.
+
+    Converting with DuckDB's own CSV writer is faster (0.57s against 3.0s on
+    1.13M rows) but only writes to a file, which would mean putting 168 MB on
+    disk per request and then needing a path that reliably deletes it -- one a
+    client disconnect does not run. This holds one batch in memory instead,
+    starts sending immediately, and overlaps its cost with the transfer.
+
+    @param path: the export parquet.
+    @returns: an iterator of encoded TSV chunks, header first.
+    """
+    con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
+    try:
+        yield ("\t".join(EXPORT_COLUMNS) + "\n").encode()
+        rows = con.execute("SELECT * FROM read_parquet(?)", [str(path)])
+        while batch := rows.fetchmany(_EXPORT_TSV_BATCH):
+            yield "".join(
+                "\t".join(map(_tsv_field, row)) + "\n" for row in batch
+            ).encode()
+    finally:
+        # Also reached when the client disconnects mid-download and the
+        # generator is closed, which is the case that would otherwise leak.
+        con.close()
+
+
+def sweep_exports(export_dir: str) -> int:
+    """Delete exports that are past retention, oldest first.
+
+    Deletes any `<name>.parquet` (or its `.partial`) directly inside the
+    configured directory -- it matches the shape this module writes, not a
+    record of what it wrote, so a parquet someone else put there is a
+    candidate too. That is why KMINDEX_EXPORT_DIR wants a directory of its
+    own; the shipped compose file gives it a dedicated volume. Nothing else
+    is touched: no recursion, and symlinks are skipped rather than followed,
+    so a link planted in the directory cannot redirect a delete outside it.
+
+    @param export_dir: configured export directory.
+    @returns: how many files were deleted.
+    """
+    directory = Path(export_dir)
+    now = time.time()
+    keepable: List[Tuple[float, int, Path]] = []
+    doomed: List[Path] = []
+    try:
+        entries = list(directory.iterdir())
+    except OSError as exc:
+        logger.warning("Could not sweep exports in %s: %s", export_dir, exc)
+        return 0
+
+    for entry in entries:
+        if entry.is_symlink() or not _EXPORT_OWNED.match(entry.name):
+            continue
+        try:
+            stat = entry.stat()
+        except OSError:
+            continue
+        if not entry.is_file():
+            continue
+        age = now - stat.st_mtime
+        partial = entry.name.endswith(_EXPORT_PARTIAL_SUFFIX)
+        if age > (
+            _EXPORT_PARTIAL_MAX_AGE_SECONDS if partial else EXPORT_MAX_AGE_SECONDS
+        ):
+            doomed.append(entry)
+        elif not partial:
+            keepable.append((stat.st_mtime, stat.st_size, entry))
+
+    # Oldest first, so what survives the byte budget is what a cached aggregate
+    # is most likely to still be pointing at.
+    keepable.sort()
+    budget = EXPORT_MAX_TOTAL_BYTES - sum(size for _mtime, size, _p in keepable)
+    for _mtime, size, entry in keepable:
+        if budget >= 0:
+            break
+        doomed.append(entry)
+        budget += size
+
+    deleted = 0
+    for entry in doomed:
+        try:
+            entry.unlink()
+            deleted += 1
+        except OSError as exc:
+            logger.warning("Could not delete stale export %s: %s", entry, exc)
+    if deleted:
+        logger.info("Swept %d stale kmindex export(s) from %s", deleted, export_dir)
+    return deleted
+
+
 def _synchronized(method):
     """Serialize a public method on the instance lock.
 
@@ -202,6 +817,10 @@ class SRAMirrorService:
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         self._meta: Dict[str, str] = {}
         self._total_runs: Optional[int] = None
+        # capability -> the columns it needs that this file does not have.
+        # Empty until _initialize has looked, and a capability is absent from
+        # it exactly when it can be served.
+        self._missing_columns: Dict[str, List[str]] = {}
         self._cache: Dict[Tuple, Tuple[float, Any]] = {}
         # Guards the shared DuckDB connection and the cache dict: the MCP
         # tools execute in FastMCP's worker threadpool, so both are touched
@@ -261,9 +880,23 @@ class SRAMirrorService:
         # line instead of one flattened "failed" with a raw traceback.
         con: Optional[duckdb.DuckDBPyConnection] = None
         try:
-            con = duckdb.connect(self.mirror_path, read_only=True)
+            # Pin the spill directory. DuckDB defaults temp_directory to
+            # "<database>.tmp", which here resolves inside the read-only bind
+            # mount that carries the mirror -- and the container runs as a
+            # non-root user while Docker creates that mount's parent as root,
+            # so the process cannot create it either way. Any query large
+            # enough to spill would fail on a path nobody chose. gettempdir()
+            # honours TMPDIR and falls back to /tmp, which is writable.
+            con = duckdb.connect(
+                self.mirror_path,
+                read_only=True,
+                config={"temp_directory": tempfile.gettempdir()},
+            )
             meta = dict(con.execute("SELECT key, value FROM mirror_meta").fetchall())
             total_runs = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+            columns = {
+                row[1] for row in con.execute("PRAGMA table_info('runs')").fetchall()
+            }
         except duckdb.IOException as exc:
             logger.error("Could not open SRA mirror at %s: %s", self.mirror_path, exc)
         except duckdb.CatalogException as exc:
@@ -278,11 +911,25 @@ class SRAMirrorService:
             self._con = con
             self._meta = meta
             self._total_runs = total_runs
+            self._missing_columns = {
+                capability: sorted(set(needed) - columns)
+                for capability, needed in _CAPABILITY_COLUMNS.items()
+                if not set(needed) <= columns
+            }
             logger.info(
-                "SRA mirror loaded: %s rows, built %s",
+                "SRA mirror loaded: %s rows, schema_version %s, built %s",
                 f"{total_runs:,}",
+                self.schema_version or "unknown",
                 meta.get("mirror_built_at", "unknown"),
             )
+            for capability, missing in sorted(self._missing_columns.items()):
+                logger.warning(
+                    "SRA mirror capability %r unavailable: schema_version %s "
+                    "is missing %s on runs",
+                    capability,
+                    self.schema_version or "unknown",
+                    ", ".join(missing),
+                )
             return
 
         # Reached only on a caught failure: close the opened handle so the
@@ -294,10 +941,95 @@ class SRAMirrorService:
     def is_available(self) -> bool:
         return self._con is not None
 
+    @property
+    def schema_version(self) -> Optional[str]:
+        """The mirror's own stamp of what shape it is, or None.
+
+        The builder has written this since it was introduced and nothing has
+        ever read it, so the drift it exists to reveal -- a deployed file at 3
+        against a builder stamping 5 -- has only ever been discoverable by
+        opening the file by hand. It is reported rather than enforced: the
+        column check above is what decides whether a query can run, and a
+        version gate on top of it would fail files that are actually fine.
+        """
+        return self._meta.get("schema_version")
+
+    def has_capability(self, capability: str) -> bool:
+        """Whether the mirror this process opened can answer for `capability`.
+
+        Deliberately narrower than `is_available`. A file that predates a
+        column answers everything else perfectly well, and a caller that has
+        to know about one query's columns should ask about that query rather
+        than being told the mirror is gone.
+
+        An unknown capability name reads as unavailable rather than as
+        available: a typo must not silently enable a query nobody checked.
+        """
+        if self._con is None:
+            return False
+        if capability not in _CAPABILITY_COLUMNS:
+            return False
+        return capability not in self._missing_columns
+
+    def capability_fingerprint(self) -> str:
+        """A short stamp of which capabilities this mirror can serve.
+
+        Exists so a cached artifact can record the mirror it was computed
+        against. A capability set cannot change while the process runs -- the
+        columns are read once at startup -- so anything derived from it is
+        stable for the lifetime of the process and changes exactly when a new
+        file is picked up. That is the property a cache key wants.
+
+        Ordered and joined rather than hashed: it is short enough to read in a
+        Redis key, and a fingerprint you can eyeball beats one you have to
+        decode when a deploy goes sideways.
+        """
+        if self._con is None:
+            return "none"
+        available = sorted(
+            name for name in _CAPABILITY_COLUMNS if name not in self._missing_columns
+        )
+        return f"{self.schema_version or 'x'}:{'+'.join(available) or 'none'}"
+
+    def _unavailable(self, capability: str) -> Optional[Dict[str, Any]]:
+        """An error payload when `capability` cannot be served, else None.
+
+        The tool-facing methods all answer with a dict rather than raising, so
+        the model gets a sentence instead of a stack trace. Which columns are
+        missing goes in it, because the person reading the log is the person
+        who has to go copy a newer mirror onto the host.
+        """
+        if self._con is None:
+            return {"error": "SRA mirror not available"}
+        missing = self._missing_columns.get(capability)
+        if not missing:
+            return None
+        return {
+            "error": (
+                f"The SRA mirror on this host cannot answer {capability} "
+                f"queries: it is missing {', '.join(missing)} on `runs`."
+            )
+        }
+
+    def missing_columns(self, capability: str) -> List[str]:
+        """Columns `capability` needs that this mirror does not carry.
+
+        Empty when the capability is serving, and empty when the whole mirror
+        is unavailable -- `is_available` is the question to ask about that.
+        """
+        return list(self._missing_columns.get(capability, ()))
+
     def _provenance(self, resolved_names: List[str]) -> Dict[str, Any]:
+        # Both spellings, because the two mirrors in circulation disagree. The
+        # builder has written 'ncbi_taxdump_version' since schema_version 5;
+        # the deployed schema_version 3 file predates the rename and carries
+        # 'taxdump_version'. Reading only one of them reports the taxonomy
+        # release as unknown against half the files we might be pointed at.
         return {
             "mirror_built_at": self._meta.get("mirror_built_at"),
-            "taxdump_version": self._meta.get("taxdump_version"),
+            "mirror_schema_version": self.schema_version,
+            "taxdump_version": self._meta.get("ncbi_taxdump_version")
+            or self._meta.get("taxdump_version"),
             "total_runs_in_mirror": self._total_runs,
             "resolved_names_for_query": resolved_names,
         }
@@ -371,6 +1103,9 @@ class SRAMirrorService:
         """
         if not self._con:
             return {"error": "SRA mirror not available"}
+
+        if (unavailable := self._unavailable(CAPABILITY_SUMMARY)) is not None:
+            return unavailable
 
         cache_key = ("summary", _norm_organism(organism))
         if (cached := self._cache_get(cache_key)) is not None:
@@ -511,6 +1246,9 @@ class SRAMirrorService:
         # can't request an unbounded result set.
         limit = max(1, min(limit, 200))
 
+        if (unavailable := self._unavailable(CAPABILITY_SEARCH)) is not None:
+            return unavailable
+
         cache_key = (
             "search",
             _norm_organism(organism),
@@ -623,6 +1361,9 @@ class SRAMirrorService:
 
         limit = max(1, min(limit, 100))
 
+        if (unavailable := self._unavailable(CAPABILITY_SUMMARY)) is not None:
+            return unavailable
+
         cache_key = ("top_bioprojects", _norm_organism(organism), limit)
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
@@ -671,6 +1412,342 @@ class SRAMirrorService:
         return result
 
     @_synchronized
+    def runs_by_accession(self, accessions: List[str]) -> Dict[str, Dict[str, Any]]:
+        """
+        Look up run metadata for a batch of run accessions.
+
+        Built for annotating a page of sequence-search hits, so it takes the
+        accessions as they come and returns only the ones the mirror knows --
+        a caller should expect misses. How many depends on how the mirror was
+        built: a taxid-filtered mirror misses most of what a Logan query
+        matches, since Logan indexes all of SRA.
+
+        The 'uncalculated' country and 'unspecified' instrument sentinels come
+        back as None, matching _COHORT_FACETS and the export. All three describe
+        the same runs on the same screen, and this was the one path still
+        spelling an absence as a value -- a search's table showed a country of
+        "uncalculated" beside a cohort that counted it as not recorded.
+        """
+        if not self._con or not accessions:
+            return {}
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return {}
+
+        cache_key = ("runs_by_accession", tuple(wanted))
+        if (cached := self._cache_get(cache_key)) is not None:
+            return cached
+
+        # Batch rather than truncate. Slicing to the batch size here silently
+        # dropped annotations from any page larger than it -- and because
+        # `wanted` is sorted, it dropped them by accession rather than by
+        # score, so the rows that survived weren't even the ranked ones.
+        rows: List[Any] = []
+        for start in range(0, len(wanted), _ACCESSION_BATCH_SIZE):
+            batch = wanted[start : start + _ACCESSION_BATCH_SIZE]
+            rows.extend(
+                self._con.execute(
+                    """
+                    SELECT acc, sra_study, bioproject, organism, assay_type,
+                           platform,
+                           nullif(instrument, 'unspecified'),
+                           librarylayout, releasedate,
+                           nullif(geo_loc_name_country_calc, 'uncalculated'),
+                           mbases
+                    FROM runs WHERE acc IN (SELECT UNNEST(?))
+                    """,
+                    [batch],
+                ).fetchall()
+            )
+
+        result = {
+            r[0]: {
+                "assay_type": r[4],
+                "bioproject": r[2],
+                "country": r[9],
+                "instrument": r[6],
+                "library_layout": r[7],
+                "mbases": r[10],
+                "organism": r[3],
+                "platform": r[5],
+                "release_date": str(r[8]) if r[8] else None,
+                "study": r[1],
+            }
+            for r in rows
+        }
+        self._cache_put(cache_key, result)
+        return result
+
+    # Deliberately not @_synchronized. That decorator holds the instance lock
+    # for the whole call, and its own justification is that "queries are
+    # sub-200ms"; this one is ~1s against a 43.5M-row table, so holding
+    # the lock across it would park every MCP tool call and assistant lookup
+    # behind one user's search. Instead the long query runs on a duckdb
+    # cursor() -- an independent connection onto the already-open database --
+    # and the lock is held only for the cache reads/writes and the cursor
+    # handoff, which are the parts that actually touch shared state. Measured:
+    # while a cursor ran a 1.4s query, the parent connection served 4,166
+    # small queries with no errors and no measurable slowdown.
+    def cohort_for_accessions(self, accessions: List[str]) -> Optional[Dict[str, Any]]:
+        """
+        Facet and count a complete hit set in one pass over the mirror.
+
+        Built for the pre-cap hit list of a sequence search, which is why it
+        takes every accession rather than a page: counting the paged rows
+        describes the display cap, not the query. On a real 1,133,516-hit job
+        the visible 50,000 reported E. coli first at 70% and dropped
+        Salmonella enterica -- the actual leader -- off the list entirely.
+
+        Returns the cohort dict, or None when the mirror is unavailable or the
+        hit set is empty. A query failure is raised rather than swallowed: the
+        caller has to be able to tell "the mirror was never there" (cache the
+        result without a cohort) from "the read failed this time" (don't), and
+        a half-filled cohort is worse than none, since the whole reason it
+        exists is to be the number that can be trusted.
+        """
+        if not self._con or not accessions:
+            return None
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return None
+
+        payload = "\n".join(wanted)
+        # Key on a digest rather than the accession tuple runs_by_accession
+        # uses: at 1.1M accessions that tuple would cost more to build, hash
+        # and hold than the query it saves. Length is carried alongside so a
+        # caller asking about the same set twice with different duplication
+        # can't be served the wrong `total`.
+        cache_key = (
+            "cohort",
+            hashlib.md5(payload.encode()).hexdigest(),
+            len(accessions),
+        )
+        with self._lock:
+            if (cached := self._cache_get(cache_key)) is not None:
+                return cached
+            cursor = self._con.cursor()
+
+        # The staging file is the join's right-hand side; it exists only for
+        # the duration of the statement and never outlives the call.
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".txt", prefix="cohort-", delete=False
+            )
+            staging.write(payload)
+            staging.close()
+            rows = cursor.execute(_cohort_sql(), [staging.name]).fetchall()
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        scalars = {value: n for facet, value, n in rows if facet == _COHORT_SCALAR_TAG}
+        grouped: Dict[str, List[Tuple[Optional[str], int]]] = {
+            name: [] for name, _expr in _COHORT_FACETS
+        }
+        organisms: List[Dict[str, Any]] = []
+        for facet, value, n in rows:
+            if facet in grouped:
+                grouped[facet].append((value, n))
+            elif facet == "organism":
+                organisms.append({"count": n, "value": value})
+        # UNION ALL does not promise to preserve branch order, so re-sort here
+        # rather than trust the LIMIT'd subquery's ordering to survive.
+        organisms.sort(key=lambda o: (-o["count"], o["value"]))
+
+        cohort = {
+            "bioprojects": scalars["bioprojects"],
+            "countries": scalars["countries"],
+            "facets": [
+                _shape_facet(name, grouped[name]) for name, _expr in _COHORT_FACETS
+            ],
+            "in_mirror": scalars["in_mirror"],
+            "organisms": scalars["organisms"],
+            "studies": scalars["studies"],
+            "top_organisms": organisms,
+            # The caller's hit count, not the deduplicated or mirrored one, so
+            # it lines up with the total_matches shown beside it. Everything
+            # else counts mirrored rows and is therefore out of in_mirror --
+            # about 99.6% of total on the measured job, and much less for a
+            # query that matches organisms the mirror was not built to carry.
+            "total": len(accessions),
+        }
+        with self._lock:
+            self._cache_put(cache_key, cohort)
+        return cohort
+
+    # Not @_synchronized, for the same reason as cohort_for_accessions above:
+    # this runs the same shape of query over the same 43.5M-row table, so the
+    # instance lock is held only for the cache reads/writes and the cursor
+    # handoff rather than across the query.
+    def geography_for_accessions(
+        self, accessions: List[str]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Every country a complete hit set was recorded from, plus the runs that
+        recorded none.
+
+        Same window and the same argument as cohort_for_accessions: computed
+        over the pre-cap hit list, because counting the surviving 50,000 counts
+        the cap rather than the query.
+
+        Returns None when the mirror cannot answer -- unconfigured, or on a
+        file that predates the columns this needs. That is a steady state, not
+        a failure: the caller caches the result without geography and nothing
+        retries. A query that starts and then breaks raises instead, so the
+        caller can tell the two apart.
+
+        @param accessions: every hit the query matched, before the cap.
+        @returns: the geography dict, or None if there is nothing to say.
+        """
+        if not self._con or not self.has_capability(CAPABILITY_GEOGRAPHY):
+            return None
+        if not accessions:
+            return None
+
+        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
+        if not wanted:
+            return None
+
+        payload = "\n".join(wanted)
+        # Digest-keyed like the cohort, and for the same reason: at a million
+        # accessions the tuple would cost more to build and hold than the
+        # query it saves.
+        cache_key = (
+            "geography",
+            hashlib.md5(payload.encode()).hexdigest(),
+            len(accessions),
+        )
+        with self._lock:
+            if (cached := self._cache_get(cache_key)) is not None:
+                return cached
+            cursor = self._con.cursor()
+
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".txt", prefix="geography-", delete=False
+            )
+            staging.write(payload)
+            staging.close()
+            rows = cursor.execute(_geography_sql(), [staging.name]).fetchall()
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        geography = _shape_geography(rows)
+        with self._lock:
+            self._cache_put(cache_key, geography)
+        return geography
+
+    # Not @_synchronized, for the reason spelled out above cohort_for_accessions:
+    # this is a ~1.5s stage-and-write against a 43.5M-row table, and holding the
+    # instance lock across it would park every MCP tool call behind one user's
+    # download. The cursor gives it its own connection onto the open database;
+    # the lock covers only the handoff.
+    def export_hits(
+        self, job_id: str, hits: List[Dict[str, Any]], export_dir: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Write a search's complete hit list, enriched from the mirror, to disk.
+
+        Called during aggregation because that is the only moment the full
+        match set exists: the aggregate keeps 50,000 hits and discards the
+        rest, so afterwards the only way back to the other million is to
+        re-download 84-280 shard datasets from a rate-limited Galaxy. Same
+        window, and the same reason, as cohort_for_accessions.
+
+        Writes to a partial name and renames into place, so a crash cannot
+        leave a truncated file that reads as a complete export.
+
+        @param job_id: Galaxy job the hits belong to; names the file.
+        @param hits: every hit, before the display cap, as accession/score/shard
+            dicts in ranked order.
+        @param export_dir: configured export directory.
+        @returns: {"rows": n, "status": ...} describing what a caller may now
+            advertise, or None when nothing was written and nothing should be
+            said about it -- the mirror is unavailable, the feature is off, or
+            there were no hits. A write failure raises rather than returning a
+            status, so the caller can tell a broken write from a disabled one.
+        """
+        destination = export_file_path(export_dir, job_id)
+        if not self._con or destination is None or not hits:
+            return None
+
+        if len(hits) > EXPORT_MAX_ROWS:
+            logger.warning(
+                "kmindex job %s: %s hits exceeds the %s-row export ceiling; "
+                "skipping materialization",
+                job_id,
+                f"{len(hits):,}",
+                f"{EXPORT_MAX_ROWS:,}",
+            )
+            return {"rows": None, "status": EXPORT_TOO_LARGE}
+
+        # Before the write, so the budget frees space for the file about to
+        # land and the new export is never its own sweep candidate.
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        sweep_exports(export_dir)
+
+        # A per-attempt partial name, not a deterministic one. The aggregation
+        # lock is an asyncio.Lock, so it orders one event loop and nothing more:
+        # a second worker or replica writing the same job would otherwise share
+        # this path and one would rename the other's half-written file into
+        # place. mkstemp in the destination directory keeps the rename atomic
+        # and removes the question.
+        fd, partial_name = tempfile.mkstemp(
+            dir=destination.parent,
+            prefix=f"{destination.stem}-",
+            suffix=f"{_EXPORT_SUFFIX}{_EXPORT_PARTIAL_SUFFIX}",
+        )
+        os.close(fd)
+        partial = Path(partial_name)
+        with self._lock:
+            cursor = self._con.cursor()
+
+        # The staging file is the join's left-hand side and never outlives the
+        # call; it carries the rank because the app's md5 tie-break has no SQL
+        # equivalent, and the export ships in the order the app ranked it.
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".tsv", prefix="kmindex-export-", delete=False
+            )
+            for ordinal, hit in enumerate(hits):
+                staging.write(
+                    f"{ordinal}\t{hit['accession']}\t{hit['score']}\t{hit['shard']}\n"
+                )
+            staging.close()
+            cursor.execute(_export_sql(), [staging.name, str(partial)])
+        except Exception:
+            try:
+                partial.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+
+        partial.replace(destination)
+        # Count the file, not the input. They agree only while runs.acc happens
+        # to be unique -- there is no constraint on it -- and a LEFT JOIN that
+        # fanned out would put a row count in the download's filename that the
+        # file does not have.
+        return {
+            "rows": export_row_count(destination),
+            "status": EXPORT_AVAILABLE,
+        }
+
+    @_synchronized
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
         """Get runs by SRA study (SRP*/ERP*/DRP*) or BioProject (PRJ*) accession."""
         if not self._con:
@@ -681,6 +1758,9 @@ class SRAMirrorService:
         # bioproject column instead of silently missing on sra_study.
         accession = accession.strip().upper()
         limit = max(1, min(limit, 500))
+
+        if (unavailable := self._unavailable(CAPABILITY_STUDY)) is not None:
+            return unavailable
 
         cache_key = ("study_runs", accession, limit)
         if (cached := self._cache_get(cache_key)) is not None:

@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.db.crud import (
+    create_galaxy_job,
     create_saved_analysis,
     create_workflow_run,
     delete_favorite,
@@ -166,3 +167,23 @@ async def test_workflow_run_round_trip_with_and_without_user():
         assert len(workflow_runs) == 1
         assert workflow_runs[0].assistant_session_id == "assistant-session-1"
         assert workflow_runs[0].workflow_trs_id.endswith("varcall-haploid/main")
+
+
+@pytest.mark.asyncio
+async def test_create_galaxy_job_links_user():
+    session = await _create_session()
+    async with session:
+        user = await upsert_user_from_claims(
+            session, {"sub": "gj-sub", "email": "g@x.org", "name": "G"}
+        )
+        job = await create_galaxy_job(
+            session,
+            user_id=user.id,
+            galaxy_job_id="abc123",
+            galaxy_instance_url="https://test.galaxyproject.org",
+            tool="kmindex",
+            params={"indexes": ["GENOMIC_BCT"]},
+        )
+        await session.commit()
+        assert job.user_id == user.id
+        assert job.galaxy_job_id == "abc123"

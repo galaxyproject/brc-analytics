@@ -281,6 +281,7 @@ def _stub_agent():
     instance.catalog = MagicMock()
     instance.catalog.workflows_by_category = []
     instance.sra_mirror = None
+    instance.galaxy = None
     instance.query_con = None
     instance.agent = object()
     instance.settings = get_settings()

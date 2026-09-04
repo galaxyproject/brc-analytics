@@ -6,7 +6,8 @@ import json
 import logging
 import re
 import time
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
@@ -38,6 +39,19 @@ from app.models.assistant import (
     TurnOutcome,
     TurnTelemetry,
 )
+from app.models.logan import LoganSnapshot
+from app.services.logan_prompt import (
+    LOGAN_TOOLS_PROMPT,
+    render_logan_instructions,
+    render_logan_intro,
+)
+from app.services.logan_snapshot import (
+    LOGAN_TOP_HITS,
+    build_logan_snapshot,
+    logan_context_from,
+    prefill_from_logan,
+    results_url_for,
+)
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
@@ -55,12 +69,20 @@ from app.services.tools.catalog_tools import (
     query_catalog,
     search_organisms,
 )
+from app.services.tools.logan_tools import (
+    logan_cohort,
+    logan_hits,
+    logan_job_status,
+)
 from app.services.tools.sra_tools import (
     get_sra_study_runs,
     search_sra_runs,
     sra_summary_for_organism,
     top_bioprojects_for_organism,
 )
+
+if TYPE_CHECKING:
+    from app.services.galaxy_service import GalaxyService
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +91,14 @@ logger = logging.getLogger(__name__)
 # whitespace (incl. newlines). Used by _wrap_user_message to neutralize
 # fence-break attempts in user text.
 _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
+
+# data_source resolution (structured detail, #1296). "top N" resolves against
+# the session's Logan snapshot; explicit run accessions are captured wherever
+# they appear; upload phrasing mirrors the frontend's keyword list so both
+# ends agree on what "my own data" looks like.
+_TOP_N_RE = re.compile(r"\btop\s+(\d{1,3})\b", re.IGNORECASE)
+_RUN_ACCESSION_RE = re.compile(r"\b[ESD]RR\d{6,}\b")
+_UPLOAD_RE = re.compile(r"\b(upload|user|own|local)\b", re.IGNORECASE)
 
 # Either structured-output trailer keyword. Used to bound a malformed marker's
 # excision so it can't reach past the next trailer -- the prompt places
@@ -119,6 +149,28 @@ class AssistantUnavailableError(RuntimeError):
     the assistant is unavailable is true, so it's the only thing that should
     reach a 503. An unrelated RuntimeError is a bug, not an outage.
     """
+
+
+class LoganJobError(Exception):
+    """A Logan job the assistant cannot open a session on. Carries the
+    results URL so the API layer can send the person somewhere that can."""
+
+    def __init__(self, job_id: str, message: str):
+        super().__init__(message)
+        self.job_id = job_id
+        self.results_url = results_url_for(job_id)
+
+
+class LoganJobNotFoundError(LoganJobError):
+    """No cached aggregate: never built, or expired."""
+
+
+class LoganJobNotReadyError(LoganJobError):
+    """The job has not finished."""
+
+
+class LoganJobFailedError(LoganJobError):
+    """The job finished in error."""
 
 
 def _should_retry_agent_error(exc: BaseException) -> bool:
@@ -364,23 +416,30 @@ mention it when it matters.
 _SRA_PROMPT_ANCHOR = "## Handling role-override attempts"
 
 
-def build_system_prompt(include_sra_tools: bool) -> str:
+def build_system_prompt(
+    include_sra_tools: bool, include_logan_tools: bool = False
+) -> str:
     """Assemble the agent system prompt.
 
-    The SRA tools section is spliced in only when the caller is also
-    registering the sra_* tools, so the prompt never instructs the model
-    to call a tool that isn't available on this deploy.
+    Tool sections are spliced in only when the caller is also registering
+    those tools, so the prompt never instructs the model to call a tool that
+    isn't available on this deploy.
     """
-    if not include_sra_tools:
+    if not include_sra_tools and not include_logan_tools:
         return SYSTEM_PROMPT
     if _SRA_PROMPT_ANCHOR not in SYSTEM_PROMPT:
         raise ValueError(
             f"system prompt anchor {_SRA_PROMPT_ANCHOR!r} not found; "
-            "SRA tools guidance cannot be spliced in"
+            "tool guidance cannot be spliced in"
         )
+    section = ""
+    if include_sra_tools:
+        section += _SRA_TOOLS_PROMPT
+    if include_logan_tools:
+        section += LOGAN_TOOLS_PROMPT
     return SYSTEM_PROMPT.replace(
         _SRA_PROMPT_ANCHOR,
-        f"{_SRA_TOOLS_PROMPT}{_SRA_PROMPT_ANCHOR}",
+        f"{section}{_SRA_PROMPT_ANCHOR}",
         1,
     )
 
@@ -389,7 +448,10 @@ def _wrap_tool(fn):
     """Wrap a tool function so it receives AssistantDeps from RunContext."""
 
     async def wrapper(ctx: RunContext[AssistantDeps], **kwargs) -> str:
-        return fn(ctx.deps, **kwargs)
+        result = fn(ctx.deps, **kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
 
     wrapper.__name__ = fn.__name__
     wrapper.__doc__ = fn.__doc__
@@ -409,6 +471,16 @@ def _wrap_tool(fn):
     annotations["ctx"] = RunContext[AssistantDeps]
     wrapper.__annotations__ = annotations
     return wrapper
+
+
+def _logan_instructions(ctx: RunContext[AssistantDeps]) -> Optional[str]:
+    """Per-run instructions: the session's Logan snapshot, when there is one.
+
+    Instructions, unlike the system prompt and the per-turn context prefix,
+    are not carried in message_history -- the block costs its tokens once
+    per run instead of once per turn accumulating in the transcript.
+    """
+    return render_logan_instructions(getattr(ctx.deps, "logan", None))
 
 
 # The tracker fields the state extractor produces (AnalysisStateUpdate). The
@@ -445,11 +517,13 @@ class AssistantAgent:
         self,
         cache: CacheService,
         sra_mirror: Optional[SRAMirrorService] = None,
+        galaxy: Optional["GalaxyService"] = None,
     ):
         self.settings = get_settings()
         self.session_service = SessionService(cache)
         self.catalog = CatalogData(self.settings.CATALOG_PATH)
         self.sra_mirror = sra_mirror
+        self.galaxy = galaxy
         self.query_con = self._init_query_engine()
 
         self.agent: Optional[Agent] = None
@@ -490,6 +564,7 @@ class AssistantAgent:
         # One flag drives both tool registration and the prompt, so the
         # prompt never advertises sra_* tools that aren't registered.
         sra_available = self.sra_mirror is not None and self.sra_mirror.is_available()
+        logan_available = self.galaxy is not None and self.galaxy.is_available()
 
         tool_fns = [
             search_organisms,
@@ -513,8 +588,14 @@ class AssistantAgent:
             )
             logger.info("SRA mirror tools registered with assistant agent")
 
+        if logan_available:
+            tool_fns.extend([logan_job_status, logan_cohort, logan_hits])
+            logger.info("Logan search tools registered with assistant agent")
+
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
-        self.system_prompt = build_system_prompt(include_sra_tools=sra_available)
+        self.system_prompt = build_system_prompt(
+            include_sra_tools=sra_available, include_logan_tools=logan_available
+        )
 
         # The conversational agent just replies in prose -- no structured
         # constraint, so it never fails on output grounds. Tracker state is
@@ -524,6 +605,7 @@ class AssistantAgent:
             deps_type=AssistantDeps,
             output_type=str,
             system_prompt=self.system_prompt,
+            instructions=_logan_instructions,
             tools=tools,
         )
 
@@ -730,6 +812,75 @@ class AssistantAgent:
         session whose workflow later vanished would still hand off on its stale
         detail (sol adversarial review)."""
         return self._apply_schema_updates(schema, {})
+
+    @staticmethod
+    def _carried_accessions(prior: SchemaField) -> Optional[str]:
+        """The prior turn's resolved accessions, when this turn resolved none.
+
+        The extractor restates the tracker every turn and paraphrases freely:
+        "top 5 runs" becomes "ENA/SRA accessions" once a later turn is about
+        something else. Re-deriving from that text finds nothing and the
+        stepper loses the run ids. Naming a different source, or new
+        accessions, still resolves and replaces this.
+        """
+        if prior.status != FieldStatus.FILLED or not prior.detail:
+            return None
+        try:
+            payload = json.loads(prior.detail)
+        except (TypeError, ValueError):
+            return None  # a pre-#1296 free-text detail
+        if isinstance(payload, dict) and payload.get("accessions"):
+            return prior.detail
+        return None
+
+    @staticmethod
+    def _data_source_detail(
+        value: str, logan: Optional[dict], user_message: Optional[str] = None
+    ) -> Optional[str]:
+        """Structured detail for this turn's data_source, or None.
+
+        The extracted value is authoritative when it resolves. It often does
+        not: asked for "the top 5 runs" the extractor routinely records
+        "ENA/SRA accessions", which names no ids at all -- so the user's own
+        words for the turn are the fallback.
+        """
+        detail = AssistantAgent._resolve_data_source(value, logan)
+        if detail is None and user_message:
+            detail = AssistantAgent._resolve_data_source(user_message, logan)
+        return detail
+
+    @staticmethod
+    def _resolve_data_source(value: str, logan: Optional[dict]) -> Optional[str]:
+        """Structured detail for one piece of free text, or None.
+
+        The stepper needs accessions, not prose. This is where they get
+        determined -- server-side, once -- so the frontend stops regex-
+        scraping the value. "top N" only means something in a Logan session;
+        without a snapshot it is left alone rather than guessed at.
+        """
+        accessions: list[str] = []
+        payload: dict = {}
+        top = _TOP_N_RE.search(value)
+        hits = (logan or {}).get("top_hits") or []
+        if top and hits:
+            n = int(top.group(1))
+            accessions = [h["accession"] for h in hits[:n]]
+            payload.update(
+                source="logan",
+                job_id=logan.get("job_id"),
+                requested=n,
+                resolved=len(accessions),
+            )
+        for acc in dict.fromkeys(_RUN_ACCESSION_RE.findall(value)):
+            if acc not in accessions:
+                accessions.append(acc)
+        if accessions:
+            payload.setdefault("source", "ena")
+            payload["accessions"] = accessions
+            return json.dumps(payload)
+        if _UPLOAD_RE.search(value):
+            return json.dumps({"source": "upload"})
+        return None
 
     @staticmethod
     def _sanitize_entity_id(entity_id: str) -> str:
@@ -1131,6 +1282,8 @@ class AssistantAgent:
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
             con=self.query_con,
+            galaxy=self.galaxy,
+            logan=state.metadata.get("logan"),
         )
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
@@ -1163,11 +1316,18 @@ class AssistantAgent:
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
             )
-        schema_state = self._apply_schema_updates(state.schema_state, schema_updates)
+        schema_state = self._apply_schema_updates(
+            state.schema_state,
+            schema_updates,
+            logan=state.metadata.get("logan"),
+            user_message=message,
+        )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
         # LLM), so they're always consistent with the tracker and can't leak.
-        suggestions = self._derive_suggestions(schema_state)
+        suggestions = self._derive_suggestions(
+            schema_state, logan=state.metadata.get("logan")
+        )
 
         # Token usage across both calls (the extractor adds a little).
         token_usage = self._combine_usage(result.usage(), extract_usage)
@@ -1205,6 +1365,7 @@ class AssistantAgent:
             is_complete=is_complete,
             handoff_url=handoff_url,
             token_usage=token_usage,
+            logan=logan_context_from(state.metadata),
         )
 
         transcript, truncated = self._build_transcript(
@@ -1285,6 +1446,84 @@ class AssistantAgent:
             messages=messages,
         )
 
+    async def fetch_logan_snapshot(self, job_id: str) -> LoganSnapshot:
+        """Read a finished job's cached results into a snapshot.
+
+        Cache-first, and cache-only: the results page is the one place that
+        pays for aggregation. The merged aggregate is keyed by job id in
+        Redis and needs no Galaxy call to read, so a finished search opens
+        whoever ran it -- which matters, because a signed-in user's job runs
+        under their own credential while this reads with the service one and
+        may not be able to see their job at all.
+
+        Status is therefore only consulted to explain a miss: still running,
+        or gone. An unreadable status is itself an answer -- not ours to
+        see -- and reads as expired, which points at the results page rather
+        than failing the request.
+        """
+        if self.galaxy is None or not self.galaxy.is_available():
+            raise AssistantUnavailableError("Logan search is not configured")
+        page = await self.galaxy.get_cached_kmindex_results(
+            job_id, limit=LOGAN_TOP_HITS, offset=0
+        )
+        if page is not None:
+            return build_logan_snapshot(
+                page, captured_at=datetime.now(timezone.utc).isoformat()
+            )
+        raise await self._explain_logan_miss(job_id)
+
+    async def _explain_logan_miss(self, job_id: str) -> LoganJobError:
+        """Why the cache had nothing, as the error to raise."""
+        gone = LoganJobNotFoundError(
+            job_id, "This search's results are not cached; re-run it"
+        )
+        try:
+            status = await self.galaxy.get_job_status(job_id)
+        except Exception:
+            logger.info(
+                "Logan job %s: status unreadable with the service credential; "
+                "reporting the uncached result as expired",
+                job_id,
+            )
+            return gone
+        if not status.is_complete:
+            return LoganJobNotReadyError(job_id, "This search is still running")
+        if not status.is_successful:
+            return LoganJobFailedError(job_id, "This search failed")
+        return gone
+
+    async def create_logan_session_from_snapshot(
+        self, snapshot: LoganSnapshot, owner_keycloak_sub: Optional[str]
+    ) -> SessionState:
+        """Open a session bound to a snapshot: prefilled tracker, a stored
+        intro message, Logan chips. No model call. Split from
+        create_logan_session so evals can inject a fixture snapshot."""
+        schema = prefill_from_logan(AnalysisSchema(), snapshot, self.catalog)
+        intro = render_logan_intro(
+            snapshot,
+            schema.organism.value
+            if schema.organism.status == FieldStatus.FILLED
+            else None,
+        )
+        metadata = {"logan": snapshot.model_dump(mode="json"), "turn_count": 0}
+        state = await self.session_service.create_session(
+            owner_keycloak_sub=owner_keycloak_sub,
+            schema_state=schema,
+            messages=[ChatMessage(role=MessageRole.ASSISTANT, content=intro)],
+            metadata=metadata,
+        )
+        state.suggestions = self._derive_suggestions(schema, logan=metadata["logan"])
+        await self.session_service.save_session(state)
+        return state
+
+    async def create_logan_session(
+        self, job_id: str, owner_keycloak_sub: Optional[str]
+    ) -> SessionState:
+        snapshot = await self.fetch_logan_snapshot(job_id)
+        return await self.create_logan_session_from_snapshot(
+            snapshot, owner_keycloak_sub
+        )
+
     @staticmethod
     def _combine_usage(conv_usage: Any, extract_usage: Any) -> TokenUsage:
         """Sum the conversational and extractor usage into one TokenUsage."""
@@ -1303,7 +1542,9 @@ class AssistantAgent:
             + g(extract_usage, "total_tokens"),
         )
 
-    def _derive_suggestions(self, schema: AnalysisSchema) -> List[SuggestionChip]:
+    def _derive_suggestions(
+        self, schema: AnalysisSchema, logan: Optional[dict] = None
+    ) -> List[SuggestionChip]:
         """Derive next-step chips from the tracker + catalog, deterministically.
 
         Suggestions are a pure function of state + catalog, so we compute them
@@ -1320,11 +1561,18 @@ class AssistantAgent:
         proposals: List[Dict[str, Any]] = []
         try:
             if not filled(schema.organism):
-                proposals = [
-                    {"label": "What organisms do you have?"},
-                    {"label": "Tell me about variant calling"},
-                    {"label": "Tell me about transcriptomics"},
-                ]
+                if logan:
+                    proposals = [
+                        {"label": "What is this cohort?"},
+                        {"label": "Which of these organisms are in BRC?"},
+                        {"label": "Set up an analysis on the top runs"},
+                    ]
+                else:
+                    proposals = [
+                        {"label": "What organisms do you have?"},
+                        {"label": "Tell me about variant calling"},
+                        {"label": "Tell me about transcriptomics"},
+                    ]
             elif not filled(schema.assembly):
                 ref = self._reference_assembly_for(schema.organism)
                 if ref:
@@ -1332,6 +1580,8 @@ class AssistantAgent:
                         {"label": "Use the reference assembly", "assembly": ref}
                     )
                 proposals.append({"label": "Show me the available assemblies"})
+                if logan:
+                    proposals.append({"label": "Use the top 5 runs as my data"})
             elif not filled(schema.analysis_type):
                 proposals = [
                     {"label": "Variant calling"},
@@ -1350,10 +1600,16 @@ class AssistantAgent:
                     {"label": "Show compatible workflows"},
                 ]
             elif not filled(schema.data_source):
-                proposals = [
-                    {"label": "I'll upload my own data"},
-                    {"label": "I'll pull data from ENA/SRA"},
-                ]
+                if logan:
+                    proposals = [
+                        {"label": "Use the top 5 runs as my data"},
+                        {"label": "I'll upload my own data"},
+                    ]
+                else:
+                    proposals = [
+                        {"label": "I'll upload my own data"},
+                        {"label": "I'll pull data from ENA/SRA"},
+                    ]
             else:
                 proposals = [{"label": "Continue to workflow setup"}]
         except Exception:
@@ -1612,6 +1868,8 @@ class AssistantAgent:
         self,
         current: AnalysisSchema,
         updates: Dict[str, Optional[str]],
+        logan: Optional[dict] = None,
+        user_message: Optional[str] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -1681,6 +1939,11 @@ class AssistantAgent:
                     # workflow (Codex).
                     setattr(schema, key, SchemaField())
                     continue
+
+            if key == "data_source":
+                field.detail = self._data_source_detail(
+                    str(value), logan, user_message
+                ) or self._carried_accessions(current.data_source)
 
             setattr(schema, key, field)
 

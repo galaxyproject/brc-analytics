@@ -24,6 +24,7 @@ import { buildWorkflowEntityValue } from "@repo/shared/views/EntityView/componen
 import { type JSX, useMemo } from "react";
 import { useAssistantHandoff } from "./hooks/UseAssistantHandoff/useAssistantHandoff";
 import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInputs";
+import { useHandoffRehydrate } from "./hooks/UseHandoffRehydrate/useHandoffRehydrate";
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
 import { type Assembly, type Props } from "./types";
@@ -44,6 +45,10 @@ export const WorkflowInputsView = ({
 }: Props): JSX.Element => {
   const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
+
+  // Before the reads below: restores the handoff cell when the page was opened
+  // cold from a handoff URL, so a reload or a shared link keeps its accessions.
+  useHandoffRehydrate(ENTITY_KEYS.ASSEMBLIES);
 
   const { initialConfiguredInput, isHandoff } = useAssistantHandoff(
     ENTITY_KEYS.ASSEMBLIES

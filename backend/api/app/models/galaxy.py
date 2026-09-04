@@ -1,0 +1,503 @@
+"""Galaxy API integration models."""
+
+from enum import Enum
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field, field_validator
+
+
+class GalaxyJobState(str, Enum):
+    """Galaxy job states as defined in the API."""
+
+    NEW = "new"
+    UPLOAD = "upload"
+    WAITING = "waiting"
+    QUEUED = "queued"
+    RUNNING = "running"
+    OK = "ok"
+    ERROR = "error"
+    PAUSED = "paused"
+    DELETED = "deleted"
+    DELETED_NEW = "deleted_new"
+
+
+class GalaxyJobSubmission(BaseModel):
+    """Request model for submitting a job to Galaxy."""
+
+    tabular_data: str = Field(..., description="Tabular data content (TSV format)")
+    num_random_lines: int = Field(
+        default=10, ge=1, le=1000, description="Number of random lines to select"
+    )
+    filename: Optional[str] = Field(
+        default="input_data", description="Name for the uploaded file"
+    )
+
+
+MAX_QUERY_BASES = 2500
+
+# kmindex_query's index select is multiple="true", so one job can search any
+# combination of the ~109 registered indexes and write a JSON per shard for each.
+# The ceiling is ours, not the tool's: a single index already fans out to dozens
+# of shard datasets (GENOMIC_BCT alone is 55), and we download every one of them
+# through a service account Galaxy rate-limits. Raise this once the aggregation
+# path stops pulling shards one dataset at a time.
+MAX_INDEXES = 8
+
+
+class KmindexQuerySubmission(BaseModel):
+    """Request model for a Logan/kmindex sequence search."""
+
+    # max_length is a cheap guard on the raw payload so a multi-megabyte body
+    # is rejected before it is parsed; single_record/max_bases below enforce
+    # the real limit on base count.
+    sequence: str = Field(
+        ...,
+        max_length=MAX_QUERY_BASES * 4,
+        description="Query sequence in FASTA format",
+    )
+    indexes: List[str] = Field(
+        ...,
+        min_length=1,
+        description=(
+            "kmindex index names to search in one job, e.g. "
+            "['METAGENOMIC_ENV', 'GENOMIC_BCT']"
+        ),
+    )
+    # kmindex indexes s-mers and queries (s+z)-mers; z=6 is the tool default and
+    # matches a standard k-mer query.
+    zvalue: int = Field(default=6, ge=0, le=16, description="Z-value")
+    threshold: float = Field(
+        default=0.0, ge=0.0, le=1.0, description="Minimum proportion of shared k-mers"
+    )
+    filename: Optional[str] = Field(
+        default="query", description="Name for the uploaded query file"
+    )
+
+    @field_validator("indexes")
+    @classmethod
+    def distinct_and_bounded(cls, value: List[str]) -> List[str]:
+        """
+        Drop blanks, de-duplicate, and cap how many indexes one job may search.
+
+        Duplicates matter beyond tidiness: kmindex keys its output JSON by shard,
+        so the same index twice would merge its hits into the ranked list twice.
+        """
+        seen: List[str] = []
+        for name in value:
+            cleaned = name.strip()
+            if cleaned and cleaned not in seen:
+                seen.append(cleaned)
+
+        if not seen:
+            raise ValueError("Select at least one index")
+        if len(seen) > MAX_INDEXES:
+            raise ValueError(
+                f"Selected {len(seen)} indexes; at most {MAX_INDEXES} per query"
+            )
+        return seen
+
+    @field_validator("sequence")
+    @classmethod
+    def single_record(cls, value: str) -> str:
+        """
+        Reject multi-record FASTA.
+
+        kmindex reports hits per query record, but the merged view collapses
+        them into one ranked list -- so a two-record query silently returns
+        both sets of accessions under the first record's name. Until the
+        aggregate is keyed by query, one record per submission.
+        """
+        if sum(1 for line in value.splitlines() if line.startswith(">")) > 1:
+            raise ValueError(
+                "Submit one sequence per query; multi-record FASTA is not supported"
+            )
+        return value
+
+    @field_validator("sequence")
+    @classmethod
+    def within_base_limit(cls, value: str) -> str:
+        """
+        Cap the query at MAX_QUERY_BASES actual bases.
+
+        The UI enforces the same ceiling, but the UI is not the only caller --
+        without this the limit is advisory and a direct API request can hand
+        an arbitrarily long query to a 96-core node.
+        """
+        bases = sum(
+            len(line.strip()) for line in value.splitlines() if not line.startswith(">")
+        )
+        if bases > MAX_QUERY_BASES:
+            raise ValueError(f"Query is {bases} bases; the limit is {MAX_QUERY_BASES}")
+        return value
+
+
+class SraRunMetadata(BaseModel):
+    """Run metadata from the local SRA mirror, joined onto a search hit."""
+
+    assay_type: Optional[str] = None
+    bioproject: Optional[str] = None
+    country: Optional[str] = None
+    instrument: Optional[str] = None
+    library_layout: Optional[str] = None
+    mbases: Optional[int] = None
+    organism: Optional[str] = None
+    platform: Optional[str] = None
+    release_date: Optional[str] = None
+    study: Optional[str] = None
+
+
+class KmindexHit(BaseModel):
+    """A single SRA accession matched by a kmindex query."""
+
+    accession: str = Field(..., description="SRA run accession, e.g. SRR13392923")
+    score: float = Field(..., description="Fraction of query k-mers shared, 0.0-1.0")
+    shard: str = Field(..., description="Index shard the hit came from")
+    sra: Optional[SraRunMetadata] = Field(
+        default=None,
+        description="Mirror metadata, absent when the accession isn't mirrored",
+    )
+
+
+class KmindexIndexSummary(BaseModel):
+    """Per-index hit counts either side of the global cap."""
+
+    hits_after_cap: int
+    hits_before_cap: int
+    index: str
+
+
+class KmindexFacetValue(BaseModel):
+    """One value of a cohort facet, with how many matched runs carry it."""
+
+    count: int
+    value: str
+
+
+class KmindexFacet(BaseModel):
+    """A facet computed over every matched run, not just the pageable ones."""
+
+    name: str = Field(
+        ...,
+        description="assay_type | platform | librarylayout | instrument | "
+        "country | release_year",
+    )
+    other: int = Field(
+        ...,
+        description="Matched runs whose value is real but outside the listed "
+        "values -- the long tail, kept as a count so the parts still sum",
+    )
+    unknown: int = Field(
+        ...,
+        description="Matched runs with no usable value for this facet, "
+        "including SRA's literal sentinels -- 'uncalculated' for country "
+        "and 'unspecified' for instrument",
+    )
+    values: List[KmindexFacetValue]
+
+
+class KmindexCohort(BaseModel):
+    """
+    Counts over the complete pre-cap hit set, joined against the SRA mirror.
+
+    The paged hits are the top of a global score sort, so counting them
+    describes the cap rather than the query: on a real 1,133,516-hit job the
+    visible 50,000 put E. coli first at 70% and dropped Salmonella enterica --
+    the actual leader at 29% -- out of the list entirely. These numbers are
+    computed before the cap, so they answer for the whole match set.
+    """
+
+    bioprojects: int
+    countries: int
+    facets: List[KmindexFacet]
+    in_mirror: int = Field(
+        ...,
+        description="Matched accessions the mirror knows about, of `total`; "
+        "every count here is out of this, not out of `total`",
+    )
+    organisms: int
+    studies: int
+    top_organisms: List[KmindexFacetValue] = Field(
+        default=[],
+        description="Ten most frequent organisms. Not a facet: the tail is "
+        "10,000 names long and the mirror carries no taxid on runs, so a "
+        "taxonomic rollup is not free",
+    )
+    total: int = Field(..., description="Hits before the cap; equals total_matches")
+
+
+class KmindexGeographyCountry(BaseModel):
+    """One country the map can draw, with how many matched runs came from it."""
+
+    count: int
+    iso_a3: str = Field(..., description="ISO 3166-1 alpha-3")
+    iso_n3: str = Field(
+        ...,
+        description="ISO 3166-1 numeric, zero-padded. This is what the "
+        "choropleth joins on -- world-110m keys its features by numeric id, "
+        "not by alpha-3, so joining on the code above would match nothing",
+    )
+    value: str = Field(
+        ...,
+        description="Canonical country name. Not the raw SRA string: several "
+        "of those share one code (Gaza Strip and West Bank are both PSE) and "
+        "the rollup is keyed by code",
+    )
+
+
+class KmindexGeography(BaseModel):
+    """
+    Where the complete pre-cap hit set was sampled from.
+
+    Separate from the cohort's country facet, which lists a head of ten and
+    rolls the rest into `other` -- that renders the reference job's 42
+    countries as ten bars. This carries all of them.
+
+    `countries`, `unmapped_countries` and `unknown` partition the matched runs
+    and sum to `in_mirror`, so the map can be reconciled rather than trusted.
+    That matters more here than anywhere else on the card: a cohort where
+    geography is recorded for a fifth of the runs is the normal case, not the
+    edge case, and a map that draws 42 countries without saying so is the
+    defect this exists to fix.
+    """
+
+    countries: List[KmindexGeographyCountry] = Field(
+        default=[],
+        description="Every country in the match set that the committed "
+        "boundary asset can draw, largest first. Not a top ten",
+    )
+    in_mirror: int = Field(
+        ...,
+        description="Matched accessions the mirror knows about; every count "
+        "here is out of this, and equals the cohort's in_mirror",
+    )
+    recorded: int = Field(
+        ..., description="Matched runs with a usable country, drawable or not"
+    )
+    unknown: int = Field(
+        ...,
+        description="Matched runs with no country recorded -- NULL, empty, or "
+        "SRA's 'uncalculated' sentinel, folded together exactly as the "
+        "cohort's country facet does so the two cannot disagree on screen",
+    )
+    unmapped_countries: List[KmindexFacetValue] = Field(
+        default=[],
+        description="Recorded countries the map cannot place, by raw SRA "
+        "value. Two causes, deliberately not distinguished: the value is not "
+        "a country (Borneo, the dissolved states), or it is one with no shape "
+        "at 1:110m -- which is 65 of the mirror's 245 values, Hong Kong and "
+        "Singapore included. Displayed, never silently dropped",
+    )
+
+
+class KmindexResults(BaseModel):
+    """Hits from a kmindex query, merged across every index shard."""
+
+    job_id: str
+    query_name: Optional[str] = None
+    total_hits: int = Field(
+        ..., description="Pageable hits, i.e. after the aggregation cap"
+    )
+    total_matches: int = Field(
+        ...,
+        description="Hits the query actually matched, before the aggregation "
+        "cap; equals total_hits when not truncated",
+    )
+    shards_searched: int
+    shards_with_hits: int
+    shards_failed: int = Field(
+        default=0,
+        description="Shards whose output could not be fetched; >0 means the "
+        "hit list is incomplete",
+    )
+    truncated: bool = Field(
+        default=False,
+        description="True when the merged hit list hit the aggregation cap",
+    )
+    per_index: List[KmindexIndexSummary] = Field(
+        default=[],
+        description="What each searched index contributed either side of the "
+        "cap; the cap is one global score sort, so a small index searched "
+        "alongside a large one keeps only a fraction of its hits",
+    )
+    cohort: Optional[KmindexCohort] = Field(
+        default=None,
+        description="Counts over every hit the query matched, before the cap. "
+        "Absent when the mirror could not answer -- never partially filled, "
+        "since the point of it is to be the trustworthy number",
+    )
+    geography: Optional[KmindexGeography] = Field(
+        default=None,
+        description="Where every matched run was sampled from, before the "
+        "cap. Absent on the same terms as the cohort, and additionally when "
+        "the deployed mirror predates the columns the query needs -- "
+        "geography fails closed on its own so the rest of the mirror keeps "
+        "serving",
+    )
+    export_bytes: Optional[int] = Field(
+        default=None,
+        description="Size of the downloadable export, which is the parquet "
+        "download byte for byte; the TSV rendering is produced on request and "
+        "is ~10x larger",
+    )
+    export_rows: Optional[int] = Field(
+        default=None,
+        description="Rows in that export -- every hit before the cap, so it "
+        "equals total_matches rather than total_hits",
+    )
+    export_status: Literal["available", "too_large", "unavailable"] = Field(
+        default="unavailable",
+        description="Whether the full, mirror-enriched match set can be "
+        "downloaded, and when it cannot, why: 'too_large' means the query "
+        "matched more rows than are worth materializing, 'unavailable' that "
+        "the mirror or export directory is unconfigured, that the write "
+        "failed, or that the file has since been swept. 'available' is "
+        "checked against the file on disk, not against the cached aggregate "
+        "that claims it, so it is never set for a link that would 404",
+    )
+    limit: int
+    offset: int
+    sra_mirror_available: bool = Field(
+        default=False, description="Whether the SRA mirror was queryable"
+    )
+    sra_annotated: int = Field(
+        default=0, description="Hits on this page found in the SRA mirror"
+    )
+    hits: List[KmindexHit] = []
+
+
+class GalaxyJobResponse(BaseModel):
+    """Response model for job submission."""
+
+    job_id: str = Field(..., description="Galaxy job ID for tracking")
+    upload_dataset_id: str = Field(..., description="ID of the uploaded dataset")
+    status: str = Field(default="submitted", description="Initial job status")
+    message: str = Field(default="Job submitted successfully")
+    identity: Optional[str] = Field(
+        default=None, description="Which credential ran the job: service or user"
+    )
+
+
+class GalaxyAccountStatus(BaseModel):
+    """Whether the caller can run Galaxy jobs as themselves."""
+
+    galaxy_login_url: Optional[str] = None
+    galaxy_user_id: Optional[str] = None
+    galaxy_username: Optional[str] = None
+    identity: str = Field(..., description="none, service, or user")
+    linked: bool
+
+
+class GalaxyDataset(BaseModel):
+    """Model for Galaxy dataset information."""
+
+    id: str
+    name: str
+    state: str
+    file_ext: str
+    file_size: Optional[int] = None
+    created_time: Optional[str] = None
+    updated_time: Optional[str] = None
+
+
+class GalaxyJobOutput(BaseModel):
+    """Model for Galaxy job output information."""
+
+    id: str
+    name: str
+    dataset: GalaxyDataset
+
+
+class GalaxyJobDetails(BaseModel):
+    """Detailed information about a Galaxy job."""
+
+    id: str
+    tool_id: str
+    state: GalaxyJobState
+    created_time: str
+    updated_time: str
+    outputs: List[GalaxyJobOutput] = []
+    inputs: Dict[str, Any] = {}
+    stdout: Optional[str] = None
+    stderr: Optional[str] = None
+    exit_code: Optional[int] = None
+
+
+class GalaxyJobStatus(BaseModel):
+    """Status response for a Galaxy job."""
+
+    job_id: str
+    state: GalaxyJobState
+    created_time: str
+    updated_time: str
+    is_complete: bool = Field(
+        default=False, description="Whether the job has finished (success or failure)"
+    )
+    is_successful: bool = Field(
+        default=False, description="Whether the job completed successfully"
+    )
+    outputs: List[GalaxyJobOutput] = []
+    stdout: Optional[str] = None
+    stderr: Optional[str] = None
+    exit_code: Optional[int] = None
+    # The job's tool parameters, carried in-process so callers that need them
+    # don't have to re-fetch a job dict this status was already built from.
+    # excluded, so it reaches neither the HTTP response (this is a public
+    # response_model) nor the status cache, which is written via model_dump().
+    # A reader therefore has to treat None as "not carried here", not as
+    # "this job has no parameters".
+    # Deliberately Any rather than Dict: the only consumer already opens with an
+    # isinstance check, and validating the shape here would turn a params value
+    # Galaxy shaped unexpectedly from inert into a 500 on every job endpoint,
+    # not just on index attribution.
+    params: Optional[Any] = Field(default=None, exclude=True)
+
+
+class GalaxyJobResult(BaseModel):
+    """Final results from a completed Galaxy job."""
+
+    job_id: str
+    status: GalaxyJobState
+    outputs: List[GalaxyJobOutput]
+    results: Dict[str, str] = Field(
+        default_factory=dict, description="Output dataset contents"
+    )
+    processing_time: Optional[str] = None
+    created_time: str
+    completed_time: Optional[str] = None
+
+
+class GalaxyAPIError(BaseModel):
+    """Model for Galaxy API errors."""
+
+    error: str
+    message: str
+    status_code: int
+    job_id: Optional[str] = None
+
+
+# Internal Galaxy API request/response models (for service layer)
+
+
+class GalaxyUploadRequest(BaseModel):
+    """Internal model for Galaxy upload tool request."""
+
+    tool_id: str
+    history_id: str
+    inputs: Dict[str, Any]
+
+
+class GalaxyToolRequest(BaseModel):
+    """Internal model for Galaxy tool execution request."""
+
+    tool_id: str
+    history_id: str
+    inputs: Dict[str, Any]
+
+
+class GalaxyAPIResponse(BaseModel):
+    """Generic Galaxy API response wrapper."""
+
+    success: bool = True
+    data: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
+    status_code: int = 200

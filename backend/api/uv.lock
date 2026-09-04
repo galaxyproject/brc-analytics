@@ -259,6 +259,21 @@ wheels = [
 ]
 
 [[package]]
+name = "bioblend"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "requests-toolbelt" },
+    { name = "tuspy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bb/3e/c39594d7b19a591c925924aaca989cacd3638d4bb06d2351d075bc337a4f/bioblend-1.9.0.tar.gz", hash = "sha256:c1aefc24ad0bd81e39e55c62231c8b61129a024f80d6596c2ede032d09eef8c5", size = 161737, upload-time = "2026-04-14T16:26:55.271Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3c/6b/72e5f22f3c5069bd950f107110cd17468cdb43abda3c55b48c4013e7b667/bioblend-1.9.0-py3-none-any.whl", hash = "sha256:573d6e8e8f1ee3f5a5630a05e561ca5c69ecfa2cf93d7e81d472ec8fe53abc49", size = 169893, upload-time = "2026-04-14T16:26:53.619Z" },
+]
+
+[[package]]
 name = "boto3"
 version = "1.42.79"
 source = { registry = "https://pypi.org/simple" }
@@ -294,6 +309,7 @@ dependencies = [
     { name = "aiosqlite" },
     { name = "alembic" },
     { name = "asyncpg" },
+    { name = "bioblend" },
     { name = "duckdb" },
     { name = "fastapi" },
     { name = "fastmcp" },
@@ -324,6 +340,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.21.0" },
     { name = "alembic", specifier = ">=1.13.2" },
     { name = "asyncpg", specifier = ">=0.29.0" },
+    { name = "bioblend", specifier = ">=1.6.0" },
     { name = "duckdb", specifier = ">=1.5.0" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "fastmcp", specifier = ">=3.0.0" },
@@ -2481,6 +2498,18 @@ wheels = [
 ]
 
 [[package]]
+name = "requests-toolbelt"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f3/61/d7545dafb7ac2230c70d38d31cbfe4cc64f7144dc41f6e4e4b78ecd9f5bb/requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6", size = 206888, upload-time = "2023-05-01T04:11:33.229Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3f/51/d4db610ef29373b879047326cbf6fa98b6c1969d6f6dc423279de2b1be2c/requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06", size = 54481, upload-time = "2023-05-01T04:11:28.427Z" },
+]
+
+[[package]]
 name = "rich"
 version = "14.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2844,6 +2873,15 @@ wheels = [
 ]
 
 [[package]]
+name = "tinydb"
+version = "4.8.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/79/4af51e2bb214b6ea58f857c51183d92beba85b23f7ba61c983ab3de56c33/tinydb-4.8.2.tar.gz", hash = "sha256:f7dfc39b8d7fda7a1ca62a8dbb449ffd340a117c1206b68c50b1a481fb95181d", size = 32566, upload-time = "2024-10-12T15:24:01.13Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/17/853354204e1ca022d6b7d011ca7f3206c4f8faa3cc743e92609b49c1d83f/tinydb-4.8.2-py3-none-any.whl", hash = "sha256:f97030ee5cbc91eeadd1d7af07ab0e48ceb04aa63d4a983adbaca4cba16e86c3", size = 24888, upload-time = "2024-10-12T15:23:59.833Z" },
+]
+
+[[package]]
 name = "tokenizers"
 version = "0.22.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2878,6 +2916,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737, upload-time = "2024-11-24T20:12:22.481Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762aeb1c1184ed1f6b14/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2", size = 78540, upload-time = "2024-11-24T20:12:19.698Z" },
+]
+
+[[package]]
+name = "tuspy"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "requests" },
+    { name = "tinydb" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/11/21/706996ed872ecb6881dec3708cfbc6a3f92026e9e62acc9fcc4bc1019f2d/tuspy-1.1.0.tar.gz", hash = "sha256:156734eac5c61a046cfecd70f14119f05be92cce198eb5a1a99a664482bedb89", size = 16949, upload-time = "2024-11-29T11:43:55.778Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/8e/b94ec25fcd4384de2a1f5e0403284f005ec743c04bafdb6698c851df5c6d/tuspy-1.1.0-py3-none-any.whl", hash = "sha256:7fc5ac8fb25de37c96c90213f83a1ffdede7f48a471cb5a15a2f57846828a79a", size = 15319, upload-time = "2024-11-29T11:43:47.072Z" },
 ]
 
 [[package]]

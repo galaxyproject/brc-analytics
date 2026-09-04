@@ -132,6 +132,23 @@ class Settings:
         self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
         self.RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
 
+        # Job submission is rate limited far more tightly than ordinary reads.
+        # One kmindex query takes a 96-core node for up to 48h, so the general
+        # budget (100/min) is no protection at all on those endpoints.
+        self.SUBMIT_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_REQUESTS", "5")
+        )
+        self.SUBMIT_RATE_LIMIT_WINDOW: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_WINDOW", "3600")
+        )
+
+        # Per-user submit budget for signed-in users. Roomier than the anonymous
+        # pool: an authenticated user is accountable, and Galaxy's own per-user
+        # quotas are the real backstop.
+        self.SUBMIT_RATE_LIMIT_USER_REQUESTS: int = int(
+            os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
+        )
+
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
         # header itself -- otherwise clients can spoof IPs.
@@ -165,6 +182,41 @@ class Settings:
 
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
+
+        # Where a kmindex search's full, mirror-enriched match set is written
+        # so it can be downloaded afterwards. Empty path disables the export
+        # entirely: nothing is materialized, the results advertise no download
+        # and the endpoint 404s. Must be writable, unlike SRA_MIRROR_PATH.
+        self.KMINDEX_EXPORT_DIR: str = os.getenv("KMINDEX_EXPORT_DIR", "")
+
+        # Galaxy job execution. Empty API key disables the Galaxy endpoints --
+        # the key is a service account, so jobs land in one shared account
+        # rather than the visitor's own Galaxy session.
+        self.GALAXY_API_URL: str = os.getenv(
+            "GALAXY_API_URL", "https://test.galaxyproject.org/api"
+        )
+        # Galaxy's web root. bioblend wants this rather than the API URL, and
+        # so do the login and ownership-record URLs -- derive it once here
+        # instead of stripping "/api" at each call site, where a str.replace
+        # would also eat an "/api" in the middle of a hostname or path.
+        self.GALAXY_BASE_URL: str = self.GALAXY_API_URL.rstrip("/").removesuffix("/api")
+        self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+
+        # Galaxy tool IDs
+        self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")
+        self.GALAXY_RANDOM_LINES_TOOL_ID: str = os.getenv(
+            "GALAXY_RANDOM_LINES_TOOL_ID", "random_lines1"
+        )
+        # Versioned rather than short id: kmindex_query's parameter shape has
+        # changed across releases, so pinning keeps tool_inputs valid.
+        self.GALAXY_KMINDEX_TOOL_ID: str = os.getenv(
+            "GALAXY_KMINDEX_TOOL_ID",
+            "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.6.1+galaxy3",
+        )
+
+        # Which Galaxy OIDC backend links accounts (the provider name in Galaxy's
+        # oidc_backends_config.xml). Used to build the connect-your-account URL.
+        self.GALAXY_OIDC_PROVIDER: str = os.getenv("GALAXY_OIDC_PROVIDER", "keycloak")
 
         # Keycloak / OIDC settings
         self.KEYCLOAK_ISSUER_URL: str = os.getenv(
