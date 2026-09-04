@@ -98,6 +98,12 @@ export const assistantAPIClient = {
   assistantSaveSession: async (
     sessionId: string
   ): Promise<SessionSaveResponse> => {
-    return httpClient.post(`assistant/session/${sessionId}/save`).json();
+    // No retries here: useAssistantChat decides what a failed save means --
+    // it re-arms on anything a later attempt could fix and stands down on
+    // anything it can't. Two retry policies stacked would turn one refusal
+    // into three requests and three server-side log lines.
+    return httpClient
+      .post(`assistant/session/${sessionId}/save`, { retry: { limit: 0 } })
+      .json();
   },
 };

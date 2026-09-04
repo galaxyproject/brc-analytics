@@ -53,35 +53,40 @@ export function FavoriteCell({
   }
 
   return (
+    // The span is load-bearing: a disabled button fires no pointer events, so
+    // without it the tooltip is missing in exactly the states -- loading,
+    // failed load, toggle in flight -- where it explains why nothing happens.
     <Tooltip title={isAuthenticated ? label : "Sign in to save"}>
-      <IconButton
-        aria-label={label}
-        // isLoading covers the window before the initial GET /favorites
-        // resolves, when isFavorited reads an empty set -- a click there
-        // would fire a create for an entity that may already be saved.
-        // hasLoaded covers the same empty set after a load that failed,
-        // where isLoading is back to false and nothing else says so.
-        // Only the rows in flight are disabled -- gating on the shared
-        // isToggling flag would freeze every star in the table.
-        // Both gates are about favorites we might not have loaded yet, which
-        // is meaningless signed out: the click just opens login. The provider
-        // never reports loading to a signed-out user today, so this only stops
-        // the cell from depending on that staying true.
-        disabled={
-          isAuthenticated &&
-          (isLoading ||
-            !hasLoaded ||
-            togglingKeys.has(favoriteKey(entityType, entityId)))
-        }
-        onClick={handleClick}
-        size="small"
-      >
-        {favorited ? (
-          <StarIcon color="primary" fontSize="small" />
-        ) : (
-          <StarBorderIcon fontSize="small" />
-        )}
-      </IconButton>
+      <span>
+        <IconButton
+          aria-label={label}
+          // isLoading covers the window before the initial GET /favorites
+          // resolves, when isFavorited reads an empty set -- a click there
+          // would fire a create for an entity that may already be saved.
+          // hasLoaded covers the same empty set after a load that failed,
+          // where isLoading is back to false and nothing else says so.
+          // Only the rows in flight are disabled -- gating on the shared
+          // isToggling flag would freeze every star in the table.
+          // Both gates are about favorites we might not have loaded yet, which
+          // is meaningless signed out: the click just opens login. The provider
+          // never reports loading to a signed-out user today, so this only stops
+          // the cell from depending on that staying true.
+          disabled={
+            isAuthenticated &&
+            (isLoading ||
+              !hasLoaded ||
+              togglingKeys.has(favoriteKey(entityType, entityId)))
+          }
+          onClick={handleClick}
+          size="small"
+        >
+          {favorited ? (
+            <StarIcon color="primary" fontSize="small" />
+          ) : (
+            <StarBorderIcon fontSize="small" />
+          )}
+        </IconButton>
+      </span>
     </Tooltip>
   );
 }

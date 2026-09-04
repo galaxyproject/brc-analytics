@@ -57,15 +57,15 @@ async def record(state: SessionState) -> str | None:
     because it was told so rather than because it inferred it, and so the
     caller can stamp that id onto the session.
     """
-    settings = get_settings()
-    if not settings.DATABASE_URL:
-        # No sink to write to. The chat endpoint authenticates via JWT alone
-        # (get_optional_current_user), so a deployment with OIDC enabled and
-        # DATABASE_URL unset is reachable -- without this, every authenticated
-        # turn would log an exception and fire Sentry.
-        return None
-
     try:
+        settings = get_settings()
+        if not settings.DATABASE_URL:
+            # No sink to write to. The chat endpoint authenticates via JWT
+            # alone (get_optional_current_user), so a deployment with OIDC
+            # enabled and DATABASE_URL unset is reachable -- without this,
+            # every authenticated turn would log an exception and fire Sentry.
+            return None
+
         return await asyncio.wait_for(
             _write(state),
             timeout=settings.ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS,
