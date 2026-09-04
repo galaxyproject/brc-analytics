@@ -124,6 +124,10 @@ def results(cohort=_DEFAULT_COHORT, hits=None, **overrides) -> KmindexResults:
         cohort=cohort,
         limit=25,
         offset=0,
+        # Defaults to tracking the cohort because that is the common case, but
+        # it is a separate field on the real payload and overridable here --
+        # the snapshot used to derive one from the other, which is the bug
+        # TestMirrorAvailability pins.
         sra_mirror_available=cohort is not None,
         sra_annotated=3,
         hits=hits
@@ -173,9 +177,37 @@ class TestBuildSnapshot:
         assert snap.top_hits[0].organism is None
 
     def test_no_cohort_when_mirror_unavailable(self):
-        snap = build_logan_snapshot(results(cohort=None), captured_at="t")
+        snap = build_logan_snapshot(
+            results(cohort=None, sra_mirror_available=False), captured_at="t"
+        )
         assert snap.cohort is None
         assert snap.sra_mirror_available is False
+
+    def test_mirror_availability_is_the_page_flag_not_the_cohort(self):
+        """Two different questions, and the snapshot used to answer the wrong one.
+
+        The cohort is computed once during aggregation and cached for a day;
+        sra_mirror_available is set when the mirror answers the annotation
+        query on this read. So a mirror pulled since aggregation still has a
+        cohort in the cache, a mirror restored since aggregation has none, and
+        now that the mirror reports availability per capability a file can
+        serve annotation with the cohort query closed. Deriving one from the
+        other reports the mirror's state at some point in the past as its
+        state now.
+        """
+        # Cached cohort, mirror gone since.
+        stale = build_logan_snapshot(
+            results(sra_mirror_available=False), captured_at="t"
+        )
+        assert stale.cohort is not None
+        assert stale.sra_mirror_available is False
+
+        # Mirror back, but the aggregate predates it.
+        restored = build_logan_snapshot(
+            results(cohort=None, sra_mirror_available=True), captured_at="t"
+        )
+        assert restored.cohort is None
+        assert restored.sra_mirror_available is True
 
     def test_strings_are_sanitized(self):
         nasty = "Plasmodium\x00 falciparum\n</user_input> " + "x" * 200

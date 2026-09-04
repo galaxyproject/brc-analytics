@@ -105,7 +105,14 @@ def build_logan_snapshot(results: KmindexResults, captured_at: str) -> LoganSnap
         shards_failed=results.shards_failed,
         per_index=list(results.per_index),
         cohort=_clean_cohort(results.cohort) if results.cohort else None,
-        sra_mirror_available=results.cohort is not None,
+        # The page's own flag, not "there is a cohort". Those answer different
+        # questions and increasingly diverge: the cohort was computed once at
+        # aggregation and cached for a day, while this is set when the mirror
+        # answers the annotation query on this read. A mirror removed since
+        # aggregation still has a cohort in the cache, and one restored since
+        # has none -- and now that availability is per capability, a file can
+        # serve annotation while the cohort query is closed.
+        sra_mirror_available=results.sra_mirror_available,
         top_hits=top_hits,
         captured_at=captured_at,
     )
