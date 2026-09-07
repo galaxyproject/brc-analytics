@@ -90,7 +90,7 @@ export type WorkflowFeatureFlags = Record<
  * Lookup view of the workflow gates, typed by the flags they belong to — the
  * one place the record's keys are named, so the checks below stay cast-free.
  */
-const workflowGateEntries = Object.entries(WORKFLOW_GATES) as [
+const WORKFLOW_GATE_ENTRIES = Object.entries(WORKFLOW_GATES) as [
   WorkflowFeatureFlag,
   (trsId: string) => boolean,
 ][];
@@ -174,7 +174,7 @@ function isWorkflowEnabled(
   { trsId }: GatedWorkflow,
   featureFlags: WorkflowFeatureFlags
 ): boolean {
-  return workflowGateEntries.every(
+  return WORKFLOW_GATE_ENTRIES.every(
     ([featureFlag, matches]) => !matches(trsId) || featureFlags[featureFlag]
   );
 }

@@ -1,10 +1,10 @@
+import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import {
   bindWorkflowFeatureFlags,
   type WorkflowFeatureFlags,
 } from "@repo/shared/workflow/featureFlags";
 import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
-import { WorkflowCategoryId } from "../../catalog/schema/generated/schema";
 import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
 
 const HYPHY_TRS_ID =
@@ -60,7 +60,7 @@ describe("bindWorkflowFeatureFlags", () => {
     const { filterCategories, isWorkflowAllowed } = buildWorkflowGates({
       [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
     });
-    const category = buildWorkflowCategory(WorkflowCategoryId.ASSEMBLY, [
+    const category = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
       UNGATED_TRS_ID,
     ]);
     expect(filterCategories([category])).toEqual([category]);
