@@ -20,21 +20,21 @@ const FEATURE_FLAG_BY_CATEGORY = {
 } as const satisfies Partial<Record<WORKFLOW_CATEGORY_ID, FeatureFlag>>;
 
 /**
- * Lookup view of the gating map. A Map because the catalog types `category` as
- * a plain string: `get` misses cleanly for any category the map doesn't hold,
- * where indexing an object would resolve inherited members such as `toString`
- * and report a category as gated.
- */
-const featureFlagByCategory = new Map<string, WorkflowCategoryFeatureFlag>(
-  Object.entries(FEATURE_FLAG_BY_CATEGORY)
-);
-
-/**
  * A feature flag that gates a workflow category, derived from the gating map so
  * the set cannot drift from the flags actually in use there.
  */
 export type WorkflowCategoryFeatureFlag =
   (typeof FEATURE_FLAG_BY_CATEGORY)[keyof typeof FEATURE_FLAG_BY_CATEGORY];
+
+/**
+ * Lookup view of the gating map. A Map because the catalog types `category` as
+ * a plain string: `get` misses cleanly for any category the map doesn't hold,
+ * where indexing an object would resolve inherited members such as `toString`
+ * and report a category as gated.
+ */
+const CATEGORY_FLAG_LOOKUP = new Map<string, WorkflowCategoryFeatureFlag>(
+  Object.entries(FEATURE_FLAG_BY_CATEGORY)
+);
 
 /**
  * Enabled state of every feature flag that gates a workflow category.
@@ -73,6 +73,6 @@ function isWorkflowCategoryEnabled(
   featureFlags: WorkflowCategoryFeatureFlags
 ): boolean {
   // A category absent from the map is ungated.
-  const featureFlag = featureFlagByCategory.get(category);
+  const featureFlag = CATEGORY_FLAG_LOOKUP.get(category);
   return featureFlag === undefined || featureFlags[featureFlag];
 }
