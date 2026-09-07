@@ -67,9 +67,13 @@ _ACCESSION_BATCH_SIZE = 500
 # warning saying a capability is unavailable, in front of a path that queries
 # anyway, promises a guard that is not there.
 #
-# Kept by hand in step with the queries below; the union is asserted against
-# the fixture schema in tests, so a column added to a query without being
-# named here shows up as a test failure rather than as a 500.
+# Kept by hand in step with the queries below, and that is the whole of the
+# guarantee -- nothing derives these names from the SQL. What the tests give
+# is indirect: each query runs against an 11-column fixture, so a column added
+# to a query but not named here fails only because the fixture happens to lack
+# it. Widen the fixture and that cover is gone, and has_capability() starts
+# promising a column the file may not have. If you add a column to a query,
+# add it here in the same change.
 CAPABILITY_ANNOTATION = "annotation"
 CAPABILITY_COHORT = "cohort"
 CAPABILITY_COORDINATES = "coordinates"
