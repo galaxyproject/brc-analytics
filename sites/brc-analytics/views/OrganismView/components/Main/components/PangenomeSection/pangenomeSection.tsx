@@ -23,7 +23,7 @@ import { getTrackTypes } from "./utils";
  * Pangenome section for the organism page: a bundle header (id + version), a
  * description of the per-assembly UCSC tracks, and a table of member assemblies
  * each linking to its UCSC browser. Rendered under the Assemblies section.
- * Gated on the `pangenome` feature flag and the organism's species having a
+ * Gated on the `demo` feature flag and the organism's species having a
  * pangenome — renders nothing otherwise.
  * @param props - Component props.
  * @param props.pangenome - The species' pangenome bundle, when it has one.

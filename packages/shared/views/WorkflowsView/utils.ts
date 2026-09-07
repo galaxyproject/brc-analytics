@@ -8,7 +8,7 @@ import type {
 } from "@repo/shared/apis/workflow";
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import type { WorkflowGates } from "@repo/shared/workflow/featureFlags";
+import type { WorkflowGates } from "@repo/shared/workflow/gates";
 import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";

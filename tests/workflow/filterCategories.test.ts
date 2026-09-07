@@ -1,5 +1,4 @@
 import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
-import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
 
 const HYPHY_TRS_ID =
@@ -17,14 +16,12 @@ describe("filterCategories - category gating", () => {
   // can reach the filter.
   const UNKNOWN = buildWorkflowCategory("NOT_A_CATEGORY", [UNGATED_TRS_ID]);
 
-  it("returns a gated category when its feature flag is enabled", () => {
-    const { filterCategories } = buildWorkflowGates({
-      [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-    });
+  it("returns a gated category when the demo flag is enabled", () => {
+    const { filterCategories } = buildWorkflowGates(true);
     expect(filterCategories([GATED])).toEqual([GATED]);
   });
 
-  it("filters out a gated category when its feature flag is disabled", () => {
+  it("filters out a gated category when the demo flag is disabled", () => {
     expect(buildWorkflowGates().filterCategories([GATED])).toEqual([]);
   });
 
@@ -37,7 +34,7 @@ describe("filterCategories - category gating", () => {
     expect(buildWorkflowGates().filterCategories(inherited)).toEqual(inherited);
   });
 
-  it("returns categories that no feature flag gates, whatever the flag state", () => {
+  it("returns categories that nothing gates, whatever the flag state", () => {
     expect(buildWorkflowGates().filterCategories([UNGATED, UNKNOWN])).toEqual([
       UNGATED,
       UNKNOWN,
@@ -51,9 +48,7 @@ describe("filterCategories - category gating", () => {
   });
 
   it("returns an empty list unchanged", () => {
-    const { filterCategories } = buildWorkflowGates({
-      [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-    });
+    const { filterCategories } = buildWorkflowGates(true);
     expect(filterCategories([])).toEqual([]);
   });
 });
@@ -80,11 +75,9 @@ describe("filterCategories - workflow gating within a category", () => {
     expect(buildWorkflowGates().filterCategories([category])).toEqual([
       { ...category, workflows: [] },
     ]);
-    expect(
-      buildWorkflowGates({ [FEATURE_FLAGS.HYPHY]: true }).filterCategories([
-        category,
-      ])
-    ).toEqual([category]);
+    expect(buildWorkflowGates(true).filterCategories([category])).toEqual([
+      category,
+    ]);
   });
 
   it("keeps a category that arrived empty", () => {

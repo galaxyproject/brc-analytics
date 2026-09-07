@@ -6,8 +6,8 @@ import { type JSX } from "react";
 import { getFilteredCards } from "./utils";
 
 export const LearnView = (): JSX.Element => {
-  const isLmlsEnabled = useFeatureFlag(FEATURE_FLAGS.LMLS);
-  const cards = getFilteredCards(isLmlsEnabled);
+  const isDemoEnabled = useFeatureFlag(FEATURE_FLAGS.DEMO);
+  const cards = getFilteredCards(isDemoEnabled);
   return (
     <ContentIndexView
       slotProps={{

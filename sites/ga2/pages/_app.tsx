@@ -11,11 +11,7 @@ import {
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { type JSX } from "react";
 
-setFeatureFlags([
-  FEATURE_FLAGS.ASSEMBLY_WORKFLOWS,
-  FEATURE_FLAGS.HYPHY,
-  FEATURE_FLAGS.LMLS,
-]);
+setFeatureFlags([FEATURE_FLAGS.DEMO]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();

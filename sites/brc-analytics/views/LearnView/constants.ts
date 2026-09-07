@@ -6,10 +6,9 @@ import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/Live
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SmartToyIcon } from "@repo/shared/components/CustomIcon/components/SmartToyIcon/smartToyIcon";
 import { YouTubeIcon } from "@repo/shared/components/CustomIcon/components/YouTubeIcon/youTubeIcon";
-import { type SectionContentCard } from "@repo/shared/views/docs/components/SectionContentCard/sectionContentCard";
-import type { ComponentProps } from "react";
+import type { LearnCard } from "./types";
 
-export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
+export const CARDS: LearnCard[] = [
   {
     StartIcon: RocketLaunchIcon,
     href: "/learn/getting-started",
@@ -62,6 +61,7 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {
     StartIcon: SearchIcon,
     href: "/learn/sequence-search-workflows",
+    isDemoGated: true,
     secondaryText:
       "Search SRA by genetic content using kmindex and LexicMap workflows.",
     title: "Sequence Search Workflows",

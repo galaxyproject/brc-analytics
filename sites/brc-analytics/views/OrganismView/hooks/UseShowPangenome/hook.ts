@@ -1,10 +1,10 @@
 import type { Pangenome } from "@brc/apis/pangenome";
-import { BRC_FEATURE_FLAGS } from "@brc/config/featureFlags";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 
 /**
  * Returns the pangenome bundle to show for a species — the given bundle when
- * the pangenome feature is enabled, otherwise undefined.
+ * the demo feature flag is enabled, otherwise undefined.
  * The bundle itself is computed at build time and arrives via the organism
  * detail data. Single source of truth so the organism-page tab and the
  * Pangenome section gate identically and can't drift.
@@ -14,6 +14,6 @@ import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureF
 export function useShowPangenome(
   pangenome: Pangenome | undefined
 ): Pangenome | undefined {
-  const isPangenomeEnabled = useFeatureFlag(BRC_FEATURE_FLAGS.PANGENOME);
-  return isPangenomeEnabled ? pangenome : undefined;
+  const isDemoEnabled = useFeatureFlag(FEATURE_FLAGS.DEMO);
+  return isDemoEnabled ? pangenome : undefined;
 }

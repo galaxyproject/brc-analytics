@@ -1,9 +1,4 @@
 import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
-import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
-import {
-  bindWorkflowFeatureFlags,
-  type WorkflowFeatureFlags,
-} from "@repo/shared/workflow/featureFlags";
 import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
 
@@ -18,14 +13,12 @@ describe("isWorkflowAllowed", () => {
     ).toBe(true);
   });
 
-  it("gates the Hyphy workflow on its own flag", () => {
+  it("gates the Hyphy workflow on the demo flag", () => {
     expect(
       buildWorkflowGates().isWorkflowAllowed({ trsId: HYPHY_TRS_ID })
     ).toBe(false);
     expect(
-      buildWorkflowGates({ [FEATURE_FLAGS.HYPHY]: true }).isWorkflowAllowed({
-        trsId: HYPHY_TRS_ID,
-      })
+      buildWorkflowGates(true).isWorkflowAllowed({ trsId: HYPHY_TRS_ID })
     ).toBe(true);
   });
 
@@ -38,47 +31,49 @@ describe("isWorkflowAllowed", () => {
     ).toBe(false);
   });
 
-  it("gates every LMLS workflow on the LMLS flag", () => {
+  it("gates every LMLS workflow on the demo flag", () => {
     const disabled = buildWorkflowGates();
-    const enabled = buildWorkflowGates({ [FEATURE_FLAGS.LMLS]: true });
+    const enabled = buildWorkflowGates(true);
     for (const { trsId } of LMLS_WORKFLOWS) {
       expect(disabled.isWorkflowAllowed({ trsId })).toBe(false);
       expect(enabled.isWorkflowAllowed({ trsId })).toBe(true);
     }
   });
-
-  it("does not let one gate's flag open another's workflow", () => {
-    const hyphyOnly = buildWorkflowGates({ [FEATURE_FLAGS.HYPHY]: true });
-    for (const { trsId } of LMLS_WORKFLOWS) {
-      expect(hyphyOnly.isWorkflowAllowed({ trsId })).toBe(false);
-    }
-  });
 });
 
-describe("bindWorkflowFeatureFlags", () => {
-  it("binds both levels to the same flag state", () => {
-    const { filterCategories, isWorkflowAllowed } = buildWorkflowGates({
-      [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-    });
-    const category = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
+describe("bindWorkflowGates", () => {
+  it("closes every gate when the demo flag is off and opens them all when it is on", () => {
+    // The single-flag guarantee, asserted in both directions: the off half
+    // pins that each named gate is actually shut, the on half that the one
+    // flag opens all of them — at both gating levels together.
+    const gatedTrsIds = [
+      HYPHY_TRS_ID,
+      ...LMLS_WORKFLOWS.map(({ trsId }) => trsId),
+    ];
+    const gatedCategory = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
       UNGATED_TRS_ID,
+      ...gatedTrsIds,
     ]);
-    expect(filterCategories([category])).toEqual([category]);
-    // The category is open; the workflow's own gate is not.
-    expect(isWorkflowAllowed({ trsId: HYPHY_TRS_ID })).toBe(false);
-  });
-});
 
-describe("WorkflowFeatureFlags exhaustiveness", () => {
-  it("rejects a flag state that leaves a gate unanswered", () => {
-    // The guarantee the gating design rests on: every resolver must answer
-    // every gate, so adding one can't leave gated content visible by default.
-    // If this stops erroring, the record has been loosened and a new gate could
-    // ship unanswered — which is why the assertion is inverted here.
-    // @ts-expect-error -- an incomplete flag state must not type-check.
-    const incomplete: WorkflowFeatureFlags = {
-      [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: true,
-    };
-    expect(bindWorkflowFeatureFlags(incomplete)).toBeDefined();
+    const disabled = buildWorkflowGates();
+    for (const trsId of gatedTrsIds) {
+      expect(disabled.isWorkflowAllowed({ trsId })).toBe(false);
+    }
+    expect(disabled.filterCategories([gatedCategory])).toEqual([]);
+
+    const enabled = buildWorkflowGates(true);
+    for (const trsId of gatedTrsIds) {
+      expect(enabled.isWorkflowAllowed({ trsId })).toBe(true);
+    }
+    expect(enabled.filterCategories([gatedCategory])).toEqual([gatedCategory]);
+  });
+
+  it("hands back a copy, so a caller cannot reorder the array it was given", () => {
+    // Both flag states: the views filter prerendered page props, so neither
+    // path may return the caller's own array.
+    const categories = [buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER)];
+    for (const gates of [buildWorkflowGates(), buildWorkflowGates(true)]) {
+      expect(gates.filterCategories(categories)).not.toBe(categories);
+    }
   });
 });
