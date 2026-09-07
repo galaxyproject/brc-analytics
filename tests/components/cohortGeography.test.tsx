@@ -245,6 +245,34 @@ describe("the map", () => {
     expect(spec.layer[1].encoding.color.scale.type).toBe("log");
   });
 
+  it("keeps the point colours off the choropleth's scale", async () => {
+    render(<CohortGeography geography={geography()} />);
+
+    await waitFor(() => expect(embedMock()).toHaveBeenCalled());
+    const [, spec] = embedMock().mock.calls[0];
+
+    // Two colour encodings that mean different things: run count on a log
+    // ramp from 1, and mean score on a linear one over 0..1.
+    const schemes = spec.layer
+      .map(
+        (layer: { encoding?: { color?: { scale?: { scheme?: string } } } }) =>
+          layer.encoding?.color?.scale?.scheme
+      )
+      .filter(Boolean);
+    expect(new Set(schemes).size).toBeGreaterThan(1);
+
+    // Which is why the resolution has to be declared. Vega-Lite shares
+    // layered colour scales by default, and the union of those two is the
+    // log one: every score sits at or under its domainMin of 1, so the
+    // points draw in the palest blue of the count ramp and plasma never
+    // applies. Both legends merge into one titled "Matched runs, Mean
+    // score". Nothing about the spec above looks wrong -- the damage happens
+    // in what vega-lite compiles it into, so this is the only place it can
+    // be caught short of compiling the spec, which jest cannot do here
+    // (vega-lite is ESM and next/jest will not transform it).
+    expect(spec.resolve.scale.color).toBe("independent");
+  });
+
   it("is not drawn at all when there is nothing to colour", () => {
     // No country the outline can place and no position either. One point on
     // its own is enough to earn a map, so both halves have to be empty.

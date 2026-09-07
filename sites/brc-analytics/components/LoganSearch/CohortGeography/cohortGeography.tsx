@@ -383,6 +383,14 @@ function buildSpec(
     // Mercator would inflate the high-latitude ones several-fold while doing
     // it.
     projection: { type: "equalEarth" },
+    // Vega-Lite resolves layered colour scales as shared by default, which
+    // silently unions two scales that mean different things: the choropleth's
+    // run count (blues, log, domainMin 1) and the points' mean score (plasma,
+    // 0..1). Shared, every score falls at or under the log floor and the
+    // points come out the palest blue in the ramp -- plasma never applies,
+    // and the two legends merge into one reading "Matched runs, Mean score".
+    // The spec looks right either way; only the compiled output differs.
+    resolve: { scale: { color: "independent" } },
     width: "container",
   };
 }
