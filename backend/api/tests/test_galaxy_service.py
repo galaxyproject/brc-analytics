@@ -848,6 +848,10 @@ def _geography_payload(in_mirror: int) -> dict:
     present: Singapore, which is a country with no shape at 1:110m, and
     Borneo, which is not a country.
 
+    Coordinates cut across that split rather than being a subset of it: the
+    Pittsburgh point is an institutional default in a country that is drawn,
+    and null island has no country at all.
+
     @param in_mirror: matched accessions the mirror knows.
     @returns: the geography dict as the mirror service hands it over.
     """
@@ -870,6 +874,14 @@ def _geography_payload(in_mirror: int) -> dict:
             {"count": 3, "value": "Singapore"},
             {"count": 2, "value": "Borneo"},
         ],
+        "located": 5,
+        "locations": [
+            {"avg_score": 0.71, "lat": 40.4406, "lon": -79.9959, "n": 3},
+            {"avg_score": 0.63, "lat": 0.0, "lon": 0.0, "n": 2},
+        ],
+        "locations_precision": None,
+        "locations_total": 2,
+        "locations_truncated": 0,
     }
 
 
@@ -932,7 +944,7 @@ class TestCohortOverTheFullHitSet:
         mirror.cohort_for_accessions = MagicMock(
             return_value=cohort, side_effect=side_effect
         )
-        mirror.geography_for_accessions = MagicMock(
+        mirror.geography_for_hits = MagicMock(
             return_value=_geography_payload(24) if cohort else None
         )
         service.sra_mirror = mirror
@@ -1154,8 +1166,11 @@ class TestGeographyInTheAggregationWindow:
 
         aggregate = await service._aggregate_shards("job1")
 
-        (accessions,) = mirror.geography_for_accessions.call_args.args
-        assert len(accessions) == 25
+        # Hits rather than accessions, because the point layer colours by
+        # score and the score only exists on the hit.
+        (hits,) = mirror.geography_for_hits.call_args.args
+        assert len(hits) == 25
+        assert {"accession", "score"} <= set(hits[0])
         assert aggregate["geography"]["in_mirror"] == 24
 
     @pytest.mark.asyncio
@@ -1181,7 +1196,7 @@ class TestGeographyInTheAggregationWindow:
         aggregate = await service._aggregate_shards("job1")
 
         assert aggregate["geography"] is None
-        mirror.geography_for_accessions.assert_not_called()
+        mirror.geography_for_hits.assert_not_called()
         assert aggregate["cohort"]["in_mirror"] == 5
         mirror.cohort_for_accessions.assert_called_once()
         # A steady state, so it is cached for a day rather than retried hourly.
@@ -1193,7 +1208,7 @@ class TestGeographyInTheAggregationWindow:
         self, service
     ):
         mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
-        mirror.geography_for_accessions = MagicMock(
+        mirror.geography_for_hits = MagicMock(
             side_effect=RuntimeError("geography read failed")
         )
         self._wire(service, hits=5)
@@ -1254,7 +1269,7 @@ class TestGeographyInTheAggregationWindow:
         second = await service.get_kmindex_results("job1")
 
         assert second.geography is not None
-        assert wide.geography_for_accessions.called
+        assert wide.geography_for_hits.called
         # The old entry is left alone rather than overwritten -- a rollback to
         # the narrow mirror finds its own aggregate still warm.
         assert len(store) == 2
@@ -1299,7 +1314,15 @@ class TestGeographyInTheAggregationWindow:
         # The numeric id is what the choropleth joins on, so it has to survive
         # serialization rather than being reconstructed in the browser.
         assert results.geography.countries[0].iso_n3 == "840"
-        assert mirror.geography_for_accessions.called
+        # The point layer reaches the model with its own denominator: five
+        # runs carry a position, out of the same 24 the countries are out of,
+        # and nothing about that is derivable from `recorded`.
+        assert results.geography.located == 5
+        assert results.geography.locations[0].n == 3
+        assert results.geography.locations[0].avg_score == 0.71
+        assert results.geography.locations_precision is None
+        assert results.geography.locations_truncated == 0
+        assert mirror.geography_for_hits.called
 
     @pytest.mark.asyncio
     async def test_an_aggregate_without_geography_reads_as_absent(self, service):
@@ -1321,6 +1344,41 @@ class TestGeographyInTheAggregationWindow:
         assert service._page_kmindex(aggregate, "job1", 5, 0).geography is None
 
     @pytest.mark.asyncio
+    async def test_a_pre_point_entry_reads_as_unasked_not_as_unrecorded(self, service):
+        # The capability fingerprint does not change when the point layer
+        # lands on a mirror that has no coordinates -- an unavailable
+        # capability is absent from it either way -- so entries cached before
+        # this deploy go on being served. They must read as "this mirror
+        # cannot be asked", which on a schema_version 3 file is true, rather
+        # than as "no matched run recorded a position", which is a claim about
+        # the cohort.
+        aggregate = {
+            "geography": {
+                "countries": [],
+                "in_mirror": 4,
+                "recorded": 0,
+                "unknown": 4,
+                "unmapped_countries": [],
+            },
+            "hits": [{"accession": "SRR9", "score": 0.9, "shard": "GENOMIC_BCT_2"}],
+            "per_index": [
+                {"hits_after_cap": 1, "hits_before_cap": 1, "index": "GENOMIC_BCT"}
+            ],
+            "query_name": "q",
+            "shards_failed": 0,
+            "shards_searched": 1,
+            "shards_with_hits": 1,
+            "total_matches": 1,
+            "truncated": False,
+        }
+
+        geography = service._page_kmindex(aggregate, "job1", 5, 0).geography
+
+        assert geography.unknown == 4
+        assert geography.located is None
+        assert geography.locations is None
+
+    @pytest.mark.asyncio
     async def test_geography_survives_the_cache_round_trip(self, service):
         store = {}
         service.cache.make_key = MagicMock(
@@ -1337,10 +1395,10 @@ class TestGeographyInTheAggregationWindow:
         await service.get_kmindex_results("job1")
 
         (cached,) = store.values()
-        assert cached["geography"] == mirror.geography_for_accessions.return_value
+        assert cached["geography"] == mirror.geography_for_hits.return_value
         # Asked once: the second read comes off the cached aggregate, which is
         # the only place geography still exists.
-        assert mirror.geography_for_accessions.call_count == 1
+        assert mirror.geography_for_hits.call_count == 1
 
 
 class TestJobMetadataIsFetchedOnce:
@@ -1495,7 +1553,7 @@ class TestExportOfTheFullMatchSet:
         mirror.is_available = MagicMock(return_value=True)
         mirror.has_capability = MagicMock(return_value=True)
         mirror.cohort_for_accessions = MagicMock(return_value=None)
-        mirror.geography_for_accessions = MagicMock(return_value=None)
+        mirror.geography_for_hits = MagicMock(return_value=None)
         mirror.export_hits = MagicMock(return_value=record, side_effect=side_effect)
         service.sra_mirror = mirror
         return mirror

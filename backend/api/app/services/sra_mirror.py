@@ -72,6 +72,7 @@ _ACCESSION_BATCH_SIZE = 500
 # named here shows up as a test failure rather than as a 500.
 CAPABILITY_ANNOTATION = "annotation"
 CAPABILITY_COHORT = "cohort"
+CAPABILITY_COORDINATES = "coordinates"
 CAPABILITY_EXPORT = "export"
 CAPABILITY_GEOGRAPHY = "geography"
 CAPABILITY_SEARCH = "search"
@@ -111,6 +112,14 @@ _CAPABILITY_COLUMNS: Dict[str, Tuple[str, ...]] = {
     # anything else down with it, and nothing else must be able to take it
     # down either.
     CAPABILITY_GEOGRAPHY: ("acc", "geo_loc_name_country_calc"),
+    # Split out from geography rather than folded into it. lat/lon arrive with
+    # schema_version 6, so on the deployed file this is the one capability
+    # that closes -- and folding it in would take the country choropleth down
+    # with it for however long the backend runs ahead of the mirror rebuild.
+    # Deploying code that is ahead of the data must not cost a feature that
+    # was already working; that is the whole argument for checking per
+    # capability rather than per service.
+    CAPABILITY_COORDINATES: ("acc", "lat", "lon"),
     CAPABILITY_SEARCH: _RUN_DETAIL_COLUMNS,
     CAPABILITY_STUDY: _RUN_DETAIL_COLUMNS,
     CAPABILITY_SUMMARY: (
@@ -468,6 +477,28 @@ def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[st
     }
 
 
+# How many coordinates the map may be handed, and how far the payload is
+# allowed to be rounded to get under it. See _collapse_locations for why 20,000
+# and why the ladder steps by a factor of ten each time: 3dp is ~110 m, 2dp
+# ~1.1 km, 1dp ~11 km. Uncapped, the worst measured cohort (soil metagenome,
+# 148,766 distinct coordinates) is several megabytes of JSON and tens of
+# thousands of marks; at 20,000 the ceiling is about 1.0 MB, ~200 KB over the
+# wire, and the map still says on screen when it had to round or truncate.
+_LOCATION_CAP = 20000
+_LOCATION_PRECISIONS: Tuple[Optional[int], ...] = (None, 3, 2, 1)
+
+# What the location half of the payload says on a mirror that has no
+# coordinates to give. Spelled out rather than left absent so the response has
+# one shape.
+_NO_LOCATIONS: Dict[str, Any] = {
+    "located": None,
+    "locations": None,
+    "locations_precision": None,
+    "locations_total": None,
+    "locations_truncated": None,
+}
+
+
 def _geography_sql() -> str:
     """Every country in a hit set, with the unrecorded runs counted alongside.
 
@@ -482,6 +513,10 @@ def _geography_sql() -> str:
     mirror is opened read_only so there is no temp table, and quoting is
     turned off so a stray quote cannot silently drop or rewrite rows.
 
+    The staging file carries the score in a second column for the point layer;
+    this half of the query reads the accession and joins semi, so a duplicate
+    on either side cannot inflate the denominator the map is measured against.
+
     The sentinel handling is copied from _COHORT_FACETS deliberately, not
     coincidentally. The map and the country bars sit on the same card, so if
     one of them counted 'uncalculated' as a place they would disagree on
@@ -493,15 +528,140 @@ def _geography_sql() -> str:
     same kind of lie as a mislabelled dot.
     """
     return """
-        WITH q AS (SELECT column0 AS acc FROM read_csv(?, header=false,
-                       quote='', escape='',
-                       columns={'column0':'VARCHAR'})),
+        WITH q AS (SELECT column0 AS acc FROM read_csv(?, delim='	',
+                       header=false, quote='', escape='',
+                       columns={'column0':'VARCHAR','column1':'DOUBLE'})),
              m AS (
                SELECT nullif(nullif(geo_loc_name_country_calc, ''),
                              'uncalculated') AS country
                FROM runs r SEMI JOIN q ON r.acc = q.acc)
         SELECT country, count(*) AS n FROM m GROUP BY 1
     """
+
+
+def _locations_sql() -> str:
+    """Every distinct coordinate a hit set was sampled at, with its score.
+
+    This is kmviz's `HitsPerLocation` preset computed server-side over the
+    whole match set, rather than shipped as five derived columns joined back
+    onto every result row. They pay 19,977 markers and 31-36 seconds to draw
+    a capped page; this pays one group-by over every hit the query matched.
+
+    An inner join rather than the country rollup's SEMI JOIN, because the
+    score lives on the staged side and a semi join cannot see it. Both sides
+    are unique -- the caller dedupes the staging file by accession, and
+    `runs.acc` is measured unique at 43,851,102 rows out of 43,851,102 -- so
+    `count(*)` is a run count and not a fanout. There is no constraint saying
+    so, which is exactly why the denominator beside the map keeps coming from
+    the SEMI JOIN in _geography_sql instead of from here.
+
+    `lat IS NOT NULL` is the whole filter. The range check that rejects the 84
+    impossible positions ran at build time, so a stored coordinate is already
+    one the projection can draw, and lat/lon are null together or not at all.
+
+    Scores are summed rather than averaged in SQL so the rounding pass in
+    _collapse_locations can merge two points without averaging averages, and
+    counted separately so a null score biases nothing.
+    """
+    return """
+        WITH q AS (SELECT column0 AS acc, column1 AS score
+                   FROM read_csv(?, delim='	', header=false,
+                       quote='', escape='',
+                       columns={'column0':'VARCHAR','column1':'DOUBLE'}))
+        SELECT r.lat, r.lon, count(*) AS n,
+               sum(q.score) AS score_total, count(q.score) AS scored
+        FROM runs r JOIN q ON r.acc = q.acc
+        WHERE r.lat IS NOT NULL
+        GROUP BY 1, 2
+    """
+
+
+def _round_locations(
+    rows: List[Tuple[float, float, int, Optional[float], int]],
+    precision: Optional[int],
+) -> List[Tuple[float, float, int, Optional[float], int]]:
+    """Merge coordinates that agree to `precision` decimal places.
+
+    Rounding keeps every run -- the counts are summed -- and spends only
+    resolution, which is why it is tried before the cap. Coordinates are the
+    key rather than a display detail, so this has to run on the values that
+    are actually emitted.
+
+    @param rows: (lat, lon, runs, summed score, scored runs) per coordinate.
+    @param precision: decimal places, or None to leave the values alone.
+    @returns: the same shape, merged.
+    """
+    if precision is None:
+        return rows
+    merged: Dict[Tuple[float, float], List[Any]] = {}
+    for lat, lon, n, score_total, scored in rows:
+        key = (round(lat, precision), round(lon, precision))
+        entry = merged.setdefault(key, [0, 0.0, 0])
+        entry[0] += n
+        entry[1] += score_total or 0.0
+        entry[2] += scored
+    return [
+        (lat, lon, n, score_total, scored)
+        for (lat, lon), (n, score_total, scored) in merged.items()
+    ]
+
+
+def _collapse_locations(
+    rows: List[Tuple[float, float, int, Optional[float], int]],
+) -> Dict[str, Any]:
+    """Fit a cohort's coordinates into a payload the page can carry.
+
+    Rounding first, truncation last, and both stated on the wire. The order
+    matters because they are not the same concession: rounding merges points
+    and keeps every run, truncation drops runs outright. A cohort that gets
+    rounded is being shown at coarser resolution; a cohort that gets truncated
+    is being shown less than it matched, and the card has to say so.
+
+    The cap is set against the environmental cohorts, because for those the
+    ladder is the normal path rather than the pathological case. Distinct
+    coordinates, measured over the v5 mirror: marine metagenome 22,316,
+    seawater metagenome 14,244, gut metagenome 33,874, E. coli 3,795,
+    P. falciparum 874. At 20,000, everything host-associated and both marine
+    cohorts come through untouched or one step down -- marine lands at 3dp,
+    which is about 110 m and well inside a ship's station keeping -- while
+    1dp, at roughly 11 km, spends precisely the resolution reading coordinates
+    was supposed to buy and is only ever reached as the last rung.
+
+    @param rows: (lat, lon, runs, summed score, scored runs) per coordinate.
+    @returns: the location half of the geography payload.
+    """
+    located = sum(n for _lat, _lon, n, _total, _scored in rows)
+    grouped = rows
+    precision: Optional[int] = None
+    for candidate in _LOCATION_PRECISIONS:
+        precision = candidate
+        grouped = _round_locations(rows, candidate)
+        if len(grouped) <= _LOCATION_CAP:
+            break
+
+    # Largest first, so a cap that does bite keeps the coordinates carrying
+    # the most runs. That biases the survivors toward institutional defaults
+    # -- Pittsburgh's 40.4406 N 79.9959 W carries 14,688 runs across 147
+    # organisms -- but no ordering fixes those and dropping the busiest points
+    # to dodge them would drop real stations too. Ties break on position so
+    # the list is stable between requests.
+    ordered = sorted(grouped, key=lambda row: (-row[2], row[0], row[1]))
+    kept = ordered[:_LOCATION_CAP]
+    return {
+        "located": located,
+        "locations": [
+            {
+                "avg_score": round(score_total / scored, 4) if scored else None,
+                "lat": lat,
+                "lon": lon,
+                "n": n,
+            }
+            for lat, lon, n, score_total, scored in kept
+        ],
+        "locations_precision": precision,
+        "locations_total": len(grouped),
+        "locations_truncated": sum(row[2] for row in ordered[_LOCATION_CAP:]),
+    }
 
 
 def _ranked(counts: Dict[str, int]) -> List[Dict[str, Any]]:
@@ -517,7 +677,10 @@ def _ranked(counts: Dict[str, int]) -> List[Dict[str, Any]]:
     ]
 
 
-def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]:
+def _shape_geography(
+    counted: List[Tuple[Optional[str], int]],
+    located: Optional[List[Tuple[float, float, int, Optional[float], int]]],
+) -> Dict[str, Any]:
     """Attach ISO codes to the grouped country counts and split out what the
     map cannot draw.
 
@@ -543,9 +706,19 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
     it up. Nothing renders a continent breakdown, and a fourth list whose
     total is neither `recorded` nor the sum of `countries` -- Singapore counts
     toward Asia and toward no shape -- is a reconciliation trap for whoever
-    reads this next. Phase 2 can add it back in the commit that draws it.
+    reads this next.
+
+    Coordinates are a fifth bucket that cuts across all of those rather than
+    partitioning alongside them: a run can have a country and a position, a
+    country and no position, or a position the country column never resolved.
+    So `located` is reported against `in_mirror` on its own line and is never
+    added to `recorded`.
 
     @param counted: (country or None, runs) straight off _geography_sql.
+    @param located: rows off _locations_sql, or None when the mirror cannot
+        answer for coordinates -- which is a fact about the file on the host,
+        not about the cohort, and has to stay distinguishable from a cohort
+        where nothing was recorded.
     @returns: the geography payload.
     """
     unknown = sum(n for value, n in counted if value is None)
@@ -572,7 +745,7 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
         )
         entry["count"] += n
 
-    return {
+    geography = {
         "countries": sorted(
             countries.values(), key=lambda c: (-c["count"], c["value"])
         ),
@@ -581,6 +754,15 @@ def _shape_geography(counted: List[Tuple[Optional[str], int]]) -> Dict[str, Any]
         "unknown": unknown,
         "unmapped_countries": _ranked(unmapped),
     }
+    # Null rather than empty when the mirror cannot be asked. An empty list is
+    # a claim that no matched run carries a coordinate; null says this file
+    # predates the columns, which is the deploy-ahead-of-rebuild window and a
+    # fact about the host rather than about the data. The keys are always
+    # present either way, so a reader never has to tell absent from unknown.
+    geography.update(
+        _collapse_locations(located) if located is not None else _NO_LOCATIONS
+    )
+    return geography
 
 
 def _export_sql() -> str:
@@ -1584,43 +1766,62 @@ class SRAMirrorService:
     # this runs the same shape of query over the same 43.5M-row table, so the
     # instance lock is held only for the cache reads/writes and the cursor
     # handoff rather than across the query.
-    def geography_for_accessions(
-        self, accessions: List[str]
+    def geography_for_hits(
+        self, hits: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Any]]:
         """
-        Every country a complete hit set was recorded from, plus the runs that
-        recorded none.
+        Every country a complete hit set was recorded from, every coordinate it
+        was sampled at, and the runs that recorded neither.
 
         Same window and the same argument as cohort_for_accessions: computed
         over the pre-cap hit list, because counting the surviving 50,000 counts
         the cap rather than the query.
 
+        Takes hits rather than accessions because the point layer colours by
+        score, and a score only exists on the hit. The country rollup still
+        only needs the accession, which is why it keeps its own SEMI JOIN.
+
         Returns None when the mirror cannot answer -- unconfigured, or on a
         file that predates the columns this needs. That is a steady state, not
         a failure: the caller caches the result without geography and nothing
         retries. A query that starts and then breaks raises instead, so the
-        caller can tell the two apart.
+        caller can tell the two apart. Coordinates are asked for separately and
+        come back null on a mirror that has none, so a file older than
+        schema_version 6 still draws its countries.
 
-        @param accessions: every hit the query matched, before the cap.
+        @param hits: every hit the query matched, before the cap, as
+            accession/score dicts.
         @returns: the geography dict, or None if there is nothing to say.
         """
         if not self._con or not self.has_capability(CAPABILITY_GEOGRAPHY):
             return None
-        if not accessions:
+        if not hits:
             return None
 
-        wanted = sorted({a.strip().upper() for a in accessions if a and a.strip()})
-        if not wanted:
+        # Deduplicated on accession, which is what makes the location join's
+        # count(*) a run count. A run reached by two shards keeps whichever
+        # score arrived first; scores from different shards are the same
+        # coverage measured against different indexes, so averaging them into
+        # one point would invent a number neither shard reported.
+        scored: Dict[str, float] = {}
+        for hit in hits:
+            accession = (hit.get("accession") or "").strip().upper()
+            if accession and accession not in scored:
+                scored[accession] = hit.get("score")
+        if not scored:
             return None
 
-        payload = "\n".join(wanted)
+        payload = "".join(
+            f"{accession}\t{'' if score is None else score}\n"
+            for accession, score in sorted(scored.items())
+        )
         # Digest-keyed like the cohort, and for the same reason: at a million
         # accessions the tuple would cost more to build and hold than the
         # query it saves.
         cache_key = (
             "geography",
             hashlib.md5(payload.encode()).hexdigest(),
-            len(accessions),
+            len(hits),
         )
         with self._lock:
             if (cached := self._cache_get(cache_key)) is not None:
@@ -1630,18 +1831,23 @@ class SRAMirrorService:
         staging = None
         try:
             staging = tempfile.NamedTemporaryFile(
-                "w", suffix=".txt", prefix="geography-", delete=False
+                "w", suffix=".tsv", prefix="geography-", delete=False
             )
             staging.write(payload)
             staging.close()
             rows = cursor.execute(_geography_sql(), [staging.name]).fetchall()
+            located = (
+                cursor.execute(_locations_sql(), [staging.name]).fetchall()
+                if self.has_capability(CAPABILITY_COORDINATES)
+                else None
+            )
         finally:
             cursor.close()
             if staging is not None:
                 staging.close()
                 Path(staging.name).unlink(missing_ok=True)
 
-        geography = _shape_geography(rows)
+        geography = _shape_geography(rows, located)
         with self._lock:
             self._cache_put(cache_key, geography)
         return geography

@@ -20,10 +20,13 @@ from app.services.sra_mirror import SRAMirrorService
 def _build_mirror(path: str) -> None:
     """Create a minimal but representative mirror at `path`.
 
-    Tables mirror the production schema's used columns. Rows cover the
-    scenarios F4-F9 exercise: a BioProject lookup, case/synonym country
-    matches, an ambiguous name (one name -> two taxids), and a resolvable
-    organism that has zero runs.
+    Tables mirror the production schema's used columns, at schema_version 6 --
+    the column set the builder produces today, coordinates included. Rows
+    cover the scenarios F4-F9 exercise: a BioProject lookup, case/synonym
+    country matches, an ambiguous name (one name -> two taxids), and a
+    resolvable organism that has zero runs. Two of the six carry a position,
+    so the coordinate paths have something to find without every test having
+    to care.
     """
     con = duckdb.connect(path)
     con.execute("CREATE TABLE mirror_meta (key VARCHAR, value VARCHAR)")
@@ -49,7 +52,8 @@ def _build_mirror(path: str) -> None:
             acc VARCHAR, sra_study VARCHAR, bioproject VARCHAR, organism VARCHAR,
             assay_type VARCHAR, platform VARCHAR, instrument VARCHAR,
             librarylayout VARCHAR, releasedate DATE,
-            geo_loc_name_country_calc VARCHAR, mbases INTEGER
+            geo_loc_name_country_calc VARCHAR, mbases INTEGER,
+            lat DOUBLE, lon DOUBLE
         )
         """
     )
@@ -57,29 +61,63 @@ def _build_mirror(path: str) -> None:
         """
         INSERT INTO runs VALUES
             ('SRR001','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
-             'ILLUMINA','HiSeq','PAIRED', DATE '2020-06-01','Kenya', 100),
+             'ILLUMINA','HiSeq','PAIRED', DATE '2020-06-01','Kenya', 100,
+             -1.2921, 36.8219),
             ('SRR002','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
              'OXFORD_NANOPORE','MinION','SINGLE', DATE '2021-06-01',
-             'United Kingdom', 200),
+             'United Kingdom', 200, NULL, NULL),
             ('SRR003','SRP002','PRJNA99999','Mycobacterium tuberculosis','WGS',
-             'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300),
+             'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300,
+             38.9072, -77.0369),
             -- Three runs with an identical releasedate, inserted ascending by
             -- accession, so an ORDER BY without a tiebreaker is ambiguous.
             ('SRRA','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 1),
+             'PAIRED', DATE '2022-01-01','Kenya', 1, NULL, NULL),
             ('SRRB','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 2),
+             'PAIRED', DATE '2022-01-01','Kenya', 2, NULL, NULL),
             ('SRRC','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 3)
+             'PAIRED', DATE '2022-01-01','Kenya', 3, NULL, NULL)
         """
     )
     con.close()
+
+
+def _hits(accessions: list, shard: str = "GENOMIC_BCT_10_null") -> list:
+    """Shape a list of accessions like the hit dicts aggregation hands over.
+
+    Descending scores, so the staged rank is not the same as accession order
+    and a query that lost the ranking would be visible.
+    """
+    return [
+        {"accession": acc, "score": 1.0 - index / 10000, "shard": shard}
+        for index, acc in enumerate(accessions)
+    ]
 
 
 @pytest.fixture()
 def mirror(tmp_path):
     path = str(tmp_path / "test-mirror.duckdb")
     _build_mirror(path)
+    svc = SRAMirrorService(path)
+    assert svc.is_available()
+    return svc
+
+
+@pytest.fixture()
+def deployed_mirror(tmp_path):
+    """The mirror as it exists on the host today: schema_version 3, no lat/lon.
+
+    Coordinates land with the rebuild, and the rebuild is a manual 10 GB copy
+    that will follow the code by some unknown amount of time. This fixture is
+    that window.
+    """
+    path = str(tmp_path / "deployed-mirror.duckdb")
+    _build_mirror(path)
+    con = duckdb.connect(path)
+    con.execute("ALTER TABLE runs DROP COLUMN lat")
+    con.execute("ALTER TABLE runs DROP COLUMN lon")
+    con.execute("INSERT INTO mirror_meta VALUES ('schema_version', '3')")
+    con.close()
     svc = SRAMirrorService(path)
     assert svc.is_available()
     return svc
@@ -206,31 +244,44 @@ class TestCapabilityGating:
     per-hit annotation, export and the MCP tools would all go down to protect
     whichever query was ahead of the file.
 
-    The fixture's `runs` is the deployed schema_version 3 column set exactly,
-    so "everything serves against the fixture" is the live case, not a
-    hypothetical.
+    The fixture's `runs` is what the builder produces today, so "everything
+    serves against the fixture" is the live case once the rebuilt mirror is on
+    the host -- and dropping a column from it is the case where it is not.
     """
 
-    def test_deployed_column_set_serves_every_capability(self, mirror):
+    # The deployed schema_version 3 column set, verbatim. Coordinates arrive
+    # with 6, so this is the file the backend runs against for as long as the
+    # code is ahead of the rebuild.
+    _DEPLOYED_COLUMNS = (
+        "acc",
+        "sra_study",
+        "bioproject",
+        "organism",
+        "assay_type",
+        "platform",
+        "instrument",
+        "librarylayout",
+        "releasedate",
+        "geo_loc_name_country_calc",
+        "mbases",
+    )
+
+    def test_the_built_column_set_serves_every_capability(self, mirror):
         for capability in sra_mirror._CAPABILITY_COLUMNS:
             assert mirror.has_capability(capability), capability
             assert mirror.missing_columns(capability) == []
 
-    def test_geography_needs_nothing_the_deployed_mirror_lacks(self, mirror):
-        # The whole reason phase 1 can ship ahead of a mirror rebuild.
-        assert set(sra_mirror._CAPABILITY_COLUMNS["geography"]) <= {
-            "acc",
-            "sra_study",
-            "bioproject",
-            "organism",
-            "assay_type",
-            "platform",
-            "instrument",
-            "librarylayout",
-            "releasedate",
-            "geo_loc_name_country_calc",
-            "mbases",
-        }
+    def test_only_coordinates_needs_anything_the_deployed_mirror_lacks(self):
+        # The reason the point layer is a capability of its own rather than
+        # part of geography: everything else, the country choropleth included,
+        # still answers off the file that is on the host today.
+        deployed = set(self._DEPLOYED_COLUMNS)
+        for capability, needed in sra_mirror._CAPABILITY_COLUMNS.items():
+            behind = set(needed) - deployed
+            if capability == "coordinates":
+                assert behind == {"lat", "lon"}
+            else:
+                assert behind == set(), capability
 
     def test_a_missing_column_only_closes_the_capabilities_that_read_it(
         self, tmp_path, caplog
@@ -255,27 +306,42 @@ class TestCapabilityGating:
         # And it says which column, so the fix is legible from the log alone.
         assert any("mbases" in r.getMessage() for r in caplog.records)
 
-    def test_geography_can_close_without_taking_anything_else_with_it(
-        self, tmp_path, monkeypatch
+    def test_coordinates_close_without_taking_anything_else_with_it(
+        self, deployed_mirror
     ):
-        # Phase 2 adds lat/lon to the geography query, and the mirror rebuild
-        # that carries them will land after the code that reads them. Simulate
-        # that ordering rather than wait for it: geography goes dark, and
-        # everything else still answers with real numbers.
-        monkeypatch.setitem(
-            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
-        )
-        path = str(tmp_path / "phase2-ahead-of-mirror.duckdb")
-        _build_mirror(path)
-        svc = SRAMirrorService(path)
-
-        assert svc.has_capability("geography") is False
-        assert svc.missing_columns("geography") == ["lat", "lon"]
-        for still_serving in ("annotation", "cohort", "export", "search", "study"):
-            assert svc.has_capability(still_serving), still_serving
-        cohort = svc.cohort_for_accessions(["SRR001", "SRR002", "SRR003"])
+        # The live case for a backend deployed ahead of the schema_version 6
+        # rebuild, not a simulation of one: the fixture is the deployed column
+        # set. Only the point layer goes dark.
+        assert deployed_mirror.has_capability("coordinates") is False
+        assert deployed_mirror.missing_columns("coordinates") == ["lat", "lon"]
+        for still_serving in (
+            "annotation",
+            "cohort",
+            "export",
+            "geography",
+            "search",
+            "study",
+        ):
+            assert deployed_mirror.has_capability(still_serving), still_serving
+        cohort = deployed_mirror.cohort_for_accessions(["SRR001", "SRR002", "SRR003"])
         assert cohort is not None and cohort["in_mirror"] == 3
-        assert svc.runs_by_accession(["SRR001"])["SRR001"]["country"] == "Kenya"
+        detail = deployed_mirror.runs_by_accession(["SRR001"])
+        assert detail["SRR001"]["country"] == "Kenya"
+
+    def test_the_choropleth_still_draws_on_a_mirror_with_no_coordinates(
+        self, deployed_mirror
+    ):
+        # Folding lat/lon into `geography` would have taken this with it, and
+        # the country map was already shipped and working.
+        geography = deployed_mirror.geography_for_hits(
+            [{"accession": "SRR001", "score": 0.9}]
+        )
+
+        assert geography["countries"][0]["iso_a3"] == "KEN"
+        # Null, not zero and not an empty list: the file cannot be asked.
+        assert geography["located"] is None
+        assert geography["locations"] is None
+        assert geography["locations_truncated"] is None
 
     def test_schema_version_is_read_and_reported(self, tmp_path, caplog):
         path = str(tmp_path / "stamped.duckdb")
@@ -335,7 +401,7 @@ class TestCapabilityGating:
         assert svc.has_capability("summary")
         assert svc.summary_for_organism("Plasmodium falciparum")["n_runs"] == 2
         assert svc.top_bioprojects_for_organism("Plasmodium falciparum")["resolved"]
-        assert svc.geography_for_accessions(["SRR001"])["in_mirror"] == 1
+        assert svc.geography_for_hits(_hits(["SRR001"]))["in_mirror"] == 1
 
     def test_summary_closes_when_its_own_columns_go(self, tmp_path):
         path = str(tmp_path / "no-platform.duckdb")
@@ -349,7 +415,7 @@ class TestCapabilityGating:
         assert "platform" in svc.summary_for_organism("Plasmodium falciparum")["error"]
         assert "platform" in svc.top_bioprojects_for_organism("P. falciparum")["error"]
         # geography does not read platform, so it keeps answering.
-        assert svc.geography_for_accessions(["SRR001"]) is not None
+        assert svc.geography_for_hits(_hits(["SRR001"])) is not None
 
     def test_the_fingerprint_changes_only_when_the_capabilities_do(
         self, tmp_path, mirror
@@ -630,7 +696,8 @@ class TestAccessionBatching:
         con = duckdb.connect(path)
         accs = [f"SRRB{i:06d}" for i in range(n)]
         con.executemany(
-            "INSERT INTO runs VALUES (?,'SRPX','PRJNAX','Batch organism','WGS',"
+            "INSERT INTO runs (acc, sra_study, bioproject, organism, assay_type, platform, instrument, librarylayout, releasedate, geo_loc_name_country_calc, mbases) "
+            "VALUES (?,'SRPX','PRJNAX','Batch organism','WGS',"
             "'ILLUMINA','X','PAIRED', DATE '2023-01-01','Kenya', 1)",
             [(a,) for a in accs],
         )
@@ -732,7 +799,7 @@ def _build_cohort_mirror(path: str) -> list:
     add(1, "", "USA", "Illumina MiSeq")
 
     con.executemany(
-        "INSERT INTO runs VALUES (?,?,?,?,?,?,?,?,?,?,1)",
+        "INSERT INTO runs (acc, sra_study, bioproject, organism, assay_type, platform, instrument, librarylayout, releasedate, geo_loc_name_country_calc, mbases) VALUES (?,?,?,?,?,?,?,?,?,?,1)",
         rows,
     )
     con.close()
@@ -985,6 +1052,19 @@ class TestCohortForAccessions:
         assert hasattr(SRAMirrorService.runs_by_accession, "__wrapped__")
 
 
+# Real coordinates, and each one is here for a reason the mirror gave it.
+# 40.4406 N 79.9959 W is Pittsburgh, which carries 14,688 runs across 147
+# organisms: an institutional default typed into the sample attribute, and the
+# residual no filter fixes. -16.040532/34.797692 is SRR7590703 in Malawi, the
+# one accession this feature has a known-good country-and-position control
+# for. 0/0 is the 254 runs recorded at null island -- a real position in the
+# Gulf of Guinea and almost certainly a placeholder, kept because nothing in
+# the row tells the two apart.
+_PITTSBURGH = (40.4406, -79.9959)
+_MALAWI = (-16.040532, 34.797692)
+_NULL_ISLAND = (0.0, 0.0)
+
+
 def _build_geography_mirror(path: str) -> list:
     """A mirror carrying every shape of country value the map has to handle.
 
@@ -995,6 +1075,11 @@ def _build_geography_mirror(path: str) -> list:
     three ways a run can have no country: NULL, empty string, and SRA's
     'uncalculated' sentinel.
 
+    Coordinates cut across all of that rather than lining up with it, which is
+    the point: some rows have a country and a position, some a country and
+    none, and one has a position with no country at all -- so `located` can
+    never be read off `recorded`.
+
     Returns every accession inserted.
     """
     _build_mirror(path)
@@ -1003,27 +1088,35 @@ def _build_geography_mirror(path: str) -> list:
 
     rows = []
 
-    def add(n, country):
+    def add(n, country, position=(None, None)):
         for _ in range(n):
-            rows.append((f"SRRG{len(rows):05d}", country))
+            rows.append((f"SRRG{len(rows):05d}", country, *position))
 
-    add(40, "USA")
-    add(12, "Malawi")
+    add(30, "USA")
+    add(10, "USA", _PITTSBURGH)
+    add(8, "Malawi", _MALAWI)
+    add(4, "Malawi")
     add(7, "Singapore")
     add(5, "Borneo")
     add(3, "Gaza Strip")
     add(2, "West Bank")
     add(6, "uncalculated")
-    add(4, None)
+    # A position with no country: the country column resolved nothing and the
+    # submitter still recorded where the sample came from.
+    add(2, None, _NULL_ISLAND)
+    add(2, None)
     add(1, "")
 
     con.executemany(
-        "INSERT INTO runs VALUES (?,'SRP1','PRJNA1','Escherichia coli','WGS',"
-        "'ILLUMINA','Illumina MiSeq','PAIRED', DATE '2020-06-01', ?, 1)",
-        [(acc, country) for acc, country in rows],
+        "INSERT INTO runs (acc, sra_study, bioproject, organism, assay_type, "
+        "platform, instrument, librarylayout, releasedate, "
+        "geo_loc_name_country_calc, mbases, lat, lon) "
+        "VALUES (?,'SRP1','PRJNA1','Escherichia coli','WGS',"
+        "'ILLUMINA','Illumina MiSeq','PAIRED', DATE '2020-06-01', ?, 1, ?, ?)",
+        rows,
     )
     con.close()
-    return [acc for acc, _country in rows]
+    return [acc for acc, *_rest in rows]
 
 
 @pytest.fixture()
@@ -1047,7 +1140,7 @@ class TestGeographyForAccessions:
 
     def test_every_country_is_listed_not_just_a_head(self, geography_mirror):
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         assert [c["value"] for c in geography["countries"]] == [
             "United States of America",
@@ -1058,7 +1151,7 @@ class TestGeographyForAccessions:
 
     def test_the_parts_reconcile_against_in_mirror(self, geography_mirror):
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         drawn = sum(c["count"] for c in geography["countries"])
         unplaceable = sum(c["count"] for c in geography["unmapped_countries"])
@@ -1074,7 +1167,7 @@ class TestGeographyForAccessions:
         # rather than on the table: nothing reaches the frontend that joins to
         # no shape.
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         for entry in geography["countries"]:
             assert entry["iso_n3"] in country_iso.TOPOJSON_COUNTRY_IDS, entry
@@ -1084,7 +1177,7 @@ class TestGeographyForAccessions:
         # Singapore has an ISO code and no 1:110m outline. Dropping it would
         # lose 64,050 runs mirror-wide with no error anywhere.
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         assert {"count": 7, "value": "Singapore"} in geography["unmapped_countries"]
         assert "SGP" not in [c["iso_a3"] for c in geography["countries"]]
@@ -1093,7 +1186,7 @@ class TestGeographyForAccessions:
         self, geography_mirror
     ):
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         assert {"count": 5, "value": "Borneo"} in geography["unmapped_countries"]
 
@@ -1105,7 +1198,7 @@ class TestGeographyForAccessions:
         svc, accessions = geography_mirror
         values = [
             c["value"]
-            for c in svc.geography_for_accessions(accessions)["unmapped_countries"]
+            for c in svc.geography_for_hits(_hits(accessions))["unmapped_countries"]
         ]
         assert values == ["Singapore", "Borneo"]
 
@@ -1114,7 +1207,7 @@ class TestGeographyForAccessions:
         # have the choropleth colour from whichever it saw last and silently
         # lose the other.
         svc, accessions = geography_mirror
-        countries = svc.geography_for_accessions(accessions)["countries"]
+        countries = svc.geography_for_hits(_hits(accessions))["countries"]
 
         palestine = [c for c in countries if c["iso_a3"] == "PSE"]
         assert len(palestine) == 1
@@ -1125,7 +1218,7 @@ class TestGeographyForAccessions:
         self, geography_mirror
     ):
         svc, accessions = geography_mirror
-        countries = svc.geography_for_accessions(accessions)["countries"]
+        countries = svc.geography_for_hits(_hits(accessions))["countries"]
         assert len({c["iso_a3"] for c in countries}) == len(countries)
         assert len({c["iso_n3"] for c in countries}) == len(countries)
 
@@ -1134,11 +1227,16 @@ class TestGeographyForAccessions:
         # them, and a fourth list reconciling against neither `recorded` nor
         # the sum of `countries` is a trap rather than a feature.
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         assert set(geography) == {
             "countries",
             "in_mirror",
+            "located",
+            "locations",
+            "locations_precision",
+            "locations_total",
+            "locations_truncated",
             "recorded",
             "unknown",
             "unmapped_countries",
@@ -1150,7 +1248,7 @@ class TestGeographyForAccessions:
         # would also disagree with the country bars on the same card, which
         # fold it into `unknown` too.
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
 
         assert geography["unknown"] == 11
         assert "uncalculated" not in [c["value"] for c in geography["countries"]]
@@ -1160,7 +1258,7 @@ class TestGeographyForAccessions:
         # The two render side by side. If they disagreed about how much
         # geography a cohort has, one of them would be lying on screen.
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions)
+        geography = svc.geography_for_hits(_hits(accessions))
         cohort = svc.cohort_for_accessions(accessions)
         country_facet = next(f for f in cohort["facets"] if f["name"] == "country")
 
@@ -1170,8 +1268,8 @@ class TestGeographyForAccessions:
 
     def test_counts_are_over_every_accession_not_a_page(self, geography_mirror):
         svc, accessions = geography_mirror
-        head = svc.geography_for_accessions(accessions[:10])
-        whole = svc.geography_for_accessions(accessions)
+        head = svc.geography_for_hits(_hits(accessions[:10]))
+        whole = svc.geography_for_hits(_hits(accessions))
 
         assert head["in_mirror"] == 10
         assert whole["in_mirror"] == 80
@@ -1179,25 +1277,25 @@ class TestGeographyForAccessions:
     def test_duplicate_and_scruffy_accessions_are_deduplicated(self, geography_mirror):
         svc, accessions = geography_mirror
         messy = [f"  {a.lower()}  " for a in accessions] + accessions
-        assert svc.geography_for_accessions(messy)["in_mirror"] == 80
+        assert svc.geography_for_hits(_hits(messy))["in_mirror"] == 80
 
     def test_accessions_the_mirror_does_not_know_are_simply_absent(
         self, geography_mirror
     ):
         svc, accessions = geography_mirror
-        geography = svc.geography_for_accessions(accessions + ["SRR_NOT_HERE"])
+        geography = svc.geography_for_hits(_hits(accessions + ["SRR_NOT_HERE"]))
         # in_mirror counts mirrored rows, so a Logan hit the mirror was never
         # built to carry lowers the denominator rather than becoming unknown.
         assert geography["in_mirror"] == 80
 
     def test_no_accessions_is_none_not_a_shell_of_zeroes(self, geography_mirror):
         svc, _accessions = geography_mirror
-        assert svc.geography_for_accessions([]) is None
-        assert svc.geography_for_accessions(["", "   "]) is None
+        assert svc.geography_for_hits([]) is None
+        assert svc.geography_for_hits(_hits(["", "   "])) is None
 
     def test_an_unavailable_mirror_answers_none(self):
         svc = SRAMirrorService("")
-        assert svc.geography_for_accessions(["SRR001"]) is None
+        assert svc.geography_for_hits(_hits(["SRR001"])) is None
 
     def test_a_mirror_without_the_columns_answers_none_without_querying(
         self, tmp_path, monkeypatch
@@ -1205,29 +1303,276 @@ class TestGeographyForAccessions:
         # Fails closed on geography alone. The cohort on the same file still
         # answers, which is the whole point of the per-capability check.
         monkeypatch.setitem(
-            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "lat", "lon")
+            sra_mirror._CAPABILITY_COLUMNS, "geography", ("acc", "not_a_column")
         )
         path = str(tmp_path / "geography-behind.duckdb")
         accessions = _build_geography_mirror(path)
         svc = SRAMirrorService(path)
 
-        assert svc.geography_for_accessions(accessions) is None
+        assert svc.geography_for_hits(_hits(accessions)) is None
         assert svc.cohort_for_accessions(accessions)["in_mirror"] == 80
 
     def test_the_cached_payload_cannot_be_mutated_by_a_caller(self, geography_mirror):
         svc, accessions = geography_mirror
-        first = svc.geography_for_accessions(accessions)
+        first = svc.geography_for_hits(_hits(accessions))
         first["recorded"] = -1
         first["countries"].append({"count": 1, "value": "BOGUS"})
 
-        second = svc.geography_for_accessions(accessions)
+        second = svc.geography_for_hits(_hits(accessions))
         assert second["recorded"] == 69
         assert all(c["value"] != "BOGUS" for c in second["countries"])
 
     def test_geography_method_is_not_wrapped_in_the_lock_decorator(self):
         # Same shape of query as the cohort over the same 43.5M-row table, so
         # it must not hold the instance lock either.
-        assert not hasattr(SRAMirrorService.geography_for_accessions, "__wrapped__")
+        assert not hasattr(SRAMirrorService.geography_for_hits, "__wrapped__")
+
+
+class TestLocationsOverTheHitSet:
+    """The point layer: every coordinate the cohort was sampled at.
+
+    Countries and coordinates are answered off the same staging file but by
+    two different joins, and they do not partition the same way -- a run can
+    carry a country and a position, a country and nothing, or a position the
+    country column never resolved. So `located` is its own number measured
+    against `in_mirror`, never a share of `recorded`.
+    """
+
+    def test_every_distinct_coordinate_comes_back_with_its_run_count(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        locations = svc.geography_for_hits(_hits(accessions))["locations"]
+
+        assert [(loc["lat"], loc["lon"], loc["n"]) for loc in locations] == [
+            (*_PITTSBURGH, 10),
+            (*_MALAWI, 8),
+            (*_NULL_ISLAND, 2),
+        ]
+
+    def test_located_is_measured_against_in_mirror_not_against_recorded(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_hits(_hits(accessions))
+
+        assert geography["located"] == 20
+        assert geography["in_mirror"] == 80
+        # Two of those twenty have no country at all, so `located` is not a
+        # subset of `recorded` and the card must not present it as one.
+        assert geography["recorded"] == 69
+        assert geography["located"] < geography["recorded"]
+
+    def test_a_position_without_a_country_is_still_drawn(self, geography_mirror):
+        # It counts toward `unknown` on the choropleth and toward `located`
+        # on the point layer at the same time. Both are true.
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_hits(_hits(accessions))
+
+        null_island = next(
+            loc
+            for loc in geography["locations"]
+            if (loc["lat"], loc["lon"]) == _NULL_ISLAND
+        )
+        assert null_island["n"] == 2
+
+    def test_the_score_is_averaged_over_the_runs_at_the_point(self, geography_mirror):
+        # kmviz's location_avg_coverage, computed over the whole match set
+        # rather than joined back onto every result row.
+        svc, accessions = geography_mirror
+        hits = _hits(accessions)
+        for i, hit in enumerate(hits):
+            hit["score"] = 1.0 if i % 2 else 0.0
+
+        locations = svc.geography_for_hits(hits)["locations"]
+
+        pittsburgh = next(
+            loc for loc in locations if (loc["lat"], loc["lon"]) == _PITTSBURGH
+        )
+        assert pittsburgh["avg_score"] == 0.5
+
+    def test_a_scoreless_hit_set_says_so_rather_than_averaging_to_zero(
+        self, geography_mirror
+    ):
+        svc, accessions = geography_mirror
+        hits = [{"accession": acc, "score": None} for acc in accessions]
+
+        locations = svc.geography_for_hits(hits)["locations"]
+
+        assert all(loc["avg_score"] is None for loc in locations)
+        assert sum(loc["n"] for loc in locations) == 20
+
+    def test_a_run_reached_twice_is_counted_once(self, geography_mirror):
+        # Two shards can both report the same accession. Counting it twice
+        # would inflate the point and the denominator it sits next to.
+        svc, accessions = geography_mirror
+        doubled = _hits(accessions) + _hits(accessions, shard="GENOMIC_INV")
+
+        geography = svc.geography_for_hits(doubled)
+
+        assert geography["located"] == 20
+        assert geography["in_mirror"] == 80
+
+    def test_nothing_is_rounded_or_dropped_at_this_size(self, geography_mirror):
+        svc, accessions = geography_mirror
+        geography = svc.geography_for_hits(_hits(accessions))
+
+        assert geography["locations_precision"] is None
+        assert geography["locations_total"] == 3
+        assert geography["locations_truncated"] == 0
+
+    def test_a_cohort_with_no_coordinates_reports_an_empty_list_not_null(
+        self, geography_mirror
+    ):
+        # Null means the mirror cannot be asked. An empty list means it was
+        # asked and this cohort has nothing, which is a different sentence.
+        svc, accessions = geography_mirror
+        without = [a for a in accessions[:30]]
+
+        geography = svc.geography_for_hits(_hits(without))
+
+        assert geography["locations"] == []
+        assert geography["located"] == 0
+        assert geography["locations_total"] == 0
+
+
+class TestTheRoundingLadderAndTheCap:
+    """How a cohort too big for the payload gets made to fit, and what it says.
+
+    Rounding and truncation are not the same concession and the code must not
+    treat them as interchangeable: rounding merges points and keeps every run,
+    truncation drops runs. So the ladder is walked all the way down before a
+    single run is dropped, and both are stated on the wire.
+
+    Cardinalities here are the measured ones. Distinct coordinates in the v5
+    mirror: marine metagenome 22,316, seawater metagenome 14,244, gut
+    metagenome 33,874, soil metagenome 148,766, E. coli 3,795, P. falciparum
+    874. Note these are distinct *positions*, not distinct `lat_lon` strings --
+    the string counts are a little higher (22,527 for marine) because
+    '0.0 N 0.0 E' and '0 N 0 E' are two strings and one place.
+    """
+
+    @staticmethod
+    def _spread(n, step=0.0001):
+        """`n` distinct coordinates, `step` apart along a line, one run each.
+
+        At the default spacing they merge ten to one at 3dp, which is what
+        makes the ladder observable.
+
+        @param n: how many.
+        @param step: spacing in degrees.
+        @returns: rows shaped as _locations_sql returns them.
+        """
+        return [
+            (round(-60 + i * step, 6), round(i * step, 6), 1, 0.5, 1) for i in range(n)
+        ]
+
+    @staticmethod
+    def _grid(n, step=0.1):
+        """`n` coordinates a tenth of a degree apart, so rounding cannot help.
+
+        A real oceanographic or soil cohort is not this evenly spread, but the
+        property that matters is the same: enough genuinely distinct positions
+        that the bottom rung of the ladder still leaves too many.
+
+        @param n: how many.
+        @param step: spacing in degrees.
+        @returns: rows shaped as _locations_sql returns them.
+        """
+        rows = []
+        for i in range(n):
+            column, row = divmod(i, 1700)
+            rows.append(
+                (round(-89 + row * step, 4), round(-179 + column * step, 4), 1, 0.5, 1)
+            )
+        return rows
+
+    def test_a_normal_cohort_is_left_alone(self):
+        # P. falciparum: 874 positions, nowhere near the cap.
+        shaped = sra_mirror._collapse_locations(self._spread(874))
+
+        assert shaped["locations_precision"] is None
+        assert shaped["locations_total"] == 874
+        assert shaped["locations_truncated"] == 0
+        assert len(shaped["locations"]) == 874
+
+    def test_e_coli_fits_without_rounding(self):
+        # The cohort the plan's own 2,000 cap would not have covered.
+        shaped = sra_mirror._collapse_locations(self._spread(3795))
+
+        assert shaped["locations_precision"] is None
+        assert len(shaped["locations"]) == 3795
+
+    def test_the_marine_cohort_costs_one_step_and_no_runs(self):
+        # 22,316 positions, over the cap. One rung down is 3dp, about 110 m --
+        # inside a research vessel's station keeping, and not the ~11 km that
+        # 1dp would spend. Every run survives.
+        shaped = sra_mirror._collapse_locations(self._spread(22316))
+
+        assert shaped["locations_precision"] == 3
+        assert shaped["locations_total"] <= sra_mirror._LOCATION_CAP
+        assert shaped["locations_truncated"] == 0
+        assert shaped["located"] == 22316
+        assert sum(loc["n"] for loc in shaped["locations"]) == 22316
+
+    def test_rounding_keeps_every_run_it_merges(self):
+        # Two stations 11 m apart, one run each. At 3dp they are one point
+        # carrying two runs, not one point carrying one.
+        rows = [(10.0001, 20.0001, 3, 1.5, 3), (10.00013, 20.00012, 5, 4.0, 5)]
+        merged = sra_mirror._round_locations(rows, 3)
+
+        assert merged == [(10.0, 20.0, 8, 5.5, 8)]
+
+    def test_a_merged_point_averages_over_runs_not_over_averages(self):
+        # The reason SQL sums the score and counts it rather than averaging
+        # in the query: 3 runs at 0.5 merged with 5 runs at 0.8 is 0.6875, the
+        # mean over eight runs. Averaging the two averages gives 0.65, which
+        # is a number no run in the cohort supports.
+        merged = sra_mirror._round_locations(
+            [(10.0001, 20.0001, 3, 1.5, 3), (10.00013, 20.00012, 5, 4.0, 5)], 3
+        )
+        shaped = sra_mirror._collapse_locations(merged)
+
+        assert shaped["locations"][0]["avg_score"] == 0.6875
+
+    def test_the_worst_measured_cohort_is_truncated_and_says_so(self):
+        # soil metagenome, 148,766 positions. Even at 1dp -- the bottom of the
+        # ladder -- it does not fit, so runs are dropped. The card has to be
+        # able to say how many, and how many places it is not showing.
+        shaped = sra_mirror._collapse_locations(self._grid(148766))
+
+        assert shaped["locations_precision"] == 1
+        assert len(shaped["locations"]) == sra_mirror._LOCATION_CAP
+        assert shaped["locations_total"] > sra_mirror._LOCATION_CAP
+        assert shaped["locations_truncated"] > 0
+        # Nothing is lost quietly: what is drawn plus what was dropped is what
+        # was found.
+        drawn = sum(loc["n"] for loc in shaped["locations"])
+        assert drawn + shaped["locations_truncated"] == shaped["located"] == 148766
+
+    def test_truncation_keeps_the_busiest_points(self):
+        rows = [(float(i), 0.0, i + 1, 0.5 * (i + 1), i + 1) for i in range(30)]
+        shaped = sra_mirror._collapse_locations(rows)
+        assert shaped["locations"][0]["n"] == 30
+
+    def test_the_order_is_stable_between_identical_requests(self):
+        # Ties on run count break on position, so "the map moved" cannot
+        # happen without the counts moving.
+        rows = [(float(i % 5), float(i), 4, 2.0, 4) for i in range(50)]
+        first = sra_mirror._collapse_locations(rows)["locations"]
+        second = sra_mirror._collapse_locations(list(reversed(rows)))["locations"]
+        assert first == second
+
+    def test_an_empty_hit_set_rounds_nothing(self):
+        shaped = sra_mirror._collapse_locations([])
+
+        assert shaped == {
+            "located": 0,
+            "locations": [],
+            "locations_precision": None,
+            "locations_total": 0,
+            "locations_truncated": 0,
+        }
 
 
 class TestGeographyAgainstTheRealVocabulary:
@@ -1247,7 +1592,7 @@ class TestGeographyAgainstTheRealVocabulary:
         # The mirror-wide NULL/'uncalculated' count, as one group, exactly as
         # _geography_sql returns it.
         counted = list(DISTINCT_COUNTRY_VALUES) + [(None, 18_110_322)]
-        return sra_mirror._shape_geography(counted)
+        return sra_mirror._shape_geography(counted, None)
 
     def test_the_totals_are_the_measured_ones(self, shaped):
         assert shaped["in_mirror"] == 43_522_611
@@ -1306,18 +1651,6 @@ def exports(tmp_path):
     path = tmp_path / "exports"
     path.mkdir()
     return path
-
-
-def _hits(accessions: list, shard: str = "GENOMIC_BCT_10_null") -> list:
-    """Shape a list of accessions like the hit dicts aggregation hands over.
-
-    Descending scores, so the staged rank is not the same as accession order
-    and a query that lost the ranking would be visible.
-    """
-    return [
-        {"accession": acc, "score": 1.0 - index / 10000, "shard": shard}
-        for index, acc in enumerate(accessions)
-    ]
 
 
 def _read_export(path) -> list:

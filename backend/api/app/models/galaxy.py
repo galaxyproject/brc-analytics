@@ -244,6 +244,19 @@ class KmindexGeographyCountry(BaseModel):
     )
 
 
+class KmindexGeographyLocation(BaseModel):
+    """One coordinate the cohort was sampled at, and what was found there."""
+
+    avg_score: Optional[float] = Field(
+        None,
+        description="Mean kmindex score over the runs at this point. Null "
+        "only if none of them carried a score",
+    )
+    lat: float
+    lon: float
+    n: int = Field(..., description="Matched runs recorded at this point")
+
+
 class KmindexGeography(BaseModel):
     """
     Where the complete pre-cap hit set was sampled from.
@@ -286,6 +299,37 @@ class KmindexGeography(BaseModel):
         "a country (Borneo, the dissolved states), or it is one with no shape "
         "at 1:110m -- which is 65 of the mirror's 245 values, Hong Kong and "
         "Singapore included. Displayed, never silently dropped",
+    )
+    located: Optional[int] = Field(
+        None,
+        description="Matched runs carrying a usable coordinate. Reported "
+        "against in_mirror on its own and never added to `recorded`: a run "
+        "can have both, either or neither. Null when the mirror predates the "
+        "coordinate columns, which is a fact about the file on the host",
+    )
+    locations: Optional[List[KmindexGeographyLocation]] = Field(
+        None,
+        description="Distinct sampling coordinates, largest first. Null on a "
+        "mirror with no coordinates; an empty list means the cohort has none",
+    )
+    locations_precision: Optional[int] = Field(
+        None,
+        description="Decimal places the coordinates above were rounded to in "
+        "order to fit, or null if they were left alone. 3 is about 110 m, 2 "
+        "about 1.1 km, 1 about 11 km. Stated because rounding is a claim "
+        "about resolution and hiding it is the same lie as hiding the "
+        "unrecorded share",
+    )
+    locations_total: Optional[int] = Field(
+        None,
+        description="Distinct coordinates at that precision before the cap, "
+        "so a reader can see how much of the map they are being shown",
+    )
+    locations_truncated: Optional[int] = Field(
+        None,
+        description="Matched runs at coordinates past the cap, i.e. drawn "
+        "nowhere. Rounding merges points and keeps every run; this is the "
+        "other kind of concession and the one that actually loses data",
     )
 
 

@@ -615,6 +615,11 @@ class GalaxyService:
         a read that started and broke is not, because it would freeze a map
         that is only missing by accident.
 
+        Hits rather than accessions, because the point layer colours by score
+        and the score exists only on the hit. Whether the mirror can answer
+        for coordinates at all is decided inside the query, one capability
+        down: a file older than schema_version 6 still returns its countries.
+
         @param job_id: the job being aggregated, for the log line.
         @param hits: every hit, before the cap.
         @returns: the geography payload, and whether the read failed.
@@ -624,8 +629,7 @@ class GalaxyService:
 
         try:
             geography = await asyncio.to_thread(
-                self.sra_mirror.geography_for_accessions,
-                [hit["accession"] for hit in hits],
+                self.sra_mirror.geography_for_hits, hits
             )
         except Exception as e:
             # Nothing partial is salvaged, for the cohort's reason: the
