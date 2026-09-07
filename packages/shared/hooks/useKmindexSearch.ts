@@ -79,6 +79,20 @@ export interface KmindexGeographyCountry {
   value: string;
 }
 
+// One coordinate the cohort was sampled at, aggregated over every matched run
+// recorded there. This is kmviz's HitsPerLocation preset computed over the
+// whole match set rather than joined back onto each result row.
+export interface KmindexGeographyLocation {
+  // Mean kmindex score over the runs at this point. Null only if none of them
+  // carried a score.
+  avg_score: number | null;
+  lat: number;
+  lon: number;
+  // Matched runs recorded here. A point is N runs, not one accession, which
+  // is why nothing on hover names a run.
+  n: number;
+}
+
 // Where the FULL pre-cap match set was sampled from, computed server-side
 // alongside the cohort. `countries`, `unmapped_countries` and `unknown`
 // partition the matched runs and sum to `in_mirror`, which is what lets the
@@ -88,6 +102,23 @@ export interface KmindexGeography {
   countries: KmindexGeographyCountry[];
   // Matched runs the mirror knows; every count here is out of this.
   in_mirror: number;
+  // Runs carrying a usable coordinate. Its own denominator against
+  // `in_mirror`, NOT a share of `recorded`: a run can have a country and a
+  // position, a country and none, or a position with no country.
+  located?: number | null;
+  // Distinct sampling coordinates, largest first. Null when the mirror
+  // predates the coordinate columns -- a fact about our deployment; an empty
+  // array means the cohort genuinely has none.
+  locations?: KmindexGeographyLocation[] | null;
+  // Decimal places the coordinates above were rounded to in order to fit, or
+  // null if they were left alone. 3 is ~110 m, 2 ~1.1 km, 1 ~11 km.
+  locations_precision?: number | null;
+  // Distinct coordinates at that precision before the cap.
+  locations_total?: number | null;
+  // Runs at coordinates past the cap, i.e. drawn nowhere. Rounding merges
+  // points and keeps every run; this is the concession that actually loses
+  // data, so it is stated separately.
+  locations_truncated?: number | null;
   // Runs with a usable country, whether or not it can be placed on the map.
   recorded: number;
   // Runs with no country recorded at all. Over four fifths of the reference

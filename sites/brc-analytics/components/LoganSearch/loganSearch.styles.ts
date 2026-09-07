@@ -108,7 +108,10 @@ export const CohortMapContainer = styled.div`
   width: 100%;
 
   /* vega-embed renders into a child div and adds its own action menu, which
-     we turn off; this keeps the SVG from overflowing a narrow column. */
+     we turn off; this keeps the drawing from overflowing a narrow column.
+     Both element types are named because the renderer depends on the data --
+     canvas once there are sampling points to draw, SVG when there are not. */
+  canvas,
   svg {
     max-width: 100%;
   }
