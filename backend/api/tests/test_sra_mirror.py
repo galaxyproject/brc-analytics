@@ -1744,20 +1744,69 @@ class TestExportHits:
         facet = next(f for f in cohort["facets"] if f["name"] == "instrument")
         assert blank == facet["unknown"] == 6
 
+    @staticmethod
+    def _columns(path) -> tuple:
+        """Column names of a written export, in file order."""
+        con = duckdb.connect()
+        try:
+            return tuple(
+                row[0]
+                for row in con.execute(
+                    f"DESCRIBE SELECT * FROM read_parquet('{path}')"
+                ).fetchall()
+            )
+        finally:
+            con.close()
+
     def test_columns_are_the_declared_export_columns(self, cohort_mirror, exports):
-        # EXPORT_COLUMNS is the TSV header; if the parquet drifts from it the
-        # header would label the wrong columns and nothing else would notice.
+        # The declared tuples are the structural check on what gets written;
+        # if the parquet drifts from them nothing else would notice.
         svc, accessions = cohort_mirror
+        svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert self._columns(exports / "job1.parquet") == (
+            sra_mirror.EXPORT_COLUMNS + sra_mirror.EXPORT_COORDINATE_COLUMNS
+        )
+
+    def test_the_download_carries_what_the_map_draws(self, geography_mirror, exports):
+        # A user who sees a cluster of points and wants the runs behind it
+        # should not have to settle for the country string. Twenty of the
+        # eighty runs in that fixture carry a position, which is also what the
+        # map's own `located` reports for them.
+        svc, accessions = geography_mirror
         svc.export_hits("job1", _hits(accessions), str(exports))
 
         con = duckdb.connect()
         try:
-            described = con.execute(
-                f"DESCRIBE SELECT * FROM read_parquet('{exports / 'job1.parquet'}')"
-            ).fetchall()
+            positions = con.execute(
+                "SELECT count(latitude) FROM read_parquet(?)",
+                [str(exports / "job1.parquet")],
+            ).fetchone()[0]
         finally:
             con.close()
-        assert tuple(row[0] for row in described) == sra_mirror.EXPORT_COLUMNS
+        assert positions == 20
+
+    def test_a_mirror_without_coordinates_still_writes_an_export(
+        self, deployed_mirror, exports
+    ):
+        # Thirteen columns and a working download beats fifteen columns and
+        # none. The export capability deliberately does not name lat/lon.
+        record = deployed_mirror.export_hits("job1", _hits(["SRR001"]), str(exports))
+
+        assert record["rows"] == 1
+        assert self._columns(exports / "job1.parquet") == sra_mirror.EXPORT_COLUMNS
+
+    def test_a_narrow_export_is_served_under_its_own_header(
+        self, deployed_mirror, exports
+    ):
+        # An export written before the mirror grew lat/lon lives for a day.
+        # Labelling those 13 columns with a 15-column header would shift every
+        # field one to the left, silently.
+        deployed_mirror.export_hits("job1", _hits(["SRR001"]), str(exports))
+
+        text = b"".join(sra_mirror.iter_export_tsv(exports / "job1.parquet")).decode()
+
+        assert text.splitlines()[0] == "\t".join(sra_mirror.EXPORT_COLUMNS)
 
     def test_rows_are_written_in_the_order_the_app_ranked_them(
         self, cohort_mirror, exports
@@ -1810,7 +1859,7 @@ class TestExportHits:
         monkeypatch.setattr(
             sra_mirror,
             "_export_sql",
-            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+            lambda _coordinates: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
         )
 
         with pytest.raises(duckdb.Error):
@@ -1834,7 +1883,7 @@ class TestExportHits:
         monkeypatch.setattr(
             sra_mirror,
             "_export_sql",
-            lambda: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+            lambda _coordinates: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
         )
         with pytest.raises(duckdb.Error):
             svc.export_hits("job2", _hits(accessions), str(exports))
@@ -1997,11 +2046,13 @@ class TestExportServing:
         text = b"".join(sra_mirror.iter_export_tsv(exports / "job1.parquet")).decode()
         lines = text.splitlines()
 
-        assert lines[0] == "\t".join(sra_mirror.EXPORT_COLUMNS)
+        assert lines[0] == "\t".join(
+            sra_mirror.EXPORT_COLUMNS + sra_mirror.EXPORT_COORDINATE_COLUMNS
+        )
         assert len(lines) == len(hits) + 1
         # The unmirrored row is present with empty metadata cells, not missing.
         unmirrored = next(ln for ln in lines if ln.startswith("SRR_NOT_MIRRORED\t"))
-        assert unmirrored.split("\t")[3:] == [""] * 10
+        assert unmirrored.split("\t")[3:] == [""] * 12
 
     def test_a_value_that_would_break_the_row_is_quoted(self, exports):
         # Nothing in the mirror carries a tab today, but a TSV that silently

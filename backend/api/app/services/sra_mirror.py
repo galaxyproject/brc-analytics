@@ -214,7 +214,8 @@ EXPORT_MAX_AGE_SECONDS = 86400
 EXPORT_MAX_TOTAL_BYTES = 5 * 1024**3
 
 # Columns in a materialized export, in order. The parquet carries its own
-# names; this is the TSV header and the structural check that the two agree.
+# names; this is the structural check that a file this module writes has the
+# columns it meant to write.
 EXPORT_COLUMNS: Tuple[str, ...] = (
     "accession",
     "score",
@@ -230,6 +231,14 @@ EXPORT_COLUMNS: Tuple[str, ...] = (
     "study",
     "mbases",
 )
+
+# The download should carry what the map draws -- a user who sees a cluster of
+# points and wants the runs behind it currently gets a country string. Appended
+# rather than folded into the tuple above, and gated on the coordinate
+# capability rather than assumed, so an export written against a mirror that
+# predates lat/lon is 13 columns and still an export. Without that the whole
+# download would go dark on the deployed file to add two columns to it.
+EXPORT_COORDINATE_COLUMNS: Tuple[str, ...] = ("latitude", "longitude")
 
 _EXPORT_SUFFIX = ".parquet"
 # A destination is written under this and renamed into place, so a COPY that
@@ -765,7 +774,7 @@ def _shape_geography(
     return geography
 
 
-def _export_sql() -> str:
+def _export_sql(with_coordinates: bool) -> str:
     """Materialize a complete hit list, joined to the mirror, as one parquet.
 
     The hits arrive as a staging file read inline for the same reason
@@ -796,8 +805,14 @@ def _export_sql() -> str:
     The two paths are numbered rather than left as bare `?`: duckdb binds a
     COPY's destination ahead of the query's own parameters, so positional
     markers hand the staging path to TO and the destination to read_csv.
+
+    @param with_coordinates: whether this mirror carries lat/lon. The columns
+        are appended rather than always selected, because a mirror older than
+        schema_version 6 would fail the whole write for them -- and an export
+        of 13 columns is worth far more than no export at all.
     """
-    return """
+    coordinates = ", r.lat AS latitude, r.lon AS longitude" if with_coordinates else ""
+    return f"""
         COPY (
           SELECT h.accession, h.score, h.shard,
                  nullif(r.organism, '') AS organism,
@@ -808,10 +823,10 @@ def _export_sql() -> str:
                  r.releasedate AS release_date,
                  nullif(nullif(r.geo_loc_name_country_calc, ''),
                         'uncalculated') AS country,
-                 r.bioproject, r.sra_study AS study, r.mbases
+                 r.bioproject, r.sra_study AS study, r.mbases{coordinates}
           FROM read_csv($1, delim='\t', header=false, quote='', escape='',
-                   columns={'ordinal':'BIGINT','accession':'VARCHAR',
-                            'score':'DOUBLE','shard':'VARCHAR'}) h
+                   columns={{'ordinal':'BIGINT','accession':'VARCHAR',
+                            'score':'DOUBLE','shard':'VARCHAR'}}) h
           LEFT JOIN runs r ON r.acc = h.accession
           ORDER BY h.ordinal
         ) TO $2 (FORMAT parquet, COMPRESSION zstd)
@@ -885,13 +900,19 @@ def iter_export_tsv(path: Path) -> Iterator[bytes]:
     client disconnect does not run. This holds one batch in memory instead,
     starts sending immediately, and overlaps its cost with the transfer.
 
+    The header comes off the file rather than off EXPORT_COLUMNS, for the
+    reason export_row_count reads the footer instead of trusting the cache: an
+    export written before the mirror grew lat/lon is 13 columns, lives for a
+    day, and would otherwise be served under a 15-column header that silently
+    shifts every field one to the left.
+
     @param path: the export parquet.
     @returns: an iterator of encoded TSV chunks, header first.
     """
     con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
     try:
-        yield ("\t".join(EXPORT_COLUMNS) + "\n").encode()
         rows = con.execute("SELECT * FROM read_parquet(?)", [str(path)])
+        yield ("\t".join(name for name, *_rest in rows.description) + "\n").encode()
         while batch := rows.fetchmany(_EXPORT_TSV_BATCH):
             yield "".join(
                 "\t".join(map(_tsv_field, row)) + "\n" for row in batch
@@ -1930,7 +1951,10 @@ class SRAMirrorService:
                     f"{ordinal}\t{hit['accession']}\t{hit['score']}\t{hit['shard']}\n"
                 )
             staging.close()
-            cursor.execute(_export_sql(), [staging.name, str(partial)])
+            cursor.execute(
+                _export_sql(self.has_capability(CAPABILITY_COORDINATES)),
+                [staging.name, str(partial)],
+            )
         except Exception:
             try:
                 partial.unlink(missing_ok=True)
