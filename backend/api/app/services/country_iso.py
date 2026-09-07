@@ -32,7 +32,7 @@ and `drawable` says whether the committed asset has a shape for it at all. It
 often does not: of the 234 distinct codes here, 174 have a shape at 1:110m
 and 60 do not, and the 60 include Hong Kong (81,649 runs) and Singapore
 (64,050). Those runs must be *reported* as unplaceable, not dropped -- see
-`geography_for_accessions`, which routes them to `unmapped_countries`.
+`geography_for_hits`, which routes them to `unmapped_countries`.
 
 Deliberately not `_COUNTRY_SYNONYMS` in sra_mirror. That table maps a user's
 search term onto the string the mirror stores, which is the opposite
