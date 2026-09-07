@@ -1,11 +1,11 @@
+import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { filterFlagGatedWorkflowCategories } from "@repo/shared/workflow/featureFlags";
-import { WorkflowCategoryId } from "../../catalog/schema/generated/schema";
 
 describe("filterFlagGatedWorkflowCategories", () => {
-  const GATED = buildWorkflowCategory(WorkflowCategoryId.ASSEMBLY);
-  const UNGATED = buildWorkflowCategory(WorkflowCategoryId.VARIANT_CALLING);
+  const GATED = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY);
+  const UNGATED = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING);
   // The catalog types `category` as a plain string, so a value outside the enum
   // can reach the filter.
   const UNKNOWN = buildWorkflowCategory("NOT_A_CATEGORY");
