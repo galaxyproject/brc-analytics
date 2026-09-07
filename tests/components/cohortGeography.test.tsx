@@ -470,16 +470,19 @@ describe("what the positions cost to draw", () => {
   });
 
   it("discloses rounding, and says it kept every run", async () => {
-    // marine metagenome: 22,316 distinct positions over 199,029 runs, which
+    // marine metagenome, driven end to end against the real mirror: 303,777
+    // runs, 199,029 of them with a position at 22,316 distinct places. That
     // is over the 20,000 cap, so the backend steps down one rung to 3dp and
-    // 19,838 places -- about 110 m, and nothing dropped.
+    // 19,846 places -- about 110 m, and nothing dropped. Note 199,029
+    // positioned against 166,417 with a country: for this cohort `located`
+    // is larger than `recorded`, which is why it gets its own denominator.
     render(
       <CohortGeography
         geography={geography({
           in_mirror: 303777,
           located: 199029,
           locations_precision: 3,
-          locations_total: 19838,
+          locations_total: 19846,
           locations_truncated: 0,
         })}
       />
@@ -488,16 +491,17 @@ describe("what the positions cost to draw", () => {
     const line = (await screen.findByText(/Sampling positions recorded for/))
       .textContent;
     expect(line).toContain("199,029 of 303,777 runs");
-    expect(line).toContain("at 19,838 places");
+    expect(line).toContain("at 19,846 places");
     expect(line).toContain("rounded to 3 decimal places (about 110 m)");
     expect(line).toContain("every run is still counted");
     expect(line).not.toContain("shown nowhere");
   });
 
   it("discloses truncation separately, because it loses runs", async () => {
-    // soil metagenome: 148,766 distinct positions over 1,035,815 runs. Even
-    // at the bottom rung -- 1dp, ~11 km -- it is 34,310 places, so 14,310 of
-    // them and the 28,277 runs at them are drawn nowhere. Measured.
+    // soil metagenome, driven end to end against the real mirror: 1,524,029
+    // runs, 1,035,815 of them with a position at 148,766 distinct places.
+    // Even at the bottom rung -- 1dp, about 11 km -- that is 34,253 places,
+    // so 14,253 of them and the 28,217 runs at them are drawn nowhere.
     render(
       <CohortGeography
         geography={geography({
@@ -505,8 +509,8 @@ describe("what the positions cost to draw", () => {
           located: 1035815,
           locations: LOCATIONS,
           locations_precision: 1,
-          locations_total: 34310,
-          locations_truncated: 28277,
+          locations_total: 34253,
+          locations_truncated: 28217,
         })}
       />
     );
@@ -514,7 +518,7 @@ describe("what the positions cost to draw", () => {
     const line = (await screen.findByText(/Sampling positions recorded for/))
       .textContent;
     expect(line).toContain("rounded to 1 decimal place (about 11 km)");
-    expect(line).toContain("28,277 runs at the other 34,307");
+    expect(line).toContain("28,217 runs at the other 34,250");
     expect(line).toContain("counted here and shown nowhere on the map");
   });
 
