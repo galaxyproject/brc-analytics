@@ -115,7 +115,9 @@ export function bindWorkflowFeatureFlags(
 /**
  * Applies both gating levels to workflow categories: drops categories whose own
  * feature flag is disabled, and drops the gated workflows within those that
- * remain.
+ * remain. A category left with no workflows is kept — whether an empty category
+ * is hidden or shown as a placeholder is the consuming view's call, and gating
+ * hands it the same empty category as any other reason one ends up empty.
  * @param workflowCategories - Workflow categories.
  * @param featureFlags - Enabled state of every workflow-gating feature flag.
  * @returns Workflow categories visible under the given flag state.
@@ -132,10 +134,6 @@ function filterFlagGatedWorkflowCategories(
     const visibleWorkflows = workflows.filter((workflow) =>
       isWorkflowEnabled(workflow, featureFlags)
     );
-    // A category left empty by its workflows' own gates is gated in effect, so
-    // it goes too. One that arrived empty is a "coming soon" placeholder the
-    // views render deliberately, so it stays for them to decide on.
-    if (workflows.length > 0 && visibleWorkflows.length === 0) continue;
     visibleCategories.push(
       visibleWorkflows.length === workflows.length
         ? workflowCategory

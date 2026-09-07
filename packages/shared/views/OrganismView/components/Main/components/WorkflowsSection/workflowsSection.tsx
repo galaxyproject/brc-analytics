@@ -25,7 +25,12 @@ export const WorkflowsSection = ({
   workflowCategories: allWorkflowCategories,
 }: Props): JSX.Element => {
   const { filterCategories } = useWorkflowFeatureFlags();
-  const workflowCategories = filterCategories(allWorkflowCategories);
+  // Categories arrive with at least one organism-compatible workflow each, so
+  // one left empty here has had all of its workflows gated away and is dropped
+  // rather than shown as an empty accordion.
+  const workflowCategories = filterCategories(allWorkflowCategories).filter(
+    ({ workflows }) => workflows.length > 0
+  );
   return (
     <Stack spacing={4} useFlexGap>
       <StyledSectionTitle
@@ -43,7 +48,6 @@ export const WorkflowsSection = ({
         workflowCategories.map((workflowCategory) => (
           <WorkflowCategory
             configureRoute={ROUTES.CONFIGURE_ORGANISM_WORKFLOW}
-            disabled={workflowCategory.workflows.length === 0}
             entityId={entityId}
             key={workflowCategory.category}
             workflowCategory={workflowCategory}

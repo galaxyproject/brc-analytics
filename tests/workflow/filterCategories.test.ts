@@ -69,15 +69,17 @@ describe("filterCategories - workflow gating within a category", () => {
     ]);
   });
 
-  it("drops a category left empty by its workflows' own gates", () => {
+  it("empties, but keeps, a category whose workflows are all gated", () => {
     // The organism page's Comparative Genomics case: the category carries no
-    // gate of its own, but every workflow in it is gated, so showing the
-    // category would surface gated content under a different heading.
+    // gate of its own, but every workflow in it is gated. It comes back empty
+    // for the view to decide on, the same as one that arrived empty.
     const category = buildWorkflowCategory(
       WORKFLOW_CATEGORY_ID.COMPARATIVE_GENOMICS,
       [HYPHY_TRS_ID]
     );
-    expect(buildWorkflowGates().filterCategories([category])).toEqual([]);
+    expect(buildWorkflowGates().filterCategories([category])).toEqual([
+      { ...category, workflows: [] },
+    ]);
     expect(
       buildWorkflowGates({ [FEATURE_FLAGS.HYPHY]: true }).filterCategories([
         category,
