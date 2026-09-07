@@ -8,9 +8,14 @@ import {
   AppProviders,
   type AppPropsWithComponent,
 } from "@repo/shared/components/layout/AppProviders/appProviders";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { type JSX } from "react";
 
-setFeatureFlags(["assembly-workflows", "hyphy", "lmls"]);
+setFeatureFlags([
+  FEATURE_FLAGS.ASSEMBLY_WORKFLOWS,
+  FEATURE_FLAGS.HYPHY,
+  FEATURE_FLAGS.LMLS,
+]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();

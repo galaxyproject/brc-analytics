@@ -1,6 +1,7 @@
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { type OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
@@ -19,9 +20,11 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<OrganismContract>();
-  const isAssemblyWorkflowsEnabled = useFeatureFlag("assembly-workflows");
-  const isHyphyEnabled = useFeatureFlag("hyphy");
-  const isLmlsEnabled = useFeatureFlag("lmls");
+  const isAssemblyWorkflowsEnabled = useFeatureFlag(
+    FEATURE_FLAGS.ASSEMBLY_WORKFLOWS
+  );
+  const isHyphyEnabled = useFeatureFlag(FEATURE_FLAGS.HYPHY);
+  const isLmlsEnabled = useFeatureFlag(FEATURE_FLAGS.LMLS);
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
   );
