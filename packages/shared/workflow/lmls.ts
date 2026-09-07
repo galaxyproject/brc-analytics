@@ -1,3 +1,4 @@
+import type { Workflow } from "@repo/shared/apis/workflow";
 import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 
@@ -6,7 +7,7 @@ import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
  * appended to the catalog's own. The single membership list, so gating,
  * listing and Galaxy landing can't drift from each other.
  */
-export const LMLS_WORKFLOWS = [LOGAN_SEARCH, LEXICMAP];
+export const LMLS_WORKFLOWS: readonly Workflow[] = [LOGAN_SEARCH, LEXICMAP];
 
 /**
  * Determines whether a TRS ID identifies an LMLS workflow.
