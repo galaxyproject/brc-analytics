@@ -3,7 +3,8 @@
 
     python -m scripts.build_sra_mirror --out /tmp/sra-mirror.duckdb
 
-Produces a single DuckDB file: every SRA run, 39 columns, plus NCBI taxonomy.
+Produces a single DuckDB file: every SRA run, 39 columns, plus NCBI taxonomy
+and lat/lon parsed out of BioSample's free-text `lat_lon`.
 `app/services/sra_mirror.py` consumes it; the playbook bind-mounts it read-only
 into the backend container (see brc-analytics-playbook, "SRA Mirror").
 
@@ -188,6 +189,52 @@ JATTR_FIELDS = {
     "env_medium": "env_medium_sam",  # 7.5%
     "center_name_j": "insdc_center_name_sam",  # 23.0%
 }
+
+# BioSample's `lat_lon` is a free-text attribute, and 39% of the filled values
+# are missing-value sentinels rather than coordinates in some other notation --
+# 'missing' (2.5M), 'not collected' (757k), 'not applicable' (716k), 'NA'
+# (147k). Only the canonical "<dd> N <dd> E" spelling is parsed, because
+# measuring the rest showed there is nothing to win: 7,387,967 of the
+# 12,182,056 filled values match this (60.6%), and what is left is sentinels.
+#
+# Hemisphere sign is applied by multiplication rather than by rewriting the
+# number, which handles the 280 rows that write a southern or western position
+# as a negative magnitude against a N/E letter ('20.20394 N -91.97077 E' is
+# 20.2 N, 91.97 W). Measured: no row in the mirror pairs a negative magnitude
+# with an S or W letter, so the multiplication cannot flip one back.
+LAT_LON_PATTERN = r"^\s*(-?\d+(?:\.\d+)?)\s*([NS])\s+(-?\d+(?:\.\d+)?)\s*([EW])\s*$"
+
+# The range check is not defensive tidying. 84 rows parse cleanly to positions
+# that cannot exist -- longitudes past 180 written in the 0-360 convention
+# ('34 N 248 E'), and lat/lon transposed ('141.4674 N 38.5515 E', which is
+# Sendai with the pair the wrong way round). An equal-area projection does not
+# misplace those by a little; it fails on them.
+LAT_LON_IN_RANGE = "lat_raw BETWEEN -90 AND 90 AND lon_raw BETWEEN -180 AND 180"
+
+# The derivation itself, as a template over whatever relation carries
+# `lat_lon`. A template rather than an inline query because this script parses
+# its arguments at import time and so cannot be imported: a test that spelled
+# the parse out a second time would go on passing while the builder drifted.
+# The groups are extracted once into a struct and signed in a second step, so
+# the regex runs once per row instead of eight times.
+COORDINATE_SQL = """
+    WITH parsed AS (
+        SELECT s.*, regexp_extract(s.lat_lon, '{pattern}',
+                        ['deg_lat', 'ns', 'deg_lon', 'ew']) AS ll
+        FROM {source} s
+    ), signed AS (
+        SELECT * EXCLUDE (ll),
+               TRY_CAST(ll.deg_lat AS DOUBLE)
+                   * CASE WHEN ll.ns = 'S' THEN -1 ELSE 1 END AS lat_raw,
+               TRY_CAST(ll.deg_lon AS DOUBLE)
+                   * CASE WHEN ll.ew = 'W' THEN -1 ELSE 1 END AS lon_raw
+        FROM parsed
+    )
+    SELECT * EXCLUDE (lat_raw, lon_raw),
+           CASE WHEN {in_range} THEN lat_raw END AS lat,
+           CASE WHEN {in_range} THEN lon_raw END AS lon
+    FROM signed
+"""
 
 INDEXES = [
     ("idx_runs_organism", "organism"),
@@ -453,15 +500,22 @@ print(
     flush=True,
 )
 t0 = time.time()
-con.execute(f"""
-    CREATE TABLE runs AS
-    SELECT p.*, nt.taxid AS tax_id
-    FROM (
-        SELECT {", ".join(select)}
-        FROM read_parquet('{GLOB}')
-    ) p
-    LEFT JOIN name_to_taxid nt ON nt.name = p.organism
-""")
+# lat/lon are derived at build time rather than at query time so the serving
+# path can GROUP BY a DOUBLE instead of re-parsing 43.8M strings per request.
+scanned = f"""(
+        SELECT p.*, nt.taxid AS tax_id
+        FROM (
+            SELECT {", ".join(select)}
+            FROM read_parquet('{GLOB}')
+        ) p
+        LEFT JOIN name_to_taxid nt ON nt.name = p.organism
+    )"""
+con.execute(
+    "CREATE TABLE runs AS "
+    + COORDINATE_SQL.format(
+        pattern=LAT_LON_PATTERN, in_range=LAT_LON_IN_RANGE, source=scanned
+    )
+)
 con.execute("CHECKPOINT;")
 rows = con.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
 print(f"  {rows:,} runs in {time.time() - t0:.0f}s -- {gb(tmp):.2f} GB", flush=True)
@@ -474,14 +528,29 @@ for name, col in INDEXES:
 
 build_taxid_names(con)
 
+# Recorded rather than left to be re-derived: "how much of lat_lon is
+# actually coordinates" is the first question anyone asks of the map, and
+# answering it means a full scan of a 10 GB file. Both halves are stored so
+# the rate can be read without also having to know how the parse was spelled.
+lat_lon_filled, lat_lon_parsed = con.execute(
+    "SELECT count(lat_lon), count(lat) FROM runs"
+).fetchone()
+
 con.execute("CREATE TABLE mirror_meta (key VARCHAR, value VARCHAR);")
 con.executemany(
     "INSERT INTO mirror_meta VALUES (?, ?)",
     [
         ("mirror_built_at", time.strftime("%Y-%m-%d")),
-        ("filter_strategy", f"none -- all SRA runs, {n_cols} columns"),
-        ("schema_version", "5"),
+        ("filter_strategy", f"none -- all SRA runs, {n_cols} scanned columns"),
+        # 6 adds parsed lat/lon. The serving side gates the map on the columns
+        # themselves rather than on this number -- a stamp says what the
+        # builder intended, a DESCRIBE says what the file has -- but the two
+        # travel together and a mismatch is worth being able to see.
+        ("schema_version", "6"),
         ("ncbi_taxdump_version", taxdump_stamp),
+        ("run_count", str(rows)),
+        ("lat_lon_filled", str(lat_lon_filled)),
+        ("lat_lon_parsed", str(lat_lon_parsed)),
         # Which jattr spelling each alias came from. Stored so a later fill-rate
         # regression can be traced to suffix drift instead of guessed at.
         ("jattr_key_map", json.dumps(jattr_keys, sort_keys=True)),
@@ -511,6 +580,15 @@ if resolved / with_org < 0.95:
     print(
         "     <-- BELOW 95%, expected ~99.95%; check the .dmp tab-trimming", flush=True
     )
+
+print(
+    f"  {'lat_lon parsed':32s} {lat_lon_parsed:>12,}  "
+    f"{100 * lat_lon_parsed / lat_lon_filled:>5.1f}% of filled, "
+    f"{100 * lat_lon_parsed / rows:.1f}% of runs",
+    flush=True,
+)
+if lat_lon_parsed / lat_lon_filled < 0.55:
+    print("     <-- BELOW 55%, expected ~60.6%; check LAT_LON_PATTERN", flush=True)
 
 print("  -- jattr fill rates (expect these to match the docstring) --", flush=True)
 for alias in jattr_keys:
