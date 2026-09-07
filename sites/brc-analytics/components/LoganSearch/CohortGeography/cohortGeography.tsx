@@ -345,7 +345,14 @@ function buildSpec(
                 longitude: { field: "lon", type: "quantitative" as const },
                 size: {
                   field: "n",
-                  legend: { format: ",", title: "Matched runs" },
+                  // No legend. Independent colour resolution puts three
+                  // legends beside a 320px map and they do not fit -- the one
+                  // that gets clipped is Mean score, which is the only one
+                  // the reader cannot infer. A size ramp is the most
+                  // guessable of the three (bigger circle, more runs), it
+                  // duplicates the choropleth's "Matched runs" title, and the
+                  // tooltip gives the exact count on hover anyway.
+                  legend: null,
                   scale: { range: POINT_SIZE_RANGE, type: "sqrt" as const },
                   type: "quantitative" as const,
                 },

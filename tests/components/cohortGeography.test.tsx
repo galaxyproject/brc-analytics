@@ -273,6 +273,24 @@ describe("the map", () => {
     expect(spec.resolve.scale.color).toBe("independent");
   });
 
+  it("leaves the score legend room by dropping the size one", async () => {
+    render(<CohortGeography geography={geography()} />);
+
+    await waitFor(() => expect(embedMock()).toHaveBeenCalled());
+    const [, spec] = embedMock().mock.calls[0];
+    const points = spec.layer[2].encoding;
+
+    // Independent colour resolution compiles to three legends, and three do
+    // not fit beside a map this tall -- the one that falls off the bottom is
+    // Mean score, the only one a reader cannot infer from the drawing. Size
+    // is the one to give up: it repeats the choropleth's "Matched runs"
+    // title, a bigger circle reads as more runs without being told, and the
+    // tooltip carries the exact count.
+    expect(points.size.legend).toBeNull();
+    expect(points.color.legend.title).toBe("Mean score");
+    expect(spec.layer[1].encoding.color.legend.title).toBe("Matched runs");
+  });
+
   it("is not drawn at all when there is nothing to colour", () => {
     // No country the outline can place and no position either. One point on
     // its own is enough to earn a map, so both halves have to be empty.
