@@ -417,7 +417,16 @@ function GeographyMap({
   points: PlottedLocation[];
 }): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = useState(false);
+  // Which attempt failed, rather than whether one did. A boolean cannot clear
+  // itself here: the message below replaces the container, so the next run
+  // finds a null ref and returns before reaching the reset, and the map stays
+  // broken for the life of the mount. Keyed on the data it failed to draw, a
+  // new cohort is simply not the attempt that failed.
+  const [failedFor, setFailedFor] = useState<
+    readonly [KmindexGeographyCountry[], PlottedLocation[]] | null
+  >(null);
+  const failed =
+    failedFor !== null && failedFor[0] === countries && failedFor[1] === points;
 
   useEffect(() => {
     let result: { finalize: () => void } | null = null;
@@ -448,13 +457,13 @@ function GeographyMap({
           return;
         }
         result = embedded;
-        setFailed(false);
+        setFailedFor(null);
       } catch (error) {
         // A map that fails to draw must say so. A blank box in the space
         // where a world was promised reads as "nothing matched anywhere",
         // which is a claim about the data rather than about the render.
         console.error("Failed to render the cohort map:", error);
-        setFailed(true);
+        setFailedFor([countries, points]);
       }
     };
 

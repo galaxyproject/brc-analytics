@@ -296,6 +296,30 @@ describe("the map", () => {
     // The counts beside it are computed server-side and are unaffected.
     expect(screen.getByText(/Geography recorded for/)).toBeTruthy();
   });
+
+  it("draws again for the next cohort after one render failed", async () => {
+    // The failure message replaces the container, so a flag that only says
+    // "a render failed" can never be cleared -- the next attempt finds a null
+    // ref and gives up before reaching the reset, and the map stays broken
+    // until the page is reloaded. One transient chunk fetch should not cost
+    // the map for the life of the mount.
+    embedMock().mockRejectedValueOnce(new Error("chunk fetch failed"));
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    const { rerender } = render(<CohortGeography geography={geography()} />);
+    expect(await screen.findByText(/The map could not be drawn/)).toBeTruthy();
+
+    const attempts = embedMock().mock.calls.length;
+    rerender(
+      <CohortGeography
+        geography={geography({ countries: COUNTRIES.slice(0, 2) })}
+      />
+    );
+
+    await waitFor(() =>
+      expect(embedMock().mock.calls.length).toBeGreaterThan(attempts)
+    );
+    expect(screen.queryByText(/The map could not be drawn/)).toBeNull();
+  });
 });
 
 describe("the point layer", () => {
