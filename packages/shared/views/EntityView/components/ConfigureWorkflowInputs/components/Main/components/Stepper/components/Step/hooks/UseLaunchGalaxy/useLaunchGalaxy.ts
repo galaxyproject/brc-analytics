@@ -10,8 +10,7 @@ import {
 } from "@repo/shared/utils/galaxy-api/galaxy-api";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import { isLmlsWorkflow } from "@repo/shared/workflow/lmls";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import {
@@ -54,10 +53,7 @@ async function getLandingUrlForWorkflow(
     );
   }
 
-  if (
-    workflow.trsId === LOGAN_SEARCH.trsId ||
-    workflow.trsId === LEXICMAP.trsId
-  ) {
+  if (isLmlsWorkflow(workflow.trsId)) {
     if (!workflow.workflowId) {
       throw new Error("Missing workflow ID for LMLS workflow");
     }

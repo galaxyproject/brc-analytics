@@ -1,11 +1,10 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
 import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
-import { useWorkflowCategoryFeatureFlags } from "@repo/shared/hooks/UseWorkflowCategoryFeatureFlags/hook";
+import { useWorkflowFeatureFlags } from "@repo/shared/hooks/UseWorkflowFeatureFlags/hook";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { EmptyState } from "@repo/shared/views/OrganismView/components/Main/components/EmptyState/emptyState";
 import { StyledSectionTitle } from "@repo/shared/views/OrganismView/components/Main/main.styles";
-import { filterFlagGatedWorkflowCategories } from "@repo/shared/workflow/featureFlags";
 import { type JSX } from "react";
 import { type Props } from "./types";
 
@@ -25,10 +24,12 @@ export const WorkflowsSection = ({
   entityId,
   workflowCategories: allWorkflowCategories,
 }: Props): JSX.Element => {
-  const featureFlags = useWorkflowCategoryFeatureFlags();
-  const workflowCategories = filterFlagGatedWorkflowCategories(
-    allWorkflowCategories,
-    featureFlags
+  const { filterCategories } = useWorkflowFeatureFlags();
+  // Categories arrive with at least one organism-compatible workflow each, so
+  // one left empty here has had all of its workflows gated away and is dropped
+  // rather than shown as an empty accordion.
+  const workflowCategories = filterCategories(allWorkflowCategories).filter(
+    ({ workflows }) => workflows.length > 0
   );
   return (
     <Stack spacing={4} useFlexGap>
@@ -47,7 +48,6 @@ export const WorkflowsSection = ({
         workflowCategories.map((workflowCategory) => (
           <WorkflowCategory
             configureRoute={ROUTES.CONFIGURE_ORGANISM_WORKFLOW}
-            disabled={workflowCategory.workflows.length === 0}
             entityId={entityId}
             key={workflowCategory.category}
             workflowCategory={workflowCategory}
