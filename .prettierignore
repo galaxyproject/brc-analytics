@@ -30,3 +30,7 @@ venv
 
 # playwright mcp debug output
 .playwright-mcp
+
+# published slide decks -- self-contained HTML served verbatim from public/.
+# Reformatting them would rewrite authored markup we do not maintain here.
+/sites/*/public/presentations
