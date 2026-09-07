@@ -3,7 +3,7 @@ import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
 
 const HYPHY_TRS_ID =
-  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0-2";
+  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2";
 const UNGATED_TRS_ID = "#workflow/github.com/iwc-workflows/something/main";
 
 describe("filterCategories - category gating", () => {

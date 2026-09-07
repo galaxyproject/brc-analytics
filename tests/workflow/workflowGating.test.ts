@@ -8,7 +8,7 @@ import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
 
 const HYPHY_TRS_ID =
-  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0-1";
+  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2";
 const UNGATED_TRS_ID = "#workflow/github.com/iwc-workflows/something/main";
 
 describe("isWorkflowAllowed", () => {
