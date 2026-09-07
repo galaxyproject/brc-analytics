@@ -83,7 +83,6 @@ export function getWorkflows(
   );
 
   for (const category of workflowGates.filterCategories(workflowCategories)) {
-    if (!category.workflows) continue;
     for (const workflow of category.workflows) {
       // Skip workflows whose minimum assembly requirement cannot be met.
       const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;

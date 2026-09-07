@@ -130,7 +130,7 @@ function filterFlagGatedWorkflowCategories(
   for (const workflowCategory of workflowCategories) {
     if (!isWorkflowCategoryEnabled(workflowCategory.category, featureFlags))
       continue;
-    const workflows = workflowCategory.workflows ?? [];
+    const { workflows } = workflowCategory;
     const visibleWorkflows = workflows.filter((workflow) =>
       isWorkflowEnabled(workflow, featureFlags)
     );
