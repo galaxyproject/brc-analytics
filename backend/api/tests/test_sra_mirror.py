@@ -696,7 +696,9 @@ class TestAccessionBatching:
         con = duckdb.connect(path)
         accs = [f"SRRB{i:06d}" for i in range(n)]
         con.executemany(
-            "INSERT INTO runs (acc, sra_study, bioproject, organism, assay_type, platform, instrument, librarylayout, releasedate, geo_loc_name_country_calc, mbases) "
+            "INSERT INTO runs (acc, sra_study, bioproject, organism, "
+            "assay_type, platform, instrument, librarylayout, releasedate, "
+            "geo_loc_name_country_calc, mbases) "
             "VALUES (?,'SRPX','PRJNAX','Batch organism','WGS',"
             "'ILLUMINA','X','PAIRED', DATE '2023-01-01','Kenya', 1)",
             [(a,) for a in accs],
@@ -799,7 +801,9 @@ def _build_cohort_mirror(path: str) -> list:
     add(1, "", "USA", "Illumina MiSeq")
 
     con.executemany(
-        "INSERT INTO runs (acc, sra_study, bioproject, organism, assay_type, platform, instrument, librarylayout, releasedate, geo_loc_name_country_calc, mbases) VALUES (?,?,?,?,?,?,?,?,?,?,1)",
+        "INSERT INTO runs (acc, sra_study, bioproject, organism, "
+        "assay_type, platform, instrument, librarylayout, releasedate, "
+        "geo_loc_name_country_calc, mbases) VALUES (?,?,?,?,?,?,?,?,?,?,1)",
         rows,
     )
     con.close()
