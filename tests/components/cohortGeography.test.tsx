@@ -287,6 +287,13 @@ describe("the map", () => {
     expect(spec.config.legend.orient).toBe("bottom");
     expect(spec.config.legend.direction).toBe("horizontal");
 
+    // Vega anchors a bottom orient group at "start", which parks both
+    // legends against the left edge under a map that runs the full width.
+    // This is the Vega-level escape hatch the spec casts for, so asserting
+    // it is what would notice a Vega-Lite version that stopped passing
+    // config through to the compiled spec.
+    expect(spec.config.legend.layout).toEqual({ bottom: { anchor: "middle" } });
+
     // Deliberately unset. Shortening the gradient is the obvious way to buy
     // horizontal margin, and it costs the choropleth its intermediate log
     // ticks: below Vega's default 200 the legend is labelled at its

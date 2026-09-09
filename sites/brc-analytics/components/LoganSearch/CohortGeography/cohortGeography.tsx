@@ -294,13 +294,27 @@ function buildSpec(
     // alone deliberately: shortening it to buy margin is what drops the
     // choropleth's intermediate log ticks, and a log legend labelled only
     // at its endpoints does not read as logarithmic at all.
+    // Cast through unknown because of `layout` alone, which is worth the
+    // ugliness being explicit about. It is current Vega API -- vega-typings
+    // documents config.legend.layout.<orient>.anchor -- but Vega-Lite types
+    // it as undefined, because Vega-Lite normally owns legend placement
+    // itself. Vega-Lite still copies config through to the compiled Vega
+    // spec, so Vega honours it; verified by rendering, not by reading the
+    // types. If a future version stops passing it through the legends go
+    // back to flush left, which is cosmetic rather than broken, and the
+    // layout assertion in the tests is what would catch it.
     config: {
       legend: {
         direction: "horizontal",
+        // Centred under the map rather than flush left. Vega anchors a
+        // bottom orient group at "start", which leaves the pair against the
+        // left edge with a third of the width empty beside it -- it reads as
+        // a drawing that ran out rather than as a key belonging to the map.
+        layout: { bottom: { anchor: "middle" } },
         orient: "bottom",
         titleOrient: "top",
       },
-    },
+    } as unknown as TopLevelSpec["config"],
     // Declared once at the top so both layers share a single fetch.
     data: {
       format: { feature: "countries", type: "topojson" },
