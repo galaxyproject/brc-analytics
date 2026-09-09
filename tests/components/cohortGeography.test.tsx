@@ -273,19 +273,40 @@ describe("the map", () => {
     expect(spec.resolve.scale.color).toBe("independent");
   });
 
-  it("leaves the score legend room by dropping the size one", async () => {
+  it("puts the colour legends under the map rather than beside it", async () => {
+    render(<CohortGeography geography={geography()} />);
+
+    await waitFor(() => expect(embedMock()).toHaveBeenCalled());
+    const [, spec] = embedMock().mock.calls[0];
+
+    // Stacked down the right-hand side the two gradients need 440px against
+    // a 320px map, and Vega clips the overflow instead of compressing it.
+    // Measured on a live cohort, Mean score painted down to 0.80 while its
+    // scale ran to 0.50, so the purple half of the ramp -- 52% of the
+    // plotted points -- had no key at all.
+    expect(spec.config.legend.orient).toBe("bottom");
+    expect(spec.config.legend.direction).toBe("horizontal");
+
+    // Deliberately unset. Shortening the gradient is the obvious way to buy
+    // horizontal margin, and it costs the choropleth its intermediate log
+    // ticks: below Vega's default 200 the legend is labelled at its
+    // endpoints only, which does not read as a log scale.
+    expect(spec.config.legend.gradientLength).toBeUndefined();
+  });
+
+  it("drops the size legend rather than the score one", async () => {
     render(<CohortGeography geography={geography()} />);
 
     await waitFor(() => expect(embedMock()).toHaveBeenCalled());
     const [, spec] = embedMock().mock.calls[0];
     const points = spec.layer[2].encoding;
 
-    // Independent colour resolution compiles to three legends, and three do
-    // not fit beside a map this tall -- the one that falls off the bottom is
-    // Mean score, the only one a reader cannot infer from the drawing. Size
-    // is the one to give up: it repeats the choropleth's "Matched runs"
-    // title, a bigger circle reads as more runs without being told, and the
-    // tooltip carries the exact count.
+    // Independent colour resolution compiles to three legends. The row
+    // below the map has room for a third, but size is still the one to give
+    // up: its title would repeat the choropleth's "Matched runs" while
+    // counting something else, a bigger circle reads as more runs without
+    // being told, and the tooltip carries the exact count. Mean score is the
+    // one a reader cannot infer from the drawing.
     expect(points.size.legend).toBeNull();
     expect(points.color.legend.title).toBe("Mean score");
     expect(spec.layer[1].encoding.color.legend.title).toBe("Matched runs");

@@ -279,6 +279,28 @@ function buildSpec(
     $schema: "https://vega.github.io/schema/vega-lite/v6.json",
     autosize: { contains: "padding", resize: true, type: "fit-x" },
     background: "transparent",
+    // Both colour legends go under the map, laid out horizontally.
+    //
+    // Stacked down the right-hand side they do not fit. Vega gives each
+    // gradient its default 200px and lays the second below the first, which
+    // needs 440px against a 320px map; it clips rather than compresses, and
+    // the one that loses its bottom is Mean score. Measured on a real
+    // cohort, the painted legend stopped at 0.80 while the scale ran to
+    // 0.50, so 52% of the plotted points -- 39% of the located runs -- were
+    // drawn in a purple the key never showed.
+    //
+    // Below the map they sit side by side and both fit, and the map gets
+    // back the width the legend column was taking. gradientLength is left
+    // alone deliberately: shortening it to buy margin is what drops the
+    // choropleth's intermediate log ticks, and a log legend labelled only
+    // at its endpoints does not read as logarithmic at all.
+    config: {
+      legend: {
+        direction: "horizontal",
+        orient: "bottom",
+        titleOrient: "top",
+      },
+    },
     // Declared once at the top so both layers share a single fetch.
     data: {
       format: { feature: "countries", type: "topojson" },
@@ -345,13 +367,13 @@ function buildSpec(
                 longitude: { field: "lon", type: "quantitative" as const },
                 size: {
                   field: "n",
-                  // No legend. Independent colour resolution puts three
-                  // legends beside a 320px map and they do not fit -- the one
-                  // that gets clipped is Mean score, which is the only one
-                  // the reader cannot infer. A size ramp is the most
-                  // guessable of the three (bigger circle, more runs), it
-                  // duplicates the choropleth's "Matched runs" title, and the
-                  // tooltip gives the exact count on hover anyway.
+                  // No legend, even though the horizontal layout below would
+                  // now have room for a third. A size ramp is the most
+                  // guessable of the three (bigger circle, more runs), its
+                  // title would repeat the choropleth's "Matched runs" while
+                  // counting something else, and the tooltip gives the exact
+                  // count on hover. Mean score is the one the reader cannot
+                  // infer, so it is the one that gets the space.
                   legend: null,
                   scale: { range: POINT_SIZE_RANGE, type: "sqrt" as const },
                   type: "quantitative" as const,
