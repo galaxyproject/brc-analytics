@@ -13,8 +13,9 @@ import { type Props } from "./types";
  * organism-scoped workflow categories (or an empty state when none exist).
  * The categories are computed at build time and arrive via props as the
  * flag-inclusive superset, so the section prerenders without the client
- * entity store; the per-user category feature flags are applied at render
- * (false on the server and during hydration, so markup stays consistent).
+ * entity store; the per-user feature flag gating both categories and
+ * individual workflows is applied at render (false on the server and during
+ * hydration, so markup stays consistent).
  * @param props - Component props.
  * @param props.entityId - Organism entity ID.
  * @param props.workflowCategories - Organism-compatible workflow categories.
