@@ -534,6 +534,10 @@ export const useKmindexSearch = (): KmindexSearchActions &
       // Back to the first page: an offset chosen at one size is a different
       // row at another.
       if (await fetchResults(state.jobId, 0)) return;
+      // Nothing disables the selector while a request is out and a cold fetch
+      // takes minutes, so a change made in the meantime may already own the
+      // ref; rolling back over it would undo a newer success.
+      if (pageSizeRef.current !== size) return;
       // The paginator follows the page the server actually returned, so a
       // request that never landed must not leave the next one at a different
       // size from the rows on screen.
@@ -568,9 +572,12 @@ export const useKmindexSearch = (): KmindexSearchActions &
       // Re-sorting re-ranks the whole listing, so page two of the old order
       // names nothing in the new one.
       if (await fetchResults(state.jobId, 0)) return;
-      // The lit header follows the response too, so a request that never
-      // landed must not leave the next page fetch sorting by a column the
-      // header never showed.
+      // Same race as the page size, and `next` is this call's own object, so
+      // identity says whether a later sort has since taken the ref over.
+      if (sortRef.current !== next) return;
+      // What goes back is the last sort that was requested, which with that
+      // check is the last one a response landed for -- and the lit header
+      // follows the response, so the next page fetch has to run in that order.
       sortRef.current = previous;
       setState((prev) => ({ ...prev, sort: previous }));
     },

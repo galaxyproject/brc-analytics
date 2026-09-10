@@ -37,6 +37,25 @@ function jsonOf(value: unknown): { json: () => Promise<unknown> } {
   return { json: (): Promise<unknown> => Promise.resolve(value) };
 }
 
+/**
+ * A promise with its settle handles exposed, so a test can hold one request
+ * open while a later one runs to completion.
+ * @returns The pending promise alongside its resolve and reject.
+ */
+function deferred(): {
+  promise: Promise<unknown>;
+  reject: (reason: unknown) => void;
+  resolve: (value: unknown) => void;
+} {
+  let resolve!: (value: unknown) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<unknown>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, reject, resolve };
+}
+
 const INDEXES = { count: 2, indexes: ["GENOMIC_BCT", "METAGENOMIC_ENV"] };
 
 const RESULTS = {
@@ -375,6 +394,74 @@ describe("sort and page size", () => {
 
     expect(lastResultsParams()).toMatchObject({ order: "desc", sort: "score" });
     expect(result.current.sort).toEqual({ column: "score", order: "desc" });
+  });
+
+  it("a stale page-size failure does not undo a later change", async () => {
+    const { result } = await reattached();
+    // Nothing disables the size selector while a request is in flight and a
+    // cold fetch runs for minutes, so two changes can be outstanding at once.
+    // Hold the first one open.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.setPageSize(100);
+      await Promise.resolve();
+    });
+
+    // The second change answers while the first is still waiting.
+    mockKy.get.mockImplementationOnce(() => jsonOf({ ...RESULTS, limit: 50 }));
+    await act(async () => {
+      await result.current.setPageSize(50);
+    });
+
+    await act(async () => {
+      pending.reject(new Error("boom"));
+      await stale;
+    });
+    await act(async () => {
+      await result.current.goToPage(50);
+    });
+
+    expect(result.current.pageSize).toBe(50);
+    expect(lastResultsParams()).toMatchObject({ limit: 50, offset: 50 });
+  });
+
+  it("a stale sort failure does not undo a later change", async () => {
+    const { result } = await reattached();
+    // Same race on the headers: the country sort answers while the organism
+    // one is still out.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.setSort("organism");
+      await Promise.resolve();
+    });
+
+    // The stub echoes the request, so this one comes back sorted by country
+    // ascending, which is what the header then lights.
+    await act(async () => {
+      await result.current.setSort("country");
+    });
+
+    await act(async () => {
+      pending.reject(new Error("boom"));
+      await stale;
+    });
+    await act(async () => {
+      await result.current.goToPage(50);
+    });
+
+    expect(result.current.sort).toEqual({ column: "country", order: "asc" });
+    expect(lastResultsParams()).toMatchObject({
+      order: "asc",
+      sort: "country",
+    });
   });
 
   it("paging keeps the current sort and size", async () => {
