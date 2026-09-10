@@ -207,3 +207,189 @@ describe("which account the search ran under", () => {
     expect(result.current.identity).toBeNull();
   });
 });
+
+describe("sort and page size", () => {
+  /**
+   * The searchParams of the most recent results request.
+   * @returns The object ky was given, or undefined when nothing was fetched.
+   */
+  function lastResultsParams(): Record<string, unknown> | undefined {
+    const calls = mockKy.get.mock.calls.filter(([url]) =>
+      String(url).includes("/results")
+    );
+    return calls.at(-1)?.[1]?.searchParams;
+  }
+
+  /**
+   * Reattach to a completed job, so the hook has a job id to page and sort.
+   * @returns The rendered hook result, with its first page already loaded.
+   */
+  async function reattached(): Promise<
+    ReturnType<typeof renderHook<ReturnType<typeof useKmindexSearch>, unknown>>
+  > {
+    setUrl(`?job=${JOB_ID}`);
+    mockKy.get.mockImplementation(
+      (url: string, options?: { searchParams?: Record<string, unknown> }) => {
+        if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+        if (url.includes("/status")) return jsonOf(COMPLETE_STATUS);
+        // The endpoint echoes the sort it applied; echoing the request back is
+        // the mirror-available path, where what was asked for is what ran.
+        const params = options?.searchParams ?? {};
+        return jsonOf({
+          ...RESULTS,
+          order: params.order ?? "desc",
+          sort: params.sort ?? "score",
+        });
+      }
+    );
+    const rendered = await renderSettled();
+    // The reattach starts polling; one tick reaches the completed job and
+    // pulls the first page.
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+    await waitFor(() => expect(rendered.result.current.results).not.toBeNull());
+    return rendered;
+  }
+
+  it("asks for the default page in score order", async () => {
+    await reattached();
+    expect(lastResultsParams()).toMatchObject({
+      limit: 25,
+      offset: 0,
+      order: "desc",
+      sort: "score",
+    });
+  });
+
+  it("sorting by a text column starts ascending and goes back to page one", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.goToPage(50);
+    });
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    expect(lastResultsParams()).toMatchObject({
+      offset: 0,
+      order: "asc",
+      sort: "organism",
+    });
+  });
+
+  it("sorting the same column again flips the direction", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    expect(lastResultsParams()).toMatchObject({
+      order: "desc",
+      sort: "organism",
+    });
+  });
+
+  it("asks again for ascending when the server fell back to score order", async () => {
+    const { result } = await reattached();
+    // The mirror cannot answer a metadata sort, so every page comes back in
+    // score order however it was asked for, and score stays the lit header.
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      if (url.includes("/status")) return jsonOf(COMPLETE_STATUS);
+      return jsonOf({
+        ...RESULTS,
+        order: "desc",
+        sort: "score",
+        sra_mirror_available: false,
+      });
+    });
+
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+
+    expect(lastResultsParams()).toMatchObject({
+      order: "asc",
+      sort: "organism",
+    });
+  });
+
+  it("sorting by score starts descending", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    await act(async () => {
+      await result.current.setSort("score");
+    });
+    expect(lastResultsParams()).toMatchObject({ order: "desc", sort: "score" });
+  });
+
+  it("changing the page size refetches from the first page at that size", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+    await act(async () => {
+      await result.current.setPageSize(100);
+    });
+    expect(lastResultsParams()).toMatchObject({ limit: 100, offset: 0 });
+  });
+
+  it("paging keeps the current sort and size", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.setPageSize(50);
+    });
+    await act(async () => {
+      await result.current.setSort("country");
+    });
+    await act(async () => {
+      await result.current.goToPage(100);
+    });
+    expect(lastResultsParams()).toMatchObject({
+      limit: 50,
+      offset: 100,
+      order: "asc",
+      sort: "country",
+    });
+  });
+
+  it("a new search goes back to score order but keeps the page size", async () => {
+    const { result } = await reattached();
+    await act(async () => {
+      await result.current.setPageSize(100);
+    });
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+
+    await act(async () => {
+      await result.current.submit({
+        indexes: ["GENOMIC_BCT"],
+        sequence: ">q\nACGT",
+        threshold: 0.3,
+        zvalue: 6,
+      });
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    await waitFor(() =>
+      expect(lastResultsParams()).toMatchObject({
+        limit: 100,
+        offset: 0,
+        order: "desc",
+        sort: "score",
+      })
+    );
+    expect(result.current.sort).toEqual({ column: "score", order: "desc" });
+    expect(result.current.pageSize).toBe(100);
+  });
+});

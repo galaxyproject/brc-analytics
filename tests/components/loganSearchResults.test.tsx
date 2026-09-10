@@ -8,10 +8,11 @@ import {
   PAGE_SIZE,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
-// The component reaches into the hook module for PAGE_SIZE, and that module
-// imports ky, which ships ESM only and Jest cannot parse.
+// The component reaches into the hook module for the page sizes and the sort
+// helpers, and that module imports ky, which ships ESM only and Jest cannot
+// parse.
 jest.mock("ky", () => ({ __esModule: true, default: {} }));
 
 type Search = ReturnType<typeof useKmindexSearch>;
@@ -89,26 +90,44 @@ function truncatedResults(perIndex: KmindexIndexSummary[]): KmindexResults {
 
 /**
  * Render the results card around a payload; the component reads only results
- * and goToPage, so the rest of the search state is stubbed.
+ * and the paging and sorting actions, so the rest of the search state is
+ * stubbed.
  * @param results - Payload as the API sends it. Typed loosely because the
  * old-backend case is precisely a payload missing keys the type declares.
- * @returns The render result.
+ * @param actions - Overrides for the stubbed actions.
+ * @returns The render result, plus the action stubs the card was handed.
  */
-function renderResults(results: unknown): ReturnType<typeof render> {
+function renderResults(
+  results: unknown,
+  actions: Partial<Pick<Search, "goToPage" | "setPageSize" | "setSort">> = {}
+): ReturnType<typeof render> & {
+  actions: Pick<Search, "goToPage" | "setPageSize" | "setSort">;
+} {
+  const resolved = {
+    goToPage: jest.fn(),
+    setPageSize: jest.fn(),
+    setSort: jest.fn(),
+    ...actions,
+  };
   const search = {
     error: null,
-    goToPage: jest.fn(),
     indexes: [],
     isLoadingIndexes: false,
     isLoadingResults: false,
     isSubmitting: false,
     jobId: BASE_RESULTS.job_id,
     jobStatus: null,
+    pageSize: PAGE_SIZE,
     reset: jest.fn(),
     results,
+    sort: { column: "score", order: "desc" },
     submit: jest.fn(),
+    ...resolved,
   } as unknown as Search;
-  return render(<LoganSearchResults search={search} />);
+  return {
+    ...render(<LoganSearchResults search={search} />),
+    actions: resolved,
+  };
 }
 
 describe("LoganSearchResults truncation disclosure", () => {
@@ -368,5 +387,50 @@ describe("coverage and ANI columns", () => {
     // The coverage cell also carries the "corrected" chip, since this hit has
     // an fp_correction.
     expect(cells[1].textContent).toMatch(/^-0\.0500/);
+  });
+});
+
+describe("sorting and page size", () => {
+  test("clicking a header asks the hook to sort by that column", () => {
+    const { actions } = renderResults(BASE_RESULTS);
+
+    fireEvent.click(screen.getByText("Organism"));
+    expect(actions.setSort).toHaveBeenCalledWith("organism");
+
+    fireEvent.click(screen.getByText("k-mer coverage"));
+    expect(actions.setSort).toHaveBeenCalledWith("score");
+
+    fireEvent.click(screen.getByText("Released"));
+    expect(actions.setSort).toHaveBeenCalledWith("release_date");
+  });
+
+  test("the active header follows what the API applied, not what was clicked", () => {
+    // Asked for organism, got score back because the mirror was down.
+    renderResults({ ...BASE_RESULTS, order: "desc", sort: "score" });
+
+    const scoreHeader = screen.getByText("k-mer coverage").closest("th");
+    const organismHeader = screen.getByText("Organism").closest("th");
+    expect(scoreHeader?.getAttribute("aria-sort")).toBe("descending");
+    expect(organismHeader?.getAttribute("aria-sort")).toBeNull();
+  });
+
+  test("offers 25, 50 and 100 rows per page and reports a change", () => {
+    const { actions } = renderResults({ ...BASE_RESULTS, limit: 50 });
+
+    const select = screen.getByRole("combobox", { name: /rows per page/i });
+    expect(select.textContent).toBe("50");
+    fireEvent.mouseDown(select);
+    expect(screen.getByRole("option", { name: "25" })).toBeTruthy();
+    expect(screen.getByRole("option", { name: "100" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("option", { name: "100" }));
+    expect(actions.setPageSize).toHaveBeenCalledWith(100);
+  });
+
+  test("the page number is computed from the page size the API served", () => {
+    renderResults({ ...BASE_RESULTS, limit: 50, offset: 100, total_hits: 400 });
+
+    // Offset 100 at 50 a page is the third page. MUI joins the range with an
+    // en dash, which the regex sidesteps.
+    expect(screen.getByText(/101.150 of 400/)).toBeTruthy();
   });
 });

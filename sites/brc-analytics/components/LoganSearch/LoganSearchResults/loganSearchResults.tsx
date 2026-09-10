@@ -12,13 +12,17 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from "@mui/material";
 import {
+  defaultOrder,
   type KmindexHit,
   type KmindexIndexSummary,
-  PAGE_SIZE,
+  type KmindexSortColumn,
+  type KmindexSortOrder,
+  PAGE_SIZE_OPTIONS,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import { type JSX } from "react";
@@ -79,10 +83,59 @@ function describeCorrection(hit: KmindexHit): string {
   );
 }
 
+interface SortableHeaderProps {
+  align?: "left" | "right";
+  appliedOrder: KmindexSortOrder;
+  appliedSort: KmindexSortColumn;
+  column: KmindexSortColumn;
+  label: string;
+  onSort: (column: KmindexSortColumn) => void;
+  title?: string;
+}
+
+/**
+ * A header cell that sorts its column, lit when it is the applied sort.
+ * @param props - Component props.
+ * @param props.align - Cell alignment, matching the body cells below it.
+ * @param props.appliedOrder - Direction the response says it applied.
+ * @param props.appliedSort - Column the response says it sorted by.
+ * @param props.column - Column this header sorts.
+ * @param props.label - Header text.
+ * @param props.onSort - Called with this column when the header is clicked.
+ * @param props.title - Tooltip for the column, if it needs one.
+ * @returns The header cell.
+ */
+function SortableHeader({
+  align,
+  appliedOrder,
+  appliedSort,
+  column,
+  label,
+  onSort,
+  title,
+}: SortableHeaderProps): JSX.Element {
+  const active = appliedSort === column;
+  return (
+    <TableCell
+      align={align}
+      sortDirection={active ? appliedOrder : false}
+      title={title}
+    >
+      <TableSortLabel
+        active={active}
+        direction={active ? appliedOrder : defaultOrder(column)}
+        onClick={(): void => onSort(column)}
+      >
+        {label}
+      </TableSortLabel>
+    </TableCell>
+  );
+}
+
 export const LoganSearchResults = ({
   search,
 }: LoganSearchResultsProps): JSX.Element | null => {
-  const { goToPage, results } = search;
+  const { goToPage, results, setPageSize, setSort } = search;
 
   if (!results) return null;
 
@@ -128,6 +181,16 @@ export const LoganSearchResults = ({
         ? `Listing the ${cap.toLocaleString()} highest-scoring -- the remaining ${notListed.toLocaleString()} cannot be paged to.`
         : `Capped at ${cap.toLocaleString()} -- more accessions matched than can be listed.`;
   }
+
+  // What the response says it did, not what was clicked: a metadata sort the
+  // mirror could not answer comes back as score order, and the lit header has
+  // to show that rather than the column the reader asked for. The fallbacks
+  // cover a backend predating the sort, which sorts by score and says nothing.
+  const appliedSort: KmindexSortColumn = results.sort ?? "score";
+  const appliedOrder: KmindexSortOrder = results.order ?? "desc";
+  // Likewise the served page size, so the page arithmetic agrees with the rows
+  // on screen even before a size change has round-tripped.
+  const pageSize = results.limit;
 
   return (
     <Card sx={{ mt: 2 }}>
@@ -227,23 +290,59 @@ export const LoganSearchResults = ({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Accession</TableCell>
-              <TableCell
+              <SortableHeader
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="accession"
+                label="Accession"
+                onSort={setSort}
+              />
+              <SortableHeader
                 align="right"
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="score"
+                label="k-mer coverage"
+                onSort={setSort}
                 title="Fraction of the query's 31-mers found in the run, after subtracting a false-positive baseline for the 227 saturated samples Logan flags"
-              >
-                k-mer coverage
-              </TableCell>
+              />
+              {/* ANI is monotone in the score, so sorting the coverage column
+                  sorts this one too and a second control would only be a
+                  second name for it. */}
               <TableCell
                 align="right"
                 title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
               >
                 ANI est.
               </TableCell>
-              <TableCell>Organism</TableCell>
-              <TableCell>Platform</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Released</TableCell>
+              <SortableHeader
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="organism"
+                label="Organism"
+                onSort={setSort}
+              />
+              <SortableHeader
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="platform"
+                label="Platform"
+                onSort={setSort}
+              />
+              <SortableHeader
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="country"
+                label="Country"
+                onSort={setSort}
+              />
+              <SortableHeader
+                appliedOrder={appliedOrder}
+                appliedSort={appliedSort}
+                column="release_date"
+                label="Released"
+                onSort={setSort}
+              />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -313,12 +412,14 @@ export const LoganSearchResults = ({
           component="div"
           count={results.total_hits}
           onPageChange={async (_, page): Promise<void> => {
-            await goToPage(page * PAGE_SIZE);
+            await goToPage(page * pageSize);
           }}
-          onRowsPerPageChange={undefined}
-          page={Math.floor(results.offset / PAGE_SIZE)}
-          rowsPerPage={PAGE_SIZE}
-          rowsPerPageOptions={[PAGE_SIZE]}
+          onRowsPerPageChange={async (event): Promise<void> => {
+            await setPageSize(Number(event.target.value));
+          }}
+          page={Math.floor(results.offset / pageSize)}
+          rowsPerPage={pageSize}
+          rowsPerPageOptions={[...PAGE_SIZE_OPTIONS]}
         />
       </CardContent>
     </Card>

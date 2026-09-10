@@ -177,11 +177,18 @@ export interface KmindexResults {
   job_id: string;
   limit: number;
   offset: number;
+  // Direction of the applied sort below.
+  order?: KmindexSortOrder;
   per_index: KmindexIndexSummary[];
   query_name: string | null;
   shards_failed: number;
   shards_searched: number;
   shards_with_hits: number;
+  // The sort the backend actually applied -- score when a metadata sort was
+  // asked for and the mirror could not answer -- so the header state follows
+  // what is on screen rather than what was clicked. Both this and `order` are
+  // optional because a backend predating the sort omits them.
+  sort?: KmindexSortColumn;
   sra_annotated: number;
   sra_mirror_available: boolean;
   // Pageable rows, i.e. what survived the cap. Paging math stays on this.
@@ -219,17 +226,48 @@ interface KmindexSearchState {
   isSubmitting: boolean;
   jobId: string | null;
   jobStatus: KmindexJobStatus | null;
+  pageSize: number;
   results: KmindexResults | null;
+  sort: KmindexSort;
 }
 
 interface KmindexSearchActions {
   goToPage: (offset: number) => Promise<void>;
   reset: () => void;
+  setPageSize: (size: number) => Promise<void>;
+  setSort: (column: KmindexSortColumn) => Promise<void>;
   submit: (submission: KmindexSubmission) => Promise<void>;
+}
+
+export type KmindexSortColumn =
+  | "score"
+  | "accession"
+  | "organism"
+  | "platform"
+  | "country"
+  | "release_date";
+export type KmindexSortOrder = "asc" | "desc";
+
+export interface KmindexSort {
+  column: KmindexSortColumn;
+  order: KmindexSortOrder;
 }
 
 const POLLING_INTERVAL = 3000;
 export const PAGE_SIZE = 25;
+// 1000 is the API's ceiling; three sizes is the picker.
+export const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
+export const DEFAULT_SORT: KmindexSort = { column: "score", order: "desc" };
+
+/**
+ * The direction a column is first sorted in: scores high to low, text and
+ * dates A to Z and old to new.
+ * @param column - Column being sorted.
+ * @returns The initial direction.
+ */
+export function defaultOrder(column: KmindexSortColumn): KmindexSortOrder {
+  return column === "score" ? "desc" : "asc";
+}
 
 const INITIAL_STATE: KmindexSearchState = {
   error: null,
@@ -240,7 +278,9 @@ const INITIAL_STATE: KmindexSearchState = {
   isSubmitting: false,
   jobId: null,
   jobStatus: null,
+  pageSize: PAGE_SIZE,
   results: null,
+  sort: DEFAULT_SORT,
 };
 
 /**
@@ -300,6 +340,11 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // first-page fetch. Cold aggregation is expensive, so make sure only one
   // wins per job.
   const fetchedRef = useRef<string | null>(null);
+  // Polling and the ?job= reattach fetch results from callbacks created
+  // before the user picked a size or a sort; refs let them read the current
+  // choice without re-arming the interval on every change.
+  const pageSizeRef = useRef(PAGE_SIZE);
+  const sortRef = useRef<KmindexSort>(DEFAULT_SORT);
 
   const stopPolling = useCallback((): void => {
     if (pollRef.current) {
@@ -339,12 +384,18 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   const fetchResults = useCallback(
     async (jobId: string, offset: number): Promise<void> => {
+      const { column, order } = sortRef.current;
       setState((prev) => ({ ...prev, isLoadingResults: true }));
       try {
         const results = await ky
           .get(`${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`, {
             credentials: "include",
-            searchParams: { limit: PAGE_SIZE, offset },
+            searchParams: {
+              limit: pageSizeRef.current,
+              offset,
+              order,
+              sort: column,
+            },
             // Cold aggregation pulls every shard from Galaxy; the warm path
             // returns from cache in milliseconds.
             timeout: 300000,
@@ -419,6 +470,9 @@ export const useKmindexSearch = (): KmindexSearchActions &
     async (submission: KmindexSubmission): Promise<void> => {
       stopPolling();
       fetchedRef.current = null;
+      // A new query is ranked afresh, so it starts in score order. The page
+      // size is the reader's preference rather than the query's and stays.
+      sortRef.current = DEFAULT_SORT;
       setState((prev) => ({
         ...prev,
         error: null,
@@ -427,6 +481,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
         jobId: null,
         jobStatus: null,
         results: null,
+        sort: DEFAULT_SORT,
       }));
 
       try {
@@ -462,9 +517,49 @@ export const useKmindexSearch = (): KmindexSearchActions &
     [fetchResults, state.jobId]
   );
 
+  const setPageSize = useCallback(
+    async (size: number): Promise<void> => {
+      pageSizeRef.current = size;
+      setState((prev) => ({ ...prev, pageSize: size }));
+      // Back to the first page: an offset chosen at one size is a different
+      // row at another.
+      if (state.jobId) await fetchResults(state.jobId, 0);
+    },
+    [fetchResults, state.jobId]
+  );
+
+  const setSort = useCallback(
+    async (column: KmindexSortColumn): Promise<void> => {
+      // Flip against the sort the response says was applied, not the one that
+      // was requested: when the mirror cannot answer a metadata sort the
+      // backend serves score order and echoes that, and the lit header follows
+      // the echo, so toggling the request would hand the reader a direction
+      // they never saw. A response carrying no sort comes from a backend
+      // predating the field, where the request is the best we know.
+      const current: KmindexSort = state.results?.sort
+        ? {
+            column: state.results.sort,
+            order: state.results.order ?? "desc",
+          }
+        : sortRef.current;
+      const next: KmindexSort =
+        current.column === column
+          ? { column, order: current.order === "asc" ? "desc" : "asc" }
+          : { column, order: defaultOrder(column) };
+      sortRef.current = next;
+      setState((prev) => ({ ...prev, sort: next }));
+      // Re-sorting re-ranks the whole listing, so page two of the old order
+      // names nothing in the new one.
+      if (state.jobId) await fetchResults(state.jobId, 0);
+    },
+    [fetchResults, state.jobId, state.results]
+  );
+
   const reset = useCallback((): void => {
     stopPolling();
     fetchedRef.current = null;
+    pageSizeRef.current = PAGE_SIZE;
+    sortRef.current = DEFAULT_SORT;
     syncJobParam(null);
     setState((prev) => ({
       ...INITIAL_STATE,
@@ -473,5 +568,5 @@ export const useKmindexSearch = (): KmindexSearchActions &
     }));
   }, [stopPolling]);
 
-  return { ...state, goToPage, reset, submit };
+  return { ...state, goToPage, reset, setPageSize, setSort, submit };
 };
