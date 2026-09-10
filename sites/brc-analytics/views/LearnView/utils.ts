@@ -1,16 +1,11 @@
-import type { SectionContentCard } from "@repo/shared/views/docs/components/SectionContentCard/sectionContentCard";
-import type { ComponentProps } from "react";
 import { CARDS } from "./constants";
+import type { LearnCard } from "./types";
 
 /**
- * Filters the cards based on the provided feature flags.
- * @param isLmlsEnabled - A boolean indicating if the LMLS feature is enabled.
- * @returns An array of filtered cards based on the feature flags.
+ * Filters out the demo-gated cards unless the demo feature flag is enabled.
+ * @param isDemoEnabled - Whether the demo feature flag is enabled.
+ * @returns The cards to show under the given flag state.
  */
-export function getFilteredCards(
-  isLmlsEnabled: boolean
-): ComponentProps<typeof SectionContentCard>[] {
-  return CARDS.filter(
-    (card) => card.href !== "/learn/sequence-search-workflows" || isLmlsEnabled
-  );
+export function getFilteredCards(isDemoEnabled: boolean): LearnCard[] {
+  return CARDS.filter(({ isDemoGated }) => isDemoEnabled || !isDemoGated);
 }

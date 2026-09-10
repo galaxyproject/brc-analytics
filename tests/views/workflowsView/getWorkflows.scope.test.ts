@@ -7,7 +7,6 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
-import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { getWorkflows } from "@repo/shared/views/WorkflowsView/utils";
 import { buildWorkflowGates } from "../../workflow/gates";
 
@@ -353,14 +352,14 @@ describe("getWorkflows - scope handling", () => {
     expect(result.find((w) => w.trsId === "lexicmap")).toBeUndefined();
   });
 
-  test("includes LMLS workflows when feature flag is enabled", () => {
+  test("includes LMLS workflows when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
     const result = getWorkflows(
       categories,
       MAPPINGS,
       ORGANISMS,
-      buildWorkflowGates({ [FEATURE_FLAGS.LMLS]: true })
+      buildWorkflowGates(true)
     );
 
     // Should include DEA + Logan Search + Lexicmap
@@ -372,14 +371,14 @@ describe("getWorkflows - scope handling", () => {
     expect(result.find((w) => w.trsId === "lexicmap")).toBeDefined();
   });
 
-  test("LMLS workflows have SEQUENCE scope when feature flag is enabled", () => {
+  test("LMLS workflows have SEQUENCE scope when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
     const result = getWorkflows(
       categories,
       MAPPINGS,
       ORGANISMS,
-      buildWorkflowGates({ [FEATURE_FLAGS.LMLS]: true })
+      buildWorkflowGates(true)
     );
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");
@@ -389,14 +388,14 @@ describe("getWorkflows - scope handling", () => {
     expect(lexicmap?.scope).toBe("SEQUENCE");
   });
 
-  test("LMLS workflows have correct category when feature flag is enabled", () => {
+  test("LMLS workflows have correct category when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
     const result = getWorkflows(
       categories,
       MAPPINGS,
       ORGANISMS,
-      buildWorkflowGates({ [FEATURE_FLAGS.LMLS]: true })
+      buildWorkflowGates(true)
     );
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");

@@ -1,21 +1,8 @@
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import {
-  bindWorkflowFeatureFlags,
-  type WorkflowFeatureFlags,
+  bindWorkflowGates,
   type WorkflowGates,
-} from "@repo/shared/workflow/featureFlags";
-
-/**
- * Every workflow-gating feature flag, disabled. Exhaustive by construction, so
- * adding a gate is a compile error here — the one place the test suite has to
- * decide what a new gate defaults to.
- */
-const ALL_DISABLED: WorkflowFeatureFlags = {
-  [FEATURE_FLAGS.ASSEMBLY_WORKFLOWS]: false,
-  [FEATURE_FLAGS.HYPHY]: false,
-  [FEATURE_FLAGS.LMLS]: false,
-};
+} from "@repo/shared/workflow/gates";
 
 /**
  * Builds a workflow category with the given ID and workflows. Only `category`
@@ -38,13 +25,11 @@ export function buildWorkflowCategory(
 }
 
 /**
- * Builds workflow gating rules for a test, with every flag disabled unless the
- * test names it.
- * @param featureFlags - Flags to enable for this test.
+ * Binds the workflow gating rules, defaulting the demo flag to disabled so a
+ * test naming no flag state reads as the gated one.
+ * @param isDemoEnabled - Whether the demo feature flag is enabled.
  * @returns Gating rules bound to the given flag state.
  */
-export function buildWorkflowGates(
-  featureFlags: Partial<WorkflowFeatureFlags> = {}
-): WorkflowGates {
-  return bindWorkflowFeatureFlags({ ...ALL_DISABLED, ...featureFlags });
+export function buildWorkflowGates(isDemoEnabled = false): WorkflowGates {
+  return bindWorkflowGates(isDemoEnabled);
 }

@@ -1,18 +1,13 @@
 /**
  * Feature flag names every site shares, so a read site names its flag through
  * this map rather than repeating the wire string. The single source of truth
- * for shared flag names: retiring one is a compile error at every use built
- * from here. A flag only one site registers and reads belongs in that site's
- * own registry instead.
+ * for flag names: retiring one is a compile error at every use built from here.
  *
  * Which flags a site exposes is per-site — a site's `setFeatureFlags` call
- * allowlists the names it accepts as URL query params (`?lmls=true`), and that
- * is what turns a flag on for a browser. Anything unset reads as off.
+ * allowlists the names it accepts as URL query params (`?demo=true`), and that
+ * is what turns a flag on for a browser. Anything unset reads as off, so a site
+ * that registers nothing has no way to turn it on.
  */
 export const FEATURE_FLAGS = {
-  ASSEMBLY_WORKFLOWS: "assembly-workflows",
-  HYPHY: "hyphy",
-  LMLS: "lmls",
+  DEMO: "demo",
 } as const;
-
-export type FeatureFlag = (typeof FEATURE_FLAGS)[keyof typeof FEATURE_FLAGS];

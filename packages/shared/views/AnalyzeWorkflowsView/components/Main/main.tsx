@@ -1,6 +1,6 @@
 import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
-import { useWorkflowFeatureFlags } from "@repo/shared/hooks/UseWorkflowFeatureFlags/hook";
+import { useWorkflowGates } from "@repo/shared/hooks/UseWorkflowGates/hook";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
 import { type JSX } from "react";
 import { type Props } from "./types";
@@ -14,7 +14,7 @@ import { buildAssemblyWorkflows } from "./utils";
  * @returns A JSX element representing the main content of the AnalyzeWorkflowsView.
  */
 export const Main = ({ assembly, entityId }: Props): JSX.Element => {
-  const workflowGates = useWorkflowFeatureFlags();
+  const workflowGates = useWorkflowGates();
   const workflowCategories = buildAssemblyWorkflows(
     assembly,
     getWorkflows(),

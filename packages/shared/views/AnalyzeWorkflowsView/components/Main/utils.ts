@@ -5,7 +5,7 @@ import {
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import type { WorkflowGates } from "@repo/shared/workflow/featureFlags";
+import type { WorkflowGates } from "@repo/shared/workflow/gates";
 import {
   workflowPloidyMatchesOrganismPloidy,
   workflowRequiresAssemblyId,

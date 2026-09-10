@@ -1,5 +1,4 @@
 import { config } from "@brc/config/config";
-import { BRC_FEATURE_FLAGS } from "@brc/config/featureFlags";
 import { BRC_DEFAULT_DESCRIPTION } from "@brc/meta/constants";
 import { ensureEntitiesLoaded } from "@brc/services/workflows/hooks/UseEntities/utils";
 import { createBrcTheme } from "@brc/theme/theme";
@@ -11,12 +10,7 @@ import {
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { type JSX } from "react";
 
-setFeatureFlags([
-  FEATURE_FLAGS.ASSEMBLY_WORKFLOWS,
-  FEATURE_FLAGS.HYPHY,
-  FEATURE_FLAGS.LMLS,
-  BRC_FEATURE_FLAGS.PANGENOME,
-]);
+setFeatureFlags([FEATURE_FLAGS.DEMO]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();

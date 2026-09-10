@@ -1,6 +1,6 @@
 import { type OrganismContract } from "@repo/shared/apis/types";
 import type { WorkflowAssemblyMapping } from "@repo/shared/apis/workflow";
-import { useWorkflowFeatureFlags } from "@repo/shared/hooks/UseWorkflowFeatureFlags/hook";
+import { useWorkflowGates } from "@repo/shared/hooks/UseWorkflowGates/hook";
 import {
   getOrganisms,
   getWorkflows as getWorkflowCategories,
@@ -19,7 +19,7 @@ import { getWorkflows } from "./utils";
 export const WorkflowsView = (): JSX.Element => {
   const workflowCategories = getWorkflowCategories();
   const organisms = getOrganisms<OrganismContract>();
-  const workflowGates = useWorkflowFeatureFlags();
+  const workflowGates = useWorkflowGates();
   const [mappings, setMappings] = useState<WorkflowAssemblyMapping[] | null>(
     null
   );
