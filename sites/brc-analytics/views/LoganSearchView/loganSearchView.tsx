@@ -1,11 +1,12 @@
 import { LoganSearch } from "@brc/components/LoganSearch/loganSearch";
+import { ROUTES } from "@brc/routes/constants";
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { Fragment, type JSX } from "react";
 import { SearchContainer, SearchSection } from "./loganSearchView.styles";
 
 const BREADCRUMBS = [
   { path: "/", text: "Home" },
-  { path: "/logan-search", text: "Logan Search" },
+  { path: ROUTES.LOGAN_SEARCH, text: "Logan Search" },
 ];
 
 export const LoganSearchView = (): JSX.Element => {
