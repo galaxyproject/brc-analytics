@@ -24,8 +24,10 @@ from app.models.galaxy import (
     GalaxyJobStatus,
     GalaxyJobSubmission,
     KmindexHit,
+    KmindexOrder,
     KmindexQuerySubmission,
     KmindexResults,
+    KmindexSort,
     SraRunMetadata,
 )
 from app.services.logan_stats import correct_score
@@ -122,6 +124,12 @@ KMINDEX_UNATTRIBUTED = "(unattributed)"
 # namespace goes through.
 KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v4"
 
+# A metadata sort is one DuckDB join over up to 50,000 accessions -- about a
+# second -- and every page of a sorted listing needs the same permutation, so
+# it is cached beside the aggregate. Keyed on the mirror fingerprint for the
+# same reason the aggregate is: a rebuilt mirror can reorder a column.
+KMINDEX_ORDER_CACHE_PREFIX = "galaxy:kmindex_order:v1"
+
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
@@ -158,6 +166,11 @@ def _decode_tool_param(value: object) -> object:
         except json.JSONDecodeError:
             return value
     return value
+
+
+def _default_order(sort: str) -> str:
+    """Score reads best high to low; text and dates read best A to Z, old to new."""
+    return "desc" if sort == "score" else "asc"
 
 
 def _submitted_index_names(job_params: Optional[dict]) -> Optional[List[str]]:
@@ -466,7 +479,12 @@ class GalaxyService:
         return None
 
     async def get_kmindex_results(
-        self, job_id: str, limit: int = 100, offset: int = 0
+        self,
+        job_id: str,
+        limit: int = 100,
+        offset: int = 0,
+        sort: KmindexSort = "score",
+        order: Optional[KmindexOrder] = None,
     ) -> KmindexResults:
         """Merge a kmindex job's per-shard outputs into one ranked hit list."""
         if not self.is_available():
@@ -487,11 +505,22 @@ class GalaxyService:
                 if aggregate is None:
                     aggregate = await self._aggregate_shards(job_id)
 
+        ordering, sort, order = await self._ordering_for(
+            aggregate, job_id, sort, order or _default_order(sort)
+        )
         # Single exit, so a cache hit can't skip annotation -- an earlier
         # version returned straight from the pre-lock hit and silently served
         # every warm request unannotated.
         return await self._annotate_with_sra(
-            self._page_kmindex(aggregate, job_id, limit, offset)
+            self._page_kmindex(
+                aggregate,
+                job_id,
+                limit,
+                offset,
+                ordering=ordering,
+                sort=sort,
+                order=order,
+            )
         )
 
     async def get_cached_kmindex_results(
@@ -546,6 +575,72 @@ class GalaxyService:
         return self.cache.make_key(
             KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id, "mirror": fingerprint}
         )
+
+    async def _ordering_for(
+        self, aggregate: dict, job_id: str, sort: str, order: str
+    ) -> Tuple[Optional[List[int]], str, str]:
+        """
+        How to walk the listed hits for a sort, and which sort that turned out
+        to be.
+
+        Returns (ordering, sort, order). `ordering` is a permutation of hit
+        positions, or None for the stored order, which is score descending.
+        The sort and order come back because they can change: a metadata sort
+        needs the mirror, and when the mirror cannot answer the page is served
+        in score order and says so, rather than 500ing or pretending.
+        """
+        hits = aggregate["hits"]
+        descending = order == "desc"
+        if sort == "score":
+            return (
+                (None if descending else list(range(len(hits) - 1, -1, -1))),
+                sort,
+                order,
+            )
+        if sort == "accession":
+            # reverse=True keeps ties in listing order, which is score rank.
+            return (
+                sorted(
+                    range(len(hits)),
+                    key=lambda i: hits[i]["accession"],
+                    reverse=descending,
+                ),
+                sort,
+                order,
+            )
+        if not self._mirror_can(CAPABILITY_ANNOTATION):
+            return None, "score", "desc"
+
+        key = self.cache.make_key(
+            KMINDEX_ORDER_CACHE_PREFIX,
+            {
+                "job_id": job_id,
+                "mirror": self.sra_mirror.capability_fingerprint(),
+                "order": order,
+                "sort": sort,
+            },
+        )
+        cached = await self.cache.get(key)
+        # A permutation only fits the listing it was built over, and the two are
+        # cached separately under keys that cannot tell them apart: an
+        # aggregation that lost shards is served uncached and is shorter than
+        # the one that follows it, and a job whose threshold could not be read
+        # keeps hits the next aggregation drops. Length is the check available,
+        # and indexing the hits with a stale permutation would 500 every page
+        # of the job for the rest of the day.
+        if cached is not None and len(cached) == len(hits):
+            return list(cached), sort, order
+        try:
+            ordering = await asyncio.to_thread(
+                self.sra_mirror.order_hits, hits, sort, descending
+            )
+        except Exception as e:
+            # A sort is a convenience on top of the listing; the listing must
+            # still come back.
+            logger.warning(f"kmindex job {job_id}: could not order by {sort}: {e}")
+            return None, "score", "desc"
+        await self.cache.set(key, ordering, CacheTTL.ONE_DAY)
+        return ordering, sort, order
 
     def _mirror_can(self, capability: str) -> bool:
         """Whether the mirror can answer for one serving path.
@@ -1061,10 +1156,21 @@ class GalaxyService:
         return {"bytes": size, "rows": record.get("rows"), "status": EXPORT_AVAILABLE}
 
     def _page_kmindex(
-        self, aggregate: dict, job_id: str, limit: int, offset: int
+        self,
+        aggregate: dict,
+        job_id: str,
+        limit: int,
+        offset: int,
+        ordering: Optional[List[int]] = None,
+        sort: str = "score",
+        order: str = "desc",
     ) -> KmindexResults:
-        """Slice a cached aggregate into a page of results."""
+        """Slice a cached aggregate into a page of results, in the given order."""
         hits = aggregate["hits"]
+        if ordering is None:
+            page = hits[offset : offset + limit]
+        else:
+            page = [hits[i] for i in ordering[offset : offset + limit]]
         export = self._export_state(aggregate, job_id)
         return KmindexResults(
             job_id=job_id,
@@ -1093,7 +1199,9 @@ class GalaxyService:
             export_status=export["status"],
             limit=limit,
             offset=offset,
-            hits=[KmindexHit(**h) for h in hits[offset : offset + limit]],
+            sort=sort,
+            order=order,
+            hits=[KmindexHit(**h) for h in page],
         )
 
     async def get_job_status(self, job_id: str) -> GalaxyJobStatus:

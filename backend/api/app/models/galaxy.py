@@ -148,6 +148,15 @@ class SraRunMetadata(BaseModel):
     study: Optional[str] = None
 
 
+# What the results listing can be sorted by. Score and accession are ordered in
+# the service; the rest are answered by the SRA mirror, and fall back to score
+# order when it cannot. The response echoes what was applied.
+KmindexSort = Literal[
+    "score", "accession", "organism", "platform", "country", "release_date"
+]
+KmindexOrder = Literal["asc", "desc"]
+
+
 class KmindexHit(BaseModel):
     """A single SRA accession matched by a kmindex query."""
 
@@ -421,6 +430,13 @@ class KmindexResults(BaseModel):
     )
     limit: int
     offset: int
+    sort: KmindexSort = Field(
+        default="score",
+        description="Column the hits on this page are ordered by -- what was "
+        "applied, which is score when a metadata sort was requested but the "
+        "mirror could not answer",
+    )
+    order: KmindexOrder = Field(default="desc", description="Direction of that sort")
     sra_mirror_available: bool = Field(
         default=False, description="Whether the SRA mirror was queryable"
     )

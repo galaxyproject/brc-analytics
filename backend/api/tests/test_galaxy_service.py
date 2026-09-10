@@ -29,8 +29,10 @@ from app.models.galaxy import (
 from app.services import galaxy_service
 from app.services.galaxy_service import (
     KMINDEX_AGG_CACHE_PREFIX,
+    KMINDEX_ORDER_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
     GalaxyService,
+    _default_order,
     _submitted_index_names,
     _submitted_threshold,
 )
@@ -2144,3 +2146,207 @@ class TestFalsePositiveCorrection:
         # Every cached aggregate carries uncorrected scores; a version bump is
         # what makes them all miss rather than serve stale rankings for a day.
         assert KMINDEX_AGG_CACHE_PREFIX == "galaxy:kmindex_agg:v4"
+
+
+def _listing(n):
+    """A cached aggregate holding n hits in score order, no cohort."""
+    return {
+        "hits": [
+            {"accession": f"SRR{i:06d}", "score": 1.0 - i / 1000, "shard": "IDX_1"}
+            for i in range(n)
+        ],
+        "per_index": [],
+        "query_name": "q",
+        "shards_failed": 0,
+        "shards_searched": 1,
+        "shards_with_hits": 1,
+        "total_matches": n,
+        "truncated": False,
+    }
+
+
+class TestDefaultOrder:
+    def test_score_descends_and_everything_else_ascends(self):
+        assert _default_order("score") == "desc"
+        for column in ("accession", "organism", "platform", "country", "release_date"):
+            assert _default_order(column) == "asc"
+
+
+class TestHitOrdering:
+    """
+    Sorting is over the listing -- the top 50,000 by score -- not the whole
+    match set, and the response says which sort was actually applied so a
+    fallback is visible rather than silent.
+    """
+
+    @pytest.mark.asyncio
+    async def test_score_desc_is_the_stored_order(self, service):
+        ordering, sort, order = await service._ordering_for(
+            _listing(5), "job1", "score", "desc"
+        )
+        assert ordering is None and (sort, order) == ("score", "desc")
+
+    @pytest.mark.asyncio
+    async def test_score_asc_reverses_it(self, service):
+        ordering, _, _ = await service._ordering_for(
+            _listing(5), "job1", "score", "asc"
+        )
+        assert ordering == [4, 3, 2, 1, 0]
+
+    @pytest.mark.asyncio
+    async def test_accession_sorts_in_python_without_the_mirror(self, service):
+        aggregate = _listing(3)
+        aggregate["hits"][0]["accession"] = "SRR9"
+        aggregate["hits"][1]["accession"] = "ERR1"
+        aggregate["hits"][2]["accession"] = "DRR5"
+        service.sra_mirror = None
+
+        ordering, _, _ = await service._ordering_for(
+            aggregate, "job1", "accession", "asc"
+        )
+        assert ordering == [2, 1, 0]
+        ordering, _, _ = await service._ordering_for(
+            aggregate, "job1", "accession", "desc"
+        )
+        assert ordering == [0, 1, 2]
+
+    @pytest.mark.asyncio
+    async def test_metadata_sort_asks_the_mirror_once_and_caches(self, service):
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.sra_mirror.order_hits.return_value = [2, 0, 1]
+        service.cache.make_key = MagicMock(return_value="order-key")
+
+        ordering, sort, order = await service._ordering_for(
+            _listing(3), "job1", "organism", "asc"
+        )
+
+        assert ordering == [2, 0, 1] and (sort, order) == ("organism", "asc")
+        service.sra_mirror.order_hits.assert_called_once()
+        args = service.sra_mirror.order_hits.call_args.args
+        assert args[1:] == ("organism", False)
+        service.cache.set.assert_awaited_once_with(
+            "order-key", [2, 0, 1], CacheTTL.ONE_DAY
+        )
+        # The key is scoped to the job, the mirror and the sort, so a rebuilt
+        # mirror or another column cannot serve this permutation.
+        key_args = service.cache.make_key.call_args.args
+        assert key_args[0] == KMINDEX_ORDER_CACHE_PREFIX
+        assert key_args[1] == {
+            "job_id": "job1",
+            "mirror": "fp",
+            "order": "asc",
+            "sort": "organism",
+        }
+
+    @pytest.mark.asyncio
+    async def test_a_cached_ordering_skips_the_mirror(self, service):
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.cache.get = AsyncMock(return_value=[1, 0])
+
+        ordering, _, _ = await service._ordering_for(
+            _listing(2), "job1", "country", "desc"
+        )
+
+        assert ordering == [1, 0]
+        service.sra_mirror.order_hits.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_an_ordering_built_over_a_different_listing_is_rebuilt(self, service):
+        # An aggregation that lost shards is shorter and is never cached, so
+        # the next full one can meet a permutation from it. Indexing 5 hits
+        # with positions from a 2-hit listing is an IndexError on every page.
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.sra_mirror.order_hits.return_value = [4, 3, 2, 1, 0]
+        service.cache.get = AsyncMock(return_value=[1, 0])
+
+        ordering, _, _ = await service._ordering_for(
+            _listing(5), "job1", "organism", "asc"
+        )
+
+        assert ordering == [4, 3, 2, 1, 0]
+        service.sra_mirror.order_hits.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_no_mirror_falls_back_to_score_and_says_so(self, service):
+        service.sra_mirror = None
+
+        ordering, sort, order = await service._ordering_for(
+            _listing(2), "job1", "organism", "asc"
+        )
+
+        assert ordering is None and (sort, order) == ("score", "desc")
+
+    @pytest.mark.asyncio
+    async def test_a_mirror_error_falls_back_rather_than_failing_the_page(
+        self, service
+    ):
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.sra_mirror.order_hits.side_effect = RuntimeError("duckdb went away")
+
+        ordering, sort, order = await service._ordering_for(
+            _listing(2), "job1", "organism", "asc"
+        )
+
+        assert ordering is None and (sort, order) == ("score", "desc")
+        service.cache.set.assert_not_awaited()
+
+    def test_page_follows_the_ordering_and_echoes_the_sort(self, service):
+        aggregate = _listing(5)
+
+        page = service._page_kmindex(
+            aggregate,
+            "job1",
+            2,
+            1,
+            ordering=[4, 2, 0, 1, 3],
+            sort="organism",
+            order="asc",
+        )
+
+        assert [h.accession for h in page.hits] == ["SRR000002", "SRR000000"]
+        assert (page.sort, page.order) == ("organism", "asc")
+        assert page.total_hits == 5
+
+    def test_page_without_an_ordering_is_the_stored_order(self, service):
+        page = service._page_kmindex(_listing(5), "job1", 2, 0)
+        assert [h.accession for h in page.hits] == ["SRR000000", "SRR000001"]
+        assert (page.sort, page.order) == ("score", "desc")
+
+    @pytest.mark.asyncio
+    async def test_results_request_threads_sort_through(self, service):
+        aggregate = _listing(3)
+        service.cache.get = AsyncMock(return_value=aggregate)
+        service.sra_mirror = None
+
+        results = await service.get_kmindex_results(
+            "job1", 10, 0, sort="score", order="asc"
+        )
+
+        assert [h.accession for h in results.hits] == [
+            "SRR000002",
+            "SRR000001",
+            "SRR000000",
+        ]
+        assert (results.sort, results.order) == ("score", "asc")
+
+    @pytest.mark.asyncio
+    async def test_results_request_defaults_the_order_per_column(self, service):
+        aggregate = _listing(2)
+        service.cache.get = AsyncMock(return_value=aggregate)
+        service.sra_mirror = None
+
+        results = await service.get_kmindex_results("job1", 10, 0, sort="accession")
+
+        assert results.order == "asc"

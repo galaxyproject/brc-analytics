@@ -274,6 +274,17 @@ _EXPORT_TSV_BATCH = 20000
 # against 4.9s over 14.7M fields.
 _EXPORT_TSV_QUOTE = re.compile(r'[\t\n\r"]')
 
+# What the results table can be sorted by, mapped to the same expressions the
+# annotation query uses -- so the value that sorts a row is the value shown on
+# it, sentinels included. An allowlist rather than an interpolated column name,
+# because the column arrives from a query string.
+_SORTABLE_COLUMNS: Dict[str, str] = {
+    "country": "nullif(nullif(r.geo_loc_name_country_calc, ''), 'uncalculated')",
+    "organism": "nullif(r.organism, '')",
+    "platform": "nullif(r.platform, '')",
+    "release_date": "r.releasedate",
+}
+
 
 # Curated abbreviations and colloquial names. NCBI's taxonomy `names.dmp`
 # has scientific names and a thicket of historical synonyms, but it
@@ -1711,6 +1722,69 @@ class SRAMirrorService:
         }
         self._cache_put(cache_key, result)
         return result
+
+    # Not @_synchronized, for the reason spelled out above cohort_for_accessions:
+    # this joins up to 50,000 staged accessions against a 43.5M-row table, so it
+    # runs on a cursor and the lock covers only the handoff.
+    def order_hits(
+        self, hits: List[Dict[str, Any]], column: str, descending: bool
+    ) -> List[int]:
+        """
+        Positions of `hits` in the order a metadata column sorts them.
+
+        One LEFT JOIN over the staged hit list rather than a lookup per row:
+        the listing is up to 50,000 hits and runs_by_accession would batch
+        that into 100 IN queries and a Python sort. Runs the mirror does not
+        know sort last in both directions -- they have no value to place, and
+        a reader sorting by country wants the countries first. Ties, and rows
+        with no value, keep the listing's own order, which is the score rank.
+
+        @param hits: the listed hits, in rank order, as accession/score/shard
+            dicts; only the accession is read.
+        @param column: one of _SORTABLE_COLUMNS.
+        @param descending: sort direction for the values; nulls stay last.
+        @returns: indices into `hits`, a permutation of range(len(hits)).
+        @raises ValueError: for a column that is not sortable.
+        @raises RuntimeError: when the mirror cannot answer.
+        """
+        expr = _SORTABLE_COLUMNS.get(column)
+        if expr is None:
+            raise ValueError(f"not a sortable column: {column!r}")
+        if not self._con or not self.has_capability(CAPABILITY_ANNOTATION):
+            raise RuntimeError("SRA mirror is not available for ordering")
+        if not hits:
+            return []
+
+        direction = "DESC" if descending else "ASC"
+        with self._lock:
+            cursor = self._con.cursor()
+        staging = None
+        try:
+            staging = tempfile.NamedTemporaryFile(
+                "w", suffix=".tsv", prefix="kmindex-order-", delete=False
+            )
+            for ordinal, hit in enumerate(hits):
+                accession = (hit.get("accession") or "").strip().upper()
+                staging.write(f"{ordinal}\t{accession}\n")
+            staging.close()
+            rows = cursor.execute(
+                f"""
+                WITH q AS (SELECT column0 AS ordinal, column1 AS acc
+                           FROM read_csv(?, delim='\t', header=false,
+                               quote='', escape='',
+                               columns={{'column0':'BIGINT','column1':'VARCHAR'}}))
+                SELECT q.ordinal
+                FROM q LEFT JOIN runs r ON r.acc = q.acc
+                ORDER BY {expr} {direction} NULLS LAST, q.ordinal
+                """,
+                [staging.name],
+            ).fetchall()
+        finally:
+            cursor.close()
+            if staging is not None:
+                staging.close()
+                Path(staging.name).unlink(missing_ok=True)
+        return [int(row[0]) for row in rows]
 
     # Deliberately not @_synchronized. That decorator holds the instance lock
     # for the whole call, and its own justification is that "queries are

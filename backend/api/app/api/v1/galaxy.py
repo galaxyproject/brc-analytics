@@ -26,8 +26,10 @@ from app.models.galaxy import (
     GalaxyJobResult,
     GalaxyJobStatus,
     GalaxyJobSubmission,
+    KmindexOrder,
     KmindexQuerySubmission,
     KmindexResults,
+    KmindexSort,
 )
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
@@ -261,6 +263,19 @@ async def get_kmindex_results(
     job_id: str,
     limit: int = Query(default=100, ge=1, le=1000),
     offset: int = Query(default=0, ge=0),
+    # B008 exempts a Query default under a plain or inline-literal annotation
+    # but not under a type alias, which is the only thing separating these two
+    # parameters from the two above.
+    sort: KmindexSort = Query(  # noqa: B008
+        default="score",
+        description="Column to order the listed hits by. Metadata columns are "
+        "answered by the SRA mirror and fall back to score when it cannot; the "
+        "response's sort/order say what was applied.",
+    ),
+    order: Optional[KmindexOrder] = Query(  # noqa: B008
+        default=None,
+        description="asc or desc; defaults to desc for score and asc otherwise",
+    ),
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
@@ -269,6 +284,8 @@ async def get_kmindex_results(
 
     kmindex writes one JSON per index shard; this unions them into a single
     ranked list so callers don't have to fetch and merge dozens of datasets.
+    Sorting is over that listing -- the top of the score range -- not over the
+    whole match set, which the export carries.
     """
     try:
         if not galaxy_service.is_available():
@@ -276,7 +293,9 @@ async def get_kmindex_results(
                 status_code=503, detail="Galaxy service is not available"
             )
 
-        return await galaxy_service.get_kmindex_results(job_id, limit, offset)
+        return await galaxy_service.get_kmindex_results(
+            job_id, limit, offset, sort=sort, order=order
+        )
 
     except HTTPException:
         raise

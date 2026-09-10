@@ -2116,3 +2116,84 @@ class TestExportServing:
 
         assert rows[1].split("\t")[0] == "SRR1"
         assert '"IDX\t""x"""' in rows[1]
+
+
+class TestOrderHits:
+    """
+    Sorting the listing by a metadata column is one join against the mirror,
+    returning a permutation of the hit list rather than rows -- the caller
+    still owns the hits and their shard attribution.
+    """
+
+    @staticmethod
+    def _hits(*accessions):
+        return [
+            {"accession": acc, "score": 1.0 - i / 100, "shard": "IDX_1"}
+            for i, acc in enumerate(accessions)
+        ]
+
+    def test_orders_by_organism_with_unknown_runs_last(self, mirror):
+        hits = self._hits("SRR001", "SRR_UNKNOWN", "SRR003", "SRR002")
+
+        order = mirror.order_hits(hits, "organism", descending=False)
+
+        # Mycobacterium before Plasmodium; the two Plasmodium runs keep their
+        # listing order; the run the mirror does not know goes last.
+        assert [hits[i]["accession"] for i in order] == [
+            "SRR003",
+            "SRR001",
+            "SRR002",
+            "SRR_UNKNOWN",
+        ]
+
+    def test_descending_reverses_values_but_still_parks_nulls_last(self, mirror):
+        hits = self._hits("SRR_UNKNOWN", "SRR003", "SRR001")
+
+        order = mirror.order_hits(hits, "release_date", descending=True)
+
+        assert [hits[i]["accession"] for i in order] == [
+            "SRR001",
+            "SRR003",
+            "SRR_UNKNOWN",
+        ]
+
+    def test_ties_keep_the_listing_order(self, mirror):
+        # Three runs share a release date; given in C, B, A order they must
+        # come back in C, B, A order, not alphabetical.
+        hits = self._hits("SRRC", "SRRB", "SRRA")
+
+        order = mirror.order_hits(hits, "release_date", descending=False)
+
+        assert order == [0, 1, 2]
+
+    def test_country_sentinel_sorts_as_unknown(self, mirror, tmp_path):
+        # 'uncalculated' is SRA's "no country", and the annotation, cohort and
+        # export all spell it as None. A sort must not file it under U.
+        path = str(tmp_path / "sentinel.duckdb")
+        _build_mirror(path)
+        con = duckdb.connect(path)
+        con.execute(
+            "UPDATE runs SET geo_loc_name_country_calc = 'uncalculated' "
+            "WHERE acc = 'SRR003'"
+        )
+        con.close()
+        svc = SRAMirrorService(path)
+        hits = self._hits("SRR003", "SRR001", "SRR002")
+
+        order = svc.order_hits(hits, "country", descending=False)
+
+        assert [hits[i]["accession"] for i in order] == ["SRR001", "SRR002", "SRR003"]
+
+    def test_rejects_a_column_it_does_not_know(self, mirror):
+        with pytest.raises(ValueError):
+            mirror.order_hits(self._hits("SRR001"), "score", descending=False)
+        with pytest.raises(ValueError):
+            mirror.order_hits(self._hits("SRR001"), "acc; DROP TABLE runs", False)
+
+    def test_empty_input_is_empty_output(self, mirror):
+        assert mirror.order_hits([], "organism", descending=False) == []
+
+    def test_returns_a_permutation(self, mirror):
+        hits = self._hits("SRR002", "SRR_X", "SRR001", "SRR003", "SRR_Y")
+        order = mirror.order_hits(hits, "platform", descending=False)
+        assert sorted(order) == list(range(len(hits)))
