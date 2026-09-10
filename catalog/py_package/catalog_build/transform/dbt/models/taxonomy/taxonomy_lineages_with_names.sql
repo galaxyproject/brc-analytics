@@ -2,13 +2,8 @@
 
 /*
   Attach each lineage taxon's scientific name and its `other_names` -- every
-  non-scientific name NCBI knows for the taxon, in one list.
-
-  `equivalent name` and `synonym` are read alongside the common-name classes
-  because a reclassified taxon's prior scientific name lives there (e.g. taxid
-  498019, Candidozyma auris, carries "Candida auris" as a synonym), and the
-  catalog and search need to reach it. `genbank synonym` is deliberately not
-  read -- NCBI no longer populates it.
+  non-scientific name NCBI knows for the taxon, in one list, including categories
+  such as common names and former scientific names.
 */
 
 with taxon_names as (
