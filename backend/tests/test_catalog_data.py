@@ -75,6 +75,25 @@ class TestSearchOrganisms:
         results = catalog.search_organisms("zzzznonexistent")
         assert results == []
 
+    def test_query_must_match_a_single_name(self, tmp_path):
+        # Names are matched one at a time, so a query that only spans two
+        # adjacent names -- or the punctuation between them -- must not match.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["foo", "bar"],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "assemblies.json").write_text(json.dumps([]))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        catalog = CatalogData(str(tmp_path))
+        assert catalog.search_organisms("foo")
+        assert catalog.search_organisms("foo', 'bar") == []
+        assert catalog.search_organisms("['foo'") == []
+
     def test_current_name_ranks_above_other_name(self, tmp_path):
         # otherNames carries prior scientific names, so a name one organism has
         # moved on from can still be another organism's current name. A caller

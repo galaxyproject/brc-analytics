@@ -131,7 +131,7 @@ class CatalogData:
                 # so stop scanning.
                 if len(current_name_matches) >= limit:
                     return current_name_matches
-            elif q in str(org.get("otherNames", "")).lower():
+            elif any(q in (name or "").lower() for name in org.get("otherNames") or []):
                 if len(other_name_matches) < limit:
                     other_name_matches.append(self._condense_organism(org))
         return (current_name_matches + other_name_matches)[:limit]
