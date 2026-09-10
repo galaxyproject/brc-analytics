@@ -177,12 +177,12 @@ _COHORT_FACETS: Tuple[Tuple[str, str], ...] = (
 # the wire, against the 50,000 hit rows it is describing.
 _COHORT_FACET_VALUES = 10
 
+_COHORT_TOP_ORGANISMS = 10
+
 # Facets whose values are not capped. Release year is ordinal and is drawn as
 # a timeline, where an "everything else" bucket would be a hole in the middle
 # of the axis; SRA spans a few dozen years, so listing them all is cheap.
 _UNCAPPED_FACETS = frozenset({"release_year"})
-
-_COHORT_TOP_ORGANISMS = 10
 
 # Tag on the scalar rows of the cohort query, which shares its result set with
 # the facet rows. Empty rather than a name so it cannot collide with a facet.
