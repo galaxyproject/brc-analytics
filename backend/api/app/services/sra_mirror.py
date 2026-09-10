@@ -224,6 +224,10 @@ EXPORT_MAX_TOTAL_BYTES = 5 * 1024**3
 EXPORT_COLUMNS: Tuple[str, ...] = (
     "accession",
     "score",
+    # Directly after the score they derive from, so a reader scanning the
+    # file sees coverage, identity and the correction as one group.
+    "ani",
+    "fp_correction",
     "shard",
     "organism",
     "assay_type",
@@ -819,6 +823,11 @@ def _export_sql(with_coordinates: bool) -> str:
     COPY's destination ahead of the query's own parameters, so positional
     markers hand the staging path to TO and the destination to read_csv.
 
+    `ani` is computed here rather than staged: it is a pure function of the
+    score, and pow() on the 31st root is one column expression. A corrected
+    score can be negative when the job's threshold could not be read, and
+    pow() of a negative base is NaN, so the CASE guards it to NULL.
+
     @param with_coordinates: whether this mirror carries lat/lon. The columns
         are appended rather than always selected, because a mirror older than
         schema_version 6 would fail the whole write for them -- and an export
@@ -827,7 +836,10 @@ def _export_sql(with_coordinates: bool) -> str:
     coordinates = ", r.lat AS latitude, r.lon AS longitude" if with_coordinates else ""
     return f"""
         COPY (
-          SELECT h.accession, h.score, h.shard,
+          SELECT h.accession, h.score,
+                 CASE WHEN h.score >= 0
+                      THEN round(pow(h.score, 1.0 / 31), 4) END AS ani,
+                 h.fp_correction, h.shard,
                  nullif(r.organism, '') AS organism,
                  nullif(r.assay_type, '') AS assay_type,
                  nullif(r.platform, '') AS platform,
@@ -839,7 +851,8 @@ def _export_sql(with_coordinates: bool) -> str:
                  r.bioproject, r.sra_study AS study, r.mbases{coordinates}
           FROM read_csv($1, delim='\t', header=false, quote='', escape='',
                    columns={{'ordinal':'BIGINT','accession':'VARCHAR',
-                            'score':'DOUBLE','shard':'VARCHAR'}}) h
+                            'score':'DOUBLE','shard':'VARCHAR',
+                            'fp_correction':'DOUBLE'}}) h
           LEFT JOIN runs r ON r.acc = h.accession
           ORDER BY h.ordinal
         ) TO $2 (FORMAT parquet, COMPRESSION zstd)
@@ -1960,8 +1973,10 @@ class SRAMirrorService:
                 "w", suffix=".tsv", prefix="kmindex-export-", delete=False
             )
             for ordinal, hit in enumerate(hits):
+                correction = hit.get("fp_correction")
                 staging.write(
-                    f"{ordinal}\t{hit['accession']}\t{hit['score']}\t{hit['shard']}\n"
+                    f"{ordinal}\t{hit['accession']}\t{hit['score']}\t{hit['shard']}\t"
+                    f"{'' if correction is None else correction}\n"
                 )
             staging.close()
             cursor.execute(

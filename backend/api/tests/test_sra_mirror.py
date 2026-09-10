@@ -1709,11 +1709,45 @@ class TestExportHits:
         rows = _read_export(exports / "job1.parquet")
         assert len(rows) == len(hits)
         unmirrored = next(r for r in rows if r[0] == "SRR_NOT_MIRRORED")
+        cols = sra_mirror.EXPORT_COLUMNS
         # Hit data kept...
-        assert unmirrored[2] == "GENOMIC_BCT_10_null"
-        assert unmirrored[1] == pytest.approx(hits[-1]["score"])
+        assert unmirrored[cols.index("shard")] == "GENOMIC_BCT_10_null"
+        assert unmirrored[cols.index("score")] == pytest.approx(hits[-1]["score"])
         # ...metadata simply absent, rather than the row being absent.
-        assert all(value is None for value in unmirrored[3:])
+        assert all(value is None for value in unmirrored[cols.index("organism") :])
+
+    def test_ani_and_the_correction_travel_with_the_hit(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions)
+        hits[0]["fp_correction"] = 0.19
+
+        svc.export_hits("job1", hits, str(exports))
+
+        cols = sra_mirror.EXPORT_COLUMNS
+        rows = _read_export(exports / "job1.parquet")
+        first = rows[0]
+        assert first[cols.index("score")] == pytest.approx(hits[0]["score"])
+        assert first[cols.index("ani")] == pytest.approx(
+            round(hits[0]["score"] ** (1 / 31), 4)
+        )
+        assert first[cols.index("fp_correction")] == pytest.approx(0.19)
+        # Everything else was not corrected, and says so with a null rather
+        # than a zero -- a zero would read as "corrected by nothing".
+        assert all(r[cols.index("fp_correction")] is None for r in rows[1:])
+
+    def test_a_negative_corrected_score_has_no_ani(self, cohort_mirror, exports):
+        # Only reachable when the job's threshold could not be read; the row
+        # still exports, with no 31st root of a negative number invented.
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions)
+        hits[0]["score"] = -0.05
+        hits[0]["fp_correction"] = 0.69
+
+        svc.export_hits("job1", hits, str(exports))
+
+        cols = sra_mirror.EXPORT_COLUMNS
+        first = _read_export(exports / "job1.parquet")[0]
+        assert first[cols.index("ani")] is None
 
     def test_country_sentinel_is_normalised_the_same_way_as_the_cohort(
         self, cohort_mirror, exports
@@ -2056,7 +2090,8 @@ class TestExportServing:
         assert len(lines) == len(hits) + 1
         # The unmirrored row is present with empty metadata cells, not missing.
         unmirrored = next(ln for ln in lines if ln.startswith("SRR_NOT_MIRRORED\t"))
-        assert unmirrored.split("\t")[3:] == [""] * 12
+        first_metadata = sra_mirror.EXPORT_COLUMNS.index("organism")
+        assert unmirrored.split("\t")[first_metadata:] == [""] * 12
 
     def test_a_value_that_would_break_the_row_is_quoted(self, exports):
         # Nothing in the mirror carries a tab today, but a TSV that silently
@@ -2064,14 +2099,16 @@ class TestExportServing:
         path = exports / "job1.parquet"
         con = duckdb.connect()
         try:
+            values = {
+                "accession": "'SRR1'",
+                "score": "1.0",
+                "shard": "e'IDX\\t\"x\"'",
+            }
             columns = ", ".join(
-                f"NULL AS {name}" for name in sra_mirror.EXPORT_COLUMNS[3:]
+                f"{values.get(name, 'NULL')} AS {name}"
+                for name in sra_mirror.EXPORT_COLUMNS
             )
-            con.execute(
-                f"""COPY (SELECT 'SRR1' AS accession, 1.0 AS score,
-                    e'IDX\\t"x"' AS shard, {columns})
-                    TO '{path}' (FORMAT parquet)"""
-            )
+            con.execute(f"COPY (SELECT {columns}) TO '{path}' (FORMAT parquet)")
         finally:
             con.close()
 

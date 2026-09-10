@@ -3,7 +3,9 @@
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, computed_field, field_validator
+
+from app.services.logan_stats import ani_estimate
 
 
 class GalaxyJobState(str, Enum):
@@ -150,12 +152,31 @@ class KmindexHit(BaseModel):
     """A single SRA accession matched by a kmindex query."""
 
     accession: str = Field(..., description="SRA run accession, e.g. SRR13392923")
-    score: float = Field(..., description="Fraction of query k-mers shared, 0.0-1.0")
+    score: float = Field(
+        ...,
+        description="Fraction of query k-mers shared, 0.0-1.0. For the 227 "
+        "saturated samples Logan flags this is the raw kmindex ratio less the "
+        "sample's false-positive baseline; see fp_correction",
+    )
     shard: str = Field(..., description="Index shard the hit came from")
+    fp_correction: Optional[float] = Field(
+        default=None,
+        description="False-positive baseline subtracted from the raw kmindex "
+        "ratio to give score; absent when no correction applied. The raw "
+        "ratio is score + fp_correction",
+    )
     sra: Optional[SraRunMetadata] = Field(
         default=None,
         description="Mirror metadata, absent when the accession isn't mirrored",
     )
+
+    @computed_field(  # type: ignore[prop-decorator]
+        description="Mash Screen ANI estimate, score ** (1/31) to four places; "
+        "null when the corrected score is negative"
+    )
+    @property
+    def ani(self) -> Optional[float]:
+        return ani_estimate(self.score)
 
 
 class KmindexIndexSummary(BaseModel):

@@ -23,13 +23,16 @@ from app.models.galaxy import (
     MAX_QUERY_BASES,
     GalaxyJobState,
     GalaxyJobStatus,
+    KmindexHit,
     KmindexQuerySubmission,
 )
 from app.services import galaxy_service
 from app.services.galaxy_service import (
+    KMINDEX_AGG_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
     GalaxyService,
     _submitted_index_names,
+    _submitted_threshold,
 )
 
 
@@ -793,7 +796,7 @@ class TestVersionedAggregateCacheKey:
 
         # The stale entry is untouched and the recomputed one lands beside it.
         assert store[stale_key] is stale
-        assert "galaxy:kmindex_agg:v3:job1" in store
+        assert "galaxy:kmindex_agg:v4:job1" in store
         # Recomputed, so the pre-cap count is real rather than the cap restated.
         assert results.total_matches == results.total_hits == 2
         assert results.truncated is False
@@ -1830,11 +1833,16 @@ class TestExportEndpoint:
 
         from app.services.sra_mirror import EXPORT_COLUMNS
 
-        tail = ", ".join(f"NULL AS {name}" for name in EXPORT_COLUMNS[3:])
-        rows = " UNION ALL ".join(
-            f"SELECT '{acc}' AS accession, 1.0 AS score, 'IDX_1' AS shard, {tail}"
-            for acc in accessions
-        )
+        def _row(acc):
+            # Named off EXPORT_COLUMNS rather than off the first three
+            # positions, so a column added to the export does not quietly
+            # turn this fixture into a differently shaped file.
+            values = {"accession": f"'{acc}'", "score": "1.0", "shard": "'IDX_1'"}
+            return "SELECT " + ", ".join(
+                f"{values.get(name, 'NULL')} AS {name}" for name in EXPORT_COLUMNS
+            )
+
+        rows = " UNION ALL ".join(_row(acc) for acc in accessions)
         con = duckdb.connect()
         try:
             con.execute(
@@ -1950,3 +1958,136 @@ class TestCachedKmindexRead:
         service._galaxy_available = False
         service.cache.get = AsyncMock(return_value=None)
         assert await service.get_cached_kmindex_results("job1") is None
+
+
+class TestSubmittedThreshold:
+    """The threshold comes back off the job the way the index list does."""
+
+    def test_reads_a_json_encoded_float(self):
+        assert _submitted_threshold({"threshold": "0.5"}) == 0.5
+
+    def test_reads_a_bare_float(self):
+        assert _submitted_threshold({"threshold": 0.25}) == 0.25
+
+    def test_missing_or_garbage_is_none(self):
+        assert _submitted_threshold(None) is None
+        assert _submitted_threshold({}) is None
+        assert _submitted_threshold({"threshold": "high"}) is None
+
+    def test_out_of_range_is_none(self):
+        # A threshold outside 0..1 is not one kmindex could have applied, so
+        # it is treated as unreadable rather than trusted.
+        assert _submitted_threshold({"threshold": "1.5"}) is None
+
+
+class TestFalsePositiveCorrection:
+    """
+    227 saturated samples match any query at an inflated ratio. Logan's site
+    subtracts each one's baseline and re-applies the threshold to the result;
+    without that the same 227 turn up in every search we run.
+    """
+
+    # In logan_fp.json with baseline 0.6910401647785788.
+    SATURATED = "SRR10916223"
+
+    @staticmethod
+    def _status(shard_count, params):
+        outputs = [MagicMock() for _ in range(shard_count)]
+        for i, o in enumerate(outputs):
+            o.dataset.id = f"ds{i}"
+        return MagicMock(
+            is_complete=True,
+            is_successful=True,
+            state="ok",
+            outputs=outputs,
+            params=params,
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_corrected_hit_under_the_threshold_is_dropped(self, service):
+        service.get_job_status = AsyncMock(
+            return_value=self._status(1, {"threshold": "0.5"})
+        )
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {self.SATURATED: 0.9, "SRR000001": 0.6}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        # 0.9 - 0.691 = 0.209, under the 0.5 the job was run at.
+        assert [h["accession"] for h in aggregate["hits"]] == ["SRR000001"]
+        assert aggregate["total_matches"] == 1
+
+    @pytest.mark.asyncio
+    async def test_a_corrected_hit_still_over_the_threshold_is_kept_and_marked(
+        self, service
+    ):
+        service.get_job_status = AsyncMock(
+            return_value=self._status(1, {"threshold": "0.25"})
+        )
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {self.SATURATED: 0.99, "SRR000001": 0.3}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+        by_acc = {h["accession"]: h for h in aggregate["hits"]}
+
+        assert by_acc[self.SATURATED]["score"] == pytest.approx(0.299)
+        assert by_acc[self.SATURATED]["fp_correction"] == pytest.approx(
+            0.6910401647785788
+        )
+        # Uncorrected hits carry no marker at all rather than a null one, so
+        # the aggregate does not grow a key on 50,000 rows to say "nothing".
+        assert "fp_correction" not in by_acc["SRR000001"]
+
+    @pytest.mark.asyncio
+    async def test_ranking_is_by_the_corrected_score(self, service):
+        service.get_job_status = AsyncMock(
+            return_value=self._status(1, {"threshold": "0.25"})
+        )
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {self.SATURATED: 0.99, "SRR000001": 0.5}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        # Raw 0.99 would rank first; corrected 0.299 ranks last.
+        assert [h["accession"] for h in aggregate["hits"]] == [
+            "SRR000001",
+            self.SATURATED,
+        ]
+
+    @pytest.mark.asyncio
+    async def test_unreadable_threshold_keeps_the_hit_corrected_and_marked(
+        self, service
+    ):
+        # Without the job's threshold there is nothing to re-apply, so the hit
+        # stays -- corrected and marked -- rather than being guessed at.
+        service.get_job_status = AsyncMock(return_value=self._status(1, None))
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {self.SATURATED: 0.9}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert len(aggregate["hits"]) == 1
+        assert aggregate["hits"][0]["score"] == pytest.approx(0.209)
+        assert aggregate["hits"][0]["fp_correction"] is not None
+
+    def test_the_hit_model_reports_ani_and_carries_the_correction(self):
+        hit = KmindexHit(
+            accession="SRR000001", score=0.5, shard="IDX_1", fp_correction=None
+        )
+        dumped = hit.model_dump()
+        assert dumped["ani"] == 0.9779
+        assert dumped["fp_correction"] is None
+
+        corrected = KmindexHit(
+            accession=self.SATURATED, score=0.299, shard="IDX_1", fp_correction=0.691
+        )
+        assert corrected.model_dump()["ani"] == round(0.299 ** (1 / 31), 4)
+
+    def test_the_aggregate_cache_prefix_moved_on(self):
+        # Every cached aggregate carries uncorrected scores; a version bump is
+        # what makes them all miss rather than serve stale rankings for a day.
+        assert KMINDEX_AGG_CACHE_PREFIX == "galaxy:kmindex_agg:v4"

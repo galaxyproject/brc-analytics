@@ -28,6 +28,7 @@ from app.models.galaxy import (
     KmindexResults,
     SraRunMetadata,
 )
+from app.services.logan_stats import correct_score
 from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
     CAPABILITY_COHORT,
@@ -111,10 +112,15 @@ KMINDEX_UNATTRIBUTED = "(unattributed)"
 # first time it is viewed after this deploys, and the assistant's cache-only
 # reads miss until that lands; that is a known one-time cliff, not a surprise.
 #
+# v4 subtracts the false-positive baseline from the 227 saturated samples. A v3
+# entry ranks on the raw ratio and carries hits that no longer clear the job's
+# threshold once corrected, so serving one back would put the same 227 samples
+# near the top of a result set the correction exists to demote.
+#
 # The version is only half the key. The mirror's capability fingerprint is the
 # other half -- see _agg_cache_key, which is what every read and write of this
 # namespace goes through.
-KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v3"
+KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v4"
 
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
@@ -193,6 +199,27 @@ def _submitted_index_names(job_params: Optional[dict]) -> Optional[List[str]]:
     if not isinstance(selection, list):
         return None
     return [str(name).strip() for name in selection if str(name).strip()]
+
+
+def _submitted_threshold(job_params: Optional[dict]) -> Optional[float]:
+    """
+    The threshold a job was run at, read from its echoed parameters.
+
+    kmindex applied it to the raw ratio; Logan's spec applies it to the
+    corrected one, so the aggregation re-applies it after subtracting the
+    false-positive baseline. Read off the job for the same reason the index
+    list is: it answers for this job, not for whatever the form defaults to
+    today. None when unreadable or outside 0..1, and the caller keeps the hit
+    rather than guess.
+    """
+    if not isinstance(job_params, dict):
+        return None
+    raw = _decode_tool_param(job_params.get("threshold"))
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return value if 0.0 <= value <= 1.0 else None
 
 
 def _index_for_shard(shard_name: str, index_names: List[str]) -> Optional[str]:
@@ -698,6 +725,7 @@ class GalaxyService:
         # get_job_status already fetched the job dict this comes out of, so on
         # a cold read it is handed over rather than fetched again.
         submitted_indexes = await self._submitted_indexes(job_id, status.params)
+        threshold = _submitted_threshold(status.params)
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
         shards = list(
@@ -731,6 +759,7 @@ class GalaxyService:
         query_name = None
         shards_with_hits = 0
         shards_failed = 0
+        corrected_out = 0
         for shard in shards:
             if not shard:
                 shards_failed += 1
@@ -744,16 +773,33 @@ class GalaxyService:
                         # Count the shard, not the (shard, query) pair -- the
                         # latter can exceed shards_searched.
                         shard_had_hits = True
-                    for accession, score in accessions.items():
-                        hits.append(
-                            {
-                                "accession": accession,
-                                "score": score,
-                                "shard": shard_name,
-                            }
-                        )
+                    for accession, raw_score in accessions.items():
+                        # Logan's own site subtracts a false-positive baseline
+                        # for 227 saturated samples and re-applies the
+                        # threshold to what is left. kmindex applied it to the
+                        # raw ratio, so a hit that only cleared it because its
+                        # Bloom filter matches everything is dropped here.
+                        score, baseline = correct_score(accession, raw_score)
+                        hit = {
+                            "accession": accession,
+                            "score": score,
+                            "shard": shard_name,
+                        }
+                        if baseline is not None:
+                            if threshold is not None and score < threshold:
+                                corrected_out += 1
+                                continue
+                            hit["fp_correction"] = baseline
+                        hits.append(hit)
             if shard_had_hits:
                 shards_with_hits += 1
+
+        if corrected_out:
+            logger.info(
+                f"kmindex job {job_id}: dropped {corrected_out} hits that fell "
+                f"under the {threshold} threshold once their false-positive "
+                "baseline was subtracted"
+            )
 
         # Sort on more than score: ties are common, and shards land in completion
         # order, so score alone leaves equal-scoring hits free to reshuffle
