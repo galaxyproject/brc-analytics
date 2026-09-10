@@ -124,25 +124,32 @@ class CatalogData:
     # ------------------------------------------------------------------
 
     def search_organisms(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Search organisms by species name, common name, or taxonomy ID."""
+        """Search organisms by species name, other name, or taxonomy ID.
+
+        Matches on a name the organism currently holds -- species, genus or
+        taxonomy id -- rank ahead of matches on `otherNames`, which carries
+        prior scientific names: one organism's superseded name can be another's
+        current one, and the assistant reads the first result.
+        """
         q = query.lower().strip()
-        results = []
+        current_name_matches = []
+        other_name_matches = []
         for org in self.organisms:
             species = (org.get("taxonomicLevelSpecies") or "").lower()
-            commons = [(name or "").lower() for name in org.get("commonNames") or []]
+            others = [(name or "").lower() for name in org.get("otherNames") or []]
             tax_id = str(org.get("ncbiTaxonomyId") or "")
             genus = (org.get("taxonomicLevelGenus") or "").lower()
 
-            if (
-                q in species
-                or any(q in common for common in commons)
-                or q == tax_id
-                or q in genus
-            ):
-                results.append(self._summarize_organism(org))
-                if len(results) >= limit:
-                    break
-        return results
+            if q in species or q == tax_id or q in genus:
+                current_name_matches.append(self._summarize_organism(org))
+                # A full page of current-name matches can no longer be displaced,
+                # so stop scanning.
+                if len(current_name_matches) >= limit:
+                    return current_name_matches
+            elif any(q in other for other in others):
+                if len(other_name_matches) < limit:
+                    other_name_matches.append(self._summarize_organism(org))
+        return (current_name_matches + other_name_matches)[:limit]
 
     def get_organism_by_taxonomy_id(self, taxonomy_id: str) -> Optional[Dict[str, Any]]:
         for org in self.organisms:
@@ -153,11 +160,17 @@ class CatalogData:
     def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
         """Find an organism by its NCBI taxonomy id -- the stable, canonical key
         suggestion chips tag organisms with (#1297). An exact (case-insensitive)
-        species or common name is also accepted as a fail-soft fallback so a chip
+        species or other name is also accepted as a fail-soft fallback so a chip
         the model mis-tags by name isn't needlessly dropped.
 
         Accepts any input (e.g. a numeric taxid or None); the value is coerced
         to a string before matching.
+
+        A taxonomy id or current scientific name wins over an other-name match,
+        whichever organism comes first in the catalog: `otherNames` carries prior
+        scientific names, so one organism's superseded name can be another's
+        current one (e.g. "Candida auris" is a synonym of Candidozyma auris),
+        and the organism that still holds the name is the right answer.
 
         Unlike search_organisms, this does NOT match on genus or substrings, so
         a genus ("Candida") or a partial string ("almonella") will not resolve.
@@ -167,15 +180,19 @@ class CatalogData:
         q = str(name).strip().lower()
         if not q:
             return None
+        other_name_match = None
         for org in self.organisms:
-            candidates = {
+            if q in {
                 (org.get("taxonomicLevelSpecies") or "").lower(),
                 str(org.get("ncbiTaxonomyId") or "").lower(),
-                *((common or "").lower() for common in org.get("commonNames") or []),
-            }
-            candidates.discard("")
-            if q in candidates:
+            }:
                 return self._summarize_organism(org)
+            if other_name_match is None and q in {
+                (other or "").lower() for other in org.get("otherNames") or []
+            }:
+                other_name_match = org
+        if other_name_match is not None:
+            return self._summarize_organism(other_name_match)
         return None
 
     def _summarize_organism(self, org: Dict[str, Any]) -> Dict[str, Any]:
@@ -190,7 +207,7 @@ class CatalogData:
 
         return {
             "species": org.get("taxonomicLevelSpecies"),
-            "common_names": org.get("commonNames"),
+            "other_names": org.get("otherNames"),
             "taxonomy_id": str(org.get("ncbiTaxonomyId")),
             "assembly_count": org.get("assemblyCount", len(genomes)),
             "reference_assembly_count": len(ref_genomes),

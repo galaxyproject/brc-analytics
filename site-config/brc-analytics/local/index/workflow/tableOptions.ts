@@ -10,7 +10,7 @@ export const TABLE_OPTIONS: Omit<
   initialState: {
     columnVisibility: {
       [CATEGORY_CONFIG.CATEGORY.key]: false,
-      [CATEGORY_CONFIG.COMMON_NAME.key]: false,
+      [CATEGORY_CONFIG.OTHER_NAMES.key]: false,
       [CATEGORY_CONFIG.PLOIDY.key]: false,
       [CATEGORY_CONFIG.TAXONOMY_ID.key]: false,
       [CATEGORY_CONFIG.TAXONOMIC_LEVEL_CLASS.key]: false,

@@ -5,7 +5,6 @@ export interface BRCDataCatalogGenome {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
-  commonNames: string[];
   coverage: string | null;
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
@@ -15,6 +14,7 @@ export interface BRCDataCatalogGenome {
   level: string;
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
+  otherNames: string[];
   otherTaxa: string[] | null;
   ploidy: ORGANISM_PLOIDY[];
   priority: OUTBREAK_PRIORITY | null;

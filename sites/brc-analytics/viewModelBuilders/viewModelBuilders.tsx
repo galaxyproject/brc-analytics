@@ -89,16 +89,16 @@ const ITALIC_TAXON_NAME_FIELDS = new Set([
 ]);
 
 /**
- * Build props for the common names cell.
+ * Build props for the other names cell.
  * @param entity - Organism or genome entity.
  * @returns Props for the NTagCell component.
  */
-export const buildCommonNames = (
+export const buildOtherNames = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof NTagCell> => {
   return {
-    label: "common names",
-    values: entity.commonNames,
+    label: "other names",
+    values: entity.otherNames,
   };
 };
 

@@ -482,14 +482,14 @@ def organism_con():
             taxonomicLevelSpecies VARCHAR,
             taxonomicLevelGenus VARCHAR,
             taxonomicLevelDomain VARCHAR,
-            commonNames VARCHAR[],
+            otherNames VARCHAR[],
             assemblyCount BIGINT,
             taxonomicGroup VARCHAR[]
         )
         """
     )
     rows = [
-        # taxid, species, genus, domain, commonNames, assemblyCount, group
+        # taxid, species, genus, domain, otherNames, assemblyCount, group
         (
             "7165",
             "Anopheles gambiae",
@@ -545,7 +545,7 @@ def test_organism_clade_list_is_bounded(organism_con):
     assert set(out["rows"][0]) == {
         "ncbiTaxonomyId",
         "taxonomicLevelSpecies",
-        "commonNames",
+        "otherNames",
         "assemblyCount",
     }
 

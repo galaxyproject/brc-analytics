@@ -4,9 +4,9 @@ import { type OUTBREAK_PRIORITY } from "./schema-types";
 export interface BRCDataCatalogOrganism {
   assemblyCount: number;
   assemblyTaxonomyIds: string[];
-  commonNames: string[];
   genomes: BRCDataCatalogGenome[];
   ncbiTaxonomyId: string;
+  otherNames: string[];
   otherTaxa: string[] | null;
   priority: OUTBREAK_PRIORITY | null;
   priorityPathogenName: string | null;

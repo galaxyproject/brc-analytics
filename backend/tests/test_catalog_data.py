@@ -4,6 +4,7 @@ Tests run against the real catalog JSON in catalog/output/, so no mocking
 needed -- CatalogData is pure in-memory lookups.
 """
 
+import json
 import os
 import sys
 
@@ -47,10 +48,10 @@ class TestSearchOrganisms:
         assert len(results) > 0
         assert all(r["genus"] == "Plasmodium" for r in results)
 
-    def test_search_by_common_name(self, catalog):
+    def test_search_by_other_name(self, catalog):
         results = catalog.search_organisms("malaria")
         assert len(results) > 0
-        names = [name for r in results for name in (r.get("commonNames") or [])]
+        names = [name for r in results for name in (r.get("otherNames") or [])]
         assert any("malaria" in n.lower() for n in names)
 
     def test_search_by_taxonomy_id(self, catalog):
@@ -73,6 +74,49 @@ class TestSearchOrganisms:
     def test_search_no_results(self, catalog):
         results = catalog.search_organisms("zzzznonexistent")
         assert results == []
+
+    def test_query_must_match_a_single_name(self, tmp_path):
+        # Names are matched one at a time, so a query that only spans two
+        # adjacent names -- or the punctuation between them -- must not match.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["foo", "bar"],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "assemblies.json").write_text(json.dumps([]))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        catalog = CatalogData(str(tmp_path))
+        assert catalog.search_organisms("foo")
+        assert catalog.search_organisms("foo', 'bar") == []
+        assert catalog.search_organisms("['foo'") == []
+
+    def test_current_name_ranks_above_other_name(self, tmp_path):
+        # otherNames carries prior scientific names, so a name one organism has
+        # moved on from can still be another organism's current name. A caller
+        # reading only the first result must get the one that holds it now.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["Genusvetus specimen"],
+                "genomes": [],
+            },
+            {
+                "ncbiTaxonomyId": 2,
+                "taxonomicLevelSpecies": "Genusvetus specimen",
+                "otherNames": [],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "assemblies.json").write_text(json.dumps([]))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        results = CatalogData(str(tmp_path)).search_organisms("Genusvetus specimen")
+        assert [r["ncbiTaxonomyId"] for r in results] == [2, 1]
 
 
 class TestCondensation:

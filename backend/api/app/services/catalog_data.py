@@ -103,28 +103,38 @@ class CatalogData:
         """
         Search organisms by name, taxonomy ID, or taxonomic group.
         Returns condensed records suitable for MCP responses.
+
+        Matches on a name the organism currently holds rank ahead of matches on
+        `otherNames`, which carries prior scientific names: one organism's
+        superseded name can be another's current one, so a caller reading only
+        the first result would otherwise get the wrong organism.
         """
         if not query.strip():
             return []
         q = query.lower()
-        results = []
+        current_name_matches = []
+        other_name_matches = []
         for org in self.organisms:
             if any(
                 q in str(org.get(field, "")).lower()
                 for field in (
                     "taxonomicLevelSpecies",
                     "taxonomicLevelGenus",
-                    "commonNames",
                     "ncbiTaxonomyId",
                     "taxonomicGroup",
                     "taxonomicLevelStrain",
                     "taxonomicLevelIsolate",
                 )
             ):
-                results.append(self._condense_organism(org))
-                if len(results) >= limit:
-                    break
-        return results
+                current_name_matches.append(self._condense_organism(org))
+                # A full page of current-name matches can no longer be displaced,
+                # so stop scanning.
+                if len(current_name_matches) >= limit:
+                    return current_name_matches
+            elif any(q in (name or "").lower() for name in org.get("otherNames") or []):
+                if len(other_name_matches) < limit:
+                    other_name_matches.append(self._condense_organism(org))
+        return (current_name_matches + other_name_matches)[:limit]
 
     def get_organism_by_taxonomy_id(self, taxonomy_id: str) -> Optional[Dict[str, Any]]:
         org = self._organisms_by_tax_id.get(str(taxonomy_id))
@@ -137,7 +147,7 @@ class CatalogData:
             "ncbiTaxonomyId": org.get("ncbiTaxonomyId"),
             "species": org.get("taxonomicLevelSpecies"),
             "genus": org.get("taxonomicLevelGenus"),
-            "commonNames": org.get("commonNames"),
+            "otherNames": org.get("otherNames"),
             "assemblyCount": org.get("assemblyCount"),
             "taxonomicGroup": org.get("taxonomicGroup"),
             "strain": org.get("taxonomicLevelStrain"),

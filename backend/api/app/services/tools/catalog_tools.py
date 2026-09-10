@@ -24,10 +24,15 @@ class AssistantDeps:
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:
-    """Search the BRC Analytics catalog for organisms by name, common name, or taxonomy ID.
+    """Search the BRC Analytics catalog for organisms by name, other name, or taxonomy ID.
+
+    An organism's other names cover every non-scientific name NCBI knows for it
+    -- common names, acronyms, and prior or alternate scientific names (e.g.
+    "Candida auris" for Candidozyma auris) -- so a reclassified organism still
+    resolves under the name a user knows it by.
 
     Args:
-        query: organism name, common name, genus, or NCBI taxonomy ID to search for
+        query: organism name, other name, genus, or NCBI taxonomy ID to search for
     """
     results = deps.catalog.search_organisms(query, limit=10)
     if not results:
@@ -132,8 +137,11 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     (list); a range = two predicates (gte + lte).
 
     Filter by scientific name via taxonomicLevelSpecies, a clade via the matching
-    rank column (e.g. taxonomicLevelGenus). When a list comes back truncated,
-    state the total and offer to narrow rather than paging.
+    rank column (e.g. taxonomicLevelGenus). otherNames is a list field holding
+    every non-scientific name for a taxon, including prior scientific names, so
+    contains/contains_any on it finds an organism under a superseded name. When a
+    list comes back truncated, state the total and offer to narrow rather than
+    paging.
 
     Args:
         query: the structured catalog query

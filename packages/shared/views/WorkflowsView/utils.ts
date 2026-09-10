@@ -28,18 +28,18 @@ function findAssemblyByTaxonomyId(
 }
 
 /**
- * Returns the common names of the assembly, or ["Any"] if the assembly is undefined.
- * `commonNames` is only present on some assemblies; those without it return ["Any"].
- * Returns ["None"] when the assembly exists but has no common names.
+ * Returns the other names of the assembly, or ["Any"] if the assembly is undefined.
+ * `otherNames` is only present on some assemblies; those without it return ["Any"].
+ * Returns ["None"] when the assembly exists but has no other names.
  * Each name becomes its own filter facet bucket.
  * @param assembly - Assembly.
- * @returns The list of common names, ["None"], or ["Any"].
+ * @returns The list of other names, ["None"], or ["Any"].
  */
-function getCommonNames(assembly: AssemblyContract | undefined): string[] {
-  // A missing commonNames field reads as ["Any"]; a present-but-empty
-  // commonNames reads as ["None"].
-  if (!assembly || assembly.commonNames === undefined) return [TAXON_ANY];
-  return assembly.commonNames.length ? assembly.commonNames : ["None"];
+function getOtherNames(assembly: AssemblyContract | undefined): string[] {
+  // A missing otherNames field reads as ["Any"]; a present-but-empty
+  // otherNames reads as ["None"].
+  if (!assembly || assembly.otherNames === undefined) return [TAXON_ANY];
+  return assembly.otherNames.length ? assembly.otherNames : ["None"];
 }
 
 /**
@@ -151,7 +151,7 @@ function indexAssemblyByTaxonomyId(
 
 /**
  * Maps an Assembly to the workflow assembly fields.
- * Includes all taxonomy fields plus site-specific fields (commonNames, taxonomicLevelRealm)
+ * Includes all taxonomy fields plus site-specific fields (otherNames, taxonomicLevelRealm)
  * which are present at runtime for all sites but only typed on site-specific WorkflowEntity extensions.
  * If the assembly is undefined, returns default values for the properties.
  * @param assembly - The assembly to map.
@@ -159,7 +159,7 @@ function indexAssemblyByTaxonomyId(
  */
 function mapAssembly(assembly: AssemblyContract | undefined): WorkflowAssembly {
   return {
-    commonNames: getCommonNames(assembly),
+    otherNames: getOtherNames(assembly),
     taxonomicLevelClass: assembly?.taxonomicLevelClass ?? TAXON_ANY,
     taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? TAXON_ANY,
     taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? TAXON_ANY,

@@ -472,7 +472,6 @@ None
 - GCF_001015335.1 (status: suppressed)
 - GCF_001021295.1 (status: suppressed)
 - GCF_001189475.1 (status: suppressed)
-- GCF_001552035.1 (status: suppressed)
 - GCF_001629985.1 (status: suppressed)
 - GCF_001876365.2 (status: suppressed)
 - GCF_001983325.1 (status: suppressed)
@@ -505,6 +504,7 @@ None
 ## GenBank assemblies with paired RefSeq accessions
 
 - GCA_002759435.3 (paired RefSeq: GCF_002759435.1)
+- GCA_031319335.1 (paired RefSeq: GCF_031319335.1)
 - GCA_050947815.1 (paired RefSeq: GCF_050947815.1)
 - GCA_943734665.2 (paired RefSeq: GCF_943734665.2)
 
