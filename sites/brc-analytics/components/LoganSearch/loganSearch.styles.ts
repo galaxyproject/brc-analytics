@@ -116,17 +116,21 @@ export const SummaryHeader = styled.div`
   justify-content: space-between;
 `;
 
-/* Actions stack on the right and align to the card's edge; on a narrow card
-   they fall under the figures and align left with them. */
+export const SummaryFigures = styled.div`
+  flex: 1 1 320px;
+  min-width: 0;
+`;
+
+/* A right-hand column with left-aligned contents: the buttons and their
+   captions read as one block, and the advice caption wraps inside the
+   column instead of setting the width of the whole header. */
 export const SummaryActions = styled.div`
+  align-items: flex-start;
   display: flex;
+  flex: 0 1 400px;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-end;
-
-  @media (max-width: 720px) {
-    align-items: flex-start;
-  }
+  max-width: 400px;
 `;
 
 /* Provenance under the headline: which job, which query, which indexes, and

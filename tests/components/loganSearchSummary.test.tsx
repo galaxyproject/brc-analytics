@@ -66,6 +66,21 @@ const WITH_EXPORT: KmindexResults = {
 
 const EXPORT_URL = `${API_BASE_URL}/galaxy/kmindex/jobs/${JOB_ID}/export`;
 
+// MUI hands a string tooltip to the child as its aria-label, so this is the
+// name the assistant link answers to as well as the text on hover.
+const ASSISTANT_TOOLTIP =
+  "The assistant can explain what this cohort is, say which of its organisms " +
+  "are in BRC, and set up a Galaxy analysis on the top runs.";
+
+// jsdom has no clipboard, so the copy cases install one. Put back whatever
+// was there, or the stub outlives the case that needed it.
+const CLIPBOARD = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+
+afterEach(() => {
+  if (CLIPBOARD) Object.defineProperty(navigator, "clipboard", CLIPBOARD);
+  else delete (navigator as { clipboard?: unknown }).clipboard;
+});
+
 /**
  * Per-index shorthand.
  * @param index - Index name as the API sends it.
@@ -197,9 +212,12 @@ describe("LoganSearchSummary", () => {
   });
 
   test("names the job and the query it ran", () => {
-    const { container } = renderSummary(BASE_RESULTS);
+    renderSummary(BASE_RESULTS);
 
-    expect(container.textContent).toContain(`Job ${JOB_ID} · query 16S`);
+    // Two captions rather than one line joined by a dot: the row they sit in
+    // already spaces them, and the dot was doing the job twice.
+    expect(screen.getByText(`Job ${JOB_ID}`)).toBeTruthy();
+    expect(screen.getByText("Query 16S")).toBeTruthy();
   });
 
   test("names the job alone when the query was not named", () => {
@@ -209,17 +227,18 @@ describe("LoganSearchSummary", () => {
     });
 
     expect(container.textContent).toContain(`Job ${JOB_ID}`);
-    expect(container.textContent).not.toContain("query");
+    expect(container.textContent).not.toContain("Query");
   });
 
   test("links to the assistant with the job id", () => {
     renderSummary(BASE_RESULTS);
 
-    expect(
-      screen
-        .getByRole("link", { name: /ask the assistant about these runs/i })
-        .getAttribute("href")
-    ).toBe(`/assistant?loganJob=${JOB_ID}`);
+    // Sentence case, not the theme capitalisation of the old label, and short
+    // enough that the sentence explaining it moves to a tooltip -- which MUI
+    // then hands to the link as its accessible name.
+    const link = screen.getByText("Ask the assistant").closest("a");
+    expect(link?.getAttribute("href")).toBe(`/assistant?loganJob=${JOB_ID}`);
+    expect(link?.getAttribute("aria-label")).toBe(ASSISTANT_TOOLTIP);
   });
 
   test("copies the results link", async () => {
@@ -236,6 +255,21 @@ describe("LoganSearchSummary", () => {
     // reopens this search rather than the empty form.
     expect(writeText).toHaveBeenCalledWith(window.location.href);
     expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+  });
+
+  test("says so when the browser refuses the clipboard", async () => {
+    const writeText = jest.fn().mockRejectedValue(new Error("denied"));
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    renderSummary(BASE_RESULTS);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+    });
+
+    // No clipboard outside a secure context, and an unguarded await there is
+    // an unhandled rejection under a button that appears to do nothing.
+    expect(screen.getByRole("button", { name: "Copy failed" })).toBeTruthy();
   });
 
   test("names the index it searched", () => {
@@ -379,10 +413,14 @@ describe("the summary's export", () => {
   test("promises the whole match set rather than the rows in the table", () => {
     const { container } = renderSummary(WITH_EXPORT);
 
-    // The strip is about the match set, so the file it offers says its own
-    // row count rather than measuring itself against the table below.
+    // The strip is about the match set, so the file it offers is the whole of
+    // it. The count is the headline directly above, and the buttons keep it
+    // in their labels, so the caption does not say it a third time.
     expect(container.textContent).toContain(
-      "Download all 1,133,516 matched runs with their SRA metadata"
+      "Download every matched run with its SRA metadata"
+    );
+    expect(container.textContent).not.toContain(
+      "Download all 1,133,516 matched runs with"
     );
   });
 
@@ -401,7 +439,7 @@ describe("the summary's export", () => {
     });
 
     expect(container.textContent).toContain(
-      "Download all 17,633 matched runs with their SRA metadata"
+      "Download every matched run with its SRA metadata"
     );
     expect(container.textContent).toContain("TSV · ~2.6 MB");
     expect(container.textContent).toContain("Parquet · 243 kB");

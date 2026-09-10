@@ -3,12 +3,13 @@ import {
   CohortStats,
   ControlRow,
   SummaryActions,
+  SummaryFigures,
   SummaryHeader,
   SummaryMeta,
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { ROUTES } from "@brc/routes/constants";
 import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
-import { Button, Card, CardContent, Typography } from "@mui/material";
+import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
@@ -46,6 +47,13 @@ const TSV_BYTES_PER_ROW = 148;
 // silently drops the tail would reintroduce the same problem in a new place --
 // and the measured job is 1,133,516 rows, over the limit.
 const SPREADSHEET_ROW_LIMIT = 1048576;
+
+// What the copy button says in each of its three states.
+const COPY_LABELS = {
+  copied: "Copied",
+  failed: "Copy failed",
+  idle: "Copy link",
+};
 
 /**
  * Bytes as a short size.
@@ -141,14 +149,10 @@ function SummaryExport({
 
   return (
     <>
-      <Typography
-        color="textSecondary"
-        component="div"
-        sx={{ mb: 1 }}
-        variant="caption"
-      >
-        Download all {rows.toLocaleString()} matched runs with their SRA
-        metadata
+      {/* The count is the headline directly above and it is in both button
+          labels, so this line says what the file is, not how big it is. */}
+      <Typography color="textSecondary" component="div" variant="caption">
+        Download every matched run with its SRA metadata
       </Typography>
       <ControlRow>
         <Button
@@ -174,12 +178,7 @@ function SummaryExport({
           Parquet{parquetSize}
         </Button>
       </ControlRow>
-      <Typography
-        color="textSecondary"
-        component="div"
-        sx={{ mt: 1 }}
-        variant="caption"
-      >
+      <Typography color="textSecondary" component="div" variant="caption">
         {rows > SPREADSHEET_ROW_LIMIT ? (
           <>
             Too many rows for a spreadsheet -- Excel and Calc stop at{" "}
@@ -212,7 +211,7 @@ export const LoganSearchSummary = ({
   search,
 }: LoganSearchSummaryProps): JSX.Element | null => {
   const { jobId, results } = search;
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"copied" | "failed" | "idle">("idle");
 
   if (!jobId || !results) return null;
   // A backend predating the breakdown sends no total_matches, and reading it
@@ -225,23 +224,29 @@ export const LoganSearchSummary = ({
   const indexes = describeIndexes(results);
 
   const copyLink = async (): Promise<void> => {
-    await navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied("copied");
+    } catch {
+      // No clipboard outside a secure context, or the browser refused.
+      // Saying so beats a button that silently does nothing.
+      setCopied("failed");
+    }
+    window.setTimeout(() => setCopied("idle"), 2000);
   };
 
   return (
     <Card sx={{ mt: 2 }}>
       <CardContent>
         <SummaryHeader>
-          <div>
+          <SummaryFigures>
             <Typography component="h2" variant="h5">
               {matched.toLocaleString()} runs matched
             </Typography>
             {cohort && (
               <CohortStats>
                 <CohortStat>
-                  <Typography variant="subtitle1">
+                  <Typography component="div" variant="subtitle1">
                     {cohort.organisms.toLocaleString()}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
@@ -249,7 +254,7 @@ export const LoganSearchSummary = ({
                   </Typography>
                 </CohortStat>
                 <CohortStat>
-                  <Typography variant="subtitle1">
+                  <Typography component="div" variant="subtitle1">
                     {cohort.bioprojects.toLocaleString()}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
@@ -257,7 +262,7 @@ export const LoganSearchSummary = ({
                   </Typography>
                 </CohortStat>
                 <CohortStat>
-                  <Typography variant="subtitle1">
+                  <Typography component="div" variant="subtitle1">
                     {cohort.studies.toLocaleString()}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
@@ -265,7 +270,7 @@ export const LoganSearchSummary = ({
                   </Typography>
                 </CohortStat>
                 <CohortStat>
-                  <Typography variant="subtitle1">
+                  <Typography component="div" variant="subtitle1">
                     {cohort.countries.toLocaleString()}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
@@ -274,33 +279,45 @@ export const LoganSearchSummary = ({
                 </CohortStat>
               </CohortStats>
             )}
-          </div>
+          </SummaryFigures>
           <SummaryActions>
             <SummaryExport cohort={cohort} results={results} />
-            <Button
-              component={Link}
-              href={`${ROUTES.ASSISTANT}?loganJob=${encodeURIComponent(jobId)}`}
-              size="small"
-              startIcon={<AutoAwesome />}
-              title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs."
-              variant="outlined"
-            >
-              Ask the assistant about these runs
-            </Button>
+            {/* A Tooltip rather than a title attribute: the title never
+                opens on focus, so what the button leads to was reachable
+                with a pointer only. */}
+            <Tooltip title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs.">
+              <Button
+                component={Link}
+                href={`${ROUTES.ASSISTANT}?loganJob=${encodeURIComponent(
+                  jobId
+                )}`}
+                size="small"
+                startIcon={<AutoAwesome />}
+                variant="outlined"
+              >
+                Ask the assistant
+              </Button>
+            </Tooltip>
           </SummaryActions>
         </SummaryHeader>
         <SummaryMeta>
           <Typography color="textSecondary" variant="caption">
             Job {jobId}
-            {results.query_name ? ` · query ${results.query_name}` : ""}
           </Typography>
+          {/* Its own caption rather than a dot-joined tail on the job: the
+              row already spaces what it holds. */}
+          {results.query_name && (
+            <Typography color="textSecondary" variant="caption">
+              Query {results.query_name}
+            </Typography>
+          )}
           {indexes && (
             <Typography color="textSecondary" variant="caption">
               {indexes}
             </Typography>
           )}
           <Button onClick={copyLink} size="small" startIcon={<LinkIcon />}>
-            {copied ? "Copied" : "Copy link"}
+            {COPY_LABELS[copied]}
           </Button>
         </SummaryMeta>
       </CardContent>
