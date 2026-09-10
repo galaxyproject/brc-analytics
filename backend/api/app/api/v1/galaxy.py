@@ -33,6 +33,8 @@ from app.models.galaxy import (
 )
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
+    GalaxyJobFailed,
+    GalaxyJobNotComplete,
     GalaxyService,
     is_unlinked_account_error,
 )
@@ -300,11 +302,11 @@ async def get_kmindex_results(
 
     except HTTPException:
         raise
+    except GalaxyJobNotComplete as e:
+        raise HTTPException(status_code=202, detail=str(e)) from e
+    except GalaxyJobFailed as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
     except Exception as e:
-        if "not yet complete" in str(e):
-            raise HTTPException(status_code=202, detail=str(e)) from e
-        if "failed" in str(e).lower():
-            raise HTTPException(status_code=422, detail=str(e)) from e
         logger.error(f"Failed to get kmindex results for {job_id}: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to get kmindex results: {str(e)}"
@@ -432,23 +434,15 @@ async def get_job_results(
 
     except HTTPException:
         raise
+    except GalaxyJobNotComplete as e:
+        raise HTTPException(status_code=202, detail=str(e)) from e
+    except GalaxyJobFailed as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
     except Exception as e:
-        # Check if it's a "job not complete" error
-        if "not yet complete" in str(e):
-            raise HTTPException(
-                status_code=202,  # Accepted but processing not complete
-                detail=str(e),
-            ) from e
-        elif "failed" in str(e).lower():
-            raise HTTPException(
-                status_code=422,  # Unprocessable Entity - job failed
-                detail=str(e),
-            ) from e
-        else:
-            logger.error(f"Failed to get job results for {job_id}: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Failed to get job results: {str(e)}"
-            ) from e
+        logger.error(f"Failed to get job results for {job_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get job results: {str(e)}"
+        ) from e
 
 
 @router.get("/jobs/{job_id}", response_model=Dict[str, Any])

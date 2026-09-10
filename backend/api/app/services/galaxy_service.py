@@ -54,6 +54,14 @@ class GalaxyAccountNotLinkedError(Exception):
     """
 
 
+class GalaxyJobNotComplete(Exception):
+    """The job exists but has not reached a terminal state yet."""
+
+
+class GalaxyJobFailed(Exception):
+    """The job reached a terminal state other than success."""
+
+
 # Galaxy answers 401 for two very different things: a token it decoded but
 # has no linked account for ("Cannot locate user by access token. The user
 # should log into Galaxy at least once with this OIDC provider.") and a token
@@ -814,9 +822,11 @@ class GalaxyService:
 
         status = await self.get_job_status(job_id)
         if not status.is_complete:
-            raise Exception(f"Job {job_id} is not yet complete (state: {status.state})")
+            raise GalaxyJobNotComplete(
+                f"Job {job_id} is not yet complete (state: {status.state})"
+            )
         if not status.is_successful:
-            raise Exception(f"Job {job_id} failed with state: {status.state}")
+            raise GalaxyJobFailed(f"Job {job_id} failed with state: {status.state}")
         if not status.outputs:
             # A successful kmindex job always writes at least one shard, so no
             # outputs means we failed to read them rather than that the query
@@ -1276,12 +1286,12 @@ class GalaxyService:
             status = await self.get_job_status(job_id)
 
             if not status.is_complete:
-                raise Exception(
+                raise GalaxyJobNotComplete(
                     f"Job {job_id} is not yet complete (state: {status.state})"
                 )
 
             if not status.is_successful:
-                raise Exception(f"Job {job_id} failed with state: {status.state}")
+                raise GalaxyJobFailed(f"Job {job_id} failed with state: {status.state}")
 
             # Get output contents
             results = {}
@@ -1309,6 +1319,11 @@ class GalaxyService:
             await self.cache.set(cache_key, result.model_dump(), CacheTTL.ONE_DAY)
             return result
 
+        except (GalaxyJobNotComplete, GalaxyJobFailed):
+            # What the job did, not a failure to ask; the wrapper below would
+            # flatten both back into the "Failed to ..." message the API layer
+            # used to have to guess at.
+            raise
         except Exception as e:
             logger.error(f"Error getting job results: {e}")
             raise Exception(f"Failed to get job results: {str(e)}") from e

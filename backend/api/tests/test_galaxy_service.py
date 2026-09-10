@@ -34,6 +34,8 @@ from app.services.galaxy_service import (
     KMINDEX_AGG_CACHE_PREFIX,
     KMINDEX_ORDER_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
+    GalaxyJobFailed,
+    GalaxyJobNotComplete,
     GalaxyService,
     _default_order,
     _submitted_index_names,
@@ -2524,3 +2526,47 @@ class TestResultsEndpoint:
             "SRR000001",
             "SRR000000",
         ]
+
+    def test_a_failed_job_is_unprocessable(self, service):
+        service.get_kmindex_results = AsyncMock(
+            side_effect=GalaxyJobFailed("Job job1 failed with state: error")
+        )
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results")
+
+        assert response.status_code == 422
+        assert response.json()["detail"] == "Job job1 failed with state: error"
+
+    def test_a_job_still_running_is_accepted(self, service):
+        service.get_kmindex_results = AsyncMock(
+            side_effect=GalaxyJobNotComplete(
+                "Job job1 is not yet complete (state: running)"
+            )
+        )
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results")
+
+        assert response.status_code == 202
+        assert (
+            response.json()["detail"] == "Job job1 is not yet complete (state: running)"
+        )
+
+    def test_a_galaxy_side_failure_is_not_reported_as_a_failed_job(self, service):
+        # Every BioBlend wrapper in the service starts its message with
+        # "Failed to ...", so a 429 from Galaxy's nginx used to match the
+        # substring the failed-job branch keyed on and reach the browser as a
+        # 422. A client cannot tell "your job died" from "try again" out of
+        # that.
+        service.get_kmindex_results = AsyncMock(
+            side_effect=Exception(
+                "Failed to get job status using BioBLEND: "
+                "GET: error 429: Too Many Requests"
+            )
+        )
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results")
+
+        assert response.status_code == 500
