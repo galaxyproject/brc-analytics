@@ -3,9 +3,11 @@ import {
   MIRROR_SCOPE_NOTE,
 } from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
+  type KmindexHit,
   type KmindexIndexSummary,
   type KmindexResults,
   PAGE_SIZE,
+  type SraRunMetadata,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import { fireEvent, render, screen, within } from "@testing-library/react";
@@ -31,17 +33,47 @@ const TIE_BAND_COPY =
   "accession decides which equally-scoring runs made the list -- arbitrary, " +
   "but the same on every reload.";
 
+/**
+ * A hit as the API sends one, defaulting to an unannotated perfect match.
+ * @param overrides - The fields a case cares about.
+ * @returns One hit.
+ */
+function hit(overrides: Partial<KmindexHit> = {}): KmindexHit {
+  return {
+    accession: "SRR000001",
+    ani: 1,
+    fp_correction: null,
+    score: 1,
+    shard: "GENOMIC_BCT_10_null",
+    sra: null,
+    ...overrides,
+  };
+}
+
+/**
+ * Mirror metadata for a run, with the three columns the table shows filled
+ * in and the rest of the record left empty.
+ * @param overrides - The fields a case cares about.
+ * @returns The metadata as the mirror records it.
+ */
+function sraMeta(overrides: Partial<SraRunMetadata> = {}): SraRunMetadata {
+  return {
+    assay_type: null,
+    bioproject: null,
+    country: "Malawi",
+    instrument: null,
+    library_layout: null,
+    mbases: null,
+    organism: "Plasmodium falciparum",
+    platform: "ILLUMINA",
+    release_date: "2018-07-25T00:00:00Z",
+    study: null,
+    ...overrides,
+  };
+}
+
 const BASE_RESULTS: KmindexResults = {
-  hits: [
-    {
-      accession: "SRR000001",
-      ani: 1,
-      fp_correction: null,
-      score: 1,
-      shard: "GENOMIC_BCT_10_null",
-      sra: null,
-    },
-  ],
+  hits: [hit()],
   job_id: "dee9dc267ca2a401",
   limit: PAGE_SIZE,
   offset: 0,
@@ -134,8 +166,16 @@ function renderResults(
   };
 }
 
+/**
+ * Open the "Why?" disclosure. The Collapse unmounts its children, so every
+ * assertion on the truncation copy has to open it first.
+ */
+function openWhy(): void {
+  fireEvent.click(screen.getByRole("button", { name: "Why?" }));
+}
+
 describe("LoganSearchResults truncation disclosure", () => {
-  test("reports the true match count and what cannot be paged to", () => {
+  test("names the window it lists and what cannot be paged to", () => {
     const { container } = renderResults(
       truncatedResults([
         summary("GENOMIC_BCT", 1100404, 47089),
@@ -143,10 +183,28 @@ describe("LoganSearchResults truncation disclosure", () => {
       ])
     );
 
-    expect(screen.getByText("1,133,516 SRA accessions matched")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Listing the 50,000 highest-coverage hits of 1,133,516 matched"
+      )
+    ).toBeTruthy();
     expect(container.textContent).toContain(
-      "Listing the 50,000 highest-scoring -- the remaining 1,083,516 cannot be paged to."
+      "The remaining 1,083,516 cannot be paged to."
     );
+  });
+
+  test("keeps the explanation closed until asked", () => {
+    renderResults(
+      truncatedResults([
+        summary("GENOMIC_BCT", 1100404, 47089),
+        summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
+      ])
+    );
+
+    // Four paragraphs of caveat above every result taught readers to scroll
+    // past the whole card; behind a toggle they are still one click away.
+    expect(screen.queryByText(/does not re-rank/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Why?" })).toBeTruthy();
   });
 
   test("says the threshold does not re-rank the listing", () => {
@@ -156,6 +214,7 @@ describe("LoganSearchResults truncation disclosure", () => {
         summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
       ])
     );
+    openWhy();
 
     expect(container.textContent).toContain(
       "Raising the threshold shrinks the underlying match count, but it does not re-rank what you see: the same accessions come back in the same order until the threshold rises above the lowest score listed here."
@@ -172,6 +231,7 @@ describe("LoganSearchResults truncation disclosure", () => {
         summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
       ])
     );
+    openWhy();
 
     expect(container.textContent).toContain(
       "GENOMIC_BCT: 47,089 of 1,100,404 listed -- alone it would still cap at 50,000"
@@ -190,6 +250,7 @@ describe("LoganSearchResults truncation disclosure", () => {
         summary("METAGENOMIC_PHG", 0, 0),
       ])
     );
+    openWhy();
 
     expect(container.textContent).toContain(
       "METAGENOMIC_UNKNOWN: 39 matched, none listed -- alone it would return all 39"
@@ -201,6 +262,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     const { container } = renderResults(
       truncatedResults([summary("GENOMIC_VRL", 157741, CAP)])
     );
+    openWhy();
 
     expect(screen.getByRole("alert")).toBeTruthy();
     expect(container.textContent).toContain(TIE_BAND_COPY);
@@ -217,6 +279,7 @@ describe("LoganSearchResults truncation disclosure", () => {
         summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
       ])
     );
+    openWhy();
 
     // This is the job where the caveat is most true and used to be hidden:
     // all 50,000 listed rows score exactly 1.0. Eight indexes over the same
@@ -230,6 +293,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     const { container } = renderResults(
       truncatedResults([summary("GENOMIC_VRL", 157741, CAP)])
     );
+    openWhy();
 
     // Measured the other way: the 2,090 bp 18S superset of a 500 bp window
     // matched 18,019 runs against the window's 17,633, same two indexes and
@@ -256,11 +320,12 @@ describe("LoganSearchResults truncation disclosure", () => {
       total_matches: 17633,
     });
 
-    expect(screen.getByText("17,633 SRA accessions")).toBeTruthy();
+    expect(screen.getByText("All 17,633 hits")).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
-    expect(container.textContent).toContain(
-      "GENOMIC_EUK 17,000 · METAGENOMIC_ENV 633"
-    );
+    expect(screen.queryByRole("button", { name: "Why?" })).toBeNull();
+    // The per-index counts went with the diagnostics chips: an untruncated
+    // listing has nothing to explain, and the toolbar names its window only.
+    expect(container.textContent).not.toContain("GENOMIC_EUK 17,000");
     expect(container.textContent).not.toContain("cannot be paged to");
   });
 
@@ -275,10 +340,13 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     const { container } = renderResults(legacy);
 
-    expect(screen.getByText("50,000 SRA accessions listed")).toBeTruthy();
+    expect(
+      screen.getByText("Listing the 50,000 highest-coverage hits")
+    ).toBeTruthy();
     expect(container.textContent).toContain(
-      "Capped at 50,000 -- more accessions matched than can be listed."
+      "More accessions matched than can be listed."
     );
+    openWhy();
     // Degraded, not broken: the card renders, and no arithmetic on the
     // missing count leaks to the page.
     expect(screen.getByRole("alert")).toBeTruthy();
@@ -294,22 +362,29 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     const { container } = renderResults(legacy);
 
-    expect(screen.getByText("17 SRA accessions")).toBeTruthy();
+    expect(screen.getByText("All 17 hits")).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
     expect(container.textContent).not.toContain("NaN");
   });
 });
 
-describe("SRA mirror chip", () => {
-  test("describes the mirror as all of SRA, not a BRC-filtered subset", () => {
-    renderResults({
-      ...BASE_RESULTS,
-      sra_annotated: 1,
-      sra_mirror_available: true,
-    });
+describe("SRA mirror caption", () => {
+  const PARTLY_ANNOTATED = {
+    ...BASE_RESULTS,
+    hits: [hit({ sra: sraMeta() }), hit({ accession: "SRR000002" })],
+    sra_annotated: 1,
+    sra_mirror_available: true,
+    total_hits: 2,
+    total_matches: 2,
+  };
 
-    const chip = screen.getByText("SRA mirror: 1/1 on this page");
-    const title = chip.closest("[title]")?.getAttribute("title") ?? "";
+  test("describes the mirror as all of SRA, not a BRC-filtered subset", () => {
+    renderResults(PARTLY_ANNOTATED);
+
+    const caption = screen.getByText(
+      /Metadata found for 1 of 2 rows on this page/
+    );
+    const title = caption.getAttribute("title") ?? "";
     expect(title).toBe(MIRROR_SCOPE_NOTE);
     // The deployed mirror is every run in SRA when it was built (v6:
     // 44,057,338 runs). The old copy told users to expect misses that
@@ -317,6 +392,17 @@ describe("SRA mirror chip", () => {
     expect(title).not.toMatch(/BRC-relevant/i);
     expect(title).toMatch(/every run|all of SRA/i);
     expect(title).toMatch(/newer than the mirror/i);
+  });
+
+  test("says nothing when the mirror answered for every row on the page", () => {
+    const { container } = renderResults({
+      ...PARTLY_ANNOTATED,
+      sra_annotated: 2,
+    });
+
+    // A diagnostic that reads 2 of 2 every time is noise; it earns its line
+    // only when the mirror missed something.
+    expect(container.textContent).not.toContain("Metadata found for");
   });
 });
 
@@ -398,6 +484,81 @@ describe("coverage and ANI columns", () => {
   });
 });
 
+describe("the hit table", () => {
+  test("shows the coverage as a rail proportional to the score", () => {
+    const { container } = renderResults({
+      ...BASE_RESULTS,
+      hits: [hit({ score: 0.8915 }), hit({ accession: "SRR000002", score: 1 })],
+      total_hits: 2,
+      total_matches: 2,
+    });
+
+    // The rail is decoration for the number beside it, so it is hidden from
+    // assistive tech and reachable only as a rendered width.
+    const rails = container.querySelectorAll<HTMLElement>(
+      "span[aria-hidden='true'] > span"
+    );
+    expect(rails).toHaveLength(2);
+    expect(rails[0].style.width).toBe("89%");
+    expect(rails[1].style.width).toBe("100%");
+  });
+
+  test("pages from the top of the table as well as the bottom", () => {
+    renderResults({ ...BASE_RESULTS, limit: 50, offset: 100, total_hits: 400 });
+
+    // A hundred rows is a long way back to the only pager.
+    expect(screen.getAllByText(/rows per page/i)).toHaveLength(2);
+    expect(screen.getAllByText(/101.150 of 400/)).toHaveLength(2);
+  });
+
+  test("dims a metadata value the mirror did not have", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [hit({ sra: sraMeta({ country: null }) })],
+      sra_annotated: 1,
+      sra_mirror_available: true,
+    });
+
+    const row = screen.getByText("Plasmodium falciparum").closest("tr");
+    expect(row).not.toBeNull();
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+
+    // Accession, coverage, ANI, organism, platform, country, released. The
+    // country is the one the mirror had nothing for.
+    expect(cells[4].textContent).toBe("ILLUMINA");
+    expect(cells[5].textContent).toBe("--");
+    expect(cells[6].textContent).toBe("2018-07-25");
+  });
+
+  test("repeats the metadata columns as one line under the organism", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [hit({ sra: sraMeta() })],
+      sra_annotated: 1,
+      sra_mirror_available: true,
+    });
+
+    // jsdom applies no media queries, so both layouts are in the document at
+    // once and CSS picks between them; this asserts the narrow one exists.
+    expect(screen.getByText("ILLUMINA, Malawi, 2018-07-25")).toBeTruthy();
+  });
+
+  test("does not decorate every row with an icon", () => {
+    const { container } = renderResults(BASE_RESULTS);
+
+    // Twenty-five external-link icons a page is chrome; the link tells a
+    // screen reader where it goes instead.
+    expect(
+      container.querySelectorAll("svg[data-testid='OpenInNewIcon']")
+    ).toHaveLength(0);
+    expect(
+      screen.getByRole("link", {
+        name: "SRR000001 (opens NCBI SRA in a new tab)",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("sorting and page size", () => {
   test("clicking a header asks the hook to sort by that column", () => {
     const { actions } = renderResults(BASE_RESULTS);
@@ -435,7 +596,9 @@ describe("sorting and page size", () => {
   test("offers 25, 50 and 100 rows per page and reports a change", () => {
     const { actions } = renderResults({ ...BASE_RESULTS, limit: 50 });
 
-    const select = screen.getByRole("combobox", { name: /rows per page/i });
+    const [select] = screen.getAllByRole("combobox", {
+      name: /rows per page/i,
+    });
     expect(select.textContent).toBe("50");
     fireEvent.mouseDown(select);
     expect(screen.getByRole("option", { name: "25" })).toBeTruthy();
@@ -449,6 +612,6 @@ describe("sorting and page size", () => {
 
     // Offset 100 at 50 a page is the third page. MUI joins the range with an
     // en dash, which the regex sidesteps.
-    expect(screen.getByText(/101.150 of 400/)).toBeTruthy();
+    expect(screen.getAllByText(/101.150 of 400/)[0]).toBeTruthy();
   });
 });

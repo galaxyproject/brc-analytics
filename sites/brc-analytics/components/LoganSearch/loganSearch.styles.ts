@@ -1,3 +1,4 @@
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
 export const SearchContainer = styled.div`
@@ -34,13 +35,65 @@ export const ControlRow = styled.div`
   flex-wrap: wrap;
 `;
 
+/* The window sentence on the left, the top pager on the right. Aligned to the
+   top because the sentence can run to two lines and the pager should not
+   drift down the toolbar with it. */
 export const ResultsToolbar = styled.div`
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
   margin-bottom: 16px;
+`;
+
+/* Digits that sit in a column: coverage, ANI, the pagination caption. Inter
+   has tabular figures; without them 0.8915 and 1.0000 are different widths
+   and the column shimmers as the page changes. */
+export const Numeric = styled.span`
+  font-variant-numeric: tabular-nums;
+`;
+
+/* The coverage cell: a short rail proportional to the score, then the number.
+   A fixed rail width rather than a share of the cell, so the bar means the
+   same thing at every column width. */
+export const CoverageCell = styled.span`
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: flex-end;
+`;
+
+export const CoverageRail = styled.span`
+  background: ${PALETTE.SMOKE_MAIN};
+  border-radius: 3px;
+  display: inline-block;
+  height: 6px;
+  overflow: hidden;
+  width: 48px;
+
+  > span {
+    background: ${PALETTE.PRIMARY_MAIN};
+    display: block;
+    height: 100%;
+  }
+`;
+
+/* Platform, country and release date leave the table below 720px and reappear
+   as one line under the organism, so a phone gets a readable list rather than
+   a seven-column scroll. Both are always in the DOM; CSS picks one. */
+export const MetaCellStyles = `
+  @media (max-width: 720px) {
+    display: none;
+  }
+`;
+
+export const OrganismMeta = styled.span`
+  display: none;
+
+  @media (max-width: 720px) {
+    display: block;
+  }
 `;
 
 /* Headline counts for the match set. Laid out as a row of labelled figures

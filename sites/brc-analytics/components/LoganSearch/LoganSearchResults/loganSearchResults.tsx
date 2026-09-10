@@ -1,14 +1,24 @@
-import { ResultsToolbar } from "@brc/components/LoganSearch/loganSearch.styles";
-import { OpenInNew } from "@mui/icons-material";
+import {
+  CoverageCell,
+  CoverageRail,
+  MetaCellStyles,
+  Numeric,
+  OrganismMeta,
+  ResultsToolbar,
+} from "@brc/components/LoganSearch/loganSearch.styles";
 import {
   Alert,
+  Box,
+  Button,
   Card,
   CardContent,
   Chip,
+  Collapse,
   Link,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TablePagination,
   TableRow,
@@ -16,6 +26,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { styled as muiStyled } from "@mui/material/styles";
+import { visuallyHidden } from "@mui/utils";
 import {
   appliedSort,
   defaultOrder,
@@ -26,13 +38,20 @@ import {
   PAGE_SIZE_OPTIONS,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { type JSX } from "react";
+import { type ChangeEvent, type ElementType, type JSX, useState } from "react";
 
 interface LoganSearchResultsProps {
   search: ReturnType<typeof useKmindexSearch>;
 }
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
+
+// MUI's styled rather than emotion's: the cell has to keep TableCell's theme
+// props, and wrapping a MUI component with a theme-free emotion string drops
+// them.
+const MetaCell = muiStyled(TableCell)`
+  ${MetaCellStyles}
+`;
 
 // The mirror is a local copy of run metadata for every run in SRA at the time
 // it was built, not a BRC-filtered subset -- an earlier tooltip said the
@@ -84,10 +103,45 @@ function describeCorrection(hit: KmindexHit): string {
   );
 }
 
+/**
+ * A metadata cell's text, dimmed when the mirror had nothing.
+ * @param props - Component props.
+ * @param props.value - The value, or null/undefined when not recorded.
+ * @returns The caption.
+ */
+function Meta({ value }: { value?: string | null }): JSX.Element {
+  return value ? (
+    <Typography color="textSecondary" variant="caption">
+      {value}
+    </Typography>
+  ) : (
+    <Typography color="text.disabled" variant="caption">
+      --
+    </Typography>
+  );
+}
+
+/**
+ * The three metadata columns as one line, for the narrow layout where they
+ * leave the table.
+ * @param hit - The hit.
+ * @returns e.g. "ILLUMINA, Malawi, 2018-07-25", or "" when none is recorded.
+ */
+function describeMeta(hit: KmindexHit): string {
+  return [
+    hit.sra?.platform,
+    hit.sra?.country,
+    hit.sra?.release_date?.slice(0, 10),
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(", ");
+}
+
 interface SortableHeaderProps {
   align?: "left" | "right";
   applied: KmindexSort;
   column: KmindexSortColumn;
+  component?: ElementType;
   label: string;
   onSort: (column: KmindexSortColumn) => void;
   title?: string;
@@ -99,6 +153,8 @@ interface SortableHeaderProps {
  * @param props.align - Cell alignment, matching the body cells below it.
  * @param props.applied - Column and direction the response says it applied.
  * @param props.column - Column this header sorts.
+ * @param props.component - Cell to render, for a column the narrow layout
+ * hides. Defaults to a plain TableCell.
  * @param props.label - Header text.
  * @param props.onSort - Called with this column when the header is clicked.
  * @param props.title - Tooltip for the column, if it needs one.
@@ -108,13 +164,14 @@ function SortableHeader({
   align,
   applied,
   column,
+  component: Cell = TableCell,
   label,
   onSort,
   title,
 }: SortableHeaderProps): JSX.Element {
   const active = applied.column === column;
   return (
-    <TableCell
+    <Cell
       align={align}
       sortDirection={active ? applied.order : false}
       title={title}
@@ -126,7 +183,7 @@ function SortableHeader({
       >
         {label}
       </TableSortLabel>
-    </TableCell>
+    </Cell>
   );
 }
 
@@ -134,6 +191,7 @@ export const LoganSearchResults = ({
   search,
 }: LoganSearchResultsProps): JSX.Element | null => {
   const { goToPage, results, setPageSize, setSort } = search;
+  const [whyOpen, setWhyOpen] = useState(false);
 
   if (!results) return null;
 
@@ -165,19 +223,23 @@ export const LoganSearchResults = ({
   // While truncated the listing is exactly the cap, so total_hits names it.
   const cap = results.total_hits;
 
-  let headline = `${results.total_hits.toLocaleString()} SRA accessions`;
+  // The toolbar names the window the table shows. It is the one place the
+  // cap is stated, and it stays true under any sort: the cap is applied on
+  // score before the listing is re-sorted, so the listed rows are the
+  // highest-coverage ones however they are ordered on screen.
+  let window = `All ${results.total_hits.toLocaleString()} hits`;
   let capNote: string | null = null;
   if (results.truncated) {
     // notListed is 0 only when the match count went missing; "the remaining 0"
     // would be a worse answer than naming the cap and leaving it there.
-    headline =
+    window =
       notListed > 0
-        ? `${totalMatches.toLocaleString()} SRA accessions matched`
-        : `${cap.toLocaleString()} SRA accessions listed`;
+        ? `Listing the ${cap.toLocaleString()} highest-coverage hits of ${totalMatches.toLocaleString()} matched`
+        : `Listing the ${cap.toLocaleString()} highest-coverage hits`;
     capNote =
       notListed > 0
-        ? `Listing the ${cap.toLocaleString()} highest-scoring -- the remaining ${notListed.toLocaleString()} cannot be paged to.`
-        : `Capped at ${cap.toLocaleString()} -- more accessions matched than can be listed.`;
+        ? `The remaining ${notListed.toLocaleString()} cannot be paged to.`
+        : `More accessions matched than can be listed.`;
   }
 
   // What the response says it did, not what was clicked: a metadata sort the
@@ -187,6 +249,27 @@ export const LoganSearchResults = ({
   // Likewise the served page size, so the page arithmetic agrees with the rows
   // on screen even before a size change has round-tripped.
   const pageSize = results.limit;
+
+  // The same pager top and bottom: a reader who has come down a page of rows
+  // should not have to go back up to move to the next one.
+  const paginationProps = {
+    component: "div" as const,
+    count: results.total_hits,
+    onPageChange: async (_: unknown, page: number): Promise<void> => {
+      await goToPage(page * pageSize);
+    },
+    onRowsPerPageChange: async (
+      event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ): Promise<void> => {
+      await setPageSize(Number(event.target.value));
+    },
+    page: Math.floor(results.offset / pageSize),
+    rowsPerPage: pageSize,
+    rowsPerPageOptions: [...PAGE_SIZE_OPTIONS],
+    // The caption is a range of row numbers, so it wants the same tabular
+    // figures the columns do.
+    sx: { fontVariantNumeric: "tabular-nums" },
+  };
 
   return (
     <Card sx={{ mt: 2 }}>
@@ -199,222 +282,241 @@ export const LoganSearchResults = ({
         )}
         <ResultsToolbar>
           <div>
-            <Typography variant="h6">{headline}</Typography>
+            <Typography component="h2" variant="subtitle1">
+              {window}
+            </Typography>
             {capNote && (
               <Typography color="textSecondary" variant="body2">
-                {capNote}
-              </Typography>
-            )}
-            {!results.truncated && showPerIndex && (
-              <Typography color="textSecondary" component="div" variant="body2">
-                {perIndex
-                  .map(
-                    (summary) =>
-                      `${summary.index} ${summary.hits_before_cap.toLocaleString()}`
-                  )
-                  .join(" · ")}
+                {capNote}{" "}
+                <Button
+                  aria-expanded={whyOpen}
+                  onClick={(): void => setWhyOpen((open) => !open)}
+                  size="small"
+                  sx={{ minWidth: 0, p: 0, verticalAlign: "baseline" }}
+                >
+                  {whyOpen ? "Hide why" : "Why?"}
+                </Button>
               </Typography>
             )}
           </div>
-          <div>
-            <Chip
-              label={`${results.shards_with_hits}/${results.shards_searched} shards`}
-              size="small"
-              sx={{ mr: 1 }}
-            />
-            {results.sra_mirror_available && (
-              <Chip
-                label={`SRA mirror: ${results.sra_annotated}/${results.hits.length} on this page`}
-                size="small"
-                title={MIRROR_SCOPE_NOTE}
-              />
-            )}
-          </div>
+          <TablePagination {...paginationProps} />
         </ResultsToolbar>
 
         {results.truncated && (
-          <Alert severity="info" sx={{ mb: 2 }}>
-            <Typography variant="body2">
-              Raising the threshold shrinks the underlying match count, but it
-              does not re-rank what you see: the same accessions come back in
-              the same order until the threshold rises above the lowest score
-              listed here. A conserved query can match hundreds of thousands of
-              runs at a perfect k-mer score, so it may not clear the cap at all.
-            </Typography>
-            {showPerIndex && (
-              <>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  The cap is one score sort across every index, applied after
-                  the shards merge, so each index keeps only what ranked highest
-                  overall -- an index with few matches can keep none of them.
-                </Typography>
-                {perIndex.map((summary) => (
-                  <Typography
-                    component="div"
-                    key={summary.index}
-                    variant="body2"
-                    sx={{ mt: 0.5 }}
-                  >
-                    {summary.index}: {describeIndexShare(summary, cap)}
+          <Collapse in={whyOpen} unmountOnExit>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                Raising the threshold shrinks the underlying match count, but it
+                does not re-rank what you see: the same accessions come back in
+                the same order until the threshold rises above the lowest score
+                listed here. A conserved query can match hundreds of thousands
+                of runs at a perfect k-mer score, so it may not clear the cap at
+                all.
+              </Typography>
+              {showPerIndex && (
+                <>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    The cap is one score sort across every index, applied after
+                    the shards merge, so each index keeps only what ranked
+                    highest overall -- an index with few matches can keep none
+                    of them.
                   </Typography>
-                ))}
-              </>
-            )}
-            {/* Unconditional: how wide the tie band is depends on the query,
-                not on how many indexes were searched, and the backend sends
-                nothing that measures it. Two indexes over 16S and eight over
-                the same put all 50,000 listed rows on one score; one index
-                over a viral spike gave 87 distinct scores. */}
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Scores repeat: the score is a fraction of your query&apos;s
-              k-mers, so ties are common and a conserved query can put every row
-              listed here on a single one. Where the cut falls inside a tie, a
-              stable hash of the accession decides which equally-scoring runs
-              made the list -- arbitrary, but the same on every reload.
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              A longer query is not a more specific one: kmindex scores the
-              fraction of your query&apos;s k-mers a run shares, so extending
-              into conserved flanking sequence raises that fraction in unrelated
-              runs too -- a 4x longer version of the same 18S query matched more
-              runs here, not fewer. The match set responds to how rare your
-              k-mers are and to the threshold above, not to query length.
-            </Typography>
-          </Alert>
+                  {perIndex.map((summary) => (
+                    <Typography
+                      component="div"
+                      key={summary.index}
+                      variant="body2"
+                      sx={{ mt: 0.5 }}
+                    >
+                      {summary.index}: {describeIndexShare(summary, cap)}
+                    </Typography>
+                  ))}
+                </>
+              )}
+              {/* Unconditional: how wide the tie band is depends on the
+                  query, not on how many indexes were searched, and the backend
+                  sends nothing that measures it. Two indexes over 16S and
+                  eight over the same put all 50,000 listed rows on one score;
+                  one index over a viral spike gave 87 distinct scores. */}
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Scores repeat: the score is a fraction of your query&apos;s
+                k-mers, so ties are common and a conserved query can put every
+                row listed here on a single one. Where the cut falls inside a
+                tie, a stable hash of the accession decides which
+                equally-scoring runs made the list -- arbitrary, but the same on
+                every reload.
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                A longer query is not a more specific one: kmindex scores the
+                fraction of your query&apos;s k-mers a run shares, so extending
+                into conserved flanking sequence raises that fraction in
+                unrelated runs too -- a 4x longer version of the same 18S query
+                matched more runs here, not fewer. The match set responds to how
+                rare your k-mers are and to the threshold above, not to query
+                length.
+              </Typography>
+            </Alert>
+          </Collapse>
         )}
 
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <SortableHeader
-                applied={applied}
-                column="accession"
-                label="Accession"
-                onSort={setSort}
-              />
-              <SortableHeader
-                align="right"
-                applied={applied}
-                column="score"
-                label="k-mer coverage"
-                onSort={setSort}
-                title="Fraction of the query's 31-mers found in the run, after subtracting a false-positive baseline for the 227 saturated samples Logan flags"
-              />
-              {/* ANI is monotone in the score, so sorting the coverage column
-                  sorts this one too and a second control would only be a
-                  second name for it. */}
-              <TableCell
-                align="right"
-                title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
-              >
-                ANI est.
-              </TableCell>
-              <SortableHeader
-                applied={applied}
-                column="organism"
-                label="Organism"
-                onSort={setSort}
-              />
-              <SortableHeader
-                applied={applied}
-                column="platform"
-                label="Platform"
-                onSort={setSort}
-              />
-              <SortableHeader
-                applied={applied}
-                column="country"
-                label="Country"
-                onSort={setSort}
-              />
-              <SortableHeader
-                applied={applied}
-                column="release_date"
-                label="Released"
-                onSort={setSort}
-              />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {results.hits.map((hit) => (
-              <TableRow key={`${hit.shard}:${hit.accession}`}>
-                <TableCell>
-                  <Link
-                    href={`${SRA_RUN_URL}${hit.accession}`}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    sx={{
-                      alignItems: "center",
-                      display: "inline-flex",
-                      gap: 0.5,
-                    }}
-                  >
-                    {hit.accession}
-                    <OpenInNew fontSize="inherit" />
-                  </Link>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <SortableHeader
+                  applied={applied}
+                  column="accession"
+                  label="Accession"
+                  onSort={setSort}
+                  title="Opens the run at NCBI SRA in a new tab"
+                />
+                <SortableHeader
+                  align="right"
+                  applied={applied}
+                  column="score"
+                  label="k-mer coverage"
+                  onSort={setSort}
+                  title="Fraction of the query's 31-mers found in the run, after subtracting a false-positive baseline for the 227 saturated samples Logan flags"
+                />
+                {/* ANI is monotone in the score, so sorting the coverage
+                    column sorts this one too and a second control would only
+                    be a second name for it. */}
+                <TableCell
+                  align="right"
+                  title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
+                >
+                  ANI est.
                 </TableCell>
-                <TableCell align="right">
-                  {hit.score.toFixed(4)}
-                  {hit.fp_correction != null && (
-                    <Tooltip title={describeCorrection(hit)}>
-                      {/* The tooltip is the only place the raw kmindex ratio
-                          is stated, and a Chip with no onClick renders a div,
-                          which nothing but a pointer can reach. */}
-                      <Chip
-                        label="corrected"
-                        size="small"
-                        sx={{ ml: 1 }}
-                        tabIndex={0}
-                        variant="outlined"
-                      />
-                    </Tooltip>
-                  )}
-                </TableCell>
-                <TableCell align="right">
-                  {hit.ani == null ? "--" : hit.ani.toFixed(4)}
-                </TableCell>
-                <TableCell>
-                  {hit.sra?.organism ? (
-                    <Typography variant="body2">{hit.sra.organism}</Typography>
-                  ) : (
-                    <Typography color="textSecondary" variant="caption">
-                      {hit.shard}
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Typography color="textSecondary" variant="caption">
-                    {hit.sra?.platform ?? "--"}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography color="textSecondary" variant="caption">
-                    {hit.sra?.country ?? "--"}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography color="textSecondary" variant="caption">
-                    {hit.sra?.release_date?.slice(0, 10) ?? "--"}
-                  </Typography>
-                </TableCell>
+                <SortableHeader
+                  applied={applied}
+                  column="organism"
+                  label="Organism"
+                  onSort={setSort}
+                />
+                <SortableHeader
+                  applied={applied}
+                  column="platform"
+                  component={MetaCell}
+                  label="Platform"
+                  onSort={setSort}
+                />
+                <SortableHeader
+                  applied={applied}
+                  column="country"
+                  component={MetaCell}
+                  label="Country"
+                  onSort={setSort}
+                />
+                <SortableHeader
+                  applied={applied}
+                  column="release_date"
+                  component={MetaCell}
+                  label="Released"
+                  onSort={setSort}
+                />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {results.hits.map((hit) => (
+                <TableRow key={`${hit.shard}:${hit.accession}`}>
+                  <TableCell>
+                    {/* No per-row icon: twenty-five of them is chrome. The
+                        destination is named for a screen reader instead. */}
+                    <Link
+                      href={`${SRA_RUN_URL}${hit.accession}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      underline="hover"
+                    >
+                      {hit.accession}
+                      <Box component="span" sx={visuallyHidden}>
+                        {" "}
+                        (opens NCBI SRA in a new tab)
+                      </Box>
+                    </Link>
+                  </TableCell>
+                  <TableCell align="right">
+                    <CoverageCell>
+                      {/* Decoration for the number beside it: the rail
+                          carries the shape of the fall-off down a page, the
+                          digits carry the value. */}
+                      <CoverageRail aria-hidden>
+                        <span
+                          style={{
+                            width: `${Math.round(Math.min(Math.max(hit.score, 0), 1) * 100)}%`,
+                          }}
+                        />
+                      </CoverageRail>
+                      <Numeric>{hit.score.toFixed(4)}</Numeric>
+                      {hit.fp_correction != null && (
+                        <Tooltip title={describeCorrection(hit)}>
+                          {/* The tooltip is the only place the raw kmindex
+                              ratio is stated, and a Chip with no onClick
+                              renders a div, which nothing but a pointer can
+                              reach. */}
+                          <Chip
+                            label="corrected"
+                            size="small"
+                            tabIndex={0}
+                            variant="outlined"
+                          />
+                        </Tooltip>
+                      )}
+                    </CoverageCell>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Numeric>
+                      {hit.ani == null ? "--" : hit.ani.toFixed(4)}
+                    </Numeric>
+                  </TableCell>
+                  <TableCell>
+                    {hit.sra?.organism ? (
+                      <Typography variant="body2">
+                        {hit.sra.organism}
+                      </Typography>
+                    ) : (
+                      <Typography color="textSecondary" variant="caption">
+                        {hit.shard}
+                      </Typography>
+                    )}
+                    <OrganismMeta>
+                      <Typography color="textSecondary" variant="caption">
+                        {describeMeta(hit)}
+                      </Typography>
+                    </OrganismMeta>
+                  </TableCell>
+                  <MetaCell>
+                    <Meta value={hit.sra?.platform} />
+                  </MetaCell>
+                  <MetaCell>
+                    <Meta value={hit.sra?.country} />
+                  </MetaCell>
+                  <MetaCell>
+                    <Meta value={hit.sra?.release_date?.slice(0, 10)} />
+                  </MetaCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-        <TablePagination
-          component="div"
-          count={results.total_hits}
-          onPageChange={async (_, page): Promise<void> => {
-            await goToPage(page * pageSize);
-          }}
-          onRowsPerPageChange={async (event): Promise<void> => {
-            await setPageSize(Number(event.target.value));
-          }}
-          page={Math.floor(results.offset / pageSize)}
-          rowsPerPage={pageSize}
-          rowsPerPageOptions={[...PAGE_SIZE_OPTIONS]}
-        />
+        {/* Only when the mirror missed something: a line reading 25 of 25 on
+            every page is a diagnostic nobody needs to read. */}
+        {results.sra_mirror_available &&
+          results.sra_annotated < results.hits.length && (
+            <Typography
+              color="textSecondary"
+              component="div"
+              sx={{ mt: 1 }}
+              title={MIRROR_SCOPE_NOTE}
+              variant="caption"
+            >
+              Metadata found for {results.sra_annotated} of{" "}
+              {results.hits.length} rows on this page.
+            </Typography>
+          )}
+
+        <TablePagination {...paginationProps} />
       </CardContent>
     </Card>
   );
