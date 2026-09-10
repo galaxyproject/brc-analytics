@@ -1,10 +1,11 @@
 """SRA-DuckDB mirror service.
 
 Wraps a read-only DuckDB connection to a local mirror of SRA run metadata.
-The mirror is built externally -- a taxdump-resolved ingest from the public
-SRA metadata parquet, filtered to BRC-relevant organisms -- and includes a
-`taxid_names` table for taxid-anchored name resolution plus a `mirror_meta`
-table for provenance metadata.
+The mirror is built externally by scripts/build_sra_mirror.py -- a
+taxdump-resolved ingest of the public SRA metadata parquet covering every
+public run, 44,057,338 at schema_version 6 -- and includes a `taxid_names`
+table for taxid-anchored name resolution plus a `mirror_meta` table for
+provenance metadata.
 """
 
 from __future__ import annotations
@@ -1632,10 +1633,10 @@ class SRAMirrorService:
         Look up run metadata for a batch of run accessions.
 
         Built for annotating a page of sequence-search hits, so it takes the
-        accessions as they come and returns only the ones the mirror knows --
-        a caller should expect misses. How many depends on how the mirror was
-        built: a taxid-filtered mirror misses most of what a Logan query
-        matches, since Logan indexes all of SRA.
+        accessions as they come and returns only the ones the mirror knows.
+        Misses should be rare -- the mirror carries every SRA run as of its
+        build (44,057,338 at v6), so one is a run newer than the mirror or one
+        SRA has no run record for. A high miss rate is a bug, not the scope.
 
         The 'uncalculated' country and 'unspecified' instrument sentinels come
         back as None, matching _COHORT_FACETS and the export. All three describe

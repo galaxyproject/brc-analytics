@@ -1,8 +1,8 @@
 """Assistant tools backed by the local SRA-DuckDB mirror.
 
 These tools answer "what sequencing data is available?" questions
-grounded in 17M real SRA runs filtered to BRC-relevant organisms via
-taxid-anchored name resolution.
+grounded in the local SRA mirror -- every public SRA run as of its
+build, ~44M -- with taxid-anchored name resolution.
 """
 
 from __future__ import annotations

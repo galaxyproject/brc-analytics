@@ -541,8 +541,9 @@ class GalaxyService:
 
         Only the current page is annotated -- a query can match tens of
         thousands of accessions, and nobody needs metadata for the ones they
-        aren't looking at. Misses are expected and left as None: the mirror
-        covers BRC-relevant organisms, while Logan indexes all of SRA.
+        aren't looking at. Misses are left as None and should be rare: the
+        mirror holds every SRA run as of its build, so a miss is a run newer
+        than the mirror or one SRA has no run record for.
         """
         if not self._mirror_can(CAPABILITY_ANNOTATION):
             return results

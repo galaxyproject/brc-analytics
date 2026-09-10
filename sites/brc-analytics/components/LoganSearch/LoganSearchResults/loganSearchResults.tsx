@@ -27,6 +27,15 @@ interface LoganSearchResultsProps {
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 
+// The mirror is a local copy of run metadata for every run in SRA at the time
+// it was built, not a BRC-filtered subset -- an earlier tooltip said the
+// opposite and taught users to expect misses that should never happen, so a
+// genuinely low annotation rate would have read as normal instead of as a bug.
+export const MIRROR_SCOPE_NOTE =
+  "Metadata comes from a local mirror of SRA holding every run in the " +
+  "archive when the mirror was built. A hit with no metadata is a run newer " +
+  "than the mirror, or one SRA holds no run record for.";
+
 /**
  * One line saying what the cap did to a single index, and what searching it
  * alone would recover.
@@ -142,7 +151,7 @@ export const LoganSearchResults = ({
               <Chip
                 label={`SRA mirror: ${results.sra_annotated}/${results.hits.length} on this page`}
                 size="small"
-                title="Logan indexes all of SRA; the mirror covers BRC-relevant organisms, so hits outside that scope have no metadata"
+                title={MIRROR_SCOPE_NOTE}
               />
             )}
           </div>

@@ -387,9 +387,9 @@ Rules:
 # default deploy (no SRA_MIRROR_PATH) these tools don't exist, so the
 # prompt must not advertise them or the model calls tools that aren't there.
 _SRA_TOOLS_PROMPT = """\
-You also have tools backed by a local mirror of SRA run metadata for \
-BRC-relevant organisms (~17M runs). Use these to ground any \
-data-availability question in real numbers:
+You also have tools backed by a local mirror of SRA run metadata \
+covering every public SRA run as of the mirror's build (~44M runs). Use \
+these to ground any data-availability question in real numbers:
 
 - `sra_summary_for_organism` — run count, top platforms/assays/countries, \
   recent activity, largest BioProjects. Call this first whenever a user \

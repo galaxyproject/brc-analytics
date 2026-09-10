@@ -46,12 +46,11 @@ def create_mcp_server(
             "\n\nThis server also exposes a local SRA metadata mirror "
             "(search_sra, sra_data_summary, get_sra_study_runs): fast, "
             "structured multi-facet search (platform / assay type / country / "
-            "release date) over SRA runs scoped to BRC-relevant organisms, "
-            "refreshed weekly and resilient to ENA/EBI outages. Prefer the SRA "
-            "tools for broad or filtered 'what data exists' queries on BRC "
-            "pathogens; prefer the ENA tools (search_ena, search_ena_keywords) "
-            "for the very latest submissions, non-BRC organisms, or free-text "
-            "keyword search."
+            "release date) over every public SRA run as of the mirror's "
+            "build, resilient to ENA/EBI outages. Prefer the SRA tools for "
+            "broad or filtered 'what data exists' queries; prefer the ENA "
+            "tools (search_ena, search_ena_keywords) for submissions newer "
+            "than the mirror or free-text keyword search."
         )
     if logan_enabled:
         instructions += (
@@ -206,9 +205,9 @@ def create_mcp_server(
             limit: int = 50,
         ) -> dict:
             """Search the local SRA mirror for sequencing runs matching an
-            organism plus optional facet filters. Fast, structured, scoped to
-            BRC-relevant organisms, refreshed weekly. Prefer over search_ena for
-            filtered "what data exists" queries on BRC pathogens.
+            organism plus optional facet filters. Fast, structured, covering
+            every public SRA run as of the mirror's build. Prefer over
+            search_ena for filtered "what data exists" queries.
 
             Args:
                 organism: scientific name or NCBI taxonomy ID (e.g. "Plasmodium

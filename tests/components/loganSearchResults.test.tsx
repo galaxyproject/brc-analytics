@@ -1,4 +1,7 @@
-import { LoganSearchResults } from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
+import {
+  LoganSearchResults,
+  MIRROR_SCOPE_NOTE,
+} from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
   type KmindexIndexSummary,
   type KmindexResults,
@@ -269,5 +272,25 @@ describe("LoganSearchResults truncation disclosure", () => {
     expect(screen.getByText("17 SRA accessions")).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
     expect(container.textContent).not.toContain("NaN");
+  });
+});
+
+describe("SRA mirror chip", () => {
+  test("describes the mirror as all of SRA, not a BRC-filtered subset", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      sra_annotated: 1,
+      sra_mirror_available: true,
+    });
+
+    const chip = screen.getByText("SRA mirror: 1/1 on this page");
+    const title = chip.closest("[title]")?.getAttribute("title") ?? "";
+    expect(title).toBe(MIRROR_SCOPE_NOTE);
+    // The deployed mirror is every run in SRA when it was built (v6:
+    // 44,057,338 runs). The old copy told users to expect misses that
+    // should never happen, and made a real annotation failure read as normal.
+    expect(title).not.toMatch(/BRC-relevant/i);
+    expect(title).toMatch(/every run|all of SRA/i);
+    expect(title).toMatch(/newer than the mirror/i);
   });
 });
