@@ -86,8 +86,9 @@ search against the European Nucleotide Archive.
 
 **SRA mirror tools** (`search_sra`, `sra_data_summary`, `get_sra_study_runs`) --
 fast structured search over a local mirror of SRA run metadata covering every
-public run as of its build. Opt-in: registered only when `SRA_MIRROR_PATH` points at a built
-mirror file; a default deploy exposes only the catalog and ENA tools.
+public run as of its build. Opt-in: registered only when `SRA_MIRROR_PATH`
+points at a built mirror file; a default deploy exposes only the catalog and
+ENA tools.
 
 **Logan search tools** (`logan_job_status`, `logan_cohort`, `logan_hits`) --
 read-only access to Logan/kmindex sequence searches run through

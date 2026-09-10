@@ -577,8 +577,8 @@ class GalaxyService:
         )
 
     async def _ordering_for(
-        self, aggregate: dict, job_id: str, sort: str, order: str
-    ) -> Tuple[Optional[List[int]], str, str]:
+        self, aggregate: dict, job_id: str, sort: KmindexSort, order: KmindexOrder
+    ) -> Tuple[Optional[List[int]], KmindexSort, KmindexOrder]:
         """
         How to walk the listed hits for a sort, and which sort that turned out
         to be.
@@ -634,6 +634,17 @@ class GalaxyService:
             ordering = await asyncio.to_thread(
                 self.sra_mirror.order_hits, hits, sort, descending
             )
+        except ValueError as e:
+            # order_hits only raises this for a column it has no expression
+            # for, which means KmindexSort and _SORTABLE_COLUMNS have drifted:
+            # the header stays clickable and never lights up, and every request
+            # for it silently serves score order. That is a bug in this repo
+            # rather than a mirror having a bad day, so it is louder.
+            logger.error(
+                f"kmindex job {job_id}: {sort} is an accepted sort but the "
+                f"mirror cannot order by it; serving score order: {e}"
+            )
+            return None, "score", "desc"
         except Exception as e:
             # A sort is a convenience on top of the listing; the listing must
             # still come back.
@@ -1049,30 +1060,6 @@ class GalaxyService:
 
         return aggregate
 
-    async def _submitted_indexes(
-        self, job_id: str, params: Optional[dict] = None
-    ) -> Optional[List[str]]:
-        """
-        The index names this job was submitted against, or None if unreadable.
-
-        Deliberately not the tool's option list: building that form needs a
-        history, and the history lookup's error path creates one per call, which
-        would have a read-only results request writing to Galaxy. The job's own
-        parameters are read-only, cannot be poisoned by an unrelated lookup
-        failing, and answer for this job rather than for whatever the instance
-        offers today.
-
-        @param job_id: the job whose parameters to read.
-        @param params: parameters already fetched by the caller. Passing them
-            avoids a third show_job round trip per cold results request -- and
-            with it a metadata call that has no retry budget, unlike the seven
-            attempts plus straggler sweep every shard download gets, and whose
-            failure used to discard the whole aggregation. None means "not
-            carried", so fall back to fetching.
-        @returns: the parsed index names, or None if they could not be read.
-        """
-        return _submitted_index_names(await self._job_params(job_id, params))
-
     async def _job_params(
         self, job_id: str, params: Optional[dict] = None
     ) -> Optional[dict]:
@@ -1086,8 +1073,20 @@ class GalaxyService:
         which used to be read separately and disagree about whether the job's
         parameters were readable at all.
 
+        The job's own echoed parameters rather than the tool's option list:
+        building that form needs a history, and the history lookup's error path
+        creates one per call, which would have a read-only results request
+        writing to Galaxy. These are read-only, cannot be poisoned by an
+        unrelated lookup failing, and answer for this job rather than for
+        whatever the instance offers today.
+
         @param job_id: the job whose parameters to read.
-        @param params: parameters the caller already holds, or None.
+        @param params: parameters the caller already holds. Passing them avoids
+            a show_job round trip per cold results request -- and with it a
+            metadata call that has no retry budget, unlike the seven attempts
+            plus straggler sweep every shard download gets, and whose failure
+            used to discard the whole aggregation. None means "not carried", so
+            fall back to fetching.
         @returns: the params dict, or None if they could not be read.
         """
         if params is not None:
@@ -1162,8 +1161,8 @@ class GalaxyService:
         limit: int,
         offset: int,
         ordering: Optional[List[int]] = None,
-        sort: str = "score",
-        order: str = "desc",
+        sort: KmindexSort = "score",
+        order: KmindexOrder = "desc",
     ) -> KmindexResults:
         """Slice a cached aggregate into a page of results, in the given order."""
         hits = aggregate["hits"]

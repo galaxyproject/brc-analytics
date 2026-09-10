@@ -1767,6 +1767,10 @@ class SRAMirrorService:
         a reader sorting by country wants the countries first. Ties, and rows
         with no value, keep the listing's own order, which is the score rank.
 
+        The LEFT JOIN cannot fan out, so the result really is a permutation
+        and not a longer list: `runs.acc` is measured unique at 43,851,102 rows
+        out of 43,851,102, the same measurement _locations_sql records.
+
         @param hits: the listed hits, in rank order, as accession/score/shard
             dicts; only the accession is read.
         @param column: one of _SORTABLE_COLUMNS.

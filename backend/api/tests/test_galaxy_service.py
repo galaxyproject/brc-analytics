@@ -12,6 +12,8 @@ covers the other side, where the parameters are carried and no fetch happens.
 """
 
 import json
+import logging
+from typing import get_args
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -25,6 +27,7 @@ from app.models.galaxy import (
     GalaxyJobStatus,
     KmindexHit,
     KmindexQuerySubmission,
+    KmindexSort,
 )
 from app.services import galaxy_service
 from app.services.galaxy_service import (
@@ -36,6 +39,7 @@ from app.services.galaxy_service import (
     _submitted_index_names,
     _submitted_threshold,
 )
+from app.services.sra_mirror import _SORTABLE_COLUMNS
 
 
 @pytest.fixture()
@@ -1411,7 +1415,7 @@ class TestJobMetadataIsFetchedOnce:
     One cold results request should make one show_job GET, not three.
 
     get_job_status already holds the full job dict, params included;
-    _get_job_outputs re-fetched it and _submitted_indexes fetched it a third
+    _get_job_outputs re-fetched it and the index-name read fetched it a third
     time purely for params it could have been handed. That third call had no
     retry budget -- unlike the seven attempts plus 20s straggler sweep every
     shard download gets -- and its failure discarded the whole aggregation. At
@@ -2384,3 +2388,139 @@ class TestHitOrdering:
         results = await service.get_kmindex_results("job1", 10, 0, sort="accession")
 
         assert results.order == "asc"
+
+    @pytest.mark.asyncio
+    async def test_a_metadata_sort_reorders_the_page_and_says_so(self, service):
+        # The positive side of the fallback tests above: when the mirror does
+        # answer, the page is walked in the permutation it returned rather than
+        # in score rank. The two cache reads are the aggregate and then the
+        # ordering, which misses.
+        service.cache.get = AsyncMock(side_effect=[_listing(3), None])
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.sra_mirror.order_hits.return_value = [2, 0, 1]
+        service.sra_mirror.runs_by_accession.return_value = {}
+
+        results = await service.get_kmindex_results("job1", 10, 0, sort="organism")
+
+        assert [h.accession for h in results.hits] == [
+            "SRR000002",
+            "SRR000000",
+            "SRR000001",
+        ]
+        assert (results.sort, results.order) == ("organism", "asc")
+
+    @pytest.mark.asyncio
+    async def test_an_unsortable_column_is_logged_as_a_bug_not_a_bad_day(
+        self, service, caplog
+    ):
+        # order_hits raises ValueError for a column it has no expression for,
+        # which means the API literal and _SORTABLE_COLUMNS have drifted -- a
+        # bug in this repo rather than a mirror having a bad day, so it is
+        # logged at error level and names the column.
+        service.sra_mirror = MagicMock()
+        service.sra_mirror.is_available.return_value = True
+        service.sra_mirror.has_capability.return_value = True
+        service.sra_mirror.capability_fingerprint.return_value = "fp"
+        service.sra_mirror.order_hits.side_effect = ValueError(
+            "not a sortable column: 'organism'"
+        )
+
+        with caplog.at_level(logging.WARNING):
+            ordering, sort, order = await service._ordering_for(
+                _listing(2), "job1", "organism", "asc"
+            )
+
+        assert ordering is None and (sort, order) == ("score", "desc")
+        errors = [r for r in caplog.records if r.levelno >= logging.ERROR]
+        assert len(errors) == 1
+        assert "organism" in errors[0].getMessage()
+
+
+class TestSortColumnsAgree:
+    """
+    The column list the API accepts and the one the mirror can sort by are two
+    hand-kept lists of the same set.
+
+    Adding a column to the literal and forgetting the dict is silent in
+    production: order_hits raises, _ordering_for falls back to score order, and
+    the header can be clicked forever without ever lighting up.
+    """
+
+    def test_every_metadata_column_the_api_accepts_is_sortable(self):
+        # score and accession are ordered in the service, without the mirror.
+        assert set(get_args(KmindexSort)) - {"score", "accession"} == set(
+            _SORTABLE_COLUMNS
+        )
+
+
+class TestResultsEndpoint:
+    """
+    The results endpoint over HTTP.
+
+    The sort arguments are typed at the edge, so a value the service has no
+    branch for is a 422 from FastAPI rather than something that reaches
+    _ordering_for and quietly becomes score order.
+    """
+
+    @staticmethod
+    def _client(service):
+        """A test client over the galaxy router alone, backed by `service`.
+
+        @param service: the GalaxyService the endpoint should be handed.
+        @returns: a TestClient.
+        """
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app.api.v1 import galaxy as galaxy_api
+        from app.core.dependencies import check_rate_limit
+
+        app = FastAPI()
+        app.include_router(galaxy_api.router, prefix="/galaxy")
+        app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: service
+        return TestClient(app)
+
+    def test_a_column_that_is_not_sortable_is_rejected(self, service):
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results?sort=bogus")
+
+        assert response.status_code == 422
+        # The location as well as the code: this endpoint also answers 422 for
+        # a job that failed, so only "query"/"sort" proves the value was turned
+        # away at the edge rather than after the service tried to serve it.
+        assert [error["loc"] for error in response.json()["detail"]] == [
+            ["query", "sort"]
+        ]
+
+    def test_a_direction_that_is_not_asc_or_desc_is_rejected(self, service):
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results?order=sideways")
+
+        assert response.status_code == 422
+        assert [error["loc"] for error in response.json()["detail"]] == [
+            ["query", "order"]
+        ]
+
+    def test_a_good_request_echoes_the_sort_it_applied(self, service):
+        service.cache.get = AsyncMock(return_value=_listing(3))
+        service.sra_mirror = None
+        client = self._client(service)
+
+        response = client.get(
+            "/galaxy/kmindex/jobs/job1/results?sort=accession&order=desc"
+        )
+        body = response.json()
+
+        assert response.status_code == 200
+        assert (body["sort"], body["order"]) == ("accession", "desc")
+        assert [hit["accession"] for hit in body["hits"]] == [
+            "SRR000002",
+            "SRR000001",
+            "SRR000000",
+        ]
