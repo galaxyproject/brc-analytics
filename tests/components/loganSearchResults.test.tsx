@@ -441,8 +441,10 @@ describe("shards that could not be read", () => {
     // is a claim about the query rather than about the index.
     const alerts = screen.getAllByRole("alert");
     expect(alerts).toHaveLength(2);
+    // "this list" would point at a list with no rows in it, so the empty
+    // state names the search instead.
     expect(alerts[0].textContent).toContain(
-      "3 of 35 index shards could not be read"
+      "3 of 35 index shards could not be read, so this search is incomplete."
     );
     expect(alerts[1].textContent).toContain("No accessions matched");
   });
@@ -535,10 +537,14 @@ describe("coverage and ANI columns", () => {
     });
 
     const chip = screen.getByText("corrected").closest(".MuiChip-root");
-    // The sentence describes the chip rather than naming it: as a string
-    // tooltip title it became the chip's aria-label, so the mark a reader can
-    // see and the mark assistive tech announces stopped being the same word.
-    expect(chip?.getAttribute("aria-label")).toBeNull();
+    // The sentence describes the chip rather than naming it. describeChild
+    // alone was not enough: MUI leaves the sentence on the chip as a native
+    // title while the tooltip is closed, and a Chip with no onClick is a
+    // role-less div that takes its name from that title -- so the mark a
+    // reader sees and the mark assistive tech announces came apart. The name
+    // is pinned to the visible word instead, and the sentence reaches the
+    // reader through aria-describedby below.
+    expect(chip?.getAttribute("aria-label")).toBe("corrected");
     expect(chip?.textContent).toBe("corrected");
     // The tooltip is the only place the raw ratio is stated, so the chip has
     // to be reachable without a pointer.

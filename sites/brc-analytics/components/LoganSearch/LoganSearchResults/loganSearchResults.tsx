@@ -161,19 +161,23 @@ function describeMeta(hit: KmindexHit): string {
  * listing: a search whose shards all failed matches nothing, and "no
  * accessions matched" on its own makes that a fact about the query.
  * @param props - Component props.
+ * @param props.noun - What the failures left incomplete. The empty state has
+ * no rows, so calling that a list points at something the reader cannot see.
  * @param props.results - Results payload, for the shard counts.
  * @returns The alert, or null when every shard answered.
  */
 function ShardWarning({
+  noun,
   results,
 }: {
+  noun: "list" | "search";
   results: KmindexResults;
 }): JSX.Element | null {
   if (results.shards_failed <= 0) return null;
   return (
     <Alert severity="warning" sx={{ mb: 2 }}>
       {results.shards_failed} of {results.shards_searched} index shards could
-      not be read, so this list is incomplete. Reload to retry.
+      not be read, so this {noun} is incomplete. Reload to retry.
     </Alert>
   );
 }
@@ -242,7 +246,7 @@ export const LoganSearchResults = ({
   if (results.total_hits === 0) {
     return (
       <Box sx={{ mt: 2 }}>
-        <ShardWarning results={results} />
+        <ShardWarning noun="search" results={results} />
         <Alert severity="info">
           No accessions matched at this threshold. Try lowering the minimum
           shared k-mer fraction, or searching a different index.
@@ -331,7 +335,7 @@ export const LoganSearchResults = ({
   return (
     <Card sx={{ mt: 2 }}>
       <CardContent>
-        <ShardWarning results={results} />
+        <ShardWarning noun="list" results={results} />
         <ResultsToolbar>
           <div>
             <Typography component="h2" variant="subtitle1">
@@ -512,10 +516,14 @@ export const LoganSearchResults = ({
                           {/* The tooltip is the only place the raw kmindex
                               ratio is stated, and a Chip with no onClick
                               renders a div, which nothing but a pointer can
-                              reach. Describing rather than naming: as a name
-                              the sentence replaced the word the reader can
-                              see on the chip. */}
+                              reach. describeChild keeps the sentence a
+                              description, but MUI writes it back as a native
+                              title while the tooltip is closed, and a
+                              role-less div takes its name from that title --
+                              so the visible word has to be pinned as the
+                              name. */}
                           <Chip
+                            aria-label="corrected"
                             label="corrected"
                             size="small"
                             tabIndex={0}
