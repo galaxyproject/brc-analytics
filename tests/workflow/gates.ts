@@ -25,8 +25,8 @@ export function buildWorkflowCategory(
 }
 
 /**
- * Builds workflow gating rules for a test, with the demo flag disabled unless
- * the test enables it.
+ * Binds the workflow gating rules, defaulting the demo flag to disabled so a
+ * test naming no flag state reads as the gated one.
  * @param isDemoEnabled - Whether the demo feature flag is enabled.
  * @returns Gating rules bound to the given flag state.
  */

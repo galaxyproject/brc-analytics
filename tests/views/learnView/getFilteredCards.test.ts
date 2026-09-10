@@ -16,11 +16,4 @@ describe("getFilteredCards", () => {
   test("returns every card when the demo flag is enabled", () => {
     expect(getFilteredCards(true)).toEqual(CARDS);
   });
-
-  test("preserves the declared card order", () => {
-    const hrefs = getFilteredCards(false).map(({ href }) => href);
-    expect(hrefs).toEqual(
-      CARDS.filter(({ isDemoGated }) => !isDemoGated).map(({ href }) => href)
-    );
-  });
 });

@@ -28,7 +28,7 @@ export interface WorkflowGates {
  */
 const DEMO_DISABLED_GATES: WorkflowGates = {
   filterCategories: filterDemoGatedCategories,
-  isWorkflowAllowed: isWorkflowVisible,
+  isWorkflowAllowed: (workflow) => !isDemoGatedWorkflow(workflow),
 };
 
 /**
@@ -96,9 +96,11 @@ function filterDemoGatedCategories(
 ): WorkflowCategory[] {
   const visibleCategories: WorkflowCategory[] = [];
   for (const workflowCategory of workflowCategories) {
-    if (!isWorkflowCategoryVisible(workflowCategory.category)) continue;
+    if (isDemoGatedCategory(workflowCategory.category)) continue;
     const { workflows } = workflowCategory;
-    const visibleWorkflows = workflows.filter(isWorkflowVisible);
+    const visibleWorkflows = workflows.filter(
+      (workflow) => !isDemoGatedWorkflow(workflow)
+    );
     visibleCategories.push(
       visibleWorkflows.length === workflows.length
         ? workflowCategory
@@ -109,31 +111,31 @@ function filterDemoGatedCategories(
 }
 
 /**
+ * Determines whether a workflow category is one the demo gates.
+ * @param category - Workflow category ID.
+ * @returns True when the category is demo gated.
+ */
+function isDemoGatedCategory(category: string): boolean {
+  return DEMO_GATED_CATEGORIES.has(category);
+}
+
+/**
+ * Determines whether an individual workflow is one the demo gates. Independent
+ * of its category's gate: a workflow in an ungated category can still be gated
+ * in its own right.
+ * @param workflow - Workflow to check.
+ * @param workflow.trsId - TRS ID of the workflow.
+ * @returns True when the workflow is demo gated.
+ */
+function isDemoGatedWorkflow({ trsId }: GatedWorkflow): boolean {
+  return DEMO_GATED_WORKFLOWS.some((matches) => matches(trsId));
+}
+
+/**
  * Determines whether a TRS ID identifies the Hyphy workflow.
  * @param trsId - TRS ID of the workflow.
  * @returns True when the TRS ID is the Hyphy workflow's.
  */
 function isHyphyWorkflow(trsId: string): boolean {
   return trsId.startsWith(HYPHY_TRS_ID_PREFIX);
-}
-
-/**
- * Determines whether a workflow category is one the demo does not gate.
- * @param category - Workflow category ID.
- * @returns True when the category is not demo gated.
- */
-function isWorkflowCategoryVisible(category: string): boolean {
-  return !DEMO_GATED_CATEGORIES.has(category);
-}
-
-/**
- * Determines whether an individual workflow is one the demo does not gate.
- * Independent of its category's gate: a workflow in a visible category can
- * still be gated in its own right.
- * @param workflow - Workflow to check.
- * @param workflow.trsId - TRS ID of the workflow.
- * @returns True when the workflow is not demo gated.
- */
-function isWorkflowVisible({ trsId }: GatedWorkflow): boolean {
-  return !DEMO_GATED_WORKFLOWS.some((matches) => matches(trsId));
 }

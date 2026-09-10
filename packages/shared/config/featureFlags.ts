@@ -6,7 +6,7 @@
  * Which flags a site exposes is per-site — a site's `setFeatureFlags` call
  * allowlists the names it accepts as URL query params (`?demo=true`), and that
  * is what turns a flag on for a browser. Anything unset reads as off, so a site
- * that registers nothing gates everything.
+ * that registers nothing has no way to turn it on.
  */
 export const FEATURE_FLAGS = {
   DEMO: "demo",

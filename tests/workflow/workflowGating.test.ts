@@ -68,6 +68,13 @@ describe("bindWorkflowGates", () => {
     expect(enabled.filterCategories([gatedCategory])).toEqual([gatedCategory]);
   });
 
+  it("returns the same rules for a given flag state", () => {
+    // Callers hold the result as a memo dependency instead of memoizing it, so
+    // a build-per-call would silently recompute over the whole catalog.
+    expect(buildWorkflowGates(true)).toBe(buildWorkflowGates(true));
+    expect(buildWorkflowGates()).toBe(buildWorkflowGates());
+  });
+
   it("hands back a copy, so a caller cannot reorder the array it was given", () => {
     // Both flag states: the views filter prerendered page props, so neither
     // path may return the caller's own array.
