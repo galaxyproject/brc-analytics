@@ -140,7 +140,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
             "chromosomes": NUMERIC,
             "strainName": SCALAR,
             "coverage": SCALAR,
-            "commonNames": LIST,
+            "otherNames": LIST,
             "geneModelUrl": SCALAR,
         },
         # ploidy is intentionally omitted from display — it's an organism-level
@@ -167,7 +167,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         source="organisms.json",
         fields={
             "ncbiTaxonomyId": SCALAR,
-            "commonNames": LIST,
+            "otherNames": LIST,
             "assemblyCount": NUMERIC,
             "priority": SCALAR,
             "priorityPathogenName": SCALAR,
@@ -184,7 +184,7 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         display=(
             "ncbiTaxonomyId",
             "taxonomicLevelSpecies",
-            "commonNames",
+            "otherNames",
             "assemblyCount",
         ),
         # Most relevant first: best-covered organisms (most assemblies), with the

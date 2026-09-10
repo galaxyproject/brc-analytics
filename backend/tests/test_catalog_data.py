@@ -47,10 +47,10 @@ class TestSearchOrganisms:
         assert len(results) > 0
         assert all(r["genus"] == "Plasmodium" for r in results)
 
-    def test_search_by_common_name(self, catalog):
+    def test_search_by_other_name(self, catalog):
         results = catalog.search_organisms("malaria")
         assert len(results) > 0
-        names = [name for r in results for name in (r.get("commonNames") or [])]
+        names = [name for r in results for name in (r.get("otherNames") or [])]
         assert any("malaria" in n.lower() for n in names)
 
     def test_search_by_taxonomy_id(self, catalog):

@@ -14,7 +14,7 @@ SAMPLE_ORGANISMS = [
         "taxonomicLevelSpecies": "Plasmodium falciparum",
         "taxonomicLevelGenus": "Plasmodium",
         "taxonomicLevelFamily": "Plasmodiidae",
-        "commonNames": ["malaria parasite"],
+        "otherNames": ["malaria parasite"],
         "assemblyCount": 2,
         "taxonomicGroup": ["Apicomplexa"],
         "genomes": [
@@ -53,7 +53,7 @@ SAMPLE_ORGANISMS = [
         "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
         "taxonomicLevelGenus": "Saccharomyces",
         "taxonomicLevelFamily": "Saccharomycetaceae",
-        "commonNames": ["yeast", "brewer's yeast"],
+        "otherNames": ["yeast", "brewer's yeast", "Candida robusta"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Fungi"],
         "genomes": [
@@ -155,16 +155,23 @@ class TestSearchOrganisms:
         assert len(results) == 1
         assert results[0]["species"] == "Plasmodium falciparum"
 
-    def test_search_by_common_name(self, catalog):
+    def test_search_by_other_name(self, catalog):
         results = catalog.search_organisms("yeast")
         assert len(results) == 1
         assert results[0]["taxonomy_id"] == "559292"
 
-    def test_search_by_secondary_common_name(self, catalog):
-        # Matches on a non-primary common name from the full list.
+    def test_search_by_secondary_other_name(self, catalog):
+        # Matches on a non-primary name from the full list.
         results = catalog.search_organisms("brewer")
         assert len(results) == 1
         assert results[0]["taxonomy_id"] == "559292"
+
+    def test_search_by_prior_scientific_name(self, catalog):
+        # otherNames carries NCBI synonyms and equivalent names, so an organism
+        # resolves under a superseded scientific name too.
+        results = catalog.search_organisms("Candida robusta")
+        assert len(results) == 1
+        assert results[0]["species"] == "Saccharomyces cerevisiae"
 
     def test_search_by_taxonomy_id(self, catalog):
         results = catalog.search_organisms("5833")
@@ -208,7 +215,7 @@ class TestFindOrganismExact:
     def test_case_insensitive(self, catalog):
         assert catalog.find_organism_exact("plasmodium falciparum") is not None
 
-    def test_common_name_match(self, catalog):
+    def test_other_name_match(self, catalog):
         assert catalog.find_organism_exact("malaria parasite") is not None
 
     def test_taxonomy_id_match(self, catalog):
@@ -423,7 +430,7 @@ LINEAGE_ORGANISMS = [
         "ncbiTaxonomyId": 562,
         "taxonomicLevelSpecies": "Escherichia coli",
         "taxonomicLevelGenus": "Escherichia",
-        "commonNames": ["E. coli"],
+        "otherNames": ["E. coli"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Bacteria"],
         "genomes": [
@@ -445,7 +452,7 @@ LINEAGE_ORGANISMS = [
         "ncbiTaxonomyId": 559292,
         "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
         "taxonomicLevelGenus": "Saccharomyces",
-        "commonNames": ["yeast"],
+        "otherNames": ["yeast"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Fungi"],
         "genomes": [

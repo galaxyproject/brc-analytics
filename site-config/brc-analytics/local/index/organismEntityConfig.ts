@@ -47,8 +47,8 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
@@ -226,10 +226,10 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildCommonNames,
+          viewBuilder: V.buildOtherNames,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
         width: { max: "0.65fr", min: "auto" },
       },
       {
@@ -293,7 +293,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES]: false,
         },
         sorting: [
           {

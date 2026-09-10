@@ -1573,7 +1573,7 @@ class AssistantAgent:
         to a string and looked up, so a non-string value (e.g. a numeric taxid)
         is still validated rather than silently passed through. An empty/
         whitespace tag is treated as absent. Organisms resolve on the taxonomy id
-        (an exact species/common name is still accepted as a fail-soft fallback);
+        (an exact species/other name is still accepted as a fail-soft fallback);
         either way the match is EXACT -- not the fuzzy search_organisms -- so a
         genus or partial name can't sneak through. Assemblies and workflows are
         looked up by their canonical id per the chip contract -- a chip that tags

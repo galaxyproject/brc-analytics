@@ -114,7 +114,7 @@ class CatalogData:
                 for field in (
                     "taxonomicLevelSpecies",
                     "taxonomicLevelGenus",
-                    "commonNames",
+                    "otherNames",
                     "ncbiTaxonomyId",
                     "taxonomicGroup",
                     "taxonomicLevelStrain",
@@ -137,7 +137,7 @@ class CatalogData:
             "ncbiTaxonomyId": org.get("ncbiTaxonomyId"),
             "species": org.get("taxonomicLevelSpecies"),
             "genus": org.get("taxonomicLevelGenus"),
-            "commonNames": org.get("commonNames"),
+            "otherNames": org.get("otherNames"),
             "assemblyCount": org.get("assemblyCount"),
             "taxonomicGroup": org.get("taxonomicGroup"),
             "strain": org.get("taxonomicLevelStrain"),

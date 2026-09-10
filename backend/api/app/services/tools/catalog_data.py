@@ -124,18 +124,18 @@ class CatalogData:
     # ------------------------------------------------------------------
 
     def search_organisms(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Search organisms by species name, common name, or taxonomy ID."""
+        """Search organisms by species name, other name, or taxonomy ID."""
         q = query.lower().strip()
         results = []
         for org in self.organisms:
             species = (org.get("taxonomicLevelSpecies") or "").lower()
-            commons = [(name or "").lower() for name in org.get("commonNames") or []]
+            others = [(name or "").lower() for name in org.get("otherNames") or []]
             tax_id = str(org.get("ncbiTaxonomyId") or "")
             genus = (org.get("taxonomicLevelGenus") or "").lower()
 
             if (
                 q in species
-                or any(q in common for common in commons)
+                or any(q in other for other in others)
                 or q == tax_id
                 or q in genus
             ):
@@ -153,7 +153,7 @@ class CatalogData:
     def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
         """Find an organism by its NCBI taxonomy id -- the stable, canonical key
         suggestion chips tag organisms with (#1297). An exact (case-insensitive)
-        species or common name is also accepted as a fail-soft fallback so a chip
+        species or other name is also accepted as a fail-soft fallback so a chip
         the model mis-tags by name isn't needlessly dropped.
 
         Accepts any input (e.g. a numeric taxid or None); the value is coerced
@@ -171,7 +171,7 @@ class CatalogData:
             candidates = {
                 (org.get("taxonomicLevelSpecies") or "").lower(),
                 str(org.get("ncbiTaxonomyId") or "").lower(),
-                *((common or "").lower() for common in org.get("commonNames") or []),
+                *((other or "").lower() for other in org.get("otherNames") or []),
             }
             candidates.discard("")
             if q in candidates:
@@ -190,7 +190,7 @@ class CatalogData:
 
         return {
             "species": org.get("taxonomicLevelSpecies"),
-            "common_names": org.get("commonNames"),
+            "other_names": org.get("otherNames"),
             "taxonomy_id": str(org.get("ncbiTaxonomyId")),
             "assembly_count": org.get("assemblyCount", len(genomes)),
             "reference_assembly_count": len(ref_genomes),

@@ -18,7 +18,7 @@ export type BaseWorkflowAssembly = Pick<
  * at runtime but only typed on site-specific WorkflowEntity extensions.
  */
 export type WorkflowAssembly = BaseWorkflowAssembly & {
-  commonNames: string[];
+  otherNames: string[];
   taxonomicLevelRealm: string;
 };
 
