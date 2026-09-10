@@ -1,4 +1,5 @@
 import { CohortGeography } from "@brc/components/LoganSearch/CohortGeography/cohortGeography";
+import { CohortYears } from "@brc/components/LoganSearch/CohortYears/cohortYears";
 import {
   CohortBarRow,
   CohortBarRows,
@@ -9,6 +10,7 @@ import { formatShare } from "@brc/components/LoganSearch/utils";
 import {
   Alert,
   AlertTitle,
+  Box,
   Card,
   CardContent,
   Divider,
@@ -230,9 +232,12 @@ export const LoganSearchCohort = ({
   const countryFacet = geography
     ? (facets.find((facet) => facet.name === "country") ?? null)
     : null;
-  const gridFacets = countryFacet
-    ? facets.filter((facet) => facet !== countryFacet)
-    : facets;
+  // Release year leaves the grid too. A grid block ranks its values by count,
+  // which for a year discards the one thing a year is for.
+  const yearFacet = facets.find((facet) => facet.name === "release_year");
+  const gridFacets = facets.filter(
+    (facet) => facet !== countryFacet && facet !== yearFacet
+  );
   // The two cards describe different sets whenever the cap bit. Derived from
   // the counts rather than the truncated flag because it is precisely the gap
   // between these two numbers that the reader has to be told about.
@@ -256,34 +261,33 @@ export const LoganSearchCohort = ({
   return (
     <Card sx={{ mt: 2 }}>
       <CardContent>
-        <Typography color="textSecondary" variant="subtitle2">
-          Every run this query matched
-        </Typography>
-        <Typography variant="h6">
-          {cohort.total.toLocaleString()} runs
+        <Typography component="h2" variant="h6">
+          How the {cohort.total.toLocaleString()} matched runs break down
         </Typography>
 
-        <Alert severity="info" sx={{ mt: 2 }}>
-          <AlertTitle>
-            These counts describe the whole match set, not the table below.
-          </AlertTitle>
-          {isTruncated ? (
+        {/* The Alert is for the case where the two disagree. When nothing was
+            cut there is no disagreement to warn about, and a standing banner
+            over the whole card would be teaching the reader to skip it. */}
+        {isTruncated ? (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <AlertTitle>
+              These counts describe the whole match set, not the table above.
+            </AlertTitle>
             <Typography variant="body2">
               All {cohort.total.toLocaleString()} matched runs are counted here.
-              The table below lists {listed.toLocaleString()} of them: the top
+              The table above lists {listed.toLocaleString()} of them: the top
               of the score range, which over-represents whatever is common at
               the top. Counting those rows gives different answers, up to and
               including a different top organism. Where the two disagree, these
               are the numbers that describe your search.
             </Typography>
-          ) : (
-            <Typography variant="body2">
-              Nothing was cut: these counts and the {listed.toLocaleString()}{" "}
-              rows in the table below describe the same set of runs, which the
-              table pages through a screen at a time.
-            </Typography>
-          )}
-        </Alert>
+          </Alert>
+        ) : (
+          <Typography color="textSecondary" variant="body2">
+            Counted over every matched run, which the table above pages through
+            a screen at a time.
+          </Typography>
+        )}
 
         {mirrorNote && (
           <Typography color="textSecondary" sx={{ mt: 2 }} variant="body2">
@@ -328,6 +332,14 @@ export const LoganSearchCohort = ({
           ))}
         </CohortFacetGrid>
 
+        {/* Full width under the grid: thirteen years in a half-width cell
+            gives each year about twenty pixels, which is not a timeline. */}
+        {yearFacet && (
+          <Box sx={{ mt: 3 }}>
+            <CohortYears facet={yearFacet} />
+          </Box>
+        )}
+
         <Typography
           color="textSecondary"
           sx={{ display: "block", mt: 2 }}
@@ -336,10 +348,8 @@ export const LoganSearchCohort = ({
           {/* Was "nothing here is clickable", which stopped being true once
               the card carried a download. The claim that has to survive is
               about the breakdowns, not about the card. */}
-          Counts only -- these values are not filters. Narrowing by a value
-          would have to run over the whole match set to stay honest, and
-          applying it to the listed rows alone would reintroduce exactly the
-          skew these counts are here to correct.
+          Counts only. These values are not filters -- narrowing by one would
+          have to run over the whole match set to stay honest.
         </Typography>
       </CardContent>
     </Card>

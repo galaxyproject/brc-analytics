@@ -70,6 +70,27 @@ const COUNTRY_FACET = facet(
   244011
 );
 
+// The same job's release years, count-descending as the API sends them, with
+// 2013, 2014 and 2016 absent because nothing matched in them. Sums to
+// IN_MIRROR: every run with metadata has a release date.
+const RELEASE_YEAR_FACET = facet(
+  "release_year",
+  [
+    ["2021", 402118],
+    ["2020", 288440],
+    ["2022", 201377],
+    ["2019", 118206],
+    ["2023", 62109],
+    ["2018", 41028],
+    ["2024", 9110],
+    ["2017", 4102],
+    ["2015", 1901],
+    ["2012", 81],
+  ],
+  0,
+  0
+);
+
 const COHORT: KmindexCohort = {
   bioprojects: 19014,
   countries: 186,
@@ -84,6 +105,7 @@ const COHORT: KmindexCohort = {
       0
     ),
     COUNTRY_FACET,
+    RELEASE_YEAR_FACET,
   ],
   in_mirror: IN_MIRROR,
   organisms: 10927,
@@ -191,8 +213,14 @@ describe("LoganSearchCohort", () => {
   test("leads with the match count and leaves the figures to the summary", () => {
     const { container } = renderCohort(BASE_RESULTS);
 
-    expect(screen.getByText("1,133,516 runs")).toBeTruthy();
-    expect(container.textContent).toContain("Every run this query matched");
+    // The heading names the set the card counts over, which is the whole
+    // match set and not the window the table pages through.
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "How the 1,133,516 matched runs break down",
+      })
+    ).toBeTruthy();
     // Organisms, BioProjects, SRA studies and countries are four measurements
     // of the same set the summary strip above already leads with, and each
     // number gets one place on the page.
@@ -232,11 +260,14 @@ describe("LoganSearchCohort", () => {
   test("separates the cohort from the table when the cap bit", () => {
     const { container } = renderCohort(BASE_RESULTS);
 
+    // The table sits above this card, so "below" would send the reader the
+    // wrong way as well as describing the wrong set.
+    expect(screen.getByRole("alert")).toBeTruthy();
     expect(container.textContent).toContain(
-      "These counts describe the whole match set, not the table below."
+      "These counts describe the whole match set, not the table above."
     );
     expect(container.textContent).toContain(
-      "All 1,133,516 matched runs are counted here. The table below lists 50,000 of them: the top of the score range, which over-represents whatever is common at the top."
+      "All 1,133,516 matched runs are counted here. The table above lists 50,000 of them: the top of the score range, which over-represents whatever is common at the top."
     );
     expect(container.textContent).toContain(
       "up to and including a different top organism"
@@ -260,8 +291,14 @@ describe("LoganSearchCohort", () => {
       truncated: false,
     });
 
+    // Nothing was cut, so there is nothing to warn about: one sentence
+    // saying what was counted, and no Alert standing over the whole card.
     expect(container.textContent).toContain(
-      "Nothing was cut: these counts and the 17,633 rows in the table below describe the same set of runs"
+      "Counted over every matched run, which the table above pages through a screen at a time."
+    );
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(container.textContent).not.toContain(
+      "These counts describe the whole match set"
     );
     expect(container.textContent).not.toContain("over-represents");
   });
@@ -283,14 +320,37 @@ describe("LoganSearchCohort", () => {
   test("accounts for every matched run in each facet it draws", () => {
     renderCohort(BASE_RESULTS);
 
-    // Both facets name the same denominator, and both add up to it.
+    // All three facets name the same denominator, and each adds up to it --
+    // the release-year timeline included, which states its own total the
+    // same way the bar blocks do.
     const rowCounts = [
       ...COUNTRY_FACET.values.map(({ count }) => count),
       COUNTRY_FACET.other,
       COUNTRY_FACET.unknown,
     ];
     expect(rowCounts.reduce((a, b) => a + b, 0)).toBe(IN_MIRROR);
-    expect(screen.getAllByText("1,128,472 runs")).toHaveLength(2);
+    expect(screen.getAllByText("1,128,472 runs")).toHaveLength(3);
+  });
+
+  test("draws release year as a timeline instead of a row in the facet grid", () => {
+    const { container } = renderCohort(BASE_RESULTS);
+
+    // The grid ranks a facet's values by count, which for a year is a
+    // ranking of the calendar. Release year leaves the grid entirely.
+    const grid =
+      screen.getByText("Library layout").parentElement?.parentElement;
+    expect(grid?.textContent).toContain("Country of origin");
+    expect(grid?.textContent).not.toContain("Release year");
+    expect(
+      screen.getByRole("img", { name: "Runs released per year, 2012 to 2024" })
+    ).toBeTruthy();
+    // Thirteen years, three of them empty, each carrying its own count.
+    expect(screen.getByTitle("2021: 402,118 runs")).toBeTruthy();
+    expect(screen.getByTitle("2016: 0 runs")).toBeTruthy();
+    // A grid row would have put that count and its share on the page as
+    // text; the timeline puts the shape there instead.
+    expect(container.textContent).not.toContain("402,118");
+    expect(container.textContent).not.toContain("35.6%");
   });
 
   test("omits the other and unrecorded rows when a facet has neither", () => {
@@ -396,7 +456,7 @@ describe("LoganSearchCohort", () => {
     expect(container.querySelectorAll("button")).toHaveLength(0);
     expect(container.querySelectorAll("input")).toHaveLength(0);
     expect(container.textContent).toContain(
-      "Counts only -- these values are not filters."
+      "Counts only. These values are not filters -- narrowing by one would have to run over the whole match set to stay honest."
     );
     // The claim that has to survive is about the breakdowns, not about the
     // card: the download and the assistant live in the summary strip above.
@@ -465,7 +525,7 @@ describe("the geography block", () => {
     // The card's standing contract. Narrowing by a country would have to run
     // over the whole match set to stay honest.
     expect(container.textContent).toContain(
-      "Counts only -- these values are not filters."
+      "Counts only. These values are not filters -- narrowing by one would have to run over the whole match set to stay honest."
     );
   });
 

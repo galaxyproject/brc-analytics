@@ -216,3 +216,42 @@ export const CohortGeographyLayout = styled.div`
     grid-template-columns: minmax(0, 1fr);
   }
 `;
+
+/* One column per year, bars bottom-aligned in the 84px the row leaves above
+   the labels. Chronological rather than ranked: a year is an axis, and
+   sorting it by count throws away the only thing it was going to show. */
+export const YearRow = styled.div`
+  align-items: flex-end;
+  display: flex;
+  gap: 3px;
+  height: 104px;
+  margin-top: 8px;
+`;
+
+export const YearColumn = styled.div`
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-end;
+  min-width: 0;
+`;
+
+/* A year that rounds to nothing against the tallest still happened: 81 runs
+   beside 402,118 is under half a pixel, and min-height is what keeps it on
+   the axis at all. */
+export const YearBar = styled.div`
+  background: ${PALETTE.PRIMARY_MAIN};
+  border-radius: 2px 2px 0 0;
+  min-height: 1px;
+`;
+
+export const YearLabel = styled.span`
+  color: ${PALETTE.INK_LIGHT};
+  font-size: 11px;
+  height: 20px;
+  line-height: 20px;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+`;
