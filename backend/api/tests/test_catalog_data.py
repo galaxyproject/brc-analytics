@@ -173,6 +173,28 @@ class TestSearchOrganisms:
         assert len(results) == 1
         assert results[0]["species"] == "Saccharomyces cerevisiae"
 
+    def test_current_name_ranks_above_other_name(self, tmp_path):
+        # A name one organism has moved on from can still be another's current
+        # name; the assistant reads the first result, so that one must lead.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["Genusvetus specimen"],
+                "genomes": [],
+            },
+            {
+                "ncbiTaxonomyId": 2,
+                "taxonomicLevelSpecies": "Genusvetus specimen",
+                "otherNames": [],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        results = CatalogData(str(tmp_path)).search_organisms("Genusvetus specimen")
+        assert [r["taxonomy_id"] for r in results] == ["2", "1"]
+
     def test_search_by_taxonomy_id(self, catalog):
         results = catalog.search_organisms("5833")
         assert len(results) == 1
@@ -217,6 +239,32 @@ class TestFindOrganismExact:
 
     def test_other_name_match(self, catalog):
         assert catalog.find_organism_exact("malaria parasite") is not None
+
+    def test_scientific_name_beats_earlier_other_name_match(self, tmp_path):
+        # otherNames carries prior scientific names, so a name one organism has
+        # moved on from can still be another organism's current name -- the
+        # mechanism behind Candidozyma auris keeping "Candida auris". The
+        # organism that currently holds the name must win even when the
+        # other-name match comes first in the catalog.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["Genusvetus specimen"],
+                "genomes": [],
+            },
+            {
+                "ncbiTaxonomyId": 2,
+                "taxonomicLevelSpecies": "Genusvetus specimen",
+                "otherNames": [],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        org = CatalogData(str(tmp_path)).find_organism_exact("Genusvetus specimen")
+        assert org is not None
+        assert org["taxonomy_id"] == "2"
 
     def test_taxonomy_id_match(self, catalog):
         assert catalog.find_organism_exact("5833") is not None
