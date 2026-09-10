@@ -226,10 +226,11 @@ interface KmindexSearchState {
   isSubmitting: boolean;
   jobId: string | null;
   jobStatus: KmindexJobStatus | null;
-  // Requested, not applied: the size and sort the last click asked for. The
-  // component reads the applied pair off `results.limit` / `results.sort`, so
-  // a header wired to `sort` here would light a column the server may never
-  // have sorted by.
+  // These mirror the refs, i.e. what the next request will send: the value a
+  // setter asked for between the call and its response, and the last landed
+  // page otherwise. The component reads the applied pair off `results.limit`
+  // and `appliedSort(results)` and has to keep doing so -- a header wired to
+  // `sort` here would light a column the server may never have sorted by.
   pageSize: number;
   results: KmindexResults | null;
   sort: KmindexSort;
@@ -366,6 +367,11 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // the paginator and the headers are drawn from, so it is also what a failed
   // request has to leave the refs agreeing with.
   const resultsRef = useRef<KmindexResults | null>(null);
+  // Number of the newest results request. Nothing is disabled while a request
+  // is out, so requests overlap, and only the newest may touch state: a stale
+  // success would put an older page over a newer one, and a stale failure
+  // would raise a banner for a request already superseded.
+  const requestSeqRef = useRef(0);
 
   const stopPolling = useCallback((): void => {
     if (pollRef.current) {
@@ -405,6 +411,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   const fetchResults = useCallback(
     async (jobId: string, offset: number): Promise<void> => {
+      const seq = ++requestSeqRef.current;
       const { column, order } = sortRef.current;
       setState((prev) => ({ ...prev, isLoadingResults: true }));
       try {
@@ -422,15 +429,29 @@ export const useKmindexSearch = (): KmindexSearchActions &
             timeout: 300000,
           })
           .json<KmindexResults>();
+        if (seq !== requestSeqRef.current) return;
         resultsRef.current = results;
-        setState((prev) => ({ ...prev, isLoadingResults: false, results }));
+        // The refs follow what landed, not what was asked for: a metadata sort
+        // the mirror could not answer comes back as score order, and paging on
+        // should stay in the order on screen rather than ask for the fallback
+        // again every page.
+        pageSizeRef.current = results.limit;
+        sortRef.current = appliedSort(results);
+        setState((prev) => ({
+          ...prev,
+          isLoadingResults: false,
+          pageSize: pageSizeRef.current,
+          results,
+          sort: sortRef.current,
+        }));
       } catch (error: unknown) {
+        if (seq !== requestSeqRef.current) return;
         const message = await toErrorMessage(error, "Failed to load results");
         // The refs are what the next request sends; the response is what the
-        // paginator and the lit header show. A failed request -- this one, or
-        // a stale one that lost a race to a newer success -- leaves them
-        // apart, so put the refs back on whatever last landed. Nothing landed
-        // yet means there is nothing on screen to disagree with.
+        // paginator and the lit header show. This is the newest request and it
+        // brought nothing back, so nothing else is coming to reconcile the
+        // two: put the refs back on whatever last landed. Nothing landed yet
+        // means there is nothing on screen to disagree with.
         const landed = resultsRef.current;
         if (landed) {
           pageSizeRef.current = landed.limit;
@@ -505,6 +526,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
       stopPolling();
       fetchedRef.current = null;
       resultsRef.current = null;
+      requestSeqRef.current += 1;
       // A new query is ranked afresh, so it starts in score order. The page
       // size is the reader's preference rather than the query's and stays.
       sortRef.current = DEFAULT_SORT;
@@ -512,6 +534,9 @@ export const useKmindexSearch = (): KmindexSearchActions &
         ...prev,
         error: null,
         identity: null,
+        // A fetch still out belongs to the old job and is now ignored, so
+        // nothing else is coming to turn the spinner off.
+        isLoadingResults: false,
         isSubmitting: true,
         jobId: null,
         jobStatus: null,
@@ -593,6 +618,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
     stopPolling();
     fetchedRef.current = null;
     resultsRef.current = null;
+    requestSeqRef.current += 1;
     pageSizeRef.current = PAGE_SIZE;
     sortRef.current = DEFAULT_SORT;
     syncJobParam(null);

@@ -21,8 +21,8 @@ import {
   defaultOrder,
   type KmindexHit,
   type KmindexIndexSummary,
+  type KmindexSort,
   type KmindexSortColumn,
-  type KmindexSortOrder,
   PAGE_SIZE_OPTIONS,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
@@ -86,8 +86,7 @@ function describeCorrection(hit: KmindexHit): string {
 
 interface SortableHeaderProps {
   align?: "left" | "right";
-  appliedOrder: KmindexSortOrder;
-  appliedSort: KmindexSortColumn;
+  applied: KmindexSort;
   column: KmindexSortColumn;
   label: string;
   onSort: (column: KmindexSortColumn) => void;
@@ -98,8 +97,7 @@ interface SortableHeaderProps {
  * A header cell that sorts its column, lit when it is the applied sort.
  * @param props - Component props.
  * @param props.align - Cell alignment, matching the body cells below it.
- * @param props.appliedOrder - Direction the response says it applied.
- * @param props.appliedSort - Column the response says it sorted by.
+ * @param props.applied - Column and direction the response says it applied.
  * @param props.column - Column this header sorts.
  * @param props.label - Header text.
  * @param props.onSort - Called with this column when the header is clicked.
@@ -108,23 +106,22 @@ interface SortableHeaderProps {
  */
 function SortableHeader({
   align,
-  appliedOrder,
-  appliedSort,
+  applied,
   column,
   label,
   onSort,
   title,
 }: SortableHeaderProps): JSX.Element {
-  const active = appliedSort === column;
+  const active = applied.column === column;
   return (
     <TableCell
       align={align}
-      sortDirection={active ? appliedOrder : false}
+      sortDirection={active ? applied.order : false}
       title={title}
     >
       <TableSortLabel
         active={active}
-        direction={active ? appliedOrder : defaultOrder(column)}
+        direction={active ? applied.order : defaultOrder(column)}
         onClick={(): void => onSort(column)}
       >
         {label}
@@ -290,16 +287,14 @@ export const LoganSearchResults = ({
           <TableHead>
             <TableRow>
               <SortableHeader
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="accession"
                 label="Accession"
                 onSort={setSort}
               />
               <SortableHeader
                 align="right"
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="score"
                 label="k-mer coverage"
                 onSort={setSort}
@@ -315,29 +310,25 @@ export const LoganSearchResults = ({
                 ANI est.
               </TableCell>
               <SortableHeader
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="organism"
                 label="Organism"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="platform"
                 label="Platform"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="country"
                 label="Country"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={applied.order}
-                appliedSort={applied.column}
+                applied={applied}
                 column="release_date"
                 label="Released"
                 onSort={setSort}

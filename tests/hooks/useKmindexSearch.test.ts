@@ -270,11 +270,13 @@ describe("sort and page size", () => {
       (url: string, options?: { searchParams?: Record<string, unknown> }) => {
         if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
         if (url.includes("/status")) return jsonOf(COMPLETE_STATUS);
-        // The endpoint echoes the sort it applied; echoing the request back is
-        // the mirror-available path, where what was asked for is what ran.
+        // The endpoint echoes the size it served and the sort it applied;
+        // echoing the request back is the mirror-available path, where what
+        // was asked for is what ran.
         const params = options?.searchParams ?? {};
         return jsonOf({
           ...RESULTS,
+          limit: params.limit ?? RESULTS.limit,
           order: params.order ?? "desc",
           sort: params.sort ?? "score",
         });
@@ -355,6 +357,50 @@ describe("sort and page size", () => {
       order: "asc",
       sort: "organism",
     });
+  });
+
+  it("paging after a mirror fallback stays in the order on screen", async () => {
+    const { result } = await reattached();
+    // Score order comes back however the sort was asked for, and that is what
+    // the reader is looking at, so page two has to ask for the same thing
+    // rather than re-request the sort the mirror already refused.
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      if (url.includes("/status")) return jsonOf(COMPLETE_STATUS);
+      return jsonOf({
+        ...RESULTS,
+        order: "desc",
+        sort: "score",
+        sra_mirror_available: false,
+      });
+    });
+
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+
+    expect(lastResultsParams()).toMatchObject({ order: "desc", sort: "score" });
+  });
+
+  it("the flip seeds from score order when the response carries no sort", async () => {
+    // The default stub answers with RESULTS, which predates the sort fields:
+    // the page on screen is in score order and says nothing about it, so a
+    // click on the score header flips it rather than asking for desc again.
+    setUrl(`?job=${JOB_ID}`);
+    const { result } = await renderSettled();
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+    await waitFor(() => expect(result.current.results).not.toBeNull());
+
+    await act(async () => {
+      await result.current.setSort("score");
+    });
+
+    expect(lastResultsParams()).toMatchObject({ order: "asc", sort: "score" });
   });
 
   it("sorting by score starts descending", async () => {
@@ -530,6 +576,77 @@ describe("sort and page size", () => {
     });
   });
 
+  it("a stale success does not overwrite a newer page", async () => {
+    const { result } = await reattached();
+    // Two size changes out at once again, but this time the slow one comes
+    // back too: landing it would put a page the reader has already moved off
+    // back on screen.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.setPageSize(100);
+      await Promise.resolve();
+    });
+
+    mockKy.get.mockImplementationOnce(() => jsonOf({ ...RESULTS, limit: 50 }));
+    await act(async () => {
+      await result.current.setPageSize(50);
+    });
+
+    await act(async () => {
+      pending.resolve({ ...RESULTS, limit: 100 });
+      await stale;
+    });
+
+    expect(result.current.results?.limit).toBe(50);
+    expect(result.current.pageSize).toBe(50);
+
+    await act(async () => {
+      await result.current.goToPage(50);
+    });
+    expect(lastResultsParams()).toMatchObject({ limit: 50, offset: 50 });
+  });
+
+  it("a page fetch that fails while a size change is out wins, and the size change is dropped", async () => {
+    const { result } = await reattached();
+    // Paging moves no ref of its own, so its failure has nothing to roll back
+    // -- but it is the newest thing the reader asked for, and they are owed
+    // the banner and the page they are still on, not the pending size.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.setPageSize(100);
+      await Promise.resolve();
+    });
+
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => Promise.reject(new Error("boom")),
+    }));
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+
+    await act(async () => {
+      pending.resolve({ ...RESULTS, limit: 100 });
+      await stale;
+    });
+
+    expect(result.current.results?.limit).toBe(25);
+    expect(result.current.pageSize).toBe(25);
+    expect(result.current.error).toBe("boom");
+
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+    expect(lastResultsParams()).toMatchObject({ limit: 25, offset: 25 });
+  });
+
   it("paging keeps the current sort and size", async () => {
     const { result } = await reattached();
     await act(async () => {
@@ -580,5 +697,31 @@ describe("sort and page size", () => {
     );
     expect(result.current.sort).toEqual({ column: "score", order: "desc" });
     expect(result.current.pageSize).toBe(100);
+  });
+
+  it("a request still out when the search is reset does not land", async () => {
+    const { result } = await reattached();
+    // Clearing the search while a page fetch is out must not put the old job's
+    // rows back on what is now an empty screen.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.goToPage(25);
+      await Promise.resolve();
+    });
+
+    act(() => {
+      result.current.reset();
+    });
+
+    await act(async () => {
+      pending.resolve({ ...RESULTS, offset: 25 });
+      await stale;
+    });
+
+    expect(result.current.results).toBeNull();
   });
 });
