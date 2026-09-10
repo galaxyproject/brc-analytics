@@ -77,11 +77,20 @@ export const CoverageRail = styled.span`
     display: block;
     height: 100%;
   }
+
+  /* Below 720px the coverage column is one of the two the table can still
+     fit, and 48px of rail is a third of what it has to say the number in. */
+  @media (max-width: 720px) {
+    display: none;
+  }
 `;
 
 /* Platform, country and release date leave the table below 720px and reappear
    as one line under the organism, so a phone gets a readable list rather than
-   a seven-column scroll. Both are always in the DOM; CSS picks one. */
+   a seven-column scroll. Both are always in the DOM; CSS picks one. The ANI
+   estimate leaves too and does not come back: it is monotone in the coverage
+   beside it, so on the two columns a phone fits it is the one that says
+   nothing the other does not. */
 export const MetaCellStyles = `
   @media (max-width: 720px) {
     display: none;

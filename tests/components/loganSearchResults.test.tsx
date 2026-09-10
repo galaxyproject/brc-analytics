@@ -120,29 +120,22 @@ function truncatedResults(perIndex: KmindexIndexSummary[]): KmindexResults {
   };
 }
 
+type SearchOverrides = Partial<
+  Pick<Search, "goToPage" | "isLoadingResults" | "setPageSize" | "setSort">
+>;
+
 /**
- * Render the results card around a payload; the component reads only results
- * and the paging and sorting actions, so the rest of the search state is
- * stubbed.
+ * A search-hook stub carrying only what the card reads: the payload, the
+ * paging and sorting actions, and whether a fetch is in flight.
  * @param results - Payload as the API sends it. Typed loosely because the
  * old-backend case is precisely a payload missing keys the type declares.
- * @param actions - Overrides for the stubbed actions.
- * @returns The render result, plus the action stubs the card was handed.
+ * @param overrides - Stub fields a case cares about.
+ * @returns The stubbed hook return.
  */
-function renderResults(
-  results: unknown,
-  actions: Partial<Pick<Search, "goToPage" | "setPageSize" | "setSort">> = {}
-): ReturnType<typeof render> & {
-  actions: Pick<Search, "goToPage" | "setPageSize" | "setSort">;
-} {
-  const resolved = {
-    goToPage: jest.fn(),
-    setPageSize: jest.fn(),
-    setSort: jest.fn(),
-    ...actions,
-  };
-  const search = {
+function searchStub(results: unknown, overrides: SearchOverrides = {}): Search {
+  return {
     error: null,
+    goToPage: jest.fn(),
     indexes: [],
     isLoadingIndexes: false,
     isLoadingResults: false,
@@ -152,17 +145,34 @@ function renderResults(
     pageSize: PAGE_SIZE,
     reset: jest.fn(),
     results,
+    setPageSize: jest.fn(),
+    setSort: jest.fn(),
     // Deliberately a column no response payload in this file applies, so a
     // component reading the requested sort rather than the applied one lights
     // a header the tests below do not expect instead of passing on a
     // coincidence.
     sort: { column: "country", order: "asc" },
     submit: jest.fn(),
-    ...resolved,
+    ...overrides,
   } as unknown as Search;
+}
+
+/**
+ * Render the results card around a payload.
+ * @param results - Payload as the API sends it.
+ * @param overrides - Stub fields a case cares about.
+ * @returns The render result, plus the action stubs the card was handed.
+ */
+function renderResults(
+  results: unknown,
+  overrides: SearchOverrides = {}
+): ReturnType<typeof render> & {
+  actions: Pick<Search, "goToPage" | "setPageSize" | "setSort">;
+} {
+  const search = searchStub(results, overrides);
   return {
     ...render(<LoganSearchResults search={search} />),
-    actions: resolved,
+    actions: search,
   };
 }
 
@@ -205,6 +215,39 @@ describe("LoganSearchResults truncation disclosure", () => {
     // Four paragraphs of caveat above every result taught readers to scroll
     // past the whole card; behind a toggle they are still one click away.
     expect(screen.queryByText(/does not re-rank/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Why?" })).toBeTruthy();
+  });
+
+  test("points the Why? button at the disclosure it opens", () => {
+    renderResults(truncatedResults([summary("GENOMIC_VRL", 157741, CAP)]));
+
+    // aria-expanded without aria-controls tells a screen reader something
+    // opened but not what, which is the half of the announcement it cannot
+    // work out for itself.
+    const button = screen.getByRole("button", { name: "Why?" });
+    expect(button.getAttribute("aria-controls")).toBe("logan-why-capped");
+    openWhy();
+    expect(document.getElementById("logan-why-capped")).not.toBeNull();
+  });
+
+  test("closes the explanation when another search lands", () => {
+    const { rerender } = renderResults(
+      truncatedResults([summary("GENOMIC_VRL", 157741, CAP)])
+    );
+    openWhy();
+    expect(screen.getByRole("button", { name: "Hide why" })).toBeTruthy();
+
+    rerender(
+      <LoganSearchResults
+        search={searchStub({
+          ...truncatedResults([summary("GENOMIC_BCT", 1100404, CAP)]),
+          job_id: "0c1d2e3f4a5b6c7d",
+        })}
+      />
+    );
+
+    // Keyed on the job: a disclosure opened over one search's numbers must
+    // not stand open over the next search's.
     expect(screen.getByRole("button", { name: "Why?" })).toBeTruthy();
   });
 
@@ -480,8 +523,9 @@ describe("coverage and ANI columns", () => {
     // Accession, k-mer coverage, ANI est.
     expect(cells[2].textContent).toBe("--");
     // The coverage cell also carries the "corrected" chip, since this hit has
-    // an fp_correction.
-    expect(cells[1].textContent).toMatch(/^-0\.0500/);
+    // an fp_correction -- ahead of the rail, so the rail and the digits stay
+    // in column against the rows that carry no chip.
+    expect(cells[1].textContent).toBe("corrected-0.0500");
   });
 });
 
@@ -510,6 +554,42 @@ describe("the hit table", () => {
     // A hundred rows is a long way back to the only pager.
     expect(screen.getAllByText(/rows per page/i)).toHaveLength(2);
     expect(screen.getAllByText(/101.150 of 400/)).toHaveLength(2);
+  });
+
+  test("groups the digits in the pagination caption", () => {
+    renderResults({ ...BASE_RESULTS, total_hits: 17629, total_matches: 17629 });
+
+    // Top and bottom. Every other figure on the card is grouped, so an
+    // unformatted "1-25 of 17629" reads as a different kind of number.
+    expect(screen.getAllByText("1-25 of 17,629")).toHaveLength(2);
+  });
+
+  test("marks the table as busy while a page or a sort is in flight", () => {
+    renderResults(BASE_RESULTS, { isLoadingResults: true });
+
+    // The status card carried a caption during the first fetch and nothing
+    // after it, so paging and sorting happened with no sign anything had.
+    expect(screen.getByRole("progressbar")).toBeTruthy();
+    const busy = screen.getByRole("table").closest("[aria-busy]");
+    expect(busy?.getAttribute("aria-busy")).toBe("true");
+  });
+
+  test("shows no pending bar once the rows have landed", () => {
+    renderResults(BASE_RESULTS);
+
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    const busy = screen.getByRole("table").closest("[aria-busy]");
+    expect(busy?.getAttribute("aria-busy")).toBe("false");
+  });
+
+  test("leaves no empty line under an organism with no metadata", () => {
+    renderResults(BASE_RESULTS);
+
+    // The metadata line the narrow layout adds is not rendered at all rather
+    // than rendered empty: an empty caption still takes a line box.
+    const row = screen.getByText("SRR000001").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[3].childElementCount).toBe(1);
   });
 
   test("dims a metadata value the mirror did not have", () => {
@@ -542,6 +622,9 @@ describe("the hit table", () => {
     // jsdom applies no media queries, so both layouts are in the document at
     // once and CSS picks between them; this asserts the narrow one exists.
     expect(screen.getByText("ILLUMINA, Malawi, 2018-07-25")).toBeTruthy();
+    const row = screen.getByText("Plasmodium falciparum").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[3].childElementCount).toBe(2);
   });
 
   test("does not decorate every row with an icon", () => {

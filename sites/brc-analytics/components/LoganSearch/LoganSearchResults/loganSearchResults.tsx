@@ -14,6 +14,7 @@ import {
   CardContent,
   Chip,
   Collapse,
+  LinearProgress,
   Link,
   Table,
   TableBody,
@@ -45,6 +46,10 @@ interface LoganSearchResultsProps {
 }
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
+
+// The truncation disclosure, named so the toggle can point aria-controls at
+// what it opens. One card per page, so a constant is enough.
+const WHY_ID = "logan-why-capped";
 
 // MUI's styled rather than emotion's: the cell has to keep TableCell's theme
 // props, and wrapping a MUI component with a theme-free emotion string drops
@@ -190,8 +195,11 @@ function SortableHeader({
 export const LoganSearchResults = ({
   search,
 }: LoganSearchResultsProps): JSX.Element | null => {
-  const { goToPage, results, setPageSize, setSort } = search;
-  const [whyOpen, setWhyOpen] = useState(false);
+  const { goToPage, isLoadingResults, results, setPageSize, setSort } = search;
+  // Keyed on the job rather than a bare boolean: a disclosure opened over one
+  // search stood open over the next one, explaining a cap that may not have
+  // bitten and naming indexes that were not searched.
+  const [whyOpenFor, setWhyOpenFor] = useState<string | null>(null);
 
   if (!results) return null;
 
@@ -213,6 +221,8 @@ export const LoganSearchResults = ({
   // scores are distributed, so it must not decide whether the tie-band caveat
   // is shown.
   const showPerIndex = perIndex.length > 1;
+
+  const whyOpen = whyOpenFor === results.job_id;
 
   // A backend predating the breakdown sends neither total_matches nor
   // per_index, so both need the same guard: an unguarded read of
@@ -253,6 +263,16 @@ export const LoganSearchResults = ({
   const paginationProps = {
     component: "div" as const,
     count: results.total_hits,
+    labelDisplayedRows: ({
+      count,
+      from,
+      to,
+    }: {
+      count: number;
+      from: number;
+      to: number;
+    }): string =>
+      `${from.toLocaleString()}-${to.toLocaleString()} of ${count.toLocaleString()}`,
     onPageChange: async (_: unknown, page: number): Promise<void> => {
       await goToPage(page * pageSize);
     },
@@ -287,8 +307,11 @@ export const LoganSearchResults = ({
               <Typography color="textSecondary" variant="body2">
                 {capNote}{" "}
                 <Button
+                  aria-controls={WHY_ID}
                   aria-expanded={whyOpen}
-                  onClick={(): void => setWhyOpen((open) => !open)}
+                  onClick={(): void =>
+                    setWhyOpenFor(whyOpen ? null : results.job_id)
+                  }
                   size="small"
                   sx={{ minWidth: 0, p: 0, verticalAlign: "baseline" }}
                 >
@@ -301,7 +324,7 @@ export const LoganSearchResults = ({
         </ResultsToolbar>
 
         {results.truncated && (
-          <Collapse in={whyOpen} unmountOnExit>
+          <Collapse id={WHY_ID} in={whyOpen} unmountOnExit>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">
                 Raising the threshold shrinks the underlying match count, but it
@@ -357,7 +380,11 @@ export const LoganSearchResults = ({
           </Collapse>
         )}
 
-        <TableContainer>
+        {/* Paging and sorting refetch, and the status card that used to
+            carry this is gone once there are results to show. */}
+        {isLoadingResults && <LinearProgress sx={{ mb: 1 }} />}
+
+        <TableContainer aria-busy={isLoadingResults}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -379,12 +406,12 @@ export const LoganSearchResults = ({
                 {/* ANI is monotone in the score, so sorting the coverage
                     column sorts this one too and a second control would only
                     be a second name for it. */}
-                <TableCell
+                <MetaCell
                   align="right"
                   title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
                 >
                   ANI est.
-                </TableCell>
+                </MetaCell>
                 <SortableHeader
                   applied={applied}
                   column="organism"
@@ -435,17 +462,10 @@ export const LoganSearchResults = ({
                   </TableCell>
                   <TableCell align="right">
                     <CoverageCell>
-                      {/* Decoration for the number beside it: the rail
-                          carries the shape of the fall-off down a page, the
-                          digits carry the value. */}
-                      <CoverageRail aria-hidden>
-                        <span
-                          style={{
-                            width: `${Math.round(Math.min(Math.max(hit.score, 0), 1) * 100)}%`,
-                          }}
-                        />
-                      </CoverageRail>
-                      <Numeric>{hit.score.toFixed(4)}</Numeric>
+                      {/* Ahead of the rail rather than after the number: a
+                          chip on the end of the cell pushes the rail and the
+                          digits left, out of column with every row that
+                          carries no chip. */}
                       {hit.fp_correction != null && (
                         <Tooltip title={describeCorrection(hit)}>
                           {/* The tooltip is the only place the raw kmindex
@@ -460,13 +480,24 @@ export const LoganSearchResults = ({
                           />
                         </Tooltip>
                       )}
+                      {/* Decoration for the number beside it: the rail
+                          carries the shape of the fall-off down a page, the
+                          digits carry the value. */}
+                      <CoverageRail aria-hidden>
+                        <span
+                          style={{
+                            width: `${Math.round(Math.min(Math.max(hit.score, 0), 1) * 100)}%`,
+                          }}
+                        />
+                      </CoverageRail>
+                      <Numeric>{hit.score.toFixed(4)}</Numeric>
                     </CoverageCell>
                   </TableCell>
-                  <TableCell align="right">
+                  <MetaCell align="right">
                     <Numeric>
                       {hit.ani == null ? "--" : hit.ani.toFixed(4)}
                     </Numeric>
-                  </TableCell>
+                  </MetaCell>
                   <TableCell>
                     {hit.sra?.organism ? (
                       <Typography variant="body2">
@@ -477,11 +508,15 @@ export const LoganSearchResults = ({
                         {hit.shard}
                       </Typography>
                     )}
-                    <OrganismMeta>
-                      <Typography color="textSecondary" variant="caption">
-                        {describeMeta(hit)}
-                      </Typography>
-                    </OrganismMeta>
+                    {/* Only when the mirror had something: an empty caption
+                        still takes a line box under every organism. */}
+                    {describeMeta(hit) && (
+                      <OrganismMeta>
+                        <Typography color="textSecondary" variant="caption">
+                          {describeMeta(hit)}
+                        </Typography>
+                      </OrganismMeta>
+                    )}
                   </TableCell>
                   <MetaCell>
                     <Meta value={hit.sra?.platform} />
