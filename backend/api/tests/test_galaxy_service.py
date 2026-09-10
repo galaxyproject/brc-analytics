@@ -1829,11 +1829,21 @@ class TestExportEndpoint:
         return TestClient(app)
 
     @staticmethod
-    def _export(directory, job_id="job1", accessions=("SRR1", "SRR2")):
-        """Write an export-shaped parquet where the endpoint will look."""
+    def _export(directory, job_id="job1", accessions=("SRR1", "SRR2"), columns=None):
+        """Write an export-shaped parquet where the endpoint will look.
+
+        @param directory: the configured export directory.
+        @param job_id: the job the file belongs to.
+        @param accessions: one row per accession.
+        @param columns: the columns to write, defaulting to what this version
+            of the writer produces. Passing fewer models a file left behind by
+            an older one.
+        """
         import duckdb
 
         from app.services.sra_mirror import EXPORT_COLUMNS
+
+        columns = EXPORT_COLUMNS if columns is None else columns
 
         def _row(acc):
             # Named off EXPORT_COLUMNS rather than off the first three
@@ -1841,7 +1851,7 @@ class TestExportEndpoint:
             # turn this fixture into a differently shaped file.
             values = {"accession": f"'{acc}'", "score": "1.0", "shard": "'IDX_1'"}
             return "SELECT " + ", ".join(
-                f"{values.get(name, 'NULL')} AS {name}" for name in EXPORT_COLUMNS
+                f"{values.get(name, 'NULL')} AS {name}" for name in columns
             )
 
         rows = " UNION ALL ".join(_row(acc) for acc in accessions)
@@ -1867,6 +1877,30 @@ class TestExportEndpoint:
         self._export(tmp_path)
 
         assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 404
+
+    def test_an_export_written_before_the_score_correction_404s(
+        self, tmp_path, monkeypatch
+    ):
+        # Its scores are the raw kmindex ratios and it has no ani column, and
+        # both formats take their header off the file -- so it downloads
+        # cleanly and disagrees with every score on the results page. Nothing
+        # else retires it: the retention sweep runs only from inside
+        # export_hits, so a job nobody re-searches serves it indefinitely.
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        client = self._client(tmp_path, monkeypatch)
+        self._export(
+            tmp_path,
+            columns=[c for c in EXPORT_COLUMNS if c not in ("ani", "fp_correction")],
+        )
+
+        response = client.get("/galaxy/kmindex/jobs/job1/export")
+
+        assert response.status_code == 404
+        assert "job1" in response.json()["detail"]
+        assert (
+            client.get("/galaxy/kmindex/jobs/job1/export?format=tsv").status_code == 404
+        )
 
     def test_a_job_id_that_is_not_an_identifier_404s(self, tmp_path, monkeypatch):
         # It is a filename here, so it never gets to be a path.

@@ -40,6 +40,7 @@ from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
     export_file_path,
+    export_is_current,
     export_row_count,
     iter_export_tsv,
 )
@@ -342,9 +343,24 @@ async def export_kmindex_results(
         )
 
     try:
+        # A file left over from before the score correction shipped would serve
+        # cleanly and wrong, and nothing sweeps it while the job goes untouched.
+        # Reading it as absent sends the caller back to the results page, whose
+        # re-aggregation rewrites it.
+        if not await asyncio.to_thread(export_is_current, path):
+            logger.info(
+                f"kmindex export for {job_id} predates the score correction; "
+                "reporting no download so a re-aggregation rewrites it"
+            )
+            raise HTTPException(
+                status_code=404,
+                detail=f"No downloadable export for job {job_id}",
+            )
         # Read from the parquet footer, so the count in the filename describes
         # the bytes being sent rather than a cache entry that outlived them.
         rows = await asyncio.to_thread(export_row_count, path)
+    except HTTPException:
+        raise
     except Exception as e:
         # Only reachable if the file is corrupt, which the write's rename-into-
         # place is meant to prevent. Nothing the caller can do differently, so

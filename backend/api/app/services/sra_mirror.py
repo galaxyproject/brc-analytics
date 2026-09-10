@@ -922,6 +922,34 @@ def export_row_count(path: Path) -> int:
         con.close()
 
 
+def export_is_current(path: Path) -> bool:
+    """Whether an export on disk was written by the current writer.
+
+    An export materialized before the score correction shipped holds the raw
+    kmindex ratios and carries neither `ani` nor `fp_correction`. Both download
+    formats take their column names off the file -- the parquet is served byte
+    for byte and iter_export_tsv reads its header from the footer -- so such a
+    file downloads cleanly and disagrees with every score the results page
+    shows. Nothing retires it on its own either: the retention sweep runs only
+    from inside export_hits, so a job nobody re-searches keeps serving it.
+
+    `ani` is the marker because it is the column the correction introduced and
+    the one the writer cannot produce without it. Read from the parquet footer,
+    which is a metadata read rather than opening 16 MB of row groups.
+
+    @param path: the export parquet.
+    @returns: whether the file carries the columns this version writes.
+    @raises duckdb.Error: if the file cannot be read as parquet at all, which
+        the caller already treats as an absent export.
+    """
+    con = duckdb.connect(config={"temp_directory": tempfile.gettempdir()})
+    try:
+        rows = con.execute("SELECT name FROM parquet_schema(?)", [str(path)]).fetchall()
+    finally:
+        con.close()
+    return "ani" in {row[0] for row in rows}
+
+
 def _tsv_field(value: Any) -> str:
     """Render one value as a TSV field, quoting it if it would break the row."""
     if value is None:
