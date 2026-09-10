@@ -176,6 +176,12 @@ _COHORT_FACETS: Tuple[Tuple[str, str], ...] = (
 # organisms the cohort lists. Ten of each keeps the whole cohort ~3 KB on
 # the wire, against the 50,000 hit rows it is describing.
 _COHORT_FACET_VALUES = 10
+
+# Facets whose values are not capped. Release year is ordinal and is drawn as
+# a timeline, where an "everything else" bucket would be a hole in the middle
+# of the axis; SRA spans a few dozen years, so listing them all is cheap.
+_UNCAPPED_FACETS = frozenset({"release_year"})
+
 _COHORT_TOP_ORGANISMS = 10
 
 # Tag on the scalar rows of the cohort query, which shares its result set with
@@ -487,7 +493,8 @@ def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[st
     reconcile the facet against in_mirror rather than having to trust it. NULL
     is `unknown` -- the facet expressions have already folded empty strings and
     the 'uncalculated' country sentinel into NULL, because a blank rendered as
-    a value is a claim the data does not make.
+    a value is a claim the data does not make. `release_year` is listed in
+    full; every other facet keeps its ten largest values.
     """
     unknown = sum(n for value, n in counted if value is None)
     # Ties are broken by value so the listed head is stable across runs; with
@@ -497,13 +504,12 @@ def _shape_facet(name: str, counted: List[Tuple[Optional[str], int]]) -> Dict[st
         ((value, n) for value, n in counted if value is not None),
         key=lambda vn: (-vn[1], vn[0]),
     )
+    listed = known if name in _UNCAPPED_FACETS else known[:_COHORT_FACET_VALUES]
     return {
         "name": name,
-        "other": sum(n for _value, n in known[_COHORT_FACET_VALUES:]),
+        "other": sum(n for _value, n in known[len(listed) :]),
         "unknown": unknown,
-        "values": [
-            {"count": n, "value": value} for value, n in known[:_COHORT_FACET_VALUES]
-        ],
+        "values": [{"count": n, "value": value} for value, n in listed],
     }
 
 

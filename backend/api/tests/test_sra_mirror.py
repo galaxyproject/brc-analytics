@@ -1056,6 +1056,34 @@ class TestCohortForAccessions:
         assert hasattr(SRAMirrorService.runs_by_accession, "__wrapped__")
 
 
+class TestShapeFacet:
+    """The per-facet cap, and the one facet that is not capped."""
+
+    @staticmethod
+    def _years(n: int):
+        return [(str(2000 + i), 1) for i in range(n)]
+
+    def test_capped_facets_keep_ten_and_roll_the_rest_into_other(self):
+        from app.services.sra_mirror import _shape_facet
+
+        shaped = _shape_facet("platform", self._years(15))
+
+        assert len(shaped["values"]) == 10
+        assert shaped["other"] == 5
+
+    def test_release_year_is_never_capped(self):
+        # Years are drawn as a timeline, and "everything else" would be a
+        # hole in the middle of the axis.
+        from app.services.sra_mirror import _shape_facet
+
+        shaped = _shape_facet("release_year", self._years(15))
+
+        assert [v["value"] for v in shaped["values"]] == [
+            str(2000 + i) for i in range(15)
+        ]
+        assert shaped["other"] == 0
+
+
 # Real coordinates, and each one is here for a reason the mirror gave it.
 # 40.4406 N 79.9959 W is Pittsburgh, which carries 14,688 runs across 147
 # organisms: an institutional default typed into the sample attribute, and the
