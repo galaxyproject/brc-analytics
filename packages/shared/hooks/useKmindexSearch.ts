@@ -17,6 +17,16 @@ export interface SraRunMetadata {
 
 export interface KmindexHit {
   accession: string;
+  // Mash Screen ANI estimate, score ** (1/31) to four places. Null when the
+  // corrected score went negative; optional because a backend predating the
+  // statistic omits it.
+  ani?: number | null;
+  // False-positive baseline subtracted from the raw kmindex ratio for one of
+  // the 227 saturated samples Logan flags; the raw ratio is score +
+  // fp_correction. Absent or null when no correction applied.
+  fp_correction?: number | null;
+  // Fraction of the query's k-mers found in the run, after the correction
+  // above when one applies.
   score: number;
   shard: string;
   sra: SraRunMetadata | null;

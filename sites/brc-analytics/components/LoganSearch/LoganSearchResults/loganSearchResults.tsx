@@ -12,9 +12,11 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
+  type KmindexHit,
   type KmindexIndexSummary,
   PAGE_SIZE,
   type useKmindexSearch,
@@ -61,6 +63,20 @@ function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
       : `alone it would still cap at ${cap.toLocaleString()}`;
   if (kept === 0) return `${total} matched, none listed -- ${alone}`;
   return `${listed} of ${total} listed -- ${alone}`;
+}
+
+/**
+ * Tooltip text for a hit whose score had a false-positive baseline subtracted.
+ * @param hit - A hit with fp_correction set.
+ * @returns One sentence naming the raw ratio and the baseline.
+ */
+function describeCorrection(hit: KmindexHit): string {
+  const raw = hit.score + (hit.fp_correction ?? 0);
+  return (
+    `kmindex reported ${raw.toFixed(4)}. This run's index is saturated and ` +
+    `matches about ${(hit.fp_correction ?? 0).toFixed(4)} of any query's ` +
+    `k-mers, so that baseline is subtracted -- as logan-search.org does.`
+  );
 }
 
 export const LoganSearchResults = ({
@@ -212,7 +228,18 @@ export const LoganSearchResults = ({
           <TableHead>
             <TableRow>
               <TableCell>Accession</TableCell>
-              <TableCell align="right">Shared k-mers</TableCell>
+              <TableCell
+                align="right"
+                title="Fraction of the query's 31-mers found in the run, after subtracting a false-positive baseline for the 227 saturated samples Logan flags"
+              >
+                k-mer coverage
+              </TableCell>
+              <TableCell
+                align="right"
+                title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
+              >
+                ANI est.
+              </TableCell>
               <TableCell>Organism</TableCell>
               <TableCell>Platform</TableCell>
               <TableCell>Country</TableCell>
@@ -237,7 +264,22 @@ export const LoganSearchResults = ({
                     <OpenInNew fontSize="inherit" />
                   </Link>
                 </TableCell>
-                <TableCell align="right">{hit.score.toFixed(4)}</TableCell>
+                <TableCell align="right">
+                  {hit.score.toFixed(4)}
+                  {hit.fp_correction != null && (
+                    <Tooltip title={describeCorrection(hit)}>
+                      <Chip
+                        label="corrected"
+                        size="small"
+                        sx={{ ml: 1 }}
+                        variant="outlined"
+                      />
+                    </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  {hit.ani == null ? "--" : hit.ani.toFixed(4)}
+                </TableCell>
                 <TableCell>
                   {hit.sra?.organism ? (
                     <Typography variant="body2">{hit.sra.organism}</Typography>

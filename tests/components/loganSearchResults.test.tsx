@@ -8,7 +8,7 @@ import {
   PAGE_SIZE,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 // The component reaches into the hook module for PAGE_SIZE, and that module
 // imports ky, which ships ESM only and Jest cannot parse.
@@ -34,6 +34,8 @@ const BASE_RESULTS: KmindexResults = {
   hits: [
     {
       accession: "SRR000001",
+      ani: 1,
+      fp_correction: null,
       score: 1,
       shard: "GENOMIC_BCT_10_null",
       sra: null,
@@ -292,5 +294,79 @@ describe("SRA mirror chip", () => {
     expect(title).not.toMatch(/BRC-relevant/i);
     expect(title).toMatch(/every run|all of SRA/i);
     expect(title).toMatch(/newer than the mirror/i);
+  });
+});
+
+describe("coverage and ANI columns", () => {
+  test("labels the score as k-mer coverage and shows the ANI estimate", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [
+        {
+          accession: "SRR000001",
+          ani: 0.9779,
+          fp_correction: null,
+          score: 0.5,
+          shard: "GENOMIC_BCT_10_null",
+          sra: null,
+        },
+      ],
+    });
+
+    expect(screen.getByText("k-mer coverage")).toBeTruthy();
+    expect(screen.getByText("ANI est.")).toBeTruthy();
+    expect(screen.getByText("0.5000")).toBeTruthy();
+    expect(screen.getByText("0.9779")).toBeTruthy();
+    expect(screen.queryByText("corrected")).toBeNull();
+  });
+
+  test("marks a corrected hit and names the raw ratio", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [
+        {
+          accession: "SRR10916223",
+          ani: 0.9619,
+          fp_correction: 0.691,
+          score: 0.299,
+          shard: "METAGENOMIC_ENV_3_null",
+          sra: null,
+        },
+      ],
+    });
+
+    const marker = screen.getByText("corrected");
+    // MUI Tooltip puts the text on aria-label until hovered.
+    const label = marker.closest("[aria-label]")?.getAttribute("aria-label");
+    expect(label).toContain("kmindex reported 0.9900");
+    expect(label).toContain("0.6910");
+  });
+
+  test("renders a dash for ANI when the API has none", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [
+        {
+          accession: "SRR000002",
+          ani: null,
+          fp_correction: 0.69,
+          score: -0.05,
+          shard: "GENOMIC_BCT_10_null",
+          sra: null,
+        },
+      ],
+    });
+
+    // Scoped to the hit's own row: Platform, Country and Released all render
+    // "--" for null metadata, so a page-wide dash search cannot fail.
+    const row = screen.getByText("SRR000002").closest("tr");
+    expect(row).not.toBeNull();
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+
+    // Accession, k-mer coverage, ANI est.
+    expect(cells[2].textContent).toBe("--");
+    // The coverage cell also carries the "corrected" chip, since this hit has
+    // an fp_correction.
+    expect(cells[1].textContent).toMatch(/^-0\.0500/);
   });
 });
