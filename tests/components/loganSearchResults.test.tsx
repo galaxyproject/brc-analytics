@@ -226,6 +226,10 @@ describe("LoganSearchResults truncation disclosure", () => {
     // work out for itself.
     const button = screen.getByRole("button", { name: "Why?" });
     expect(button.getAttribute("aria-controls")).toBe("logan-why-capped");
+    // Closed as well as open: the Collapse unmounts its children, so an id
+    // that lives on the Collapse leaves the button pointing at nothing for
+    // the whole of the time the disclosure is shut.
+    expect(document.getElementById("logan-why-capped")).not.toBeNull();
     openWhy();
     expect(document.getElementById("logan-why-capped")).not.toBeNull();
   });
@@ -412,6 +416,44 @@ describe("LoganSearchResults truncation disclosure", () => {
   });
 });
 
+describe("shards that could not be read", () => {
+  const FAILED = { shards_failed: 3, shards_searched: 35 };
+
+  test("warns above the rows it managed to list", () => {
+    renderResults({ ...BASE_RESULTS, ...FAILED });
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "3 of 35 index shards could not be read, so this list is incomplete."
+    );
+  });
+
+  test("warns when the failures are why nothing matched", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      ...FAILED,
+      hits: [],
+      total_hits: 0,
+      total_matches: 0,
+    });
+
+    // The empty state returned before the warning was rendered, so a search
+    // whose shards all failed read as a query that matched nothing -- which
+    // is a claim about the query rather than about the index.
+    const alerts = screen.getAllByRole("alert");
+    expect(alerts).toHaveLength(2);
+    expect(alerts[0].textContent).toContain(
+      "3 of 35 index shards could not be read"
+    );
+    expect(alerts[1].textContent).toContain("No accessions matched");
+  });
+
+  test("says nothing when every shard answered", () => {
+    const { container } = renderResults(BASE_RESULTS);
+
+    expect(container.textContent).not.toContain("could not be read");
+  });
+});
+
 describe("SRA mirror caption", () => {
   const PARTLY_ANNOTATED = {
     ...BASE_RESULTS,
@@ -422,20 +464,24 @@ describe("SRA mirror caption", () => {
     total_matches: 2,
   };
 
-  test("describes the mirror as all of SRA, not a BRC-filtered subset", () => {
+  test("describes the mirror as all of SRA, not a BRC-filtered subset", async () => {
     renderResults(PARTLY_ANNOTATED);
 
     const caption = screen.getByText(
       /Metadata found for 1 of 2 rows on this page/
     );
-    const title = caption.getAttribute("title") ?? "";
-    expect(title).toBe(MIRROR_SCOPE_NOTE);
+    // A title attribute never opens on focus, so the one explanation of what
+    // the mirror covers was reachable with a pointer only.
+    expect(caption.getAttribute("tabindex")).toBe("0");
+    fireEvent.mouseOver(caption);
+    const note = (await screen.findByRole("tooltip")).textContent ?? "";
+    expect(note).toBe(MIRROR_SCOPE_NOTE);
     // The deployed mirror is every run in SRA when it was built (v6:
     // 44,057,338 runs). The old copy told users to expect misses that
     // should never happen, and made a real annotation failure read as normal.
-    expect(title).not.toMatch(/BRC-relevant/i);
-    expect(title).toMatch(/every run|all of SRA/i);
-    expect(title).toMatch(/newer than the mirror/i);
+    expect(note).not.toMatch(/BRC-relevant/i);
+    expect(note).toMatch(/every run|all of SRA/i);
+    expect(note).toMatch(/newer than the mirror/i);
   });
 
   test("says nothing when the mirror answered for every row on the page", () => {
@@ -473,7 +519,7 @@ describe("coverage and ANI columns", () => {
     expect(screen.queryByText("corrected")).toBeNull();
   });
 
-  test("marks a corrected hit and names the raw ratio", () => {
+  test("marks a corrected hit and names the raw ratio", async () => {
     renderResults({
       ...BASE_RESULTS,
       hits: [
@@ -488,15 +534,21 @@ describe("coverage and ANI columns", () => {
       ],
     });
 
-    const marker = screen.getByText("corrected");
-    // MUI Tooltip puts the text on aria-label until hovered.
-    const chip = marker.closest("[aria-label]");
-    const label = chip?.getAttribute("aria-label");
-    expect(label).toContain("kmindex reported 0.9900");
-    expect(label).toContain("0.6910");
+    const chip = screen.getByText("corrected").closest(".MuiChip-root");
+    // The sentence describes the chip rather than naming it: as a string
+    // tooltip title it became the chip's aria-label, so the mark a reader can
+    // see and the mark assistive tech announces stopped being the same word.
+    expect(chip?.getAttribute("aria-label")).toBeNull();
+    expect(chip?.textContent).toBe("corrected");
     // The tooltip is the only place the raw ratio is stated, so the chip has
     // to be reachable without a pointer.
     expect(chip?.getAttribute("tabindex")).toBe("0");
+
+    fireEvent.mouseOver(chip as HTMLElement);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip.textContent).toContain("kmindex reported 0.9900");
+    expect(tooltip.textContent).toContain("0.6910");
+    expect(chip?.getAttribute("aria-describedby")).toBe(tooltip.id);
   });
 
   test("renders a dash for ANI when the API has none", () => {
@@ -609,6 +661,24 @@ describe("the hit table", () => {
     expect(cells[4].textContent).toBe("ILLUMINA");
     expect(cells[5].textContent).toBe("--");
     expect(cells[6].textContent).toBe("2018-07-25");
+  });
+
+  test("sets the release date in the same figures as the other numbers", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [hit({ sra: sraMeta() })],
+      sra_annotated: 1,
+      sra_mirror_available: true,
+    });
+
+    const row = screen.getByText("Plasmodium falciparum").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    // Numeric is one styled span, so carrying its class is the date sitting
+    // in the tabular figures every other column of digits already uses --
+    // without them a column of dates shimmers as the page changes.
+    const released = within(cells[6]).getByText("2018-07-25");
+    const coverage = within(cells[1]).getByText("1.0000");
+    expect(released.className).toBe(coverage.className);
   });
 
   test("repeats the metadata columns as one line under the organism", () => {

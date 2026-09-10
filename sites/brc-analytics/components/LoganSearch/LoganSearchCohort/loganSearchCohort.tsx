@@ -202,7 +202,12 @@ function CohortFacetBlock({ facet }: { facet: KmindexFacet }): JSX.Element {
   const facetTotal = sum(rows.map((row) => row.count));
   return (
     <div>
-      <Typography variant="subtitle2">{facetLabel(facet.name)}</Typography>
+      {/* A block inside the metadata breakdown, so h4 under that section's
+          h3. subtitle2 renders an h6 left to itself, which put every title on
+          this card at the same level as every other. */}
+      <Typography component="h4" variant="subtitle2">
+        {facetLabel(facet.name)}
+      </Typography>
       <Typography color="textSecondary" variant="caption">
         {facetTotal.toLocaleString()} runs
       </Typography>
@@ -296,7 +301,12 @@ export const LoganSearchCohort = ({
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography variant="subtitle2">Top organisms</Typography>
+        {/* The card's two sections, so h3 under its h2 heading. subtitle2 on
+            its own renders an h6, which flattened the whole card to one
+            level for anything navigating by heading. */}
+        <Typography component="h3" variant="subtitle2">
+          Top organisms
+        </Typography>
         <Typography color="textSecondary" variant="caption">
           {describeTopOrganisms(cohort)}
         </Typography>
@@ -312,7 +322,9 @@ export const LoganSearchCohort = ({
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography variant="subtitle2">Metadata breakdown</Typography>
+        <Typography component="h3" variant="subtitle2">
+          Metadata breakdown
+        </Typography>
         <Typography
           color="textSecondary"
           component="div"

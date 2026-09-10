@@ -34,6 +34,7 @@ import {
   defaultOrder,
   type KmindexHit,
   type KmindexIndexSummary,
+  type KmindexResults,
   type KmindexSort,
   type KmindexSortColumn,
   PAGE_SIZE_OPTIONS,
@@ -111,17 +112,28 @@ function describeCorrection(hit: KmindexHit): string {
 /**
  * A metadata cell's text, dimmed when the mirror had nothing.
  * @param props - Component props.
+ * @param props.numeric - Set for a column of digits, so the value gets the
+ * tabular figures the score and the ANI estimate already use.
  * @param props.value - The value, or null/undefined when not recorded.
  * @returns The caption.
  */
-function Meta({ value }: { value?: string | null }): JSX.Element {
-  return value ? (
+function Meta({
+  numeric,
+  value,
+}: {
+  numeric?: boolean;
+  value?: string | null;
+}): JSX.Element {
+  if (!value) {
+    return (
+      <Typography color="text.disabled" variant="caption">
+        --
+      </Typography>
+    );
+  }
+  return (
     <Typography color="textSecondary" variant="caption">
-      {value}
-    </Typography>
-  ) : (
-    <Typography color="text.disabled" variant="caption">
-      --
+      {numeric ? <Numeric>{value}</Numeric> : value}
     </Typography>
   );
 }
@@ -140,6 +152,30 @@ function describeMeta(hit: KmindexHit): string {
   ]
     .filter((part): part is string => Boolean(part))
     .join(", ");
+}
+
+/**
+ * The warning that part of the index could not be read.
+ *
+ * Shared by the listing and the empty state rather than living in the
+ * listing: a search whose shards all failed matches nothing, and "no
+ * accessions matched" on its own makes that a fact about the query.
+ * @param props - Component props.
+ * @param props.results - Results payload, for the shard counts.
+ * @returns The alert, or null when every shard answered.
+ */
+function ShardWarning({
+  results,
+}: {
+  results: KmindexResults;
+}): JSX.Element | null {
+  if (results.shards_failed <= 0) return null;
+  return (
+    <Alert severity="warning" sx={{ mb: 2 }}>
+      {results.shards_failed} of {results.shards_searched} index shards could
+      not be read, so this list is incomplete. Reload to retry.
+    </Alert>
+  );
 }
 
 interface SortableHeaderProps {
@@ -205,10 +241,13 @@ export const LoganSearchResults = ({
 
   if (results.total_hits === 0) {
     return (
-      <Alert severity="info" sx={{ mt: 2 }}>
-        No accessions matched at this threshold. Try lowering the minimum shared
-        k-mer fraction, or searching a different index.
-      </Alert>
+      <Box sx={{ mt: 2 }}>
+        <ShardWarning results={results} />
+        <Alert severity="info">
+          No accessions matched at this threshold. Try lowering the minimum
+          shared k-mer fraction, or searching a different index.
+        </Alert>
+      </Box>
     );
   }
 
@@ -292,12 +331,7 @@ export const LoganSearchResults = ({
   return (
     <Card sx={{ mt: 2 }}>
       <CardContent>
-        {results.shards_failed > 0 && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {results.shards_failed} of {results.shards_searched} index shards
-            could not be read, so this list is incomplete. Reload to retry.
-          </Alert>
-        )}
+        <ShardWarning results={results} />
         <ResultsToolbar>
           <div>
             <Typography component="h2" variant="subtitle1">
@@ -324,60 +358,67 @@ export const LoganSearchResults = ({
         </ResultsToolbar>
 
         {results.truncated && (
-          <Collapse id={WHY_ID} in={whyOpen} unmountOnExit>
-            <Alert severity="info" sx={{ mb: 2 }}>
-              <Typography variant="body2">
-                Raising the threshold shrinks the underlying match count, but it
-                does not re-rank what you see: the same accessions come back in
-                the same order until the threshold rises above the lowest score
-                listed here. A conserved query can match hundreds of thousands
-                of runs at a perfect k-mer score, so it may not clear the cap at
-                all.
-              </Typography>
-              {showPerIndex && (
-                <>
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    The cap is one score sort across every index, applied after
-                    the shards merge, so each index keeps only what ranked
-                    highest overall -- an index with few matches can keep none
-                    of them.
-                  </Typography>
-                  {perIndex.map((summary) => (
-                    <Typography
-                      component="div"
-                      key={summary.index}
-                      variant="body2"
-                      sx={{ mt: 0.5 }}
-                    >
-                      {summary.index}: {describeIndexShare(summary, cap)}
+          /* The id sits on a wrapper that is always in the document rather
+             than on the Collapse, which unmountOnExit takes away: an
+             aria-controls pointing at nothing is dangling for precisely the
+             time the button is worth pressing. */
+          <div id={WHY_ID}>
+            <Collapse in={whyOpen} unmountOnExit>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  Raising the threshold shrinks the underlying match count, but
+                  it does not re-rank what you see: the same accessions come
+                  back in the same order until the threshold rises above the
+                  lowest score listed here. A conserved query can match hundreds
+                  of thousands of runs at a perfect k-mer score, so it may not
+                  clear the cap at all.
+                </Typography>
+                {showPerIndex && (
+                  <>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      The cap is one score sort across every index, applied
+                      after the shards merge, so each index keeps only what
+                      ranked highest overall -- an index with few matches can
+                      keep none of them.
                     </Typography>
-                  ))}
-                </>
-              )}
-              {/* Unconditional: how wide the tie band is depends on the
-                  query, not on how many indexes were searched, and the backend
-                  sends nothing that measures it. Two indexes over 16S and
-                  eight over the same put all 50,000 listed rows on one score;
-                  one index over a viral spike gave 87 distinct scores. */}
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Scores repeat: the score is a fraction of your query&apos;s
-                k-mers, so ties are common and a conserved query can put every
-                row listed here on a single one. Where the cut falls inside a
-                tie, a stable hash of the accession decides which
-                equally-scoring runs made the list -- arbitrary, but the same on
-                every reload.
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                A longer query is not a more specific one: kmindex scores the
-                fraction of your query&apos;s k-mers a run shares, so extending
-                into conserved flanking sequence raises that fraction in
-                unrelated runs too -- a 4x longer version of the same 18S query
-                matched more runs here, not fewer. The match set responds to how
-                rare your k-mers are and to the threshold above, not to query
-                length.
-              </Typography>
-            </Alert>
-          </Collapse>
+                    {perIndex.map((summary) => (
+                      <Typography
+                        component="div"
+                        key={summary.index}
+                        variant="body2"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {summary.index}: {describeIndexShare(summary, cap)}
+                      </Typography>
+                    ))}
+                  </>
+                )}
+                {/* Unconditional: how wide the tie band is depends on the
+                    query, not on how many indexes were searched, and the
+                    backend sends nothing that measures it. Two indexes over
+                    16S and eight over the same put all 50,000 listed rows on
+                    one score; one index over a viral spike gave 87 distinct
+                    scores. */}
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Scores repeat: the score is a fraction of your query&apos;s
+                  k-mers, so ties are common and a conserved query can put every
+                  row listed here on a single one. Where the cut falls inside a
+                  tie, a stable hash of the accession decides which
+                  equally-scoring runs made the list -- arbitrary, but the same
+                  on every reload.
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  A longer query is not a more specific one: kmindex scores the
+                  fraction of your query&apos;s k-mers a run shares, so
+                  extending into conserved flanking sequence raises that
+                  fraction in unrelated runs too -- a 4x longer version of the
+                  same 18S query matched more runs here, not fewer. The match
+                  set responds to how rare your k-mers are and to the threshold
+                  above, not to query length.
+                </Typography>
+              </Alert>
+            </Collapse>
+          </div>
         )}
 
         {/* Paging and sorting refetch, and the status card that used to
@@ -467,11 +508,13 @@ export const LoganSearchResults = ({
                           digits left, out of column with every row that
                           carries no chip. */}
                       {hit.fp_correction != null && (
-                        <Tooltip title={describeCorrection(hit)}>
+                        <Tooltip describeChild title={describeCorrection(hit)}>
                           {/* The tooltip is the only place the raw kmindex
                               ratio is stated, and a Chip with no onClick
                               renders a div, which nothing but a pointer can
-                              reach. */}
+                              reach. Describing rather than naming: as a name
+                              the sentence replaced the word the reader can
+                              see on the chip. */}
                           <Chip
                             label="corrected"
                             size="small"
@@ -525,7 +568,7 @@ export const LoganSearchResults = ({
                     <Meta value={hit.sra?.country} />
                   </MetaCell>
                   <MetaCell>
-                    <Meta value={hit.sra?.release_date?.slice(0, 10)} />
+                    <Meta numeric value={hit.sra?.release_date?.slice(0, 10)} />
                   </MetaCell>
                 </TableRow>
               ))}
@@ -537,16 +580,22 @@ export const LoganSearchResults = ({
             every page is a diagnostic nobody needs to read. */}
         {results.sra_mirror_available &&
           results.sra_annotated < results.hits.length && (
-            <Typography
-              color="textSecondary"
-              component="div"
-              sx={{ mt: 1 }}
-              title={MIRROR_SCOPE_NOTE}
-              variant="caption"
-            >
-              Metadata found for {results.sra_annotated} of{" "}
-              {results.hits.length} rows on this page.
-            </Typography>
+            // A Tooltip rather than a title attribute, and tabbable so it
+            // opens: what the mirror covers is the difference between this
+            // line being a bug report and being a fact about a run's age, and
+            // a title reaches nobody who is not holding a mouse.
+            <Tooltip describeChild title={MIRROR_SCOPE_NOTE}>
+              <Typography
+                color="textSecondary"
+                component="div"
+                sx={{ mt: 1 }}
+                tabIndex={0}
+                variant="caption"
+              >
+                Metadata found for {results.sra_annotated} of{" "}
+                {results.hits.length} rows on this page.
+              </Typography>
+            </Tooltip>
           )}
 
         <TablePagination {...paginationProps} />

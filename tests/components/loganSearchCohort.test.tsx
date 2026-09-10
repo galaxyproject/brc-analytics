@@ -231,6 +231,37 @@ describe("LoganSearchCohort", () => {
     expect(container.textContent).not.toContain("SRA studies");
   });
 
+  test("nests its section and block titles under the card's own heading", () => {
+    renderCohort(WITH_GEOGRAPHY);
+
+    // subtitle2 renders an h6, so every title on the card sat four levels
+    // below the h2 above it and the card read as one flat row of h6s to
+    // anything navigating by heading.
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Top organisms" })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Metadata breakdown" })
+    ).toBeTruthy();
+    // The blocks inside the breakdown, wherever they are drawn: the facet
+    // grid, the map beside the country bars, and the year timeline under it.
+    expect(
+      screen.getByRole("heading", { level: 4, name: "Release year" })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 4, name: "Library layout" })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 4, name: "Country of origin" })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", {
+        level: 4,
+        name: "Where these runs came from",
+      })
+    ).toBeTruthy();
+  });
+
   test("names the top organism the capped table would miss", () => {
     const { container } = renderCohort(BASE_RESULTS);
 

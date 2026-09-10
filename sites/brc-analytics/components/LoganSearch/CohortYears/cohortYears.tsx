@@ -74,7 +74,10 @@ export const CohortYears = ({
     /* The margin lives here rather than on a wrapper in the card, so a facet
        with no years leaves no gap behind it. */
     <Box sx={{ mt: 3 }}>
-      <Typography variant="subtitle2">Release year</Typography>
+      {/* A block of the card's metadata breakdown, so h4 under that h3. */}
+      <Typography component="h4" variant="subtitle2">
+        Release year
+      </Typography>
       <Typography color="textSecondary" component="div" variant="caption">
         {counted.toLocaleString()} runs
         {facet.unknown > 0 &&

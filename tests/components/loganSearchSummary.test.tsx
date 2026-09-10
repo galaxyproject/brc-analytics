@@ -66,8 +66,8 @@ const WITH_EXPORT: KmindexResults = {
 
 const EXPORT_URL = `${API_BASE_URL}/galaxy/kmindex/jobs/${JOB_ID}/export`;
 
-// MUI hands a string tooltip to the child as its aria-label, so this is the
-// name the assistant link answers to as well as the text on hover.
+// The sentence on hover. It describes the link rather than naming it, so it
+// is what the tooltip says and not what the link is called.
 const ASSISTANT_TOOLTIP =
   "The assistant can explain what this cohort is, say which of its organisms " +
   "are in BRC, and set up a Galaxy analysis on the top runs.";
@@ -234,11 +234,25 @@ describe("LoganSearchSummary", () => {
     renderSummary(BASE_RESULTS);
 
     // Sentence case, not the theme capitalisation of the old label, and short
-    // enough that the sentence explaining it moves to a tooltip -- which MUI
-    // then hands to the link as its accessible name.
-    const link = screen.getByText("Ask the assistant").closest("a");
-    expect(link?.getAttribute("href")).toBe(`/assistant?loganJob=${JOB_ID}`);
-    expect(link?.getAttribute("aria-label")).toBe(ASSISTANT_TOOLTIP);
+    // enough that the sentence explaining it moves to a tooltip. The label on
+    // screen is still what the link is called: a string tooltip that names its
+    // child instead leaves a 140-character name with no "Ask the assistant"
+    // anywhere in it, which is the mismatch WCAG 2.5.3 is about.
+    const link = screen.getByRole("link", { name: "Ask the assistant" });
+    expect(link.getAttribute("href")).toBe(`/assistant?loganJob=${JOB_ID}`);
+    expect(link.getAttribute("aria-label")).toBeNull();
+  });
+
+  test("keeps the assistant sentence as a description of that link", async () => {
+    renderSummary(BASE_RESULTS);
+
+    // Still one hover away, and now announced after the link's own name
+    // rather than in place of it.
+    const link = screen.getByRole("link", { name: "Ask the assistant" });
+    fireEvent.mouseOver(link);
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip.textContent).toBe(ASSISTANT_TOOLTIP);
+    expect(link.getAttribute("aria-describedby")).toBe(tooltip.id);
   });
 
   test("copies the results link", async () => {

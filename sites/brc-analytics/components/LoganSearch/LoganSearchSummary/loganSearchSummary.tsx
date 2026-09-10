@@ -284,8 +284,14 @@ export const LoganSearchSummary = ({
             <SummaryExport cohort={cohort} results={results} />
             {/* A Tooltip rather than a title attribute: the title never
                 opens on focus, so what the button leads to was reachable
-                with a pointer only. */}
-            <Tooltip title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs.">
+                with a pointer only. Describing rather than naming, because a
+                string title is handed to the child as its aria-label, and a
+                140-character name with no "Ask the assistant" in it is a
+                link nobody can ask for by the words on it. */}
+            <Tooltip
+              describeChild
+              title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs."
+            >
               <Button
                 component={Link}
                 href={`${ROUTES.ASSISTANT}?loganJob=${encodeURIComponent(

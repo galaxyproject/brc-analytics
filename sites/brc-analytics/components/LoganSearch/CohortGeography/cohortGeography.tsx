@@ -571,7 +571,10 @@ export const CohortGeography = ({
   const positions = describeLocations(geography);
   return (
     <div>
-      <Typography variant="subtitle2">Where these runs came from</Typography>
+      {/* A block of the card's metadata breakdown, so h4 under that h3. */}
+      <Typography component="h4" variant="subtitle2">
+        Where these runs came from
+      </Typography>
       <Typography color="textSecondary" component="div" variant="caption">
         {describeCoverage(geography)}
       </Typography>
