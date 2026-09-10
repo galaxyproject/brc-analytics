@@ -1,4 +1,7 @@
-import { useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import {
+  appliedSort,
+  useKmindexSearch,
+} from "@repo/shared/hooks/useKmindexSearch";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import ky from "ky";
 
@@ -224,6 +227,22 @@ describe("which account the search ran under", () => {
     });
 
     expect(result.current.identity).toBeNull();
+  });
+});
+
+describe("the sort a response says it applied", () => {
+  it("reads score order out of a response predating the field", () => {
+    expect(appliedSort(RESULTS)).toEqual({ column: "score", order: "desc" });
+  });
+
+  it("reads back the pair a response carries", () => {
+    expect(
+      appliedSort({
+        ...RESULTS,
+        order: "asc" as const,
+        sort: "country" as const,
+      })
+    ).toEqual({ column: "country", order: "asc" });
   });
 });
 
@@ -461,6 +480,53 @@ describe("sort and page size", () => {
     expect(lastResultsParams()).toMatchObject({
       order: "asc",
       sort: "country",
+    });
+  });
+
+  it("a failed size change does not undo a sort that landed at the new size", async () => {
+    const { result } = await reattached();
+    // Every request carries the size and the sort together, so the sort that
+    // answers second lands at the size the first one asked for. Hold the size
+    // change open while that happens.
+    const pending = deferred();
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => pending.promise,
+    }));
+    let stale!: Promise<void>;
+    await act(async () => {
+      stale = result.current.setPageSize(100);
+      await Promise.resolve();
+    });
+
+    mockKy.get.mockImplementationOnce(() =>
+      jsonOf({
+        ...RESULTS,
+        limit: 100,
+        offset: 0,
+        order: "asc",
+        sort: "organism",
+      })
+    );
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    expect(lastResultsParams()).toMatchObject({ limit: 100, sort: "organism" });
+
+    await act(async () => {
+      pending.reject(new Error("boom"));
+      await stale;
+    });
+    await act(async () => {
+      await result.current.goToPage(100);
+    });
+
+    expect(result.current.pageSize).toBe(100);
+    expect(result.current.sort).toEqual({ column: "organism", order: "asc" });
+    expect(lastResultsParams()).toMatchObject({
+      limit: 100,
+      offset: 100,
+      order: "asc",
+      sort: "organism",
     });
   });
 

@@ -273,6 +273,19 @@ export function defaultOrder(column: KmindexSortColumn): KmindexSortOrder {
   return column === "score" ? "desc" : "asc";
 }
 
+/**
+ * The sort a response says it applied. A response predating the field sorted
+ * by score and said nothing, which is what the lit header shows.
+ * @param results - A landed results page.
+ * @returns The applied column and direction.
+ */
+export function appliedSort(results: KmindexResults): KmindexSort {
+  return {
+    column: results.sort ?? DEFAULT_SORT.column,
+    order: results.order ?? DEFAULT_SORT.order,
+  };
+}
+
 const INITIAL_STATE: KmindexSearchState = {
   error: null,
   identity: null,
@@ -349,6 +362,10 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // choice without re-arming the interval on every change.
   const pageSizeRef = useRef(PAGE_SIZE);
   const sortRef = useRef<KmindexSort>(DEFAULT_SORT);
+  // The last page that landed, whichever request brought it back. It is what
+  // the paginator and the headers are drawn from, so it is also what a failed
+  // request has to leave the refs agreeing with.
+  const resultsRef = useRef<KmindexResults | null>(null);
 
   const stopPolling = useCallback((): void => {
     if (pollRef.current) {
@@ -386,10 +403,8 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   useEffect(() => stopPolling, [stopPolling]);
 
-  // Resolves to whether the server answered, so a caller that moved the
-  // requested size or sort ahead of the response can put it back.
   const fetchResults = useCallback(
-    async (jobId: string, offset: number): Promise<boolean> => {
+    async (jobId: string, offset: number): Promise<void> => {
       const { column, order } = sortRef.current;
       setState((prev) => ({ ...prev, isLoadingResults: true }));
       try {
@@ -407,16 +422,27 @@ export const useKmindexSearch = (): KmindexSearchActions &
             timeout: 300000,
           })
           .json<KmindexResults>();
+        resultsRef.current = results;
         setState((prev) => ({ ...prev, isLoadingResults: false, results }));
-        return true;
       } catch (error: unknown) {
         const message = await toErrorMessage(error, "Failed to load results");
+        // The refs are what the next request sends; the response is what the
+        // paginator and the lit header show. A failed request -- this one, or
+        // a stale one that lost a race to a newer success -- leaves them
+        // apart, so put the refs back on whatever last landed. Nothing landed
+        // yet means there is nothing on screen to disagree with.
+        const landed = resultsRef.current;
+        if (landed) {
+          pageSizeRef.current = landed.limit;
+          sortRef.current = appliedSort(landed);
+        }
         setState((prev) => ({
           ...prev,
           error: message,
           isLoadingResults: false,
+          pageSize: pageSizeRef.current,
+          sort: sortRef.current,
         }));
-        return false;
       }
     },
     []
@@ -478,6 +504,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
     async (submission: KmindexSubmission): Promise<void> => {
       stopPolling();
       fetchedRef.current = null;
+      resultsRef.current = null;
       // A new query is ranked afresh, so it starts in score order. The page
       // size is the reader's preference rather than the query's and stays.
       sortRef.current = DEFAULT_SORT;
@@ -527,40 +554,26 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   const setPageSize = useCallback(
     async (size: number): Promise<void> => {
-      const previous = pageSizeRef.current;
       pageSizeRef.current = size;
       setState((prev) => ({ ...prev, pageSize: size }));
       if (!state.jobId) return;
       // Back to the first page: an offset chosen at one size is a different
       // row at another.
-      if (await fetchResults(state.jobId, 0)) return;
-      // Nothing disables the selector while a request is out and a cold fetch
-      // takes minutes, so a change made in the meantime may already own the
-      // ref; rolling back over it would undo a newer success.
-      if (pageSizeRef.current !== size) return;
-      // The paginator follows the page the server actually returned, so a
-      // request that never landed must not leave the next one at a different
-      // size from the rows on screen.
-      pageSizeRef.current = previous;
-      setState((prev) => ({ ...prev, pageSize: previous }));
+      await fetchResults(state.jobId, 0);
     },
     [fetchResults, state.jobId]
   );
 
   const setSort = useCallback(
     async (column: KmindexSortColumn): Promise<void> => {
-      const previous = sortRef.current;
       // Flip against the sort the response says was applied, not the one that
       // was requested: when the mirror cannot answer a metadata sort the
       // backend serves score order and echoes that, and the lit header follows
       // the echo, so toggling the request would hand the reader a direction
-      // they never saw. A response carrying no sort comes from a backend
-      // predating the field, where the request is the best we know.
-      const current: KmindexSort = state.results?.sort
-        ? {
-            column: state.results.sort,
-            order: state.results.order ?? "desc",
-          }
+      // they never saw. With nothing landed there is no header to flip against
+      // and the request is the best we know.
+      const current: KmindexSort = state.results
+        ? appliedSort(state.results)
         : sortRef.current;
       const next: KmindexSort =
         current.column === column
@@ -571,15 +584,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
       if (!state.jobId) return;
       // Re-sorting re-ranks the whole listing, so page two of the old order
       // names nothing in the new one.
-      if (await fetchResults(state.jobId, 0)) return;
-      // Same race as the page size, and `next` is this call's own object, so
-      // identity says whether a later sort has since taken the ref over.
-      if (sortRef.current !== next) return;
-      // What goes back is the last sort that was requested, which with that
-      // check is the last one a response landed for -- and the lit header
-      // follows the response, so the next page fetch has to run in that order.
-      sortRef.current = previous;
-      setState((prev) => ({ ...prev, sort: previous }));
+      await fetchResults(state.jobId, 0);
     },
     [fetchResults, state.jobId, state.results]
   );
@@ -587,6 +592,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
   const reset = useCallback((): void => {
     stopPolling();
     fetchedRef.current = null;
+    resultsRef.current = null;
     pageSizeRef.current = PAGE_SIZE;
     sortRef.current = DEFAULT_SORT;
     syncJobParam(null);

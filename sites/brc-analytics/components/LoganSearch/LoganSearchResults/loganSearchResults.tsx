@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  appliedSort,
   defaultOrder,
   type KmindexHit,
   type KmindexIndexSummary,
@@ -184,10 +185,8 @@ export const LoganSearchResults = ({
 
   // What the response says it did, not what was clicked: a metadata sort the
   // mirror could not answer comes back as score order, and the lit header has
-  // to show that rather than the column the reader asked for. The fallbacks
-  // cover a backend predating the sort, which sorts by score and says nothing.
-  const appliedSort: KmindexSortColumn = results.sort ?? "score";
-  const appliedOrder: KmindexSortOrder = results.order ?? "desc";
+  // to show that rather than the column the reader asked for.
+  const applied = appliedSort(results);
   // Likewise the served page size, so the page arithmetic agrees with the rows
   // on screen even before a size change has round-tripped.
   const pageSize = results.limit;
@@ -291,16 +290,16 @@ export const LoganSearchResults = ({
           <TableHead>
             <TableRow>
               <SortableHeader
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="accession"
                 label="Accession"
                 onSort={setSort}
               />
               <SortableHeader
                 align="right"
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="score"
                 label="k-mer coverage"
                 onSort={setSort}
@@ -316,29 +315,29 @@ export const LoganSearchResults = ({
                 ANI est.
               </TableCell>
               <SortableHeader
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="organism"
                 label="Organism"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="platform"
                 label="Platform"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="country"
                 label="Country"
                 onSort={setSort}
               />
               <SortableHeader
-                appliedOrder={appliedOrder}
-                appliedSort={appliedSort}
+                appliedOrder={applied.order}
+                appliedSort={applied.column}
                 column="release_date"
                 label="Released"
                 onSort={setSort}
