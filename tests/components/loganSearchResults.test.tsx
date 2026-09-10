@@ -183,11 +183,12 @@ describe("LoganSearchResults truncation disclosure", () => {
       ])
     );
 
+    // The match count itself is the summary strip's line, directly above.
+    // Restating it here would put the same number on screen twice.
     expect(
-      screen.getByText(
-        "Listing the 50,000 highest-coverage hits of 1,133,516 matched"
-      )
+      screen.getByText("Listing the 50,000 highest-coverage hits")
     ).toBeTruthy();
+    expect(container.textContent).not.toContain("of 1,133,516 matched");
     expect(container.textContent).toContain(
       "The remaining 1,083,516 cannot be paged to."
     );

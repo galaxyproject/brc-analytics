@@ -96,6 +96,40 @@ export const OrganismMeta = styled.span`
   }
 `;
 
+/* The match count and its figures on the left, the export and the assistant
+   on the right. Aligned to the top because the figures wrap to two rows on a
+   narrow card and the buttons should not drift down with them. */
+export const SummaryHeader = styled.div`
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  justify-content: space-between;
+`;
+
+/* Actions stack on the right and align to the card's edge; on a narrow card
+   they fall under the figures and align left with them. */
+export const SummaryActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+
+  @media (max-width: 720px) {
+    align-items: flex-start;
+  }
+`;
+
+/* Provenance under the headline: which job, which query, which indexes, and
+   the way to hand any of it to someone else. */
+export const SummaryMeta = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 12px;
+`;
+
 /* Headline counts for the match set. Laid out as a row of labelled figures
    rather than a sentence so organisms/BioProjects/studies/countries read as
    four separate measurements of one set, not a list of trivia. */

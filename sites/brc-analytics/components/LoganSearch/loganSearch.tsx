@@ -1,10 +1,10 @@
 import { useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { type JSX } from "react";
-import { LoganSearchAnalyze } from "./LoganSearchAnalyze/loganSearchAnalyze";
 import { LoganSearchCohort } from "./LoganSearchCohort/loganSearchCohort";
 import { LoganSearchForm } from "./LoganSearchForm/loganSearchForm";
 import { LoganSearchResults } from "./LoganSearchResults/loganSearchResults";
 import { LoganSearchStatus } from "./LoganSearchStatus/loganSearchStatus";
+import { LoganSearchSummary } from "./LoganSearchSummary/loganSearchSummary";
 
 export const LoganSearch = (): JSX.Element => {
   const search = useKmindexSearch();
@@ -13,9 +13,9 @@ export const LoganSearch = (): JSX.Element => {
     <div>
       <LoganSearchForm search={search} />
       <LoganSearchStatus search={search} />
-      <LoganSearchCohort search={search} />
-      <LoganSearchAnalyze search={search} />
+      <LoganSearchSummary search={search} />
       <LoganSearchResults search={search} />
+      <LoganSearchCohort search={search} />
     </div>
   );
 };

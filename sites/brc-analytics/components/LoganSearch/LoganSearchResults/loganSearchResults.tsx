@@ -223,19 +223,17 @@ export const LoganSearchResults = ({
   // While truncated the listing is exactly the cap, so total_hits names it.
   const cap = results.total_hits;
 
-  // The toolbar names the window the table shows. It is the one place the
-  // cap is stated, and it stays true under any sort: the cap is applied on
-  // score before the listing is re-sorted, so the listed rows are the
-  // highest-coverage ones however they are ordered on screen.
-  let window = `All ${results.total_hits.toLocaleString()} hits`;
+  // The toolbar names the window the table shows, and only the window: the
+  // match count is the summary strip's line, directly above. It stays true
+  // under any sort, because the cap is applied on score before the listing is
+  // re-sorted, so the listed rows are the highest-coverage ones however they
+  // are ordered on screen.
+  let listWindow = `All ${results.total_hits.toLocaleString()} hits`;
   let capNote: string | null = null;
   if (results.truncated) {
+    listWindow = `Listing the ${cap.toLocaleString()} highest-coverage hits`;
     // notListed is 0 only when the match count went missing; "the remaining 0"
     // would be a worse answer than naming the cap and leaving it there.
-    window =
-      notListed > 0
-        ? `Listing the ${cap.toLocaleString()} highest-coverage hits of ${totalMatches.toLocaleString()} matched`
-        : `Listing the ${cap.toLocaleString()} highest-coverage hits`;
     capNote =
       notListed > 0
         ? `The remaining ${notListed.toLocaleString()} cannot be paged to.`
@@ -283,7 +281,7 @@ export const LoganSearchResults = ({
         <ResultsToolbar>
           <div>
             <Typography component="h2" variant="subtitle1">
-              {window}
+              {listWindow}
             </Typography>
             {capNote && (
               <Typography color="textSecondary" variant="body2">

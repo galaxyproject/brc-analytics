@@ -68,25 +68,31 @@ export const LoganSearchStatus = ({
           yourself.
         </Alert>
       )}
-      <Card sx={{ mt: 2 }}>
-        <CardContent>
-          <ControlRow>
-            <Typography variant="subtitle1">Job {jobId}</Typography>
-            <Chip
-              color={STATE_COLORS[state] ?? "default"}
-              label={STATE_LABELS[state] ?? state}
-              size="small"
-            />
-          </ControlRow>
-          {!isDone && <LinearProgress sx={{ mt: 2 }} />}
-          {isLoadingResults && (
-            <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
-              Merging hits across index shards -- this takes a moment the first
-              time.
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
+      {/* Only while the search is still running. Once results are in, the job
+          id and the state it reached are both said better by the summary
+          strip, and a card whose only content is "Complete" is a row of
+          furniture between the query and its answer. */}
+      {!isDone && (
+        <Card sx={{ mt: 2 }}>
+          <CardContent>
+            <ControlRow>
+              <Typography variant="subtitle1">Job {jobId}</Typography>
+              <Chip
+                color={STATE_COLORS[state] ?? "default"}
+                label={STATE_LABELS[state] ?? state}
+                size="small"
+              />
+            </ControlRow>
+            <LinearProgress sx={{ mt: 2 }} />
+            {isLoadingResults && (
+              <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
+                Merging hits across index shards -- this takes a moment the
+                first time.
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 };

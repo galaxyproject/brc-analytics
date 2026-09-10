@@ -1,5 +1,4 @@
 import { LoganSearchCohort } from "@brc/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
-import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
   type KmindexFacet,
@@ -115,19 +114,6 @@ const BASE_RESULTS: KmindexResults = {
   truncated: true,
 };
 
-// The same job with the enriched export materialized. Both numbers come from
-// running the backend's own export writer over the real 84-shard corpus
-// against the real mirror: 1,133,516 rows, 15.6 MB of zstd parquet, which the
-// same code streams back as 168.0 MB of TSV.
-const WITH_EXPORT: KmindexResults = {
-  ...BASE_RESULTS,
-  export_bytes: 15600000,
-  export_rows: TOTAL,
-  export_status: "available",
-};
-
-const EXPORT_URL = `${API_BASE_URL}/galaxy/kmindex/jobs/${BASE_RESULTS.job_id}/export`;
-
 // Geography over the same 1,133,516-hit job. `unknown` is deliberately the
 // country facet's own 244,011 -- the two are computed from one column with
 // the same sentinel handling, so they cannot be allowed to disagree on the
@@ -202,15 +188,19 @@ describe("LoganSearchCohort", () => {
     expect(container.innerHTML).toBe("");
   });
 
-  test("leads with the match count and the structure behind it", () => {
+  test("leads with the match count and leaves the figures to the summary", () => {
     const { container } = renderCohort(BASE_RESULTS);
 
     expect(screen.getByText("1,133,516 runs")).toBeTruthy();
-    expect(screen.getByText("10,927")).toBeTruthy();
-    expect(screen.getByText("19,014")).toBeTruthy();
-    expect(screen.getByText("19,148")).toBeTruthy();
-    expect(screen.getByText("186")).toBeTruthy();
     expect(container.textContent).toContain("Every run this query matched");
+    // Organisms, BioProjects, SRA studies and countries are four measurements
+    // of the same set the summary strip above already leads with, and each
+    // number gets one place on the page.
+    expect(screen.queryByText("19,014")).toBeNull();
+    expect(screen.queryByText("19,148")).toBeNull();
+    expect(screen.queryByText("186")).toBeNull();
+    expect(container.textContent).not.toContain("BioProjects");
+    expect(container.textContent).not.toContain("SRA studies");
   });
 
   test("names the top organism the capped table would miss", () => {
@@ -408,163 +398,9 @@ describe("LoganSearchCohort", () => {
     expect(container.textContent).toContain(
       "Counts only -- these values are not filters."
     );
-    // The card carries a download now, so the claim can no longer be that
-    // nothing in it is clickable -- only that no breakdown is a control.
+    // The claim that has to survive is about the breakdowns, not about the
+    // card: the download and the assistant live in the summary strip above.
     expect(container.textContent).not.toContain("nothing here is clickable");
-  });
-
-  test("offers no download when the backend sends no export fields", () => {
-    const { container } = renderCohort(BASE_RESULTS);
-
-    // The card still renders -- the counts do not depend on the file.
-    expect(container.textContent).toContain("1,133,516 runs");
-    expect(container.querySelectorAll("a")).toHaveLength(0);
-    expect(container.textContent).not.toContain("Download");
-  });
-
-  test("offers no download when the export was not materialized", () => {
-    const { container } = renderCohort({
-      ...BASE_RESULTS,
-      export_bytes: null,
-      export_rows: null,
-      export_status: "unavailable",
-    });
-
-    // No disabled button, no tooltip explaining an absence nobody can fix.
-    expect(container.querySelectorAll("a")).toHaveLength(0);
-    expect(container.textContent).not.toContain("Download");
-  });
-
-  test("says a narrower query brings the download back when the set was too large", () => {
-    const { container } = renderCohort({
-      ...BASE_RESULTS,
-      export_bytes: null,
-      export_rows: null,
-      export_status: "too_large",
-    });
-
-    // The one absence with a cause the reader can act on, so it is the one
-    // absence worth a sentence -- still no control.
-    expect(container.textContent).toContain(
-      "Too many matched runs to prepare a download of the full set. A higher minimum shared k-mer fraction, or fewer indexes, brings one back."
-    );
-    expect(container.querySelectorAll("a")).toHaveLength(0);
-  });
-
-  test("links both formats at the export endpoint for this job", () => {
-    const { container } = renderCohort(WITH_EXPORT);
-
-    const tsv = screen.getByRole("link", {
-      name: "Download all 1,133,516 matched runs as TSV",
-    });
-    const parquet = screen.getByRole("link", {
-      name: "Download all 1,133,516 matched runs as Parquet",
-    });
-
-    expect(tsv.getAttribute("href")).toBe(`${EXPORT_URL}?format=tsv`);
-    expect(parquet.getAttribute("href")).toBe(`${EXPORT_URL}?format=parquet`);
-    // Plain anchors, not fetch-then-blob: streaming 160 MB is the browser's
-    // job, so nothing in the card may be a scripted button.
-    expect(tsv.hasAttribute("download")).toBe(true);
-    expect(parquet.hasAttribute("download")).toBe(true);
-    expect(container.querySelectorAll("button")).toHaveLength(0);
-  });
-
-  test("states the parquet size and marks the TSV size as derived", () => {
-    const { container } = renderCohort(WITH_EXPORT);
-
-    // Parquet is the size the API reports, stated flatly. TSV never exists as
-    // a file to measure, so it is derived from the row count at the measured
-    // 148 B/row and marked as the estimate it is -- landing on the 168.0 MB
-    // the backend's own writer actually produces for these rows.
-    expect(container.textContent).toContain("TSV · ~168 MB");
-    expect(container.textContent).toContain("Parquet · 15.6 MB");
-  });
-
-  test("does not send a million-row export to a spreadsheet", () => {
-    // Excel and Calc stop at 1,048,576 rows and drop the tail behind one
-    // dismissable warning. This export exists because the 50,000 rows on
-    // screen misrepresent the match set, so recommending a format that
-    // silently truncates would put the same problem back in a new place --
-    // and the measured job is 1,133,516 rows, 84,941 past the limit.
-    const { container } = renderCohort(WITH_EXPORT);
-
-    expect(container.textContent).toContain("Too many rows for a spreadsheet");
-    expect(container.textContent).not.toContain("opens in a spreadsheet");
-  });
-
-  test("still recommends TSV when the set does fit in a spreadsheet", () => {
-    const { container } = renderCohort({
-      ...WITH_EXPORT,
-      cohort: { ...COHORT, in_mirror: 17566, total: 17633 },
-      export_bytes: 260000,
-      export_rows: 17633,
-      total_matches: 17633,
-    });
-
-    expect(container.textContent).toContain("TSV opens in a spreadsheet");
-    expect(container.textContent).not.toContain("Too many rows");
-  });
-
-  test("promises the whole match set rather than the rows in the table", () => {
-    const { container } = renderCohort(WITH_EXPORT);
-
-    expect(container.textContent).toContain("Download the whole match set");
-    expect(container.textContent).toContain(
-      "All 1,133,516 matched runs with their SRA metadata, in one file -- the set these counts describe, not the 50,000 rows the table below pages through."
-    );
-  });
-
-  test("says the file joins metadata the table only has for a page when nothing was cut", () => {
-    const whole = 17633;
-    const { container } = renderCohort({
-      ...WITH_EXPORT,
-      cohort: { ...COHORT, in_mirror: whole, total: whole },
-      // Small enough to land under a megabyte, the one band the megabyte
-      // formatting cannot carry.
-      export_bytes: 243000,
-      export_rows: whole,
-      total_hits: whole,
-      total_matches: whole,
-      truncated: false,
-    });
-
-    expect(container.textContent).toContain(
-      "All 17,633 matched runs with their SRA metadata, in one file -- the same set as the table below, joined to metadata for every row rather than the page on screen."
-    );
-    expect(container.textContent).toContain("TSV · ~2.6 MB");
-    expect(container.textContent).toContain("Parquet · 243 kB");
-    // Full mirror coverage: nothing to warn about, so nothing said.
-    expect(container.textContent).not.toContain("metadata columns left empty");
-  });
-
-  test("sizes the largest export the ceiling permits without four figures of megabytes", () => {
-    // The backend refuses to materialize past EXPORT_MAX_ROWS = 5,000,000, so
-    // this is the biggest download that can actually be offered: ~740 MB of
-    // TSV. Sized at the ceiling rather than at some larger number the ceiling
-    // forbids, so this test keeps failing if the two ever drift apart.
-    const ceiling = 5000000;
-    const { container } = renderCohort({
-      ...WITH_EXPORT,
-      cohort: { ...COHORT, in_mirror: ceiling, total: ceiling },
-      // Measured at the real ceiling against the real mirror: 84 MB parquet.
-      export_bytes: 84000000,
-      export_rows: ceiling,
-      total_matches: ceiling,
-    });
-
-    expect(container.textContent).toContain("TSV · ~740 MB");
-    expect(container.textContent).toContain("Parquet · 84.0 MB");
-  });
-
-  test("admits the rows that carry a hit but no metadata are in the file too", () => {
-    const { container } = renderCohort(WITH_EXPORT);
-
-    // 5,044 of 1,133,516. The coverage share is already stated above at
-    // greater weight; this only says what it means for the file.
-    expect(container.textContent).toContain(
-      "The 5,044 runs the mirror does not know are in it too, carrying their hit with the metadata columns left empty."
-    );
   });
 });
 
