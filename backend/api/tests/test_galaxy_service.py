@@ -2064,6 +2064,7 @@ class TestFalsePositiveCorrection:
         # Without the job's threshold there is nothing to re-apply, so the hit
         # stays -- corrected and marked -- rather than being guessed at.
         service.get_job_status = AsyncMock(return_value=self._status(1, None))
+        service.gi.jobs.show_job = MagicMock(side_effect=Exception("Galaxy is down"))
         service._download_shard = AsyncMock(
             return_value={"IDX_1": {"q": {self.SATURATED: 0.9}}}
         )
@@ -2073,6 +2074,58 @@ class TestFalsePositiveCorrection:
         assert len(aggregate["hits"]) == 1
         assert aggregate["hits"][0]["score"] == pytest.approx(0.209)
         assert aggregate["hits"][0]["fp_correction"] is not None
+
+    @pytest.mark.asyncio
+    async def test_threshold_is_fetched_when_the_cached_status_lacks_params(
+        self, service
+    ):
+        # The status cache drops params, and the results page always reads
+        # status to completion before asking for results -- so this is the
+        # path every real aggregation takes.
+        service.get_job_status = AsyncMock(return_value=self._status(1, None))
+        service.gi.jobs.show_job = MagicMock(
+            return_value={"params": {"threshold": "0.5", "db_opts|kmindex": ["IDX_1"]}}
+        )
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {self.SATURATED: 0.9, "SRR000001": 0.6}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert [h["accession"] for h in aggregate["hits"]] == ["SRR000001"]
+        service.gi.jobs.show_job.assert_called_once_with("job1")
+
+    @pytest.mark.asyncio
+    async def test_params_are_fetched_once_for_indexes_and_threshold(self, service):
+        service.get_job_status = AsyncMock(return_value=self._status(1, None))
+        service.gi.jobs.show_job = MagicMock(
+            return_value={"params": {"threshold": "0.5", "db_opts|kmindex": ["IDX_1"]}}
+        )
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {"SRR000001": 0.6}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        assert [s["index"] for s in aggregate["per_index"]] == ["IDX_1"]
+
+    @pytest.mark.asyncio
+    async def test_a_shard_whose_only_hits_were_dropped_does_not_count(self, service):
+        service.get_job_status = AsyncMock(
+            return_value=self._status(2, {"threshold": "0.5"})
+        )
+        service._download_shard = AsyncMock(
+            side_effect=[
+                {"IDX_1": {"q": {self.SATURATED: 0.9}}},
+                {"IDX_2": {"q": {"SRR000001": 0.6}}},
+            ]
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["shards_with_hits"] == 1
+        assert aggregate["shards_searched"] == 2
 
     def test_the_hit_model_reports_ani_and_carries_the_correction(self):
         hit = KmindexHit(

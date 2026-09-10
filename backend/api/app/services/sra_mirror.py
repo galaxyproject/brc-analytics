@@ -26,6 +26,7 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 import duckdb
 
 from app.services import country_iso
+from app.services.logan_stats import KMER_SIZE
 
 logger = logging.getLogger(__name__)
 
@@ -826,7 +827,10 @@ def _export_sql(with_coordinates: bool) -> str:
     `ani` is computed here rather than staged: it is a pure function of the
     score, and pow() on the 31st root is one column expression. A corrected
     score can be negative when the job's threshold could not be read, and
-    pow() of a negative base is NaN, so the CASE guards it to NULL.
+    pow() of a negative base is NaN, so the CASE guards it to NULL. DuckDB's
+    round is half-away-from-zero where Python's is half-to-even, so the two
+    ANI figures can differ in the fourth place for a 31st root, which is why
+    the export is not asserted equal to the model bit-for-bit.
 
     @param with_coordinates: whether this mirror carries lat/lon. The columns
         are appended rather than always selected, because a mirror older than
@@ -838,7 +842,7 @@ def _export_sql(with_coordinates: bool) -> str:
         COPY (
           SELECT h.accession, h.score,
                  CASE WHEN h.score >= 0
-                      THEN round(pow(h.score, 1.0 / 31), 4) END AS ani,
+                      THEN round(pow(h.score, 1.0 / {KMER_SIZE}), 4) END AS ani,
                  h.fp_correction, h.shard,
                  nullif(r.organism, '') AS organism,
                  nullif(r.assay_type, '') AS assay_type,

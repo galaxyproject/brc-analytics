@@ -719,13 +719,17 @@ class GalaxyService:
                 f"Job {job_id} reported success but exposed no output datasets"
             )
 
-        # Read the submitted index list up front. It is what attributes the
-        # shard keys, and taking it before the downloads keeps the round trip
-        # off the span where both the full and the capped hit list are alive.
-        # get_job_status already fetched the job dict this comes out of, so on
-        # a cold read it is handed over rather than fetched again.
-        submitted_indexes = await self._submitted_indexes(job_id, status.params)
-        threshold = _submitted_threshold(status.params)
+        # Read the job's parameters up front. They carry the submitted index
+        # list, which attributes the shard keys, and the threshold the job ran
+        # at, which is re-applied to the corrected scores; one fetch serves
+        # both, so neither can end up thinking the parameters were readable
+        # while the other did not. Taking it before the downloads keeps the
+        # round trip off the span where both the full and the capped hit list
+        # are alive. get_job_status already fetched the job dict this comes out
+        # of, so on a cold read it is handed over rather than fetched again.
+        params = await self._job_params(job_id, status.params)
+        submitted_indexes = _submitted_index_names(params)
+        threshold = _submitted_threshold(params)
 
         semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
         shards = list(
@@ -769,11 +773,7 @@ class GalaxyService:
             for shard_name, queries in shard.items():
                 for name, accessions in (queries or {}).items():
                     query_name = query_name or name
-                    if accessions:
-                        # Count the shard, not the (shard, query) pair -- the
-                        # latter can exceed shards_searched.
-                        shard_had_hits = True
-                    for accession, raw_score in accessions.items():
+                    for accession, raw_score in (accessions or {}).items():
                         # Logan's own site subtracts a false-positive baseline
                         # for 227 saturated samples and re-applies the
                         # threshold to what is left. kmindex applied it to the
@@ -790,6 +790,11 @@ class GalaxyService:
                                 corrected_out += 1
                                 continue
                             hit["fp_correction"] = baseline
+                        # Count the shard, not the (shard, query) pair -- the
+                        # latter can exceed shards_searched. Counted on the
+                        # kept hit, so a shard whose only matches were dropped
+                        # saturated samples reports no hits rather than one.
+                        shard_had_hits = True
                         hits.append(hit)
             if shard_had_hits:
                 shards_with_hits += 1
@@ -971,17 +976,34 @@ class GalaxyService:
             carried", so fall back to fetching.
         @returns: the parsed index names, or None if they could not be read.
         """
-        if params is None:
-            try:
-                job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
-                params = job.get("params")
-            except Exception as e:
-                logger.warning(
-                    f"kmindex job {job_id}: could not read the submitted "
-                    f"index list: {e}"
-                )
-                return None
-        return _submitted_index_names(params)
+        return _submitted_index_names(await self._job_params(job_id, params))
+
+    async def _job_params(
+        self, job_id: str, params: Optional[dict] = None
+    ) -> Optional[dict]:
+        """
+        The job's echoed tool parameters, fetching them when the caller has none.
+
+        GalaxyJobStatus drops params on the way into the status cache, so a
+        status read after the job completed -- which is every read the results
+        page makes, since it polls status to completion first -- arrives with
+        none. One show_job here serves both the index list and the threshold,
+        which used to be read separately and disagree about whether the job's
+        parameters were readable at all.
+
+        @param job_id: the job whose parameters to read.
+        @param params: parameters the caller already holds, or None.
+        @returns: the params dict, or None if they could not be read.
+        """
+        if params is not None:
+            return params
+        try:
+            job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+        except Exception as e:
+            logger.warning(f"kmindex job {job_id}: could not read job parameters: {e}")
+            return None
+        params = job.get("params") if isinstance(job, dict) else None
+        return params if isinstance(params, dict) else None
 
     def _export_state(self, aggregate: dict, job_id: str) -> dict:
         """
