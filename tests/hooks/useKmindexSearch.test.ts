@@ -341,6 +341,42 @@ describe("sort and page size", () => {
     expect(lastResultsParams()).toMatchObject({ limit: 100, offset: 0 });
   });
 
+  it("a failed page-size change leaves the next page at the size on screen", async () => {
+    const { result } = await reattached();
+    // The refetch at the new size never lands, so the rows on screen are
+    // still the 25 the last successful response carried.
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => Promise.reject(new Error("boom")),
+    }));
+    await act(async () => {
+      await result.current.setPageSize(100);
+    });
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+
+    expect(lastResultsParams()).toMatchObject({ limit: 25, offset: 25 });
+    expect(result.current.pageSize).toBe(25);
+  });
+
+  it("a failed sort change leaves the next page in the order on screen", async () => {
+    const { result } = await reattached();
+    // Same for the order: the header still lights the score column the last
+    // successful response echoed.
+    mockKy.get.mockImplementationOnce(() => ({
+      json: (): Promise<unknown> => Promise.reject(new Error("boom")),
+    }));
+    await act(async () => {
+      await result.current.setSort("organism");
+    });
+    await act(async () => {
+      await result.current.goToPage(25);
+    });
+
+    expect(lastResultsParams()).toMatchObject({ order: "desc", sort: "score" });
+    expect(result.current.sort).toEqual({ column: "score", order: "desc" });
+  });
+
   it("paging keeps the current sort and size", async () => {
     const { result } = await reattached();
     await act(async () => {

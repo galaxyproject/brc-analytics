@@ -40,6 +40,7 @@ describe("Logan Search in the header", () => {
     const links = headerLinks(true);
     const index = links.findIndex((link) => link.url === ROUTES.LOGAN_SEARCH);
 
+    expect(index).toBeGreaterThan(0);
     expect(links[index].label).toBe("Logan Search");
     expect(links[index - 1].label).toBe("Workflows");
   });

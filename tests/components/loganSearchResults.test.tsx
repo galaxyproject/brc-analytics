@@ -120,10 +120,11 @@ function renderResults(
     pageSize: PAGE_SIZE,
     reset: jest.fn(),
     results,
-    // Deliberately disagrees with every response payload in this file, so a
-    // component reading the requested sort rather than the applied one fails
-    // the tests below instead of passing on a coincidence.
-    sort: { column: "organism", order: "asc" },
+    // Deliberately a column no response payload in this file applies, so a
+    // component reading the requested sort rather than the applied one lights
+    // a header the tests below do not expect instead of passing on a
+    // coincidence.
+    sort: { column: "country", order: "asc" },
     submit: jest.fn(),
     ...resolved,
   } as unknown as Search;

@@ -265,11 +265,11 @@ describe("the map", () => {
     // layered colour scales by default, and the union of those two is the
     // log one: every score sits at or under its domainMin of 1, so the
     // points draw in the palest blue of the count ramp and plasma never
-    // applies. Both legends merge into one titled "Matched runs, Mean
-    // score". Nothing about the spec above looks wrong -- the damage happens
-    // in what vega-lite compiles it into, so this is the only place it can
-    // be caught short of compiling the spec, which jest cannot do here
-    // (vega-lite is ESM and next/jest will not transform it).
+    // applies. Both legends merge into one titled "Matched runs, Mean k-mer
+    // coverage". Nothing about the spec above looks wrong -- the damage
+    // happens in what vega-lite compiles it into, so this is the only place
+    // it can be caught short of compiling the spec, which jest cannot do
+    // here (vega-lite is ESM and next/jest will not transform it).
     expect(spec.resolve.scale.color).toBe("independent");
   });
 
@@ -281,9 +281,9 @@ describe("the map", () => {
 
     // Stacked down the right-hand side the two gradients need 440px against
     // a 320px map, and Vega clips the overflow instead of compressing it.
-    // Measured on a live cohort, Mean score painted down to 0.80 while its
-    // scale ran to 0.50, so the purple half of the ramp -- 52% of the
-    // plotted points -- had no key at all.
+    // Measured on a live cohort, Mean k-mer coverage painted down to 0.80
+    // while its scale ran to 0.50, so the purple half of the ramp -- 52% of
+    // the plotted points -- had no key at all.
     expect(spec.config.legend.orient).toBe("bottom");
     expect(spec.config.legend.direction).toBe("horizontal");
 
@@ -312,10 +312,10 @@ describe("the map", () => {
     // below the map has room for a third, but size is still the one to give
     // up: its title would repeat the choropleth's "Matched runs" while
     // counting something else, a bigger circle reads as more runs without
-    // being told, and the tooltip carries the exact count. Mean score is the
-    // one a reader cannot infer from the drawing.
+    // being told, and the tooltip carries the exact count. Mean k-mer
+    // coverage is the one a reader cannot infer from the drawing.
     expect(points.size.legend).toBeNull();
-    expect(points.color.legend.title).toBe("Mean score");
+    expect(points.color.legend.title).toBe("Mean k-mer coverage");
     expect(spec.layer[1].encoding.color.legend.title).toBe("Matched runs");
   });
 

@@ -120,10 +120,13 @@ async def logan_cohort(deps: AssistantDeps, job_id: str) -> str:
 async def logan_hits(
     deps: AssistantDeps, job_id: str, offset: int = 0, limit: int = 25
 ) -> str:
-    """A page of score-ranked hits from a finished Logan search, each with
-    its SRA run metadata when the mirror knows it (organism, platform, assay
-    type, library layout, instrument, country, release date, BioProject,
-    study). Sorted by shared k-mer score, highest first.
+    """A page of hits from a finished Logan search, ranked by k-mer coverage
+    (the fraction of the query's 31-mers found in the run, highest first),
+    each with its SRA run metadata when the mirror knows it (organism,
+    platform, assay type, library layout, instrument, country, release date,
+    BioProject, study). For the 227 saturated samples Logan flags, score is
+    the raw kmindex ratio less that sample's false-positive baseline, given
+    as fp_correction; ani is the Mash Screen ANI estimate, score ** (1/31).
 
     Never compute shares or distributions from a page of hits; use
     logan_cohort for that.

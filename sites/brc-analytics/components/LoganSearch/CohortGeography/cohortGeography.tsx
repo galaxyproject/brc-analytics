@@ -284,8 +284,8 @@ function buildSpec(
     // Stacked down the right-hand side they do not fit. Vega gives each
     // gradient its default 200px and lays the second below the first, which
     // needs 440px against a 320px map; it clips rather than compresses, and
-    // the one that loses its bottom is Mean score. Measured on a real
-    // cohort, the painted legend stopped at 0.80 while the scale ran to
+    // the one that loses its bottom is Mean k-mer coverage. Measured on a
+    // real cohort, the painted legend stopped at 0.80 while the scale ran to
     // 0.50, so 52% of the plotted points -- 39% of the located runs -- were
     // drawn in a purple the key never showed.
     //
@@ -373,7 +373,7 @@ function buildSpec(
               encoding: {
                 color: {
                   field: "avg_score",
-                  legend: { format: ".2f", title: "Mean score" },
+                  legend: { format: ".2f", title: "Mean k-mer coverage" },
                   scale: { scheme: POINT_SCHEME },
                   type: "quantitative" as const,
                 },
@@ -386,8 +386,8 @@ function buildSpec(
                   // guessable of the three (bigger circle, more runs), its
                   // title would repeat the choropleth's "Matched runs" while
                   // counting something else, and the tooltip gives the exact
-                  // count on hover. Mean score is the one the reader cannot
-                  // infer, so it is the one that gets the space.
+                  // count on hover. Mean k-mer coverage is the one the reader
+                  // cannot infer, so it is the one that gets the space.
                   legend: null,
                   scale: { range: POINT_SIZE_RANGE, type: "sqrt" as const },
                   type: "quantitative" as const,
@@ -407,7 +407,7 @@ function buildSpec(
                   {
                     field: "avg_score",
                     format: ".3f",
-                    title: "Mean score",
+                    title: "Mean k-mer coverage",
                     type: "quantitative" as const,
                   },
                 ],
@@ -431,8 +431,9 @@ function buildSpec(
     // run count (blues, log, domainMin 1) and the points' mean score (plasma,
     // 0..1). Shared, every score falls at or under the log floor and the
     // points come out the palest blue in the ramp -- plasma never applies,
-    // and the two legends merge into one reading "Matched runs, Mean score".
-    // The spec looks right either way; only the compiled output differs.
+    // and the two legends merge into one reading "Matched runs, Mean k-mer
+    // coverage". The spec looks right either way; only the compiled output
+    // differs.
     resolve: { scale: { color: "independent" } },
     width: "container",
   };
