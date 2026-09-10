@@ -266,8 +266,10 @@ describe("LoganSearchCohort", () => {
     expect(container.textContent).toContain(
       "These counts describe the whole match set, not the table above."
     );
+    // The heading above it already opens with N, so the paragraph says what
+    // it counts rather than counting it again.
     expect(container.textContent).toContain(
-      "All 1,133,516 matched runs are counted here. The table above lists 50,000 of them: the top of the score range, which over-represents whatever is common at the top."
+      "Every matched run is counted here. The table above lists 50,000 of them: the top of the score range, which over-represents whatever is common at the top."
     );
     expect(container.textContent).toContain(
       "up to and including a different top organism"
@@ -342,14 +344,19 @@ describe("LoganSearchCohort", () => {
     expect(grid?.textContent).toContain("Country of origin");
     expect(grid?.textContent).not.toContain("Release year");
     expect(
-      screen.getByRole("img", { name: "Runs released per year, 2012 to 2024" })
+      screen.getByRole("img", {
+        name: "Runs released per year, 2012 to 2024; most in 2021, with 402,118",
+      })
     ).toBeTruthy();
     // Thirteen years, three of them empty, each carrying its own count.
     expect(screen.getByTitle("2021: 402,118 runs")).toBeTruthy();
     expect(screen.getByTitle("2016: 0 runs")).toBeTruthy();
     // A grid row would have put that count and its share on the page as
-    // text; the timeline puts the shape there instead.
-    expect(container.textContent).not.toContain("402,118");
+    // visible text; the timeline draws the shape and leaves the numbers to
+    // the hidden list a screen reader reads.
+    expect(
+      screen.getByText("2021: 402,118 runs", { selector: "li" })
+    ).toBeTruthy();
     expect(container.textContent).not.toContain("35.6%");
   });
 

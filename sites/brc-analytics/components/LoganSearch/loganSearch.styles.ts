@@ -230,14 +230,15 @@ export const CohortGeographyLayout = styled.div`
   }
 `;
 
-/* One column per year, bars bottom-aligned in the 84px the row leaves above
-   the labels. Chronological rather than ranked: a year is an axis, and
-   sorting it by count throws away the only thing it was going to show. */
+/* One column per year: a 68px band of bars over 20px of labels.
+   Chronological rather than ranked, because a year is an axis and sorting it
+   by count throws away the only thing it was going to show. Kept shallow --
+   at 1,200px a taller band is a wall of navy across the whole card. */
 export const YearRow = styled.div`
   align-items: flex-end;
   display: flex;
   gap: 3px;
-  height: 104px;
+  height: 88px;
   margin-top: 8px;
 `;
 
@@ -250,21 +251,31 @@ export const YearColumn = styled.div`
   min-width: 0;
 `;
 
-/* A year that rounds to nothing against the tallest still happened: 81 runs
-   beside 402,118 is under half a pixel, and min-height is what keeps it on
-   the axis at all. */
+/* The band the bars stand in, and the line they stand on. The baseline is
+   what makes an empty year read as a gap in a row of columns rather than as
+   a column that failed to draw. */
+export const YearBand = styled.div`
+  border-bottom: 1px solid ${PALETTE.SMOKE_MAIN};
+  display: flex;
+  flex-direction: column;
+  height: 68px;
+  justify-content: flex-end;
+`;
+
 export const YearBar = styled.div`
   background: ${PALETTE.PRIMARY_MAIN};
   border-radius: 2px 2px 0 0;
-  min-height: 1px;
 `;
 
+/* Every fifth column carries a label and the four beside it are empty, so a
+   label is let out of its own column rather than clipped: left-aligned from
+   the column it belongs to, running into the space beside it. */
 export const YearLabel = styled.span`
   color: ${PALETTE.INK_LIGHT};
   font-size: 11px;
   height: 20px;
   line-height: 20px;
-  overflow: hidden;
-  text-align: center;
+  overflow: visible;
+  text-align: left;
   white-space: nowrap;
 `;

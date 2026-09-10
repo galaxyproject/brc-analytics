@@ -10,7 +10,6 @@ import { formatShare } from "@brc/components/LoganSearch/utils";
 import {
   Alert,
   AlertTitle,
-  Box,
   Card,
   CardContent,
   Divider,
@@ -274,12 +273,12 @@ export const LoganSearchCohort = ({
               These counts describe the whole match set, not the table above.
             </AlertTitle>
             <Typography variant="body2">
-              All {cohort.total.toLocaleString()} matched runs are counted here.
-              The table above lists {listed.toLocaleString()} of them: the top
-              of the score range, which over-represents whatever is common at
-              the top. Counting those rows gives different answers, up to and
-              including a different top organism. Where the two disagree, these
-              are the numbers that describe your search.
+              Every matched run is counted here. The table above lists{" "}
+              {listed.toLocaleString()} of them: the top of the score range,
+              which over-represents whatever is common at the top. Counting
+              those rows gives different answers, up to and including a
+              different top organism. Where the two disagree, these are the
+              numbers that describe your search.
             </Typography>
           </Alert>
         ) : (
@@ -334,11 +333,7 @@ export const LoganSearchCohort = ({
 
         {/* Full width under the grid: thirteen years in a half-width cell
             gives each year about twenty pixels, which is not a timeline. */}
-        {yearFacet && (
-          <Box sx={{ mt: 3 }}>
-            <CohortYears facet={yearFacet} />
-          </Box>
-        )}
+        {yearFacet && <CohortYears facet={yearFacet} />}
 
         <Typography
           color="textSecondary"

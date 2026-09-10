@@ -44,13 +44,22 @@ function labels(): string[] {
 }
 
 /**
+ * The bars themselves, one per column. Each column is a band carrying the
+ * baseline, the bar inside it, and the label under it.
+ * @returns One bar per column, in document order.
+ */
+function bars(): HTMLElement[] {
+  return columns().map(
+    (column) => column.firstElementChild?.firstElementChild as HTMLElement
+  );
+}
+
+/**
  * The inline heights the bars were given, in document order.
  * @returns One CSS height per column.
  */
 function heights(): string[] {
-  return columns().map(
-    (column) => (column.firstElementChild as HTMLElement).style.height
-  );
+  return bars().map((bar) => bar.style.height);
 }
 
 describe("yearBars", () => {
@@ -72,12 +81,16 @@ describe("yearBars", () => {
   });
 
   test("ignores a value that is not a year", () => {
-    // The mirror's sentinels reach the facet as strings like anything else.
+    // The mirror's sentinels reach the facet as strings like anything else,
+    // and a blank converts to the number 0 -- which as a year would stretch
+    // the axis back two millennia.
     expect(
       yearBars(
         yearFacet([
           ["2010", 100],
           ["uncalculated", 7],
+          ["", 3],
+          ["202", 2],
           ["2011", 40],
         ])
       )
@@ -109,10 +122,33 @@ describe("CohortYears", () => {
     // under fifteen bars is not a shape anyone can read.
     expect(screen.getByTitle("2021: 400 runs")).toBeTruthy();
     expect(screen.getByTitle("2020: 0 runs")).toBeTruthy();
+    // The range alone says nothing about the shape, so the label names the
+    // peak too and the hidden list below carries the rest.
     expect(
-      screen.getByRole("img", { name: "Runs released per year, 2018 to 2022" })
+      screen.getByRole("img", {
+        name: "Runs released per year, 2018 to 2022; most in 2021, with 400",
+      })
     ).toBeTruthy();
     expect(screen.getByText("750 runs")).toBeTruthy();
+  });
+
+  test("lists every year and its count for a screen reader", () => {
+    render(
+      <CohortYears
+        facet={yearFacet([
+          ["2021", 2992],
+          ["2019", 200],
+        ])}
+      />
+    );
+
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    expect(items.map((item) => item.textContent)).toEqual([
+      "2019: 200 runs",
+      "2020: 0 runs",
+      "2021: 2,992 runs",
+    ]);
   });
 
   test("labels every fifth year once there are more than twelve", () => {
@@ -146,6 +182,26 @@ describe("CohortYears", () => {
     expect(screen.getByTitle("2022: 90 runs")).toBeTruthy();
   });
 
+  test("draws nothing for an empty year and a stub for a tiny one", () => {
+    render(
+      <CohortYears
+        facet={yearFacet([
+          ["2021", 402118],
+          ["2019", 81],
+        ])}
+      />
+    );
+
+    // 81 beside 402,118 is under half a pixel, so the stub is what keeps it
+    // on the axis; 2020 happened to nobody, and has to read as the gap it is.
+    expect(heights()).toEqual(["0%", "0%", "100%"]);
+    expect(bars().map((bar) => bar.style.minHeight)).toEqual([
+      "1px",
+      "0",
+      "1px",
+    ]);
+  });
+
   test("says how many runs have no release date", () => {
     render(<CohortYears facet={yearFacet([["2020", 10]], 0, 5)} />);
 
@@ -158,6 +214,74 @@ describe("CohortYears", () => {
     render(<CohortYears facet={yearFacet([["2020", 10]], 7, 0)} />);
 
     expect(screen.getByText("10 runs, 7 in years not listed")).toBeTruthy();
+  });
+
+  test("labels the last column when it stands clear of the previous label", () => {
+    // Sixteen years: the last column is a labelled fifth already.
+    const { unmount } = render(
+      <CohortYears
+        facet={yearFacet([
+          ["2010", 10],
+          ["2025", 90],
+        ])}
+      />
+    );
+
+    expect(labels().filter(Boolean)).toEqual(["2010", "2015", "2020", "2025"]);
+    unmount();
+
+    // Nineteen: the axis would otherwise stop at 2025 and leave the three
+    // most recent years unnamed at the end of the row. Three columns is far
+    // enough from the previous label for the two not to collide -- at two the
+    // last column stays unlabelled, as the thirteen-year case above shows.
+    render(
+      <CohortYears
+        facet={yearFacet([
+          ["2010", 10],
+          ["2028", 90],
+        ])}
+      />
+    );
+
+    expect(labels().filter(Boolean)).toEqual([
+      "2010",
+      "2015",
+      "2020",
+      "2025",
+      "2028",
+    ]);
+  });
+
+  test("draws a single-year facet as one full-height column", () => {
+    render(<CohortYears facet={yearFacet([["2020", 42]])} />);
+
+    expect(columns()).toHaveLength(1);
+    expect(heights()).toEqual(["100%"]);
+    expect(labels()).toEqual(["2020"]);
+    expect(
+      screen.getByRole("img", {
+        name: "Runs released per year, 2020 to 2020; most in 2020, with 42",
+      })
+    ).toBeTruthy();
+  });
+
+  test("draws no bars at all when every year counted nothing", () => {
+    render(
+      <CohortYears
+        facet={yearFacet([
+          ["2020", 0],
+          ["2021", 0],
+        ])}
+      />
+    );
+
+    // A facet of zeroes has no tallest year to measure the others against,
+    // and no peak worth naming.
+    expect(heights()).toEqual(["0%", "0%"]);
+    expect(
+      screen.getByRole("img", { name: "Runs released per year, 2020 to 2021" })
+    ).toBeTruthy();
+    expect(screen.getByText("0 runs")).toBeTruthy();
   });
 
   test("renders nothing for a facet with no years", () => {
