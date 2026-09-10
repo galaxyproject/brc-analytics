@@ -120,7 +120,10 @@ function renderResults(
     pageSize: PAGE_SIZE,
     reset: jest.fn(),
     results,
-    sort: { column: "score", order: "desc" },
+    // Deliberately disagrees with every response payload in this file, so a
+    // component reading the requested sort rather than the applied one fails
+    // the tests below instead of passing on a coincidence.
+    sort: { column: "organism", order: "asc" },
     submit: jest.fn(),
     ...resolved,
   } as unknown as Search;
@@ -356,9 +359,13 @@ describe("coverage and ANI columns", () => {
 
     const marker = screen.getByText("corrected");
     // MUI Tooltip puts the text on aria-label until hovered.
-    const label = marker.closest("[aria-label]")?.getAttribute("aria-label");
+    const chip = marker.closest("[aria-label]");
+    const label = chip?.getAttribute("aria-label");
     expect(label).toContain("kmindex reported 0.9900");
     expect(label).toContain("0.6910");
+    // The tooltip is the only place the raw ratio is stated, so the chip has
+    // to be reachable without a pointer.
+    expect(chip?.getAttribute("tabindex")).toBe("0");
   });
 
   test("renders a dash for ANI when the API has none", () => {
@@ -412,6 +419,16 @@ describe("sorting and page size", () => {
     const organismHeader = screen.getByText("Organism").closest("th");
     expect(scoreHeader?.getAttribute("aria-sort")).toBe("descending");
     expect(organismHeader?.getAttribute("aria-sort")).toBeNull();
+  });
+
+  test("the lit header is the one the response says it sorted by", () => {
+    // The mirror answered, so the applied sort is the requested one.
+    renderResults({ ...BASE_RESULTS, order: "asc", sort: "organism" });
+
+    const organismHeader = screen.getByText("Organism").closest("th");
+    const scoreHeader = screen.getByText("k-mer coverage").closest("th");
+    expect(organismHeader?.getAttribute("aria-sort")).toBe("ascending");
+    expect(scoreHeader?.getAttribute("aria-sort")).toBeNull();
   });
 
   test("offers 25, 50 and 100 rows per page and reports a change", () => {

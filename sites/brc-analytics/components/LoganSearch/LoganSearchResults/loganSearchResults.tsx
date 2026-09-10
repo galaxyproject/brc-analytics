@@ -367,10 +367,14 @@ export const LoganSearchResults = ({
                   {hit.score.toFixed(4)}
                   {hit.fp_correction != null && (
                     <Tooltip title={describeCorrection(hit)}>
+                      {/* The tooltip is the only place the raw kmindex ratio
+                          is stated, and a Chip with no onClick renders a div,
+                          which nothing but a pointer can reach. */}
                       <Chip
                         label="corrected"
                         size="small"
                         sx={{ ml: 1 }}
+                        tabIndex={0}
                         variant="outlined"
                       />
                     </Tooltip>
