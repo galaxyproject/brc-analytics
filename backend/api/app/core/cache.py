@@ -11,7 +11,14 @@ logger = logging.getLogger(__name__)
 # database is live state -- assistant and auth sessions, in-flight PKCE,
 # rate-limit counters -- and has to survive a restart. Add new cache namespaces
 # here; missing one only means it ages out on its TTL, the safe way to be wrong.
-CACHE_KEY_PATTERNS = ("ena:*", "v1:*")
+CACHE_KEY_PATTERNS = (
+    "ena:*",
+    "v1:*",
+    # Not a cached response but a claim that some process is mid-merge on a
+    # job's shards, and a restart is the one moment that claim is known false.
+    # The aggregates it guards stay out -- they are versioned, not swept.
+    "galaxy:kmindex_aggregating:*",
+)
 
 # Bounds both the DELETE argument list and our own key buffer, so neither grows
 # with the size of the namespace.

@@ -143,7 +143,9 @@ KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v4"
 # a request blocked on the lock holds a connection open the whole time while
 # telling the reader nothing. Keyed on the job alone -- it is about the
 # aggregation run, not about which mirror will serve the result -- and
-# TTL-bounded, so a crashed aggregation cannot park the marker forever.
+# TTL-bounded, so a crashed aggregation cannot park the marker forever. A
+# restart shortens that hour to nothing, since clear_caches() sweeps this
+# namespace: a process that has just started is not merging anything.
 KMINDEX_AGGREGATING_PREFIX = "galaxy:kmindex_aggregating:v1"
 
 # A metadata sort is one DuckDB join over up to 50,000 accessions -- about a
@@ -522,9 +524,7 @@ class GalaxyService:
             # queue on the lock behind them: the caller can ask again, and a
             # connection parked for the length of a 2,869-shard merge is one
             # the proxy will cut before the answer exists.
-            marker_key = self.cache.make_key(
-                KMINDEX_AGGREGATING_PREFIX, {"job_id": job_id}
-            )
+            marker_key = self._aggregating_key(job_id)
             if await self.cache.get(marker_key):
                 raise GalaxyJobAggregating(
                     f"Results for job {job_id} are still being merged"
@@ -615,6 +615,14 @@ class GalaxyService:
         return self.cache.make_key(
             KMINDEX_AGG_CACHE_PREFIX, {"job_id": job_id, "mirror": fingerprint}
         )
+
+    def _aggregating_key(self, job_id: str) -> str:
+        """Where the marker saying this job is mid-merge lives.
+
+        @param job_id: the kmindex job.
+        @returns: the cache key.
+        """
+        return self.cache.make_key(KMINDEX_AGGREGATING_PREFIX, {"job_id": job_id})
 
     async def _ordering_for(
         self, aggregate: dict, job_id: str, sort: KmindexSort, order: KmindexOrder

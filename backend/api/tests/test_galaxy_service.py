@@ -1257,8 +1257,13 @@ class TestGeographyInTheAggregationWindow:
         """
         store = {}
         service.cache.make_key = MagicMock(
+            # The marker is keyed on the job alone; everything else here hangs
+            # on the mirror fingerprint being in the key, so keep the KeyError
+            # that says so.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}:{params.get('mirror', '')}"
+                f"{prefix}:{params['job_id']}"
+                if prefix == KMINDEX_AGGREGATING_PREFIX
+                else f"{prefix}:{params['job_id']}:{params['mirror']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -1300,8 +1305,13 @@ class TestGeographyInTheAggregationWindow:
         # change of mirror may cost a re-aggregation.
         store = {}
         service.cache.make_key = MagicMock(
+            # The marker is keyed on the job alone; everything else here hangs
+            # on the mirror fingerprint being in the key, so keep the KeyError
+            # that says so.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}:{params.get('mirror', '')}"
+                f"{prefix}:{params['job_id']}"
+                if prefix == KMINDEX_AGGREGATING_PREFIX
+                else f"{prefix}:{params['job_id']}:{params['mirror']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))

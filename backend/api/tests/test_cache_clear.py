@@ -46,6 +46,12 @@ async def test_clear_caches_drops_cached_responses_and_keeps_live_state():
             "ena:study:PRJEB1234": "cached",
             "v1:assemblies:links": "cached",
             "v1:organisms:links:5833": "cached",
+            # A claim that a process is merging this job's shards. The process
+            # it was claimed by is the one that just went away.
+            "galaxy:kmindex_aggregating:v1:job1": "claimed",
+            # The aggregate that marker guarded costs thousands of downloads to
+            # rebuild and carries its own version, so it rides the restart out.
+            "galaxy:kmindex_agg:v4:job1:6:cohort+geography": "expensive",
             "assistant:session:abc123": "live conversation",
             "auth:session:def456": "logged-in user",
             "auth:pkce:state789": "in-flight login",
@@ -55,11 +61,12 @@ async def test_clear_caches_drops_cached_responses_and_keeps_live_state():
 
     cleared = await service.clear_caches()
 
-    assert cleared == 4
+    assert cleared == 5
     assert sorted(service.redis.values) == [
         "assistant:session:abc123",
         "auth:pkce:state789",
         "auth:session:def456",
+        "galaxy:kmindex_agg:v4:job1:6:cohort+geography",
         "ratelimit:203.0.113.5",
     ]
 
