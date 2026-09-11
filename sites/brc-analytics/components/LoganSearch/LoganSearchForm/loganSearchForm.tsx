@@ -2,16 +2,23 @@ import {
   ControlRow,
   FormColumn,
   FormGrid,
+  FormSpan,
+  IndexAxisRow,
+  IndexChips,
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import {
+  axisOptions,
   countBases,
+  describeIndexSelection,
+  type IndexAxisOption,
+  indexDivision,
   indexStrategy,
+  selectIndexes,
   sortIndexes,
 } from "@brc/components/LoganSearch/utils";
 import { Search } from "@mui/icons-material";
 import {
-  Autocomplete,
   Button,
   Card,
   CardContent,
@@ -19,10 +26,11 @@ import {
   CircularProgress,
   Slider,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
-import { type JSX, type ReactNode, useMemo, useState } from "react";
+import { type JSX, useMemo, useState } from "react";
 
 interface LoganSearchFormProps {
   search: ReturnType<typeof useKmindexSearch>;
@@ -31,11 +39,6 @@ interface LoganSearchFormProps {
 // Logan-Search caps queries at 2.5 kb; k-mer recall degrades past that and the
 // index is built for gene-sized queries, not whole genomes.
 const MAX_QUERY_BASES = 2500;
-
-// Mirrors MAX_INDEXES in the backend's galaxy models. The tool itself accepts
-// any combination of the ~109 indexes; the ceiling is our shard download path,
-// since each index fans out to dozens of datasets we pull individually.
-const MAX_INDEXES = 8;
 
 // Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
 // and it carries all but a handful of that query's hits. Fall back to whatever
@@ -59,24 +62,211 @@ CGTATTCAGATGTCAGAGGTGAAATTCTTAGATTTTCTGGAGACGAACAACTGCGAAAGCATTTGTCTAA
 AATACTTCCATTAATCAAGAACGAAAGTTAAGGGAGTGAAGACGATCAGATACCGTCGTAATCTTAACCA
 TAAACTATGC`;
 
+interface AxisChipModel extends IndexAxisOption {
+  // Selecting this code would leave the job with nothing to search.
+  disabled: boolean;
+}
+
+/**
+ * One toggle chip in an axis row.
+ *
+ * The span is what carries the tooltip: a disabled MUI chip fires no pointer
+ * events of its own, so a wrapper is the only thing left to hover for the
+ * reason it is disabled -- which is exactly when the reason is wanted.
+ * @param props - Component props.
+ * @param props.disabled - Set when picking this value would search nothing.
+ * @param props.label - Chip text.
+ * @param props.onClick - Called when the chip is clicked.
+ * @param props.selected - Whether this value is part of the axis selection.
+ * @param props.tooltip - What the chip stands for, or why it cannot be picked.
+ * @returns The chip.
+ */
+function AxisChip({
+  disabled = false,
+  label,
+  onClick,
+  selected,
+  tooltip,
+}: {
+  disabled?: boolean;
+  label: string;
+  onClick: () => void;
+  selected: boolean;
+  tooltip: string;
+}): JSX.Element {
+  return (
+    <Tooltip describeChild title={tooltip}>
+      <span>
+        <Chip
+          aria-pressed={selected}
+          clickable
+          color={selected ? "primary" : "default"}
+          disabled={disabled}
+          label={label}
+          onClick={onClick}
+          // The theme's chips are 20/24px tags. These are the form's main
+          // control, so they get a size you can hit and read.
+          size="medium"
+          sx={{ "& .MuiChip-label": { fontSize: 14, px: 1.5 }, height: 32 }}
+          variant="filled"
+        />
+      </span>
+    </Tooltip>
+  );
+}
+
+/**
+ * What a value chip says on hover: what it stands for, or why it is closed.
+ * @param option - The value the chip carries.
+ * @param disabledReason - Why nothing pairs with it, for the disabled case.
+ * @returns The tooltip text.
+ */
+function chipTooltip(option: AxisChipModel, disabledReason: string): string {
+  if (option.disabled) return `${option.code} -- ${disabledReason}`;
+  const noun = option.count === 1 ? "index" : "indexes";
+  const note = option.note ? ` ${option.note}` : "";
+  return `${option.code} -- ${option.count} ${noun}.${note}`;
+}
+
+/**
+ * One axis of the picker: its label, an All chip, then a chip per value.
+ * @param props - Component props.
+ * @param props.allTooltip - Tooltip for the All chip.
+ * @param props.disabledReason - Tooltip tail for a value nothing pairs with.
+ * @param props.label - Row label, shown beside the chips.
+ * @param props.labelId - Id the row's group is labelled by.
+ * @param props.onSelectAll - Called when All is clicked.
+ * @param props.onToggle - Called with the code of the clicked value chip.
+ * @param props.options - The row's values, in display order.
+ * @param props.picked - Codes currently selected; empty means All.
+ * @returns The row.
+ */
+function AxisRow({
+  allTooltip,
+  disabledReason,
+  label,
+  labelId,
+  onSelectAll,
+  onToggle,
+  options,
+  picked,
+}: {
+  allTooltip: string;
+  disabledReason: string;
+  label: string;
+  labelId: string;
+  onSelectAll: () => void;
+  onToggle: (code: string) => void;
+  options: AxisChipModel[];
+  picked: string[];
+}): JSX.Element {
+  return (
+    <IndexAxisRow aria-labelledby={labelId} role="group">
+      <Typography component="span" id={labelId} variant="body2">
+        {label}
+      </Typography>
+      <IndexChips>
+        <AxisChip
+          key="all"
+          label="All"
+          onClick={onSelectAll}
+          selected={picked.length === 0}
+          tooltip={allTooltip}
+        />
+        {options.map((option) => (
+          <AxisChip
+            disabled={option.disabled}
+            key={option.code}
+            label={option.label}
+            onClick={(): void => onToggle(option.code)}
+            selected={picked.includes(option.code)}
+            tooltip={chipTooltip(option, disabledReason)}
+          />
+        ))}
+      </IndexChips>
+    </IndexAxisRow>
+  );
+}
+
+/**
+ * Labels for the codes chosen on one axis, in the row's order rather than the
+ * order they were clicked, so the sentence reads the same as the chips do.
+ * @param options - The axis's values, in display order.
+ * @param picked - Codes currently selected.
+ * @returns The chosen labels.
+ */
+function pickedLabels(options: IndexAxisOption[], picked: string[]): string[] {
+  return options
+    .filter((option) => picked.includes(option.code))
+    .map((option) => option.label);
+}
+
+/**
+ * Add a code to an axis selection, or take it out again.
+ * @param picked - Codes currently selected.
+ * @param code - The clicked code.
+ * @returns The new selection.
+ */
+function toggleCode(picked: string[], code: string): string[] {
+  return picked.includes(code)
+    ? picked.filter((value) => value !== code)
+    : [...picked, code];
+}
+
 export const LoganSearchForm = ({
   search,
 }: LoganSearchFormProps): JSX.Element => {
   const [sequence, setSequence] = useState(SAMPLE_QUERY);
-  const [picked, setPicked] = useState<string[] | null>(null);
+  // Division and strategy codes. null means "not touched": the default is
+  // derived from the loaded list rather than seeded, because the list arrives
+  // asynchronously and a default the instance lacks would select nothing.
+  const [organismsPicked, setOrganismsPicked] = useState<string[] | null>(null);
+  const [librariesPicked, setLibrariesPicked] = useState<string[] | null>(null);
   const [threshold, setThreshold] = useState(0.5);
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
+  const organismOptions = useMemo(
+    () => axisOptions(options, "division"),
+    [options]
+  );
+  const libraryOptions = useMemo(
+    () => axisOptions(options, "strategy"),
+    [options]
+  );
 
-  // Derive rather than seed state with a default: the index list arrives
-  // asynchronously, and a value MUI can't find among its options warns.
-  const indexes =
-    picked ??
-    (options.includes(DEFAULT_INDEX) ? [DEFAULT_INDEX] : options.slice(0, 1));
+  const hasDefault = options.includes(DEFAULT_INDEX);
+  const organisms =
+    organismsPicked ?? (hasDefault ? [indexDivision(DEFAULT_INDEX)] : []);
+  const libraries =
+    librariesPicked ?? (hasDefault ? [indexStrategy(DEFAULT_INDEX)] : []);
+
+  const indexes = selectIndexes(options, organisms, libraries);
+
+  // A value is unreachable only against the *other* row's current selection,
+  // and a value already picked is part of what the other row was filtered by:
+  // disabling it would trap the selection in the state that disabled it.
+  const organismChips: AxisChipModel[] = organismOptions.map((option) => ({
+    ...option,
+    disabled:
+      !organisms.includes(option.code) &&
+      selectIndexes(options, [option.code], libraries).length === 0,
+  }));
+  const libraryChips: AxisChipModel[] = libraryOptions.map((option) => ({
+    ...option,
+    disabled:
+      !libraries.includes(option.code) &&
+      selectIndexes(options, organisms, [option.code]).length === 0,
+  }));
+
+  const sentence = describeIndexSelection({
+    libraries: pickedLabels(libraryOptions, libraries),
+    organisms: pickedLabels(organismOptions, organisms),
+    selected: indexes,
+    total: options.length,
+  });
 
   const bases = countBases(sequence);
   const tooLong = bases > MAX_QUERY_BASES;
-  const tooMany = indexes.length > MAX_INDEXES;
   // An errored job keeps its jobId with no results forever, so leaving the
   // error out of this leaves the form stuck "running" with no way back.
   const isRunning =
@@ -85,7 +275,6 @@ export const LoganSearchForm = ({
 
   const canSubmit =
     indexes.length > 0 &&
-    !tooMany &&
     bases > 0 &&
     !tooLong &&
     !isRunning &&
@@ -107,7 +296,7 @@ export const LoganSearchForm = ({
                   : `${bases} bases. FASTA; headers are ignored.`
               }
               maxRows={20}
-              minRows={8}
+              minRows={6}
               multiline
               onChange={(e): void => setSequence(e.target.value)}
               slotProps={{ input: { sx: { fontFamily: "monospace" } } }}
@@ -116,66 +305,6 @@ export const LoganSearchForm = ({
           </FormColumn>
 
           <FormColumn>
-            <Typography variant="h6">Indexes</Typography>
-            {search.isLoadingIndexes ? (
-              <ControlRow>
-                <CircularProgress size={20} />
-                <Typography color="textSecondary" variant="body2">
-                  Loading available indexes...
-                </Typography>
-              </ControlRow>
-            ) : (
-              <Autocomplete
-                disableCloseOnSelect
-                getOptionLabel={(option): string => option}
-                groupBy={indexStrategy}
-                multiple
-                onChange={(_, value): void => setPicked(value)}
-                options={options}
-                renderInput={(params): JSX.Element => (
-                  <TextField
-                    {...params}
-                    error={tooMany}
-                    helperText={
-                      tooMany
-                        ? `${indexes.length} selected -- at most ${MAX_INDEXES} per query`
-                        : `${indexes.length} of ${options.length} selected. One job searches them all.`
-                    }
-                    label="kmindex indexes"
-                    placeholder={indexes.length ? "" : "Add an index"}
-                  />
-                )}
-                renderValue={(value, getItemProps): ReactNode =>
-                  value.map((option, index) => (
-                    <Chip
-                      label={option}
-                      size="small"
-                      {...getItemProps({ index })}
-                      key={option}
-                    />
-                  ))
-                }
-                sx={{
-                  // The theme pins every outlined field at 40px, and MUI's Autocomplete
-                  // padding was written for its own 56px field: the input line overflows
-                  // the box and the chips ride 6px low. Let the box grow from 40px, and
-                  // size the input line to the chip row (20px chip + 3px margins) so one
-                  // row sits centred and each further row adds exactly one row.
-                  "& .MuiOutlinedInput-root": {
-                    "& .MuiAutocomplete-input": {
-                      paddingBottom: "3px",
-                      paddingTop: "3px",
-                    },
-                    height: "auto",
-                    minHeight: 40,
-                    paddingBottom: "7px",
-                    paddingTop: "7px",
-                  },
-                }}
-                value={indexes}
-              />
-            )}
-
             <div>
               <Typography gutterBottom variant="body2">
                 Minimum shared k-mer fraction: {threshold.toFixed(2)}
@@ -195,7 +324,65 @@ export const LoganSearchForm = ({
                 aggregate.
               </Typography>
             </div>
+          </FormColumn>
 
+          <FormSpan>
+            <Typography variant="h6">Indexes</Typography>
+            <Typography color="textSecondary" variant="body2">
+              Every index is one organism group by one library type. A job
+              searches each index that matches both rows.
+            </Typography>
+            {search.isLoadingIndexes && (
+              <ControlRow>
+                <CircularProgress size={20} />
+                <Typography color="textSecondary" variant="body2">
+                  Loading available indexes...
+                </Typography>
+              </ControlRow>
+            )}
+            {!search.isLoadingIndexes && options.length === 0 && (
+              <Typography color="textSecondary" variant="body2">
+                No indexes are available right now.
+              </Typography>
+            )}
+            {!search.isLoadingIndexes && options.length > 0 && (
+              <>
+                <AxisRow
+                  allTooltip="Every organism group registered."
+                  disabledReason="no index pairs it with the selected library types."
+                  label="Organism"
+                  labelId="logan-axis-organism"
+                  onSelectAll={(): void => setOrganismsPicked([])}
+                  onToggle={(code): void =>
+                    setOrganismsPicked(toggleCode(organisms, code))
+                  }
+                  options={organismChips}
+                  picked={organisms}
+                />
+                <AxisRow
+                  allTooltip="Every library type registered."
+                  disabledReason="no index pairs it with the selected organism groups."
+                  label="Library type"
+                  labelId="logan-axis-library"
+                  onSelectAll={(): void => setLibrariesPicked([])}
+                  onToggle={(code): void =>
+                    setLibrariesPicked(toggleCode(libraries, code))
+                  }
+                  options={libraryChips}
+                  picked={libraries}
+                />
+                <Typography
+                  aria-live="polite"
+                  color="textSecondary"
+                  variant="body2"
+                >
+                  {sentence}
+                </Typography>
+              </>
+            )}
+          </FormSpan>
+
+          <FormSpan>
             <ControlRow>
               <Button
                 disabled={!canSubmit}
@@ -218,7 +405,8 @@ export const LoganSearchForm = ({
                   wedged, which is exactly when it would be disabled otherwise. */}
               <Button
                 onClick={(): void => {
-                  setPicked(null);
+                  setOrganismsPicked(null);
+                  setLibrariesPicked(null);
                   search.reset();
                 }}
                 variant="outlined"
@@ -226,7 +414,7 @@ export const LoganSearchForm = ({
                 Reset
               </Button>
             </ControlRow>
-          </FormColumn>
+          </FormSpan>
         </FormGrid>
       </CardContent>
     </Card>

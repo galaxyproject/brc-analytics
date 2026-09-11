@@ -28,6 +28,34 @@ export const FormColumn = styled.div`
   min-width: 0;
 `;
 
+/* A row that spans both form columns: the index picker wants the full
+   width so its two chip rows wrap once or twice rather than five times. */
+export const FormSpan = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  grid-column: 1 / -1;
+`;
+
+/* Axis label on the left, chips wrapping beside it; stacked when the
+   label column would take a third of a phone. */
+export const IndexAxisRow = styled.div`
+  align-items: baseline;
+  display: grid;
+  gap: 8px 16px;
+  grid-template-columns: 112px minmax(0, 1fr);
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+export const IndexChips = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
 export const ControlRow = styled.div`
   display: flex;
   gap: 16px;
