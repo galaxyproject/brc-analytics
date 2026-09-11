@@ -33,6 +33,7 @@ from app.models.galaxy import (
 )
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
+    GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
     GalaxyService,
@@ -302,6 +303,12 @@ async def get_kmindex_results(
 
     except HTTPException:
         raise
+    except GalaxyJobAggregating as e:
+        # Same answer as a job that has not finished: come back for it. The
+        # job is done, but another request is still merging its shards, and
+        # queueing this one behind that lock only holds a connection open
+        # until the proxy cuts it.
+        raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobNotComplete as e:
         raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobFailed as e:

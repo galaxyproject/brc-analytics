@@ -62,6 +62,10 @@ class GalaxyJobFailed(Exception):
     """The job reached a terminal state other than success."""
 
 
+class GalaxyJobAggregating(Exception):
+    """The job finished, and its shards are being merged by another request."""
+
+
 # Galaxy answers 401 for two very different things: a token it decoded but
 # has no linked account for ("Cannot locate user by access token. The user
 # should log into Galaxy at least once with this OIDC provider.") and a token
@@ -131,6 +135,16 @@ KMINDEX_UNATTRIBUTED = "(unattributed)"
 # other half -- see _agg_cache_key, which is what every read and write of this
 # namespace goes through.
 KMINDEX_AGG_CACHE_PREFIX = "galaxy:kmindex_agg:v4"
+
+# Marker set for the duration of one aggregation, so a second request for the
+# same job can answer "still merging" instead of queueing on the lock until the
+# proxy gives up on it. A search over every index fans out to thousands of
+# shards and takes longer to merge than anything in front of us will wait, and
+# a request blocked on the lock holds a connection open the whole time while
+# telling the reader nothing. Keyed on the job alone -- it is about the
+# aggregation run, not about which mirror will serve the result -- and
+# TTL-bounded, so a crashed aggregation cannot park the marker forever.
+KMINDEX_AGGREGATING_PREFIX = "galaxy:kmindex_aggregating:v1"
 
 # A metadata sort is one DuckDB join over up to 50,000 accessions -- about a
 # second -- and every page of a sorted listing needs the same permutation, so
@@ -416,9 +430,11 @@ class GalaxyService:
                 "Galaxy service not available - check API key configuration"
             )
 
+        # The count, not the names: a search over every index would put ~1.9 KB
+        # of index list in the log on every submission.
         logger.info(
-            f"Submitting kmindex query against {', '.join(submission.indexes)} "
-            f"({len(submission.sequence)} chars)"
+            f"Submitting kmindex query against {len(submission.indexes)} "
+            f"index(es) ({len(submission.sequence)} chars)"
         )
 
         try:
@@ -502,6 +518,18 @@ class GalaxyService:
         aggregate = await self.cache.get(cache_key)
 
         if aggregate is None:
+            # Someone else is already merging this job. Say so rather than
+            # queue on the lock behind them: the caller can ask again, and a
+            # connection parked for the length of a 2,869-shard merge is one
+            # the proxy will cut before the answer exists.
+            marker_key = self.cache.make_key(
+                KMINDEX_AGGREGATING_PREFIX, {"job_id": job_id}
+            )
+            if await self.cache.get(marker_key):
+                raise GalaxyJobAggregating(
+                    f"Results for job {job_id} are still being merged"
+                )
+
             # Serialize aggregation across the whole process. Without this,
             # several callers landing on a cold cache each pull every shard at
             # once, which multiplies the load Galaxy is already rate-limiting
@@ -511,7 +539,11 @@ class GalaxyService:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
-                    aggregate = await self._aggregate_shards(job_id)
+                    await self.cache.set(marker_key, "1", CacheTTL.ONE_HOUR)
+                    try:
+                        aggregate = await self._aggregate_shards(job_id)
+                    finally:
+                        await self.cache.delete(marker_key)
 
         ordering, sort, order = await self._ordering_for(
             aggregate, job_id, sort, order or _default_order(sort)
@@ -1002,16 +1034,23 @@ class GalaxyService:
         }
 
         # A dropped shard means missing accessions, and a hit count that looks
-        # authoritative while being wrong is worse than a slow answer. Report it,
-        # and don't cache it -- the next request gets a clean attempt. An
-        # unreadable index list gets the same treatment: a day of
-        # "(unattributed)" parked beside a perfectly good hit list has no way to
-        # refresh itself.
+        # authoritative while being wrong is worse than a slow answer -- so the
+        # missing shards are worth another attempt, but not on every request.
+        # A search over every index is 2,869 downloads, and repeating all of
+        # them for one lost shard serializes every other cold fetch behind the
+        # lock while the reader waits. Keep the partial for an hour instead:
+        # one re-aggregation per hour rather than one per request, a transient
+        # failure still heals on its own, and the results page says how many
+        # shards are missing while it stands. An unreadable index list is a
+        # different case and still refuses the cache: a day of "(unattributed)"
+        # parked beside a perfectly good hit list has no way to refresh itself.
         if shards_failed:
+            ttl = CacheTTL.ONE_HOUR
             logger.error(
                 f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
-                "failed to download; returning a partial result uncached"
+                f"failed to download; returning a partial result cached for {ttl}s"
             )
+            await self.cache.set(cache_key, aggregate, ttl)
         elif submitted_indexes is None:
             logger.error(
                 f"kmindex job {job_id}: submitted index list unreadable; "

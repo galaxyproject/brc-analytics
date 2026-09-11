@@ -14,7 +14,7 @@ covers the other side, where the parameters are carried and no fetch happens.
 import json
 import logging
 from typing import get_args
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
 from pydantic import ValidationError
@@ -31,8 +31,10 @@ from app.models.galaxy import (
 from app.services import galaxy_service
 from app.services.galaxy_service import (
     KMINDEX_AGG_CACHE_PREFIX,
+    KMINDEX_AGGREGATING_PREFIX,
     KMINDEX_ORDER_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
+    GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
     GalaxyService,
@@ -52,6 +54,7 @@ def service(monkeypatch):
     get_settings.cache_clear()
 
     cache = MagicMock()
+    cache.delete = AsyncMock(return_value=True)
     cache.get = AsyncMock(return_value=None)
     cache.set = AsyncMock(return_value=True)
     cache.make_key = MagicMock(return_value="k")
@@ -156,7 +159,11 @@ class TestMergeBookkeeping:
         ]
 
     @pytest.mark.asyncio
-    async def test_failed_shards_are_counted_and_not_cached(self, service):
+    async def test_failed_shards_are_counted_and_cached_for_an_hour(self, service):
+        # A search over every index is thousands of downloads, so repeating all
+        # of them on the next request to recover one shard costs far more than
+        # it buys. An hour is long enough to stop the repeat and short enough
+        # that a transient failure still heals.
         service.get_job_status = AsyncMock(return_value=self._status(2))
         service._download_shard = AsyncMock(
             side_effect=[{"IDX_1": {"q": {"SRR1": 0.9}}}, None, None]
@@ -165,7 +172,10 @@ class TestMergeBookkeeping:
         aggregate = await service._aggregate_shards("job1")
 
         assert aggregate["shards_failed"] == 1
-        service.cache.set.assert_not_called()
+        service.cache.set.assert_called_once()
+        _key, value, ttl = service.cache.set.call_args.args
+        assert ttl == CacheTTL.ONE_HOUR
+        assert value["shards_failed"] == 1
 
 
 class TestQueryValidation:
@@ -789,6 +799,7 @@ class TestVersionedAggregateCacheKey:
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         service.gi.jobs.show_job = MagicMock(return_value=self._job(["GENOMIC_BCT"]))
         service.get_job_status = AsyncMock(return_value=self._status(1))
         service._download_shard = AsyncMock(
@@ -1086,6 +1097,7 @@ class TestCohortOverTheFullHitSet:
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         mirror = self._mirror(
             service,
             side_effect=duckdb_binder_error(),
@@ -1113,6 +1125,7 @@ class TestCohortOverTheFullHitSet:
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
         self._wire(service, hits=5)
 
@@ -1245,13 +1258,14 @@ class TestGeographyInTheAggregationWindow:
         store = {}
         service.cache.make_key = MagicMock(
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params.get('mirror', '')}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
 
         narrow = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
         narrow.has_capability = MagicMock(
@@ -1287,13 +1301,14 @@ class TestGeographyInTheAggregationWindow:
         store = {}
         service.cache.make_key = MagicMock(
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params.get('mirror', '')}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
         mirror.capability_fingerprint = MagicMock(return_value="3:cohort+geography")
         self._wire(service, hits=5)
@@ -1394,6 +1409,7 @@ class TestGeographyInTheAggregationWindow:
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
         self._wire(service, hits=5)
 
@@ -1743,6 +1759,7 @@ class TestExportOfTheFullMatchSet:
         service.cache.set = AsyncMock(
             side_effect=lambda key, value, ttl: store.__setitem__(key, value)
         )
+        service.cache.delete = AsyncMock(side_effect=lambda key: store.pop(key, None))
         mirror = self._mirror(service, {"rows": 5, "status": "available"})
         self._wire(service, hits=5)
         self._materialize(tmp_path, rows=5)
@@ -2453,6 +2470,78 @@ class TestSortColumnsAgree:
         )
 
 
+class TestAggregatingMarker:
+    """
+    A reader who arrives mid-merge is told to come back, not put in the queue.
+
+    Merging a search that fanned out over every index runs longer than the
+    proxy in front of us will wait. A second request queued on the
+    process-wide lock holds its connection open for the whole merge and then
+    loses it anyway, having told the reader nothing; the marker lets the
+    endpoint say what is happening instead.
+    """
+
+    @staticmethod
+    def _keyed(service):
+        """Key the cache by prefix and job, so the marker is its own entry.
+
+        @param service: the service whose cache to stub.
+        @returns: the key the aggregating marker lands on.
+        """
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        return f"{KMINDEX_AGGREGATING_PREFIX}:job1"
+
+    @pytest.mark.asyncio
+    async def test_the_marker_stands_for_the_length_of_the_aggregation(self, service):
+        marker_key = self._keyed(service)
+        during = {}
+
+        async def _aggregate(_job_id):
+            during["set"] = list(service.cache.set.call_args_list)
+            during["deleted"] = list(service.cache.delete.call_args_list)
+            return _listing(3)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        await service.get_kmindex_results("job1")
+
+        assert during["set"] == [call(marker_key, "1", CacheTTL.ONE_HOUR)]
+        assert during["deleted"] == []
+        service.cache.delete.assert_awaited_once_with(marker_key)
+
+    @pytest.mark.asyncio
+    async def test_a_failed_aggregation_still_clears_the_marker(self, service):
+        # The TTL is the backstop for a process that dies mid-merge; anything
+        # that merely raises has to clear it on the way out, or the next hour
+        # of requests is told to come back for a merge nobody is running.
+        marker_key = self._keyed(service)
+        service._aggregate_shards = AsyncMock(
+            side_effect=GalaxyJobFailed("Job job1 failed with state: error")
+        )
+
+        with pytest.raises(GalaxyJobFailed):
+            await service.get_kmindex_results("job1")
+
+        service.cache.delete.assert_awaited_once_with(marker_key)
+
+    @pytest.mark.asyncio
+    async def test_a_cold_read_against_a_running_merge_is_refused(self, service):
+        marker_key = self._keyed(service)
+        # Cold aggregate, marker standing: someone else is already on it.
+        service.cache.get = AsyncMock(
+            side_effect=lambda key: "1" if key == marker_key else None
+        )
+        service._aggregate_shards = AsyncMock()
+
+        with pytest.raises(GalaxyJobAggregating, match="still being merged"):
+            await service.get_kmindex_results("job1")
+
+        service._aggregate_shards.assert_not_awaited()
+
+
 class TestResultsEndpoint:
     """
     The results endpoint over HTTP.
@@ -2546,6 +2635,24 @@ class TestResultsEndpoint:
         assert response.status_code == 202
         assert (
             response.json()["detail"] == "Job job1 is not yet complete (state: running)"
+        )
+
+    def test_a_job_still_merging_is_accepted(self, service):
+        # The job itself is done, but another request is still merging its
+        # shards. Same answer as a job that has not finished, for the same
+        # reason: there is nothing to serve yet, so ask again.
+        service.get_kmindex_results = AsyncMock(
+            side_effect=GalaxyJobAggregating(
+                "Results for job job1 are still being merged"
+            )
+        )
+        client = self._client(service)
+
+        response = client.get("/galaxy/kmindex/jobs/job1/results")
+
+        assert response.status_code == 202
+        assert (
+            response.json()["detail"] == "Results for job job1 are still being merged"
         )
 
     def test_a_galaxy_side_failure_is_not_reported_as_a_failed_job(self, service):
