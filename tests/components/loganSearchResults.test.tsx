@@ -311,7 +311,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     );
   });
 
-  test("separates an index that matched nothing from one that kept nothing", () => {
+  test("spells out an index that kept nothing but counts one that matched nothing", () => {
     const { container } = renderResults(
       truncatedResults([
         summary("GENOMIC_BCT", 1100404, 47089),
@@ -322,10 +322,12 @@ describe("LoganSearchResults truncation disclosure", () => {
     );
     openWhy();
 
+    // Being outranked by the others is what the disclosure is here to explain.
     expect(container.textContent).toContain(
       "METAGENOMIC_UNKNOWN: 39 matched, none listed -- alone it would return all 39"
     );
-    expect(container.textContent).toContain("METAGENOMIC_PHG: no matches");
+    // Matching nothing is not: the cap did not do it, and the rollup counts it.
+    expect(container.textContent).not.toContain("METAGENOMIC_PHG:");
   });
 
   test("rolls the indexes past the tenth into one line", () => {
@@ -358,6 +360,23 @@ describe("LoganSearchResults truncation disclosure", () => {
     // Nothing was left out, so a rollup would be a line saying "0 more".
     expect(alert.textContent).toContain("GENOMIC_MAM: 3 of 1,500 listed");
     expect(alert.textContent).not.toContain("more indexes");
+  });
+
+  test("gives a line to the matchers and one line to all the rest", () => {
+    // The shape a job over the whole registry has once the query is narrow:
+    // three indexes saw it and nine did not. Ten lines, seven of them saying
+    // an index matched nothing, would explain the cap to nobody.
+    renderResults(
+      truncatedResults([
+        ...TWELVE_INDEXES.slice(0, 3),
+        ...TWELVE_INDEXES.slice(3).map((one) => summary(one.index, 0, 0)),
+      ])
+    );
+    openWhy();
+
+    const alert = screen.getByRole("alert");
+    expect(within(alert).getAllByText(INDEX_LINE)).toHaveLength(3);
+    expect(alert.textContent).toContain("9 more indexes: 0 matched, 0 listed.");
   });
 
   test("still carries an explanation when only one index was searched", () => {
@@ -477,7 +496,8 @@ describe("shards that could not be read", () => {
     renderResults({ ...BASE_RESULTS, ...FAILED });
 
     expect(screen.getByRole("alert").textContent).toContain(
-      "3 of 35 index shards could not be read, so this list is incomplete."
+      "3 of 35 index shards could not be read, so this list is incomplete. " +
+        "Come back in an hour and the missing shards are retried."
     );
   });
 
@@ -498,7 +518,8 @@ describe("shards that could not be read", () => {
     // "this list" would point at a list with no rows in it, so the empty
     // state names the search instead.
     expect(alerts[0].textContent).toContain(
-      "3 of 35 index shards could not be read, so this search is incomplete."
+      "3 of 35 index shards could not be read, so this search is incomplete. " +
+        "Come back in an hour and the missing shards are retried."
     );
     expect(alerts[1].textContent).toContain("No accessions matched");
   });

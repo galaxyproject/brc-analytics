@@ -122,6 +122,21 @@ function registry(count: number): string[] {
 }
 
 /**
+ * A breakdown over that many real indexes, largest first, carrying the row the
+ * backend appends for hits it could not attribute to any of them.
+ * @param count - How many real indexes the job searched.
+ * @returns The per-index rows as the API sends them.
+ */
+function breakdownOver(count: number): KmindexIndexSummary[] {
+  return [
+    ...Array.from({ length: count }, (_, i) =>
+      summary(`GENOMIC_${i}`, count - i, 0)
+    ),
+    summary("(unattributed)", 1, 0),
+  ];
+}
+
+/**
  * A search-hook stub carrying only what the strip reads.
  * @param overrides - Fields to set on top of an idle search. Typed loosely
  * because the old-backend cases are precisely payloads missing keys the type
@@ -381,6 +396,33 @@ describe("LoganSearchSummary", () => {
     // provenance of a search nobody narrowed.
     expect(screen.getByText(/^Searched /).textContent).toBe(
       `Searched all 4 indexes; most matched in ${TOP_THREE}`
+    );
+  });
+
+  test("counts the indexes searched, not the row for what it could not place", () => {
+    renderSummary(
+      { ...BASE_RESULTS, per_index: breakdownOver(109) },
+      registry(109)
+    );
+
+    // The synthetic row is a fact about the merge rather than a 110th index.
+    // Counted as one it takes "all" off every full-registry job there is --
+    // the exact job whose provenance is worth saying out loud.
+    expect(screen.getByText(/^Searched /).textContent).toBe(
+      "Searched all 109 indexes; most matched in GENOMIC_0 (109), " +
+        "GENOMIC_1 (108), and GENOMIC_2 (107)"
+    );
+  });
+
+  test("still withholds all when a registered index went unsearched", () => {
+    renderSummary(
+      { ...BASE_RESULTS, per_index: breakdownOver(108) },
+      registry(109)
+    );
+
+    expect(screen.getByText(/^Searched /).textContent).toBe(
+      "Searched 108 indexes; most matched in GENOMIC_0 (108), " +
+        "GENOMIC_1 (107), and GENOMIC_2 (106)"
     );
   });
 

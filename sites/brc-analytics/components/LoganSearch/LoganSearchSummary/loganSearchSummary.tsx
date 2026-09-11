@@ -49,6 +49,9 @@ const TSV_BYTES_PER_ROW = 148;
 // and the measured job is 1,133,516 rows, over the limit.
 const SPREADSHEET_ROW_LIMIT = 1048576;
 
+// Mirrors KMINDEX_UNATTRIBUTED in the backend's galaxy_service.py.
+const UNATTRIBUTED_INDEX = "(unattributed)";
+
 // What the copy button says in each of its three states.
 const COPY_LABELS = {
   copied: "Copied",
@@ -105,9 +108,16 @@ function describeIndexes(
     (a, b) => b.hits_before_cap - a.hits_before_cap
   );
   if (sorted.length > 3) {
+    // The backend appends a row for hits it could not attribute to any index,
+    // which is a fact about the merge rather than an index that was searched.
+    // Counted as one, it puts every full-registry job one over the registry
+    // and quietly costs the sentence its "all".
+    const searched = perIndex.filter(
+      (one) => one.index !== UNATTRIBUTED_INDEX
+    ).length;
     const counted = `Searched ${
-      perIndex.length === registered ? "all " : ""
-    }${perIndex.length} indexes`;
+      searched === registered ? "all " : ""
+    }${searched} indexes`;
     const top = sorted
       .filter((summary) => summary.hits_before_cap > 0)
       .slice(0, 3)

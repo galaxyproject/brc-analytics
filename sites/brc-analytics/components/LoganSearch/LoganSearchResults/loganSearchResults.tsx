@@ -53,10 +53,11 @@ const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 const WHY_ID = "logan-why-capped";
 
 // How many indexes the disclosure spells out before rolling the rest into one
-// line. The disclosure is here to explain what the cap did, and past the ten
+// line, and they are the ten largest matchers rather than the ten largest
+// rows. The disclosure is here to explain what the cap did, and past the ten
 // largest every line says the same thing -- matched, kept none -- which the
 // rollup says once. A job over all 109 indexes would otherwise answer "why?"
-// with 109 lines.
+// with 109 lines, most of them about an index the query never reached.
 const MAX_INDEX_LINES = 10;
 
 // MUI's styled rather than emotion's: the cell has to keep TableCell's theme
@@ -105,8 +106,8 @@ function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
 /**
  * The one line standing in for every index the disclosure did not spell out.
  *
- * They are the smallest matchers, so their lines would read alike -- matched
- * something, kept none of it -- and the two numbers that differ are worth
+ * They are the smallest matchers and every index that matched nothing at all,
+ * so their lines would read alike -- and the two numbers that differ are worth
  * more summed than repeated.
  * @param rest - Per-index rows past the ones listed individually.
  * @returns The rollup sentence, or null when nothing was left out.
@@ -203,7 +204,8 @@ function ShardWarning({
   return (
     <Alert severity="warning" sx={{ mb: 2 }}>
       {results.shards_failed} of {results.shards_searched} index shards could
-      not be read, so this {noun} is incomplete. Reload to retry.
+      not be read, so this {noun} is incomplete. Come back in an hour and the
+      missing shards are retried.
     </Alert>
   );
 }
@@ -290,7 +292,15 @@ export const LoganSearchResults = ({
   // scores are distributed, so it must not decide whether the tie-band caveat
   // is shown.
   const showPerIndex = perIndex.length > 1;
-  const restNote = describeRestIndexes(perIndex.slice(MAX_INDEX_LINES));
+  // Only matchers get a line of their own. With 109 indexes and a query a
+  // handful of them see, seven of the ten spelled-out lines would say the
+  // index matched nothing, which explains the cap to nobody. Zero rows sort
+  // last, so the lines are the head of the sorted list either way.
+  const indexLines = Math.min(
+    perIndex.filter((one) => one.hits_before_cap > 0).length,
+    MAX_INDEX_LINES
+  );
+  const restNote = describeRestIndexes(perIndex.slice(indexLines));
 
   const whyOpen = whyOpenFor === results.job_id;
 
@@ -412,7 +422,7 @@ export const LoganSearchResults = ({
                       ranked highest overall -- an index with few matches can
                       keep none of them.
                     </Typography>
-                    {perIndex.slice(0, MAX_INDEX_LINES).map((summary) => (
+                    {perIndex.slice(0, indexLines).map((summary) => (
                       <Typography
                         component="div"
                         key={summary.index}
