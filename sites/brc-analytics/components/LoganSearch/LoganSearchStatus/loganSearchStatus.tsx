@@ -86,8 +86,8 @@ export const LoganSearchStatus = ({
             <LinearProgress sx={{ mt: 2 }} />
             {isLoadingResults && (
               <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
-                Merging hits across index shards -- this takes a moment the
-                first time.
+                Merging hits across index shards. A search over many indexes can
+                take a while; this page keeps checking.
               </Typography>
             )}
           </CardContent>

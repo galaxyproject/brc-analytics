@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
-import ky from "ky";
+import ky, { HTTPError, TimeoutError } from "ky";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface SraRunMetadata {
@@ -259,6 +259,18 @@ export interface KmindexSort {
 }
 
 const POLLING_INTERVAL = 3000;
+// Merging the shards of a search that fanned out over many indexes runs well
+// past the 300 s this request and dev's nginx both give up at. The backend
+// finishes the merge regardless and caches what it got, so asking again is
+// how the page finds out -- there is no push and nothing else to wait on. The
+// budget is the hour that cached result lives, so a merge that never lands
+// ends in a sentence rather than a spinner nobody is coming back to.
+const RESULTS_RETRY_INTERVAL_MS = 15000;
+const RESULTS_MERGE_BUDGET_MS = 60 * 60 * 1000;
+// Gateway statuses the proxy invents when it stops waiting on the backend.
+// The merge is still running behind them, so they mean "ask again" rather
+// than "this job is broken".
+const MERGING_STATUSES = new Set([502, 503, 504]);
 export const PAGE_SIZE = 25;
 // 1000 is the API's ceiling; three sizes is the picker.
 export const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
@@ -327,6 +339,18 @@ async function toErrorMessage(
 }
 
 /**
+ * Whether a failed results request means the merge is still running.
+ * @param error - Error thrown by ky.
+ * @returns True when the page should ask again rather than raise a banner.
+ */
+function isStillMerging(error: unknown): boolean {
+  if (error instanceof TimeoutError) return true;
+  return (
+    error instanceof HTTPError && MERGING_STATUSES.has(error.response.status)
+  );
+}
+
+/**
  * Put the running job in the URL, or clear it.
  *
  * replaceState rather than pushState: successive searches shouldn't stack up
@@ -372,11 +396,29 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // success would put an older page over a newer one, and a stale failure
   // would raise a banner for a request already superseded.
   const requestSeqRef = useRef(0);
+  // When this job was first seen to be still merging. It bounds the retries
+  // below, so a merge that never finishes ends in a message; null means the
+  // last thing we heard was an answer rather than "not yet".
+  const mergeStartedRef = useRef<number | null>(null);
+  // A scheduled re-ask of the results endpoint, held so the page can drop it
+  // when it leaves the job it belongs to.
+  const retryRef = useRef<NodeJS.Timeout | null>(null);
+  // Holds fetchResults for the re-ask it schedules; see the effect below it.
+  const fetchResultsRef = useRef<
+    ((jobId: string, offset: number) => Promise<void>) | null
+  >(null);
 
   const stopPolling = useCallback((): void => {
     if (pollRef.current) {
       clearInterval(pollRef.current);
       pollRef.current = null;
+    }
+    // A pending re-ask is the same kind of scheduled work as the poll tick and
+    // belongs to the same job, so it goes the same way. submit and reset both
+    // come through here.
+    if (retryRef.current) {
+      clearTimeout(retryRef.current);
+      retryRef.current = null;
     }
   }, []);
 
@@ -414,39 +456,12 @@ export const useKmindexSearch = (): KmindexSearchActions &
       const seq = ++requestSeqRef.current;
       const { column, order } = sortRef.current;
       setState((prev) => ({ ...prev, isLoadingResults: true }));
-      try {
-        const results = await ky
-          .get(`${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`, {
-            credentials: "include",
-            searchParams: {
-              limit: pageSizeRef.current,
-              offset,
-              order,
-              sort: column,
-            },
-            // Cold aggregation pulls every shard from Galaxy; the warm path
-            // returns from cache in milliseconds.
-            timeout: 300000,
-          })
-          .json<KmindexResults>();
-        if (seq !== requestSeqRef.current) return;
-        resultsRef.current = results;
-        // The refs follow what landed, not what was asked for: a metadata sort
-        // the mirror could not answer comes back as score order, and paging on
-        // should stay in the order on screen rather than ask for the fallback
-        // again every page.
-        pageSizeRef.current = results.limit;
-        sortRef.current = appliedSort(results);
-        setState((prev) => ({
-          ...prev,
-          isLoadingResults: false,
-          pageSize: pageSizeRef.current,
-          results,
-          sort: sortRef.current,
-        }));
-      } catch (error: unknown) {
-        if (seq !== requestSeqRef.current) return;
-        const message = await toErrorMessage(error, "Failed to load results");
+
+      /**
+       * Raise the banner, leaving the refs agreeing with what is on screen.
+       * @param message - What to tell the reader.
+       */
+      const failWith = (message: string): void => {
         // The refs are what the next request sends; the response is what the
         // paginator and the lit header show. This is the newest request and it
         // brought nothing back, so nothing else is coming to reconcile the
@@ -464,10 +479,96 @@ export const useKmindexSearch = (): KmindexSearchActions &
           pageSize: pageSizeRef.current,
           sort: sortRef.current,
         }));
+      };
+
+      /**
+       * Ask again shortly, unless this job has been merging past the budget.
+       * @returns The message to fail with, or null once a retry is booked.
+       */
+      const keepAsking = (): string | null => {
+        mergeStartedRef.current ??= Date.now();
+        if (Date.now() - mergeStartedRef.current > RESULTS_MERGE_BUDGET_MS) {
+          mergeStartedRef.current = null;
+          return "Results are still being merged after an hour. Reload later to try again.";
+        }
+        retryRef.current = setTimeout(() => {
+          retryRef.current = null;
+          // A fresh call rather than this one resumed: the re-ask takes its
+          // own sequence number, so a submit or a reset in the meantime
+          // invalidates it exactly the way it invalidates a request in
+          // flight. Reusing `seq` would let a superseded job's page land.
+          const askAgain = fetchResultsRef.current;
+          if (askAgain) void askAgain(jobId, offset);
+        }, RESULTS_RETRY_INTERVAL_MS);
+        return null;
+      };
+
+      try {
+        // The Response first, not .json(): the backend answers 202 with a
+        // {detail} body while another request is still merging this job's
+        // shards, ky does not throw on it, and parsing that body as a results
+        // page would hand the table hits and counts that are not there.
+        const response = await ky.get(
+          `${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`,
+          {
+            credentials: "include",
+            searchParams: {
+              limit: pageSizeRef.current,
+              offset,
+              order,
+              sort: column,
+            },
+            // Cold aggregation pulls every shard from Galaxy; the warm path
+            // returns from cache in milliseconds.
+            timeout: 300000,
+          }
+        );
+        if (seq !== requestSeqRef.current) return;
+        if (response.status === 202) {
+          const expired = keepAsking();
+          if (expired) failWith(expired);
+          return;
+        }
+        const results = await response.json<KmindexResults>();
+        if (seq !== requestSeqRef.current) return;
+        mergeStartedRef.current = null;
+        resultsRef.current = results;
+        // The refs follow what landed, not what was asked for: a metadata sort
+        // the mirror could not answer comes back as score order, and paging on
+        // should stay in the order on screen rather than ask for the fallback
+        // again every page.
+        pageSizeRef.current = results.limit;
+        sortRef.current = appliedSort(results);
+        setState((prev) => ({
+          ...prev,
+          isLoadingResults: false,
+          pageSize: pageSizeRef.current,
+          results,
+          sort: sortRef.current,
+        }));
+      } catch (error: unknown) {
+        if (seq !== requestSeqRef.current) return;
+        // A merge that outlives this request's own timeout, or the proxy's,
+        // arrives here looking like a failure. The backend is still working.
+        if (isStillMerging(error)) {
+          const expired = keepAsking();
+          if (expired) failWith(expired);
+          return;
+        }
+        mergeStartedRef.current = null;
+        failWith(await toErrorMessage(error, "Failed to load results"));
       }
     },
     []
   );
+
+  // What the scheduled re-ask calls. fetchResults is stable, so this lands
+  // once on mount, long before any results request can be out; going through
+  // the ref is only how the retry, which is written inside fetchResults,
+  // reaches the binding fetchResults is on its way to being assigned to.
+  useEffect(() => {
+    fetchResultsRef.current = fetchResults;
+  }, [fetchResults]);
 
   const startPolling = useCallback(
     (jobId: string): void => {
@@ -527,6 +628,9 @@ export const useKmindexSearch = (): KmindexSearchActions &
       fetchedRef.current = null;
       resultsRef.current = null;
       requestSeqRef.current += 1;
+      // The budget is per job: a new one must not inherit the clock of the
+      // search it replaced, or its first 202 would already be an hour late.
+      mergeStartedRef.current = null;
       // A new query is ranked afresh, so it starts in score order. The page
       // size is the reader's preference rather than the query's and stays.
       sortRef.current = DEFAULT_SORT;
@@ -619,6 +723,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
     fetchedRef.current = null;
     resultsRef.current = null;
     requestSeqRef.current += 1;
+    mergeStartedRef.current = null;
     pageSizeRef.current = PAGE_SIZE;
     sortRef.current = DEFAULT_SORT;
     syncJobParam(null);

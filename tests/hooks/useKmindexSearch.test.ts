@@ -3,17 +3,42 @@ import {
   useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import ky from "ky";
+import ky, { HTTPError, TimeoutError } from "ky";
 
-jest.mock("ky", () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn() },
-}));
+// The hook tells "still merging" from "this job is broken" with instanceof, so
+// the stub has to carry error classes of its own rather than plain Errors.
+jest.mock("ky", () => {
+  class StubHTTPError extends Error {
+    response: { json: () => Promise<unknown>; status: number };
+    constructor(status: number, detail: string) {
+      super(`HTTP ${status}`);
+      this.response = {
+        json: (): Promise<unknown> => Promise.resolve({ detail }),
+        status,
+      };
+    }
+  }
+  class StubTimeoutError extends Error {}
+  return {
+    HTTPError: StubHTTPError,
+    TimeoutError: StubTimeoutError,
+    __esModule: true,
+    default: { get: jest.fn(), post: jest.fn() },
+  };
+});
 
 const mockKy = ky as unknown as {
   get: jest.Mock;
   post: jest.Mock;
 };
+
+// ky's real constructors take a Response; the stubs above take the two things
+// a test actually cares about.
+const MockHTTPError = HTTPError as unknown as new (
+  status: number,
+  detail: string
+) => Error;
+const MockTimeoutError = TimeoutError as unknown as new () => Error;
 
 const JOB_ID = "dee9dc267ca2a401";
 
@@ -723,5 +748,187 @@ describe("sort and page size", () => {
     });
 
     expect(result.current.results).toBeNull();
+  });
+});
+
+describe("a merge that outlives the request", () => {
+  // What the backend answers while another request is still merging the job's
+  // shards. ky does not throw on a 202, so the hook sees a Response.
+  const STILL_MERGING = {
+    json: (): Promise<unknown> =>
+      Promise.resolve({ detail: `Results for job ${JOB_ID} are being merged` }),
+    status: 202,
+  };
+
+  /**
+   * Results requests made so far.
+   * @returns How many times the results endpoint was asked.
+   */
+  function resultsCalls(): number {
+    return mockKy.get.mock.calls.filter(([url]) =>
+      String(url).includes("/results")
+    ).length;
+  }
+
+  /**
+   * Reattach to a completed job, answering each results request in turn.
+   * @param answers - One per results request; the last one repeats.
+   * @returns The rendered hook result, with the first request already out.
+   */
+  async function reattachedWith(
+    answers: (() => unknown)[]
+  ): Promise<
+    ReturnType<typeof renderHook<ReturnType<typeof useKmindexSearch>, unknown>>
+  > {
+    setUrl(`?job=${JOB_ID}`);
+    let asked = 0;
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      if (url.includes("/status")) return jsonOf(COMPLETE_STATUS);
+      const answer = answers[Math.min(asked, answers.length - 1)];
+      asked += 1;
+      return answer();
+    });
+    const rendered = await renderSettled();
+    // The reattach starts polling; one tick reaches the completed job and
+    // makes the first results request.
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+    return rendered;
+  }
+
+  it("asks again after a 202 and lands the results", async () => {
+    const { result } = await reattachedWith([
+      (): unknown => STILL_MERGING,
+      (): unknown => jsonOf(RESULTS),
+    ]);
+
+    // Still merging is neither a failure nor an empty result: the spinner
+    // stays up and the table stays away.
+    expect(result.current.results).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(true);
+
+    // Halfway through the wait, nothing has changed.
+    await act(async () => {
+      jest.advanceTimersByTime(7000);
+    });
+    expect(resultsCalls()).toBe(1);
+    expect(result.current.isLoadingResults).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(8000);
+    });
+
+    await waitFor(() => expect(result.current.results).not.toBeNull());
+    expect(resultsCalls()).toBe(2);
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(false);
+  });
+
+  it("asks again after the request times out", async () => {
+    // The merge ran past the request's own 300 s, which is what a search over
+    // many indexes does routinely.
+    const { result } = await reattachedWith([
+      (): unknown => {
+        throw new MockTimeoutError();
+      },
+      (): unknown => jsonOf(RESULTS),
+    ]);
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(15000);
+    });
+
+    await waitFor(() => expect(result.current.results).not.toBeNull());
+    expect(resultsCalls()).toBe(2);
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(false);
+  });
+
+  it("asks again after the proxy gives up with a 504", async () => {
+    // nginx stopped waiting on the backend; the backend did not stop merging.
+    const { result } = await reattachedWith([
+      (): unknown => {
+        throw new MockHTTPError(504, "Gateway Time-out");
+      },
+      (): unknown => jsonOf(RESULTS),
+    ]);
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(15000);
+    });
+
+    await waitFor(() => expect(result.current.results).not.toBeNull());
+    expect(resultsCalls()).toBe(2);
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoadingResults).toBe(false);
+  });
+
+  it("gives up once the job has been merging for an hour", async () => {
+    const { result } = await reattachedWith([(): unknown => STILL_MERGING]);
+    // The first 202 stamped the clock; the next arrives past the budget,
+    // which is as long as the backend keeps a partial result anyway.
+    const nowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(Date.now() + 60 * 60 * 1000 + 1);
+
+    await act(async () => {
+      jest.advanceTimersByTime(15000);
+    });
+    nowSpy.mockRestore();
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.error).toBe(
+      "Results are still being merged after an hour. Reload later to try again."
+    );
+    expect(result.current.isLoadingResults).toBe(false);
+
+    // And it stops asking.
+    const asked = resultsCalls();
+    await act(async () => {
+      jest.advanceTimersByTime(60000);
+    });
+    expect(resultsCalls()).toBe(asked);
+  });
+
+  it("a pending re-ask does not fire for a search the page has left", async () => {
+    const { result } = await reattachedWith([
+      (): unknown => STILL_MERGING,
+      (): unknown => jsonOf(RESULTS),
+    ]);
+    const asked = resultsCalls();
+
+    act(() => {
+      result.current.reset();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(60000);
+    });
+
+    expect(resultsCalls()).toBe(asked);
+    expect(result.current.results).toBeNull();
+    expect(result.current.isLoadingResults).toBe(false);
+  });
+
+  it("a server error still raises the banner straight away", async () => {
+    const { result } = await reattachedWith([
+      (): unknown => {
+        throw new MockHTTPError(500, "Failed to get kmindex results: boom");
+      },
+    ]);
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.error).toBe("Failed to get kmindex results: boom");
+    expect(result.current.isLoadingResults).toBe(false);
+    expect(resultsCalls()).toBe(1);
   });
 });
