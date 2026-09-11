@@ -111,15 +111,25 @@ function chip(name: string, label: string): HTMLElement {
 }
 
 /**
- * The tooltip a chip shows, hovering the span that wraps it -- a disabled
- * chip fires no pointer events of its own.
+ * The tooltip a chip shows, hovering the chip itself -- an unavailable value
+ * is marked rather than disabled, so it still takes pointer events.
  * @param name - The row's label.
  * @param label - The chip's text.
  * @returns The tooltip text.
  */
 async function tooltipOf(name: string, label: string): Promise<string> {
-  fireEvent.mouseOver(chip(name, label).parentElement as HTMLElement);
+  fireEvent.mouseOver(chip(name, label));
   return (await screen.findByRole("tooltip")).textContent ?? "";
+}
+
+/**
+ * The Search button, which the empty cases assert is closed.
+ * @returns The button.
+ */
+function searchButton(): HTMLButtonElement {
+  return screen.getByRole("button", {
+    name: "Search Logan",
+  }) as HTMLButtonElement;
 }
 
 describe("LoganSearchForm index picker", () => {
@@ -184,7 +194,7 @@ describe("LoganSearchForm index picker", () => {
     expect(screen.getByText("Searching all 109 indexes.")).toBeTruthy();
   });
 
-  test("a value with nothing to pair with is disabled, with the reason", async () => {
+  test("a value with nothing to pair with is marked, with the reason", async () => {
     renderForm();
 
     expect(
@@ -201,6 +211,42 @@ describe("LoganSearchForm index picker", () => {
     ).toBeNull();
   });
 
+  test("an unavailable value keeps its place in the tab order", () => {
+    renderForm();
+
+    expect(chip("Organism", "Environmental").getAttribute("tabindex")).toBe(
+      "0"
+    );
+  });
+
+  test("clicking an unavailable value changes nothing", () => {
+    renderForm();
+
+    fireEvent.click(chip("Organism", "Environmental"));
+
+    expect(screen.getByText(DEFAULT_SENTENCE)).toBeTruthy();
+    expect(chip("Organism", "Environmental").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
+  });
+
+  test("says so when the two rows cross to nothing", () => {
+    renderForm();
+
+    // The only empty product is one that was reachable a click earlier: ENV
+    // pairs with nothing genomic, but sits beside BCT under All until the
+    // library row narrows and BCT is then taken away.
+    fireEvent.click(chip("Library type", "All"));
+    fireEvent.click(chip("Organism", "Bacteria"));
+    fireEvent.click(chip("Organism", "Invertebrates"));
+    fireEvent.click(chip("Organism", "Environmental"));
+    fireEvent.click(chip("Library type", "Genomic"));
+    fireEvent.click(chip("Organism", "Bacteria"));
+
+    expect(screen.getByText("No index matches that combination.")).toBeTruthy();
+    expect(searchButton().disabled).toBe(true);
+  });
+
   test("an enabled chip names its code, its count and its caveat", async () => {
     renderForm();
 
@@ -213,7 +259,7 @@ describe("LoganSearchForm index picker", () => {
   test("submits the product the chips describe", () => {
     const { submit } = renderForm();
 
-    fireEvent.click(screen.getByRole("button", { name: "Search Logan" }));
+    fireEvent.click(searchButton());
 
     expect(submit).toHaveBeenCalledTimes(1);
     expect(submit).toHaveBeenCalledWith({
@@ -258,12 +304,6 @@ describe("LoganSearchForm index picker", () => {
 
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "" } });
 
-    expect(
-      (
-        screen.getByRole("button", {
-          name: "Search Logan",
-        }) as HTMLButtonElement
-      ).disabled
-    ).toBe(true);
+    expect(searchButton().disabled).toBe(true);
   });
 });

@@ -7,9 +7,11 @@ export const SearchContainer = styled.div`
   gap: 24px;
 `;
 
-/* The query box wants width; the index picker and threshold don't. Side by
-   side they fill the row instead of leaving the right half of a 1200px page
-   empty. Collapses to one column before the two halves get too cramped. */
+/* The query and the threshold share the first row: the query box wants width,
+   and the slider wants exactly the narrower column -- given the whole page a
+   0.05 step is a couple of pixels of travel. The picker goes below them, across
+   both columns, through FormSpan. Collapses to one column before the two halves
+   get too cramped. */
 export const FormGrid = styled.div`
   display: grid;
   gap: 24px 32px;

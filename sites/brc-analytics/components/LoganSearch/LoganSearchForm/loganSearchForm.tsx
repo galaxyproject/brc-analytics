@@ -11,6 +11,7 @@ import {
   axisOptions,
   countBases,
   describeIndexSelection,
+  type IndexAxis,
   type IndexAxisOption,
   indexDivision,
   indexStrategy,
@@ -45,6 +46,20 @@ const MAX_QUERY_BASES = 2500;
 // the instance actually has registered.
 const DEFAULT_INDEX = "GENOMIC_INV";
 
+// The theme's chips are 20/24px tags. These are the form's main control, so
+// they get a size you can hit and read, and a focus ring you can see: the
+// default focus style is a slightly darker grey on a grey chip, which at a
+// glance is no ring at all.
+const CHIP_SX = {
+  "& .MuiChip-label": { fontSize: 14, px: 1.5 },
+  "&.Mui-focusVisible": {
+    outline: "2px solid",
+    outlineColor: "primary.main",
+    outlineOffset: "2px",
+  },
+  height: 32,
+};
+
 // A 500 bp window of the P. falciparum 18S rRNA (GenBank M19172.1). Measured
 // against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages at
 // 25 a page, where the bacterial 16S fragment that used to sit here returned
@@ -63,54 +78,59 @@ AATACTTCCATTAATCAAGAACGAAAGTTAAGGGAGTGAAGACGATCAGATACCGTCGTAATCTTAACCA
 TAAACTATGC`;
 
 interface AxisChipModel extends IndexAxisOption {
-  // Selecting this code would leave the job with nothing to search.
-  disabled: boolean;
+  // Settled with the other row's selection in hand, so the chip itself never
+  // has to work out what it stands for.
+  tooltip: string;
+  // Nothing registered pairs this value with the other row's selection.
+  unavailable: boolean;
 }
 
 /**
  * One toggle chip in an axis row.
  *
- * The span is what carries the tooltip: a disabled MUI chip fires no pointer
- * events of its own, so a wrapper is the only thing left to hover for the
- * reason it is disabled -- which is exactly when the reason is wanted.
+ * An unavailable value is marked rather than disabled. MUI's `disabled` drops
+ * the chip out of the tab order and turns off its pointer events, which takes
+ * the reason it cannot be picked away from the reader most likely to need it
+ * read out.
  * @param props - Component props.
- * @param props.disabled - Set when picking this value would search nothing.
  * @param props.label - Chip text.
- * @param props.onClick - Called when the chip is clicked.
+ * @param props.onClick - Called when a pickable chip is clicked.
  * @param props.selected - Whether this value is part of the axis selection.
  * @param props.tooltip - What the chip stands for, or why it cannot be picked.
+ * @param props.unavailable - Set when picking this value would search nothing.
  * @returns The chip.
  */
 function AxisChip({
-  disabled = false,
   label,
   onClick,
   selected,
   tooltip,
+  unavailable = false,
 }: {
-  disabled?: boolean;
   label: string;
   onClick: () => void;
   selected: boolean;
   tooltip: string;
+  unavailable?: boolean;
 }): JSX.Element {
   return (
     <Tooltip describeChild title={tooltip}>
-      <span>
-        <Chip
-          aria-pressed={selected}
-          clickable
-          color={selected ? "primary" : "default"}
-          disabled={disabled}
-          label={label}
-          onClick={onClick}
-          // The theme's chips are 20/24px tags. These are the form's main
-          // control, so they get a size you can hit and read.
-          size="medium"
-          sx={{ "& .MuiChip-label": { fontSize: 14, px: 1.5 }, height: 32 }}
-          variant="filled"
-        />
-      </span>
+      <Chip
+        aria-disabled={unavailable || undefined}
+        aria-pressed={selected}
+        clickable
+        color={selected ? "primary" : "default"}
+        label={label}
+        // The handler stays attached when the value is unavailable: without one
+        // the chip is not a button, and the button is what the tooltip
+        // describes.
+        onClick={(): void => {
+          if (!unavailable) onClick();
+        }}
+        size="medium"
+        sx={unavailable ? { ...CHIP_SX, opacity: 0.5 } : CHIP_SX}
+        variant="filled"
+      />
     </Tooltip>
   );
 }
@@ -118,21 +138,62 @@ function AxisChip({
 /**
  * What a value chip says on hover: what it stands for, or why it is closed.
  * @param option - The value the chip carries.
- * @param disabledReason - Why nothing pairs with it, for the disabled case.
+ * @param unavailable - Whether anything pairs it with the other row.
+ * @param reason - Why nothing pairs with it, for the unavailable case.
  * @returns The tooltip text.
  */
-function chipTooltip(option: AxisChipModel, disabledReason: string): string {
-  if (option.disabled) return `${option.code} -- ${disabledReason}`;
+function chipTooltip(
+  option: IndexAxisOption,
+  unavailable: boolean,
+  reason: string
+): string {
+  if (unavailable) return `${option.code} -- ${reason}`;
   const noun = option.count === 1 ? "index" : "indexes";
   const note = option.note ? ` ${option.note}` : "";
   return `${option.code} -- ${option.count} ${noun}.${note}`;
 }
 
 /**
+ * The chips one row offers: its values in display order, which of them the
+ * other row has closed off, and what each of them says on hover.
+ *
+ * A value is unreachable only against the *other* row's current selection, and
+ * a value already picked is part of what the other row was filtered by: closing
+ * it would trap the selection in the state that closed it. The two rows are the
+ * same rule with the axes swapped, so they are one function called twice.
+ * @param indexes - Index names from the API.
+ * @param picked - Codes selected on this axis; empty means all.
+ * @param other - Codes selected on the other axis; empty means all.
+ * @param axis - Which half of STRATEGY_DIVISION this row picks.
+ * @returns The row's chips, in display order.
+ */
+function axisChips(
+  indexes: string[],
+  picked: string[],
+  other: string[],
+  axis: IndexAxis
+): AxisChipModel[] {
+  const isDivision = axis === "division";
+  const reason = isDivision
+    ? "no index pairs it with the selected library types."
+    : "no index pairs it with the selected organism groups.";
+  return axisOptions(indexes, axis).map((option) => {
+    const paired = isDivision
+      ? selectIndexes(indexes, [option.code], other)
+      : selectIndexes(indexes, other, [option.code]);
+    const unavailable = !picked.includes(option.code) && paired.length === 0;
+    return {
+      ...option,
+      tooltip: chipTooltip(option, unavailable, reason),
+      unavailable,
+    };
+  });
+}
+
+/**
  * One axis of the picker: its label, an All chip, then a chip per value.
  * @param props - Component props.
  * @param props.allTooltip - Tooltip for the All chip.
- * @param props.disabledReason - Tooltip tail for a value nothing pairs with.
  * @param props.label - Row label, shown beside the chips.
  * @param props.labelId - Id the row's group is labelled by.
  * @param props.onSelectAll - Called when All is clicked.
@@ -143,7 +204,6 @@ function chipTooltip(option: AxisChipModel, disabledReason: string): string {
  */
 function AxisRow({
   allTooltip,
-  disabledReason,
   label,
   labelId,
   onSelectAll,
@@ -152,7 +212,6 @@ function AxisRow({
   picked,
 }: {
   allTooltip: string;
-  disabledReason: string;
   label: string;
   labelId: string;
   onSelectAll: () => void;
@@ -175,12 +234,12 @@ function AxisRow({
         />
         {options.map((option) => (
           <AxisChip
-            disabled={option.disabled}
             key={option.code}
             label={option.label}
             onClick={(): void => onToggle(option.code)}
             selected={picked.includes(option.code)}
-            tooltip={chipTooltip(option, disabledReason)}
+            tooltip={option.tooltip}
+            unavailable={option.unavailable}
           />
         ))}
       </IndexChips>
@@ -225,14 +284,6 @@ export const LoganSearchForm = ({
   const [threshold, setThreshold] = useState(0.5);
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
-  const organismOptions = useMemo(
-    () => axisOptions(options, "division"),
-    [options]
-  );
-  const libraryOptions = useMemo(
-    () => axisOptions(options, "strategy"),
-    [options]
-  );
 
   const hasDefault = options.includes(DEFAULT_INDEX);
   const organisms =
@@ -241,26 +292,12 @@ export const LoganSearchForm = ({
     librariesPicked ?? (hasDefault ? [indexStrategy(DEFAULT_INDEX)] : []);
 
   const indexes = selectIndexes(options, organisms, libraries);
-
-  // A value is unreachable only against the *other* row's current selection,
-  // and a value already picked is part of what the other row was filtered by:
-  // disabling it would trap the selection in the state that disabled it.
-  const organismChips: AxisChipModel[] = organismOptions.map((option) => ({
-    ...option,
-    disabled:
-      !organisms.includes(option.code) &&
-      selectIndexes(options, [option.code], libraries).length === 0,
-  }));
-  const libraryChips: AxisChipModel[] = libraryOptions.map((option) => ({
-    ...option,
-    disabled:
-      !libraries.includes(option.code) &&
-      selectIndexes(options, organisms, [option.code]).length === 0,
-  }));
+  const organismChips = axisChips(options, organisms, libraries, "division");
+  const libraryChips = axisChips(options, libraries, organisms, "strategy");
 
   const sentence = describeIndexSelection({
-    libraries: pickedLabels(libraryOptions, libraries),
-    organisms: pickedLabels(organismOptions, organisms),
+    libraries: pickedLabels(libraryChips, libraries),
+    organisms: pickedLabels(organismChips, organisms),
     selected: indexes,
     total: options.length,
   });
@@ -305,6 +342,9 @@ export const LoganSearchForm = ({
           </FormColumn>
 
           <FormColumn>
+            <Typography variant="h6">Threshold</Typography>
+            {/* The reading, the slider and the caption are one control, so they
+                sit inside the column's gap rather than spread across it. */}
             <div>
               <Typography gutterBottom variant="body2">
                 Minimum shared k-mer fraction: {threshold.toFixed(2)}
@@ -349,7 +389,6 @@ export const LoganSearchForm = ({
               <>
                 <AxisRow
                   allTooltip="Every organism group registered."
-                  disabledReason="no index pairs it with the selected library types."
                   label="Organism"
                   labelId="logan-axis-organism"
                   onSelectAll={(): void => setOrganismsPicked([])}
@@ -361,7 +400,6 @@ export const LoganSearchForm = ({
                 />
                 <AxisRow
                   allTooltip="Every library type registered."
-                  disabledReason="no index pairs it with the selected organism groups."
                   label="Library type"
                   labelId="logan-axis-library"
                   onSelectAll={(): void => setLibrariesPicked([])}
