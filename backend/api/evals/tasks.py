@@ -419,3 +419,30 @@ def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
         )
 
     return task
+
+
+def make_logan_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
+    """Replay a scripted conversation inside a session opened from a Logan
+    snapshot fixture, and report the final state. The snapshot is injected,
+    not fetched, so the eval needs no Galaxy and no Redis aggregate."""
+    from app.models.logan import LoganSnapshot
+
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
+    _prepare_service(aa, entry)
+
+    async def task(case_input: dict) -> ConversationOutput:
+        snapshot = LoganSnapshot.model_validate(case_input["snapshot"])
+        state = await aa.create_logan_session_from_snapshot(snapshot, None)
+        session_id = state.session_id
+        last_resp = None
+        for turn in case_input["turns"]:
+            last_resp = await aa.chat(turn, session_id=session_id)
+        assert last_resp is not None
+        return ConversationOutput(
+            final_schema=last_resp.schema_state.model_dump(),
+            is_complete=last_resp.is_complete,
+            reply=last_resp.reply,
+            handoff_url=last_resp.handoff_url,
+        )
+
+    return task

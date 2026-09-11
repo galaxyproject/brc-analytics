@@ -27,11 +27,21 @@ from app.models.assistant import (
     SchemaField,
     SessionState,
 )
+from app.models.galaxy import GalaxyJobState
 from app.services.assistant_agent import (
     MAX_HISTORY_MESSAGES,
     AssistantAgent,
     AssistantTimeoutError,
+    AssistantUnavailableError,
+    LoganJobFailedError,
+    LoganJobNotFoundError,
+    LoganJobNotReadyError,
 )
+from app.services.logan_snapshot import build_logan_snapshot
+from tests.test_logan_snapshot import JOB as LOGAN_JOB
+from tests.test_logan_snapshot import results as logan_results
+from tests.test_logan_tools import _galaxy as _logan_galaxy
+from tests.test_logan_tools import _status as _logan_status
 
 
 @pytest.fixture()
@@ -41,6 +51,7 @@ def agent():
     instance.catalog = MagicMock()
     instance.catalog.workflows_by_category = []
     instance.sra_mirror = None
+    instance.galaxy = None
     instance.query_con = None  # query_catalog degrades to "unavailable"
     instance.settings = get_settings()
     return instance
@@ -1564,11 +1575,12 @@ class TestSystemPrompts:
         assert "Carry EVERY prior value forward" in EXTRACT_PROMPT
 
 
-def _build_agent_via_init(sra_available):
+def _build_agent_via_init(sra_available, galaxy_available=None):
     """Drive the real _init_agent with an offline TestModel.
 
     sra_available: None -> no mirror injected; True/False -> mirror with
-    is_available() returning that value.
+    is_available() returning that value. galaxy_available reads the same way
+    for the Logan tools' Galaxy service.
     """
     from pydantic_ai.models.test import TestModel
 
@@ -1588,6 +1600,12 @@ def _build_agent_via_init(sra_available):
         mirror = MagicMock()
         mirror.is_available.return_value = sra_available
         instance.sra_mirror = mirror
+    if galaxy_available is None:
+        instance.galaxy = None
+    else:
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = galaxy_available
+        instance.galaxy = galaxy
     instance._build_model = lambda *a, **k: TestModel()
     instance._init_agent()
     return instance
@@ -1976,6 +1994,7 @@ def _extraction_agent(reply, state, catalog=None):
     # Real int: _build_transcript compares a serialized size against it.
     instance.settings.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES = 65536
     instance.sra_mirror = None
+    instance.galaxy = None
     instance.query_con = None
     instance.catalog = catalog if catalog is not None else MagicMock()
     if catalog is None:
@@ -2537,3 +2556,454 @@ class TestDeriveSuggestions:
             setattr(schema, name, SchemaField(value="x", status=FieldStatus.FILLED))
         chips = agent._derive_suggestions(schema)
         assert [c.label for c in chips] == ["Continue to workflow setup"]
+
+
+LOGAN_META = {
+    "job_id": "fe6f66a714dcbec8",
+    "top_hits": [
+        {"rank": i + 1, "accession": acc, "score": 1.0}
+        for i, acc in enumerate(["ERR662077", "SRR7590703", "ERR450106", "ERR072010"])
+    ],
+}
+
+
+class TestDataSourceDetail:
+    def test_top_n_resolves_from_snapshot_in_rank_order(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("Top 3 runs from the Logan search", LOGAN_META)
+        )
+        assert detail == {
+            "source": "logan",
+            "job_id": "fe6f66a714dcbec8",
+            "requested": 3,
+            "resolved": 3,
+            "accessions": ["ERR662077", "SRR7590703", "ERR450106"],
+        }
+
+    def test_top_n_beyond_available_records_requested(self, agent):
+        detail = json.loads(agent._data_source_detail("top 50 runs", LOGAN_META))
+        assert detail["requested"] == 50
+        assert detail["resolved"] == 4
+        assert len(detail["accessions"]) == 4
+
+    def test_top_n_without_snapshot_is_ignored(self, agent):
+        assert agent._data_source_detail("top 5 runs", None) is None
+
+    def test_explicit_accessions(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("SRA runs SRR7590703 and ERR662077", None)
+        )
+        assert detail == {"source": "ena", "accessions": ["SRR7590703", "ERR662077"]}
+
+    def test_explicit_accessions_deduped_and_short_ids_ignored(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("ERR12 ERR662077 ERR662077", None)
+        )
+        assert detail["accessions"] == ["ERR662077"]
+
+    def test_top_n_and_explicit_merge_as_logan(self, agent):
+        detail = json.loads(
+            agent._data_source_detail("top 2 plus DRR999999", LOGAN_META)
+        )
+        assert detail["source"] == "logan"
+        assert detail["accessions"] == ["ERR662077", "SRR7590703", "DRR999999"]
+
+    def test_upload_phrasing(self, agent):
+        assert json.loads(agent._data_source_detail("my own FASTQ files", None)) == {
+            "source": "upload"
+        }
+        assert json.loads(agent._data_source_detail("User upload", None)) == {
+            "source": "upload"
+        }
+
+    def test_no_signal(self, agent):
+        assert agent._data_source_detail("ENA", None) is None
+
+
+class TestApplySchemaUpdatesDataSource:
+    def test_writes_detail_from_snapshot(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "Top 2 runs from Logan"}, logan=LOGAN_META
+        )
+        assert out.data_source.status == FieldStatus.FILLED
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
+
+    def test_writes_detail_for_explicit_runs_without_snapshot(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "SRR7590703"}
+        )
+        assert json.loads(out.data_source.detail) == {
+            "source": "ena",
+            "accessions": ["SRR7590703"],
+        }
+
+    def test_detail_is_none_when_nothing_resolves(self, agent):
+        out = agent._apply_schema_updates(AnalysisSchema(), {"data_source": "ENA"})
+        assert out.data_source.status == FieldStatus.FILLED
+        assert out.data_source.detail is None
+
+
+class TestWrapToolAwaitsCoroutines:
+    @pytest.mark.asyncio
+    async def test_async_tool_result_is_awaited(self):
+        from app.services.assistant_agent import _wrap_tool
+
+        async def tool(deps, x: int) -> str:
+            return json.dumps({"x": x})
+
+        wrapped = _wrap_tool(tool)
+        ctx = SimpleNamespace(deps=None)
+        assert await wrapped(ctx, x=3) == '{"x": 3}'
+
+
+class TestInitAgentLoganGating:
+    def test_no_galaxy_no_logan_tools_or_prompt(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=None)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert "logan_cohort" not in names
+        assert "logan_cohort" not in inst.system_prompt
+
+    def test_galaxy_available_registers_tools_and_prompt(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=True)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert {"logan_job_status", "logan_cohort", "logan_hits"} <= names
+        assert "`logan_cohort`" in inst.system_prompt
+
+    def test_galaxy_unconfigured_registers_nothing(self):
+        inst = _build_agent_via_init(sra_available=None, galaxy_available=False)
+        names = set(inst.agent._function_toolset.tools)  # name-keyed dict
+        assert "logan_cohort" not in names
+
+
+class TestLoganInstructions:
+    @pytest.mark.asyncio
+    async def test_snapshot_reaches_the_model_as_instructions(self):
+        """A session with a snapshot renders it into instructions; one without
+        renders none. Captured from the FunctionModel's view of the request."""
+        from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
+        from pydantic_ai.models.function import FunctionModel
+
+        from app.services.logan_snapshot import build_logan_snapshot
+        from tests.test_logan_snapshot import results as logan_page
+
+        seen: list = []
+
+        def model_fn(messages, info):
+            seen.append(getattr(messages[-1], "instructions", None))
+            if info.output_tools:
+                return ModelResponse(
+                    parts=[ToolCallPart(info.output_tools[0].name, {})]
+                )
+            return ModelResponse(parts=[TextPart("ok")])
+
+        inst = _extraction_agent("ok", {})
+        inst._build_model = lambda *a, **k: FunctionModel(model_fn)
+        inst._init_agent()
+        snap = build_logan_snapshot(logan_page(), captured_at="t").model_dump(
+            mode="json"
+        )
+
+        state = SessionState(session_id="s1", metadata={"logan": snap})
+        _wire_session(inst, state)
+        await inst.chat("what is this?", session_id="s1")
+        assert any(s and "## Logan search context" in s for s in seen)
+
+        seen.clear()
+        plain = SessionState(session_id="s2")
+        _wire_session(inst, plain)
+        await inst.chat("hello", session_id="s2")
+        assert not any(s and "## Logan search context" in s for s in seen)
+
+
+class TestDeriveSuggestionsLogan:
+    def test_logan_session_with_empty_organism(self, agent):
+        chips = agent._derive_suggestions(AnalysisSchema(), logan=LOGAN_META)
+        assert [c.label for c in chips] == [
+            "What is this cohort?",
+            "Which of these organisms are in BRC?",
+            "Set up an analysis on the top runs",
+        ]
+
+    def test_logan_session_with_organism_adds_top_runs_chip(self, agent):
+        agent._reference_assembly_for = lambda org: None
+        schema = AnalysisSchema(organism=_filled_field("Plasmodium falciparum", "5833"))
+        chips = agent._derive_suggestions(schema, logan=LOGAN_META)
+        labels = [c.label for c in chips]
+        assert "Show me the available assemblies" in labels
+        assert labels[-1] == "Use the top 5 runs as my data"
+
+    def test_logan_session_data_source_chips(self, agent):
+        agent.catalog.workflows_by_category = []
+        schema = AnalysisSchema(
+            organism=_filled_field("Plasmodium falciparum", "5833"),
+            assembly=_filled_field("GCF_000002765.6", "GCF_000002765.6"),
+            analysis_type=_filled_field("Variant Calling"),
+            workflow=_filled_field("wf", "trs"),
+        )
+        chips = agent._derive_suggestions(schema, logan=LOGAN_META)
+        assert [c.label for c in chips] == [
+            "Use the top 5 runs as my data",
+            "I'll upload my own data",
+        ]
+
+    def test_without_logan_unchanged(self, agent):
+        chips = agent._derive_suggestions(AnalysisSchema())
+        assert chips[0].label == "What organisms do you have?"
+
+
+class TestCreateLoganSession:
+    def _agent(self, galaxy):
+        inst = _extraction_agent("ok", {})
+        inst.galaxy = galaxy
+        inst.catalog.find_organism_exact = MagicMock(
+            return_value={"species": "Plasmodium falciparum", "taxonomy_id": "5833"}
+        )
+        inst.catalog.organisms = []
+        return inst
+
+    @pytest.mark.asyncio
+    async def test_fetch_snapshot_happy_path(self):
+        galaxy = _logan_galaxy(
+            cached=logan_results(), status=_logan_status(GalaxyJobState.OK, True, True)
+        )
+        snap = await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert snap.job_id == LOGAN_JOB
+        assert snap.cohort.in_mirror == 17629
+        galaxy.get_cached_kmindex_results.assert_awaited_once_with(
+            LOGAN_JOB, limit=25, offset=0
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_not_ready(self):
+        galaxy = _logan_galaxy(
+            status=_logan_status(GalaxyJobState.QUEUED, False, False)
+        )
+        with pytest.raises(LoganJobNotReadyError) as e:
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert e.value.results_url == f"/logan-search?job={LOGAN_JOB}"
+
+    @pytest.mark.asyncio
+    async def test_fetch_failed_job(self):
+        galaxy = _logan_galaxy(status=_logan_status(GalaxyJobState.ERROR, True, False))
+        with pytest.raises(LoganJobFailedError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+
+    @pytest.mark.asyncio
+    async def test_fetch_expired(self):
+        galaxy = _logan_galaxy(
+            cached=None, status=_logan_status(GalaxyJobState.OK, True, True)
+        )
+        with pytest.raises(LoganJobNotFoundError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        galaxy._aggregate_shards.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_fetch_unconfigured(self):
+        galaxy = _logan_galaxy()
+        galaxy.is_available.return_value = False
+        with pytest.raises(AssistantUnavailableError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+
+    @pytest.mark.asyncio
+    async def test_create_from_snapshot_builds_the_session(self):
+        inst = self._agent(_logan_galaxy())
+        created = {}
+
+        async def create_session(
+            owner_keycloak_sub=None, *, schema_state=None, messages=None, metadata=None
+        ):
+            state = SessionState(
+                session_id="s-logan",
+                owner_keycloak_sub=owner_keycloak_sub,
+                schema_state=schema_state,
+                messages=messages or [],
+                metadata=metadata or {},
+            )
+            created["state"] = state
+            return state
+
+        inst.session_service = SimpleNamespace(
+            create_session=AsyncMock(side_effect=create_session),
+            save_session=AsyncMock(),
+        )
+        snap = build_logan_snapshot(logan_results(), captured_at="t")
+        state = await inst.create_logan_session_from_snapshot(
+            snap, owner_keycloak_sub="u1"
+        )
+
+        assert state.session_id == "s-logan"
+        assert state.owner_keycloak_sub == "u1"
+        assert state.metadata["logan"]["job_id"] == LOGAN_JOB
+        assert state.schema_state.organism.value == "Plasmodium falciparum"
+        assert state.schema_state.organism.detail == "5833"
+        assert len(state.messages) == 1
+        assert state.messages[0].role == MessageRole.ASSISTANT
+        assert "17,629 runs" in state.messages[0].content
+        assert state.suggestions[0].label in (
+            "Use the reference assembly",
+            "Show me the available assemblies",
+        )
+        assert state.metadata["turn_count"] == 0
+        inst.session_service.save_session.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_chat_response_carries_logan_context(self):
+        inst = _extraction_agent("ok", {})
+        snap = build_logan_snapshot(logan_results(), captured_at="t").model_dump(
+            mode="json"
+        )
+        state = SessionState(session_id="s1", metadata={"logan": snap})
+        _wire_session(inst, state)
+        resp = await inst.chat("hi", session_id="s1")
+        assert resp.logan is not None
+        assert resp.logan.job_id == LOGAN_JOB
+        assert resp.logan.top_organism == "Plasmodium falciparum"
+
+    @pytest.mark.asyncio
+    async def test_chat_response_without_snapshot_has_no_context(self):
+        inst = _extraction_agent("ok", {})
+        _wire_session(inst, SessionState(session_id="s2"))
+        resp = await inst.chat("hi", session_id="s2")
+        assert resp.logan is None
+
+
+class TestDataSourceDetailIsSticky:
+    """A later turn that only rephrases the data source must not lose the
+    accessions an earlier turn resolved -- the extractor summarises freely,
+    and the stepper needs the ids."""
+
+    def _with_accessions(self):
+        return AnalysisSchema(
+            data_source=SchemaField(
+                value="Top 2 runs from Logan",
+                status=FieldStatus.FILLED,
+                detail=json.dumps(
+                    {
+                        "source": "logan",
+                        "accessions": ["ERR662077", "SRR7590703"],
+                    }
+                ),
+            )
+        )
+
+    def test_generic_rephrase_keeps_the_accessions(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(),
+            {"data_source": "ENA/SRA accessions"},
+            logan=LOGAN_META,
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
+        assert out.data_source.value == "ENA/SRA accessions"
+
+    def test_switching_to_upload_replaces_them(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(),
+            {"data_source": "actually I'll upload my own files"},
+            logan=LOGAN_META,
+        )
+        assert json.loads(out.data_source.detail) == {"source": "upload"}
+
+    def test_naming_new_accessions_replaces_them(self, agent):
+        out = agent._apply_schema_updates(
+            self._with_accessions(), {"data_source": "DRR999999"}, logan=LOGAN_META
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == ["DRR999999"]
+
+    def test_nothing_to_carry_forward_stays_none(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(), {"data_source": "ENA/SRA accessions"}
+        )
+        assert out.data_source.detail is None
+
+    def test_a_prior_free_text_detail_is_not_carried(self, agent):
+        prior = AnalysisSchema(
+            data_source=SchemaField(
+                value="ENA", status=FieldStatus.FILLED, detail="some prose"
+            )
+        )
+        out = agent._apply_schema_updates(prior, {"data_source": "ENA/SRA"})
+        assert out.data_source.detail is None
+
+
+class TestDataSourceDetailFallsBackToTheUserMessage:
+    """The extractor paraphrases: asked for "the top 5 runs" it routinely
+    writes "ENA/SRA accessions". Resolving only its wording loses the ids on
+    the very turn that chose them, so the user's own words are the fallback."""
+
+    def test_user_message_resolves_when_the_extracted_value_does_not(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA/SRA accessions"},
+            logan=LOGAN_META,
+            user_message="Use the top 3 runs as my data.",
+        )
+        detail = json.loads(out.data_source.detail)
+        assert detail["source"] == "logan"
+        assert detail["accessions"] == ["ERR662077", "SRR7590703", "ERR450106"]
+
+    def test_the_extracted_value_still_wins(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "top 2 runs"},
+            logan=LOGAN_META,
+            user_message="actually use the top 4 runs",
+        )
+        assert len(json.loads(out.data_source.detail)["accessions"]) == 2
+
+    def test_no_signal_anywhere_stays_none(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA"},
+            logan=LOGAN_META,
+            user_message="what workflows are compatible?",
+        )
+        assert out.data_source.detail is None
+
+    def test_message_fallback_needs_no_snapshot_for_explicit_ids(self, agent):
+        out = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"data_source": "ENA/SRA accessions"},
+            user_message="use ERR662077 and SRR7590703 please",
+        )
+        assert json.loads(out.data_source.detail)["accessions"] == [
+            "ERR662077",
+            "SRR7590703",
+        ]
+
+
+class TestFetchLoganSnapshotIsCacheFirst:
+    """A signed-in user's Logan job runs under their own Galaxy credential,
+    but the assistant reads with the service one -- so it may not be able to
+    see that job's status at all. The merged aggregate is job-id-keyed in
+    Redis and needs no Galaxy call, so the cache is consulted first and an
+    unreadable status can only ever change how a MISS is explained."""
+
+    def _agent(self, galaxy):
+        inst = _extraction_agent("ok", {})
+        inst.galaxy = galaxy
+        return inst
+
+    @pytest.mark.asyncio
+    async def test_cached_job_opens_without_asking_galaxy_anything(self):
+        galaxy = _logan_galaxy(cached=logan_results())
+        galaxy.get_job_status = AsyncMock(
+            side_effect=AssertionError("status must not gate a cache hit")
+        )
+        snap = await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
+        assert snap.job_id == LOGAN_JOB
+        galaxy.get_job_status.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_unreadable_status_on_a_miss_reads_as_expired(self):
+        # Not our job to see -- say so as "expired", which points the user at
+        # the results page, rather than blowing up into a 503.
+        galaxy = _logan_galaxy(cached=None)
+        galaxy.get_job_status = AsyncMock(side_effect=Exception("404 not found"))
+        with pytest.raises(LoganJobNotFoundError):
+            await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)

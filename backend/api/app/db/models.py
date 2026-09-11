@@ -12,10 +12,19 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+# What every migration actually creates: JSONB on PostgreSQL, plain JSON
+# everywhere else -- see `_json_type()`, which each of the four migrations
+# defines identically. The models declared bare JSON, so on Postgres the ORM
+# and the live schema disagreed on all seven of these columns, which shows up
+# as phantom autogenerate diffs and as the wrong answer when someone inspects
+# the metadata to find out what a column is.
+JSON_COLUMN = JSON().with_variant(JSONB(astext_type=Text()), "postgresql")
 
 
 def utcnow() -> datetime:
@@ -37,7 +46,7 @@ class User(Base):
     keycloak_sub: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     email: Mapped[str | None] = mapped_column(Text, nullable=True)
     name: Mapped[str | None] = mapped_column(Text, nullable=True)
-    preferences: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    preferences: Mapped[dict] = mapped_column(JSON_COLUMN, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utcnow,
@@ -99,8 +108,8 @@ class SavedAnalysis(Base):
         nullable=False,
     )
     title: Mapped[str | None] = mapped_column(Text, nullable=True)
-    schema: Mapped[dict] = mapped_column(JSON, nullable=False)
-    messages: Mapped[list] = mapped_column(JSON, nullable=False)
+    schema: Mapped[dict] = mapped_column(JSON_COLUMN, nullable=False)
+    messages: Mapped[list] = mapped_column(JSON_COLUMN, nullable=False)
     source_session: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -144,7 +153,7 @@ class WorkflowRun(Base):
     assistant_session_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     galaxy_invocation_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
-    parameters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    parameters: Mapped[dict] = mapped_column(JSON_COLUMN, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utcnow,
@@ -162,6 +171,43 @@ class WorkflowRun(Base):
     )
 
     user: Mapped[User | None] = relationship(back_populates="workflow_runs")
+
+
+class GalaxyJob(Base):
+    """Ownership record for a Galaxy job submitted by a signed-in user.
+
+    Anonymous (service-account) jobs write no row -- the job id stays the
+    only handle, exactly as before user accounts existed.
+    """
+
+    __tablename__ = "galaxy_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    galaxy_job_id: Mapped[str] = mapped_column(Text, nullable=False)
+    galaxy_instance_url: Mapped[str] = mapped_column(Text, nullable=False)
+    tool: Mapped[str] = mapped_column(String(64), nullable=False)
+    params: Mapped[dict] = mapped_column(JSON_COLUMN, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        nullable=False,
+    )
+
+    __table_args__ = (
+        # Named to match migration 0004, which names it explicitly rather
+        # than relying on a backend-generated name.
+        UniqueConstraint("galaxy_job_id", name="uq_galaxy_jobs_galaxy_job_id"),
+    )
 
 
 class AssistantTurnLog(Base):
@@ -218,13 +264,15 @@ class AssistantTurnLog(Base):
     # This turn's new pydantic-ai messages only (not the rehydrated history),
     # so tool calls and their returns are recoverable without duplicating the
     # whole conversation on every row. Byte-capped -- see transcript_truncated.
-    transcript: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    transcript: Mapped[list] = mapped_column(JSON_COLUMN, default=list, nullable=False)
     # True when the transcript hit the size cap and trailing messages were
     # dropped, so a short transcript is never mistaken for a short turn.
     transcript_truncated: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
-    schema_state: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    schema_state: Mapped[dict] = mapped_column(
+        JSON_COLUMN, default=dict, nullable=False
+    )
     input_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     output_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     total_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

@@ -4,13 +4,11 @@ import { type Outbreak } from "@brc/apis/outbreak";
 import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
 import { Branding } from "@brc/components/layout/Branding/branding";
 import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";
-import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { type AppSiteConfig } from "@repo/shared/config/types";
-import { ROUTES } from "@repo/shared/routes/constants";
 import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
@@ -19,6 +17,7 @@ import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
 import { type WorkflowEntity } from "./index/workflow/types";
 import { workflowEntityConfig } from "./index/workflowEntityConfig";
+import { headerNavigation } from "./navigation";
 import { socialMedia } from "./socialMedia";
 
 const LOCALHOST = "http://localhost:3000";
@@ -29,12 +28,17 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 // Login UI is gated by a build-time env var so deployments (the playbook) flip
 // it per environment without an app-code change. Defaults off when unset.
 const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
+// Same shape as the login flag, for the same reason: the page behind it needs
+// a Galaxy API key and an SRA mirror, which production does not have yet.
+const LOGAN_SEARCH_ENABLED =
+  process.env.NEXT_PUBLIC_LOGAN_SEARCH_ENABLED === "true";
 
 /**
  * Make site config object.
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
  * @param loginEnabled - Whether to show the login button.
+ * @param loganSearchEnabled - Whether to show the Logan Search header entry.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -49,7 +53,8 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
 export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
-  loginEnabled = LOGIN_ENABLED
+  loginEnabled = LOGIN_ENABLED,
+  loganSearchEnabled = LOGAN_SEARCH_ENABLED
 ): AppSiteConfig {
   return {
     appTitle: APP_TITLE,
@@ -92,22 +97,7 @@ export function makeConfig(
           link: "/",
           src: "/logo/brc.svg",
         }),
-        navigation: [
-          undefined,
-          [
-            { label: "About", url: SITE_ROUTES.ABOUT },
-            { label: "Learn", url: SITE_ROUTES.LEARN },
-            { label: "Organisms", url: ROUTES.ORGANISMS },
-            { label: "Assemblies", url: ROUTES.GENOMES },
-            { label: "Workflows", url: ROUTES.WORKFLOWS },
-            {
-              label: "Priority Pathogens",
-              url: SITE_ROUTES.PRIORITY_PATHOGENS,
-            },
-            { label: "Assistant", url: SITE_ROUTES.ASSISTANT },
-          ],
-          undefined,
-        ],
+        navigation: headerNavigation(loganSearchEnabled),
         socialMedia: socialMedia,
       },
     },
@@ -118,6 +108,11 @@ export function makeConfig(
   };
 }
 
-const config: AppSiteConfig = makeConfig(BROWSER_URL, GIT_HUB_REPO_URL, true);
+const config: AppSiteConfig = makeConfig(
+  BROWSER_URL,
+  GIT_HUB_REPO_URL,
+  true,
+  true
+);
 
 export default config;

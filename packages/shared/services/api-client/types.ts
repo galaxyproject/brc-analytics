@@ -23,6 +23,27 @@ export interface SuggestionChip {
   message: string;
 }
 
+export interface LoganContext {
+  in_mirror: number;
+  job_id: string;
+  results_url: string;
+  top_organism: string | null;
+  top_organism_share: number | null;
+  total_matches: number;
+}
+
+export interface LoganSessionRequest {
+  logan_job_id: string;
+}
+
+export interface DataSourceDetail {
+  accessions?: string[];
+  job_id?: string;
+  requested?: number;
+  resolved?: number;
+  source?: "ena" | "logan" | "upload";
+}
+
 export interface AssistantChatRequest {
   message: string;
   session_id?: string;
@@ -39,6 +60,7 @@ export interface TokenUsage {
 export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
+  logan?: LoganContext | null;
   reply: string;
   schema_state: AnalysisSchema;
   session_id: string;
@@ -49,6 +71,7 @@ export interface AssistantChatResponse {
 export interface SessionRestoreResponse {
   handoff_url: string | null;
   is_complete: boolean;
+  logan?: LoganContext | null;
   messages: { content: string; role: "user" | "assistant" }[];
   schema_state: AnalysisSchema;
   session_id: string;

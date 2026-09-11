@@ -24,12 +24,18 @@ from app.models.assistant import (
     ChatResponse,
     SessionRestoreResponse,
 )
+from app.models.logan import LoganSessionRequest
 from app.models.user_data import UserMeResponse
 from app.services import turn_log
 from app.services.assistant_agent import (
     AssistantTimeoutError,
     AssistantUnavailableError,
+    LoganJobError,
+    LoganJobFailedError,
+    LoganJobNotFoundError,
+    LoganJobNotReadyError,
 )
+from app.services.logan_snapshot import logan_context_from
 
 logger = logging.getLogger(__name__)
 
@@ -170,6 +176,76 @@ async def assistant_chat(
     return chat_response
 
 
+def _logan_error(status_code: int, code: str, err: LoganJobError) -> HTTPException:
+    return HTTPException(
+        status_code=status_code,
+        detail={"code": code, "message": str(err), "results_url": err.results_url},
+    )
+
+
+@router.post("/session", response_model=SessionRestoreResponse)
+async def create_session(
+    request: LoganSessionRequest,
+    response: Response,
+    agent=Depends(get_assistant_agent),
+    _rate_limit=Depends(check_rate_limit),
+    current_user: UserMeResponse | None = Depends(get_optional_current_user),
+):
+    """Open a new assistant session bound to a finished Logan search.
+
+    No model call: the reply is a stored intro plus a prefilled tracker.
+    The job's merged results must already be cached (the results page
+    builds them); otherwise this points back at that page rather than
+    rebuilding them here.
+    """
+    if not agent.is_available():
+        raise HTTPException(
+            status_code=503,
+            detail="Analysis assistant is unavailable (LLM not configured)",
+        )
+    job_id = request.logan_job_id
+    try:
+        state = await agent.create_logan_session(
+            job_id, current_user.sub if current_user else None
+        )
+    except LoganJobNotFoundError as e:
+        raise _logan_error(404, "logan_job_not_found", e) from e
+    except LoganJobNotReadyError as e:
+        raise _logan_error(409, "logan_job_not_ready", e) from e
+    except LoganJobFailedError as e:
+        raise _logan_error(422, "logan_job_failed", e) from e
+    except AssistantUnavailableError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("Could not open a Logan session for job %s", job_id)
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "code": "logan_unavailable",
+                "message": "Could not reach Galaxy to read that search.",
+                "results_url": f"/logan-search?job={job_id}",
+            },
+        ) from e
+
+    schema_state = agent.reconcile_schema(state.schema_state)
+    suggestions = agent._derive_suggestions(
+        schema_state, logan=state.metadata.get("logan")
+    )
+    is_complete, handoff_url = agent.compute_handoff(
+        schema_state, session_id=state.session_id
+    )
+    set_session_cookie(response, state.session_id)
+    return SessionRestoreResponse(
+        session_id=state.session_id,
+        messages=state.messages,
+        schema_state=schema_state,
+        suggestions=suggestions,
+        is_complete=is_complete,
+        handoff_url=handoff_url,
+        logan=logan_context_from(state.metadata),
+    )
+
+
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
 async def restore_session(
     session_id: str,
@@ -195,7 +271,9 @@ async def restore_session(
     # can be inconsistent with a schema that just lost a removed workflow (e.g. a
     # stale "continue to handoff" chip), which would steer the user down an
     # invalid path (Copilot). This is the same derivation the chat path runs.
-    suggestions = agent._derive_suggestions(schema_state)
+    suggestions = agent._derive_suggestions(
+        schema_state, logan=state.metadata.get("logan")
+    )
     is_complete, handoff_url = agent.compute_handoff(
         schema_state, session_id=state.session_id
     )
@@ -206,6 +284,7 @@ async def restore_session(
         suggestions=suggestions,
         is_complete=is_complete,
         handoff_url=handoff_url,
+        logan=logan_context_from(state.metadata),
     )
 
 

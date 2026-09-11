@@ -11,6 +11,7 @@ from app.api.v1 import (
     cache,
     ena,
     favorites,
+    galaxy,
     health,
     links,
     saved_analyses,
@@ -24,6 +25,7 @@ from app.core.dependencies import (
     get_cache_service,
     get_catalog_data,
     get_ena_service,
+    get_service_galaxy,
     get_sra_mirror_service,
     reset_all_services,
 )
@@ -54,6 +56,7 @@ def create_app() -> FastAPI:
         get_catalog_data(),
         get_ena_service(),
         sra_mirror=get_sra_mirror_service(),
+        galaxy=get_service_galaxy(),
     )
     mcp_app = mcp.http_app(path="/", stateless_http=True)
 
@@ -107,6 +110,7 @@ def create_app() -> FastAPI:
     app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
     app.include_router(links.router, prefix="/api/v1", tags=["links"])
     app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
+    app.include_router(galaxy.router, prefix="/api/v1/galaxy", tags=["galaxy"])
     app.include_router(assistant.router, prefix="/api/v1/assistant", tags=["assistant"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
     app.include_router(favorites.router, prefix="/api/v1/favorites", tags=["favorites"])

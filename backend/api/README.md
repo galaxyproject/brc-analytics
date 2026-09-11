@@ -85,9 +85,18 @@ catalog and sequencing-data search.
 search against the European Nucleotide Archive.
 
 **SRA mirror tools** (`search_sra`, `sra_data_summary`, `get_sra_study_runs`) --
-fast structured search over a local SRA metadata mirror scoped to BRC-relevant
-organisms. Opt-in: registered only when `SRA_MIRROR_PATH` points at a built
-mirror file; a default deploy exposes only the catalog and ENA tools.
+fast structured search over a local mirror of SRA run metadata covering every
+public run as of its build. Opt-in: registered only when `SRA_MIRROR_PATH`
+points at a built mirror file; a default deploy exposes only the catalog and
+ENA tools.
+
+**Logan search tools** (`logan_job_status`, `logan_cohort`, `logan_hits`) --
+read-only access to Logan/kmindex sequence searches run through
+`/logan-search`: whether a job finished, its whole-match-set counts and facets,
+and pages of score-ranked hits with SRA metadata. Opt-in: registered only when
+`GALAXY_API_KEY` is set. Cache-only -- they read the merged result the results
+page assembled (cached for a day) and never rebuild it, so a tool that reports
+`expired` means opening that page first.
 
 ## Configuration
 

@@ -3,6 +3,7 @@ import type {
   AssistantChatRequest,
   AssistantChatResponse,
   AssistantInfoResponse,
+  LoganSessionRequest,
   SessionRestoreResponse,
 } from "@repo/shared/services/api-client/types";
 import ky, { type HTTPError } from "ky";
@@ -50,6 +51,21 @@ export const assistantAPIClient = {
         retry: { limit: 0 },
         timeout: 120000,
       })
+      .json();
+  },
+
+  /**
+   * Open a new assistant session bound to a finished Logan search.
+   * @param request - The Logan job id.
+   * @returns Promise resolving to the new session (intro, schema, suggestions).
+   */
+  assistantCreateSession: async (
+    request: LoganSessionRequest
+  ): Promise<SessionRestoreResponse> => {
+    // One attempt: a 404/409 is an answer, not a blip, and the caller links
+    // the user back to the results page either way.
+    return httpClient
+      .post("assistant/session", { json: request, retry: { limit: 0 } })
       .json();
   },
 
