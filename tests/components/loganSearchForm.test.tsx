@@ -280,14 +280,20 @@ describe("LoganSearchForm index picker", () => {
     expect(screen.getByText(DEFAULT_SENTENCE)).toBeTruthy();
   });
 
-  test("rests on All when the instance lacks the default index", () => {
+  test("falls back to the first index when the instance lacks the default", () => {
     renderForm({ indexes: VIRAL_ONLY });
 
-    expect(chip("Organism", "All").getAttribute("aria-pressed")).toBe("true");
-    expect(chip("Library type", "All").getAttribute("aria-pressed")).toBe(
+    // Not All: resting on everything would make one click on an untouched
+    // form the most expensive job the instance can run.
+    expect(chip("Organism", "Viruses").getAttribute("aria-pressed")).toBe(
       "true"
     );
-    expect(screen.getByText("Searching all 9 indexes.")).toBeTruthy();
+    expect(chip("Library type", "Genomic").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(
+      screen.getByText("Searching 1 of 9 indexes: GENOMIC_VRL.")
+    ).toBeTruthy();
   });
 
   test("says so when the instance has no indexes at all", () => {

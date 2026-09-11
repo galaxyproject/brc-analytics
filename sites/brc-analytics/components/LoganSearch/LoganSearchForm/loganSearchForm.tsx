@@ -57,6 +57,9 @@ const CHIP_SX = {
     outlineColor: "primary.main",
     outlineOffset: "2px",
   },
+  // The chip stays clickable so it keeps the tab order and the tooltip, which
+  // leaves MUI's pointer cursor promising a click that does nothing.
+  "&[aria-disabled='true']": { cursor: "default" },
   height: 32,
 };
 
@@ -278,18 +281,21 @@ export const LoganSearchForm = ({
   const [sequence, setSequence] = useState(SAMPLE_QUERY);
   // Division and strategy codes. null means "not touched": the default is
   // derived from the loaded list rather than seeded, because the list arrives
-  // asynchronously and a default the instance lacks would select nothing.
+  // asynchronously and a default the instance lacks would select nothing. What
+  // it falls back to when DEFAULT_INDEX is missing is the first index the
+  // instance does have, never All -- a default nobody chose should be the
+  // cheapest coherent job, never the dearest one on offer.
   const [organismsPicked, setOrganismsPicked] = useState<string[] | null>(null);
   const [librariesPicked, setLibrariesPicked] = useState<string[] | null>(null);
   const [threshold, setThreshold] = useState(0.5);
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
 
-  const hasDefault = options.includes(DEFAULT_INDEX);
-  const organisms =
-    organismsPicked ?? (hasDefault ? [indexDivision(DEFAULT_INDEX)] : []);
-  const libraries =
-    librariesPicked ?? (hasDefault ? [indexStrategy(DEFAULT_INDEX)] : []);
+  const defaultIndexes = options.includes(DEFAULT_INDEX)
+    ? [DEFAULT_INDEX]
+    : options.slice(0, 1);
+  const organisms = organismsPicked ?? defaultIndexes.map(indexDivision);
+  const libraries = librariesPicked ?? defaultIndexes.map(indexStrategy);
 
   const indexes = selectIndexes(options, organisms, libraries);
   const organismChips = axisChips(options, organisms, libraries, "division");
