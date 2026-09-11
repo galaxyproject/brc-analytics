@@ -2,6 +2,7 @@ import {
   axisOptions,
   describeIndexSelection,
   indexDivision,
+  joinNaturally,
   selectIndexes,
 } from "@brc/components/LoganSearch/utils";
 
@@ -193,6 +194,22 @@ describe("selectIndexes", () => {
 
   test("an unregistered pairing selects nothing", () => {
     expect(selectIndexes(INDEXES, ["ENV"], ["GENOMIC"])).toEqual([]);
+  });
+});
+
+describe("joinNaturally", () => {
+  test("leaves one item alone", () => {
+    expect(joinNaturally(["bacteria"])).toBe("bacteria");
+  });
+
+  test("joins two items with and", () => {
+    expect(joinNaturally(["bacteria", "viruses"])).toBe("bacteria and viruses");
+  });
+
+  test("takes the Oxford comma from three items on", () => {
+    expect(joinNaturally(["bacteria", "viruses", "phage"])).toBe(
+      "bacteria, viruses, and phage"
+    );
   });
 });
 

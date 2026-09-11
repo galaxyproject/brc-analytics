@@ -174,7 +174,7 @@ function lowerFirst(label: string): string {
  * @param labels - Labels already cased for mid-sentence use.
  * @returns One phrase.
  */
-function joinNaturally(labels: string[]): string {
+export function joinNaturally(labels: string[]): string {
   if (labels.length < 2) return labels.join("");
   if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
   return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;

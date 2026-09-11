@@ -7,6 +7,7 @@ import {
   SummaryHeader,
   SummaryMeta,
 } from "@brc/components/LoganSearch/loganSearch.styles";
+import { joinNaturally } from "@brc/components/LoganSearch/utils";
 import { ROUTES } from "@brc/routes/constants";
 import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
 import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
@@ -76,16 +77,6 @@ function formatBytes(bytes: number): string {
 }
 
 /**
- * An English list, Oxford comma and all.
- * @param parts - The items, already rendered.
- * @returns "A", "A and B", or "A, B, and C".
- */
-function joinNames(parts: string[]): string {
-  if (parts.length < 3) return parts.join(" and ");
-  return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
-}
-
-/**
  * Which indexes the search ran over, and what each of them matched.
  *
  * The per-index counts are a fact about the search rather than about the
@@ -126,7 +117,7 @@ function describeIndexes(
       );
     // Every index came back empty, so there is no "most" to point at.
     if (top.length === 0) return counted;
-    return `${counted}; most matched in ${joinNames(top)}`;
+    return `${counted}; most matched in ${joinNaturally(top)}`;
   }
   const named = sorted.map(
     (summary) =>
