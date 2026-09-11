@@ -1,25 +1,47 @@
 {{ config(materialized="table") }}
 
+-- Collect curated names and catalog-relevant NCBI names into a single list.
+
+with source_names as (
+
+    select
+        tax_id,
+        name_txt,
+        name_class as ncbi_class,
+        false as is_curated
+    from {{ source("ncbi", "taxonomy_names") }}
+    where tax_id in (select tax_id from {{ ref("taxonomy_lineages") }})
+
+    union all
+
+    select
+        taxonomy_id as tax_id,
+        unnest(from_json(other_names, '"varchar[]"')) as name_txt,
+        null as ncbi_class,
+        true as is_curated
+    from {{ source("catalog_source", "organism_taxa") }}
+
+),
+
 /*
   Attach each lineage taxon's scientific name and its `other_names` -- every
   non-scientific name NCBI knows for the taxon, in one list, including categories
-  such as common names and former scientific names.
+  such as common names and former scientific names, and with the addition of
+  curated names from the catalog source.
 */
 
-with taxon_names as (
+taxon_names as (
 
-    -- The `where` restricts the aggregate to the taxa the join below keeps;
-    -- without it this groups all of names.dmp (~3M taxa) to use ~5k of them.
     select
         tax_id,
-        min(name_txt) filter (name_class = 'scientific name') as taxon_name,
+        min(name_txt) filter (ncbi_class = 'scientific name') as taxon_name,
         list_concat(
-            list(name_txt order by name_txt) filter (name_class = 'genbank common name'),
-            list(name_txt order by name_txt) filter (name_class in ('common name', 'acronym')),
-            list(name_txt order by name_txt) filter (name_class in ('equivalent name', 'synonym'))
+            list(name_txt order by name_txt) filter (ncbi_class = 'genbank common name'),
+            list(name_txt order by name_txt) filter (ncbi_class in ('common name', 'acronym')),
+            list(name_txt order by name_txt) filter (ncbi_class in ('equivalent name', 'synonym')),
+            list(name_txt order by name_txt) filter (is_curated)
         ) as all_names
-    from {{ source("ncbi", "taxonomy_names") }}
-    where tax_id in (select tax_id from {{ ref("taxonomy_lineages") }})
+    from source_names
     group by tax_id
 
 ),
