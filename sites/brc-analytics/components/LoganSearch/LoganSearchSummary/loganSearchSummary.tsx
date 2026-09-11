@@ -76,6 +76,16 @@ function formatBytes(bytes: number): string {
 }
 
 /**
+ * An English list, Oxford comma and all.
+ * @param parts - The items, already rendered.
+ * @returns "A", "A and B", or "A, B, and C".
+ */
+function joinNames(parts: string[]): string {
+  if (parts.length < 3) return parts.join(" and ");
+  return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+}
+
+/**
  * Which indexes the search ran over, and what each of them matched.
  *
  * The per-index counts are a fact about the search rather than about the
@@ -83,21 +93,45 @@ function formatBytes(bytes: number): string {
  * With one index the count is the headline count again, so only the name is
  * worth saying.
  * @param results - Results payload, for the per-index breakdown.
+ * @param registered - How many indexes the form offered, so a search over
+ * every one of them can say so. 0 when that list never loaded, which is why
+ * the "all" wording is a match rather than a threshold.
  * @returns A sentence, or null when the backend sent no breakdown.
  */
-function describeIndexes(results: KmindexResults): string | null {
+function describeIndexes(
+  results: KmindexResults,
+  registered: number
+): string | null {
   const perIndex = results.per_index ?? [];
   if (perIndex.length === 0) return null;
   if (perIndex.length === 1) return `Searched ${perIndex[0].index}`;
   // Largest first: selection order buries which index got swamped by which.
   // Counted before the cap, because the cap's per-index effect is already
-  // explained in the table's own disclosure.
-  const named = [...perIndex]
-    .sort((a, b) => b.hits_before_cap - a.hits_before_cap)
-    .map(
-      (summary) =>
-        `${summary.index} (${summary.hits_before_cap.toLocaleString()} matched)`
-    );
+  // explained in the table's own disclosure. Past three indexes only the
+  // three largest are named: this caption is provenance, not the breakdown,
+  // and a job over all 109 would otherwise put a paragraph in a caption.
+  const sorted = [...perIndex].sort(
+    (a, b) => b.hits_before_cap - a.hits_before_cap
+  );
+  if (sorted.length > 3) {
+    const counted = `Searched ${
+      perIndex.length === registered ? "all " : ""
+    }${perIndex.length} indexes`;
+    const top = sorted
+      .filter((summary) => summary.hits_before_cap > 0)
+      .slice(0, 3)
+      .map(
+        (summary) =>
+          `${summary.index} (${summary.hits_before_cap.toLocaleString()})`
+      );
+    // Every index came back empty, so there is no "most" to point at.
+    if (top.length === 0) return counted;
+    return `${counted}; most matched in ${joinNames(top)}`;
+  }
+  const named = sorted.map(
+    (summary) =>
+      `${summary.index} (${summary.hits_before_cap.toLocaleString()} matched)`
+  );
   return `Searched ${named.join(", ")}`;
 }
 
@@ -221,7 +255,7 @@ export const LoganSearchSummary = ({
   // says it better than a strip headed with a zero.
   if (matched <= 0) return null;
   const cohort = results.cohort ?? null;
-  const indexes = describeIndexes(results);
+  const indexes = describeIndexes(results, search.indexes.length);
 
   const copyLink = async (): Promise<void> => {
     try {

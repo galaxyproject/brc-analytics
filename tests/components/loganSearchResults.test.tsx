@@ -185,6 +185,28 @@ function openWhy(): void {
 }
 
 describe("LoganSearchResults truncation disclosure", () => {
+  // Twelve indexes, largest first, with the after-cap column summing to the
+  // 50,000 cap -- the shape a job over the whole registry has, where the tail
+  // is a run of indexes that matched something and kept none of it.
+  const TWELVE_INDEXES = [
+    summary("GENOMIC_BCT", 1100404, 47089),
+    summary("GENOMIC_VRL", 157741, 1200),
+    summary("METATRANSCRIPTOMIC_BCT", 33112, 900),
+    summary("METAGENOMIC_ENV", 21000, 400),
+    summary("GENOMIC_EUK", 17000, 300),
+    summary("GENOMIC_INV", 12000, 60),
+    summary("GENOMIC_PLN", 9000, 30),
+    summary("GENOMIC_PRI", 6000, 12),
+    summary("GENOMIC_ROD", 3000, 6),
+    summary("GENOMIC_MAM", 1500, 3),
+    summary("METAGENOMIC_PHG", 900, 0),
+    summary("METAGENOMIC_UNKNOWN", 39, 0),
+  ];
+
+  // One per index the disclosure spells out. The rollup line starts with a
+  // digit, so it is not one of these.
+  const INDEX_LINE = /^[A-Z_]+: /;
+
   test("names the window it lists and what cannot be paged to", () => {
     const { container } = renderResults(
       truncatedResults([
@@ -304,6 +326,38 @@ describe("LoganSearchResults truncation disclosure", () => {
       "METAGENOMIC_UNKNOWN: 39 matched, none listed -- alone it would return all 39"
     );
     expect(container.textContent).toContain("METAGENOMIC_PHG: no matches");
+  });
+
+  test("rolls the indexes past the tenth into one line", () => {
+    // Handed over smallest first, so the ten that get a line are the ten the
+    // component sorted to the top rather than the ten the API happened to
+    // send first.
+    renderResults(truncatedResults([...TWELVE_INDEXES].reverse()));
+    openWhy();
+
+    const alert = screen.getByRole("alert");
+    expect(within(alert).getAllByText(INDEX_LINE)).toHaveLength(10);
+    expect(alert.textContent).toContain(
+      "GENOMIC_MAM: 3 of 1,500 listed -- alone it would return all 1,500"
+    );
+    // 900 + 39 matched between them, and the cap left them nothing. Twelve
+    // lines is already long; 109 of them is why the tail is summed.
+    expect(alert.textContent).toContain(
+      "2 more indexes: 939 matched, 0 listed."
+    );
+    expect(alert.textContent).not.toContain("METAGENOMIC_PHG");
+    expect(alert.textContent).not.toContain("METAGENOMIC_UNKNOWN");
+  });
+
+  test("lists all ten when ten is all there is", () => {
+    renderResults(truncatedResults(TWELVE_INDEXES.slice(0, 10)));
+    openWhy();
+
+    const alert = screen.getByRole("alert");
+    expect(within(alert).getAllByText(INDEX_LINE)).toHaveLength(10);
+    // Nothing was left out, so a rollup would be a line saying "0 more".
+    expect(alert.textContent).toContain("GENOMIC_MAM: 3 of 1,500 listed");
+    expect(alert.textContent).not.toContain("more indexes");
   });
 
   test("still carries an explanation when only one index was searched", () => {

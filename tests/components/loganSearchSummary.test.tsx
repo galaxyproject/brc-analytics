@@ -96,6 +96,31 @@ function summary(
   return { hits_after_cap: after, hits_before_cap: before, index };
 }
 
+// A four-index breakdown in selection order rather than in size order, so the
+// caption has to sort it before it can name the three largest.
+const FOUR_INDEXES = [
+  summary("METAGENOMIC_ENV", 12, 12),
+  summary("GENOMIC_BCT", 1100404, 47089),
+  summary("METATRANSCRIPTOMIC_BCT", 33112, 2911),
+  summary("GENOMIC_VRL", 157741, 0),
+];
+
+// The three largest of those, as the caption renders them.
+const TOP_THREE =
+  "GENOMIC_BCT (1,100,404), GENOMIC_VRL (157,741), and " +
+  "METATRANSCRIPTOMIC_BCT (33,112)";
+
+/**
+ * A stand-in for the index list the form loaded. Only its length is read, so
+ * the names are filler -- what matters is whether the search covered all of
+ * them.
+ * @param count - How many indexes the API offered.
+ * @returns That many index names.
+ */
+function registry(count: number): string[] {
+  return Array.from({ length: count }, (_, i) => `GENOMIC_${i}`);
+}
+
 /**
  * A search-hook stub carrying only what the strip reads.
  * @param overrides - Fields to set on top of an idle search. Typed loosely
@@ -121,14 +146,19 @@ function search(overrides: Record<string, unknown>): Search {
 }
 
 /**
- * Render the strip around a payload; the component reads only the job id and
- * the results.
+ * Render the strip around a payload; the component reads the job id, the
+ * results, and how many indexes the form had to offer.
  * @param results - Payload as the API sends it.
+ * @param indexes - The index list the form loaded. Empty by default, which is
+ * also what a failed load leaves behind.
  * @returns The render result.
  */
-function renderSummary(results: unknown): ReturnType<typeof render> {
+function renderSummary(
+  results: unknown,
+  indexes: string[] = []
+): ReturnType<typeof render> {
   return render(
-    <LoganSearchSummary search={search({ jobId: JOB_ID, results })} />
+    <LoganSearchSummary search={search({ indexes, jobId: JOB_ID, results })} />
   );
 }
 
@@ -310,6 +340,63 @@ describe("LoganSearchSummary", () => {
     // Selection order buries which index got swamped by which.
     expect(container.textContent).toContain(
       "Searched GENOMIC_INV (17,629 matched), METAGENOMIC_INV (4 matched)"
+    );
+  });
+
+  test("still spells three indexes out in full", () => {
+    const { container } = renderSummary(
+      {
+        ...BASE_RESULTS,
+        per_index: [
+          summary("METAGENOMIC_INV", 4, 4),
+          summary("GENOMIC_INV", 17629, 17629),
+          summary("METATRANSCRIPTOMIC_INV", 812, 812),
+        ],
+      },
+      registry(109)
+    );
+
+    // Three still fits a caption, so the bound below does not take away the
+    // breakdown from the jobs that were already readable.
+    expect(container.textContent).toContain(
+      "Searched GENOMIC_INV (17,629 matched), METATRANSCRIPTOMIC_INV (812 matched), METAGENOMIC_INV (4 matched)"
+    );
+  });
+
+  test("names only the three largest once there are more than three indexes", () => {
+    renderSummary({ ...BASE_RESULTS, per_index: FOUR_INDEXES }, registry(109));
+
+    // The fourth is in the count, not in the sentence: a job over all 109
+    // indexes would otherwise write a paragraph into a caption, and the full
+    // breakdown is a click away in the table's own disclosure.
+    expect(screen.getByText(/^Searched /).textContent).toBe(
+      `Searched 4 indexes; most matched in ${TOP_THREE}`
+    );
+  });
+
+  test("says so when the search covered every index there is", () => {
+    renderSummary({ ...BASE_RESULTS, per_index: FOUR_INDEXES }, registry(4));
+
+    // "all" is the one thing the count alone cannot say, and it is the whole
+    // provenance of a search nobody narrowed.
+    expect(screen.getByText(/^Searched /).textContent).toBe(
+      `Searched all 4 indexes; most matched in ${TOP_THREE}`
+    );
+  });
+
+  test("points at no index in particular when none of them matched", () => {
+    renderSummary(
+      {
+        ...BASE_RESULTS,
+        per_index: FOUR_INDEXES.map((one) => summary(one.index, 0, 0)),
+      },
+      registry(109)
+    );
+
+    // "most matched in" needs a most. With every index at zero the sentence
+    // stops at what was searched.
+    expect(screen.getByText(/^Searched /).textContent).toBe(
+      "Searched 4 indexes"
     );
   });
 

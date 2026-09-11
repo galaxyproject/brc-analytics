@@ -52,6 +52,13 @@ const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 // what it opens. One card per page, so a constant is enough.
 const WHY_ID = "logan-why-capped";
 
+// How many indexes the disclosure spells out before rolling the rest into one
+// line. The disclosure is here to explain what the cap did, and past the ten
+// largest every line says the same thing -- matched, kept none -- which the
+// rollup says once. A job over all 109 indexes would otherwise answer "why?"
+// with 109 lines.
+const MAX_INDEX_LINES = 10;
+
 // MUI's styled rather than emotion's: the cell has to keep TableCell's theme
 // props, and wrapping a MUI component with a theme-free emotion string drops
 // them.
@@ -93,6 +100,25 @@ function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
       : `alone it would still cap at ${cap.toLocaleString()}`;
   if (kept === 0) return `${total} matched, none listed -- ${alone}`;
   return `${listed} of ${total} listed -- ${alone}`;
+}
+
+/**
+ * The one line standing in for every index the disclosure did not spell out.
+ *
+ * They are the smallest matchers, so their lines would read alike -- matched
+ * something, kept none of it -- and the two numbers that differ are worth
+ * more summed than repeated.
+ * @param rest - Per-index rows past the ones listed individually.
+ * @returns The rollup sentence, or null when nothing was left out.
+ */
+function describeRestIndexes(rest: KmindexIndexSummary[]): string | null {
+  if (rest.length === 0) return null;
+  const matched = rest.reduce((total, one) => total + one.hits_before_cap, 0);
+  const listed = rest.reduce((total, one) => total + one.hits_after_cap, 0);
+  return (
+    `${rest.length.toLocaleString()} more indexes: ` +
+    `${matched.toLocaleString()} matched, ${listed.toLocaleString()} listed.`
+  );
 }
 
 /**
@@ -264,6 +290,7 @@ export const LoganSearchResults = ({
   // scores are distributed, so it must not decide whether the tie-band caveat
   // is shown.
   const showPerIndex = perIndex.length > 1;
+  const restNote = describeRestIndexes(perIndex.slice(MAX_INDEX_LINES));
 
   const whyOpen = whyOpenFor === results.job_id;
 
@@ -385,7 +412,7 @@ export const LoganSearchResults = ({
                       ranked highest overall -- an index with few matches can
                       keep none of them.
                     </Typography>
-                    {perIndex.map((summary) => (
+                    {perIndex.slice(0, MAX_INDEX_LINES).map((summary) => (
                       <Typography
                         component="div"
                         key={summary.index}
@@ -395,6 +422,15 @@ export const LoganSearchResults = ({
                         {summary.index}: {describeIndexShare(summary, cap)}
                       </Typography>
                     ))}
+                    {restNote && (
+                      <Typography
+                        component="div"
+                        variant="body2"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {restNote}
+                      </Typography>
+                    )}
                   </>
                 )}
                 {/* Unconditional: how wide the tie band is depends on the
