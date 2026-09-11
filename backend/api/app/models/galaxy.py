@@ -37,14 +37,6 @@ class GalaxyJobSubmission(BaseModel):
 
 MAX_QUERY_BASES = 2500
 
-# kmindex_query's index select is multiple="true", so one job can search any
-# combination of the ~109 registered indexes and write a JSON per shard for each.
-# The ceiling is ours, not the tool's: a single index already fans out to dozens
-# of shard datasets (GENOMIC_BCT alone is 55), and we download every one of them
-# through a service account Galaxy rate-limits. Raise this once the aggregation
-# path stops pulling shards one dataset at a time.
-MAX_INDEXES = 8
-
 
 class KmindexQuerySubmission(BaseModel):
     """Request model for a Logan/kmindex sequence search."""
@@ -77,12 +69,15 @@ class KmindexQuerySubmission(BaseModel):
 
     @field_validator("indexes")
     @classmethod
-    def distinct_and_bounded(cls, value: List[str]) -> List[str]:
+    def distinct_and_nonempty(cls, value: List[str]) -> List[str]:
         """
-        Drop blanks, de-duplicate, and cap how many indexes one job may search.
+        Drop blanks and de-duplicate.
 
         Duplicates matter beyond tidiness: kmindex keys its output JSON by shard,
         so the same index twice would merge its hits into the ranked list twice.
+        There is no upper bound: every registered index in one job is a supported
+        query, and a shard the download path cannot fetch is reported on the
+        results page rather than prevented here.
         """
         seen: List[str] = []
         for name in value:
@@ -92,10 +87,6 @@ class KmindexQuerySubmission(BaseModel):
 
         if not seen:
             raise ValueError("Select at least one index")
-        if len(seen) > MAX_INDEXES:
-            raise ValueError(
-                f"Selected {len(seen)} indexes; at most {MAX_INDEXES} per query"
-            )
         return seen
 
     @field_validator("sequence")

@@ -21,7 +21,6 @@ from pydantic import ValidationError
 
 from app.core.cache import CacheTTL
 from app.models.galaxy import (
-    MAX_INDEXES,
     MAX_QUERY_BASES,
     GalaxyJobState,
     GalaxyJobStatus,
@@ -216,7 +215,7 @@ class TestQueryLengthCap:
 
 
 class TestIndexSelection:
-    """kmindex_query's select is multiple="true"; the cap on it is ours."""
+    """kmindex_query's select is multiple="true"; any combination is a job."""
 
     def test_multiple_indexes_accepted(self):
         submission = KmindexQuerySubmission(
@@ -251,16 +250,12 @@ class TestIndexSelection:
         with pytest.raises(ValidationError):
             KmindexQuerySubmission(sequence="ACGT", indexes=["", "  "])
 
-    def test_over_the_cap_rejected(self):
-        with pytest.raises(ValidationError):
-            KmindexQuerySubmission(
-                sequence="ACGT", indexes=[f"IDX_{n}" for n in range(MAX_INDEXES + 1)]
-            )
-
-    def test_at_the_cap_accepted(self):
-        assert KmindexQuerySubmission(
-            sequence="ACGT", indexes=[f"IDX_{n}" for n in range(MAX_INDEXES)]
-        )
+    def test_every_registered_index_accepted(self):
+        # 109 is the size of the registered list on Galaxy Test (2026-09-10);
+        # the point is that nothing in the model bounds it.
+        names = [f"IDX_{n}" for n in range(109)]
+        submission = KmindexQuerySubmission(sequence="ACGT", indexes=names)
+        assert submission.indexes == names
 
 
 class TestTieBreakIsArchiveNeutral:
