@@ -263,8 +263,9 @@ const POLLING_INTERVAL = 3000;
 // past the 300 s this request and dev's nginx both give up at. The backend
 // finishes the merge regardless and caches what it got, so asking again is
 // how the page finds out -- there is no push and nothing else to wait on. The
-// budget is the hour that cached result lives, so a merge that never lands
-// ends in a sentence rather than a spinner nobody is coming back to.
+// budget mirrors the hour the backend keeps a partial aggregate and its
+// still-merging marker, so a merge that never lands ends in a sentence rather
+// than a spinner nobody is coming back to.
 const RESULTS_RETRY_INTERVAL_MS = 15000;
 const RESULTS_MERGE_BUDGET_MS = 60 * 60 * 1000;
 // Gateway statuses the proxy invents when it stops waiting on the backend.
@@ -400,8 +401,9 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // below, so a merge that never finishes ends in a message; null means the
   // last thing we heard was an answer rather than "not yet".
   const mergeStartedRef = useRef<number | null>(null);
-  // A scheduled re-ask of the results endpoint, held so the page can drop it
-  // when it leaves the job it belongs to.
+  // A scheduled re-ask of the results endpoint, held so it can be dropped
+  // when the page leaves the job it belongs to, or when a newer request
+  // supersedes the one that booked it.
   const retryRef = useRef<NodeJS.Timeout | null>(null);
   // Holds fetchResults for the re-ask it schedules; see the effect below it.
   const fetchResultsRef = useRef<
@@ -453,6 +455,13 @@ export const useKmindexSearch = (): KmindexSearchActions &
 
   const fetchResults = useCallback(
     async (jobId: string, offset: number): Promise<void> => {
+      // The newest request owns the booking, the same invariant requestSeqRef
+      // states for responses: a booking left unheld fires for a job nobody is
+      // waiting on any more, and nothing can clear it.
+      if (retryRef.current) {
+        clearTimeout(retryRef.current);
+        retryRef.current = null;
+      }
       const seq = ++requestSeqRef.current;
       const { column, order } = sortRef.current;
       setState((prev) => ({ ...prev, isLoadingResults: true }));

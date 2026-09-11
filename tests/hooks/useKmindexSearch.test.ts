@@ -919,6 +919,54 @@ describe("a merge that outlives the request", () => {
     expect(result.current.isLoadingResults).toBe(false);
   });
 
+  it("a newer request takes over the re-ask a 202 booked", async () => {
+    // A page-size change during the wait is a request for the same job, and it
+    // is answered. The booking it superseded must not ask a third time.
+    const { result } = await reattachedWith([
+      (): unknown => STILL_MERGING,
+      (): unknown => jsonOf({ ...RESULTS, limit: 50 }),
+    ]);
+    expect(resultsCalls()).toBe(1);
+
+    await act(async () => {
+      await result.current.setPageSize(50);
+    });
+
+    await waitFor(() => expect(result.current.results).not.toBeNull());
+    expect(result.current.results?.limit).toBe(50);
+    expect(resultsCalls()).toBe(2);
+
+    // The 202's timer would have come due somewhere in here.
+    await act(async () => {
+      jest.advanceTimersByTime(30000);
+    });
+    expect(resultsCalls()).toBe(2);
+    expect(result.current.error).toBeNull();
+  });
+
+  it("two waits in a row leave nothing behind for a reset to miss", async () => {
+    // Everything is answered 202, so the sort request goes out while the first
+    // wait is still booked -- reset has one booking to clear, not two.
+    const { result } = await reattachedWith([(): unknown => STILL_MERGING]);
+
+    await act(async () => {
+      await result.current.setSort("score");
+    });
+    expect(resultsCalls()).toBe(2);
+
+    act(() => {
+      result.current.reset();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(30000);
+    });
+
+    expect(resultsCalls()).toBe(2);
+    expect(result.current.results).toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+
   it("a server error still raises the banner straight away", async () => {
     const { result } = await reattachedWith([
       (): unknown => {
