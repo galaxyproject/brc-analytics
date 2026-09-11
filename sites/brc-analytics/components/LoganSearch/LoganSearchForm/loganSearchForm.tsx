@@ -155,6 +155,23 @@ export const LoganSearchForm = ({
                     />
                   ))
                 }
+                sx={{
+                  // The theme pins every outlined field at 40px, and MUI's Autocomplete
+                  // padding was written for its own 56px field: the input line overflows
+                  // the box and the chips ride 6px low. Let the box grow from 40px, and
+                  // size the input line to the chip row (20px chip + 3px margins) so one
+                  // row sits centred and each further row adds exactly one row.
+                  "& .MuiOutlinedInput-root": {
+                    "& .MuiAutocomplete-input": {
+                      paddingBottom: "3px",
+                      paddingTop: "3px",
+                    },
+                    height: "auto",
+                    minHeight: 40,
+                    paddingBottom: "7px",
+                    paddingTop: "7px",
+                  },
+                }}
                 value={indexes}
               />
             )}
