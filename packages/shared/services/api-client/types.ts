@@ -40,16 +40,23 @@ export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
   reply: string;
+  /** True when the backend persisted this turn to the user's saved analyses. */
+  saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
   token_usage?: TokenUsage;
 }
 
+export interface SessionSaveResponse {
+  saved_analysis_id: string;
+}
+
 export interface SessionRestoreResponse {
   handoff_url: string | null;
   is_complete: boolean;
   messages: { content: string; role: "user" | "assistant" }[];
+  saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
@@ -126,6 +133,9 @@ export interface WorkflowRunResponse {
   id: string;
   launch_source: string;
   parameters: Record<string, unknown>;
+  // On the wire but unread: crud.py hardcodes "handoff_created" and there is
+  // no endpoint to move it off that. Real invocation status needs per-user
+  // Galaxy bearer tokens.
   status: string;
   updated_at: string;
   workflow_id: string | null;
