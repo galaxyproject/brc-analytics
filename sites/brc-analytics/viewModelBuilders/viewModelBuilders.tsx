@@ -26,6 +26,7 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { Chip } from "@mui/material";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { FavoriteButton } from "@repo/shared/components/Favorites/components/FavoriteButton/favoriteButton";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
@@ -33,6 +34,7 @@ import { TagList } from "@repo/shared/components/Table/components/TableCell/comp
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
@@ -480,6 +482,12 @@ export const buildOrganismHero = (
   );
   if (priorityTag) tags.push(priorityTag);
   return {
+    actions: (
+      <FavoriteButton
+        entityId={organism.ncbiTaxonomyId}
+        entityType={ENTITY_TYPE.ORGANISM}
+      />
+    ),
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
     children: <Tabs pangenome={organism.pangenome} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,

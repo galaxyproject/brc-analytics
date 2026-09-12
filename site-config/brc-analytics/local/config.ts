@@ -9,8 +9,12 @@ import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
-import { type AppSiteConfig } from "@repo/shared/config/types";
+import {
+  type AppEntityConfig,
+  type AppSiteConfig,
+} from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { BRC_DATA_CATALOG_CATEGORY_KEY } from "@site-config/brc-analytics/category";
 import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
@@ -29,6 +33,32 @@ const GIT_HUB_REPO_URL = "https://github.com/galaxyproject/brc-analytics";
 // Login UI is gated by a build-time env var so deployments (the playbook) flip
 // it per environment without an app-code change. Defaults off when unset.
 const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
+
+/**
+ * Removes the SAVED column from an entity's list config when login is
+ * disabled. FavoriteCell itself already renders nothing without login, but
+ * the column header, its grid track, and its entry in the column-visibility
+ * menu are static config and would otherwise ship regardless.
+ * @param entityConfig - Entity config to gate.
+ * @param loginEnabled - Whether login (and so the SAVED column) is enabled.
+ * @returns entityConfig unchanged when loginEnabled is true, otherwise with
+ * the SAVED column filtered out of list.columns.
+ */
+function withSavedColumnGated<T>(
+  entityConfig: AppEntityConfig<T>,
+  loginEnabled: boolean
+): AppEntityConfig<T> {
+  if (loginEnabled) return entityConfig;
+  return {
+    ...entityConfig,
+    list: {
+      ...entityConfig.list,
+      columns: entityConfig.list.columns.filter(
+        (column) => column.id !== BRC_DATA_CATALOG_CATEGORY_KEY.SAVED
+      ),
+    },
+  };
+}
 
 /**
  * Make site config object.
@@ -58,8 +88,14 @@ export function makeConfig(
       url: "",
     },
     entities: [
-      organismEntityConfig as EntityConfig<BRCDataCatalogOrganism>,
-      genomeEntityConfig as EntityConfig<BRCDataCatalogGenome>,
+      withSavedColumnGated(
+        organismEntityConfig,
+        loginEnabled
+      ) as EntityConfig<BRCDataCatalogOrganism>,
+      withSavedColumnGated(
+        genomeEntityConfig,
+        loginEnabled
+      ) as EntityConfig<BRCDataCatalogGenome>,
       priorityPathogensEntityConfig as EntityConfig<Outbreak>,
       workflowEntityConfig as EntityConfig<WorkflowEntity>,
     ],

@@ -10,6 +10,14 @@ import {
 } from "@ga2/viewModelBuilders/viewModelBuilders";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 
+// buildOrganismHero in the BRC viewModelBuilders module now pulls in
+// FavoriteButton, which imports the real api-client at module scope -- and
+// that imports ky, an ESM-only package Jest can't parse. Stub api-client;
+// nothing in this suite calls it.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: {},
+}));
+
 describe("buildGenomeSpecies", () => {
   test("surfaces species, taxonomy id and all populated minor fields", () => {
     const genome = {
