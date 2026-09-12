@@ -94,6 +94,12 @@ class Settings:
         self.ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES: int = int(
             os.getenv("ASSISTANT_TURN_LOG_MAX_TRANSCRIPT_BYTES", "65536")
         )
+        # Conversation auto-save is awaited in the request too, so a hung
+        # database would delay a reply the user has already earned. Same shape
+        # and reasoning as the turn-log cap above.
+        self.ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS: float = float(
+            os.getenv("ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS", "2.0")
+        )
 
         # ENA API settings
         self.ENA_API_BASE: str = os.getenv(
