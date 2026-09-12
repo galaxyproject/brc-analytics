@@ -167,26 +167,128 @@ async def get_saved_analysis(
     return result.scalar_one_or_none()
 
 
-async def create_saved_analysis(
+async def _get_saved_analysis_by_session(
+    session: AsyncSession, user_id: uuid.UUID, source_session: str
+) -> SavedAnalysis | None:
+    """Takes an id, not a User: the retry path runs after a rollback, which
+    expires the ORM object and would turn `user.id` into a lazy load."""
+    return await session.scalar(
+        select(SavedAnalysis).where(
+            SavedAnalysis.user_id == user_id,
+            SavedAnalysis.source_session == source_session,
+        )
+    )
+
+
+async def _get_saved_analysis_by_id(
+    session: AsyncSession, user_id: uuid.UUID, saved_analysis_id: str
+) -> SavedAnalysis | None:
+    """Same user-id-not-User contract as the by-session lookup above."""
+    try:
+        saved_analysis_uuid = uuid.UUID(saved_analysis_id)
+    except ValueError:
+        return None
+
+    return await session.scalar(
+        select(SavedAnalysis).where(
+            SavedAnalysis.user_id == user_id,
+            SavedAnalysis.id == saved_analysis_uuid,
+        )
+    )
+
+
+async def upsert_saved_analysis(
     session: AsyncSession,
     user: User,
     *,
-    title: str | None,
-    schema: dict[str, Any],
+    agent_message_history: list[dict[str, Any]],
     messages: list[dict[str, Any]],
-    source_session: str | None,
+    saved_analysis_id: str | None = None,
+    schema: dict[str, Any],
+    source_session: str,
+    title: str,
 ) -> SavedAnalysis:
-    saved_analysis = SavedAnalysis(
-        user_id=user.id,
-        title=title,
-        schema=schema,
-        messages=messages,
-        source_session=source_session,
+    """Write this conversation's current state, creating the row once.
+
+    `saved_analysis_id` is the durable identity and wins when the session
+    knows it. `source_session` is only a pointer to the currently-live Redis
+    session, and reopening an analysis moves it -- so a session that resumed
+    an analysis must not fall back to the pointer, or opening the same
+    analysis on a second device would make each device insert its own row.
+
+    The title is only set on insert -- a user who renames an analysis must
+    not have it overwritten by the next turn.
+    """
+    if not source_session:
+        # NULLs compare distinct, so a missing key would match nothing on the
+        # SELECT and slip past the unique index -- a fresh row every turn
+        # rather than the loud failure you'd want.
+        raise ValueError("upsert_saved_analysis requires a source_session")
+
+    user_id = user.id
+    by_session = await _get_saved_analysis_by_session(session, user_id, source_session)
+    by_id = (
+        await _get_saved_analysis_by_id(session, user_id, saved_analysis_id)
+        if saved_analysis_id
+        else None
     )
-    session.add(saved_analysis)
+    existing = by_id or by_session
+    if existing is None:
+        created = SavedAnalysis(
+            agent_message_history=agent_message_history,
+            messages=messages,
+            schema=schema,
+            source_session=source_session,
+            title=title,
+            user_id=user_id,
+        )
+        session.add(created)
+        try:
+            await session.commit()
+        except IntegrityError:
+            # Race window: two turns of the same conversation land together,
+            # both SELECT nothing, and the unique index rejects the second.
+            # The caller is fail-open, so raising here would silently drop an
+            # auto-save. Recover onto the winner's row instead.
+            await session.rollback()
+            by_session = await _get_saved_analysis_by_session(
+                session, user_id, source_session
+            )
+            existing = by_session
+            if existing is None:
+                raise
+        else:
+            await session.refresh(created)
+            return created
+
+    existing.agent_message_history = agent_message_history
+    existing.messages = messages
+    existing.schema = schema
+    if existing.source_session != source_session and by_session in (None, existing):
+        # This session resumed the analysis, so point the row back at it. Only
+        # safe while no *other* row holds this session id -- the partial unique
+        # index on (user_id, source_session) would reject that, and a losing
+        # write here costs the user the turn's auto-save.
+        existing.source_session = source_session
     await session.commit()
-    await session.refresh(saved_analysis)
-    return saved_analysis
+    await session.refresh(existing)
+    return existing
+
+
+async def repoint_saved_analysis_session(
+    session: AsyncSession,
+    user: User,
+    saved_analysis_id: str,
+    source_session: str | None,
+) -> SavedAnalysis | None:
+    """Point an analysis at a freshly rehydrated Redis session."""
+    analysis = await get_saved_analysis(session, user, saved_analysis_id)
+    if analysis is None:
+        return None
+    analysis.source_session = source_session
+    await session.commit()
+    await session.refresh(analysis)
+    return analysis
 
 
 async def delete_saved_analysis(
