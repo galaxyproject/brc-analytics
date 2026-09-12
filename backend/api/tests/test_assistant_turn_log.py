@@ -824,7 +824,9 @@ async def test_a_broken_log_sink_does_not_cost_the_user_their_reply():
     def exploding_sink(_telemetry):
         raise RuntimeError("sink is down")
 
-    response, _ = await agent.chat_with_telemetry("hi", on_turn=exploding_sink)
+    response, _telemetry, _state = await agent.chat_with_telemetry(
+        "hi", on_turn=exploding_sink
+    )
 
     assert response.reply == "Ready to go."
 
