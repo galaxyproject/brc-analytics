@@ -5496,11 +5496,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -7380,11 +7380,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -42577,7 +42577,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_002572885.1/",
     "gcPercent": 47.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/572/885/GCA_002572885.1/genes/GCA_002572885.1_Emmon_parv_130.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 27837035,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -50129,11 +50129,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -50214,11 +50214,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -129257,11 +129257,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -149917,11 +149917,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -159110,11 +159110,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -218812,11 +218812,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -325440,11 +325440,11 @@
     "ncbiTaxonomyId": "30069",
     "otherNames": [
       "Asian malaria mosquito",
+      "Anopheles intermedius",
       "Anopheles mysorensis",
       "Anopheles stephensi mysorensis",
       "Anopheles stephensi var. mysorensis",
-      "Neocellia intermedia",
-      "Neocellia intermedia Rothwell, 1907"
+      "Neocellia intermedia"
     ],
     "otherTaxa": null,
     "ploidy": [
