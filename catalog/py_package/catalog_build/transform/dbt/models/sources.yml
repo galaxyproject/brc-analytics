@@ -96,12 +96,16 @@ sources:
         columns:
           - name: accession
             data_tests:
+              - unique:
+                  name: catalog_assemblies_unique_accessions
               - not_null:
                   name: catalog_assemblies_have_accessions
       - name: organisms
         columns:
           - name: taxonomy_id
             data_tests:
+              - unique:
+                  name: catalog_organisms_unique_tax_ids
               - not_null:
                   name: catalog_organisms_have_tax_ids
               - relationships:
@@ -134,6 +138,10 @@ sources:
         columns:
           - name: taxonomy_id
             data_tests:
+              - unique:
+                  name: catalog_outbreaks_unique_tax_ids
+                  config:
+                    enabled: "{{ var('has_outbreaks', false) }}"
               - not_null:
                   name: catalog_outbreaks_have_tax_ids
                   config:
