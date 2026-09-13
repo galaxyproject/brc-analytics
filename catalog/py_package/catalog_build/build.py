@@ -405,10 +405,14 @@ def report_missing_values(
     return missing_values
 
 
-def report_inconsistent_taxonomy_ids(df):
+def report_inconsistent_taxonomy_ids(df: pd.DataFrame):
     inconsistent_ids_series = (
-        df.groupby(["species", "strain"], dropna=False)
+        # Rows with missing species can't be reported on meaningfully
+        df.dropna(subset="species")
+        # Get species/strain combinations with multiple taxonomy IDs
+        .groupby(["species", "strain"], dropna=False)
         .filter(lambda g: g["taxonomyId"].nunique() > 1)
+        # Get taxonomy IDs for each group
         .groupby(["species", "strain"], dropna=False)["taxonomyId"]
         .apply(set)
     )
