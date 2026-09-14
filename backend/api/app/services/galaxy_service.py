@@ -351,9 +351,12 @@ class GalaxyService:
                 self.gi = GalaxyInstance(url=base_url, token=credential.secret)
             else:
                 self.gi = GalaxyInstance(url=base_url, key=credential.secret)
-            logger.info(
-                f"Galaxy service initialized ({credential.kind}) for URL: "
-                f"{self.settings.GALAXY_API_URL}"
+            # Debug, not info: the router builds one of these per request,
+            # status polls included.
+            logger.debug(
+                "Galaxy service initialized (%s) for URL: %s",
+                credential.kind,
+                self.settings.GALAXY_API_URL,
             )
 
         # Memoized per instance, so a history id never leaks across requests/users.
@@ -1279,9 +1282,9 @@ class GalaxyService:
             # this backend also serves the assistant and MCP, and blocking the
             # event loop on a Galaxy round-trip stalls all of them.
             job_data = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
-
-            # Debug: log the full job data response
-            logger.info(f"BioBLEND job {job_id} full response: {job_data}")
+            # Debug, not info: every open search polls this every three
+            # seconds, and the job dict carries the tool's parameters.
+            logger.debug("Galaxy job %s full response: %s", job_id, job_data)
 
             state = job_data["state"]
             status = GalaxyJobStatus(
@@ -1299,10 +1302,12 @@ class GalaxyService:
                 params=job_data.get("params"),
             )
 
-            # Debug: log state changes
-            logger.info(
-                f"BioBLEND Job {job_id} current state: {job_data['state']}, "
-                f"complete: {status.is_complete}, successful: {status.is_successful}"
+            logger.debug(
+                "Galaxy job %s state: %s, complete: %s, successful: %s",
+                job_id,
+                state,
+                status.is_complete,
+                status.is_successful,
             )
 
             # Only a successful job's outputs are ever read. A paused one isn't

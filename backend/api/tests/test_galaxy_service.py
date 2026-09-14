@@ -179,6 +179,17 @@ class TestJobStatusStates:
         assert status.is_complete and status.outputs == []
         service.gi.datasets.show_dataset.assert_not_called()
 
+    @pytest.mark.asyncio
+    async def test_a_status_poll_logs_nothing_at_info(self, service, caplog):
+        # Every search polls every three seconds, and the job dict carries the
+        # tool's parameters.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job("running"))
+
+        with caplog.at_level(logging.INFO, logger="app.services.galaxy_service"):
+            await service.get_job_status("job1")
+
+        assert not [r for r in caplog.records if r.levelno >= logging.INFO]
+
 
 class TestAggregateRefusesEmptyOutputs:
     """A successful kmindex job always writes shards; zero means we misread."""
