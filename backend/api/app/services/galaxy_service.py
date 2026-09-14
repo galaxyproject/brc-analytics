@@ -6,7 +6,7 @@ import json
 import logging
 import random
 import time
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import List, Optional, Tuple
 
 from bioblend import ConnectionError as BioblendConnectionError
@@ -160,6 +160,15 @@ KMINDEX_ORDER_CACHE_PREFIX = "galaxy:kmindex_order:v1"
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
 _AGGREGATION_LOCK = asyncio.Lock()
+
+# Finding or creating the history jobs land in is a read-then-write against
+# Galaxy, and the router builds a GalaxyService per request, so the per-instance
+# memo cannot stop two first submissions each finding nothing and each creating
+# one. The lock is per Galaxy account -- the user's sub, or None for the service
+# account -- because that's the scope of the race, and bioblend sets no request
+# timeout, so one shared lock would let a single hung get_histories hold up every
+# account's submissions.
+_HISTORY_LOCKS = defaultdict(asyncio.Lock)
 
 
 def _tie_break(accession: str) -> str:
@@ -1593,48 +1602,53 @@ class GalaxyService:
         """
         if self.credential is not None and self.credential.kind == "user":
             shared_history_name = "BRC Logan Search"
+            account = self.credential.user_sub
         else:
             shared_history_name = "BRC ANALYTICS JOBS"
+            account = None
 
         if self._shared_history_id:
             return self._shared_history_id
 
-        try:
-            # Get all histories using BioBLEND
-            histories = await asyncio.to_thread(self.gi.histories.get_histories)
+        async with _HISTORY_LOCKS[account]:
+            try:
+                # Get all histories using BioBLEND
+                histories = await asyncio.to_thread(self.gi.histories.get_histories)
 
-            # Look for existing shared history
-            for history in histories:
-                if history.get("name") == shared_history_name:
-                    history_id = history["id"]
-                    logger.info(
-                        "Using existing shared history: "
-                        f"{history_id} ({shared_history_name})"
-                    )
-                    self._shared_history_id = history_id
-                    return history_id
+                # Look for existing shared history
+                for history in histories:
+                    if history.get("name") == shared_history_name:
+                        history_id = history["id"]
+                        logger.info(
+                            "Using existing shared history: "
+                            f"{history_id} ({shared_history_name})"
+                        )
+                        self._shared_history_id = history_id
+                        return history_id
 
-            # If we get here, the shared history doesn't exist, so create it
-            logger.info(f"Creating new shared history: {shared_history_name}")
-            new_history = await asyncio.to_thread(
-                self.gi.histories.create_history, name=shared_history_name
-            )
-            history_id = new_history["id"]
-            logger.info(f"Created shared history: {history_id} ({shared_history_name})")
-            self._shared_history_id = history_id
-            return history_id
+                # If we get here, the shared history doesn't exist, so create it
+                logger.info(f"Creating new shared history: {shared_history_name}")
+                new_history = await asyncio.to_thread(
+                    self.gi.histories.create_history, name=shared_history_name
+                )
+                history_id = new_history["id"]
+                logger.info(
+                    f"Created shared history: {history_id} ({shared_history_name})"
+                )
+                self._shared_history_id = history_id
+                return history_id
 
-        except Exception as e:
-            logger.error(f"Error getting or creating shared history: {e}")
-            if self.credential is not None and self.credential.kind == "user":
-                # Never litter someone's own account with timestamped strays
-                # over a transient blip, and let an unlinked 401 travel intact
-                # to the connect-prompt mapping instead of dying here.
-                raise
-            # Fallback to creating a new history with timestamp
-            fallback_name = f"{shared_history_name} - {int(time.time())}"
-            logger.warning(f"Falling back to creating history: {fallback_name}")
-            fallback_history = await asyncio.to_thread(
-                self.gi.histories.create_history, name=fallback_name
-            )
-            return fallback_history["id"]
+            except Exception as e:
+                logger.error(f"Error getting or creating shared history: {e}")
+                if self.credential is not None and self.credential.kind == "user":
+                    # Never litter someone's own account with timestamped strays
+                    # over a transient blip, and let an unlinked 401 travel
+                    # intact to the connect-prompt mapping instead of dying here.
+                    raise
+                # Fallback to creating a new history with timestamp
+                fallback_name = f"{shared_history_name} - {int(time.time())}"
+                logger.warning(f"Falling back to creating history: {fallback_name}")
+                fallback_history = await asyncio.to_thread(
+                    self.gi.histories.create_history, name=fallback_name
+                )
+                return fallback_history["id"]

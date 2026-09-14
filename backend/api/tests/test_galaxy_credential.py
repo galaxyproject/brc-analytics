@@ -1,13 +1,18 @@
 """Credential resolution: user bearer wins, service key is the anonymous
 fallback, and GalaxyService passes each to bioblend the right way."""
 
+import asyncio
 import json
+import threading
+import time
+from collections import defaultdict
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from app.core.dependencies import get_galaxy_credential
 from app.core.galaxy_credential import GalaxyCredential
+from app.services import galaxy_service
 from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
 
 # Verbatim from galaxy/lib/galaxy/authnz/managers.py -- the two 401s we have
@@ -171,6 +176,73 @@ async def test_service_jobs_keep_shared_history_name():
     svc.gi.histories.create_history = MagicMock(return_value={"id": "h2"})
     await svc._get_or_create_shared_history()
     svc.gi.histories.create_history.assert_called_once_with(name="BRC ANALYTICS JOBS")
+
+
+@pytest.mark.asyncio
+async def test_concurrent_first_submissions_create_one_shared_history(monkeypatch):
+    # The router builds a GalaxyService per request, so the per-instance memo
+    # can't stop two first submissions each finding nothing and each creating
+    # the history.
+    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
+    histories = []
+
+    def get_histories():
+        snapshot = list(histories)
+        # Widen the gap between the read and the write it decides.
+        time.sleep(0.05)
+        return snapshot
+
+    def create_history(name):
+        history = {"id": f"h{len(histories)}", "name": name}
+        histories.append(history)
+        return history
+
+    services = []
+    for _ in range(2):
+        with patch("app.services.galaxy_service.GalaxyInstance"):
+            svc = GalaxyService(
+                MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
+            )
+        svc.gi = MagicMock()
+        svc.gi.histories.get_histories = MagicMock(side_effect=get_histories)
+        svc.gi.histories.create_history = MagicMock(side_effect=create_history)
+        services.append(svc)
+
+    ids = await asyncio.gather(*(s._get_or_create_shared_history() for s in services))
+
+    assert len(histories) == 1
+    assert ids[0] == ids[1]
+
+
+@pytest.mark.asyncio
+async def test_one_account_stuck_on_galaxy_does_not_hold_up_another(monkeypatch):
+    # bioblend sets no request timeout, so a hung get_histories can hold its
+    # lock indefinitely; that has to stay one account's problem.
+    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
+    release = threading.Event()
+
+    def user_service(sub, get_histories):
+        with patch("app.services.galaxy_service.GalaxyInstance"):
+            svc = GalaxyService(
+                MagicMock(),
+                credential=GalaxyCredential(kind="user", secret="tok", user_sub=sub),
+            )
+        svc.gi = MagicMock()
+        svc.gi.histories.get_histories = MagicMock(side_effect=get_histories)
+        svc.gi.histories.create_history = MagicMock(return_value={"id": sub})
+        return svc
+
+    stuck = user_service("u1", lambda: release.wait(5) and [])
+    free = user_service("u2", lambda: [])
+
+    stuck_task = asyncio.create_task(stuck._get_or_create_shared_history())
+    # Let the stuck lookup take its lock before the other one asks.
+    await asyncio.sleep(0.05)
+    try:
+        assert await asyncio.wait_for(free._get_or_create_shared_history(), 1) == "u2"
+    finally:
+        release.set()
+        await stuck_task
 
 
 def test_galaxy_login_url_derives_from_api_url(monkeypatch):
