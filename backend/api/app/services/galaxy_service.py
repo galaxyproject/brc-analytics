@@ -664,24 +664,28 @@ class GalaxyService:
         if not self._mirror_can(CAPABILITY_ANNOTATION):
             return None, "score", "desc"
 
+        # A permutation only fits the listing it was built over, and the listing
+        # under one job id can change while a day-long permutation is still
+        # cached: a partial aggregate lives an hour, and the one that replaces
+        # it can hold different accessions at the same length -- both capped at
+        # KMINDEX_MAX_HITS, say. A length check can't see that, and the stale
+        # permutation would silently misorder every page, so the listing itself
+        # goes in the key.
+        listing = hashlib.sha256(
+            "\n".join(h["accession"] for h in hits).encode()
+        ).hexdigest()
         key = self.cache.make_key(
             KMINDEX_ORDER_CACHE_PREFIX,
             {
                 "job_id": job_id,
+                "listing": listing,
                 "mirror": self.sra_mirror.capability_fingerprint(),
                 "order": order,
                 "sort": sort,
             },
         )
         cached = await self.cache.get(key)
-        # A permutation only fits the listing it was built over, and the two are
-        # cached separately under keys that cannot tell them apart: an
-        # aggregation that lost shards is served uncached and is shorter than
-        # the one that follows it, and a job whose threshold could not be read
-        # keeps hits the next aggregation drops. Length is the check available,
-        # and indexing the hits with a stale permutation would 500 every page
-        # of the job for the rest of the day.
-        if cached is not None and len(cached) == len(hits):
+        if cached is not None:
             return list(cached), sort, order
         try:
             ordering = await asyncio.to_thread(

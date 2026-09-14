@@ -2392,11 +2392,13 @@ class TestHitOrdering:
         service.cache.set.assert_awaited_once_with(
             "order-key", [2, 0, 1], CacheTTL.ONE_DAY
         )
-        # The key is scoped to the job, the mirror and the sort, so a rebuilt
-        # mirror or another column cannot serve this permutation.
+        # The key is scoped to the job, the listing, the mirror and the sort, so
+        # a re-aggregated listing, a rebuilt mirror or another column cannot
+        # serve this permutation.
         key_args = service.cache.make_key.call_args.args
         assert key_args[0] == KMINDEX_ORDER_CACHE_PREFIX
-        assert key_args[1] == {
+        assert set(key_args[1]) == {"job_id", "listing", "mirror", "order", "sort"}
+        assert {k: v for k, v in key_args[1].items() if k != "listing"} == {
             "job_id": "job1",
             "mirror": "fp",
             "order": "asc",
@@ -2419,23 +2421,39 @@ class TestHitOrdering:
         service.sra_mirror.order_hits.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_an_ordering_built_over_a_different_listing_is_rebuilt(self, service):
-        # An aggregation that lost shards is shorter and is never cached, so
-        # the next full one can meet a permutation from it. Indexing 5 hits
-        # with positions from a 2-hit listing is an IndexError on every page.
+    async def test_an_ordering_is_never_read_back_against_another_listing(
+        self, service
+    ):
+        # A partial aggregate is cached for an hour, and the one that replaces
+        # it can hold different accessions at the same length -- both capped at
+        # 50,000, say. A permutation from the first would silently misorder
+        # the second, so the second has to miss and be ordered afresh.
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: json.dumps(
+                [prefix, params], sort_keys=True
+            )
+        )
+        service.cache.get = AsyncMock(side_effect=store.get)
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
         service.sra_mirror = MagicMock()
         service.sra_mirror.is_available.return_value = True
         service.sra_mirror.has_capability.return_value = True
         service.sra_mirror.capability_fingerprint.return_value = "fp"
-        service.sra_mirror.order_hits.return_value = [4, 3, 2, 1, 0]
-        service.cache.get = AsyncMock(return_value=[1, 0])
+        service.sra_mirror.order_hits.side_effect = [[2, 0, 1], [1, 2, 0]]
+        first = _listing(3)
+        second = _listing(3)
+        second["hits"][0]["accession"] = "ERR999999"
 
-        ordering, _, _ = await service._ordering_for(
-            _listing(5), "job1", "organism", "asc"
-        )
+        await service._ordering_for(first, "job1", "organism", "asc")
+        ordering, _, _ = await service._ordering_for(second, "job1", "organism", "asc")
+        again, _, _ = await service._ordering_for(first, "job1", "organism", "asc")
 
-        assert ordering == [4, 3, 2, 1, 0]
-        service.sra_mirror.order_hits.assert_called_once()
+        assert ordering == [1, 2, 0]
+        assert again == [2, 0, 1]
+        assert service.sra_mirror.order_hits.call_count == 2
 
     @pytest.mark.asyncio
     async def test_no_mirror_falls_back_to_score_and_says_so(self, service):
