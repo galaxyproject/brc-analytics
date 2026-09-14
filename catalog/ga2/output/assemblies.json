@@ -38539,7 +38539,7 @@
       "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Golden_Mantella_%28Mantella_aurantiaca%29%2C_Torotorofotsy_wetlands%2C_Madagascar_%2811352840145%29.jpg",
       "url": "/organism_image/Mantella_aurantiaca_1024x1024.jpg"
     },
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 3319283846,
     "level": "Chromosome",
     "lineageTaxonomyIds": [
@@ -38612,7 +38612,7 @@
       "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Golden_Mantella_%28Mantella_aurantiaca%29%2C_Torotorofotsy_wetlands%2C_Madagascar_%2811352840145%29.jpg",
       "url": "/organism_image/Mantella_aurantiaca_1024x1024.jpg"
     },
-    "isRef": "No",
+    "isRef": "Yes",
     "length": 3336091145,
     "level": "Chromosome",
     "lineageTaxonomyIds": [

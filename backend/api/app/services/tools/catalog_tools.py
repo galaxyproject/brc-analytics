@@ -142,11 +142,15 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     (list); a range = two predicates (gte + lte).
 
     Filter by scientific name via taxonomicLevelSpecies, a clade via the matching
-    rank column (e.g. taxonomicLevelGenus). otherNames is a list field holding
-    every non-scientific name for a taxon, including prior scientific names, so
-    contains/contains_any on it finds an organism under a superseded name. When a
-    list comes back truncated, state the total and offer to narrow rather than
-    paging.
+    rank column (e.g. taxonomicLevelGenus). otherNames is a list field of
+    non-scientific names, including prior scientific names, so
+    contains/contains_any on it finds an organism under a superseded name. On an
+    organism row, these are aggregated from the organism's assemblies, and may include
+    infraspecific names, depending on the assemblies present; on an assembly row they
+    include the assembly taxon's own names, as well as names inherited from ancestors
+    up to and including species, so don't report an assembly's otherNames entry as a
+    name of its strain — it may belong to the species. When a list comes back
+    truncated, state the total and offer to narrow rather than paging.
 
     Args:
         query: the structured catalog query
