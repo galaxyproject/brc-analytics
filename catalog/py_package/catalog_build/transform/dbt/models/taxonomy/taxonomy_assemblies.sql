@@ -1,18 +1,20 @@
 {{ config(materialized="table") }}
 
-with species_cutoff as (
+with lineage as (
 
     /*
       `other_names` draws on the query taxon and every ancestor up to and
       including species, so a strain's assemblies are findable by the species'
       common names. A query taxon at or above species rank has no species
-      ancestor below it, so `coalesce(..., 0)` falls back to the query taxon.
+      ancestor below it, so the fallback depth of 0 keeps just the query taxon.
     */
     select
-        query_tax_id,
-        coalesce(max(depth) filter (rank = 'species'), 0) as species_depth
+        *,
+        coalesce(
+            max(depth) filter (rank = 'species') over (partition by query_tax_id),
+            0
+        ) as species_depth
     from {{ ref("taxonomy_lineages_with_names") }}
-    group by query_tax_id
 
 ),
 
@@ -29,12 +31,11 @@ grouped as (
         -- Nearest taxon first; within a taxon the name-class order set by
         -- `taxonomy_lineages_with_names` is preserved.
         flatten(
-            list(l.other_names order by l.depth, l.tax_id)
-            filter (l.depth <= c.species_depth)
+            list(l.other_names order by l.depth)
+            filter (l.depth <= l.species_depth)
         ) as all_other_names
     from {{ source("catalog_source", "assembly_taxa") }} t
-    join {{ ref("taxonomy_lineages_with_names") }} l on l.query_tax_id = t.taxonomy_id
-    join species_cutoff c on c.query_tax_id = t.taxonomy_id
+    join lineage l on l.query_tax_id = t.taxonomy_id
     group by t.taxonomy_id
 
 )
