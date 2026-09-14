@@ -1,7 +1,7 @@
 """Galaxy API integration models."""
 
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, computed_field, field_validator
 
@@ -9,18 +9,55 @@ from app.services.logan_stats import ani_estimate
 
 
 class GalaxyJobState(str, Enum):
-    """Galaxy job states as defined in the API."""
+    """Galaxy job states, as galaxy.schema.schema.JobState defines them."""
 
     NEW = "new"
+    RESUBMITTED = "resubmitted"
     UPLOAD = "upload"
     WAITING = "waiting"
     QUEUED = "queued"
     RUNNING = "running"
     OK = "ok"
     ERROR = "error"
+    FAILED = "failed"
     PAUSED = "paused"
+    DELETING = "deleting"
     DELETED = "deleted"
+    STOPPING = "stop"
+    STOPPED = "stopped"
+    SKIPPED = "skipped"
+    # Only reported by older Galaxy releases.
     DELETED_NEW = "deleted_new"
+
+
+# States a job will not leave without someone stepping in, so there is nothing
+# left to poll for: Galaxy's Job.is_terminal, plus FAILED (set alongside
+# erroring every output) and the older DELETED_NEW. PAUSED is here although a
+# user can resume it -- nobody resumes an anonymous search, and polling one
+# forever is the worse failure.
+TERMINAL_JOB_STATES = frozenset(
+    {
+        GalaxyJobState.OK,
+        GalaxyJobState.ERROR,
+        GalaxyJobState.FAILED,
+        GalaxyJobState.PAUSED,
+        GalaxyJobState.DELETED,
+        GalaxyJobState.DELETED_NEW,
+        GalaxyJobState.STOPPED,
+        GalaxyJobState.SKIPPED,
+    }
+)
+
+# The subset that will not change at all -- Galaxy's Job.terminal_states -- and
+# so is safe to answer from cache. A paused job can still be resumed.
+SETTLED_JOB_STATES = frozenset(
+    {
+        GalaxyJobState.OK,
+        GalaxyJobState.ERROR,
+        GalaxyJobState.DELETED,
+        GalaxyJobState.DELETED_NEW,
+    }
+)
 
 
 class GalaxyJobSubmission(BaseModel):
@@ -498,7 +535,9 @@ class GalaxyJobStatus(BaseModel):
     """Status response for a Galaxy job."""
 
     job_id: str
-    state: GalaxyJobState
+    # A Galaxy newer than the enum can report a state it doesn't list, and that
+    # should read as "not finished yet" rather than fail every status poll.
+    state: Union[GalaxyJobState, str] = Field(union_mode="left_to_right")
     created_time: str
     updated_time: str
     is_complete: bool = Field(

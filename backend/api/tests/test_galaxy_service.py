@@ -91,6 +91,95 @@ class TestJobOutputsFailFast:
             await service._get_job_outputs("job1")
 
 
+class TestJobStatusStates:
+    """Which Galaxy states end polling, which are cached, and what an unknown
+    one does."""
+
+    @staticmethod
+    def _job(state):
+        return {"create_time": "t0", "outputs": {}, "state": state, "update_time": "t1"}
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "state", ["paused", "stopped", "skipped", "failed", "deleted_new"]
+    )
+    async def test_a_job_that_will_not_progress_ends_polling_as_a_failure(
+        self, service, state
+    ):
+        # Left out of is_complete, the results endpoint answers 202 for good
+        # and the page polls every three seconds forever.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
+
+        status = await service.get_job_status("job1")
+
+        assert status.is_complete and not status.is_successful
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "state", ["new", "resubmitted", "queued", "running", "deleting", "stop"]
+    )
+    async def test_a_job_still_moving_keeps_polling(self, service, state):
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
+
+        status = await service.get_job_status("job1")
+
+        assert not status.is_complete
+
+    @pytest.mark.asyncio
+    async def test_a_state_the_enum_does_not_list_is_not_a_500(self, service):
+        service.gi.jobs.show_job = MagicMock(
+            return_value=self._job("some_future_state")
+        )
+
+        status = await service.get_job_status("job1")
+
+        assert status.state == "some_future_state"
+        assert not status.is_complete
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("state", ["ok", "error", "deleted"])
+    async def test_a_settled_status_is_served_from_cache(self, service, state):
+        service.cache.get = AsyncMock(
+            return_value={
+                "created_time": "t0",
+                "is_complete": True,
+                "is_successful": state == "ok",
+                "job_id": "job1",
+                "state": state,
+                "updated_time": "t1",
+            }
+        )
+        service.gi.jobs.show_job = MagicMock()
+
+        status = await service.get_job_status("job1")
+
+        assert status.state == state
+        service.gi.jobs.show_job.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_is_not_cached_because_it_can_be_resumed(self, service):
+        service.gi.jobs.show_job = MagicMock(return_value=self._job("paused"))
+
+        await service.get_job_status("job1")
+
+        service.cache.set.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_only_a_successful_job_fetches_its_outputs(self, service):
+        # Nothing reads a failed job's outputs, and a paused one isn't cached,
+        # so fetching them would repeat on every poll -- and one failed
+        # show_dataset would 500 the status and restart the polling.
+        job = self._job("paused")
+        job["outputs"] = {"out0": {"id": "ds0"}}
+        service.gi.jobs.show_job = MagicMock(return_value=job)
+        service.gi.datasets.show_dataset = MagicMock(side_effect=RuntimeError("429"))
+
+        status = await service.get_job_status("job1")
+
+        assert status.is_complete and status.outputs == []
+        service.gi.datasets.show_dataset.assert_not_called()
+
+
 class TestAggregateRefusesEmptyOutputs:
     """A successful kmindex job always writes shards; zero means we misread."""
 

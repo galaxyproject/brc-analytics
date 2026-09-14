@@ -16,6 +16,8 @@ from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
+    SETTLED_JOB_STATES,
+    TERMINAL_JOB_STATES,
     GalaxyDataset,
     GalaxyJobOutput,
     GalaxyJobResponse,
@@ -1269,8 +1271,7 @@ class GalaxyService:
         cache_key = self.cache.make_key("galaxy:job_status", {"job_id": job_id})
         cached_status = await self.cache.get(cache_key)
 
-        if cached_status and cached_status.get("state") in ["ok", "error"]:
-            # Job is complete, return cached result
+        if cached_status and cached_status.get("state") in SETTLED_JOB_STATES:
             return GalaxyJobStatus(**cached_status)
 
         try:
@@ -1282,14 +1283,14 @@ class GalaxyService:
             # Debug: log the full job data response
             logger.info(f"BioBLEND job {job_id} full response: {job_data}")
 
-            # Parse job status
+            state = job_data["state"]
             status = GalaxyJobStatus(
                 job_id=job_id,
-                state=GalaxyJobState(job_data["state"]),
+                state=state,
                 created_time=job_data["create_time"],
                 updated_time=job_data["update_time"],
-                is_complete=job_data["state"] in ["ok", "error", "deleted"],
-                is_successful=job_data["state"] == "ok",
+                is_complete=state in TERMINAL_JOB_STATES,
+                is_successful=state == GalaxyJobState.OK,
                 stdout=job_data.get("stdout"),
                 stderr=job_data.get("stderr"),
                 exit_code=job_data.get("exit_code"),
@@ -1304,11 +1305,14 @@ class GalaxyService:
                 f"complete: {status.is_complete}, successful: {status.is_successful}"
             )
 
-            # If job is complete, get outputs. Hand over the job dict already
-            # fetched above rather than making _get_job_outputs re-fetch it.
-            if status.is_complete:
+            # Only a successful job's outputs are ever read. A paused one isn't
+            # cached, so fetching them there would repeat a show_dataset per
+            # output on every poll, and one failed fetch would 500 the status.
+            # Hand over the job dict already fetched above rather than making
+            # _get_job_outputs re-fetch it.
+            if status.is_successful:
                 status.outputs = await self._get_job_outputs(job_id, job_data)
-                # Cache completed job status for 1 hour
+            if state in SETTLED_JOB_STATES:
                 await self.cache.set(cache_key, status.model_dump(), CacheTTL.ONE_HOUR)
 
             return status
