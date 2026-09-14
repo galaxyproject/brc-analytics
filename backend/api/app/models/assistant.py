@@ -4,6 +4,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from app.models.logan import LoganContext
+
 
 class FieldStatus(str, Enum):
     """Status of a field in the analysis schema."""
@@ -161,6 +163,10 @@ class ChatResponse(BaseModel):
         description="URL to the workflow stepper, set when is_complete is True",
     )
     token_usage: Optional[TokenUsage] = None
+    logan: Optional[LoganContext] = Field(
+        default=None,
+        description="Set when the session was opened from a Logan search",
+    )
 
 
 class TurnOutcome(str, Enum):
@@ -227,6 +233,10 @@ class SessionRestoreResponse(BaseModel):
     suggestions: List[SuggestionChip] = Field(default_factory=list)
     is_complete: bool = False
     handoff_url: Optional[str] = None
+    logan: Optional[LoganContext] = Field(
+        default=None,
+        description="Set when the session was opened from a Logan search",
+    )
 
 
 class AssistantInfoResponse(BaseModel):

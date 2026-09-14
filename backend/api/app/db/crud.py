@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import (
     AssistantTurnLog,
     Favorite,
+    GalaxyJob,
     SavedAnalysis,
     User,
     WorkflowRun,
@@ -259,6 +260,28 @@ async def create_assistant_turn_log(
     # back and the factory sets expire_on_commit=False, so a re-SELECT on every
     # turn buys nothing.
     return turn_log
+
+
+async def create_galaxy_job(
+    session: AsyncSession,
+    *,
+    user_id: uuid.UUID,
+    galaxy_job_id: str,
+    galaxy_instance_url: str,
+    tool: str,
+    params: dict | None = None,
+) -> GalaxyJob:
+    """Record ownership of a Galaxy job. Caller commits."""
+    job = GalaxyJob(
+        galaxy_instance_url=galaxy_instance_url,
+        galaxy_job_id=galaxy_job_id,
+        params=params or {},
+        tool=tool,
+        user_id=user_id,
+    )
+    session.add(job)
+    await session.flush()
+    return job
 
 
 async def purge_assistant_turn_logs_before(

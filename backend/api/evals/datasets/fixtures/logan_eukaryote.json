@@ -1,0 +1,478 @@
+{
+  "job_id": "fe6f66a714dcbec8",
+  "query_name": "Plasmodium_falciparum_18S",
+  "results_url": "/logan-search?job=fe6f66a714dcbec8",
+  "total_matches": 17629,
+  "total_hits": 17629,
+  "truncated": false,
+  "shards_searched": 35,
+  "shards_with_hits": 17,
+  "shards_failed": 0,
+  "per_index": [
+    {
+      "hits_after_cap": 17629,
+      "hits_before_cap": 17629,
+      "index": "GENOMIC_INV"
+    }
+  ],
+  "cohort": {
+    "bioprojects": 399,
+    "countries": 42,
+    "facets": [
+      {
+        "name": "assay_type",
+        "other": 1821,
+        "unknown": 0,
+        "values": [
+          {
+            "count": 14929,
+            "value": "WGS"
+          },
+          {
+            "count": 879,
+            "value": "WGA"
+          }
+        ]
+      },
+      {
+        "name": "platform",
+        "other": 141,
+        "unknown": 0,
+        "values": [
+          {
+            "count": 17432,
+            "value": "ILLUMINA"
+          },
+          {
+            "count": 56,
+            "value": "PACBIO_SMRT"
+          }
+        ]
+      },
+      {
+        "name": "librarylayout",
+        "other": 0,
+        "unknown": 0,
+        "values": [
+          {
+            "count": 17130,
+            "value": "PAIRED"
+          },
+          {
+            "count": 499,
+            "value": "SINGLE"
+          }
+        ]
+      },
+      {
+        "name": "instrument",
+        "other": 10903,
+        "unknown": 4,
+        "values": [
+          {
+            "count": 6722,
+            "value": "Illumina HiSeq 2000"
+          }
+        ]
+      },
+      {
+        "name": "country",
+        "other": 2175,
+        "unknown": 14240,
+        "values": [
+          {
+            "count": 754,
+            "value": "Malawi"
+          },
+          {
+            "count": 460,
+            "value": "Mozambique"
+          }
+        ]
+      },
+      {
+        "name": "release_year",
+        "other": 14637,
+        "unknown": 0,
+        "values": [
+          {
+            "count": 2992,
+            "value": "2014"
+          }
+        ]
+      }
+    ],
+    "in_mirror": 17629,
+    "organisms": 191,
+    "studies": 404,
+    "top_organisms": [
+      {
+        "count": 14473,
+        "value": "Plasmodium falciparum"
+      },
+      {
+        "count": 1823,
+        "value": "Plasmodium falciparum 3D7"
+      },
+      {
+        "count": 397,
+        "value": "human blood metagenome"
+      }
+    ],
+    "total": 17629
+  },
+  "sra_mirror_available": true,
+  "top_hits": [
+    {
+      "rank": 1,
+      "accession": "ERR662077",
+      "score": 1.0,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 2,
+      "accession": "SRR7590703",
+      "score": 0.99,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": "Malawi",
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 3,
+      "accession": "ERR450106",
+      "score": 0.98,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 4,
+      "accession": "ERR072010",
+      "score": 0.97,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 5,
+      "accession": "ERR426114",
+      "score": 0.96,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 6,
+      "accession": "ERR019045",
+      "score": 0.95,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 7,
+      "accession": "SRR8487146",
+      "score": 0.94,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 8,
+      "accession": "ERR2789127",
+      "score": 0.93,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": "Mozambique",
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 9,
+      "accession": "ERR1912410",
+      "score": 0.92,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 10,
+      "accession": "SRR3502909",
+      "score": 0.91,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 11,
+      "accession": "ERR161721",
+      "score": 0.9,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 12,
+      "accession": "ERR1081237",
+      "score": 0.89,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 13,
+      "accession": "SRR5989637",
+      "score": 0.88,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 14,
+      "accession": "ERR2679528",
+      "score": 0.87,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 15,
+      "accession": "ERR022854",
+      "score": 0.86,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 16,
+      "accession": "SRR7182377",
+      "score": 0.85,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 17,
+      "accession": "ERR3506490",
+      "score": 0.84,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 18,
+      "accession": "ERR1218383",
+      "score": 0.83,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 19,
+      "accession": "SRR5507118",
+      "score": 0.82,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 20,
+      "accession": "ERR268051",
+      "score": 0.81,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 21,
+      "accession": "ERR945302",
+      "score": 0.8,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 22,
+      "accession": "SRR9024306",
+      "score": 0.79,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 23,
+      "accession": "ERR1149275",
+      "score": 0.78,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 24,
+      "accession": "ERR2678846",
+      "score": 0.77,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    },
+    {
+      "rank": 25,
+      "accession": "SRR6768787",
+      "score": 0.76,
+      "organism": "Plasmodium falciparum",
+      "platform": "ILLUMINA",
+      "assay_type": "WGS",
+      "library_layout": "PAIRED",
+      "instrument": "Illumina HiSeq 2000",
+      "country": null,
+      "release_date": "2014-10-29",
+      "bioproject": "PRJEB2136",
+      "study": "ERP000190"
+    }
+  ],
+  "captured_at": "2026-08-24T15:00:00Z"
+}

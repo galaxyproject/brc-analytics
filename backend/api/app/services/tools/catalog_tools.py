@@ -11,6 +11,7 @@ from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_query import CatalogQuery, execute
 
 if TYPE_CHECKING:
+    from app.services.galaxy_service import GalaxyService
     from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,10 @@ class AssistantDeps:
     catalog: CatalogData
     sra_mirror: Optional["SRAMirrorService"] = None
     con: Any = None  # in-process DuckDB connection for query_catalog (optional)
+    galaxy: Optional["GalaxyService"] = None
+    # The session's Logan snapshot (LoganSnapshot as a dict), when the
+    # conversation was opened from a search. Rendered into instructions.
+    logan: Optional[dict] = None
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:

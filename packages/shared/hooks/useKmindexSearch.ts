@@ -1,0 +1,747 @@
+import { API_BASE_URL } from "@repo/shared/config/api";
+import ky, { HTTPError, TimeoutError } from "ky";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export interface SraRunMetadata {
+  assay_type: string | null;
+  bioproject: string | null;
+  country: string | null;
+  instrument: string | null;
+  library_layout: string | null;
+  mbases: number | null;
+  organism: string | null;
+  platform: string | null;
+  release_date: string | null;
+  study: string | null;
+}
+
+export interface KmindexHit {
+  accession: string;
+  // Mash Screen ANI estimate, score ** (1/31) to four places. Null when the
+  // corrected score went negative; optional because a backend predating the
+  // statistic omits it.
+  ani?: number | null;
+  // False-positive baseline subtracted from the raw kmindex ratio for one of
+  // the 227 saturated samples Logan flags; the raw ratio is score +
+  // fp_correction. Absent or null when no correction applied.
+  fp_correction?: number | null;
+  // Fraction of the query's k-mers found in the run, after the correction
+  // above when one applies.
+  score: number;
+  shard: string;
+  sra: SraRunMetadata | null;
+}
+
+export interface KmindexIndexSummary {
+  hits_after_cap: number;
+  hits_before_cap: number;
+  index: string;
+}
+
+export interface KmindexFacetValue {
+  count: number;
+  value: string;
+}
+
+export interface KmindexFacet {
+  // Column the facet was counted over: assay_type | platform | librarylayout
+  // | instrument | country | release_year.
+  name: string;
+  // Matched rows whose value fell outside `values`, i.e. the tail.
+  other: number;
+  // Matched rows with no value for this facet. Non-zero for country in
+  // particular, where over a fifth of SRA has no usable geography.
+  unknown: number;
+  values: KmindexFacetValue[];
+}
+
+// Summary of the FULL pre-cap match set, computed server-side before the hit
+// list is truncated. The listed hits are the top of a global score sort, and
+// the top of the score range over-represents whatever is common there, so
+// anything tallied from them disagrees with these counts -- on the measured
+// job, Escherichia coli 70.2% against a true Salmonella enterica 29.2%.
+export interface KmindexCohort {
+  bioprojects: number;
+  countries: number;
+  facets: KmindexFacet[];
+  // Matched rows the SRA mirror knows; facet and organism counts are over
+  // these, not over `total`.
+  in_mirror: number;
+  organisms: number;
+  studies: number;
+  // Counts only -- organism has too many distinct values to facet.
+  top_organisms: KmindexFacetValue[];
+  // Equals total_matches on KmindexResults.
+  total: number;
+}
+
+// One country the map can actually draw.
+export interface KmindexGeographyCountry {
+  count: number;
+  // ISO 3166-1 alpha-3.
+  iso_a3: string;
+  // ISO 3166-1 numeric, zero-padded. THIS is what the choropleth joins on:
+  // world-110m keys its features by numeric id, so a join on iso_a3 matches
+  // nothing and renders an empty map with no error.
+  iso_n3: string;
+  // Canonical name, not the raw SRA string -- several of those share a code
+  // (Gaza Strip and West Bank are both PSE) and the rollup is keyed by code.
+  value: string;
+}
+
+// One coordinate the cohort was sampled at, aggregated over every matched run
+// recorded there. This is kmviz's HitsPerLocation preset computed over the
+// whole match set rather than joined back onto each result row.
+export interface KmindexGeographyLocation {
+  // Mean kmindex score over the runs at this point. Null only if none of them
+  // carried a score.
+  avg_score: number | null;
+  lat: number;
+  lon: number;
+  // Matched runs recorded here. A point is N runs, not one accession, which
+  // is why nothing on hover names a run.
+  n: number;
+}
+
+// Where the FULL pre-cap match set was sampled from, computed server-side
+// alongside the cohort. `countries`, `unmapped_countries` and `unknown`
+// partition the matched runs and sum to `in_mirror`, which is what lets the
+// card state its own denominator instead of implying one.
+export interface KmindexGeography {
+  // Every drawable country in the match set, largest first. Not a top ten.
+  countries: KmindexGeographyCountry[];
+  // Matched runs the mirror knows; every count here is out of this.
+  in_mirror: number;
+  // Runs carrying a usable coordinate. Its own denominator against
+  // `in_mirror`, NOT a share of `recorded`: a run can have a country and a
+  // position, a country and none, or a position with no country.
+  located?: number | null;
+  // Distinct sampling coordinates, largest first. Null when the mirror
+  // predates the coordinate columns -- a fact about our deployment; an empty
+  // array means the cohort genuinely has none.
+  locations?: KmindexGeographyLocation[] | null;
+  // Decimal places the coordinates above were rounded to in order to fit, or
+  // null if they were left alone. 3 is ~110 m, 2 ~1.1 km, 1 ~11 km.
+  locations_precision?: number | null;
+  // Distinct coordinates at that precision before the cap.
+  locations_total?: number | null;
+  // Runs at coordinates past the cap, i.e. drawn nowhere. Rounding merges
+  // points and keeps every run; this is the concession that actually loses
+  // data, so it is stated separately.
+  locations_truncated?: number | null;
+  // Runs with a usable country, whether or not it can be placed on the map.
+  recorded: number;
+  // Runs with no country recorded at all. Over four fifths of the reference
+  // cohort, and the single most important number on the card.
+  unknown: number;
+  // Recorded countries the map cannot place, by raw SRA value: either not a
+  // country (Borneo) or a country with no shape at 1:110m (Hong Kong,
+  // Singapore). Displayed as a count, never dropped.
+  unmapped_countries: KmindexFacetValue[];
+}
+
+// Whether a search's full match set can be downloaded, and when it cannot,
+// why. "too_large" is a property of the query -- it matched more rows than
+// are worth materializing -- and the only one of the two a reader can act
+// on; "unavailable" is everything on our side, from an unconfigured mirror
+// to a file that has since been swept.
+export type KmindexExportStatus = "available" | "too_large" | "unavailable";
+
+export interface KmindexResults {
+  // Optional because a backend predating the cohort summary omits it entirely,
+  // as does a job whose SRA mirror was unavailable.
+  cohort?: KmindexCohort | null;
+  // Size on disk of the downloadable export, which is the parquet download
+  // byte for byte; the TSV rendering is produced on request and is ~10x
+  // larger. Null unless export_status is "available".
+  export_bytes?: number | null;
+  // Rows in that export: every hit before the cap, so this tracks
+  // total_matches rather than the capped total_hits. Null unless
+  // export_status is "available".
+  export_rows?: number | null;
+  // Whether the enriched full match set can be downloaded from
+  // .../jobs/{job_id}/export, and when it cannot, why. The file is
+  // materialized once during aggregation while the pre-cap hit list is still
+  // alive, so "unavailable" is not something asking again fixes -- the mirror
+  // or export directory is unconfigured, or the file has since been swept.
+  // Optional for the same reason cohort is: a backend predating the export
+  // omits it entirely.
+  export_status?: KmindexExportStatus;
+  // Absent on a backend predating the map, on a job whose mirror was
+  // unavailable, and on one whose mirror predates the columns the geography
+  // query needs -- geography closes on its own so the rest of the mirror
+  // keeps serving. Absent is not the same as "no geography recorded", which
+  // is `recorded === 0`.
+  geography?: KmindexGeography | null;
+  hits: KmindexHit[];
+  job_id: string;
+  limit: number;
+  offset: number;
+  // Direction of the applied sort below.
+  order?: KmindexSortOrder;
+  per_index: KmindexIndexSummary[];
+  query_name: string | null;
+  shards_failed: number;
+  shards_searched: number;
+  shards_with_hits: number;
+  // The sort the backend actually applied -- score when a metadata sort was
+  // asked for and the mirror could not answer -- so the header state follows
+  // what is on screen rather than what was clicked. Both this and `order` are
+  // optional because a backend predating the sort omits them.
+  sort?: KmindexSortColumn;
+  sra_annotated: number;
+  sra_mirror_available: boolean;
+  // Pageable rows, i.e. what survived the cap. Paging math stays on this.
+  total_hits: number;
+  // Rows the search actually matched, before the cap; equals total_hits when
+  // truncated is false.
+  total_matches: number;
+  truncated: boolean;
+}
+
+export interface KmindexJobStatus {
+  is_complete: boolean;
+  is_successful: boolean;
+  job_id: string;
+  state: string;
+  stderr?: string;
+}
+
+export interface KmindexSubmission {
+  indexes: string[];
+  sequence: string;
+  threshold: number;
+  zvalue: number;
+}
+
+interface KmindexSearchState {
+  error: string | null;
+  // Which Galaxy account the running search was submitted under: "user" for
+  // the signed-in visitor's own, "service" for the shared BRC account. Null
+  // until a submission answers -- a job reattached from ?job= never learns it.
+  identity: string | null;
+  indexes: string[];
+  isLoadingIndexes: boolean;
+  isLoadingResults: boolean;
+  isSubmitting: boolean;
+  jobId: string | null;
+  jobStatus: KmindexJobStatus | null;
+  // These mirror the refs, i.e. what the next request will send: the value a
+  // setter asked for between the call and its response, and the last landed
+  // page otherwise. The component reads the applied pair off `results.limit`
+  // and `appliedSort(results)` and has to keep doing so -- a header wired to
+  // `sort` here would light a column the server may never have sorted by.
+  pageSize: number;
+  results: KmindexResults | null;
+  sort: KmindexSort;
+}
+
+interface KmindexSearchActions {
+  goToPage: (offset: number) => Promise<void>;
+  reset: () => void;
+  setPageSize: (size: number) => Promise<void>;
+  setSort: (column: KmindexSortColumn) => Promise<void>;
+  submit: (submission: KmindexSubmission) => Promise<void>;
+}
+
+export type KmindexSortColumn =
+  | "score"
+  | "accession"
+  | "organism"
+  | "platform"
+  | "country"
+  | "release_date";
+export type KmindexSortOrder = "asc" | "desc";
+
+export interface KmindexSort {
+  column: KmindexSortColumn;
+  order: KmindexSortOrder;
+}
+
+const POLLING_INTERVAL = 3000;
+// Merging the shards of a search that fanned out over many indexes runs well
+// past the 300 s this request and dev's nginx both give up at. The backend
+// finishes the merge regardless and caches what it got, so asking again is
+// how the page finds out -- there is no push and nothing else to wait on. The
+// budget mirrors the hour the backend keeps a partial aggregate and its
+// still-merging marker, so a merge that never lands ends in a sentence rather
+// than a spinner nobody is coming back to.
+const RESULTS_RETRY_INTERVAL_MS = 15000;
+const RESULTS_MERGE_BUDGET_MS = 60 * 60 * 1000;
+// Gateway statuses the proxy invents when it stops waiting on the backend.
+// The merge is still running behind them, so they mean "ask again" rather
+// than "this job is broken".
+const MERGING_STATUSES = new Set([502, 503, 504]);
+export const PAGE_SIZE = 25;
+// 1000 is the API's ceiling; three sizes is the picker.
+export const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
+export const DEFAULT_SORT: KmindexSort = { column: "score", order: "desc" };
+
+/**
+ * The direction a column is first sorted in: scores high to low, text and
+ * dates A to Z and old to new.
+ * @param column - Column being sorted.
+ * @returns The initial direction.
+ */
+export function defaultOrder(column: KmindexSortColumn): KmindexSortOrder {
+  return column === "score" ? "desc" : "asc";
+}
+
+/**
+ * The sort a response says it applied. A response predating the field sorted
+ * by score and said nothing, which is what the lit header shows.
+ * @param results - A landed results page.
+ * @returns The applied column and direction.
+ */
+export function appliedSort(results: KmindexResults): KmindexSort {
+  return {
+    column: results.sort ?? DEFAULT_SORT.column,
+    order: results.order ?? DEFAULT_SORT.order,
+  };
+}
+
+const INITIAL_STATE: KmindexSearchState = {
+  error: null,
+  identity: null,
+  indexes: [],
+  isLoadingIndexes: true,
+  isLoadingResults: false,
+  isSubmitting: false,
+  jobId: null,
+  jobStatus: null,
+  pageSize: PAGE_SIZE,
+  results: null,
+  sort: DEFAULT_SORT,
+};
+
+/**
+ * Pull a readable message out of a ky HTTPError, falling back to its status.
+ * @param error - Error thrown by ky.
+ * @param fallback - Message to use when nothing better is available.
+ * @returns Human-readable error message.
+ */
+async function toErrorMessage(
+  error: unknown,
+  fallback: string
+): Promise<string> {
+  if (error && typeof error === "object" && "response" in error) {
+    const { response } = error as {
+      response: { json: () => Promise<{ detail?: string }>; status: number };
+    };
+    try {
+      const body = await response.json();
+      return body.detail || `HTTP ${response.status}`;
+    } catch {
+      return `HTTP ${response.status}`;
+    }
+  }
+  if (error instanceof Error) return error.message;
+  return fallback;
+}
+
+/**
+ * Whether a failed results request means the merge is still running.
+ * @param error - Error thrown by ky.
+ * @returns True when the page should ask again rather than raise a banner.
+ */
+function isStillMerging(error: unknown): boolean {
+  if (error instanceof TimeoutError) return true;
+  return (
+    error instanceof HTTPError && MERGING_STATUSES.has(error.response.status)
+  );
+}
+
+/**
+ * Put the running job in the URL, or clear it.
+ *
+ * replaceState rather than pushState: successive searches shouldn't stack up
+ * as history entries the Back button walks through one at a time.
+ * @param jobId - Galaxy job id to record, or null to drop the parameter.
+ */
+function syncJobParam(jobId: string | null): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (jobId) {
+    url.searchParams.set("job", jobId);
+  } else {
+    url.searchParams.delete("job");
+  }
+  window.history.replaceState(null, "", url);
+}
+
+/**
+ * Drives a Logan/kmindex sequence search: lists the available indexes, submits
+ * a FASTA query, polls the resulting Galaxy job, and pages through the merged
+ * hits once it completes.
+ * @returns Search state and actions.
+ */
+export const useKmindexSearch = (): KmindexSearchActions &
+  KmindexSearchState => {
+  const [state, setState] = useState<KmindexSearchState>(INITIAL_STATE);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  // A poll tick already in flight when the job completes can fire a second
+  // first-page fetch. Cold aggregation is expensive, so make sure only one
+  // wins per job.
+  const fetchedRef = useRef<string | null>(null);
+  // Polling and the ?job= reattach fetch results from callbacks created
+  // before the user picked a size or a sort; refs let them read the current
+  // choice without re-arming the interval on every change.
+  const pageSizeRef = useRef(PAGE_SIZE);
+  const sortRef = useRef<KmindexSort>(DEFAULT_SORT);
+  // The last page that landed, whichever request brought it back. It is what
+  // the paginator and the headers are drawn from, so it is also what a failed
+  // request has to leave the refs agreeing with.
+  const resultsRef = useRef<KmindexResults | null>(null);
+  // Number of the newest results request. Nothing is disabled while a request
+  // is out, so requests overlap, and only the newest may touch state: a stale
+  // success would put an older page over a newer one, and a stale failure
+  // would raise a banner for a request already superseded.
+  const requestSeqRef = useRef(0);
+  // When this job was first seen to be still merging. It bounds the retries
+  // below, so a merge that never finishes ends in a message; null means the
+  // last thing we heard was an answer rather than "not yet".
+  const mergeStartedRef = useRef<number | null>(null);
+  // A scheduled re-ask of the results endpoint, held so it can be dropped
+  // when the page leaves the job it belongs to, or when a newer request
+  // supersedes the one that booked it.
+  const retryRef = useRef<NodeJS.Timeout | null>(null);
+  // Holds fetchResults for the re-ask it schedules; see the effect below it.
+  const fetchResultsRef = useRef<
+    ((jobId: string, offset: number) => Promise<void>) | null
+  >(null);
+
+  const stopPolling = useCallback((): void => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    // A pending re-ask is the same kind of scheduled work as the poll tick and
+    // belongs to the same job, so it goes the same way. submit and reset both
+    // come through here.
+    if (retryRef.current) {
+      clearTimeout(retryRef.current);
+      retryRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    ky.get(`${API_BASE_URL}/galaxy/kmindex/indexes`, {
+      credentials: "include",
+      timeout: 120000,
+    })
+      .json<{ count: number; indexes: string[] }>()
+      .then(({ indexes }) => {
+        if (!cancelled)
+          setState((prev) => ({ ...prev, indexes, isLoadingIndexes: false }));
+      })
+      .catch(async (error: unknown) => {
+        const message = await toErrorMessage(error, "Failed to load indexes");
+        if (!cancelled)
+          setState((prev) => ({
+            ...prev,
+            error: message,
+            isLoadingIndexes: false,
+          }));
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => stopPolling, [stopPolling]);
+
+  const fetchResults = useCallback(
+    async (jobId: string, offset: number): Promise<void> => {
+      // The newest request owns the booking, the same invariant requestSeqRef
+      // states for responses: a booking left unheld fires for a job nobody is
+      // waiting on any more, and nothing can clear it.
+      if (retryRef.current) {
+        clearTimeout(retryRef.current);
+        retryRef.current = null;
+      }
+      const seq = ++requestSeqRef.current;
+      const { column, order } = sortRef.current;
+      setState((prev) => ({ ...prev, isLoadingResults: true }));
+
+      /**
+       * Raise the banner, leaving the refs agreeing with what is on screen.
+       * @param message - What to tell the reader.
+       */
+      const failWith = (message: string): void => {
+        // The refs are what the next request sends; the response is what the
+        // paginator and the lit header show. This is the newest request and it
+        // brought nothing back, so nothing else is coming to reconcile the
+        // two: put the refs back on whatever last landed. Nothing landed yet
+        // means there is nothing on screen to disagree with.
+        const landed = resultsRef.current;
+        if (landed) {
+          pageSizeRef.current = landed.limit;
+          sortRef.current = appliedSort(landed);
+        }
+        setState((prev) => ({
+          ...prev,
+          error: message,
+          isLoadingResults: false,
+          pageSize: pageSizeRef.current,
+          sort: sortRef.current,
+        }));
+      };
+
+      /**
+       * Ask again shortly, unless this job has been merging past the budget.
+       * @returns The message to fail with, or null once a retry is booked.
+       */
+      const keepAsking = (): string | null => {
+        mergeStartedRef.current ??= Date.now();
+        if (Date.now() - mergeStartedRef.current > RESULTS_MERGE_BUDGET_MS) {
+          mergeStartedRef.current = null;
+          return "Results are still being merged after an hour. Reload later to try again.";
+        }
+        retryRef.current = setTimeout(() => {
+          retryRef.current = null;
+          // A fresh call rather than this one resumed: the re-ask takes its
+          // own sequence number, so a submit or a reset in the meantime
+          // invalidates it exactly the way it invalidates a request in
+          // flight. Reusing `seq` would let a superseded job's page land.
+          const askAgain = fetchResultsRef.current;
+          if (askAgain) void askAgain(jobId, offset);
+        }, RESULTS_RETRY_INTERVAL_MS);
+        return null;
+      };
+
+      try {
+        // The Response first, not .json(): the backend answers 202 with a
+        // {detail} body while another request is still merging this job's
+        // shards, ky does not throw on it, and parsing that body as a results
+        // page would hand the table hits and counts that are not there.
+        const response = await ky.get(
+          `${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`,
+          {
+            credentials: "include",
+            searchParams: {
+              limit: pageSizeRef.current,
+              offset,
+              order,
+              sort: column,
+            },
+            // Cold aggregation pulls every shard from Galaxy; the warm path
+            // returns from cache in milliseconds.
+            timeout: 300000,
+          }
+        );
+        if (seq !== requestSeqRef.current) return;
+        if (response.status === 202) {
+          const expired = keepAsking();
+          if (expired) failWith(expired);
+          return;
+        }
+        const results = await response.json<KmindexResults>();
+        if (seq !== requestSeqRef.current) return;
+        mergeStartedRef.current = null;
+        resultsRef.current = results;
+        // The refs follow what landed, not what was asked for: a metadata sort
+        // the mirror could not answer comes back as score order, and paging on
+        // should stay in the order on screen rather than ask for the fallback
+        // again every page.
+        pageSizeRef.current = results.limit;
+        sortRef.current = appliedSort(results);
+        setState((prev) => ({
+          ...prev,
+          isLoadingResults: false,
+          pageSize: pageSizeRef.current,
+          results,
+          sort: sortRef.current,
+        }));
+      } catch (error: unknown) {
+        if (seq !== requestSeqRef.current) return;
+        // A merge that outlives this request's own timeout, or the proxy's,
+        // arrives here looking like a failure. The backend is still working.
+        if (isStillMerging(error)) {
+          const expired = keepAsking();
+          if (expired) failWith(expired);
+          return;
+        }
+        mergeStartedRef.current = null;
+        failWith(await toErrorMessage(error, "Failed to load results"));
+      }
+    },
+    []
+  );
+
+  // What the scheduled re-ask calls. fetchResults is stable, so this lands
+  // once on mount, long before any results request can be out; going through
+  // the ref is only how the retry, which is written inside fetchResults,
+  // reaches the binding fetchResults is on its way to being assigned to.
+  useEffect(() => {
+    fetchResultsRef.current = fetchResults;
+  }, [fetchResults]);
+
+  const startPolling = useCallback(
+    (jobId: string): void => {
+      stopPolling();
+      pollRef.current = setInterval(async () => {
+        try {
+          const status = await ky
+            .get(`${API_BASE_URL}/galaxy/jobs/${jobId}/status`, {
+              credentials: "include",
+              timeout: 30000,
+            })
+            .json<KmindexJobStatus>();
+          setState((prev) => ({ ...prev, jobStatus: status }));
+
+          if (status.is_complete) {
+            stopPolling();
+            if (status.is_successful) {
+              if (fetchedRef.current === jobId) return;
+              fetchedRef.current = jobId;
+              await fetchResults(jobId, 0);
+            } else {
+              setState((prev) => ({
+                ...prev,
+                error: `Job ${status.state}${
+                  status.stderr ? `: ${status.stderr.slice(0, 500)}` : ""
+                }`,
+              }));
+            }
+          }
+        } catch (error: unknown) {
+          const message = await toErrorMessage(error, "Lost track of the job");
+          setState((prev) => ({ ...prev, error: message }));
+        }
+      }, POLLING_INTERVAL);
+    },
+    [fetchResults, stopPolling]
+  );
+
+  // Reattach to a job named in the URL (?job=<galaxy job id>). A search can
+  // outlive its page by a long way -- Vista queues have run past 40 minutes --
+  // so the job id needs to be shareable and survive a reload. Polling handles
+  // both cases: still running, or finished and ready to page.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const jobId = new URLSearchParams(window.location.search).get("job");
+    if (!jobId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setState((prev) => ({ ...prev, jobId }));
+    startPolling(jobId);
+    // Mount only -- re-running this would restart polling on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only reattach
+  }, []);
+
+  const submit = useCallback(
+    async (submission: KmindexSubmission): Promise<void> => {
+      stopPolling();
+      fetchedRef.current = null;
+      resultsRef.current = null;
+      requestSeqRef.current += 1;
+      // The budget is per job: a new one must not inherit the clock of the
+      // search it replaced, or its first 202 would already be an hour late.
+      mergeStartedRef.current = null;
+      // A new query is ranked afresh, so it starts in score order. The page
+      // size is the reader's preference rather than the query's and stays.
+      sortRef.current = DEFAULT_SORT;
+      setState((prev) => ({
+        ...prev,
+        error: null,
+        identity: null,
+        // A fetch still out belongs to the old job and is now ignored, so
+        // nothing else is coming to turn the spinner off.
+        isLoadingResults: false,
+        isSubmitting: true,
+        jobId: null,
+        jobStatus: null,
+        results: null,
+        sort: DEFAULT_SORT,
+      }));
+
+      try {
+        const { identity, job_id } = await ky
+          .post(`${API_BASE_URL}/galaxy/kmindex/submit`, {
+            credentials: "include",
+            json: submission,
+            timeout: 120000,
+          })
+          .json<{ identity?: string | null; job_id: string }>();
+
+        setState((prev) => ({
+          ...prev,
+          identity: identity ?? null,
+          isSubmitting: false,
+          jobId: job_id,
+        }));
+        syncJobParam(job_id);
+        startPolling(job_id);
+      } catch (error: unknown) {
+        const message = await toErrorMessage(error, "Failed to submit query");
+        setState((prev) => ({ ...prev, error: message, isSubmitting: false }));
+      }
+    },
+    [startPolling, stopPolling]
+  );
+
+  const goToPage = useCallback(
+    async (offset: number): Promise<void> => {
+      if (!state.jobId) return;
+      await fetchResults(state.jobId, offset);
+    },
+    [fetchResults, state.jobId]
+  );
+
+  const setPageSize = useCallback(
+    async (size: number): Promise<void> => {
+      pageSizeRef.current = size;
+      setState((prev) => ({ ...prev, pageSize: size }));
+      if (!state.jobId) return;
+      // Back to the first page: an offset chosen at one size is a different
+      // row at another.
+      await fetchResults(state.jobId, 0);
+    },
+    [fetchResults, state.jobId]
+  );
+
+  const setSort = useCallback(
+    async (column: KmindexSortColumn): Promise<void> => {
+      // Flip against the sort the response says was applied, not the one that
+      // was requested: when the mirror cannot answer a metadata sort the
+      // backend serves score order and echoes that, and the lit header follows
+      // the echo, so toggling the request would hand the reader a direction
+      // they never saw. With nothing landed there is no header to flip against
+      // and the request is the best we know.
+      const current: KmindexSort = state.results
+        ? appliedSort(state.results)
+        : sortRef.current;
+      const next: KmindexSort =
+        current.column === column
+          ? { column, order: current.order === "asc" ? "desc" : "asc" }
+          : { column, order: defaultOrder(column) };
+      sortRef.current = next;
+      setState((prev) => ({ ...prev, sort: next }));
+      if (!state.jobId) return;
+      // Re-sorting re-ranks the whole listing, so page two of the old order
+      // names nothing in the new one.
+      await fetchResults(state.jobId, 0);
+    },
+    [fetchResults, state.jobId, state.results]
+  );
+
+  const reset = useCallback((): void => {
+    stopPolling();
+    fetchedRef.current = null;
+    resultsRef.current = null;
+    requestSeqRef.current += 1;
+    mergeStartedRef.current = null;
+    pageSizeRef.current = PAGE_SIZE;
+    sortRef.current = DEFAULT_SORT;
+    syncJobParam(null);
+    setState((prev) => ({
+      ...INITIAL_STATE,
+      indexes: prev.indexes,
+      isLoadingIndexes: false,
+    }));
+  }, [stopPolling]);
+
+  return { ...state, goToPage, reset, setPageSize, setSort, submit };
+};
