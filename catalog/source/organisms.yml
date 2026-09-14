@@ -101,8 +101,6 @@ organisms:
   - taxonomy_id: 562
     ploidy:
       - HAPLOID
-    other_names:
-      - E. coli
   - taxonomy_id: 573
     ploidy:
       - HAPLOID
@@ -6025,8 +6023,6 @@ organisms:
   - taxonomy_id: 3052230
     ploidy:
       - HAPLOID
-    other_names:
-      - HCV
   - taxonomy_id: 3052236
     ploidy:
       - HAPLOID
@@ -6100,7 +6096,6 @@ organisms:
     ploidy:
       - HAPLOID
     other_names:
-      - Ebola
       - EBOV
   - taxonomy_id: 3052464
     ploidy:
