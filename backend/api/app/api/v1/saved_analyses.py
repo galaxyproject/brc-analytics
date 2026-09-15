@@ -107,6 +107,12 @@ async def open_saved_analysis(
         # later reopen elsewhere cannot orphan it.
         restored_state.saved_analysis_id = durable_id
         await agent.session_service.save_session(restored_state)
+    else:
+        # Reading a session leaves its TTL alone, so one handed back minutes
+        # from expiry would lapse before the next turn and fork the analysis
+        # (#1691). Touch rather than re-save: writing back the copy read above
+        # could clobber a turn another device has committed since.
+        await agent.session_service.touch_session(restored_state.session_id)
     # Bind the session to this browser so the frontend can hydrate computed
     # handoff state from GET /assistant/session/{id}.
     set_session_cookie(response, restored_state.session_id)

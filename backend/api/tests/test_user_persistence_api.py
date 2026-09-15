@@ -36,6 +36,10 @@ from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 class FakeSessionService:
     def __init__(self):
         self.sessions: dict[str, SessionState] = {}
+        self.touched: list[str] = []
+
+    async def touch_session(self, session_id: str) -> None:
+        self.touched.append(session_id)
 
     async def require_session(
         self, session_id: str, owner_keycloak_sub: str | None
@@ -467,6 +471,21 @@ def test_open_reuses_the_live_session(persistence_client):
     listed = client.get("/api/v1/saved_analyses").json()
     assert len(listed) == 1
     assert listed[0]["source_session"] == session_id
+
+
+def test_open_resets_the_ttl_of_a_reused_session(persistence_client):
+    """Reading a session leaves its TTL alone, so a reused one could be handed
+    back minutes from expiry and lapse before the user's next turn."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+    assert opened.status_code == 200, opened.text
+
+    assert agent.session_service.touched == [session_id]
 
 
 def test_autosave_carries_the_analysis_id_onto_the_session(persistence_client):
