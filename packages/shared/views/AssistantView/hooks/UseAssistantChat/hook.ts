@@ -1,4 +1,4 @@
-import { apiClient } from "@repo/shared/services/api-client/api-client";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
@@ -11,6 +11,23 @@ import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// A save that failed for one of these will fail the same way next time: the
+// deployment cannot save at all, there is nothing to save, the session is not
+// ours, or it is gone. Anything else -- a network drop, a 500 -- is worth
+// another attempt when the effect next runs.
+const PERMANENT_SAVE_FAILURES = new Set([403, 404, 409, 501]);
+
+/**
+ * Whether a failed save is worth attempting again.
+ * @param error - Rejection from the save request.
+ * @returns true when a later attempt could succeed.
+ */
+function isRetryableSaveFailure(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } })?.response
+    ?.status;
+  return status === undefined || !PERMANENT_SAVE_FAILURES.has(status);
+}
+
 interface ChatMessageDisplay {
   content: string;
   role: "user" | "assistant";
@@ -21,14 +38,12 @@ interface UseAssistantChatReturn {
   handoffUrl: string | null;
   isComplete: boolean;
   isRestoring: boolean;
+  isSaved: boolean;
   loading: boolean;
   logan: LoganContext | null;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
-  saveAnalysis: () => Promise<void>;
-  saveLoading: boolean;
-  saveMessage: string | null;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   suggestions: SuggestionChip[];
@@ -54,7 +69,7 @@ interface UseAssistantChatOptions {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, sendMessage, save/reset/retry functions.
+ * @returns Chat state, sendMessage, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -66,6 +81,7 @@ export const useAssistantChat = ({
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
   const [logan, setLogan] = useState<LoganContext | null>(null);
   const [loading, setLoading] = useState(false);
@@ -74,8 +90,6 @@ export const useAssistantChat = ({
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
     null
   );
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
   const initialMessageSentRef = useRef(false);
@@ -83,7 +97,9 @@ export const useAssistantChat = ({
   // ?loganJob= param re-renders the page without it, which would otherwise
   // re-arm the restore effect against the id we just wrote.
   const loganOpenedRef = useRef(false);
+  const saveAttemptRef = useRef<string | null>(null);
   const router = useRouter();
+  const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
   // A question of whitespace is no question: it would neither be asked nor
   // leave the conversation it displaced restorable.
   const question = initialMessage?.trim();
@@ -130,6 +146,10 @@ export const useAssistantChat = ({
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
         setLogan(restored.logan ?? null);
+        // Whether this is already on disk is the server's to answer. Inferring
+        // it from auth state instead would re-save every signed-in session on
+        // every mount just to find out.
+        setIsSaved(restored.saved);
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -217,6 +237,51 @@ export const useAssistantChat = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- router is stable for the life of the page; listing it would re-run this effect on every shallow replace, including the one it performs itself
   }, [initialLoganJobId, sessionKey]);
 
+  // Auto-save rides on chat turns, which leaves the sign-in case uncovered:
+  // someone who signed in *because* we offered to keep this conversation has
+  // not sent a turn since, so nothing has been written and the session dies
+  // with its two-hour TTL. Claim and persist it as soon as we know who they
+  // are -- and only let the UI call it saved once that has come back.
+  useEffect(() => {
+    if (!isConfigured || isAuthLoading || !isAuthenticated) return;
+    // A turn in flight is about to save this itself, and mid-send the
+    // messages already include the user's line with no reply yet.
+    if (isSaved || isRestoring || loading) return;
+    const sessionId = sessionIdRef.current;
+    if (!sessionId || messages.length === 0) return;
+    // Once per session. Without this, a deployment that cannot save at all
+    // (no database configured) would fire a doomed request every turn.
+    if (saveAttemptRef.current === sessionId) return;
+    saveAttemptRef.current = sessionId;
+
+    let cancelled = false;
+    assistantAPIClient
+      .assistantSaveSession(sessionId)
+      .then(() => {
+        if (!cancelled) setIsSaved(true);
+      })
+      .catch((error: unknown) => {
+        // The label stays off, which is the honest reading. But the latch was
+        // set before the request went out, so leaving it set after a failure
+        // that a retry could fix means this session is never saved again --
+        // and this effect exists for the user who signs in to keep what is on
+        // screen and then sends nothing more.
+        if (isRetryableSaveFailure(error)) saveAttemptRef.current = null;
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [
+    isAuthLoading,
+    isAuthenticated,
+    isConfigured,
+    isRestoring,
+    isSaved,
+    loading,
+    messages.length,
+  ]);
+
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
       if (!message.trim() || sendingRef.current) return;
@@ -225,7 +290,6 @@ export const useAssistantChat = ({
       setLoading(true);
       setError(null);
       setLastFailedMessage(null);
-      setSaveMessage(null);
 
       // Add user message immediately for responsiveness
       setMessages((prev) => [...prev, { content: message, role: "user" }]);
@@ -251,6 +315,10 @@ export const useAssistantChat = ({
         setIsComplete(response.is_complete);
         setHandoffUrl(response.handoff_url);
         setLogan(response.logan ?? null);
+        // Latched, not mirrored: a later turn whose write fails does not
+        // un-save the turns already on disk, and flickering the label would
+        // say something worse than either state on its own.
+        if (response.saved) setIsSaved(true);
       } catch (err) {
         const errorMessage = handleChatError(err);
         setError(errorMessage);
@@ -317,46 +385,24 @@ export const useAssistantChat = ({
     setSchema(null);
     setSuggestions([]);
     setIsComplete(false);
+    setIsSaved(false);
     setHandoffUrl(null);
     setLogan(null);
     setError(null);
     setLastFailedMessage(null);
-    setSaveMessage(null);
   }, [router, sessionKey]);
-
-  const saveAnalysis = useCallback(async (): Promise<void> => {
-    if (!sessionIdRef.current) {
-      setSaveMessage("There is no active assistant session to save.");
-      return;
-    }
-
-    setSaveLoading(true);
-    setSaveMessage(null);
-    try {
-      const savedAnalysis = await apiClient.saveAnalysis(sessionIdRef.current);
-      setSaveMessage(
-        savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
-      );
-    } catch {
-      setSaveMessage("Failed to save this analysis.");
-    } finally {
-      setSaveLoading(false);
-    }
-  }, []);
 
   return {
     error,
     handoffUrl,
     isComplete,
     isRestoring,
+    isSaved,
     loading,
     logan,
     messages,
     onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
-    saveAnalysis,
-    saveLoading,
-    saveMessage,
     schema,
     sendMessage,
     suggestions,

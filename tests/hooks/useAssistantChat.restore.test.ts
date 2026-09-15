@@ -25,12 +25,6 @@ jest.mock("next/router", () => ({
     replace: mockReplace,
   }),
 }));
-// Keeps ESM-only ky out of the jest module graph, which it enters through the
-// shared client the hook imports for saved analyses.
-jest.mock("@repo/shared/services/api-client/api-client", () => ({
-  apiClient: { saveAnalysis: jest.fn() },
-}));
-
 const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
 
 const SESSION_KEY = "brc-assistant-session-id";

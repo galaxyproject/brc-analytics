@@ -134,9 +134,9 @@ def test_orm_json_columns_match_what_the_migrations_create():
         for column in table.c
         if "JSON" in column.type.compile(postgresql.dialect()).upper()
     ]
-    # Seven today. The assertion is the shape, not the number, but a count of
+    # Eight today. The assertion is the shape, not the number, but a count of
     # zero would pass every check below while testing nothing.
-    assert len(json_columns) == 7
+    assert len(json_columns) == 8
 
     for name, column in json_columns:
         where = f"{name}.{column.name}"

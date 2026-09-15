@@ -23,13 +23,11 @@ interface ChatPanelProps {
   error: string | null;
   introText: string;
   isRestoring?: boolean;
+  isSaved: boolean;
   loading: boolean;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
-  onSave: () => void;
   onSend: (message: string) => void;
-  saveLabel: string | null;
-  saveLoading: boolean;
   suggestions: SuggestionChip[];
 }
 
@@ -39,13 +37,11 @@ interface ChatPanelProps {
  * @param props.error - Error message to display
  * @param props.introText - Welcome/intro text shown before any messages
  * @param props.isRestoring - Whether a previous session is being restored
+ * @param props.isSaved - Whether the backend has confirmed this conversation is persisted
  * @param props.loading - Whether the assistant is processing
  * @param props.messages - Chat message history
  * @param props.onRetry - Callback to retry the last failed request
- * @param props.onSave - Callback to save the current chat
  * @param props.onSend - Callback to send a message
- * @param props.saveLabel - Save status message
- * @param props.saveLoading - Whether a save request is in flight
  * @param props.suggestions - Suggestion chips to display
  * @returns Chat panel element
  */
@@ -53,13 +49,11 @@ export const ChatPanel = ({
   error,
   introText,
   isRestoring,
+  isSaved,
   loading,
   messages,
   onRetry,
-  onSave,
   onSend,
-  saveLabel,
-  saveLoading,
   suggestions,
 }: ChatPanelProps): JSX.Element => {
   const {
@@ -97,21 +91,6 @@ export const ChatPanel = ({
   };
 
   const inputDisabled = loading || !!isRestoring;
-
-  const handleSave = (): void => {
-    if (isConfigured && !isAuthLoading && !isAuthenticated) {
-      login();
-      return;
-    }
-    onSave();
-  };
-
-  let saveButtonLabel = "Save";
-  if (saveLoading) {
-    saveButtonLabel = "Saving...";
-  } else if (isConfigured && !isAuthenticated) {
-    saveButtonLabel = "Sign In to Save";
-  }
 
   return (
     <ChatContainer>
@@ -172,15 +151,26 @@ export const ChatPanel = ({
       />
 
       <InputRow>
-        <Button
-          disabled={
-            loading || saveLoading || messages.length === 0 || isAuthLoading
-          }
-          onClick={handleSave}
-          variant="outlined"
-        >
-          {saveButtonLabel}
-        </Button>
+        {/* Driven by the backend telling us it wrote the row, not by being
+        signed in with messages on screen. Signing in does not itself save
+        anything, so inferring it here told users their conversation was kept
+        moments before its session expired. */}
+        {isSaved && (
+          <Typography color="text.secondary" variant="caption">
+            Saved to your account
+          </Typography>
+        )}
+        {/* Not while auth is still resolving: AuthProvider starts signed-out,
+        and the restore call can beat /auth/me, which would offer to save a
+        conversation that is already being saved. */}
+        {isConfigured &&
+          !isAuthLoading &&
+          !isAuthenticated &&
+          messages.length >= 2 && (
+            <Button onClick={login} size="small" variant="text">
+              Sign in to keep this conversation
+            </Button>
+          )}
         <TextField
           disabled={inputDisabled}
           fullWidth
@@ -200,13 +190,6 @@ export const ChatPanel = ({
           Send
         </Button>
       </InputRow>
-      {saveLabel && (
-        <Box sx={{ pb: 2, px: 2 }}>
-          <Typography color="text.secondary" variant="body2">
-            {saveLabel}
-          </Typography>
-        </Box>
-      )}
     </ChatContainer>
   );
 };
