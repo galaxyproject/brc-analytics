@@ -6,16 +6,32 @@ export const StyledForm = styled.form`
   max-width: 560px;
   width: 100%;
 
-  /* The input ships with padding around its paper and a plain icon button;
-     the hero renders the paper flush and the send action as a primary button. */
+  /* The input ships with padding around its paper, a plain icon button, and the
+     field stacked above the button so the row beneath it can hold more actions.
+     The hero has no other actions: it renders the paper flush, the field and
+     the send action on a single row, and the send action as a primary button. */
   && {
     .MuiBox-root {
       padding: 0;
     }
 
     .MuiPaper-root {
-      border-color: ${PALETTE.SMOKE_DARK};
-      box-shadow: ${SHADOWS["02"]};
+      align-items: center;
+      border: none;
+      box-shadow:
+        inset 0 0 0 1px ${PALETTE.SMOKE_DARK},
+        ${SHADOWS["02"]};
+      flex-direction: row;
+    }
+
+    .MuiInputBase-root {
+      padding: 8px 0 8px 16px;
+
+      input::placeholder,
+      textarea::placeholder {
+        color: ${PALETTE.INK_LIGHT};
+        opacity: 1;
+      }
     }
 
     .MuiIconButton-root {
