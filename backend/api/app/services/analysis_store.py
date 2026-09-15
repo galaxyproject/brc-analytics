@@ -91,11 +91,18 @@ async def persist(state: SessionState) -> str | None:
     chat turn, but wrong when the user asked for this and is being told the
     result: a swallowed error there becomes a promise we did not keep.
 
+    Bounded like record(), but a timeout raises instead of being swallowed:
+    the user is waiting on this request, and a stalled connection must come
+    back as a failure rather than hold it (and a worker) open.
+
     Returns the saved analysis id, or None when there is nothing to save.
     """
-    if not get_settings().DATABASE_URL:
+    settings = get_settings()
+    if not settings.DATABASE_URL:
         raise RuntimeError("Saving analyses requires DATABASE_URL")
-    return await _write(state)
+    return await asyncio.wait_for(
+        _write(state), timeout=settings.ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS
+    )
 
 
 async def _write(state: SessionState) -> str | None:

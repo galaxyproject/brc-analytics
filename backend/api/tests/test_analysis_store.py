@@ -213,3 +213,25 @@ async def test_a_slow_write_is_abandoned_not_awaited():
         await analysis_store.record(_state())
 
     sentry.capture_message.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_a_stalled_explicit_save_fails_instead_of_hanging():
+    """persist() backs a request the user is waiting on, so a stalled write has
+    to come back as an error the endpoint can answer -- not hold it open."""
+
+    async def never_finishes(*args, **kwargs):
+        await asyncio.sleep(10)
+
+    settings = SimpleNamespace(
+        ASSISTANT_AUTOSAVE_TIMEOUT_SECONDS=0.01, DATABASE_URL="postgresql://fake"
+    )
+
+    with (
+        patch.object(analysis_store, "upsert_saved_analysis", never_finishes),
+        patch.object(analysis_store, "get_user_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "db_session"),
+        patch.object(analysis_store, "get_settings", return_value=settings),
+        pytest.raises(asyncio.TimeoutError),
+    ):
+        await analysis_store.persist(_state())
