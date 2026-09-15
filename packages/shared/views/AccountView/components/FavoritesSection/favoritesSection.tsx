@@ -72,7 +72,7 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
                   </Button>
                 </>
               }
-              key={favorite.entity_id}
+              key={favoriteKey(entityType, favorite.entity_id)}
               subtitle={`Saved ${new Date(favorite.created_at).toLocaleDateString()}`}
               title={getFavoriteLabel(
                 favorite.entity_type as FavoriteEntityType,
