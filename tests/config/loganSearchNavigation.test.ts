@@ -1,8 +1,22 @@
 import { ROUTES } from "@brc/routes/constants";
+import { type NavLinkItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/navigation";
 import { headerNavigation } from "@site-config/brc-analytics/local/navigation";
 
 /**
- * Every header link the config declares, flattened across nav groups.
+ * Flattens a navigation link together with any links nested in its menu.
+ * @param link - Navigation link.
+ * @returns The link followed by its menu items, in display order.
+ */
+function flattenLink(link: NavLinkItem): { label: string; url: string }[] {
+  return [
+    { label: String(link.label), url: link.url },
+    ...(link.menuItems ?? []).flatMap(flattenLink),
+  ];
+}
+
+/**
+ * Every header link the config declares, flattened across nav groups and the
+ * menus nested within them.
  * @param loganSearchEnabled - The build flag under test.
  * @returns Links in display order.
  */
@@ -10,7 +24,7 @@ function headerLinks(
   loganSearchEnabled: boolean
 ): { label: string; url: string }[] {
   return headerNavigation(loganSearchEnabled).flatMap((group) =>
-    (group ?? []).map((link) => ({ label: String(link.label), url: link.url }))
+    (group ?? []).flatMap(flattenLink)
   );
 }
 
