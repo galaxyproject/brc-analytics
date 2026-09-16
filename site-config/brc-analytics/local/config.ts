@@ -86,7 +86,6 @@ export function makeConfig(
             url: "https://pathogendatanetwork.org/",
           },
         ],
-        socials: socialMedia.socials,
         versionInfo: createElement(VersionInfoWithServerStatus),
       },
       header: {

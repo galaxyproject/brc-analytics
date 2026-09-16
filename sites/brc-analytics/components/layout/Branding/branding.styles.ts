@@ -1,30 +1,36 @@
-import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+import { bpDown1200 } from "@repo/shared/styles/mixins/breakpoints";
 
-export const Brands = styled.div`
+export const StyledStack = styled(Stack)`
   align-items: center;
-  display: flex;
-  gap: 16px;
+  flex-direction: row;
 
   img {
     margin: 0;
   }
 
-  ${bpDownSm} {
-    div {
-      padding-left: 0;
-      padding-right: 0;
-    }
+  ${bpDown1200} {
+    display: contents;
   }
 `;
 
 export const LargeBrand = styled.div`
   padding: 8px;
+
+  ${bpDown1200} {
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 export const SmallBrand = styled.div`
   padding: 4px;
+
+  ${bpDown1200} {
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 export const FooterText = styled(Typography)`
