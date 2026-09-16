@@ -17,7 +17,10 @@ export const SectionHero = (): JSX.Element => {
       <HeroImageRight />
       <SectionLayout>
         <Headline>
-          <Head>AI-powered analytics for pathogen, host, and vector data</Head>
+          <Head>
+            AI-powered analytics for pathogen, host, <br />
+            and vector data
+          </Head>
           <Subhead>
             Ask our AI assistant anything about genomic data. Get instant
             insights into disease-causing organisms through natural conversation
