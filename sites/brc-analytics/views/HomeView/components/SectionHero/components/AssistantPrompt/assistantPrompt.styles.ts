@@ -1,5 +1,6 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
+import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 
 export const StyledForm = styled.form`
@@ -50,5 +51,9 @@ export const StyledForm = styled.form`
         opacity: 0.5;
       }
     }
+  }
+
+  ${bpDownSm} {
+    max-width: 424px;
   }
 `;
