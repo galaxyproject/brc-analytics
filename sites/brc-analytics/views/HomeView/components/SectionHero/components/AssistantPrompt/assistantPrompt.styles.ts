@@ -54,6 +54,10 @@ export const StyledForm = styled.form`
   }
 
   ${bpDownSm} {
+    /* Narrower than the 560px above, but still wide enough to unwrap the
+       placeholder: it needs 356px, plus the 64px the field padding and the send
+       button take. Deliberately wider than the headline column so the box can
+       hold its placeholder on one line, and capped so it stays tied to it. */
     max-width: 424px;
   }
 `;
