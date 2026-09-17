@@ -32,8 +32,3 @@ classes:
         required: true
         multivalued: true
         range: OrganismPloidy
-      other_names:
-        description: Curated alternative names for the organism, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the organism's NCBI-derived other names in the built catalog. Should be given as display forms, since matching against them normalizes casing and punctuation.
-        required: false
-        multivalued: true
-        range: string
