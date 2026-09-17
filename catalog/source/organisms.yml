@@ -104,6 +104,8 @@ organisms:
   - taxonomy_id: 573
     ploidy:
       - HAPLOID
+    other_names:
+      - K. pneumoniae
   - taxonomy_id: 582
     ploidy:
       - HAPLOID
@@ -257,6 +259,8 @@ organisms:
   - taxonomy_id: 1280
     ploidy:
       - HAPLOID
+    other_names:
+      - S. aureus
   - taxonomy_id: 1309
     ploidy:
       - HAPLOID
@@ -329,6 +333,10 @@ organisms:
   - taxonomy_id: 1773
     ploidy:
       - HAPLOID
+    other_names:
+      - TB
+      - MTB
+      - M. tuberculosis
   - taxonomy_id: 1824
     ploidy:
       - HAPLOID
@@ -409,6 +417,8 @@ organisms:
       - HAPLOID
       - DIPLOID
       - POLYPLOID
+    other_names:
+      - S. cerevisiae
   - taxonomy_id: 4952
     ploidy:
       - HAPLOID
@@ -561,6 +571,8 @@ organisms:
   - taxonomy_id: 5476
     ploidy:
       - DIPLOID
+    other_names:
+      - C. albicans
   - taxonomy_id: 5478
     ploidy:
       - HAPLOID
@@ -747,6 +759,8 @@ organisms:
   - taxonomy_id: 5833
     ploidy:
       - HAPLOID
+    other_names:
+      - P. falciparum
   - taxonomy_id: 5849
     ploidy:
       - HAPLOID
@@ -762,6 +776,8 @@ organisms:
   - taxonomy_id: 5855
     ploidy:
       - HAPLOID
+    other_names:
+      - P. vivax
   - taxonomy_id: 5857
     ploidy:
       - HAPLOID
@@ -973,6 +989,8 @@ organisms:
   - taxonomy_id: 7227
     ploidy:
       - DIPLOID
+    other_names:
+      - D. melanogaster
   - taxonomy_id: 7370
     ploidy:
       - DIPLOID
@@ -3628,6 +3646,8 @@ organisms:
   - taxonomy_id: 498019
     ploidy:
       - HAPLOID
+    other_names:
+      - C. auris
   - taxonomy_id: 505693
     ploidy:
       - HAPLOID
@@ -3857,6 +3877,8 @@ organisms:
   - taxonomy_id: 746128
     ploidy:
       - HAPLOID
+    other_names:
+      - A. fumigatus
   - taxonomy_id: 751941
     ploidy:
       - HAPLOID
@@ -6073,6 +6095,8 @@ organisms:
   - taxonomy_id: 3052462
     ploidy:
       - HAPLOID
+    other_names:
+      - EBOV
   - taxonomy_id: 3052464
     ploidy:
       - HAPLOID
@@ -6422,6 +6446,9 @@ organisms:
   - taxonomy_id: 3418604
     ploidy:
       - HAPLOID
+    other_names:
+      - COVID-19
+      - COVID
   - taxonomy_id: 3418650
     ploidy:
       - HAPLOID
