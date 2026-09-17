@@ -81,6 +81,21 @@ sources:
                   arguments:
                     to: ref('taxonomy_organisms')
                     field: taxonomy_id
+      - name: curated_taxa
+        # Only tested when the catalog curates information for individual taxa
+        columns:
+          - name: taxonomy_id
+            data_tests:
+              - not_null:
+                  name: catalog_curated_taxa_have_tax_ids
+                  config:
+                    enabled: "{{ var('has_curated_taxa', false) }}"
+              # The loader drops duplicate curated taxa silently, so flag them here
+              # rather than let one entry quietly override another
+              - unique:
+                  name: catalog_curated_taxa_unique_ids
+                  config:
+                    enabled: "{{ var('has_curated_taxa', false) }}"
       - name: outbreak_taxa
         # Only tested when the catalog has outbreaks
         columns:

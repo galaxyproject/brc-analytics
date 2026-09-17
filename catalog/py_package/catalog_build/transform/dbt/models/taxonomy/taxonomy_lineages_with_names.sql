@@ -12,14 +12,23 @@ with source_names as (
     from {{ source("ncbi", "taxonomy_names") }}
     where tax_id in (select tax_id from {{ ref("taxonomy_lineages") }})
 
+    {% if var("has_curated_taxa", false) %}
     union all
 
+    /*
+      Curated names apply to the taxon they're given for and to no other, so they're
+      attached at that taxon's own tax_id; the join at the end of this model discards
+      any curated taxon that no lineage passes through. Taxa below rank 'species' are
+      the motivating case -- the names then reach only the assemblies actually
+      identified as that taxon, and the organisms grouping those assemblies.
+    */
     select
         taxonomy_id as tax_id,
         unnest(from_json(other_names, '"varchar[]"')) as name_txt,
         null as ncbi_class,
         true as is_curated
-    from {{ source("catalog_source", "organism_taxa") }}
+    from {{ source("catalog_source", "curated_taxa") }}
+    {% endif %}
 
 ),
 

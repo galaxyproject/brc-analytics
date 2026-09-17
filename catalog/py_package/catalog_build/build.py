@@ -232,6 +232,12 @@ def read_organisms(organisms_path):
     ).astype({"taxonomy_id": "string"})
 
 
+def read_taxa(taxa_path):
+    if taxa_path is None:
+        return None
+    return read_dataframe_from_yaml(taxa_path, schema.Taxa, "taxa")
+
+
 def read_outbreaks(outbreaks_path):
     if outbreaks_path is None:
         return None
@@ -1521,6 +1527,7 @@ def load_and_transform(
     taxonomic_levels: list[str],
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
+    taxa_df: pd.DataFrame | None,
     outbreaks_df: pd.DataFrame | None,
 ):
     """
@@ -1535,6 +1542,7 @@ def load_and_transform(
       taxonomic_levels: Taxonomic levels to build columns for during transformation
       assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
       organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      taxa_df: DataFrame of source curated taxa (must include `taxonomy_id` and `other_names` columns), or None for catalogs without curated taxa
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
 
     Returns:
@@ -1557,6 +1565,7 @@ def load_and_transform(
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_df=assemblies_df,
         organisms_df=organisms_df,
+        taxa_df=taxa_df,
         outbreaks_df=outbreaks_df,
     )
 
@@ -1564,6 +1573,7 @@ def load_and_transform(
     transform_result = do_dbt_transformations(
         temp_folder_path,
         taxonomic_levels=taxonomic_levels,
+        has_curated_taxa=taxa_df is not None,
         has_outbreaks=outbreaks_df is not None,
     )
 
@@ -1594,6 +1604,7 @@ def build_files(
     primary_output_path=None,
     qc_report_path=None,
     organisms_path,
+    taxa_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
     organism_image_path=None,
@@ -1615,6 +1626,7 @@ def build_files(
       primary_output_path: Path to save SRA metadata at
       qc_report_path: Path to save QC report to (if omitted, no report is generated)
       organisms_path: Path of input organisms YAML, used to perform checks
+      taxa_path: Path of input curated taxa YAML
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
       organism_image_path: path to folder containing organism images
@@ -1669,9 +1681,11 @@ def build_files(
         base_genomes_df["accession"],
     )
 
-    # Load source organisms and outbreaks; outbreaks are optional (only some
-    # catalogs use them), so source_outbreaks_df is None when no path is given
+    # Load source organisms, curated taxa, and outbreaks; curated taxa and outbreaks are
+    # optional (only some catalogs use them), so their DataFrames are None when no path
+    # is given
     source_organisms_df = read_organisms(organisms_path)
+    source_taxa_df = read_taxa(taxa_path)
     source_outbreaks_df = read_outbreaks(outbreaks_path)
 
     # Do database-based loading and transformation
@@ -1681,6 +1695,7 @@ def build_files(
         taxonomic_levels=taxonomic_levels_for_tree,
         assemblies_df=base_genomes_df.rename(columns={"taxonomyId": "taxonomy_id"}),
         organisms_df=source_organisms_df,
+        taxa_df=source_taxa_df,
         outbreaks_df=source_outbreaks_df,
     )
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
