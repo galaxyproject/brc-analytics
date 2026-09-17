@@ -11,8 +11,11 @@ is the path most of these tests are exercising. TestJobMetadataIsFetchedOnce
 covers the other side, where the parameters are carried and no fetch happens.
 """
 
+import asyncio
 import json
 import logging
+import time
+from collections import defaultdict
 from typing import get_args
 from unittest.mock import AsyncMock, MagicMock, call
 
@@ -32,6 +35,8 @@ from app.services import galaxy_service
 from app.services.galaxy_service import (
     KMINDEX_AGG_CACHE_PREFIX,
     KMINDEX_AGGREGATING_PREFIX,
+    KMINDEX_INDEX_CACHE_PREFIX,
+    KMINDEX_INDEX_LAST_GOOD_PREFIX,
     KMINDEX_ORDER_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
     GalaxyJobAggregating,
@@ -42,6 +47,7 @@ from app.services.galaxy_service import (
     _submitted_index_names,
     _submitted_threshold,
 )
+from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.sra_mirror import _SORTABLE_COLUMNS
 
 
@@ -2122,6 +2128,194 @@ class TestCachedKmindexRead:
         service._galaxy_available = False
         service.cache.get = AsyncMock(return_value=None)
         assert await service.get_cached_kmindex_results("job1") is None
+
+
+class TestKmindexIndexList:
+    """
+    The index picker's options come off the pinned tool's form, the one Galaxy
+    call every visitor's search page makes. Reading it per page view is what got
+    us rate-limited, so it is cached, read once when cold, and still answerable
+    when Galaxy will not answer at all.
+    """
+
+    @staticmethod
+    def _store_backed(service, store=None):
+        """Point a service's cache at a dict, standing in for Redis."""
+        store = {} if store is None else store
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: json.dumps(
+                [prefix, params], sort_keys=True
+            )
+        )
+        service.cache.get = AsyncMock(side_effect=store.get)
+        service.cache.set = AsyncMock(
+            side_effect=lambda key, value, ttl: store.__setitem__(key, value)
+        )
+        return store
+
+    @staticmethod
+    def _tool_form(names):
+        return {"inputs": [{"name": "kmindex", "options": [[n, n] for n in names]}]}
+
+    @staticmethod
+    def _cached_lists(service, store):
+        """What is held as an answer, ignoring the short failure marker."""
+        return [
+            store[key]
+            for prefix in (KMINDEX_INDEX_CACHE_PREFIX, KMINDEX_INDEX_LAST_GOOD_PREFIX)
+            if (key := service._index_cache_key(prefix)) in store
+        ]
+
+    @pytest.mark.asyncio
+    async def test_a_cached_list_asks_galaxy_nothing(self, service):
+        # Including the history: a cache hit has to cost no Galaxy call at all,
+        # or the fix leaves half the traffic in place.
+        service.cache.get = AsyncMock(return_value=["A", "B"])
+        service._get_or_create_shared_history = AsyncMock(
+            side_effect=AssertionError("history")
+        )
+        service.gi.tools.build = MagicMock(side_effect=AssertionError("cold path"))
+
+        assert await service.list_kmindex_indexes() == ["A", "B"]
+
+    @pytest.mark.asyncio
+    async def test_a_cold_read_is_cached_for_a_day_and_kept_far_longer(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        store = self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A", "B"]))
+
+        first = await service.list_kmindex_indexes()
+        second = await service.list_kmindex_indexes()
+
+        assert first == ["A", "B"] == second
+        assert service.gi.tools.build.call_count == 1
+        assert [c.args[2] for c in service.cache.set.call_args_list] == [
+            CacheTTL.ONE_DAY,
+            CacheTTL.THIRTY_DAYS,
+        ]
+        assert len(store) == 2
+
+    @pytest.mark.asyncio
+    async def test_concurrent_cold_reads_make_one_galaxy_call(
+        self, service, monkeypatch
+    ):
+        # A TTL expiry or a deploy puts every open search page on the cold path
+        # at once, and the router builds a service per request, so the requests
+        # that arrive mid-read have to wait for that answer rather than ask
+        # again -- asking again in a burst is what Galaxy answers with 429.
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        store = {}
+        builds = []
+
+        def build(**kwargs):
+            builds.append(kwargs)
+            # Widen the gap between the read and the write it decides.
+            time.sleep(0.05)
+            return self._tool_form(["A"])
+
+        services = [service, GalaxyService(MagicMock())]
+        for svc in services:
+            svc.gi = MagicMock()
+            svc._galaxy_available = True
+            svc.gi.tools.build = MagicMock(side_effect=build)
+            svc._get_or_create_shared_history = AsyncMock(return_value="h1")
+            self._store_backed(svc, store)
+
+        lists = await asyncio.gather(*(s.list_kmindex_indexes() for s in services))
+
+        assert lists == [["A"], ["A"]]
+        assert len(builds) == 1
+
+    @pytest.mark.asyncio
+    async def test_a_rate_limited_read_serves_the_last_good_list(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        store = self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A", "B"]))
+        await service.list_kmindex_indexes()
+        # The day-long entry ages out; the long-lived copy is what remains.
+        del store[service._index_cache_key(KMINDEX_INDEX_CACHE_PREFIX)]
+        service.gi.tools.build = MagicMock(
+            side_effect=Exception("Unexpected HTTP status code: 429")
+        )
+
+        assert await service.list_kmindex_indexes() == ["A", "B"]
+
+    @pytest.mark.asyncio
+    async def test_a_cold_cache_and_an_unreachable_galaxy_still_draw_the_picker(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        store = self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(
+            side_effect=Exception("Unexpected HTTP status code: 429")
+        )
+
+        assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+        assert self._cached_lists(service, store) == []
+
+    @pytest.mark.asyncio
+    async def test_a_failing_read_is_not_retried_once_per_request(
+        self, service, monkeypatch
+    ):
+        # The burst that trips the rate limit arrives while it is tripped, so
+        # the requests behind the failure must not each take their turn on the
+        # lock and ask again -- on the service account that also leaves a
+        # timestamped stray history behind per attempt.
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(
+            side_effect=Exception("Unexpected HTTP status code: 429")
+        )
+
+        for _ in range(3):
+            assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+
+        assert service.gi.tools.build.call_count == 1
+        assert service._get_or_create_shared_history.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_a_galaxy_that_never_answers_gives_the_lock_back(
+        self, service, monkeypatch
+    ):
+        # bioblend sets no request timeout, and this read holds the lock every
+        # other cold reader waits on, so a silent Galaxy has to end the read
+        # rather than park the index list for the whole process.
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        monkeypatch.setattr(galaxy_service, "KMINDEX_INDEX_READ_TIMEOUT", 0.05)
+        self._store_backed(service)
+
+        async def never_answers():
+            await asyncio.sleep(30)
+
+        service._build_kmindex_index_list = AsyncMock(side_effect=never_answers)
+
+        # The outer bound is the regression guard: without the timeout this
+        # call is the 30 seconds, not the 50 milliseconds.
+        indexes = await asyncio.wait_for(service.list_kmindex_indexes(), timeout=5)
+
+        assert indexes == list(FALLBACK_INDEX_NAMES)
+
+    @pytest.mark.asyncio
+    async def test_an_unreadable_tool_form_is_never_cached_as_an_answer(
+        self, service, monkeypatch
+    ):
+        # No options parsed is a failed read, not a search with nothing to
+        # search -- caching it would hold the picker empty for a day.
+        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        store = self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(return_value={"inputs": []})
+
+        assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+        assert self._cached_lists(service, store) == []
 
 
 class TestSubmittedThreshold:

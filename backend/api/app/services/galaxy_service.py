@@ -32,6 +32,7 @@ from app.models.galaxy import (
     KmindexSort,
     SraRunMetadata,
 )
+from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.logan_stats import correct_score
 from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
@@ -156,6 +157,36 @@ KMINDEX_AGGREGATING_PREFIX = "galaxy:kmindex_aggregating:v1"
 # same reason the aggregate is: a rebuilt mirror can reorder a column.
 KMINDEX_ORDER_CACHE_PREFIX = "galaxy:kmindex_order:v1"
 
+# The index list is read off the pinned tool's form, which changes only when a
+# new index is published -- rare enough that a day-old answer is right, and
+# reading it per page view is what gets us rate-limited: tools.build renders the
+# whole form, including the 109-option select, and every visitor's search page
+# asks for it. The second entry is the same list kept far longer, as something
+# to serve when Galaxy will not answer at all; it is never read while the first
+# one is live, so a stale copy cannot mask a fresh answer.
+#
+# Deliberately outside CACHE_KEY_PATTERNS: a restart is exactly when having
+# yesterday's answer is worth most, and the boot-time warm refreshes it anyway.
+KMINDEX_INDEX_CACHE_PREFIX = "galaxy:kmindex_indexes:v1"
+KMINDEX_INDEX_LAST_GOOD_PREFIX = "galaxy:kmindex_indexes_last_good:v1"
+
+# A read that just failed is a read that is about to fail again: the burst which
+# trips the rate limit arrives while it is tripped, and taking turns on the lock
+# to ask once per request is what keeps it that way -- and, on the service
+# account, leaves a timestamped stray history behind each time, since that is
+# what _get_or_create_shared_history does when the lookup it needs first fails.
+# So a failure is remembered briefly, and the requests behind it are answered
+# from the last good list without touching Galaxy at all.
+KMINDEX_INDEX_COOLDOWN_PREFIX = "galaxy:kmindex_indexes_cooldown:v1"
+KMINDEX_INDEX_COOLDOWN_SECONDS = 60
+
+# bioblend sets no request timeout, and this call is made holding the lock every
+# other cold reader is waiting on, so a Galaxy that accepts the connection and
+# then says nothing would park the index list for everyone rather than for one
+# request. The list is small and the form is rendered server-side in about half
+# a second, so half a minute is already far past "slow".
+KMINDEX_INDEX_READ_TIMEOUT = 30.0
+
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
@@ -169,6 +200,14 @@ _AGGREGATION_LOCK = asyncio.Lock()
 # timeout, so one shared lock would let a single hung get_histories hold up every
 # account's submissions.
 _HISTORY_LOCKS = defaultdict(asyncio.Lock)
+
+# One Galaxy call per cold cache rather than one per waiting request. The list
+# is the same for everyone, so the requests that arrive while it is being read
+# are waiting for that answer, not for a turn to ask again -- which is the shape
+# that trips the rate limit, since a deploy or a TTL expiry lands every visitor
+# on the cold path at once. Keyed by cache key, so two Galaxy instances (tests,
+# a re-pointed dev) do not queue behind each other.
+_INDEX_LOCKS = defaultdict(asyncio.Lock)
 
 
 def _tie_break(accession: str) -> str:
@@ -420,22 +459,93 @@ class GalaxyService:
             logger.error(f"Failed to submit Galaxy job: {str(e)}")
             raise Exception(f"Galaxy job submission failed: {str(e)}") from e
 
-    async def list_kmindex_indexes(self, history_id: str = None) -> List[str]:
+    def _index_cache_key(self, prefix: str) -> str:
+        """Key the index list on what decides it, not on who is asking.
+
+        The options belong to the tool, so one entry serves every caller, signed
+        in or not -- and a re-pointed Galaxy or a bumped tool version gets its
+        own entry rather than inheriting the old one's answer.
+        """
+        return self.cache.make_key(
+            prefix,
+            {
+                "url": self.settings.GALAXY_API_URL,
+                "tool": self.settings.GALAXY_KMINDEX_TOOL_ID,
+            },
+        )
+
+    async def list_kmindex_indexes(self) -> List[str]:
         """List the Logan/kmindex indexes registered on the Galaxy instance."""
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        history_id = history_id or await self._get_or_create_shared_history()
-        try:
-            tool = await asyncio.to_thread(
-                self.gi.tools.build,
-                tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
-                history_id=history_id,
+        key = self._index_cache_key(KMINDEX_INDEX_CACHE_PREFIX)
+        cached = await self.cache.get(key)
+        if cached:
+            return cached
+
+        async with _INDEX_LOCKS[key]:
+            cached = await self.cache.get(key)
+            if cached:
+                return cached
+
+            cooldown_key = self._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX)
+            if await self.cache.get(cooldown_key):
+                return await self._last_known_indexes()
+
+            try:
+                indexes = await asyncio.wait_for(
+                    self._build_kmindex_index_list(), KMINDEX_INDEX_READ_TIMEOUT
+                )
+            except Exception as e:
+                # Not fatal any more: the picker can be drawn from the last
+                # answer. Galaxy rate-limiting one page view is not a reason to
+                # give the reader a broken search page.
+                logger.error(f"Failed to list kmindex indexes: {e}")
+                indexes = []
+
+            if not indexes:
+                # An empty list reads as a search with nothing to search, so it
+                # is treated as a failed read rather than cached as an answer.
+                await self.cache.set(cooldown_key, True, KMINDEX_INDEX_COOLDOWN_SECONDS)
+                return await self._last_known_indexes()
+
+            await self.cache.set(key, indexes, CacheTTL.ONE_DAY)
+            await self.cache.set(
+                self._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX),
+                indexes,
+                CacheTTL.THIRTY_DAYS,
             )
-            return _find_kmindex_options(tool.get("inputs", []))
-        except Exception as e:
-            logger.error(f"Failed to list kmindex indexes: {e}")
-            raise Exception(f"Failed to list kmindex indexes: {str(e)}") from e
+            return indexes
+
+    async def _build_kmindex_index_list(self) -> List[str]:
+        """Read the index names off the pinned tool's form, uncached."""
+        history_id = await self._get_or_create_shared_history()
+        tool = await asyncio.to_thread(
+            self.gi.tools.build,
+            tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
+            history_id=history_id,
+        )
+        return _find_kmindex_options(tool.get("inputs", []))
+
+    async def _last_known_indexes(self) -> List[str]:
+        """The most recent good answer, or the names shipped with the build."""
+        cached = await self.cache.get(
+            self._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX)
+        )
+        if cached:
+            logger.warning(
+                "Galaxy would not list kmindex indexes; serving %d from the last "
+                "good answer",
+                len(cached),
+            )
+            return cached
+        logger.warning(
+            "Galaxy would not list kmindex indexes and none are cached; serving "
+            "the %d shipped with this build",
+            len(FALLBACK_INDEX_NAMES),
+        )
+        return list(FALLBACK_INDEX_NAMES)
 
     async def submit_kmindex_query(
         self, submission: KmindexQuerySubmission
