@@ -4,7 +4,6 @@ import { bpDown1200 } from "@repo/shared/styles/mixins/breakpoints";
 
 export const StyledStack = styled(Stack)`
   align-items: center;
-  flex-direction: row;
 
   img {
     margin: 0;

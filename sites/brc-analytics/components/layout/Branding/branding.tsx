@@ -14,7 +14,7 @@ import {
 
 export const Branding = (): JSX.Element => {
   return (
-    <StyledStack spacing={4} useFlexGap>
+    <StyledStack direction={STACK_PROPS.DIRECTION.ROW} spacing={4} useFlexGap>
       <Stack direction={STACK_PROPS.DIRECTION.ROW} spacing={4} useFlexGap>
         <LargeBrand>
           <Logo
