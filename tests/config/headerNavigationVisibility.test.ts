@@ -104,7 +104,9 @@ describe("header navigation visibility", () => {
     expect(drawerLabels("xs")).toEqual(PRIMARY_LABELS);
   });
 
-  test("the drawer matches the collapsed header at sm", () => {
+  test("flattening the sm navigation yields the collapsed link set", () => {
+    // Coverage of the flattening itself, not of a rendered surface: the drawer
+    // is bound to the widths below the inline nav, so it never renders at sm.
     expect(drawerLabels("sm")).toEqual([
       ...PERSISTENT_LABELS,
       "More",
