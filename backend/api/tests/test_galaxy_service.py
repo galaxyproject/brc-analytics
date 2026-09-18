@@ -20,6 +20,7 @@ from typing import get_args
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
+import requests
 from pydantic import ValidationError
 
 from app.core.cache import CacheTTL
@@ -3046,3 +3047,22 @@ class TestGalaxyServiceTimeouts:
         finally:
             sock.close()
             get_settings.cache_clear()
+
+    @pytest.mark.asyncio
+    async def test_download_shard_retries_on_timeout(self, service, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_DOWNLOAD_ATTEMPTS", 2)
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+
+        # Make the first call fail with a timeout, and the second succeed
+        service.gi.datasets.download_dataset = MagicMock(
+            side_effect=[
+                requests.exceptions.ReadTimeout("Read timed out"),
+                '{"IDX_1": {"q": {"SRR1": 1.0}}}'.encode("utf-8"),
+            ]
+        )
+
+        sem = asyncio.Semaphore(1)
+        result = await service._download_shard("ds1", sem)
+
+        assert service.gi.datasets.download_dataset.call_count == 2
+        assert result == {"IDX_1": {"q": {"SRR1": 1.0}}}

@@ -9,6 +9,7 @@ import time
 from collections import Counter, defaultdict
 from typing import List, Optional, Tuple
 
+import requests
 from bioblend import ConnectionError as BioblendConnectionError
 from bioblend.galaxy import GalaxyInstance
 
@@ -626,8 +627,14 @@ class GalaxyService:
             except Exception as e:
                 # Sleep outside the semaphore so a backing-off task doesn't
                 # hold a slot the other shards could be using.
-                is_rate_limit = "429" in str(e)
-                if not is_rate_limit or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1:
+                # A rate limit is matched on the message because bioblend wraps the
+                # HTTP status into one of its own errors, but a socket timeout is
+                # requests' own exception and reaches us intact -- so match the type
+                # rather than hunting for "timed out" in prose that may not say it.
+                is_retryable = isinstance(
+                    e, requests.exceptions.Timeout
+                ) or "429" in str(e)
+                if not is_retryable or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1:
                     logger.warning(f"Shard {dataset_id} download failed: {e}")
                     return None
                 await asyncio.sleep(
