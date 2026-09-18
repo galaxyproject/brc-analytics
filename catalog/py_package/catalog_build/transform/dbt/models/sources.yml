@@ -90,10 +90,15 @@ sources:
                   name: catalog_curated_taxa_have_tax_ids
                   config:
                     enabled: "{{ var('has_curated_taxa', false) }}"
-              # The loader drops duplicate curated taxa silently, so flag them here
-              # rather than let one entry quietly override another
               - unique:
                   name: catalog_curated_taxa_unique_ids
+                  config:
+                    enabled: "{{ var('has_curated_taxa', false) }}"
+              - relationships:
+                  name: catalog_curated_taxa_in_lineages
+                  arguments:
+                    to: ref('taxonomy_lineages')
+                    field: tax_id
                   config:
                     enabled: "{{ var('has_curated_taxa', false) }}"
       - name: outbreak_taxa
