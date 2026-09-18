@@ -5,6 +5,7 @@ Galaxy and cached. This copy exists for the one case that leaves nothing to
 serve: a cold cache and a Galaxy that will not answer. Without it the search
 page has no index picker at all, which is a worse answer than a list that is a
 release out of date. Captured from Galaxy Test, tool kmindex_query/0.6.1+galaxy3.
+To refresh, copy the output of `GalaxyService._build_kmindex_index_list()`.
 """
 
 FALLBACK_INDEX_NAMES = (
