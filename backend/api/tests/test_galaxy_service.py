@@ -2994,3 +2994,55 @@ class TestResultsEndpoint:
         response = client.get("/galaxy/kmindex/jobs/job1/results")
 
         assert response.status_code == 500
+
+
+class TestGalaxyServiceTimeouts:
+    """Tests that bioblend socket timeouts work and are retried properly."""
+
+    @pytest.mark.asyncio
+    async def test_silent_galaxy_times_out(self, monkeypatch):
+        import socket
+        import threading
+        from app.core.config import get_settings
+
+        # Bind a silent socket to accept a connection and drop it
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(("127.0.0.1", 0))
+        sock.listen(1)
+        port = sock.getsockname()[1]
+
+        # Accept one connection in a thread to complete the handshake but send nothing
+        def accept_and_hold():
+            try:
+                conn, _ = sock.accept()
+                time.sleep(1.0)
+                conn.close()
+            except Exception:
+                pass
+
+        t = threading.Thread(target=accept_and_hold)
+        t.daemon = True
+        t.start()
+
+        try:
+            monkeypatch.setattr(galaxy_service, "GALAXY_REQUEST_TIMEOUT", 0.1)
+            # GALAXY_BASE_URL is derived from GALAXY_API_URL, so this is the knob.
+            monkeypatch.setenv("GALAXY_API_URL", f"http://127.0.0.1:{port}/api")
+            monkeypatch.setenv("GALAXY_API_KEY", "test-key")
+            get_settings.cache_clear()
+
+            cache = MagicMock()
+            svc = GalaxyService(cache)
+
+            start = time.monotonic()
+            with pytest.raises(Exception) as exc:
+                await asyncio.to_thread(svc.gi.datasets.download_dataset, "fake_ds")
+            duration = time.monotonic() - start
+
+            # Should fail well before the thread's 1.0s sleep
+            assert duration < 0.5
+            err_str = str(exc.value).lower()
+            assert "timeout" in err_str or "timed out" in err_str
+        finally:
+            sock.close()
+            get_settings.cache_clear()

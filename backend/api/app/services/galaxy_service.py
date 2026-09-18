@@ -187,6 +187,13 @@ KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 # a second, so half a minute is already far past "slow".
 KMINDEX_INDEX_READ_TIMEOUT = 30.0
 
+# bioblend sets no socket timeout by default. We set a global request timeout
+# here because requests' timeout is connect + inter-byte read, not total transfer
+# time. This means a download that is actually progressing will never trip it,
+# only a silent socket will. Therefore, a single timeout value is safe for every
+# call site, both short RPCs and long dataset downloads.
+GALAXY_REQUEST_TIMEOUT = 30.0
+
 # Aggregation is process-wide serialized: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job.
@@ -399,6 +406,7 @@ class GalaxyService:
                 self.gi = GalaxyInstance(url=base_url, token=credential.secret)
             else:
                 self.gi = GalaxyInstance(url=base_url, key=credential.secret)
+            self.gi.timeout = GALAXY_REQUEST_TIMEOUT
             # Debug, not info: the router builds one of these per request,
             # status polls included.
             logger.debug(
