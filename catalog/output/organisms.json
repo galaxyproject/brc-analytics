@@ -65104,7 +65104,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_002572885.1/",
         "gcPercent": 47.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/572/885/GCA_002572885.1/genes/GCA_002572885.1_Emmon_parv_130.ncbiGene.gtf.gz",
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 27837035,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -368497,7 +368497,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_000341325.1/",
         "gcPercent": 44,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/341/325/GCA_000341325.1/genes/GCA_000341325.1_Pred3.augustus.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 65093147,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
