@@ -148063,9 +148063,7 @@
           "SARSrCoV",
           "Human coronavirus (strain SARS)",
           "SARS-like coronavirus",
-          "SARS-related coronavirus",
-          "COVID",
-          "COVID-19"
+          "SARS-related coronavirus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -148180,8 +148178,6 @@
       "Human coronavirus (strain SARS)",
       "SARS-like coronavirus",
       "SARS-related coronavirus",
-      "COVID",
-      "COVID-19",
       "SARS-CoV-2",
       "2019-nCoV",
       "COVID-19 virus",
@@ -148189,7 +148185,9 @@
       "Human coronavirus 2019",
       "SARS-2",
       "SARS-CoV2",
-      "SARS2"
+      "SARS2",
+      "COVID",
+      "COVID-19"
     ],
     "otherTaxa": null,
     "priority": "CRITICAL",
