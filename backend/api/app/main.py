@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 import sentry_sdk
 from fastapi import FastAPI
@@ -34,6 +35,27 @@ from app.services import turn_log
 from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
+
+
+async def warm_kmindex_indexes() -> None:
+    """Fill the index-list cache before a reader needs it.
+
+    The list is the one Galaxy call the search page makes on arrival, so the
+    first visitor after a restart is the one who pays for it -- and if Galaxy is
+    rate-limiting us just then, they are the one who sees it fail. Warming it
+    here moves that to boot, where a failure costs nothing: the entry is
+    long-lived and survives the restart, so there is usually one there already.
+    """
+    galaxy = get_service_galaxy()
+    if not galaxy.is_available():
+        return
+    try:
+        indexes = await galaxy.list_kmindex_indexes()
+        logger.info("Warmed the kmindex index list: %d indexes", len(indexes))
+    except Exception as e:
+        # Never a reason to fail a boot. The search page still has the last
+        # good answer, or the names shipped with the build.
+        logger.warning("Could not warm the kmindex index list: %s", e)
 
 
 def create_app() -> FastAPI:
@@ -77,9 +99,21 @@ def create_app() -> FastAPI:
                     "conversations will not be recorded beyond the Redis session TTL"
                 )
 
+            # Off the boot path on purpose: nothing here has to finish before
+            # the app can serve, and a Galaxy that is slow to answer must not
+            # hold up a restart.
+            warm_task = asyncio.create_task(warm_kmindex_indexes())
+
             # Owns the retention sweep for the app's lifetime.
             async with turn_log.lifecycle():
                 yield
+
+            # Awaited, not just cancelled: a warm still mid-read when Redis and
+            # the DB close behind it is how a shutdown ends in a pending-task
+            # warning rather than a clean stop.
+            warm_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await warm_task
 
             auth_service = get_auth_service()
             await auth_service.close()
