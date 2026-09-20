@@ -29,7 +29,7 @@ test.describe("BRC Analytics - What's New", () => {
 
     await expect(page.getByText(TITLE)).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Learn more & apply" })
+      page.getByRole("link", { name: "Try PrimAeon" })
     ).toBeVisible();
   });
 
