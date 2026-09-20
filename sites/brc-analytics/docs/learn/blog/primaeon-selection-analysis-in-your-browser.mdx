@@ -1,0 +1,80 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/blog"
+    text: "Blog"
+contentType: "ARTICLE"
+date: "2026-09-20"
+description: "PrimAeon runs HyphAeon's deep-learning selection analysis entirely in your browser — a full report in seconds, with no upload and no install."
+title: "PrimAeon: selection analysis in seconds, in your browser"
+---
+
+{/* TODO: confirm author attribution before publishing */}
+
+_The HyphAeon team_
+
+[PrimAeon](https://primaeon.org) is live: paste a codon alignment into a
+browser tab, and a selection report streams back in seconds. No account, no
+install, no upload — the inference runs entirely on your device.
+
+## Why this is fast enough to matter
+
+PrimAeon is powered by **HyphAeon**, a phylogenetic foundation model that acts
+as a neural surrogate for HyPhy's likelihood methods. The headline number from
+the [preprint](https://www.biorxiv.org/content/10.64898/2026.09.06.749597v1) is
+speed: site-level episodic selection inference comparable to MEME at
+**100×–1,100× the speed of maximum-likelihood estimation**. Analyses that used
+to justify a coffee break — or a cluster job — now finish before the page has
+finished scrolling.
+
+That speed changes what the analysis is _for_. A selection scan stops being a
+deliberate, budgeted step and becomes something you can do speculatively:
+screen every gene in an alignment set, sanity-check a hypothesis before
+committing to a full study, or triage an outbreak sequence the moment it
+arrives.
+
+## What you get
+
+One alignment in, one report out:
+
+- **Site-level selection** — the neural MEME surrogate
+- **Co-selection networks** — which sites evolve together
+- **Digital deep mutational scanning** — predicted effect of every substitution
+- **Phenotype association** — sites linked to traits
+
+A tree is optional. Supply one with branch lengths and it is used as given;
+without one, PrimAeon works tree-free from pairwise TN93 distances.
+
+## Private by construction
+
+Because the models ship as ONNX graphs running on ONNX Runtime's WebAssembly
+backend — the analysis pipeline itself ported to JavaScript — **your sequences
+never leave the browser tab**. For sensitive
+data — pre-publication genomes, clinical cohorts, surveillance data under
+embargo — that removes the upload question entirely rather than merely
+answering it.
+
+## The other half: ChronAeon
+
+The same foundation model powers **ChronAeon**, the "radar" to HyphAeon's
+"microscope": molecular clock dating, R₀/Rₜ phylodynamics, phylogeography, and
+streaming genomic triage — analyses that reproduce landmark benchmarks (the
+1931 HIV-1 group M origin date, H5N1 dispersal routes, 2009 H1N1 growth rates)
+in seconds rather than MCMC hours. ChronAeon is Python today
+(`pip install chronaeon`); see the [docs](https://veg.github.io/chronaeon).
+
+Both packages are also wrapped for [Galaxy](https://usegalaxy.org) — useful
+when you want web-based batch runs, or to customize an analysis beyond what
+PrimAeon's one-report interface offers.
+
+## Try it, then dig in
+
+- **[primaeon.org](https://primaeon.org)** — run a scan now
+- [Choosing between PrimAeon, HyphAeon, ChronAeon, and HyPhy](/learn/primaeon) — our Learn guide to the ecosystem
+- [HyphAeon on GitHub](https://github.com/veg/HyphAeon) and the [interactive overview](https://veg.github.io/HyphAeon/)
+- [bioRxiv preprint](https://www.biorxiv.org/content/10.64898/2026.09.06.749597v1) · [model weights on Hugging Face](https://huggingface.co/datamonkey/hyphaeon)
+
+_HyphAeon is supported in part by BRC Analytics and by NIH and NSF awards —
+see the [project page](https://veg.github.io/HyphAeon/) for full
+acknowledgments._

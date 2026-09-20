@@ -1,0 +1,114 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "PrimAeon"
+contentType: "ARTICLE"
+description: "How to use PrimAeon, HyphAeon, and ChronAeon — and when to reach for HyPhy instead."
+enableOutline: true
+title: "PrimAeon and the HyphAeon ecosystem"
+---
+
+[PrimAeon](https://primaeon.org) is a browser app for evolutionary analysis:
+you paste in a sequence alignment and get a selection report back in seconds.
+Everything runs client-side — the HyphAeon models ship as ONNX graphs executed
+under ONNX Runtime's WebAssembly backend, with the analysis pipeline ported to
+JavaScript — so **your sequences never leave your device**. There is nothing to
+install and no account to create.
+
+Underneath PrimAeon sits an ecosystem of tools built on the same foundation
+model. This page explains what each piece does, what inputs it needs, and how
+to choose between them — including when you should use classic HyPhy instead.
+
+## The pieces
+
+| Tool                   | What it is                                                                                                                    | Where it runs                                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **PrimAeon**           | Browser app: one alignment in, one selection report out                                                                       | [primaeon.org](https://primaeon.org), entirely in your browser                                                                                        |
+| **HyphAeon**           | Python package over the foundation model — the "microscope": selection, epistasis, mutational scanning, phenotype association | `pip install hyphaeon` ([GitHub](https://github.com/veg/HyphAeon))                                                                                    |
+| **ChronAeon**          | Python package over the same model — the "radar": molecular clock dating, phylodynamics, phylogeography, genomic triage       | `pip install chronaeon` ([docs](https://veg.github.io/chronaeon))                                                                                     |
+| **HyPhy / Datamonkey** | The classic maximum-likelihood methods (MEME, BUSTED, FEL, aBSREL, …); HyphAeon is a neural surrogate for MEME                | [datamonkey.org](https://datamonkey.org), [v3.datamonkey.org](https://v3.datamonkey.org) (in-browser via WASM), or [HyPhy](https://hyphy.org) locally |
+
+## Which tool for which question
+
+| Question                                                      | Tool                                           | Input required                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Which sites in my gene are under episodic positive selection? | PrimAeon, or `hyphaeon meme`                   | Codon alignment (FASTA); tree optional                                             |
+| Which sites co-evolve? Where are the epistatic sectors?       | `hyphaeon epistasis`                           | Codon alignment; tree optional                                                     |
+| What is the predicted effect of every possible mutation?      | `hyphaeon dms`                                 | Codon alignment; tree optional                                                     |
+| Which sites are associated with a phenotype or trait?         | `hyphaeon phenotype`                           | Codon alignment + trait (metadata file, preset, or foreground list); tree optional |
+| When did this clade or outbreak originate?                    | `chronaeon date`                               | Alignment with sampling dates (in headers or a metadata file); tree optional       |
+| How fast is the outbreak growing? What is R₀ / Rₜ?            | `chronaeon dynamics`                           | Dated alignment or tree                                                            |
+| Where did the pathogen spread, and along which routes?        | `chronaeon phylogeo`                           | Alignment + location metadata; tree optional (auto-built)                          |
+| Screen many genomes for anomalies or emerging clades          | `chronaeon triage` / `chronaeon sketch`        | Reference alignment + streaming FASTA (triage); unaligned FASTA (sketch)           |
+| I need the exact likelihood methods for a publication         | HyPhy via [Datamonkey](https://datamonkey.org) | Codon alignment + tree                                                             |
+
+## Inputs
+
+The input that matters most is the alignment:
+
+- **Codon-aware alignment (PrimAeon, `hyphaeon`).** Selection analyses need a
+  nucleotide alignment of coding sequences that preserves codon frame: the
+  alignment length must be a multiple of 3 and free of in-frame stop codons —
+  PrimAeon validates both on upload. Produce one with a codon-aware aligner
+  (MACSE, bealign, cawlign) or by aligning protein sequences and
+  back-translating to codons. A plain nucleotide alignment from MAFFT or
+  MUSCLE can introduce frameshifting gaps and will fail validation.
+- **Alignments for ChronAeon.** `chronaeon date` and `autoclock` also take
+  in-frame codon alignments (FASTA/NEXUS, or BEAST XML with tip dates);
+  `triage` and `sketch` work on raw, unaligned sequences. `date` and
+  `dynamics` need sampling dates — auto-extracted from sequence headers or
+  supplied as a metadata CSV/TSV (or Auspice JSON); `phylogeo` additionally
+  needs location metadata.
+- **Tree (optional, Newick).** Everywhere a tree is accepted it is optional:
+  HyphAeon and `chronaeon date` fall back to a tree-free path from pairwise
+  TN93 distances (`--use-tn93`), and `chronaeon phylogeo` auto-builds one with
+  FastTree. Trees can also be embedded in a NEXUS alignment.
+- **Trait metadata (`hyphaeon phenotype` only).** The trait can come from a
+  CSV/TSV metadata file, a curated preset (`--preset`), or an inline
+  foreground/background taxon list (`--foreground`/`--background`).
+- **Making a codon-aware alignment.** `chronaeon align` threads unaligned CDS
+  sequences onto a reference in codon frame; external options include MACSE,
+  bealign, and cawlign, or aligning proteins and back-translating. `hyphaeon
+filter` (or `meme --filter`) can then surgically mask alignment artifacts
+  before inference.
+
+A few rules of thumb:
+
+- **Start in PrimAeon** when you have an alignment and want an answer fast, or
+  when the data cannot leave your machine. A tree is optional — without one,
+  PrimAeon works tree-free from pairwise TN93 distances.
+- **Move to the Python packages** when you need batch runs, the full command
+  surface (spectral splits, temporal dynamics, disease prediction, alignment
+  filtering), or GPU acceleration.
+- **Use HyPhy/Datamonkey** when you need the statistical guarantees of the
+  original maximum-likelihood methods. PrimAeon reports are neural _surrogate_
+  results — every report is flagged `is_surrogate` and includes a path to run
+  the exact analysis on Datamonkey. If privacy is the concern rather than
+  speed, [v3.datamonkey.org](https://v3.datamonkey.org) runs real HyPhy in the
+  browser via WebAssembly too.
+
+## Privacy
+
+Three of these options never send your data anywhere: PrimAeon (WASM port of
+the HyphAeon models), v3.datamonkey.org (WASM port of HyPhy), and the Python
+packages on your own hardware. The classic datamonkey.org service runs on a
+server, like Galaxy.
+
+## Links
+
+- [primaeon.org](https://primaeon.org) — the browser app
+- [HyphAeon on GitHub](https://github.com/veg/HyphAeon) — monorepo: `aeon-core`, `hyphaeon`, `chronaeon`
+- [HyphAeon interactive overview](https://veg.github.io/HyphAeon/) — methods, benchmarks, and the story behind the model
+- [ChronAeon docs](https://veg.github.io/chronaeon) — dating, phylodynamics, and surveillance guides
+- [bioRxiv preprint](https://www.biorxiv.org/content/10.64898/2026.09.06.749597v1) — the HyphAeon paper
+- [Model weights on Hugging Face](https://huggingface.co/datamonkey/hyphaeon)
+- [hyphy.org](https://hyphy.org) and [HyPhy on GitHub](https://github.com/veg/hyphy) — the likelihood-method reference
+- [datamonkey.org](https://datamonkey.org) / [v3.datamonkey.org](https://v3.datamonkey.org) — HyPhy as a web service / in-browser
+- [usegalaxy.org](https://usegalaxy.org) — the `hyphaeon` and `chronaeon` tool suites, for web-based batch runs
+
+## Support
+
+HyphAeon is supported in part by [BRC Analytics](https://brc-analytics.org)
+and the NIH/NIAID.
