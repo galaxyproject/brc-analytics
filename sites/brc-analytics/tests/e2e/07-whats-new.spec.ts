@@ -82,7 +82,7 @@ test.describe("BRC Analytics - What's New", () => {
   }) => {
     await page.goto("/");
 
-    const card = page.getByText("NIAID BRC AI Codeathon 2.0");
+    const card = page.getByText("PrimAeon: selection analysis in your browser");
     const start = (await card.boundingBox())?.x ?? 0;
 
     await page.getByRole("button", { name: FORWARD }).click();
