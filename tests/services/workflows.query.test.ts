@@ -1,4 +1,7 @@
-import { findWorkflow } from "@repo/shared/services/workflows/entities";
+import {
+  findWorkflow,
+  findWorkflowCategories,
+} from "@repo/shared/services/workflows/entities";
 import { getEntities, getEntity } from "@repo/shared/services/workflows/query";
 import {
   getEntitiesById,
@@ -63,5 +66,23 @@ describe("workflows query", () => {
     setEntitiesById("workflows", workflowsMap);
 
     expect(findWorkflow("stale-workflow-id")).toBeUndefined();
+  });
+
+  test("findWorkflowCategories returns every category holding the workflow", () => {
+    const trsId = "#workflow/github.com/iwc-workflows/something/main";
+    const first = { category: "OTHER", workflows: [{ trsId }] };
+    const second = { category: "ASSEMBLY", workflows: [{ trsId }] };
+    const other = { category: "VARIANT_CALLING", workflows: [] };
+    setEntitiesByType("workflows", [first, other, second]);
+
+    expect(findWorkflowCategories(trsId)).toEqual([first, second]);
+  });
+
+  test("findWorkflowCategories returns empty when no category holds the workflow, or none are loaded", () => {
+    expect(findWorkflowCategories("logan-search")).toEqual([]);
+
+    setEntitiesByType("workflows", [{ category: "OTHER", workflows: [] }]);
+
+    expect(findWorkflowCategories("logan-search")).toEqual([]);
   });
 });
