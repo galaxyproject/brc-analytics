@@ -1,0 +1,795 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: "/learn/blog"
+    text: "Blog"
+contentType: "ARTICLE"
+date: "2026-09-21"
+description: "PyEuk: a tool suite for catalogue-free multilocus typing"
+title: "PyEuk: a tool suite for catalogue-free multilocus typing"
+---
+
+[![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.09.10.750732-b31b1b.svg)](https://doi.org/10.64898/2026.09.10.750732)
+
+Sergei Kosakovsky Pond<sup>1</sup>, Danielle Callan<sup>1</sup>, Anton Nekrutenko<sup>2,\*</sup>
+
+<sup>1</sup> Institute for Genomics and Evolutionary Medicine, Department of
+Biology, Temple University, Philadelphia, PA, USA
+<sup>2</sup> Department of Biochemistry and Molecular Biology, The Pennsylvania
+State University, University Park, PA, USA
+<sup>*</sup> Corresponding author: aun1@psu.edu
+
+<Alert icon={false} severity="warning">
+  This is the third post in a series on the analysis of
+  *[Cyclospora](https://en.wikipedia.org/wiki/Cyclospora)* ([taxid
+  44417](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=44417))
+  outbreaks. [Part
+  1](/learn/blog/genotyping-cyclospora-assessing-current-practices) described
+  the parasite, the assay, the public sequencing record, and the benchmark
+  cohort. [Part
+  2](/learn/blog/genotyping-cyclospora-from-haplotype-calls-to-outbreak-clusters)
+  dissected CDC's typing pipeline and introduced PyEuk. This part presents the
+  complete manuscript describing PyEuk and its validation across *Cyclospora*
+  and *Plasmodium vivax* cohorts.
+</Alert>
+
+---
+
+## Abstract
+
+Multilocus sequence typing anchors molecular epidemiology, but traditional frameworks require centrally curated allele catalogues. For emerging and uncultivable eukaryotic parasites, maintaining these databases is impractical, leaving surveillance reliant on fragmented, assay-specific scripts. PyEuk eliminates this bottleneck by providing an open, catalogue-free suite that calls microhaplotypes directly from sequence differences relative to a reference within data-defined genomic windows. When amplicon coordinates are uncharacterized or unpublished, PyEuk reconstructs target panels _de novo_ from raw read coverage peaks mapped to a draft assembly. Across benchmark cohorts spanning _Cyclospora cayetanensis_ and _Plasmodium vivax_, PyEuk recovers epidemiological structure established by tracebacks, geography, and recurrence classification without requiring organism-specific parameter recalibration. In foodborne outbreaks, it resolves independent transmission chains using either curated or _de novo_ panels and scales to national surveillance archives exceeding 8,058 isolates. In _P. vivax_ malaria, its heterozygosity-weighted identity-by-state (wIBS) distance separates continental lineages, discriminates homologous from heterologous recurrence pairs, and delineates transmission clusters. Rather than forcing an arbitrary partition on continuous variation, PyEuk evaluates bootstrap stability, reporting supported cluster count ranges alongside reproducible transmission cores. PyEuk provides a portable, reproducible foundation for eukaryotic pathogen surveillance.
+
+## Introduction
+
+Multilocus sequence typing (MLST) has anchored molecular epidemiology and public health surveillance since 1998. Developed by [Maiden et al. (1998)](https://pubmed.ncbi.nlm.nih.gov/9501229/) to overcome the inter-laboratory variability and subjective scoring of gel electrophoresis, MLST replaced analog band patterns with digital sequence types. By sequencing internal fragments of conserved housekeeping loci and assigning sequential integers to distinct alleles, the method established an objective, portable classification framework that underpins surveillance and outbreak investigations across hundreds of bacterial, fungal, and parasitic species ([Maiden 2006](https://pubmed.ncbi.nlm.nih.gov/16774461/), [Jolley et al. 2018](https://pubmed.ncbi.nlm.nih.gov/30345391/)).
+
+Even in the era of high-throughput sequencing, MLST and its gene-by-gene descendants remain central. While whole-genome sequencing (WGS) offers complete genome resolution, public health surveillance routinely confronts clinical and environmental specimens—such as stool or produce washes—where pathogen biomass is dwarfed by host and commensal DNA. Under these conditions, unbiased WGS is cost-prohibitive without culture enrichment, whereas targeted amplicon sequencing delivers deep coverage directly from uncultured, low-biomass templates ([Neafsey et al. 2021](https://pubmed.ncbi.nlm.nih.gov/33833443/)). Furthermore, many clinically significant infections are polyclonal; while short-read WGS collapses co-circulating lineages into chimeric consensus sequences, amplicon deep sequencing recovers physically phased microhaplotypes at single-molecule resolution ([Callahan et al. 2016](https://pubmed.ncbi.nlm.nih.gov/27214047/), [Callahan et al. 2017](https://pubmed.ncbi.nlm.nih.gov/28731476/), [Hathaway et al. 2018](https://pubmed.ncbi.nlm.nih.gov/29202193/), [Tessema et al. 2022](https://pubmed.ncbi.nlm.nih.gov/32840625/)). High-throughput sequencing accelerated gene-by-gene typing, scaling the approach to core-genome (cgMLST) and whole-genome (wgMLST) schemes spanning thousands of loci ([Maiden et al. 2013](https://pubmed.ncbi.nlm.nih.gov/23979428/), [Moura et al. 2016](https://pubmed.ncbi.nlm.nih.gov/27723724/), [Silva et al. 2018](https://pubmed.ncbi.nlm.nih.gov/29543149/)). However, this portability requires centralized curation and database synchronization for every new allele and profile ([Uelze et al. 2020](https://pubmed.ncbi.nlm.nih.gov/33829127/)). For eukaryotic parasites lacking dedicated consortia, this dependency creates an operational bottleneck.
+
+The foodborne apicomplexan parasite _Cyclospora cayetanensis_ illustrates the practical limits of catalogue-dependent typing. Outbreak investigations are bedeviled by prolonged incubation periods and perishable produce vehicles that disperse cases across jurisdictions ([Herwaldt 2000](https://pubmed.ncbi.nlm.nih.gov/11049789/), [Markon et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39561398/)), leaving an orphaned backlog of over 2,200 U.S. cases unlinked between 2011 and 2015 without a validated typing tool ([Casillas et al. 2019](https://pubmed.ncbi.nlm.nih.gov/31002104/)). Initial five-locus microsatellite typing resolved only 17 genotypes across 54 patients, suffered amplification dropouts, and conflated unrelated cases ([Hofstetter et al. 2019](https://pubmed.ncbi.nlm.nih.gov/30702060/)). To improve resolution, the Centers for Disease Control and Prevention (CDC) developed a targeted amplicon panel of polymorphic nuclear markers ([Houghton et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32275020/)). Because _Cyclospora_ infections are frequently heterozygous or multi-strain mixtures that break discrete allele calls, [Barratt et al. (2019)](https://pubmed.ncbi.nlm.nih.gov/31148531/) bypassed allele catalogues, quantifying pairwise genetic dissimilarity between specimen haplotype sets using an ensemble of Bayesian and heuristic classifiers. This distance grouped 648 of 927 clinical specimens during the 2018 outbreak ([Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/)), matured into a production pipeline with 90% sensitivity and 99% specificity in 2019 ([Barratt et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34511150/)), and introduced tree-cutting heuristics for cluster detection ([Barratt and Plucinski 2023](https://pubmed.ncbi.nlm.nih.gov/36617302/), [Jacobson et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37744999/)).
+
+While distance-based heuristics established the empirical viability of catalogue-free parasite typing, translating these methods into accessible surveillance tools has proven difficult. The original implementation was developed as an institutional prototype rather than a distributable software package. Consequently, external public health laboratories seeking to adopt the approach had to navigate script releases bound to legacy environments without containerized workflows or test suites ([Yanta et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35208901/)). Furthermore, because the underlying algorithms were tailored to a specific amplicon panel and pathogen, extending the methodology to other eukaryotic parasites or sequencing assays required bioinformatic re-engineering. To address these limitations, we developed PyEuk to refine the statistical foundations and computational performance of haplotype-based typing. By replacing heuristic classifier ensembles with dropout-tolerant identity-by-state metrics and vectorizing pairwise calculations, PyEuk executes substantially faster while establishing a principled framework for cluster discovery.
+
+Existing amplicon pipelines cleave into two distinct camps. General community-profiling suites such as mothur and QIIME 2 ([Schloss et al. 2009](https://pubmed.ncbi.nlm.nih.gov/19801464/), [Bolyen et al. 2019](https://pubmed.ncbi.nlm.nih.gov/31341288/)) identify whole-amplicon sequence variants without reference coordinate placement, rendering haplotype definitions dependent on read length and primer trimming. Conversely, specialized parasite-typing tools—including SeekDeep, HaplotypR, AmpSeqR, MAD⁴HatTeR, and vivaxGEN—are tailored to specific pathogens or multiplex panels, requiring user-supplied primer coordinates, custom target databases, or organism-specific heuristics ([Lerch et al. 2017](https://pubmed.ncbi.nlm.nih.gov/29132317/), [Hathaway et al. 2018](https://pubmed.ncbi.nlm.nih.gov/29202193/), [Han et al. 2023](https://pubmed.ncbi.nlm.nih.gov/39584015/), [Aranda-Díaz et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40155691/), [Kleinecke et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40764298/)). Similarly, veterinary metabarcoding platforms like Nemabiome depend on curated marker databases for species assignment ([Avramenko et al. 2015](https://pubmed.ncbi.nlm.nih.gov/26630572/), [Workentine et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32650716/)). Adapting existing pipelines to emerging parasites or new panels therefore requires substantial manual effort, often without validated reference schemes ([Jesudoss Chelladurai et al. 2025](https://pubmed.ncbi.nlm.nih.gov/41408328/)).
+
+To decouple multilocus typing from curated allele catalogues and assay-specific scripts, we developed PyEuk—a modular, open-source software framework and Galaxy workflow ecosystem ([Galaxy Community 2024](https://pubmed.ncbi.nlm.nih.gov/38769056/)). PyEuk defines and names microhaplotypes deterministically from sequence differences relative to a reference within data-adaptive coverage windows, generating portable labels without centralized databases. When amplicon coordinates are uncharacterized or unavailable, PyEuk reconstructs the panel _de novo_ from coverage peaks of raw sequencing reads mapped to a draft genome. Furthermore, PyEuk quantifies clustering uncertainty by evaluating stability across bootstrap resamples, reporting supported cluster count ranges alongside stable transmission cores. We demonstrate PyEuk across five surveillance and clinical validation cohorts from _Cyclospora cayetanensis_ and _Plasmodium vivax_, evaluating foodborne outbreak investigations with curated and _de novo_ panels, an expanded multi-cluster outbreak assay, a six-year national surveillance archive, a clinical recurrence study, and travel-associated malaria surveillance with panel sizes ranging from 6 to 495 amplicons.
+
+## Results
+
+### An end-to-end framework for catalogue-free typing and panel inference
+
+PyEuk operationalizes multilocus typing through an end-to-end analytical framework implemented as modular command-line tools within the `pyeuk` suite and interoperable Galaxy workflows (Figure 1). Depending on whether amplicon target coordinates are pre-defined or inferred _de novo_, analyses follow one of two pathways. In the Standard workflow, aligned reads are first processed by `define-windows` to delineate shared, high-coverage coordinate intervals across the cohort, ensuring that all specimens are evaluated over an identical reference baseline. Within each window, `call-haplotypes` extracts spanning reads, resolves insertions and deletions, and filters sequencing errors based on read counts and abundance. PyEuk avoids arbitrary integer allele numbers: each haplotype receives a deterministic label recording its exact variant positions relative to the reference within each window (for example, `=` for a reference match, or notation such as `14A>G` or `28_29insT`). When laboratories share the identical reference sequence, coordinate conventions, and window definitions, these variant strings provide directly portable microhaplotype identifiers without central database synchronization. These calls are compiled by `build-sheet` into a specimen-by-haplotype matrix that explicitly distinguishes biological absence from missing calls caused by PCR dropout. Finally, `eukaryotyping` computes pairwise heterozygosity-weighted identity-by-state (wIBS) distances across mutually amplified loci, and `cluster` performs hierarchical grouping.
+
+Secondary analysis of amplicon archives is routinely hamstrung when primer schemes and target coordinates are omitted from sequence repositories. PyEuk overcomes this through its Panel-Inference workflow, reconstructing target panels _de novo_ from raw read coverage. Because targeted amplicon sequencing concentrates reads into sharp depth peaks against an unamplified genomic background, mapping a sample of reads to a draft reference assembly delineates amplified targets. The `derive-panel` module discovers these contiguous peaks via a data-adaptive coverage threshold and exports the corresponding reference sequences into a panel FASTA for downstream analysis. Inferred panels frequently achieve higher and more uniform cohort coverage than the original curated markers (Figure S1).
+
+Hierarchical clustering trees are often cut at fixed thresholds, which can impose artificial boundaries on continuous genetic variation. PyEuk instead evaluates partition stability across bootstrap resamples. Because missing data from locus dropouts can introduce non-Euclidean distortions, PyEuk provides optional projection of pairwise dissimilarities onto the positive semi-definite cone. When independent clustering metrics concur, the pipeline reports a single partition. When support is divided, it reports the range of supported cluster counts and identifies stable cores—groups of specimens that consistently cluster together across resamples—alongside the fraction of specimen pairs decisively classified as linked or unlinked.
+
+<Figure
+  alt="Figure 1. The two PyEuk workflows"
+  caption={
+    <figcaption>
+      <span>
+        <b>Figure 1. The two PyEuk workflows.</b> <b>(A) Standard workflow</b>,
+        used when the panel is known. <code>bwa-mem2</code> (
+        <a href="https://doi.org/10.1109/IPDPS.2019.00041">
+          Vasimuddin et al. 2019
+        </a>
+        ) aligns reads to the panel, and <code>define-windows</code>,{" "}
+        <code>call-haplotypes</code>, <code>build-sheet</code>,{" "}
+        <code>eukaryotyping</code>, and <code>cluster</code> produce the sweep
+        and report. <b>(B) Panel-Inference workflow</b>, used when the panel is
+        unavailable. <code>bwa-mem2</code> (
+        <a href="https://doi.org/10.1109/IPDPS.2019.00041">
+          Vasimuddin et al. 2019
+        </a>
+        ) aligns reads to the reference genome, and <code>derive-panel</code>{" "}
+        identifies amplicon coverage peaks and writes their reference sequences
+        to a panel FASTA. This becomes the panel input for (A). The tag above
+        each step indicates whether it operates on one specimen or the full
+        cohort.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_workflow.svg"
+/>
+
+### Resolving foodborne outbreak clusters with curated and de novo amplicon panels
+
+The 2018 multi-state _Cyclospora_ outbreak provides a benchmark to test whether PyEuk can resolve real-world transmission chains with and without curated panel coordinates. During this outbreak, epidemiologic traceback linked 153 clinical specimens with complete sequence data to two independent commercial produce distributors: 98 cases to Vendor A and 55 to Vendor B (from a broader investigation of 648 genotyped specimens; [Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/)). We typed these 153 specimens under two parallel regimes: first using the authors' curated eight-marker amplicon panel, and second using a panel inferred _de novo_ from raw sequencing reads mapped to a draft reference genome. While the curated assay targets eight loci, the eighth marker is a mitochondrial junction with variable-number tandem repeats that requires multi-template matching against twenty junction sequences rather than a single linear reference (Methods §4b). Because PyEuk aligns reads against linear coordinates without variant catalogues, it excludes this repeat junction, typing the remaining seven single-reference markers across 28 read-derived sub-amplicon windows (corresponding to the 24 published CDC BED intervals).
+
+Applied to the 153 clinical specimens using the curated eight-marker panel, PyEuk's consensus sweep converges on _k_ = 2, separating the two commercial distributors. This partition closely matches the epidemiologic traceback (adjusted Rand index 0.9737), identifying 14 stable cores with 90% of specimen pairs decisively classified as linked or unlinked across bootstrap resamples. All 98 Vendor A specimens cluster together alongside one Vendor B specimen, while 54 of the 55 Vendor B specimens form the second cluster. Whereas established surveillance frameworks partition hierarchical trees using supervised distance thresholds tuned against known epidemiologic links ([Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/); [Barratt and Plucinski 2023](https://pubmed.ncbi.nlm.nih.gov/36617302/)), PyEuk's unsupervised sweep recovers this outbreak division directly from sequence dissimilarities without label training.
+
+PyEuk matches this discriminatory accuracy when operating without curated panel coordinates. Mapping raw reads to the draft assembly CcayRef3 (RefSeq GCF_002999335.1; 738 contigs, contig N50 193 kb), `derive-panel` extracted six contiguous coverage peaks. Whereas fixed curated markers exhibit variable amplification efficiency (median depth 588×; Figure S1), `derive-panel` isolates regions of high, uniform coverage (median depth 5,464×), excluding dropout-prone loci. The derived panel separates the two commercial suppliers completely: the primary bifurcation yields an exact 98-and-55 split matching Vendor A and Vendor B (adjusted Rand index 1.0000). Beneath this primary division, higher polymorphism within the derived panel splits the vendor clusters into subclusters; because these internal divisions vary across bootstrap resamples, the sweep reports a range of [12, 28] groups rather than a single point estimate, delineating 15 stable cores with 93% of specimen pairs decisively classified as linked or unlinked.
+
+Reconstructing the typing panel _de novo_ preserves the branching structure of the outbreak (Figure 2). When comparing the tree built from the curated eight-marker panel against the tree inferred from the derived six-amplicon panel, pairwise tree distances correlate strongly (cophenetic correlation _r_ = 0.9755), and the hierarchical order of cluster merges is preserved (Baker's Gamma γ = 0.9269). Both panels yield congruent specimen groupings across the tree, demonstrating that automated panel discovery captures genuine epidemiological relationships rather than mapping noise. Given only raw amplicon reads and a draft reference genome, PyEuk reconstructs the assay _de novo_ and recovers outbreak transmission networks with high fidelity.
+
+<Figure
+  alt="Figure 2. Outbreak cluster recovery and topological congruence between curated and derived amplicon panels"
+  caption={
+    <figcaption>
+      <span>
+        <b>
+          Figure 2. Outbreak cluster recovery and topological congruence between
+          curated and derived amplicon panels.
+        </b>{" "}
+        Facing Ward hierarchical trees constructed from pairwise
+        heterozygosity-weighted identity-by-state (wIBS) distances for 153
+        clinical <i>Cyclospora cayetanensis</i> specimens from the 2018
+        foodborne outbreak. Leaves are coloured by epidemiologically verified
+        tracebacks (Vendor A in blue, Vendor B in orange).{" "}
+        <b>(A) Curated panel:</b> Using the published eight-marker CDC panel,
+        the primary bifurcation separates the two suppliers with an adjusted
+        Rand index of 0.9737, misplacing only a single Vendor B specimen into
+        the Vendor A cluster. <b>(B) Derived panel:</b> Using a six-amplicon
+        panel reconstructed <i>de novo</i> by <code>derive-panel</code> from raw
+        reads mapped to the draft assembly CcayRef3 without target metadata, the
+        primary bifurcation achieves complete vendor separation (adjusted Rand
+        index 1.0000; 98 Vendor A and 55 Vendor B specimens). Across the full
+        cohort, branching topologies are highly congruent (cophenetic
+        correlation <i>r</i> = 0.9755, Baker's Gamma γ = 0.9269), demonstrating
+        that uncurated sequencing reads and a draft reference genome are
+        sufficient to reconstruct transmission chains with high fidelity.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_supplied_vs_derived.svg"
+/>
+
+Whereas the 2018 benchmark presented a binary traceback (_k_ = 2), molecular surveillance routinely confronts multi-source contamination events where multiple transmission chains circulate concurrently. An independent investigation by the US Food and Drug Administration ([Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/); BioProject PRJNA1052691) provides a benchmark for this regime. Seeking to improve the resolution of the original eight-marker assay, the authors developed an expanded 52-locus targeted amplicon sequencing (TAS) panel and used the Barratt eukaryotyping ensemble to delineate 24 discrete clusters across 66 clinical specimens (CDC01–CDC66). We tested whether PyEuk could recover these clusters without access to the authors' panel coordinates. Using `derive-panel`, we mapped raw reads to the draft _C. cayetanensis_ assembly to reconstruct a 45-amplicon panel _de novo_.
+
+Rather than imposing an arbitrary cut on this multi-cluster population, PyEuk's unsupervised bootstrap sweep reports a range of [16, 25] groups, bracketing the published count of 24. This stability range holds regardless of whether the analysis is restricted to the focal outbreak cohort or expanded across the entire surveillance repository. Of the 66 clinical specimens evaluated in the published study, 65 pass completeness filtering, yielding 16 stable cores with 95% of pairs decisively resolved. When expanded to all 99 libraries in the BioProject archive—which includes technical replicates, alternative PCR preparations, and inoculated matrix samples alongside clinical specimens (84 passing filtering; [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/))—the sweep yields a consistent structure of 18 stable cores (96% of pairs resolved) across the same [16, 25] range. When evaluated at the published benchmark of _k_ = 24, the resulting Ward tree displays strong concordance with the FDA grouping (adjusted Rand index 0.84; Figure 3). Although the two analyses disagree on the broader branching order connecting these clusters (Baker's Gamma γ = 0.63)—as expected when comparing heterozygosity-weighted identity-by-state (wIBS) distances against a classifier ensemble across differing marker sets (45 derived vs. 52 curated loci)—the cluster memberships themselves show high concordance. PyEuk thus approximates the multi-cluster architecture reported by the FDA without requiring its curated primer schemes or custom lab-specific classification pipelines.
+
+<Figure
+  alt="Figure 3. Unsupervised cluster concordance with published multi-cluster outbreak groupings"
+  caption={
+    <figcaption>
+      <span>
+        <b>
+          Figure 3. Unsupervised cluster concordance with published
+          multi-cluster outbreak groupings.
+        </b>{" "}
+        <b>(A)</b> Ward hierarchical tree constructed from pairwise
+        heterozygosity-weighted identity-by-state (wIBS) distances across 65
+        clinical <i>Cyclospora cayetanensis</i> specimens (CDC01–CDC66;
+        PRJNA1052691) using a 45-amplicon panel derived <i>de novo</i> without
+        reference panel coordinates. Adjacent color strips indicate genetic
+        lineage (Lineage / Species A in green, divergent Lineage / Species B in
+        vermillion), the 24 published targeted amplicon sequencing (TAS)
+        clusters (
+        <a href="https://pubmed.ncbi.nlm.nih.gov/38792677/">
+          Leonard et al. 2024
+        </a>
+        ), and PyEuk's 16 stable transmission cores (thin outlines denote
+        singletons outside stable cores). <b>(B)</b> Metadata color legend.
+        Genetic lineages denote Lineage / Species A (<i>n</i> = 55, green) and
+        Lineage / Species B (<i>n</i> = 10, vermillion). Swatches denote the 24
+        published TAS clusters (<i>C</i>
+        <sub>01</sub>–<i>C</i>
+        <sub>24</sub>;{" "}
+        <a href="https://pubmed.ncbi.nlm.nih.gov/38792677/">
+          Leonard et al. 2024
+        </a>
+        ) and PyEuk's 16 stable transmission cores (≥ 90% bootstrap
+        co-assignment; thin outlines denote unassigned singletons, <i>n</i> =
+        4). Concordance benchmarks at the published partition (<i>k</i> = 24)
+        are adjusted Rand index 0.8408, sweep stability range [16, 25] clusters,
+        95.2% pairwise resolution, Baker's Gamma γ = 0.6266, and cophenetic
+        correlation <i>r</i> = 0.6953.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_leonard_tanglegram.svg"
+/>
+
+### Resolving transmission cores across eight thousand national surveillance isolates
+
+Typing frameworks evaluated on small, well-demarcated outbreak clusters often struggle when applied to continuous, large-scale surveillance. To test whether PyEuk can sustain unsupervised cluster inference across continuous public health monitoring, we analyzed the CDC's six-year national _Cyclospora_ genotyping archive (PRJNA578931)—encompassing 8,325 clinical specimens collected between 2018 and 2023 across 40 US states and typed with the original eight-marker assay. This multi-year archive presents an expansive testbed: the data are unlabelled, span multiple transmission seasons, and reflect the biological complexity of sporadic infections, co-circulating outbreaks, and continuous background transmission.
+
+The canonical surveillance assay targets nine loci within our derived 45-amplicon panel. Because each polymorphic locus encompasses multiple data-defined microhaplotype windows, the 8,325 surveillance specimens generated an 8,325 × 613 specimen-by-haplotype matrix across 32 called windows (spanning nine represented amplicon targets, averaging 68.1 window-haplotype columns per amplicon target) and capturing circulating allelic diversity alongside multi-strain mixtures. Retaining specimens with haplotype calls across at least 10% of defined windows (`min_completeness` ≥ 0.10) excluded 267 low-coverage dropouts, leaving 8,058 high-quality isolates for national-scale clustering. The entire workflow—spanning read mapping, window definition, haplotype calling, distance matrix construction, and a 200-replicate bootstrap sweep—completed in 7.5 hours on a standard 16-core workstation, with the clustering sweep itself processing the 8,058-isolate matrix in approximately 70 minutes (and pairwise wIBS distance matrix evaluation taking under 4 minutes).
+
+Rather than forcing an arbitrary partition on this multi-year population, PyEuk's unsupervised bootstrap sweep reports a stability range of [14, 511] clusters—spanning fourteen broad genetic lineages to 511 fine-scale clusters. In the published surveillance literature, investigators routinely enforce a single integer count (_k_ = 10 to _k_ = 46) by tuning stringency heuristics against known epidemiologic links. When unsupervised selectors are evaluated on these data, however, they diverge markedly (knee, silhouette, and gap criteria do not converge), prompting prior studies to dismiss unsupervised clustering as unviable. In a continuous national transmission reservoir, the cluster count is underdetermined by sequence data alone. Rather than enforcing an arbitrary point estimate, PyEuk's sweep substantially overlaps the literature range while identifying 283 stable transmission cores (≥ 90% bootstrap co-assignment) that decisively resolve 89% of all isolate pairs (Figure 4).
+
+Analyzing structured specimen identifiers indicates that these 283 transmission cores reflect geographical and temporal transmission dynamics rather than technical batch artifacts. Although public repositories omit case reports, specimen aliases encode reporting state and collection year for 74% of the archive (Methods §13b), annotating 76% of core members across 262 cores. Among these 262 annotated cores, 185 (70.6%) span multiple US states, and 159 (60.7%) span multiple collection years. The largest core encompasses 610 specimens across 24 states over six transmission seasons, consistent with interstate fresh produce distribution networks. Concurrently, PyEuk isolates localized outbreaks (for example, among annotated specimens within cores, one core with 49% of cases in Illinois, and another with 63% in New York). Unsupervised clustering thus recovers both components of national cyclosporiasis: multi-state distribution networks and localized point-source outbreaks.
+
+<Figure
+  alt="Figure 4. Macro-population structure and transmission core dynamics across eight thousand national surveillance isolates"
+  caption={
+    <figcaption>
+      <span>
+        <b>
+          Figure 4. Macro-population structure and transmission core dynamics
+          across eight thousand national surveillance isolates.
+        </b>{" "}
+        <b>(A)</b> Macro-population architecture across 8,058 clinical{" "}
+        <i>Cyclospora</i> specimens (PRJNA578931) typed across a derived
+        45-amplicon panel. Hierarchical clustering under Ward's criterion
+        separates the population into three major clades (I–III, consistent with
+        the tripartite lineage structure reported for <i>Cyclospora</i>;{" "}
+        <a href="https://pubmed.ncbi.nlm.nih.gov/36560856/">
+          Barratt et al. 2023
+        </a>
+        ). Within each clade, fine-scale divergence harbors numerous
+        transmission cores (≥ 90% bootstrap co-assignment). <b>(B)</b>{" "}
+        Transmission core landscape across 262 state-annotated stable cores (of
+        283 cores total), plotting core size (isolate count, log scale) against
+        interstate dispersion (number of US states spanned among annotated
+        members). Marker size reflects total isolates; colors denote primary
+        reporting state. Callouts highlight landmark transmission archetypes:
+        expansive interstate distribution networks (Core 12 uniting 610
+        specimens across 24 states and six years; Core 51 spanning 19 states)
+        alongside localized point-source outbreaks (Core 1, 49% Illinois; Core
+        2, 83% Wisconsin; Core 210, 63% New York among state-annotated
+        isolates). <b>(C)</b> Interstate reach and persistence profiles across
+        262 annotated cores, demonstrating that 70.6% of cores cross state lines
+        (up to 24 states) and 60.7% persist across multiple transmission seasons
+        (≥ 2 collection years, with some cores observed across up to seven
+        years), capturing the dual architecture of national foodborne
+        transmission.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_cdc8k_tree_cores_states.svg"
+/>
+
+### Generalizing multilocus typing across diverse eukaryotic pathogen architectures
+
+Typing frameworks tailored to a single organism frequently encode assumptions—such as uniform diploidy or low within-host diversity—that fail when transferred to divergent eukaryotic architectures. To establish whether PyEuk's catalogue-free window framework generalizes beyond _Cyclospora_, we evaluated two independent validation cohorts whose biological ground truth was established by external clinical and epidemiological criteria.
+
+The first validation cohort, PvAmpSeq (PRJNA1153071), evaluates _Plasmodium vivax_ malaria across an eleven-amplicon microhaplotype panel (_n_ = 277). Designed by [Rosado et al. (2026)](https://pubmed.ncbi.nlm.nih.gov/42111217/), the panel targets eleven of the fourteen _P. vivax_ chromosomes (chromosomes 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, and 14), with each locus spanning 89 to 139 base pairs within coding regions of the PvP01 reference genome to capture linked single-molecule microhaplotypes without phasing ambiguity. Here, biological ground truth is defined at two scales. At the macro-geographic scale, truth is established by allopatric continental origin: patient isolates were collected in Peru (_n_ = 142) and the Solomon Islands (_n_ = 135), representing geographically isolated gene pools with no contemporary exchange. At the micro-epidemiological scale, truth is defined by recurrence classification from trial and cohort investigators: 91 longitudinally paired patient episodes were classified by [Rosado et al. (2026)](https://pubmed.ncbi.nlm.nih.gov/42111217/) using genetic relatedness models into homologous probable relapses (reactivation carrying genetically concordant lineages) versus heterologous probable reinfections (carrying discordant lineages). Blind to clinical and geographic metadata, PyEuk recapitulates the continental split (adjusted Rand index 0.9712 against country of origin; 140 of 142 Peru and all 135 Solomon Islands isolates assigned to their continental group) and discriminates homologous from heterologous recurrence pairs (ROC AUC 0.9608 across 85 evaluable pairs).
+
+The second validation cohort, CDC AmpliSeq (PRJNA1092573), presents an entirely different design: an open national surveillance archive of 157 travel-associated _P. vivax_ cases typed across a high-density 495-amplicon panel. Here, the ground truth is an expert-curated surveillance classification established by CDC investigators using supervised clustering ([Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/)), which resolved the 157 scored specimens into 92 discrete transmission groups—predominantly 79 isolated singletons reflecting sporadic international travel, alongside a modest smattering of small clusters. Without a pre-specified group count, PyEuk's distance-mode clustering closely reproduces this singleton-dominated benchmark (recovering 93 groups and 83 singletons against 92 deposited groups and 79 singletons). Together, these benchmarks demonstrate that data-defined microhaplotypes sustain robust unsupervised typing across divergent eukaryotic taxa without requiring organism-specific parameter recalibration.
+
+### PvAmpSeq, _Plasmodium vivax_
+
+Controlling _Plasmodium vivax_ requires teasing apart whether recurrent malaria is a hypnozoite relapse—reactivation of dormant liver parasites—or a new mosquito reinfection. Unlike _Plasmodium falciparum_, _P. vivax_ forms persistent hepatic hypnozoites that can awaken months after successful blood-stage clearance, causing recurrent clinical malaria even in the absence of active vector transmission. The distinction dictates divergent interventions: clinically, preventing relapse requires radical cure with 8-aminoquinolines (such as 14-day primaquine or single-dose tafenoquine) to clear the cryptic hepatic reservoir; epidemiologically, reinfections indicate persistent vector transmission in the community. Because recurrent blood-stage parasites are morphologically indistinguishable by microscopy, microhaplotyping provides an objective basis to adjudicate recurrent episodes.
+
+From the eleven short amplicons developed by [Rosado et al. (2026)](https://pubmed.ncbi.nlm.nih.gov/42111217/), PyEuk derived 13 catalogue-free windows, generating a 277 by 101 specimen-by-haplotype sheet across 142 Peruvian and 135 Solomon Islands isolates. Operating entirely unsupervised and blind to geographic and clinical annotations, the resulting continuous heterozygosity-weighted identity-by-state (wIBS) metric resolves the parasite population across two distinct biological scales (Figure 5).
+
+At the macro-geographic scale, PyEuk cleanly separates the two continental populations (Figure 5A). Cutting the dendrogram at two groups segregates 140 of 142 Peruvian isolates into one clade and all 135 Solomon Islands isolates into the other, yielding an adjusted Rand index of 0.9712 against continental origin. The two discordant Peruvian isolates form a tightly linked pair (_d_ = 0.019) positioned at the basal boundary between clades. Below this continental split, PyEuk identifies 51 stable transmission cores across an unsupervised stability sweep of [17, 37] clusters, partitioning 93.3% of specimen pairs with high bootstrap support (≥ 90%; all 51 cores are country-specific, with 19 in Peru and 32 in the Solomon Islands).
+
+<Figure
+  alt="Figure 5. Continental population architecture and clinical recurrence discrimination in Plasmodium vivax"
+  caption={
+    <figcaption>
+      <span>
+        <b>
+          Figure 5. Continental population architecture and clinical recurrence
+          discrimination in <i>Plasmodium vivax</i>.
+        </b>{" "}
+        <b>(A)</b> Continental macro-architecture across 277 clinical{" "}
+        <i>P. vivax</i> isolates (PRJNA1153071) typed across eleven amplicons.
+        Deep divergence at the root separates the population into two
+        continental branches (ARI = 0.9712 against country of origin), grouping
+        140 of 142 Peru isolates (blue) and all 135 Solomon Islands isolates
+        (vermillion). Below this primary split, PyEuk resolves 51 stable
+        transmission cores across an unsupervised sweep of [17, 37] clusters
+        (93.3% pairwise resolution; all 51 cores are country-specific, with 19
+        in Peru and 32 in the Solomon Islands). Two boundary Peruvian isolates
+        group adjacent to the Solomon Islands clade (<i>d</i> = 0.019).{" "}
+        <b>(B)</b> Pairwise heterozygosity-weighted identity-by-state (wIBS)
+        distance distributions across 91 longitudinal patient recurrence pairs.
+        Pairs classified as homologous probable relapses by{" "}
+        <a href="https://pubmed.ncbi.nlm.nih.gov/42111217/">
+          Rosado et al. (2026)
+        </a>{" "}
+        (<i>n</i> = 34) exhibit near-zero divergence (median 0.0208), whereas
+        heterologous probable reinfections (<i>n</i> = 51) sprawl across the
+        tree (median 0.1545; undecided, <i>n</i> = 6, median 0.1432). An
+        empirical threshold of <i>d</i> ≤ 0.070 (dashed line) separates
+        homologous from heterologous pairs. <b>(C)</b> Classification
+        concordance under the empirical threshold (<i>d</i> ≤ 0.070), achieving
+        92.9% overall concordance against the investigator classification (79 of
+        85 evaluable pairs, ROC AUC = 0.9608) with 85.3% sensitivity for
+        homologous pairs (29 of 34 caught) and 98.0% specificity against
+        heterologous pairs (50 of 51 confirmed).
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_pvampseq_tree.svg"
+/>
+
+The same genetic distance that separates continents also separates homologous from heterologous recurrence pairs (Figure 5B). Among the 91 longitudinal patient pairs available in the cohort (out of 106 deposited by [Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)), pairs classified by investigators as homologous relapses exhibit near-zero genetic distances (median 0.0208), reflecting clonal reactivation of dormant liver hypnozoites, whereas heterologous recurrences exhibit seven-fold greater divergence (median 0.1545; ROC AUC = 0.9608 across 85 evaluable pairs; 6 pairs were undecided by investigators, median 0.1432).
+
+At an empirical threshold of _d_ ≤ 0.070, PyEuk achieves 92.9% classification concordance against the investigators' genetic classification (79 of 85 pairs; Figure 5C), identifying 85.3% of homologous relapses (29 of 34 pairs) and 98.0% of heterologous reinfections (50 of 51 pairs, with one discordance; ROC AUC = 0.9608). Whereas probabilistic classification frameworks such as Pv3Rs or pairwise identity-by-descent models incorporate population allele frequency priors and complex model assumptions—with false discovery rates of 20% to 27% reported in simulation sensitivity analyses ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/))—PyEuk achieves high concordance on observed clinical pairs directly from sample-level presence/absence matrices without requiring external population allele frequency priors or explicit demographic modeling. Because this threshold was evaluated on these pairs, prospective cohorts will be needed to fix operational cutoffs. Across eleven short loci spanning 1.3 kb of sequence, PyEuk separates continental lineages and distinguishes homologous from heterologous recurrences without organism-specific tuning.
+
+### CDC AmpliSeq, _Plasmodium vivax_
+
+National genomic surveillance of travel-associated malaria presents a distinct epidemiological challenge: distinguishing sporadic international importations from domestic transmission outbreaks. In non-endemic countries like the United States, most malaria diagnoses represent independent travel to diverse endemic regions across the globe. Public health surveillance must therefore solve an asymmetric classification problem: isolating the majority of unrelated singletons while flagging common-source clusters or domestic outbreaks.
+
+The CDC AmpliSeq cohort (PRJNA1092573) tests this capacity at scale. Typed across 495 amplicons distributed across the _P. vivax_ genome—more than an order of magnitude larger than the PvAmpSeq panel—the open surveillance archive profiles 157 scored specimens against an expert-curated CDC benchmark. Dominated by sporadic international travel, this benchmark resolves the population into 92 transmission groups, including 79 isolated singletons alongside a modest smattering of small clusters.
+
+This singleton-dominated architecture illustrates the distinction between clustering objectives. Standard hierarchical clustering configured for closed clinical cohorts (count mode) assumes that isolates partition into a small number of cohesive clades; when applied to open surveillance, count sweeps hit artificial group ceilings and merge unrelated travel cases into large clusters. Indeed, PyEuk's count sweep on the 169 completeness-filtered specimens (derived from 1,960 windows on a 196 by 5,222 matrix) returns [17, 38] clusters with the true count undetermined, correctly signaling that the population cannot be represented by a modest group count.
+
+To match the open surveillance setting, PyEuk switches to distance mode, cutting the hierarchical tree at a fixed dissimilarity threshold (_d_ = 0.0869) so that unrelated cases remain singletons. Under this label-free threshold, PyEuk closely mirrors the CDC expert curation without access to external annotations, recovering 93 transmission groups and 83 singletons (adjusted Rand index 0.7801; optimizing the distance cutoff directly against the CDC benchmark yields an upper ceiling of 0.8063; largest group 25 versus 19 deposited). The contrast between PvAmpSeq and CDC AmpliSeq demonstrates that study design dictates clustering strategy: closed clinical cohorts require count mode to resolve shared transmission, whereas open surveillance archives require distance mode to preserve singletons.
+
+Projecting these distance-mode clusters across collection year (2003–2024) and reporting jurisdiction (29 U.S. states) distinguishes potential transmission links from sporadic travel (Figure 6). While most imported cases remain solitary singletons scattered across jurisdictions, PyEuk identifies prominent multi-state transmission lineages. Genotype grp66 connects 27 specimens across seven states (with 17 cases diagnosed in New York, and 26 cases diagnosed in 2023 alongside one in 2022), whereas genotype grp65 links 10 cases spanning five states across an eight-year observation window (2017–2024, observed in four separate years: 2017, 2022, 2023, and 2024). Because the national archive records jurisdiction of diagnosis rather than country of exposure, unsupervised distance clustering provides a systematic framework to distinguish shared epidemiological exposure from independent travel importations.
+
+<Figure
+  alt="Figure 6. CDC AmpliSeq surveillance footprint"
+  caption={
+    <figcaption>
+      <span>
+        <b>Figure 6. CDC AmpliSeq surveillance footprint.</b> Bubbles show
+        specimens by U.S. state of diagnosis (rows, 29 states) and collection
+        year (columns, 2003–2024). Bubble area represents specimen count (
+        <i>n</i> = 169). State identifies the jurisdiction of diagnosis for an
+        imported case. The archive does not record the parasite's country of
+        exposure. Rings identify cells containing a genotype assigned to a
+        multi-specimen distance-mode group (Ward linkage cut at 0.0869).{" "}
+        <b>grp66</b> (vermillion) encompasses 27 specimens across seven states
+        (17 in New York; 26 in 2023 and 1 in 2022), and <b>grp65</b> (blue)
+        encompasses 10 specimens across five states (Florida, Louisiana,
+        Arkansas, New York, and Texas) detected across four years within the
+        2017–2024 observation window (2017, 2022, 2023, and 2024). Five further
+        genotypes (green) each link a smaller set of cells. A dashed ring marks
+        a two-specimen cluster within a single cell. Clustering includes all 169
+        retained specimens (100 groups, including 89 singletons). The adjusted
+        Rand agreement in the text uses the 157 specimens also labelled in the
+        deposited cluster table. Eight specimens lack a recorded state and six
+        lack a year, shown as ‘unknown’.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig_cdc_footprint.svg"
+/>
+
+---
+
+## Discussion
+
+Molecular surveillance of eukaryotic pathogens has historically adapted frameworks from bacteriology. Bacterial multilocus sequence typing (MLST; [Maiden et al. 1998](https://pubmed.ncbi.nlm.nih.gov/9501229/), 2013) established a standard by indexing variation against curated databases of discrete alleles—a system that encounters biological limits in eukaryotic parasites characterized by meiotic recombination, polyclonality, copy-number variation, and within-host diversity. For neglected eukaryotic pathogens, maintaining static allele catalogues places a substantial curation burden on surveillance laboratories. PyEuk addresses this by decoupling microhaplotype extraction from pre-existing catalogues, extracting physically linked variants directly from individual sequencing reads across defined genomic windows. By standardizing reference sequences, coordinates, and window intervals, these variant definitions can be shared across laboratories without maintaining a centralized allele repository. The framework is pathogen- and amplicon-agnostic—scaling from compact surveillance assays in _Cryptosporidium_ ([Ryan et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34715087/)) to 1,960 targets in extensive panels. However, this flexibility operates within biophysical bounds. First, microhaplotypic phasing is anchored to the length of single reads or merged fragments (typically 250 to 500 bp on Illumina instruments), avoiding statistical phasing across unlinked loci. Second, linear window models cannot accommodate non-linear structural rearrangements or variable-number tandem-repeat (VNTR) junctions that vary in copy number and require multi-template matching or fragment sizing. A prominent example is the eighth marker of the CDC _Cyclospora_ panel, a mitochondrial repeat junction that cannot be aligned to a single linear reference and is omitted in catalogue-free analysis (Methods §4b). That PyEuk achieves near-perfect epidemiological separation (ARI = 0.9737) using the seven linear loci demonstrates that dense single-molecule microhaplotypes substitute handily for the absent repeat junctions, though integrating specialized repeat callers remains an important future direction. Furthermore, PyEuk operates with or without prior locus coordinates: while it refines user-supplied BED intervals, executing `derive-panel` discovers amplicons _de novo_ from raw read coverage peaks, as demonstrated by coordinate-free reconstruction of the _Cyclospora_ panel (45 derived of 52 curated loci; [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/)).
+
+Our empirical findings also illuminate broader practical challenges in targeted amplicon panel design for eukaryotic pathogen surveillance. Across multiplex PCR assays, sequencing coverage across targeted ampliconic regions varies wildly (Figure S1). Multiplex primer design for eukaryotic parasites is inherently demanding due to fluctuating GC composition, complex repetitive architectures, and unrecognized polymorphism within primer-binding regions across diverse strains ([LaVerriere et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35437908/)). Consequently, widely used community panels frequently exhibit suboptimal thermodynamic or stoichiometric balance, resulting in pronounced amplification disparities where a small subset of efficient amplicons sequesters the vast majority of sequencing throughput while other targets achieve only marginal depth or drop out entirely (Figure S1). In the 495-amplicon _P. vivax_ CDC AmpliSeq panel, for example, median amplicon depths span several orders of magnitude, with numerous targets receiving only tens of reads. Similarly, in the 2018 _Cyclospora_ outbreak cohort, the curated panel yielded a median depth of 588× alongside substantial interquartile dispersion, whereas empirical panel derivation concentrated sequencing effort on consistently amplified coverage peaks (median depth 5,464×; Figure S1). These observations suggest that general amplicon panels are frequently not designed or balanced as effectively as they could be, and would benefit from iterative experimental re-optimization to prune inefficient loci and balance multiplex pools. Until such panel refinements are routine, analytical software must remain robust to these design imperfections. PyEuk accommodates this operational reality both upstream—by enabling data-adaptive panel derivation that selectively captures robustly covered regions—and downstream, by incorporating locus-dropout-tolerant pairwise distance formulations that prevent uneven target performance from biasing phylogenetic and epidemiological inference.
+
+Translating genetic divergence into actionable public health clusters depends on the epidemiological objective. In closed traceback investigations or clinical recurrence trials (such as the 2018 _Cyclospora_ outbreak or longitudinal malaria cohorts), cases coalesce into a small, bounded number of exposures; here, count-mode cuts and partition-stability searches identify discrete epidemiological groups. Conversely, in continuous surveillance across wide geographic archives—such as the two-decade CDC AmpliSeq cohort (2003–2024) across 29 U.S. states—the landscape is dominated by sporadic singletons. Rather than forcing a single clustering heuristic across these disparate regimes, PyEuk aligns the tree-partitioning strategy with the study design: count-mode cuts resolve bounded outbreaks, while distance-mode cuts (_d_ = 0.0869) preserve background singletons while delineating multi-state transmission clusters. Delineating cluster boundaries in continuous hierarchical trees is an ongoing challenge in molecular epidemiology. The CDC eight-marker _Cyclospora_ archive has been analyzed across studies reporting cluster counts from 10 to 46 ([Barratt et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34511150/); [Barratt and Plucinski 2023](https://pubmed.ncbi.nlm.nih.gov/36617302/); [Jacobson et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37744999/); [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/)), reflecting the sensitivity of static distance thresholds in an expanding surveillance archive. PyEuk complements these frameworks by reporting stability sweeps rather than prescribing a single cut: with the curated panel, the sweep settles decisively on [2, 2] when boundaries are discrete, while delineating a broader stability range of [14, 511] with 283 reproducible cores across 8,058 national surveillance isolates. Communicating this stability envelope helps epidemiologists distinguish robust transmission cores (≥ 90% bootstrap co-assignment) from boundary-sensitive assignments.
+
+Across cohorts spanning distinct apicomplexan parasite species, PyEuk mirrored or refined published surveillance findings. PyEuk separated the 2018 _Cyclospora_ distribution chains (Vendor A 98/98, Vendor B 54/55; adjusted Rand index ARI = 0.9737, 1 error; [2, 2] sweep); mapped 24 published _Cyclospora_ TAS clusters without panel coordinates into a stable range of [16, 25] clusters and 16 transmission cores (ARI = 0.8408; [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/)); replicated published CDC AmpliSeq surveillance groupings (93 groups and 83 singletons vs. 92 groups and 79 singletons published; ARI = 0.7801 label-free, 0.8063 tuned); and grouped 8,058 national surveillance isolates into three major clades consistent with the tripartite _Cyclospora_ lineage structure ([Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/)). In _Plasmodium vivax_ ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)), PyEuk recovered continental lineages (Peru 140/142, Solomon Islands 135/135; ARI = 0.9712) and classified 85 longitudinal recurrence pairs with 92.9% concordance against the investigators' model classification (AUC = 0.9608, detecting 29 of 34 homologous pairs with 1 discordance at _d_ ≤ 0.070). While Bayesian identity-by-descent algorithms such as Pv3Rs ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)) provide formal probabilistic likelihoods, their calibration can be sensitive to background allele frequency estimation in settings with limited population baselines, where false discovery rates of 20% to 27% have been observed in simulated sensitivity analyses. When amplicon panels provide high microhaplotypic diversity, direct observation of physical multi-SNP configurations offers straightforward empirical classification without requiring external population allele frequency priors or models, while explicit genealogical models remain valuable for likelihood ratios in low-diversity populations.
+
+Scalable molecular epidemiology requires accessible software architectures that execute rapidly on standard computational infrastructure. PyEuk is an end-to-end Python package (`pyeuk`) providing an upstream panel-inference tool (`derive-panel`) alongside a five-stage core command hierarchy (`define-windows`, `call-haplotypes`, `build-sheet`, `eukaryotyping`, `cluster`). By isolating haplotype extraction from distance evaluation and vectorizing heterozygosity-weighted pairwise calculations using dense Numba-compiled array kernels, the software processes expansive cohorts with dispatch; evaluating pairwise wIBS distances across the 8,058-specimen CDC _Cyclospora_ archive requires under 4 minutes on a standard 16-core workstation (with the full 200-replicate bootstrap sweep completing in approximately 70 minutes). To support public health laboratories operating with limited computational resources, PyEuk is open source and can be downloaded right now from GitHub ([https://github.com/spond/pyeuk](https://github.com/spond/pyeuk)) and Bioconda ([https://bioconda.github.io/recipes/pyeuk/README.html](https://bioconda.github.io/recipes/pyeuk/README.html)), with companion Galaxy workflows ([Galaxy Community 2024](https://pubmed.ncbi.nlm.nih.gov/38769056/); [Bray et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36828587/)) currently under review and to become available from the Intergalactic Workflow Commission (IWC; [https://iwc.galaxyproject.org/](https://iwc.galaxyproject.org/)).
+
+These principles generalize across neglected tropical diseases and veterinary parasitology. In waterborne enteric protozoa like _Cryptosporidium parvum_ and _C. hominis_, surveillance has traditionally relied on Sanger sequencing of the hypervariable _gp60_ locus, which provides broad typing but cannot disentangle mixed-strain oocyst co-infections ([Ryan et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34715087/)), while _Giardia duodenalis_ displays allelic sequence heterozygosity and deep assemblage divergence ([Cacciò et al. 2008](https://pubmed.ncbi.nlm.nih.gov/18571176/)) that challenge standard MLST. Similarly, kinetoplastid parasites like _Leishmania_ and _Trypanosoma cruzi_ display aneuploidy, somy variation, and hybrid lineages ([Rogers et al. 2011](https://pubmed.ncbi.nlm.nih.gov/22038252/); [Zingales 2018](https://pubmed.ncbi.nlm.nih.gov/28941731/)); because PyEuk avoids forcing read counts into diploid genotypes and evaluates continuous heterozygosity-weighted identity-by-state across presence/absence haplotype matrices, it natively accommodates multiple co-infecting lineages and polyclonality without requiring diploid genotype constraints. In veterinary parasitology, amplicon deep sequencing of gastrointestinal nematodes profiles species composition and anthelmintic resistance loci (such as isotype-1 β-tubulin; [Avramenko et al. 2015](https://pubmed.ncbi.nlm.nih.gov/26630572/); [Workentine et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32650716/); [Jesudoss Chelladurai et al. 2025](https://pubmed.ncbi.nlm.nih.gov/41408328/)). By requiring reads to span entire windows, PyEuk preserves physical phase across adjacent codons, clarifying whether resistance mutations reside on shared or distinct haplotypes—a capability equally relevant for tracking linked antifungal resistance in emerging fungal pathogens like _Candida auris_ (_ERG11_, _FKS1_; [Chow et al. 2018](https://pubmed.ncbi.nlm.nih.gov/30293877/)).
+
+Targeted amplicon sequencing is increasingly accessible to public health and disease surveillance programs. By grounding inference in physically observed sequencing reads, decoupling analysis from static reference catalogues, and reporting clustering stability across study designs, PyEuk provides a flexible, modular foundation for molecular epidemiology. As genomic surveillance networks expand, catalogue-free microhaplotype analysis offers a portable framework to translate amplicon sequencing into epidemiological insights across diverse eukaryotic pathogens.
+
+## Methods
+
+### 1. Analysis pipeline and command hierarchy
+
+PyEuk performs unsupervised multilocus microhaplotype genotyping, pairwise genetic distance calculation, and hierarchical clustering directly from amplicon sequencing reads and an unannotated reference panel, operating entirely without pre-curated variant catalogues. Catalogue-dependent typing schemes (such as classical MLST or centralized variant registries) founder when confronting hypervariable eukaryotic pathogens that undergo rapid meiotic recombination, extensive polyclonality, or lack dedicated curation consortia. PyEuk resolves this bottleneck by deriving coordinates, variant definitions, and clustering stability directly from sequencing data through six command-line tools: an upstream panel-inference module (`pyeuk derive-panel`) and a core five-stage analysis pipeline:
+
+| Command                 | Function                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pyeuk derive-panel`    | Reconstructs amplicon panels _de novo_ from raw read coverage peaks mapped to a draft genome                 |
+| `pyeuk define-windows`  | Identifies optimal sub-amplicon analysis windows directly from read coverage                                 |
+| `pyeuk call-haplotypes` | Extracts, normalizes, and filters physically phased microhaplotypes from spanning reads                      |
+| `pyeuk build-sheet`     | Compiles multi-sample calls into a binary specimen-by-haplotype matrix                                       |
+| `pyeuk eukaryotyping`   | Computes pairwise locus-dropout-tolerant, heterozygosity-weighted identity-by-state (wIBS) genetic distances |
+| `pyeuk cluster`         | Builds hierarchical trees, evaluates partition stability, and delineates clusters                            |
+
+When amplicon coordinates are uncharacterized, `pyeuk derive-panel` extracts candidate markers directly from read coverage; the subsequent three pipeline commands dynamically determine informative sub-amplicon intervals and assemble physical sequence reads into a structured haplotype matrix; the final two commands quantify genetic divergence and partition transmission groups across diverse surveillance study designs (Methods §9 and §10).
+
+### 2. Unit of analysis: linked microhaplotypes versus single-site variants
+
+The fundamental operational unit in PyEuk is the _window microhaplotype_—the exact, gap-normalized nucleotide sequence observed across a defined reference interval on a single, continuous physical sequencing read. Conventional per-site variant callers fragment reads into isolated single-nucleotide polymorphisms, discarding physical phase information and conflating polyclonal mixtures with multiply mutated monoclonal lineages. By strictly conditioning haplotype calls on sequencing reads that cover every nucleotide of a window interval end to end, PyEuk preserves physical within-molecule linkage without invoking statistical imputation or cross-molecule phasing assumptions.
+
+A read contributes to a haplotype call if and only if its alignment spans every base of the target window [*pos*<sub>start</sub>, *pos*<sub>end</sub>]. Across polyclonal infections, this physical constraint preserves true lineage architecture. For example, when two polymorphic sites occur within a single window, spanning reads directly establish whether mutations reside on the same sequenced molecule or represent co-infecting lineages carrying distinct single variants. In a specimen with two variant positions each exhibiting ~50% allele frequency, a per-site caller cannot distinguish between two co-circulating single-mutant strains and a dual-mutant lineage co-existing with wild type. By conditioning haplotype calls on physical reads that span the entire window end to end (Figure S2), PyEuk directly observes within-molecule phase, distinguishing separate co-infecting lineages from multi-mutant haplotypes without relying on statistical imputation.
+
+### 3. Surveillance and clinical validation cohorts
+
+We evaluated PyEuk across five surveillance and clinical validation cohorts spanning two eukaryotic pathogen species (_Cyclospora cayetanensis_ and _Plasmodium vivax_), panel densities from 6 to 495 amplicons, and diverse epidemiological study designs (Table 1). Empirical validation follows the progression of analytical regimes presented in the Results: (1) resolving a binary foodborne outbreak with curated versus _de novo_ panels, (2) recovering multi-cluster outbreak structures without reference panel coordinates, (3) scaling unsupervised transmission core discovery across an expansive multi-year national surveillance archive, (4) adjudicating continental divergence and clinical recurrence (relapse vs. reinfection) in malaria, and (5) dissecting singleton-dominated open national surveillance.
+
+**Table 1. Surveillance and clinical validation cohorts.**
+
+| Cohort                     | BioProject   | Panel                                             | Loci / Windows              |       Specimens        | Source                                                                                                                          |
+| :------------------------- | :----------- | :------------------------------------------------ | :-------------------------- | :--------------------: | :------------------------------------------------------------------------------------------------------------------------------ |
+| _Cyclospora_ 2018 outbreak | PRJNA578931  | CDC 8-marker (7 linear loci) / Derived 6-amplicon | 7 / 6 amplicons (24/28 win) |          153           | [Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/)                                                             |
+| _Cyclospora_ FDA TAS       | PRJNA1052691 | Derived 45-amplicon (52-locus TAS)                | 45 amplicons (26 win)       |    66 (99 archive)     | [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/)                                                                |
+| _Cyclospora_ surveillance  | PRJNA578931  | Derived 45-amplicon (9 expanded CDC loci)         | 9 loci (32 called win)      | 8,325 (8,058 retained) | [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/); [Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/) |
+| _P.\ vivax_ PvAmpSeq       | PRJNA1153071 | 11 microhaplotype markers                         | 11 amplicons (13 win)       |          277           | [Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)                                                                 |
+| _P.\ vivax_ CDC AmpliSeq   | PRJNA1092573 | 495 amplicons                                     | 444 amplicons (1,760 win)   |   196 (169 retained)   | [Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/)                                                                |
+
+Panel sizes range from 6 to 495 sequences across two species, evaluating five distinct surveillance and clinical cohorts:
+
+**Cyclospora 2018 foodborne outbreak.** The 153-specimen 2018 multi-state outbreak cohort represents clinical isolates with verified traceback evaluated in the initial molecular investigation ([Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/); BioProject PRJNA578931 / PRJNA498911). We typed these specimens under two parallel regimes: first using the published curated eight-marker amplicon panel (typing the seven single-reference linear loci across 28 read-derived sub-amplicon windows corresponding to the 24 published CDC BED intervals while omitting the non-linear mitochondrial repeat junction; Methods §4b), and second using a six-amplicon panel inferred _de novo_ by `derive-panel` from raw reads mapped to the draft assembly CcayRef3 (RefSeq GCF*002999335.1). This benchmark evaluates binary outbreak cluster recovery (\_k* = 2) and topological congruence between curated and derived panels.
+
+**Cyclospora FDA TAS multi-cluster cohort.** To test multi-cluster resolution in the absence of panel coordinates, we evaluated the targeted amplicon sequencing (TAS) dataset generated by the US Food and Drug Administration ([Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/); BioProject PRJNA1052691). The study established an expert-curated benchmark of 24 discrete clusters across 66 clinical specimens (CDC01–CDC66) using the Barratt eukaryotyping classifier ensemble on a 52-locus panel. We tested whether PyEuk could reconstruct the panel and recover these clusters without access to primer schemes or target coordinates, utilizing `derive-panel` to infer a 45-amplicon panel _de novo_ from raw reads mapped to CcayRef3 across the 66 clinical specimens (65 passing completeness filtering) and the full 99-library archive (84 passing filtering).
+
+**Cyclospora national surveillance archive.** To test whether PyEuk sustains unsupervised cluster inference across continuous, large-scale public health monitoring, we analyzed the CDC's six-year national _Cyclospora_ genotyping archive (PRJNA578931; [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/); [Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/)). Encompassing 8,325 clinical specimens collected between 2018 and 2023 across 40 US states, this multi-year archive presents an unlabelled, open surveillance testbed spanning multiple transmission seasons. While the 2018 outbreak investigation utilized the original eight-marker assay (seven linear loci evaluated), ongoing national CDC surveillance expanded the scheme to target nine loci within our derived 45-amplicon panel. Filtering at `min_completeness` ≥ 0.10 retained 8,058 high-quality isolates across 32 called windows (yielding a 613-column haplotype matrix across nine represented amplicon targets), evaluating macro-population species divergence, bootstrap stability sweeps, and transmission core persistence across states and years.
+
+**PvAmpSeq, _Plasmodium vivax_.** Designed by Rosado et al. (2026; BioProject PRJNA1153071) to investigate recurrent malaria, the PvAmpSeq panel evaluates _P. vivax_ malaria across eleven microhaplotype amplicons targeting eleven chromosomes of the PvP01 reference genome (generating 13 catalogue-free windows). The cohort comprises 277 clinical isolates (all quality-passing runs under PRJNA1153071) evaluated against two independent ground truths: (1) macro-geographic allopatric origin between Peru (_n_ = 142) and the Solomon Islands (_n_ = 135), and (2) recurrence classification across 91 longitudinally paired patient episodes classified by trial and cohort investigators ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)) using genetic relatedness models into homologous probable hypnozoite relapses (_n_ = 34), heterologous probable mosquito reinfections (_n_ = 51), and undecided cases (_n_ = 6). This cohort tests whether continuous genetic distances can separate continental lineages and distinguish relapse from reinfection without external population allele frequency priors or model tuning.
+
+**CDC AmpliSeq, _Plasmodium vivax_.** The CDC AmpliSeq cohort (PRJNA1092573; [Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/)) evaluates open national genomic surveillance of travel-associated _P. vivax_ malaria. Comprising 196 patient libraries collected between 2003 and 2024 across 29 US states and typed across a high-density 495-amplicon panel (444 amplicons passing quality filters and yielding 1,760 retained sub-amplicon windows out of 1,960 published BED intervals), the dataset represents an asymmetric classification benchmark. Retaining 169 specimens with completeness ≥ 0.70, isolates were evaluated against an expert-curated CDC benchmark resolving 157 scored specimens into 92 transmission groups (dominated by 79 isolated singletons). This cohort tests PyEuk's distance-mode clustering for isolating sporadic international travel importations while identifying multi-state domestic transmission clusters.
+
+All raw sequencing reads were retrieved from the European Nucleotide Archive (ENA). We retained only sequencing runs where both paired-end FASTQ files downloaded completely, verified by comparing downloaded byte counts against archive manifests. Each result set details excluded runs. Amplicon and read lengths are omitted because they could not be independently sourced from public archive metadata.
+
+### 4a. Panel coordinate curation and linear verification
+
+Reference panels were assembled as FASTA files containing one representative sequence per amplicon locus, derived from the source publications' deposited data, and subjected to coordinate verification prior to alignment. Unsupervised microhaplotyping requires unambiguous coordinates; panel curation resolves indexing discrepancies, identifies non-linear repeat junctions, and screens read archives before alignment.
+
+For PvAmpSeq, cross-referencing the published Chr09 marker (reported as 128 bases in the publication's table) against the PvP01 reference genome interval (`PvP01_09_v1:1459600-1459728`, 129 bases) identified a missing guanine at zero-based offset 119. All 312 published Chr09 haplotypes are 129 bases long and retain this guanine, demonstrating that the error resided in the publication's summary table rather than the underlying dataset. We corrected the panel sequence accordingly and retained the original file.
+
+### 4b. Non-linear tandem-repeat junctions
+
+Markers characterized by non-linear repetitive junctions represent an intrinsic methodological boundary for linear catalogue-free microhaplotyping. Standard sequence alignment and window definition assume collinear mapping against a single static reference sequence. When an assay targets variable-number tandem-repeat (VNTR) arrays or complex genomic junctions that vary in repeat copy number, forcing reads against a single linear reference generates clipped alignments, degenerate gaps, and spurious variant calls. Such loci historically demand multi-template sequence catalogues or fragment-sizing algorithms that lie outside the scope of window-based microhaplotyping.
+
+The CDC eight-marker _Cyclospora_ panel provides a clear illustration of this architectural constraint: its eighth marker spans a mitochondrial junction containing variable tandem repeats of a 15-base unit, which the original surveillance pipeline types by length classification and multi-template matching against 20 curated junction sequences rather than alignment to a single reference ([Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/); [Barratt et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34511150/)). Because PyEuk models linear alignments against a single reference per locus, this marker was omitted, restricting analysis to the seven single-reference loci. This restriction matches the published CDC BED schema, which tiles 24 target regions across these exact seven loci. As demonstrated in the Results, dense microhaplotypes across the seven linear markers provide ample phylogenetic signal to achieve near-perfect outbreak separation (ARI = 0.9737) without the repeat junction.
+
+### 5. Read alignment and primary filtering
+
+PyEuk aligns raw paired-end sequencing reads against the amplicon panel and extracts high-confidence, non-redundant primary alignments. Amplicon libraries frequently contain non-specific primer binding, chimeric artifacts, and multi-mapping reads; alignment filtering ensures consistent read representation, preventing coverage inflation and spurious haplotype calls.
+
+Reads are mapped using `bwa-mem2` (v2.2.1; [Vasimuddin et al. 2019](https://doi.org/10.1109/IPDPS.2019.00041)). Alignments are filtered via `pysam` to retain reads satisfying three strict criteria: (1) mapping quality score MAPQ ≥ 20, (2) flag indicating a properly paired read pair (`PROPER_PAIR`), and (3) exclusion of secondary (`SECONDARY`) and supplementary (`SUPPLEMENTARY`) alignments. Restricting analysis to primary alignments of properly paired reads removes secondary and supplementary mappings, preventing multi-mapping artifacts from contributing redundant haplotype observations.
+
+### 6. Dynamic catalogue-free window definition
+
+The `pyeuk define-windows` command automatically identifies data-adaptive sub-amplicon coordinate intervals with balanced spanning read support directly from empirical read alignments without requiring pre-annotated locus boundaries. In targeted amplicon sequencing, forward and reverse sequencing reads originate from disparate primer positions and overlap asymmetrically. Naively pinning an analysis window to the first covered nucleotide restricts spanning coverage to a single strand, whereas maximizing width alone selects intervals that starve one read orientation. Dynamic optimization ensures windows capture maximum haplotype length while preserving balanced spanning coverage across both sequencing strands.
+
+Window definition evaluates three properties across each reference sequence: coverage extent, placement, and width. The coverage extent is aggregated from the first and last positions meeting read depth ≥ 20 across sampled specimens. Within this extent, candidate intervals are evaluated across a width grid and scored by the objective function _S_ = width × _f_<sub>span</sub>, where _f_<sub>span</sub> is the fraction of overlapping reads that span the interval end to end (_f_<sub>span</sub> ≥ 0.30). Spanning fractions are measured directly from empirical CIGAR alignments rather than inferred from nominal read lengths, avoiding percentile-based estimation biases where a nominal 70% read-length rule delivered only 30% to 33% observed spanning coverage.
+
+Asymmetric read initiation across strands demonstrates the necessity of strand-aware placement. Across an amplified target where forward and reverse reads initiate at staggered positions (for example, spanning positions 191 to 515 with depth ≥ 20, where forward reads initiate predominantly at position 195 and reverse reads at 212), only a small fraction of reads reach the first covered base (107 reads). Tiling from the first base limits the window to 150 bases (48.1% spanning coverage). Scoring width alone selects a 300-base window spanned by 34.2% of reads overall but only 0.04% of forward reads. Multiplying width by spanning fraction shifts the start by 24 bases to position 215 (reached by 92.8% of reads), recovering a 270-base window with 97.6% spanning coverage. The algorithm tiles the remaining coverage extent at this width, placing a boundary at the start of the spannable interval; leading or trailing remnants meeting the minimum width threshold are retained as distinct adjacent windows.
+
+### 7. Microhaplotype calling and abundance-based error filtering
+
+The `pyeuk call-haplotypes` command extracts, normalizes, and filters single-molecule microhaplotypes across all defined windows for each specimen, reporting observed variants alongside explicit uncalled records. PCR amplification and Illumina sequencing introduce base substitutions and indel alignment ambiguities that artificially inflate haplotype diversity if unpoliced. Pre-count normalization standardizes indel representations, while abundance-ratio filtering purges putative single-base sequencing errors and PCR chimeras (1-bp neighbors with ≥ 8-fold abundance disparity) while preserving authentic low-frequency lineages.
+
+For each specimen and window, the caller: (1) selects reads covering every base of the window, (2) left-aligns all gap coordinates to their leftmost equivalent positions, (3) tallies exact sequence occurrences, (4) purges putative single-base sequencing errors if a 1-bp neighbor is ≥ 8-fold more abundant, (5) applies the tripartite depth and frequency thresholds in Table 2, and (6) writes one record per passing haplotype.
+
+**Table 2. The three filters of the caller.**
+
+| Filter      | Function                                                     | Default |
+| ----------- | ------------------------------------------------------------ | ------- |
+| `min_span`  | Reads that span the window, before any haplotype is examined | 30      |
+| `min_reads` | Reads that carry one haplotype                               | 10      |
+| `min_freq`  | Fraction of the spanning reads that carry one haplotype      | 0.05    |
+
+Leftmost gap normalization precedes sequence counting so that alternative alignments of identical insertion or deletion events collapse into a unified variant tally rather than being recorded as distinct alleles. Surviving haplotypes are designated by 1-based reference substitutions (e.g., `45T>A,57T>C`) or `=` for reference identity. If no haplotype passes filtering, the locus is recorded as `NOT_CALLED` with its spanning read depth (_N_<sub>span</sub> < 30 denotes uncalled; _N_<sub>span</sub> ≥ 30 denotes evaluated but filtered), preserving failed specimens in downstream matrices rather than silently dropping them.
+
+### 8. Specimen-by-haplotype matrix construction
+
+The `pyeuk build-sheet` command compiles multi-specimen haplotype calls into a binary specimen-by-haplotype matrix alongside a long-format read frequency table. Genetic distance calculation requires decoupling allelic presence from observational absence, ensuring that technical locus dropout is treated as missing data rather than identity with the reference.
+
+The matrix assigns specimens to rows and distinct window-haplotypes to columns. An entry of `X` denotes presence; all columns within a window remain empty if the locus was `NOT_CALLED`. Reference-identical alleles are explicitly tracked under `=`. An accompanying long-format table records absolute read counts and within-host frequencies for all called variants, preserving quantitative mixture proportions. Cohort-wide minor allele frequency filtering (`min_maf`) is disabled by default (0.0), as applying arbitrary thresholds (such as 0.05) removes informative rare outbreak markers, causing 2,443 of 3,392 successfully called _Cyclospora_ specimen-window observations to appear uncalled (yielding 51 columns when disabled vs 15 columns when filtered at 0.05).
+
+### 9. Weighted identity-by-state genetic distance
+
+The `pyeuk eukaryotyping` command calculates pairwise genetic distances between specimens using a locus-dropout-tolerant, heterozygosity-weighted identity-by-state (wIBS) formulation. Unsupervised surveillance data exhibit heterogeneous amplification dropout across loci. Unweighted distance metrics disproportionately reward matches at uninformative, invariant reference alleles, while standard Euclidean calculations cannot accommodate missing loci without distortion.
+
+For specimens _i_ and _j_, pairwise distance is computed strictly over the intersection of mutually called windows _W_<sub>_ij_</sub>:
+
+```
+d(i, j) = [ Σ_{w ∈ W_{ij}} (1 / m_w) Σ_{h ∈ H_w} w_{w,h} |x_{i,w,h} − x_{j,w,h}| ] / [ Σ_{w ∈ W_{ij}} Σ_{h ∈ H_w} w_{w,h} ]
+```
+
+where _x_<sub>_i_,_w_,_h_</sub> ∈ &#123;0, 1&#125; indicates haplotype presence in specimen _i_ at window _w_, _m_<sub>_w_</sub> denotes locus ploidy (_m_<sub>_w_</sub> = 2 for diploid nuclear loci and _m_<sub>_w_</sub> = 1 for mitochondrial or haploid loci), and weights follow expected heterozygosity:
+
+```
+w_{w,h} = 2 p_{w,h} (1 − p_{w,h})
+```
+
+with _p_<sub>_w_,_h_</sub> denoting the cohort-wide frequency of haplotype _h_ across specimens called at window _w_ (the default `heterozygosity` scheme in PyEuk 0.6.0). In degenerate cases where specimens share no called loci (|_W_<sub>_ij_</sub>| = 0), the pairwise distance defaults to 1.0; if all shared loci are invariant across the cohort (Σ _w_<sub>_w_,_h_</sub> = 0), distance defaults to 0.0. Ward's hierarchical clustering assumes Euclidean dissimilarity. Pairwise locus dropout can introduce mild non-Euclidean distortions (negative eigenvalues in the distance Gram matrix). PyEuk provides an optional projection onto the positive semi-definite (PSD) cone within the distance engine by clipping negative eigenvalues to zero. Projection was disabled for count-mode analyses (retaining raw metric geometry) and enabled for high-density distance-mode surveillance (CDC AmpliSeq; Table 3).
+
+### 10. Hierarchical clustering and partition selection
+
+The `pyeuk cluster` command performs agglomerative hierarchical clustering under Ward's minimum variance criterion, interrogates partition stability via a multi-selector sweep, and delineates clusters in either count or distance mode. No single clustering criterion universally fits all epidemiologic paradigms. Closed foodborne outbreaks require partitioning into a discrete number of cohesive transmission groups, whereas national surveillance archives are dominated by unrelated travel singletons where forcing specimens into a low _k_ manufactures false epidemiological linkage.
+
+The clustering sweep evaluates partition stability by subsampling 85% of specimens without replacement across _B_ = 200 resamples. Across resampled subsets, pairwise co-assignment frequencies are accumulated. A specimen pair is considered decisively resolved if |2*p* − 1| ≥ 0.5 (equivalent to co-assignment _p_ ≤ 0.25 or _p_ ≥ 0.75). _Stable transmission cores_ are identified as connected components of specimen pairs exhibiting ≥ 90% bootstrap co-assignment. Candidate cluster counts _k_ ∈ [2, *k*<sub>max</sub>] are evaluated across multiple criteria: merge-height gap knee (identifying the maximum drop in successive dendrogram join heights), average silhouette width, and the gap statistic relative to a uniform null ([Tibshirani et al. 2001](https://doi.org/10.1111/1467-9868.00293)). When selector criteria concur, PyEuk reports a determined partition. When support is divided, the reported stability range [*k*<sub>min</sub>, *k*<sub>max</sub>] is derived from consensus tree splits evaluated at 0.75 and 0.45 support thresholds, bounding the multi-scale hierarchy without enforcing an artificial point estimate.
+
+Count mode selects an optimal _k_ from the largest merge-height gap satisfying two guarded constraints: relative gap Δ*h* / _h_<sub>max</sub> ≥ 0.22, and minimum cluster membership _n_<sub>min</sub> ≥ max(2, min(5, ⌊0.10*n*⌋)). These constants were calibrated on six _Cyclospora_ sheets and 12 column-shuffled null cohorts (_k_ = 1 for nulls, _k_ = 2 for real sheets). Specimens in sub-threshold clusters remain unassigned. Count mode suits closed investigations where every accepted specimen belongs to an exposure group and clusters of two cases are uninformative.
+
+Distance mode cuts the dendrogram at an absolute dissimilarity threshold _d_<sub>cut</sub> without selecting _k_ or searching for a gap, allowing singletons to remain isolated. Without labels, PyEuk sets _d_<sub>cut</sub> to the empirical 5th percentile of pairwise distances; with labeled training pairs, it sets _d_<sub>cut</sub> = median(_d_<sub>within</sub>) + 3 × 1.4826 × MAD(_d_<sub>within</sub>).
+
+Operational mode must be selected based on study design, not organism biology. Six label-free distribution tests (Silverman multi-modality, gap statistic, silhouette, nearest-neighbor fractions, median-to-first-percentile ratios, and negative eigenvalue mass) failed to separate CDC surveillance from outbreak cohorts. Across all 157 CDC specimens at baseline completeness (≥ 0.10, including 79 singletons), distance mode achieves an ARI of 0.7952 (rising to 0.8063 when filtering completeness ≥ 0.70, or 0.7801 under label-free cut selection) while count mode collapses to 0.0470 (forcing 79 singletons into one cluster). Conversely, restricting analysis to the four largest published clusters removes singletons, inverting performance: count mode achieves an ARI of 1.0000 while distance mode yields 0.1137.
+
+### 11. Software architecture, containerization, and Galaxy workflows
+
+PyEuk is implemented in Python 3.10+ as an open-source software suite with automated unit tests (54 of 54 passing), containerized images, and Galaxy workflow integrations. Deploying surveillance tools across public health laboratories requires platform independence, containerization, and accessible workflow execution.
+
+Computational bottlenecks in pairwise wIBS distance calculation and dendrogram evaluation are vectorized via NumPy and SciPy. Core read alignment parsing uses `pysam` (packaged via the `amplicon` extra on PyPI). The software is open source and can be downloaded right now from GitHub ([https://github.com/spond/pyeuk](https://github.com/spond/pyeuk)) and Bioconda ([https://bioconda.github.io/recipes/pyeuk/README.html](https://bioconda.github.io/recipes/pyeuk/README.html)).
+
+Conceptually, PyEuk operates under two overarching analytical workflows (Figure 1): the Standard workflow when amplicon coordinates are known, and the Panel-Inference workflow when panels must be derived _de novo_ from raw reads using `derive-panel`. For execution on compute infrastructure, PyEuk's core Standard pipeline is integrated into Galaxy through three standardized, Planemo-tested workflow implementations: (1) end-to-end FASTQ processing with dynamic window derivation, (2) FASTQ processing with user-supplied BED coordinates, and (3) BAM execution for rapid parameter re-sweeps without repeating alignment. Companion Galaxy workflows are registered on WorkflowHub ([Gustafsson et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40399296/)), are currently under review, and will become available from the Intergalactic Workflow Commission (IWC; [https://iwc.galaxyproject.org/](https://iwc.galaxyproject.org/)). Each workflow exports a standardized artifact bundle: coordinate BED, specimen-by-haplotype matrix, wIBS distance matrix, cluster membership table, and run-parameter JSON.
+
+### 12. Cohort-specific parameterization and completeness filtering
+
+Detailed parameter configurations applied across empirical validation benchmarks are summarized in Table 3. Panel density and sequencing depth dictate specific quality control thresholds, particularly when distinguishing low-depth technical dropouts from authentic biological variation.
+
+**Table 3. The settings of each run.**
+
+| Cohort       | `min_span` | `min_freq` | Windows       | Projection | Cut mode                                     | Ploidy (_m_) | `min_completeness` |
+| ------------ | ---------- | ---------- | ------------- | ---------- | -------------------------------------------- | ------------ | ------------------ |
+| _Cyclospora_ | 30         | 0.05       | from reads    | off        | count                                        | 2 (nuclear)  | 0.10               |
+| PvAmpSeq     | 30         | 0.05       | from reads    | off        | count                                        | 2 (nuclear)  | 0.10               |
+| CDC AmpliSeq | 30         | 0.10       | published BED | on         | distance 0.0869 (label-free) / 0.080 (tuned) | 2 (nuclear)  | 0.70               |
+
+Both _Cyclospora_ and PvAmpSeq utilized identical front-end filtering (_N_<sub>span</sub> ≥ 30, _f_<sub>hap</sub> ≥ 0.05) and read-derived windows with PSD projection disabled. CDC AmpliSeq applied _f_<sub>hap</sub> ≥ 0.10 across 1,960 published BED intervals (retaining calls across 1,760 windows; median width 68 bases, range 16 to 78 bases) with PSD projection enabled. Locus ploidy defaults to _m_<sub>_w_</sub> = 2 for nuclear loci and _m_<sub>_w_</sub> = 1 for mitochondrial loci; because none of the workflow runs specified ploidy overrides, all nuclear loci across both _Cyclospora_ and _P. vivax_ cohorts were evaluated under the default _m_ = 2 allele-sharing formulation. The CDC AmpliSeq distance cut of 0.08 maximizes agreement with published surveillance labels; label-free calibration selects 0.0869 and gives an ARI of 0.7801, indicating that 0.08 is label-tuned.
+
+For CDC AmpliSeq alone, `min_completeness` was raised from 0.10 to 0.70. Specimen completeness exhibited a bimodal distribution with an empty gap between 0.5301 and 0.7068 (median 0.945): 169 specimens were at or above 0.70 (minimum 0.7068) and 27 below (maximum 0.5301). Raising the threshold excluded 27 low-coverage specimens (8 with zero calls, 5 below 0.10, 4 between 0.10 and 0.35, and 10 between 0.35 and 0.55), increasing ARI by 0.0111 (from 0.7952 to 0.8063). Completeness filtering is panel-dependent; a cohort covering only part of an assay may exhibit completeness near 0.50 and would be excluded by a 0.70 threshold.
+
+### 13a. Performance evaluation and benchmark scoring
+
+We evaluated clustering accuracy and distance discrimination against independent ground truth benchmarks from source publications (Table 4). Unsupervised typing must be rigorously validated against external clinical, geographic, and outbreak annotations without using those annotations during inference.
+
+**Table 4. Ground truth benchmarks for empirical scoring.**
+
+| Cohort                           | Comparison                                                        | Source                                                                                                                                                                       |
+| -------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cyclospora 2018 outbreak         | Two commercial distributor clusters                               | Epidemiologic traceback ([Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/))                                                                                |
+| Cyclospora FDA TAS               | 24 multi-cluster outbreak groupings                               | Published classifier ensemble ([Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/))                                                                             |
+| Cyclospora national surveillance | Species/lineage clades and multi-state/year core persistence      | Archive metadata and parsed sample aliases ([Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/); [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/)) |
+| PvAmpSeq                         | Continental origin (Peru vs. Solomon Islands)                     | Archive metadata ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/))                                                                                           |
+| PvAmpSeq                         | Homologous versus heterologous recurrence across 91 patient pairs | Multi-locus IBD / genetic relatedness classification ([Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/))                                                       |
+| CDC AmpliSeq                     | 92 transmission groups (79 singletons) and travel history         | Expert-curated CDC benchmark ([Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/))                                                                              |
+
+Partition concordance was evaluated via the Adjusted Rand Index (ARI), where 1.0 indicates identical assignments and 0 indicates chance-level agreement. Each ARI is reported alongside the number of scored specimens, excluding unassigned isolates. Genetic distance discrimination was quantified by Receiver Operating Characteristic Area Under the Curve (ROC AUC), where 0.5 denotes no discrimination and 1.0 denotes complete separation. Comparisons utilize deposited results from source publications without rerunning external tools in frozen histories.
+
+### 13b. Inferring specimen state and year from identifiers
+
+Public sequencing archives frequently omit case report forms and epidemiological metadata. In the absence of clinical records, structured sample identifiers provide an independent means to evaluate whether transmission cores capture authentic multi-state or localized outbreaks.
+
+In BioProject PRJNA578931, sample aliases encode reporting state and collection year within structured naming schemas. Aliases follow `<yy>US<ST>…`: a two-digit year, country code `US`, and two-letter state abbreviation (e.g., `18USIA…` denotes Iowa 2018). Regex parsers extracted state and collection year for 6,136 of 8,325 specimens (74%) in PRJNA578931 (annotating 76% of core members across 262 cores).
+
+These annotations represent inferred metadata rather than formal epidemiological records: reporting state does not guarantee the place of exposure, and collection year cannot resolve discrete transmission chains within a season. Because multi-state produce distribution produces multi-state _Cyclospora_ outbreaks, cores spanning multiple states are expected under commercial foodborne transmission. We therefore use state and year to describe the geographic and temporal composition of stable transmission cores, never as ground truth for ARI scoring.
+
+### 14. Held-out cross-validation and parameter stability
+
+We evaluated the generalization performance and parameter stability of the minimum spanning read filter (`min_span`) across held-out test partitions. Because the full-cohort benchmark threshold of `min_span` = 30 was initially identified via a parameter sweep across the 153 _Cyclospora_ outbreak specimens, repeated cross-validation is required to quantify potential in-sample optimization bias.
+
+We executed 40 independent random Monte Carlo splits (65% training, 35% testing; _n_<sub>test</sub> = 53). For each split, we evaluated two settings on the held-out specimens: a fixed default of `min_span` = 30 and a value tuned strictly on that split's training set. We also recorded the value obtained by tuning on the held-out set itself, representing an empirical upper-bound oracle.
+
+A fixed threshold of 30 yields a mean held-out ARI of 0.8608, a median of 0.9237, and a standard deviation of 0.2594 (with three of the 40 splits returning 0.0000 due to over-pruning). Training-set tuning achieves a mean ARI of 0.8950 and a median of 0.9242. The oracle mean is 0.9524, representing an in-sample selection advantage of 0.0574.
+
+### 15. Data and code availability
+
+All sequencing datasets analyzed in this study are publicly available from the NCBI Sequence Read Archive (SRA) and European Nucleotide Archive (ENA) under the BioProject accessions listed in Table 1. PyEuk is open source and can be downloaded right now from GitHub ([https://github.com/spond/pyeuk](https://github.com/spond/pyeuk)) and Bioconda ([https://bioconda.github.io/recipes/pyeuk/README.html](https://bioconda.github.io/recipes/pyeuk/README.html)). Companion Galaxy workflows are currently under review and will become available from the Intergalactic Workflow Commission (IWC; [https://iwc.galaxyproject.org/](https://iwc.galaxyproject.org/)).
+
+---
+
+## Acknowledgments
+
+We thank the entire Galaxy team and Björn Grüning for their support and contributions to this work. This research was supported by the National Institute of Allergy and Infectious Diseases (NIAID) of the National Institutes of Health (NIH) under award number [U24AI183870](https://reporter.nih.gov/search/ITDZqr1H70e4HYCRe8gT6A/project-details/11141082) (_An integrated platform for multiomic analyses of pathogen and host data using scalable public infrastructure_).
+
+---
+
+## References
+
+Aranda-Díaz A, Neubauer Vickers E, Murie K, et al. Sensitive and modular amplicon sequencing of
+_Plasmodium falciparum_ diversity and resistance for research and public health. Sci Rep.
+2025;15:10737. [doi:10.1038/s41598-025-94716-5](https://doi.org/10.1038/s41598-025-94716-5). [PMID 40155691](https://pubmed.ncbi.nlm.nih.gov/40155691/).
+
+Avramenko RW, Redman EM, Lewis R, Yazwinski TA, Wasmuth JD, Gilleard JS. Exploring the
+gastrointestinal "nemabiome": deep amplicon sequencing to quantify the species composition of
+parasitic nematode communities. PLoS One. 2015;10(12):e0143559. [doi:10.1371/journal.pone.0143559](https://doi.org/10.1371/journal.pone.0143559).
+[PMID 26630572](https://pubmed.ncbi.nlm.nih.gov/26630572/).
+
+Barratt JLN, Park S, Nascimento FS, et al. Genotyping genetically heterogeneous _Cyclospora
+cayetanensis_ infections to complement epidemiological case linkage. Parasitology.
+2019;146(10):1275-1283. [doi:10.1017/S0031182019000581](https://doi.org/10.1017/S0031182019000581). [PMID 31148531](https://pubmed.ncbi.nlm.nih.gov/31148531/).
+
+Barratt J, Houghton K, Richins T, et al. Investigation of US _Cyclospora cayetanensis_ outbreaks
+in 2019 and evaluation of an improved _Cyclospora_ genotyping system against 2019 cyclosporiasis
+outbreak clusters. Epidemiol Infect. 2021;149:e214. [doi:10.1017/S0950268821002090](https://doi.org/10.1017/S0950268821002090). [PMID 34511150](https://pubmed.ncbi.nlm.nih.gov/34511150/).
+
+Barratt JLN, Plucinski MM. Epidemiologic utility of a framework for partition number selection
+when dissecting hierarchically clustered genetic data evaluated on the intestinal parasite
+_Cyclospora cayetanensis_. Am J Epidemiol. 2023;192(5):772-781. [doi:10.1093/aje/kwad006](https://doi.org/10.1093/aje/kwad006).
+[PMID 36617302](https://pubmed.ncbi.nlm.nih.gov/36617302/).
+
+Barratt JLN, Shen J, Houghton K, et al. _Cyclospora cayetanensis_ comprises at least 3 species
+that cause human cyclosporiasis. Parasitology. 2023;150(3):269-285.
+[doi:10.1017/S003118202200172X](https://doi.org/10.1017/S003118202200172X). [PMID 36560856](https://pubmed.ncbi.nlm.nih.gov/36560856/).
+
+Barratt JLN, Jacobson D, Pierre-Louis E, et al. Genetic characterization of _Plasmodium vivax_
+linked to autochthonous malaria transmission in the US (2023) using Illumina AmpliSeq
+technology: a genetic epidemiology study. Lancet Reg Health Am. 2025;48:101159.
+[doi:10.1016/j.lana.2025.101159](https://doi.org/10.1016/j.lana.2025.101159). [PMID 40612707](https://pubmed.ncbi.nlm.nih.gov/40612707/).
+
+Bolyen E, Rideout JR, Dillon MR, et al. Reproducible, interactive, scalable and extensible
+microbiome data science using QIIME 2. Nat Biotechnol. 2019;37:852-857.
+[doi:10.1038/s41587-019-0209-9](https://doi.org/10.1038/s41587-019-0209-9). [PMID 31341288](https://pubmed.ncbi.nlm.nih.gov/31341288/).
+
+Bray S, Chilton J, Bernt M, et al. The Planemo toolkit for developing, deploying, and executing
+scientific data analyses in Galaxy and beyond. Genome Res. 2023;33:261-268.
+[doi:10.1101/gr.276963.122](https://doi.org/10.1101/gr.276963.122). [PMID 36828587](https://pubmed.ncbi.nlm.nih.gov/36828587/).
+
+Cacciò SM, Beck R, Lalle M, et al. Multilocus genotyping of _Giardia duodenalis_ reveals
+striking differences between assemblages A and B. Int J Parasitol. 2008;38(13):1523-1531.
+[doi:10.1016/j.ijpara.2008.04.008](https://doi.org/10.1016/j.ijpara.2008.04.008). [PMID 18571176](https://pubmed.ncbi.nlm.nih.gov/18571176/).
+
+Callahan BJ, McMurdie PJ, Rosen MJ, Han AW, Johnson AJ, Holmes SP. DADA2: high-resolution sample
+inference from Illumina amplicon data. Nat Methods. 2016;13(7):581-583. [doi:10.1038/nmeth.3869](https://doi.org/10.1038/nmeth.3869).
+[PMID 27214047](https://pubmed.ncbi.nlm.nih.gov/27214047/).
+
+Callahan BJ, McMurdie PJ, Holmes SP. Exact sequence variants should replace operational
+taxonomic units in marker-gene data analysis. ISME J. 2017;11:2639-2643.
+[doi:10.1038/ismej.2017.119](https://doi.org/10.1038/ismej.2017.119). [PMID 28731476](https://pubmed.ncbi.nlm.nih.gov/28731476/).
+
+Casillas SM, Hall RL, Herwaldt BL. Cyclosporiasis surveillance — United States, 2011-2015. MMWR
+Surveill Summ. 2019;68(3):1-16. [doi:10.15585/mmwr.ss6803a1](https://doi.org/10.15585/mmwr.ss6803a1). [PMID 31002104](https://pubmed.ncbi.nlm.nih.gov/31002104/).
+
+Chow NA, Gade L, Tsay SV, et al. Multiple introductions and subsequent transmission of
+multidrug-resistant _Candida auris_ in the USA: a molecular epidemiological survey. Lancet
+Infect Dis. 2018;18(12):1377-1384. [doi:10.1016/S1473-3099(18)30597-8](<https://doi.org/10.1016/S1473-3099(18)30597-8>). [PMID 30293877](https://pubmed.ncbi.nlm.nih.gov/30293877/).
+
+Galaxy Community. The Galaxy platform for accessible, reproducible, and collaborative data
+analyses: 2024 update. Nucleic Acids Res. 2024;52:W83-W94. [doi:10.1093/nar/gkae410](https://doi.org/10.1093/nar/gkae410). [PMID 38769056](https://pubmed.ncbi.nlm.nih.gov/38769056/).
+
+Gustafsson OJR, Wilkinson SR, Bacall F, et al. WorkflowHub: a registry for computational
+workflows. Sci Data. 2025;12:837. [doi:10.1038/s41597-025-04786-3](https://doi.org/10.1038/s41597-025-04786-3). [PMID 40399296](https://pubmed.ncbi.nlm.nih.gov/40399296/).
+
+Han J, Munro JE, Bahlo M. AmpSeqR: an R package for amplicon deep sequencing data analysis.
+F1000Res. 2023;12:327 (version 2, 2025). [doi:10.12688/f1000research.129581.2](https://doi.org/10.12688/f1000research.129581.2). [PMID 39584015](https://pubmed.ncbi.nlm.nih.gov/39584015/).
+
+Hathaway NJ, Parobek CM, Juliano JJ, Bailey JA. SeekDeep: single-base resolution de novo
+clustering for amplicon deep sequencing. Nucleic Acids Res. 2018;46(4):e21.
+[doi:10.1093/nar/gkx1201](https://doi.org/10.1093/nar/gkx1201). [PMID 29202193](https://pubmed.ncbi.nlm.nih.gov/29202193/).
+
+Herwaldt BL. _Cyclospora cayetanensis_: a review, focusing on the outbreaks of cyclosporiasis in
+the 1990s. Clin Infect Dis. 2000;31(4):1040-1057. [doi:10.1086/314051](https://doi.org/10.1086/314051). [PMID 11049789](https://pubmed.ncbi.nlm.nih.gov/11049789/).
+
+Hofstetter JN, Nascimento FS, Park S, et al. Evaluation of multilocus sequence typing of
+_Cyclospora cayetanensis_ based on microsatellite markers. Parasite. 2019;26:3.
+[doi:10.1051/parasite/2019004](https://doi.org/10.1051/parasite/2019004). [PMID 30702060](https://pubmed.ncbi.nlm.nih.gov/30702060/).
+
+Houghton KA, Lomsadze A, Park S, et al. Development of a workflow for identification of nuclear
+genotyping markers for _Cyclospora cayetanensis_. Parasite. 2020;27:24.
+[doi:10.1051/parasite/2020022](https://doi.org/10.1051/parasite/2020022). [PMID 32275020](https://pubmed.ncbi.nlm.nih.gov/32275020/).
+
+Jacobson DK, Low R, Plucinski MM, Barratt JLN. An improved framework for detecting discrete
+epidemiologically meaningful partitions in hierarchically clustered genetic data. Bioinform Adv.
+2023;3(1):vbad118. [doi:10.1093/bioadv/vbad118](https://doi.org/10.1093/bioadv/vbad118). [PMID 37744999](https://pubmed.ncbi.nlm.nih.gov/37744999/).
+
+Jesudoss Chelladurai JRJ, Quintana TA, Abraham A. QIIME2 pipeline for ITS2-based nemabiome
+sequencing in veterinary species and the importance of analysis parameters. Parasit Vectors.
+2025;19:39. [doi:10.1186/s13071-025-07184-1](https://doi.org/10.1186/s13071-025-07184-1). [PMID 41408328](https://pubmed.ncbi.nlm.nih.gov/41408328/).
+
+Jolley KA, Bray JE, Maiden MCJ. Open-access bacterial population genomics: BIGSdb software, the
+PubMLST.org website and their applications. Wellcome Open Res. 2018;3:124.
+[doi:10.12688/wellcomeopenres.14826.1](https://doi.org/10.12688/wellcomeopenres.14826.1). [PMID 30345391](https://pubmed.ncbi.nlm.nih.gov/30345391/).
+
+Kleinecke M, Sutanto E, Rumaseb A, et al. Microhaplotype deep sequencing assays to capture
+_Plasmodium vivax_ infection lineages. Nat Commun. 2025;16:7192. [doi:10.1038/s41467-025-62357-x](https://doi.org/10.1038/s41467-025-62357-x).
+[PMID 40764298](https://pubmed.ncbi.nlm.nih.gov/40764298/).
+
+LaVerriere E, Schwabl P, Carrasquilla M, et al. Design and implementation of multiplexed amplicon
+sequencing panels to serve genomic epidemiology of infectious disease: a malaria case study. Mol
+Ecol Resour. 2022;22(6):2285-2303. [doi:10.1111/1755-0998.13622](https://doi.org/10.1111/1755-0998.13622). [PMID 35437908](https://pubmed.ncbi.nlm.nih.gov/35437908/).
+
+Leonard SR, Mammel MK, Almeria S, et al. Evaluation of the increased genetic resolution and
+utility for source tracking of a recently developed method for genotyping _Cyclospora
+cayetanensis_. Microorganisms. 2024;12(5):848. [doi:10.3390/microorganisms12050848](https://doi.org/10.3390/microorganisms12050848). [PMID 38792677](https://pubmed.ncbi.nlm.nih.gov/38792677/).
+
+Lerch A, Koepfli C, Hofmann NE, et al. Development of amplicon deep sequencing markers and data
+analysis pipeline for genotyping multi-clonal malaria infections. BMC Genomics. 2017;18:864.
+[doi:10.1186/s12864-017-4260-y](https://doi.org/10.1186/s12864-017-4260-y). [PMID 29132317](https://pubmed.ncbi.nlm.nih.gov/29132317/).
+
+Maiden MC, Bygraves JA, Feil E, et al. Multilocus sequence typing: a portable approach to the
+identification of clones within populations of pathogenic microorganisms. Proc Natl Acad Sci U S
+A. 1998;95(6):3140-3145. [doi:10.1073/pnas.95.6.3140](https://doi.org/10.1073/pnas.95.6.3140). [PMID 9501229](https://pubmed.ncbi.nlm.nih.gov/9501229/).
+
+Maiden MC. Multilocus sequence typing of bacteria. Annu Rev Microbiol. 2006;60:561-588.
+[doi:10.1146/annurev.micro.59.030804.121325](https://doi.org/10.1146/annurev.micro.59.030804.121325). [PMID 16774461](https://pubmed.ncbi.nlm.nih.gov/16774461/).
+
+Maiden MC, Jansen van Rensburg MJ, Bray JE, et al. MLST revisited: the gene-by-gene approach to
+bacterial genomics. Nat Rev Microbiol. 2013;11(10):728-736. [doi:10.1038/nrmicro3093](https://doi.org/10.1038/nrmicro3093). [PMID 23979428](https://pubmed.ncbi.nlm.nih.gov/23979428/).
+
+Markon AO, Karasick A, Punzalan C, da Silva AJ, Wolpert B. Evaluating foodborne cyclosporiasis
+using Foodborne Diseases Active Surveillance Network and Foodborne Disease Outbreak Surveillance
+System data, 2015-2019. Am J Trop Med Hyg. 2025;112(2):319-326. [doi:10.4269/ajtmh.24-0208](https://doi.org/10.4269/ajtmh.24-0208).
+[PMID 39561398](https://pubmed.ncbi.nlm.nih.gov/39561398/).
+
+Moura A, Criscuolo A, Pouseele H, et al. Whole genome-based population biology and epidemiological
+surveillance of _Listeria monocytogenes_. Nat Microbiol. 2016;2:16185.
+[doi:10.1038/nmicrobiol.2016.185](https://doi.org/10.1038/nmicrobiol.2016.185). [PMID 27723724](https://pubmed.ncbi.nlm.nih.gov/27723724/).
+
+Nascimento FS, Barratt J, Houghton K, et al. Evaluation of an ensemble-based distance statistic
+for clustering MLST datasets using epidemiologically defined clusters of cyclosporiasis.
+Epidemiol Infect. 2020;148:e172. [doi:10.1017/S0950268820001697](https://doi.org/10.1017/S0950268820001697). [PMID 32741426](https://pubmed.ncbi.nlm.nih.gov/32741426/).
+
+Neafsey DE, Taylor AR, MacInnis BL. Advances and opportunities in malaria population genomics.
+Nat Rev Genet. 2021;22(8):502-517. [doi:10.1038/s41576-021-00349-5](https://doi.org/10.1038/s41576-021-00349-5). [PMID 33833443](https://pubmed.ncbi.nlm.nih.gov/33833443/).
+
+Rogers MB, Hilley JD, Dickens NJ, et al. Chromosome and gene copy number variation allow major
+structural change between species and strains of _Leishmania_. Genome Res. 2011;21(12):2129-2142.
+[doi:10.1101/gr.122945.111](https://doi.org/10.1101/gr.122945.111). [PMID 22038252](https://pubmed.ncbi.nlm.nih.gov/22038252/).
+
+Rosado J, Han J, Obadia T, et al. Understanding _Plasmodium vivax_ recurrent infections using
+an amplicon deep sequencing assay, identity-by-descent and model-based classification.
+iScience. 2026;29:115799. [doi:10.1016/j.isci.2026.115799](https://doi.org/10.1016/j.isci.2026.115799). [PMID 42111217](https://pubmed.ncbi.nlm.nih.gov/42111217/).
+
+Ryan UM, Feng Y, Fayer R, et al. Taxonomy and molecular epidemiology of _Cryptosporidium_ and
+_Giardia_ — a 50 year perspective (1971-2021). Int J Parasitol. 2021;51(13-14):1099-1119.
+[doi:10.1016/j.ijpara.2021.08.007](https://doi.org/10.1016/j.ijpara.2021.08.007). [PMID 34715087](https://pubmed.ncbi.nlm.nih.gov/34715087/).
+
+Schloss PD, Westcott SL, Ryabin T, et al. Introducing mothur: open-source, platform-independent,
+community-supported software for describing and comparing microbial communities. Appl Environ
+Microbiol. 2009;75:7537-7541. [doi:10.1128/AEM.01541-09](https://doi.org/10.1128/AEM.01541-09). [PMID 19801464](https://pubmed.ncbi.nlm.nih.gov/19801464/).
+
+Shen J, Cama VA, Jacobson D, Barratt J, Straily A. _Cyclospora_ genotypic variations and
+associated epidemiologic characteristics, United States, 2018–2021. Emerg Infect Dis.
+2025;31(2):256-266. [doi:10.3201/eid3102.240399](https://doi.org/10.3201/eid3102.240399). [PMID 39983699](https://pubmed.ncbi.nlm.nih.gov/39983699/).
+
+Silva M, Machado MP, Silva DN, et al. chewBBACA: a complete suite for gene-by-gene schema creation
+and strain identification. Microb Genom. 2018;4(3):e000166. [doi:10.1099/mgen.0.000166](https://doi.org/10.1099/mgen.0.000166).
+[PMID 29543149](https://pubmed.ncbi.nlm.nih.gov/29543149/).
+
+Tessema SK, Hathaway NJ, Teyssier NB, et al. Sensitive, highly multiplexed sequencing of
+microhaplotypes from the _Plasmodium falciparum_ heterozygome. J Infect Dis. 2022;225(7):1227-1237.
+[doi:10.1093/infdis/jiaa527](https://doi.org/10.1093/infdis/jiaa527). [PMID 32840625](https://pubmed.ncbi.nlm.nih.gov/32840625/).
+
+Tibshirani R, Walther G, Hastie T. Estimating the number of clusters in a data set via the gap
+statistic. J R Stat Soc Series B Stat Methodol. 2001;63(2):411-423. [doi:10.1111/1467-9868.00293](https://doi.org/10.1111/1467-9868.00293).
+
+Uelze L, Grützke J, Borowiak M, et al. Typing methods based on whole genome sequencing data. One
+Health Outlook. 2020;2:3. [doi:10.1186/s42522-020-0010-1](https://doi.org/10.1186/s42522-020-0010-1). [PMID 33829127](https://pubmed.ncbi.nlm.nih.gov/33829127/).
+
+Vasimuddin M, Misra S, Li H, Aluru S. Efficient architecture-aware acceleration of BWA-MEM for
+multicore systems. IEEE Int Parallel Distrib Process Symp (IPDPS). 2019:314-324.
+[doi:10.1109/IPDPS.2019.00041](https://doi.org/10.1109/IPDPS.2019.00041).
+
+Workentine ML, Chen R, Zhu S, et al. A database for ITS2 sequences from nematodes. BMC Genet.
+2020;21:74. [doi:10.1186/s12863-020-00880-0](https://doi.org/10.1186/s12863-020-00880-0). [PMID 32650716](https://pubmed.ncbi.nlm.nih.gov/32650716/).
+
+Yanta CA, Barta JR, Corbeil A, et al. Genotyping Canadian _Cyclospora cayetanensis_ isolates to
+supplement cyclosporiasis outbreak investigations. Microorganisms. 2022;10(2):447.
+[doi:10.3390/microorganisms10020447](https://doi.org/10.3390/microorganisms10020447). [PMID 35208901](https://pubmed.ncbi.nlm.nih.gov/35208901/).
+
+Zingales B. _Trypanosoma cruzi_ genetic diversity: Something new for something known about Chagas
+disease manifestations, serodiagnosis and drug sensitivity. Acta Trop. 2018;184:38-52.
+[doi:10.1016/j.actatropica.2017.09.017](https://doi.org/10.1016/j.actatropica.2017.09.017). [PMID 28941731](https://pubmed.ncbi.nlm.nih.gov/28941731/).
+
+---
+
+---
+
+## Supplementary figures
+
+<Figure
+  alt="Figure S1. Per-amplicon coverage across cohorts, derived versus supplied panels"
+  caption={
+    <figcaption>
+      <span>
+        <b>
+          Figure S1. Per-amplicon coverage across cohorts, derived versus
+          supplied panels.
+        </b>{" "}
+        Each point shows an amplicon's median read depth across specimens. Bars
+        mark cohort medians and bands mark interquartile ranges. Depth is
+        plotted on a log scale. Derived panels (left) select amplicons from
+        coverage peaks and have high, even coverage. Supplied panels (right)
+        include poorly covered amplicons and show lower, more variable depth,
+        particularly the 495-amplicon CDC AmpliSeq panel, where some amplicons
+        have only tens of reads. In the clearest comparison, both{" "}
+        <i>Cyclospora</i> panels use the same 153 libraries: median per-amplicon
+        coverage across covered regions is 588 for the supplied panel and 5,464
+        for the derived panel, which selects the coverage peaks. Absolute depth
+        depends on sequencing effort and is not comparable across cohorts. The
+        relevant comparison is variation within and between panel types.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/figS_coverage.svg"
+/>
+
+<Figure
+  alt="Figure S2. The window haplotype"
+  caption={
+    <figcaption>
+      <span>
+        <b>Figure S2. The window haplotype.</b> A window is an interval on a
+        reference sequence. Only reads covering every base contribute a
+        haplotype: read 3 starts inside the window and read 4 ends inside it, so
+        both are excluded. Each of the other four reads contributes one
+        haplotype. Names describe differences from the reference:{" "}
+        <code>45T&gt;A,57T&gt;C</code> denotes two differences, and{" "}
+        <code>=</code> denotes a reference match. The specimen has two
+        haplotypes at this window, each supported by two reads. This is an
+        illustrative schematic demonstrating coordinate boundaries and spanning
+        requirements; production calling incorporates upstream alignment
+        filtering (MAPQ ≥ 20, proper pairs), left-alignment indel normalization,
+        and minimum spanning read count (<i>N</i>
+        <sub>span</sub> ≥ 30) and abundance frequency (<i>f</i>
+        <sub>hap</sub> ≥ 0.05) thresholds.
+      </span>
+    </figcaption>
+  }
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig1_encoding.svg"
+/>
