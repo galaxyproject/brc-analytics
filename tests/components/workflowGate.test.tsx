@@ -89,15 +89,22 @@ describe("WorkflowGate", () => {
     expect(screen.queryByText("content")).toBeNull();
   });
 
-  test("gates a workflow outside the catalog by its own rule alone", () => {
+  test("renders the fallback for a gated workflow outside the catalog", () => {
     // Stored under its raw TRS ID with no category; must fall through to the
     // workflow-level rule rather than fail the category lookup.
     renderGate(LOGAN_SEARCH.trsId);
-    expect(screen.getByText("not found")).toBeTruthy();
 
+    expect(screen.getByText("not found")).toBeTruthy();
+    expect(screen.queryByText("content")).toBeNull();
+  });
+
+  test("renders children for a workflow outside the catalog when the demo flag is on", () => {
     mockUseFeatureFlag.mockReturnValue(true);
+
     renderGate(LOGAN_SEARCH.trsId);
+
     expect(screen.getByText("content")).toBeTruthy();
+    expect(screen.queryByText("not found")).toBeNull();
   });
 
   test("renders children for gated workflows when the demo flag is on", () => {

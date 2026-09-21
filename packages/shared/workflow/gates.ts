@@ -104,8 +104,7 @@ function filterDemoGatedCategories(
     if (isDemoGatedCategory(workflowCategory.category)) continue;
     const { workflows } = workflowCategory;
     const visibleWorkflows = workflows.filter(
-      (workflow) =>
-        !isDemoGatedWorkflow({ categoryIds: [], trsId: workflow.trsId })
+      (workflow) => !isDemoGatedTrsId(workflow.trsId)
     );
     visibleCategories.push(
       visibleWorkflows.length === workflows.length
