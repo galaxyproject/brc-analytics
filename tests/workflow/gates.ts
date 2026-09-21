@@ -1,8 +1,20 @@
-import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { indexWorkflowsById } from "@repo/shared/services/workflows/loader";
+import {
+  getEntitiesById,
+  getEntitiesByType,
+  setEntitiesById,
+  setEntitiesByType,
+} from "@repo/shared/services/workflows/store";
 import {
   bindWorkflowGates,
   type WorkflowGates,
 } from "@repo/shared/workflow/gates";
+
+export const HYPHY_TRS_ID =
+  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2";
+export const UNGATED_TRS_ID =
+  "#workflow/github.com/iwc-workflows/something/main";
 
 /**
  * Builds a workflow category with the given ID and workflows. Only `category`
@@ -32,4 +44,20 @@ export function buildWorkflowCategory(
  */
 export function buildWorkflowGates(isDemoEnabled = false): WorkflowGates {
   return bindWorkflowGates(isDemoEnabled);
+}
+
+/**
+ * Seeds the workflows store as the loader does, indexing catalog and extra
+ * workflows with the loader's own rules. Clears whatever was loaded before.
+ * @param categories - Catalog workflow categories to load.
+ * @param extraWorkflows - Workflows outside the catalog to load.
+ */
+export function seedWorkflowsStore(
+  categories: WorkflowCategory[],
+  extraWorkflows: Workflow[] = []
+): void {
+  getEntitiesById().clear();
+  getEntitiesByType().clear();
+  setEntitiesById("workflows", indexWorkflowsById(categories, extraWorkflows));
+  setEntitiesByType("workflows", categories);
 }
