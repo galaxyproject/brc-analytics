@@ -2,6 +2,15 @@ import { getEntitiesById, getEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
 
 /**
+ * Finds entities by entity list type, returning undefined when none are loaded.
+ * @param entityListType - Entity list type.
+ * @returns Entities, or undefined when none are loaded.
+ */
+export function findEntities<T>(entityListType: EntityRoute): T[] | undefined {
+  return getEntitiesByType().get(entityListType) as T[] | undefined;
+}
+
+/**
  * Finds an entity by entity list type and entity id, returning undefined when
  * there is no match.
  * @param entityListType - Entity list type.
@@ -21,14 +30,14 @@ export function findEntity<T>(
  * @returns Map of entity list types to entities.
  */
 export function getEntities<T>(entityListType: EntityRoute): T[] {
-  const entities = getEntitiesByType().get(entityListType);
+  const entities = findEntities<T>(entityListType);
 
   if (!entities)
     throw new Error(
       `No entities found for entity list type: ${entityListType}`
     );
 
-  return entities as T[];
+  return entities;
 }
 
 /**

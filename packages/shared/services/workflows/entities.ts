@@ -3,7 +3,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { findEntity, getEntities, getEntity } from "./query";
+import { findEntities, findEntity, getEntities, getEntity } from "./query";
 
 /**
  * Finds an organism by entity id, returning undefined when there is no match.
@@ -23,6 +23,21 @@ export function findOrganism<T extends OrganismContract>(
  */
 export function findWorkflow(trsId: string): Workflow | undefined {
   return findEntity<Workflow>("workflows", trsId);
+}
+
+/**
+ * Finds every catalog category holding the workflow with the given raw TRS id
+ * — a workflow can be listed under more than one. Empty for a workflow no
+ * category holds, including one that exists outside the catalog, and when no
+ * workflows are loaded.
+ * @param trsId - Raw TRS id, as the catalog records it.
+ * @returns Workflow categories holding the workflow.
+ */
+export function findWorkflowCategories(trsId: string): WorkflowCategory[] {
+  return (findEntities<WorkflowCategory>("workflows") ?? []).filter(
+    (category) =>
+      category.workflows.some((workflow) => workflow.trsId === trsId)
+  );
 }
 
 /**
