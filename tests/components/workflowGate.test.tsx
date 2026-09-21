@@ -11,6 +11,7 @@ import type {
 import type { WorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
 import {
   isAssemblyWorkflowAvailable,
+  isListedWorkflowAvailable,
   isOrganismWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
@@ -67,6 +68,22 @@ function buildAssembly(galaxyDatacacheUrl: string | null): AssemblyContract {
     lineageTaxonomyIds: ["1", TAXONOMY_ID],
     ploidy: [ORGANISM_PLOIDY.DIPLOID],
   } as AssemblyContract;
+}
+
+/**
+ * Renders the gate as the workflow detail page does: with no entity.
+ * @param trsId - Workflow TRS ID, as it appears in the URL.
+ */
+function renderDetailGate(trsId: string): void {
+  render(
+    <WorkflowGate
+      fallback={<div>not found</div>}
+      isWorkflowAvailable={isListedWorkflowAvailable}
+      trsId={trsId}
+    >
+      <div>content</div>
+    </WorkflowGate>
+  );
 }
 
 /**
@@ -314,6 +331,56 @@ describe("WorkflowGate", () => {
         "unknown-organism"
       );
       expectFallback();
+    });
+  });
+
+  describe("on the workflow detail page", () => {
+    test("renders children for a workflow the listing offers", () => {
+      renderDetailGate(formatTrsId(UNGATED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders the fallback for an unknown workflow", () => {
+      renderDetailGate("stale-workflow-id");
+      expectFallback();
+    });
+
+    test("renders the fallback for a workflow in a gated category", () => {
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders the fallback for a workflow gated in its own right", () => {
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders children for a workflow also in an ungated category", () => {
+      renderDetailGate(formatTrsId(SHARED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for gated workflows when the demo flag is on", () => {
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectContent();
+      cleanup();
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for a workflow appended outside the catalog", () => {
+      renderDetailGate(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId);
+      expectContent();
+    });
+
+    test("gates an appended workflow by its own rule", () => {
+      renderDetailGate(LOGAN_SEARCH.trsId);
+      expectFallback();
+      cleanup();
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(LOGAN_SEARCH.trsId);
+      expectContent();
     });
   });
 });

@@ -5,8 +5,7 @@ import {
   loadWorkflows,
 } from "@repo/shared/services/workflows/loader";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
+import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
 
 /**
  * Ensures that the entities and workflows are loaded.
@@ -16,11 +15,7 @@ import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 export const ensureEntitiesLoaded = createEntitiesLoader(
   async (config: SiteConfig): Promise<void> => {
     await Promise.all([
-      loadWorkflows([
-        CUSTOM_WORKFLOW,
-        DIFFERENTIAL_EXPRESSION_ANALYSIS,
-        ...LMLS_WORKFLOWS,
-      ]),
+      loadWorkflows([CUSTOM_WORKFLOW, ...UNCATALOGED_WORKFLOWS]),
       loadEntities(config),
     ]);
   }
