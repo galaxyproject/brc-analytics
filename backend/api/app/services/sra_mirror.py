@@ -308,13 +308,13 @@ _SORTABLE_COLUMNS: Dict[str, str] = {
 # old 11676, etc.) -- using the new ones.
 #
 # Note: These aliases are being transitioned to living in the catalog
-# input (`other_names` in organisms.yml). Any new aliases should be
+# input (`other_names` in taxa.yml). Any new aliases should be
 # mirrored there, in display format. Currently, it's assumed that the
-# aliases in organisms.yml will be matched against loosely with respect
+# aliases in taxa.yml will be matched against loosely with respect
 # to punctuation (e.g. only "E. coli" is listed, not "E.coli"); when the
 # aliases below are retired in favor of the catalog data, it may be
 # necessary to update the matching algorithm and/or add some missing
-# name variants to organisms.yml.
+# name variants to taxa.yml.
 _ORGANISM_ALIASES: Dict[str, int] = {
     # Viruses
     "sars-cov-2": 3418604,
