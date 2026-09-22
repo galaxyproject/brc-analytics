@@ -3004,6 +3004,7 @@ class TestGalaxyServiceTimeouts:
     async def test_silent_galaxy_times_out(self, monkeypatch):
         import socket
         import threading
+
         from app.core.config import get_settings
 
         # Bind a silent socket to accept a connection and drop it
