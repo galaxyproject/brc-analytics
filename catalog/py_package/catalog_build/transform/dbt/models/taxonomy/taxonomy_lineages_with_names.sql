@@ -56,12 +56,28 @@ taxon_names as (
 
 ),
 
+name_keys as (
+
+    /*
+      Case-folded copy of `all_names`, aligned element-for-element, so the dedup
+      below can match names that differ only in capitalization. The lambda can
+      only see `all_names`, hence the parallel list rather than a folded
+      comparison inline.
+    */
+    select
+        *,
+        list_transform(all_names, name_txt -> lower(name_txt)) as all_name_keys
+    from taxon_names
+
+),
+
 deduped_names as (
 
     /*
       Keeping each name's first occurrence leaves a name carried by two classes
       in the earlier group, so the concatenation order above decides the output
-      order. The taxon's own scientific name is dropped; `is distinct from`
+      order -- and, among names differing only in case, which capitalization
+      survives. The taxon's own scientific name is dropped; `is distinct from`
       rather than `<>` so a taxon with no scientific name (which would make
       every comparison NULL) keeps its names instead of losing all of them.
       list_concat over empty groups yields [], never NULL, which the
@@ -73,10 +89,12 @@ deduped_names as (
         list_filter(
             all_names,
             (name_txt, i) ->
-                i = list_position(all_names, name_txt)
-                and name_txt is distinct from taxon_name
+                -- Note: case-insentive deduplication works when per-taxon as it is here, but should
+                -- be avoided when it could create discrepancies between different catalog entities.
+                i = list_position(all_name_keys, lower(name_txt))
+                and lower(name_txt) is distinct from lower(taxon_name)
         ) as other_names
-    from taxon_names
+    from name_keys
 
 )
 
