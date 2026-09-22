@@ -3,14 +3,13 @@ import { type BRCDataCatalogOrganism } from "@brc/apis/organism";
 import { type Outbreak } from "@brc/apis/outbreak";
 import { AuthButton } from "@brc/components/layout/AuthButton/authButton";
 import { Branding } from "@brc/components/layout/Branding/branding";
-import { PrimAeonButton } from "@brc/components/layout/PrimAeonButton/primAeonButton";
 import { VersionInfoWithServerStatus } from "@brc/components/layout/VersionInfoWithServerStatus/versionInfoWithServerStatus";
 import { FILTER_SORT } from "@databiosphere/findable-ui/lib/common/filters/sort/config/types";
 import { Logo } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Logo/logo";
 import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type EntityConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import { type AppSiteConfig } from "@repo/shared/config/types";
-import { createElement, Fragment } from "react";
+import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
 import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
@@ -90,12 +89,7 @@ export function makeConfig(
         versionInfo: createElement(VersionInfoWithServerStatus),
       },
       header: {
-        actions: createElement(
-          Fragment,
-          null,
-          createElement(PrimAeonButton),
-          loginEnabled ? createElement(AuthButton) : null
-        ),
+        actions: loginEnabled ? createElement(AuthButton) : undefined,
         logo: Logo({
           alt: APP_TITLE,
           height: 26,
