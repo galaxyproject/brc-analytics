@@ -10,6 +10,7 @@ with source_names as (
         name_class as ncbi_class,
         false as is_curated
     from {{ source("ncbi", "taxonomy_names") }}
+    -- Limit names to only catalog-relevant taxa, to avoid processing the entire (quite large) name list.
     where tax_id in (select tax_id from {{ ref("taxonomy_lineages") }})
 
     {% if var("has_curated_taxa", false) %}
