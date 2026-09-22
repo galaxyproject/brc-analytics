@@ -637,7 +637,7 @@ class Taxon(ConfiguredBaseModel):
     )
     other_names: List[str] = Field(
         default=...,
-        description="""Curated alternative names for the taxon, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the taxon's NCBI-derived other names in the built catalog. Should be given as display forms, since matching against them normalizes casing and punctuation.""",
+        description="""Curated alternative names for the taxon, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the taxon's NCBI-derived other names in the built catalog. Should be given as display forms; consumers are responsible for normalizing case and punctuation as appropriate.""",
         json_schema_extra={
             "linkml_meta": {"alias": "other_names", "domain_of": ["Taxon"]}
         },
