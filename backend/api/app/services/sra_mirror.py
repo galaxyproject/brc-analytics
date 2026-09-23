@@ -311,7 +311,7 @@ _SORTABLE_COLUMNS: Dict[str, str] = {
 # input (`other_names` in taxa.yml). Any new aliases should be
 # mirrored there, in display format. Currently, it's assumed that the
 # aliases in taxa.yml will be matched against loosely with respect
-# to punctuation (e.g. only "E. coli" is listed, not "E.coli"); when the
+# to punctuation (e.g. only "C. auris" is listed, not "C.auris"); when the
 # aliases below are retired in favor of the catalog data, it may be
 # necessary to update the matching algorithm and/or add some missing
 # name variants to taxa.yml.
