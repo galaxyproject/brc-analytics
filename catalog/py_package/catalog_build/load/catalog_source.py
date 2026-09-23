@@ -76,9 +76,7 @@ def load_catalog_source_data(
       taxa_df: DataFrame of source curated taxa (must include `taxonomy_id` and `other_names` columns, the latter containing a list of curated other names per taxon), or None for catalogs without curated taxa
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
     """
-    # Get dataframes with just unique taxonomy IDs as ints, plus the curated taxa's
-    # other names; duplicates are dropped by taxonomy ID alone, since the lists of other names
-    # aren't hashable
+    # Get dataframes with just unique taxonomy IDs as ints, plus the curated taxa's other names
     assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
     organism_taxa_df = organisms_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
     # Duplicates are not dropped for taxa, but *are* checked by a dbt test
