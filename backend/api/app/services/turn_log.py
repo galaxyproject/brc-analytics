@@ -28,24 +28,9 @@ from app.db.crud import (
 )
 from app.db.session import db_session
 from app.models.assistant import TurnTelemetry
+from app.services.sanitize import strip_nuls
 
 logger = logging.getLogger(__name__)
-
-
-def _strip_nuls(value):
-    """Remove NUL characters, which Postgres rejects in text and jsonb.
-
-    A NUL is legal in a Python str and in JSON, so a user can paste one into
-    the chat box and -- because this writer is fail-open -- silently keep the
-    whole turn out of the corpus. Scrubbing beats losing the row.
-    """
-    if isinstance(value, str):
-        return value.replace("\x00", "")
-    if isinstance(value, dict):
-        return {_strip_nuls(k): _strip_nuls(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_strip_nuls(v) for v in value]
-    return value
 
 
 def active_retention_days(settings=None) -> int | None:
@@ -119,13 +104,13 @@ async def _write(telemetry: TurnTelemetry) -> None:
             session_id=telemetry.session_id,
             turn_index=telemetry.turn_index,
             user_id=user_id,
-            user_message=_strip_nuls(telemetry.user_message),
-            assistant_reply=_strip_nuls(telemetry.assistant_reply),
+            user_message=strip_nuls(telemetry.user_message),
+            assistant_reply=strip_nuls(telemetry.assistant_reply),
             outcome=telemetry.outcome.value,
             error_kind=telemetry.error_kind,
-            transcript=_strip_nuls(telemetry.transcript),
+            transcript=strip_nuls(telemetry.transcript),
             transcript_truncated=telemetry.transcript_truncated,
-            schema_state=_strip_nuls(telemetry.schema_state),
+            schema_state=strip_nuls(telemetry.schema_state),
             input_tokens=usage.input_tokens,
             output_tokens=usage.output_tokens,
             total_tokens=usage.total_tokens,

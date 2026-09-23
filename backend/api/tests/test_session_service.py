@@ -2,16 +2,21 @@ import pytest
 import redis.asyncio as redis
 
 from app.models.assistant import AnalysisSchema, ChatMessage, MessageRole
-from app.services.session_service import SessionService
+from app.services.session_service import SESSION_TTL, SessionService
 
 
 class FakeCache:
     def __init__(self, fail_reads: bool = False):
         self.values: dict[str, dict] = {}
+        self.expired: dict[str, int] = {}
         self.fail_reads = fail_reads
 
     async def delete(self, key: str) -> bool:
         return self.values.pop(key, None) is not None
+
+    async def expire(self, key: str, ttl: int) -> bool:
+        self.expired[key] = ttl
+        return key in self.values
 
     async def get(self, key: str):
         return self.values.get(key)
@@ -146,3 +151,20 @@ async def test_create_session_stores_metadata():
     assert state.metadata == {"logan": {"job_id": "abc"}}
     loaded = await service.get_session(state.session_id)
     assert loaded.metadata == {"logan": {"job_id": "abc"}}
+
+
+@pytest.mark.asyncio
+async def test_touch_session_resets_the_ttl_without_rewriting_the_session():
+    """Reopening an analysis reuses a live session it only read. Writing that
+    copy back would drop any turn saved in between, so the TTL reset has to
+    leave the stored value alone."""
+    cache = FakeCache()
+    service = SessionService(cache)
+    state = await service.create_session(owner_keycloak_sub="user-a")
+    key = service._key(state.session_id)
+    stored = cache.values[key]
+
+    await service.touch_session(state.session_id)
+
+    assert cache.expired == {key: SESSION_TTL}
+    assert cache.values[key] is stored

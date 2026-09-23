@@ -167,6 +167,19 @@ class ChatResponse(BaseModel):
         default=None,
         description="Set when the session was opened from a Logan search",
     )
+    saved: bool = Field(
+        False,
+        description=(
+            "True when this turn was persisted to the user's saved analyses. "
+            "Always False for anonymous conversations."
+        ),
+    )
+
+
+class SessionSaveResponse(BaseModel):
+    """Response from explicitly saving a session to the user's account."""
+
+    saved_analysis_id: str
 
 
 class TurnOutcome(str, Enum):
@@ -215,6 +228,10 @@ class SessionState(BaseModel):
 
     session_id: str
     owner_keycloak_sub: Optional[str] = None
+    # The SavedAnalysis this conversation belongs to, once one exists. The
+    # session id is a mutable pointer -- reopening an analysis can move it --
+    # so auto-save keys on this instead wherever the session knows it.
+    saved_analysis_id: Optional[str] = None
     schema_state: AnalysisSchema = Field(default_factory=AnalysisSchema)
     messages: List[ChatMessage] = Field(default_factory=list)
     suggestions: List[SuggestionChip] = Field(default_factory=list)
@@ -237,6 +254,10 @@ class SessionRestoreResponse(BaseModel):
         default=None,
         description="Set when the session was opened from a Logan search",
     )
+    # Whether this conversation is already on disk. Without it the client can
+    # only infer saved-ness from being signed in, which is not the same
+    # question and costs a redundant save on every mount.
+    saved: bool = False
 
 
 class AssistantInfoResponse(BaseModel):

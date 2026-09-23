@@ -59,6 +59,14 @@ class SessionService:
     async def save_session(self, state: SessionState) -> None:
         await self._save(state)
 
+    async def touch_session(self, session_id: str) -> None:
+        """Reset a session's TTL without rewriting it.
+
+        For a caller that read the session and has nothing to change: saving
+        back the copy it read would overwrite any turn that landed in between.
+        """
+        await self.cache.expire(self._key(session_id), SESSION_TTL)
+
     async def require_session(
         self, session_id: str, owner_keycloak_sub: str | None
     ) -> SessionState:
