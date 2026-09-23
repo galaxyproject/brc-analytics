@@ -1,4 +1,4 @@
 export interface Props {
-  entityContext: string;
+  entityContext?: string;
   href: string;
 }
