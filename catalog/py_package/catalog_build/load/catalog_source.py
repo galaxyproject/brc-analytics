@@ -81,10 +81,10 @@ def load_catalog_source_data(
     # aren't hashable
     assembly_taxa_df = assemblies_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
     organism_taxa_df = organisms_df[["taxonomy_id"]].astype("Int64").drop_duplicates()
+    # Duplicates are not dropped for taxa, but *are* checked by a dbt test
+    # Also note that all source files will be loaded without modification following #1687
     curated_taxa_df = (
-        taxa_df[["taxonomy_id", "other_names"]]
-        .astype({"taxonomy_id": "Int64"})
-        .drop_duplicates(subset="taxonomy_id")
+        taxa_df[["taxonomy_id", "other_names"]].astype({"taxonomy_id": "Int64"})
         if taxa_df is not None
         else None
     )
