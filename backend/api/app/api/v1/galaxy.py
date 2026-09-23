@@ -186,9 +186,12 @@ async def list_kmindex_indexes(
         indexes = await galaxy_service.list_kmindex_indexes()
         return {"count": len(indexes), "indexes": indexes}
     except Exception as e:
+        # The detail is rendered on the search page, so it says what happened
+        # and nothing more: pasting the upstream failure in put a proxy's HTML
+        # error page in front of the reader, 429 and all.
         logger.error(f"Failed to list kmindex indexes: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to list kmindex indexes: {str(e)}"
+            status_code=500, detail="Failed to list kmindex indexes"
         ) from e
 
 
@@ -256,9 +259,11 @@ async def submit_kmindex_query(
             },
         ) from e
     except Exception as e:
+        # Same reason as the index list above: bioblend puts the upstream body
+        # in str(e), and this detail is rendered on the search page.
         logger.error(f"Failed to submit kmindex query: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to submit kmindex query: {str(e)}"
+            status_code=500, detail="Failed to submit kmindex query"
         ) from e
 
 
