@@ -23,12 +23,12 @@ to choose between them — including when you should use classic HyPhy instead.
 
 ## The pieces
 
-| Tool                   | What it is                                                                                                                    | Where it runs                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **PrimAeon**           | Browser app: one alignment in, one selection report out                                                                       | [primaeon.org](https://primaeon.org), entirely in your browser                                                                                        |
-| **HyphAeon**           | Python package over the foundation model — the "microscope": selection, epistasis, mutational scanning, phenotype association | `pip install hyphaeon` ([GitHub](https://github.com/veg/HyphAeon))                                                                                    |
-| **ChronAeon**          | Python package over the same model — the "radar": molecular clock dating, phylodynamics, phylogeography, genomic triage       | `pip install chronaeon` ([docs](https://veg.github.io/chronaeon))                                                                                     |
-| **HyPhy / Datamonkey** | The classic maximum-likelihood methods (MEME, BUSTED, FEL, aBSREL, …); HyphAeon is a neural surrogate for MEME                | [datamonkey.org](https://datamonkey.org), [v3.datamonkey.org](https://v3.datamonkey.org) (in-browser via WASM), or [HyPhy](https://hyphy.org) locally |
+| Tool                   | What it is                                                                                                                      | Where it runs                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **PrimAeon**           | Browser app: one alignment in, one report out — selection, co-selection, DMS, phenotype; `/time` adds clock + temporal analyses | [primaeon.org](https://primaeon.org), entirely in your browser                                                                                        |
+| **HyphAeon**           | Python package over the foundation model — the "microscope": selection, epistasis, mutational scanning, phenotype association   | `pip install hyphaeon` ([GitHub](https://github.com/veg/HyphAeon))                                                                                    |
+| **ChronAeon**          | Python package over the same model — the "radar": molecular clock dating, phylodynamics, phylogeography, genomic triage         | `pip install chronaeon` ([docs](https://veg.github.io/chronaeon))                                                                                     |
+| **HyPhy / Datamonkey** | The classic maximum-likelihood methods (MEME, BUSTED, FEL, aBSREL, …); HyphAeon is a neural surrogate for MEME                  | [datamonkey.org](https://datamonkey.org), [v3.datamonkey.org](https://v3.datamonkey.org) (in-browser via WASM), or [HyPhy](https://hyphy.org) locally |
 
 ## Which tool for which question
 
@@ -38,11 +38,25 @@ to choose between them — including when you should use classic HyPhy instead.
 | Which sites co-evolve? Where are the epistatic sectors?       | `hyphaeon epistasis`                           | Codon alignment; tree optional                                                     |
 | What is the predicted effect of every possible mutation?      | `hyphaeon dms`                                 | Codon alignment; tree optional                                                     |
 | Which sites are associated with a phenotype or trait?         | `hyphaeon phenotype`                           | Codon alignment + trait (metadata file, preset, or foreground list); tree optional |
-| When did this clade or outbreak originate?                    | `chronaeon date`                               | Alignment with sampling dates (in headers or a metadata file); tree optional       |
+| When did this clade or outbreak originate?                    | PrimAeon `/time`, or `chronaeon date`          | Alignment with sampling dates (in headers or a metadata file); tree optional       |
 | How fast is the outbreak growing? What is R₀ / Rₜ?            | `chronaeon dynamics`                           | Dated alignment or tree                                                            |
 | Where did the pathogen spread, and along which routes?        | `chronaeon phylogeo`                           | Alignment + location metadata; tree optional (auto-built)                          |
 | Screen many genomes for anomalies or emerging clades          | `chronaeon triage` / `chronaeon sketch`        | Reference alignment + streaming FASTA (triage); unaligned FASTA (sketch)           |
 | I need the exact likelihood methods for a publication         | HyPhy via [Datamonkey](https://datamonkey.org) | Codon alignment + tree                                                             |
+
+A few rules of thumb:
+
+- **Start in PrimAeon** when you have an alignment and want an answer fast, or
+  when the data cannot leave your machine.
+- **Move to the Python packages** when you need batch runs, the full command
+  surface (spectral splits, temporal dynamics, disease prediction, alignment
+  filtering), or GPU acceleration.
+- **Use HyPhy/Datamonkey** when you need the statistical guarantees of the
+  original maximum-likelihood methods. PrimAeon reports are neural _surrogate_
+  results — every report is flagged `is_surrogate` and includes a path to run
+  the exact analysis on Datamonkey. If privacy is the concern rather than
+  speed, [v3.datamonkey.org](https://v3.datamonkey.org) runs real HyPhy in the
+  browser via WebAssembly too.
 
 ## Inputs
 
@@ -57,7 +71,8 @@ The input that matters most is the alignment:
   MUSCLE can introduce frameshifting gaps and will fail validation.
 - **Alignments for ChronAeon.** `chronaeon date` and `autoclock` also take
   in-frame codon alignments (FASTA/NEXUS, or BEAST XML with tip dates);
-  `triage` and `sketch` work on raw, unaligned sequences. `date` and
+  `sketch` works on raw, unaligned sequences, while `triage` streams
+  unaligned FASTA against a reference alignment. `date` and
   `dynamics` need sampling dates — auto-extracted from sequence headers or
   supplied as a metadata CSV/TSV (or Auspice JSON); `phylogeo` additionally
   needs location metadata.
@@ -69,32 +84,15 @@ The input that matters most is the alignment:
   CSV/TSV metadata file, a curated preset (`--preset`), or an inline
   foreground/background taxon list (`--foreground`/`--background`).
 - **Making a codon-aware alignment.** `chronaeon align` threads unaligned CDS
-  sequences onto a reference in codon frame; external options include MACSE,
-  bealign, and cawlign, or aligning proteins and back-translating. `hyphaeon
-filter` (or `meme --filter`) can then surgically mask alignment artifacts
-  before inference.
-
-A few rules of thumb:
-
-- **Start in PrimAeon** when you have an alignment and want an answer fast, or
-  when the data cannot leave your machine. A tree is optional — without one,
-  PrimAeon works tree-free from pairwise TN93 distances.
-- **Move to the Python packages** when you need batch runs, the full command
-  surface (spectral splits, temporal dynamics, disease prediction, alignment
-  filtering), or GPU acceleration.
-- **Use HyPhy/Datamonkey** when you need the statistical guarantees of the
-  original maximum-likelihood methods. PrimAeon reports are neural _surrogate_
-  results — every report is flagged `is_surrogate` and includes a path to run
-  the exact analysis on Datamonkey. If privacy is the concern rather than
-  speed, [v3.datamonkey.org](https://v3.datamonkey.org) runs real HyPhy in the
-  browser via WebAssembly too.
+  sequences onto a reference in codon frame; `hyphaeon filter` (or
+  `meme --filter`) can then surgically mask alignment artifacts before
+  inference.
 
 ## Privacy
 
-Three of these options never send your data anywhere: PrimAeon (WASM port of
-the HyphAeon models), v3.datamonkey.org (WASM port of HyPhy), and the Python
-packages on your own hardware. The classic datamonkey.org service runs on a
-server, like Galaxy.
+PrimAeon, v3.datamonkey.org, and anything you run locally — the Python
+packages or HyPhy itself — never send your data anywhere. The classic
+datamonkey.org service runs on a server, like Galaxy.
 
 ## Links
 
@@ -106,7 +104,7 @@ server, like Galaxy.
 - [Model weights on Hugging Face](https://huggingface.co/datamonkey/hyphaeon)
 - [hyphy.org](https://hyphy.org) and [HyPhy on GitHub](https://github.com/veg/hyphy) — the likelihood-method reference
 - [datamonkey.org](https://datamonkey.org) / [v3.datamonkey.org](https://v3.datamonkey.org) — HyPhy as a web service / in-browser
-- [usegalaxy.org](https://usegalaxy.org) — the `hyphaeon` and `chronaeon` tool suites, for web-based batch runs
+- [hyphaeon Galaxy wrappers](https://github.com/galaxyproject/tools-iuc/tree/main/tools/hyphaeon) — installed on [usegalaxy.eu](https://usegalaxy.eu) for web-based batch runs; `chronaeon` wrappers are in progress
 
 ## Support
 
