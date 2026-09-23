@@ -89,7 +89,7 @@ deduped_names as (
         list_filter(
             all_names,
             (name_txt, i) ->
-                -- Note: case-insentive deduplication works when per-taxon as it is here, but should
+                -- Note: case-insensitive deduplication works when per-taxon as it is here, but should
                 -- be avoided when it could create discrepancies between different catalog entities.
                 i = list_position(all_name_keys, lower(name_txt))
                 and lower(name_txt) is distinct from lower(taxon_name)
