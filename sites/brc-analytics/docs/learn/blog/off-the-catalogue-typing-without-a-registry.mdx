@@ -65,7 +65,7 @@ Secondary analysis of amplicon archives is routinely hamstrung when primer schem
 Hierarchical clustering trees are often cut at fixed thresholds, which can impose artificial boundaries on continuous genetic variation. PyEuk instead evaluates partition stability across bootstrap resamples. Because missing data from locus dropouts can introduce non-Euclidean distortions, PyEuk provides optional projection of pairwise dissimilarities onto the positive semi-definite cone. When independent clustering metrics concur, the pipeline reports a single partition. When support is divided, it reports the range of supported cluster counts and identifies stable cores—groups of specimens that consistently cluster together across resamples—alongside the fraction of specimen pairs decisively classified as linked or unlinked.
 
 <Figure
-  alt="Figure 1. The two PyEuk workflows"
+  alt="Overview of PyEuk Standard and Panel-Inference workflows"
   caption={
     <figcaption>
       <span>
@@ -104,7 +104,7 @@ PyEuk matches this discriminatory accuracy when operating without curated panel 
 Reconstructing the typing panel _de novo_ preserves the branching structure of the outbreak (Figure 2). When comparing the tree built from the curated eight-marker panel against the tree inferred from the derived six-amplicon panel, pairwise tree distances correlate strongly (cophenetic correlation _r_ = 0.9755), and the hierarchical order of cluster merges is preserved (Baker's Gamma γ = 0.9269). Both panels yield congruent specimen groupings across the tree, demonstrating that automated panel discovery captures genuine epidemiological relationships rather than mapping noise. Given only raw amplicon reads and a draft reference genome, PyEuk reconstructs the assay _de novo_ and recovers outbreak transmission networks with high fidelity.
 
 <Figure
-  alt="Figure 2. Outbreak cluster recovery and topological congruence between curated and derived amplicon panels"
+  alt="Outbreak cluster recovery trees for curated and derived panels"
   caption={
     <figcaption>
       <span>
@@ -140,7 +140,7 @@ Whereas the 2018 benchmark presented a binary traceback (_k_ = 2), molecular sur
 Rather than imposing an arbitrary cut on this multi-cluster population, PyEuk's unsupervised bootstrap sweep reports a range of [16, 25] groups, bracketing the published count of 24. This stability range holds regardless of whether the analysis is restricted to the focal outbreak cohort or expanded across the entire surveillance repository. Of the 66 clinical specimens evaluated in the published study, 65 pass completeness filtering, yielding 16 stable cores with 95% of pairs decisively resolved. When expanded to all 99 libraries in the BioProject archive—which includes technical replicates, alternative PCR preparations, and inoculated matrix samples alongside clinical specimens (84 passing filtering; [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/))—the sweep yields a consistent structure of 18 stable cores (96% of pairs resolved) across the same [16, 25] range. When evaluated at the published benchmark of _k_ = 24, the resulting Ward tree displays strong concordance with the FDA grouping (adjusted Rand index 0.84; Figure 3). Although the two analyses disagree on the broader branching order connecting these clusters (Baker's Gamma γ = 0.63)—as expected when comparing heterozygosity-weighted identity-by-state (wIBS) distances against a classifier ensemble across differing marker sets (45 derived vs. 52 curated loci)—the cluster memberships themselves show high concordance. PyEuk thus approximates the multi-cluster architecture reported by the FDA without requiring its curated primer schemes or custom lab-specific classification pipelines.
 
 <Figure
-  alt="Figure 3. Unsupervised cluster concordance with published multi-cluster outbreak groupings"
+  alt="Tanglegram comparing FDA cluster assignments to PyEuk tree"
   caption={
     <figcaption>
       <span>
@@ -192,7 +192,7 @@ Rather than forcing an arbitrary partition on this multi-year population, PyEuk'
 Analyzing structured specimen identifiers indicates that these 283 transmission cores reflect geographical and temporal transmission dynamics rather than technical batch artifacts. Although public repositories omit case reports, specimen aliases encode reporting state and collection year for 74% of the archive (Methods §13b), annotating 76% of core members across 262 cores. Among these 262 annotated cores, 185 (70.6%) span multiple US states, and 159 (60.7%) span multiple collection years. The largest core encompasses 610 specimens across 24 states over six transmission seasons, consistent with interstate fresh produce distribution networks. Concurrently, PyEuk isolates localized outbreaks (for example, among annotated specimens within cores, one core with 49% of cases in Illinois, and another with 63% in New York). Unsupervised clustering thus recovers both components of national cyclosporiasis: multi-state distribution networks and localized point-source outbreaks.
 
 <Figure
-  alt="Figure 4. Macro-population structure and transmission core dynamics across eight thousand national surveillance isolates"
+  alt="National surveillance dendrogram, transmission core landscape, and state reach"
   caption={
     <figcaption>
       <span>
@@ -247,7 +247,7 @@ From the eleven short amplicons developed by [Rosado et al. (2026)](https://pubm
 At the macro-geographic scale, PyEuk cleanly separates the two continental populations (Figure 5A). Cutting the dendrogram at two groups segregates 140 of 142 Peruvian isolates into one clade and all 135 Solomon Islands isolates into the other, yielding an adjusted Rand index of 0.9712 against continental origin. The two discordant Peruvian isolates form a tightly linked pair (_d_ = 0.019) positioned at the basal boundary between clades. Below this continental split, PyEuk identifies 51 stable transmission cores across an unsupervised stability sweep of [17, 37] clusters, partitioning 93.3% of specimen pairs with high bootstrap support (≥ 90%; all 51 cores are country-specific, with 19 in Peru and 32 in the Solomon Islands).
 
 <Figure
-  alt="Figure 5. Continental population architecture and clinical recurrence discrimination in Plasmodium vivax"
+  alt="Continental lineage tree and clinical recurrence ROC curve in Plasmodium vivax"
   caption={
     <figcaption>
       <span>
@@ -304,7 +304,7 @@ To match the open surveillance setting, PyEuk switches to distance mode, cutting
 Projecting these distance-mode clusters across collection year (2003–2024) and reporting jurisdiction (29 U.S. states) distinguishes potential transmission links from sporadic travel (Figure 6). While most imported cases remain solitary singletons scattered across jurisdictions, PyEuk identifies prominent multi-state transmission lineages. Genotype grp66 connects 27 specimens across seven states (with 17 cases diagnosed in New York, and 26 cases diagnosed in 2023 alongside one in 2022), whereas genotype grp65 links 10 cases spanning five states across an eight-year observation window (2017–2024, observed in four separate years: 2017, 2022, 2023, and 2024). Because the national archive records jurisdiction of diagnosis rather than country of exposure, unsupervised distance clustering provides a systematic framework to distinguish shared epidemiological exposure from independent travel importations.
 
 <Figure
-  alt="Figure 6. CDC AmpliSeq surveillance footprint"
+  alt="CDC AmpliSeq surveillance cases by diagnosis state and collection year"
   caption={
     <figcaption>
       <span>
@@ -743,7 +743,7 @@ disease manifestations, serodiagnosis and drug sensitivity. Acta Trop. 2018;184:
 ## Supplementary figures
 
 <Figure
-  alt="Figure S1. Per-amplicon coverage across cohorts, derived versus supplied panels"
+  alt="Per-amplicon median read depth across cohorts for derived versus supplied panels"
   caption={
     <figcaption>
       <span>
@@ -770,7 +770,7 @@ disease manifestations, serodiagnosis and drug sensitivity. Acta Trop. 2018;184:
 />
 
 <Figure
-  alt="Figure S2. The window haplotype"
+  alt="Schematic of window coordinate boundaries and spanning read requirements"
   caption={
     <figcaption>
       <span>
