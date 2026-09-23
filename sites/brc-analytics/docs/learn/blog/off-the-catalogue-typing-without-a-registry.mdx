@@ -6,11 +6,17 @@ breadcrumbs:
     text: "Blog"
 contentType: "ARTICLE"
 date: "2026-09-21"
-description: "PyEuk: a tool suite for catalogue-free multilocus typing"
+description: "A complete manuscript describing PyEuk — an open, catalogue-free tool suite for multilocus microhaplotype typing and surveillance of eukaryotic parasites."
 title: "PyEuk: a tool suite for catalogue-free multilocus typing"
 ---
 
-[![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.09.10.750732-b31b1b.svg)](https://doi.org/10.64898/2026.09.10.750732)
+<a href="https://doi.org/10.64898/2026.09.10.750732">
+  <img
+    alt="bioRxiv preprint"
+    src="/learn/blog/off-the-catalogue-typing-without-a-registry/biorxiv.svg"
+    style={{ border: "none", margin: 0 }}
+  />
+</a>
 
 Sergei Kosakovsky Pond, Danielle Callan, Anton Nekrutenko
 
@@ -216,9 +222,8 @@ Analyzing structured specimen identifiers indicates that these 283 transmission 
         isolates). <b>(C)</b> Interstate reach and persistence profiles across
         262 annotated cores, demonstrating that 70.6% of cores cross state lines
         (up to 24 states) and 60.7% persist across multiple transmission seasons
-        (≥ 2 collection years, with some cores observed across up to seven
-        years), capturing the dual architecture of national foodborne
-        transmission.
+        (≥ 2 collection years, with some cores observed across up to six years),
+        capturing the dual architecture of national foodborne transmission.
       </span>
     </figcaption>
   }
@@ -292,9 +297,9 @@ National genomic surveillance of travel-associated malaria presents a distinct e
 
 The CDC AmpliSeq cohort (PRJNA1092573) tests this capacity at scale. Typed across 495 amplicons distributed across the _P. vivax_ genome—more than an order of magnitude larger than the PvAmpSeq panel—the open surveillance archive profiles 157 scored specimens against an expert-curated CDC benchmark. Dominated by sporadic international travel, this benchmark resolves the population into 92 transmission groups, including 79 isolated singletons alongside a modest smattering of small clusters.
 
-This singleton-dominated architecture illustrates the distinction between clustering objectives. Standard hierarchical clustering configured for closed clinical cohorts (count mode) assumes that isolates partition into a small number of cohesive clades; when applied to open surveillance, count sweeps hit artificial group ceilings and merge unrelated travel cases into large clusters. Indeed, PyEuk's count sweep on the 169 completeness-filtered specimens (derived from 1,960 windows on a 196 by 5,222 matrix) returns [17, 38] clusters with the true count undetermined, correctly signaling that the population cannot be represented by a modest group count.
+This singleton-dominated architecture illustrates the distinction between clustering objectives. Standard hierarchical clustering configured for closed clinical cohorts (count mode) assumes that isolates partition into a small number of cohesive clades; when applied to open surveillance, count sweeps hit artificial group ceilings and merge unrelated travel cases into large clusters. Indeed, PyEuk's count sweep on the 169 completeness-filtered specimens (derived from 1,760 called windows across 1,960 published BED intervals on a 196 by 5,222 matrix) returns [17, 38] clusters with the true count undetermined, correctly signaling that the population cannot be represented by a modest group count.
 
-To match the open surveillance setting, PyEuk switches to distance mode, cutting the hierarchical tree at a fixed dissimilarity threshold (_d_ = 0.0869) so that unrelated cases remain singletons. Under this label-free threshold, PyEuk closely mirrors the CDC expert curation without access to external annotations, recovering 93 transmission groups and 83 singletons (adjusted Rand index 0.7801; optimizing the distance cutoff directly against the CDC benchmark yields an upper ceiling of 0.8063; largest group 25 versus 19 deposited). The contrast between PvAmpSeq and CDC AmpliSeq demonstrates that study design dictates clustering strategy: closed clinical cohorts require count mode to resolve shared transmission, whereas open surveillance archives require distance mode to preserve singletons.
+To match the open surveillance setting, PyEuk switches to distance mode, cutting the hierarchical tree at a fixed dissimilarity threshold (_d_ = 0.0869) so that unrelated cases remain singletons. Under this label-free threshold, PyEuk closely mirrors the CDC expert curation without access to external annotations, recovering 93 transmission groups and 83 singletons (adjusted Rand index 0.7801; optimizing the distance cutoff directly against the CDC benchmark yields 0.7952 at baseline completeness and an upper ceiling of 0.8063 when combined with `min_completeness` ≥ 0.70; largest group 25 versus 19 deposited). The contrast between PvAmpSeq and CDC AmpliSeq demonstrates that study design dictates clustering strategy: closed clinical cohorts require count mode to resolve shared transmission, whereas open surveillance archives require distance mode to preserve singletons.
 
 Projecting these distance-mode clusters across collection year (2003–2024) and reporting jurisdiction (29 U.S. states) distinguishes potential transmission links from sporadic travel (Figure 6). While most imported cases remain solitary singletons scattered across jurisdictions, PyEuk identifies prominent multi-state transmission lineages. Genotype grp66 connects 27 specimens across seven states (with 17 cases diagnosed in New York, and 26 cases diagnosed in 2023 alongside one in 2022), whereas genotype grp65 links 10 cases spanning five states across an eight-year observation window (2017–2024, observed in four separate years: 2017, 2022, 2023, and 2024). Because the national archive records jurisdiction of diagnosis rather than country of exposure, unsupervised distance clustering provides a systematic framework to distinguish shared epidemiological exposure from independent travel importations.
 
@@ -374,13 +379,13 @@ We evaluated PyEuk across five surveillance and clinical validation cohorts span
 
 **Table 1. Surveillance and clinical validation cohorts.**
 
-| Cohort                     | BioProject   | Panel                                             | Loci / Windows              |       Specimens        | Source                                                                                                                          |
-| :------------------------- | :----------- | :------------------------------------------------ | :-------------------------- | :--------------------: | :------------------------------------------------------------------------------------------------------------------------------ |
-| _Cyclospora_ 2018 outbreak | PRJNA578931  | CDC 8-marker (7 linear loci) / Derived 6-amplicon | 7 / 6 amplicons (24/28 win) |          153           | [Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/)                                                             |
-| _Cyclospora_ FDA TAS       | PRJNA1052691 | Derived 45-amplicon (52-locus TAS)                | 45 amplicons (26 win)       |    66 (99 archive)     | [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/)                                                                |
-| _Cyclospora_ surveillance  | PRJNA578931  | Derived 45-amplicon (9 expanded CDC loci)         | 9 loci (32 called win)      | 8,325 (8,058 retained) | [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/); [Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/) |
-| _P.\ vivax_ PvAmpSeq       | PRJNA1153071 | 11 microhaplotype markers                         | 11 amplicons (13 win)       |          277           | [Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)                                                                 |
-| _P.\ vivax_ CDC AmpliSeq   | PRJNA1092573 | 495 amplicons                                     | 444 amplicons (1,760 win)   |   196 (169 retained)   | [Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/)                                                                |
+| Cohort                     | BioProject   | Panel                                             | Loci / Windows                     |       Specimens        | Source                                                                                                                          |
+| :------------------------- | :----------- | :------------------------------------------------ | :--------------------------------- | :--------------------: | :------------------------------------------------------------------------------------------------------------------------------ |
+| _Cyclospora_ 2018 outbreak | PRJNA578931  | CDC 8-marker (7 linear loci) / Derived 6-amplicon | 7 amplicons (28 win) / 6 amplicons |          153           | [Nascimento et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32741426/)                                                             |
+| _Cyclospora_ FDA TAS       | PRJNA1052691 | Derived 45-amplicon (52-locus TAS)                | 45 amplicons (26 win)              |    66 (99 archive)     | [Leonard et al. 2024](https://pubmed.ncbi.nlm.nih.gov/38792677/)                                                                |
+| _Cyclospora_ surveillance  | PRJNA578931  | Derived 45-amplicon (9 expanded CDC loci)         | 9 loci (32 called win)             | 8,325 (8,058 retained) | [Shen et al. 2025](https://pubmed.ncbi.nlm.nih.gov/39983699/); [Barratt et al. 2023](https://pubmed.ncbi.nlm.nih.gov/36560856/) |
+| _P. vivax_ PvAmpSeq        | PRJNA1153071 | 11 microhaplotype markers                         | 11 amplicons (13 win)              |          277           | [Rosado et al. 2026](https://pubmed.ncbi.nlm.nih.gov/42111217/)                                                                 |
+| _P. vivax_ CDC AmpliSeq    | PRJNA1092573 | 495 amplicons                                     | 444 amplicons (1,760 win)          |   196 (169 retained)   | [Barratt et al. 2025](https://pubmed.ncbi.nlm.nih.gov/40612707/)                                                                |
 
 Panel sizes range from 6 to 495 sequences across two species, evaluating five distinct surveillance and clinical cohorts:
 
@@ -451,7 +456,8 @@ The `pyeuk eukaryotyping` command calculates pairwise genetic distances between 
 For specimens _i_ and _j_, pairwise distance is computed strictly over the intersection of mutually called windows _W_<sub>_ij_</sub>:
 
 ```
-d(i, j) = [ Σ_{w ∈ W_{ij}} (1 / m_w) Σ_{h ∈ H_w} w_{w,h} |x_{i,w,h} − x_{j,w,h}| ] / [ Σ_{w ∈ W_{ij}} Σ_{h ∈ H_w} w_{w,h} ]
+d(i, j) = [ Σ_{w ∈ W_{ij}} (1 / m_w) Σ_{h ∈ H_w} w_{w,h} |x_{i,w,h} − x_{j,w,h}| ]
+          / [ Σ_{w ∈ W_{ij}} Σ_{h ∈ H_w} w_{w,h} ]
 ```
 
 where _x_<sub>_i_,_w_,_h_</sub> ∈ &#123;0, 1&#125; indicates haplotype presence in specimen _i_ at window _w_, _m_<sub>_w_</sub> denotes locus ploidy (_m_<sub>_w_</sub> = 2 for diploid nuclear loci and _m_<sub>_w_</sub> = 1 for mitochondrial or haploid loci), and weights follow expected heterozygosity:
@@ -472,7 +478,7 @@ Count mode selects an optimal _k_ from the largest merge-height gap satisfying t
 
 Distance mode cuts the dendrogram at an absolute dissimilarity threshold _d_<sub>cut</sub> without selecting _k_ or searching for a gap, allowing singletons to remain isolated. Without labels, PyEuk sets _d_<sub>cut</sub> to the empirical 5th percentile of pairwise distances; with labeled training pairs, it sets _d_<sub>cut</sub> = median(_d_<sub>within</sub>) + 3 × 1.4826 × MAD(_d_<sub>within</sub>).
 
-Operational mode must be selected based on study design, not organism biology. Six label-free distribution tests (Silverman multi-modality, gap statistic, silhouette, nearest-neighbor fractions, median-to-first-percentile ratios, and negative eigenvalue mass) failed to separate CDC surveillance from outbreak cohorts. Across all 157 CDC specimens at baseline completeness (≥ 0.10, including 79 singletons), distance mode achieves an ARI of 0.7952 (rising to 0.8063 when filtering completeness ≥ 0.70, or 0.7801 under label-free cut selection) while count mode collapses to 0.0470 (forcing 79 singletons into one cluster). Conversely, restricting analysis to the four largest published clusters removes singletons, inverting performance: count mode achieves an ARI of 1.0000 while distance mode yields 0.1137.
+Operational mode must be selected based on study design, not organism biology. Six label-free distribution tests (Silverman multi-modality, gap statistic, silhouette, nearest-neighbor fractions, median-to-first-percentile ratios, and negative eigenvalue mass) failed to separate CDC surveillance from outbreak cohorts. Across all 157 CDC specimens at baseline completeness (≥ 0.10, including 79 singletons), distance mode achieves an ARI of 0.7952 under a tuned cutoff (or 0.7801 under label-free cut selection; rising to 0.8063 when the tuned cutoff is combined with completeness filtering ≥ 0.70) while count mode collapses to 0.0470 (forcing 79 singletons into one cluster). Conversely, restricting analysis to the four largest published clusters removes singletons, inverting performance: count mode achieves an ARI of 1.0000 while distance mode yields 0.1137.
 
 ### 11. Software architecture, containerization, and Galaxy workflows
 
@@ -760,7 +766,7 @@ disease manifestations, serodiagnosis and drug sensitivity. Acta Trop. 2018;184:
       </span>
     </figcaption>
   }
-  src="/learn/blog/off-the-catalogue-typing-without-a-registry/figS_coverage.svg"
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/figS1_coverage.svg"
 />
 
 <Figure
@@ -785,5 +791,5 @@ disease manifestations, serodiagnosis and drug sensitivity. Acta Trop. 2018;184:
       </span>
     </figcaption>
   }
-  src="/learn/blog/off-the-catalogue-typing-without-a-registry/fig1_encoding.svg"
+  src="/learn/blog/off-the-catalogue-typing-without-a-registry/figS2_encoding.svg"
 />
