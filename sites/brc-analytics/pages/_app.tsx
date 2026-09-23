@@ -10,7 +10,7 @@ import {
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { type JSX } from "react";
 
-setFeatureFlags([FEATURE_FLAGS.DEMO]);
+setFeatureFlags([FEATURE_FLAGS.ASSISTANT_UI, FEATURE_FLAGS.DEMO]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   const appConfig = config();
