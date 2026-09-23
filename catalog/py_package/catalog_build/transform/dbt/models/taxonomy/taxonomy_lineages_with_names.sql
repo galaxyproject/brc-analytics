@@ -60,9 +60,8 @@ name_keys as (
 
     /*
       Case-folded copy of `all_names`, aligned element-for-element, so the dedup
-      below can match names that differ only in capitalization. The lambda can
-      only see `all_names`, hence the parallel list rather than a folded
-      comparison inline.
+      below can match names that differ only in capitalization without recomputing
+      the lowercase names for every comparison.
     */
     select
         *,
