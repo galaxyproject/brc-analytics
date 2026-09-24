@@ -5,14 +5,14 @@ breadcrumbs:
   - path: ""
     text: "MCP Server"
 contentType: "ARTICLE"
-description: ""
+description: "Connect AI assistants like Claude, Cursor, and other tools to BRC Analytics genomic catalog data and sequencing searches via the Model Context Protocol (MCP)."
 enableOutline: true
 title: "MCP Server"
 ---
 
 ## What is MCP?
 
-The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that lets AI assistants -- like Claude Desktop, Claude Code, and other MCP-aware clients -- connect to external data sources and tools. BRC Analytics runs a public MCP server that exposes our full catalog (organisms, assemblies, workflows) and ENA sequencing-data search as a set of tools your assistant can call directly.
+The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that lets AI assistants -- like Claude Desktop, Claude Code, Cursor, and other MCP-aware clients -- connect to external data sources and tools. BRC Analytics runs a public MCP server that exposes our full catalog (organisms, assemblies, workflows), raw sequencing-data search via the European Nucleotide Archive (ENA) and NCBI SRA, as well as read-only context resources and guided analysis prompts.
 
 Once connected, you can ask questions like _"What assemblies do you have for Plasmodium falciparum?"_ or _"Find me Illumina RNA-seq runs for taxonomy ID 5833"_ in plain language, and the assistant will pull live answers from BRC Analytics instead of guessing.
 
@@ -23,7 +23,18 @@ This is an experimental feature -- the tool surface and connection details may c
 The MCP endpoint is:
 
 ```
-https://brc-analytics.org/api/v1/mcp
+https://brc-analytics.org/api/v1/mcp/
+```
+
+> [!NOTE]
+> Include the trailing slash (`/`) in the endpoint URL.
+
+### Claude Code
+
+Add the server to Claude Code using the CLI:
+
+```bash
+claude mcp add --transport http brc-analytics https://brc-analytics.org/api/v1/mcp/
 ```
 
 ### Claude Desktop
@@ -34,7 +45,7 @@ Edit your Claude Desktop config (`~/Library/Application Support/Claude/claude_de
 {
   "mcpServers": {
     "brc-analytics": {
-      "url": "https://brc-analytics.org/api/v1/mcp"
+      "url": "https://brc-analytics.org/api/v1/mcp/"
     }
   }
 }
@@ -42,34 +53,82 @@ Edit your Claude Desktop config (`~/Library/Application Support/Claude/claude_de
 
 Restart Claude Desktop. You should see the `brc-analytics` server listed in the tools panel.
 
-### Other clients
+### Cursor and Other MCP Clients
 
-Any MCP-compliant client that supports HTTP transport can connect using the same URL. Consult your client's documentation for the exact config format.
+For Cursor, add the server to `~/.cursor/mcp.json` or configure it via Cursor Settings > MCP:
 
-### Running locally
+```json
+{
+  "mcpServers": {
+    "brc-analytics": {
+      "url": "https://brc-analytics.org/api/v1/mcp/"
+    }
+  }
+}
+```
 
-If you're running the BRC Analytics backend yourself (see the project README), swap the URL for `http://localhost:8000/api/v1/mcp` (or `http://localhost:8080/api/v1/mcp` when using the Docker stack).
+Any MCP-compliant client that supports HTTP/SSE transport can connect using the same URL. Consult your client's documentation for the exact configuration format.
 
-## What you can do with it
+### Running Locally
 
-The server provides two groups of tools:
+If you are running the BRC Analytics backend yourself (see the project README), use:
 
-**Catalog tools** -- explore curated BRC content:
+```
+http://localhost:8000/api/v1/mcp/
+```
 
-- Search organisms by name, taxonomy ID, or taxonomic group
-- List and inspect genome assemblies, including ploidy and annotation status
-- Browse workflow categories and individual workflow details
-- Check whether a given workflow is compatible with a given assembly
-- Resolve the inputs (reference genome URL, gene model) that a workflow needs for a particular assembly
+(or `http://localhost:8080/api/v1/mcp/` when using the Docker stack).
 
-**ENA tools** -- search the European Nucleotide Archive for raw sequencing data:
+## What You Can Do With It
 
-- Find sequencing runs by NCBI taxonomy ID
-- Search by keywords (organism names, library strategies like RNA-Seq or WGS, platforms like Illumina or PacBio)
+The server exposes tools, read-only resources, and guided prompt templates.
 
-Results from ENA searches are capped at 50 records per call, with a `has_more` flag if additional results exist.
+### Catalog Tools
 
-## Things to try
+Explore curated BRC Analytics content:
+
+- `search_organisms(query, limit=10)` -- search organisms by scientific name, previous/other names, taxonomy ID, or taxonomic group.
+- `get_organism(taxonomy_id)` -- fetch a single organism record by NCBI taxonomy ID.
+- `get_assemblies(taxonomy_id)` -- list all genome assemblies for an organism, including ploidy, assembly level, coverage, and annotation status.
+- `get_assembly_details(accession)` -- get full metadata for a specific genome assembly (e.g. `GCF_000005845.2`).
+- `list_workflow_categories()` -- list all analysis workflow categories with workflow counts.
+- `get_workflows_in_category(category)` -- list all workflows within a category using its key (e.g. `VARIANT_CALLING`) or display name.
+- `get_compatible_workflows(ploidies, taxonomy_id="")` -- discover workflows compatible with specific ploidy levels (e.g. `haploid`, `diploid`) and optional taxonomy filters.
+- `get_workflow_details(iwc_id)` -- get full workflow metadata, TRS ID, and step information by IWC ID.
+- `check_compatibility(iwc_id, accession)` -- check whether a workflow and genome assembly are compatible, returning ploidy, taxonomy, or annotation issues.
+- `resolve_workflow_inputs(iwc_id, accession)` -- resolve deterministic inputs (reference genome FASTA, gene models) and identify required user data (sequencing reads).
+
+### Sequencing Data Tools
+
+Search repositories for raw sequencing reads to power your analyses:
+
+**ENA tools** -- live search against the European Nucleotide Archive:
+
+- `search_ena(taxonomy_id)` -- find read runs by NCBI taxonomy ID (up to 50 records per call, with a `has_more` pagination flag).
+- `search_ena_keywords(keywords)` -- search runs by keywords, such as platforms (`ILLUMINA`, `OXFORD_NANOPORE`) or library strategies (`RNA-Seq`, `WGS`).
+
+**SRA mirror tools** -- fast local queries _(available on deployments configured with an SRA metadata mirror)_:
+
+- `search_sra(organism, assay_type=None, platform=None, country=None, since=None, limit=50)` -- fast, structured multi-facet search over SRA runs scoped to BRC pathogens.
+- `sra_data_summary(organism)` -- snapshot of available SRA data (run counts, top platforms, assays, BioProjects).
+- `get_sra_study_runs(accession, limit=200)` -- retrieve runs for an SRA study (`SRP*`, `ERP*`, `DRP*`) or BioProject (`PRJNA*`, `PRJEB*`, `PRJDB*`).
+
+### Catalog Resources
+
+Clients supporting MCP resources can read catalog context directly via standard URIs without consuming tool execution steps:
+
+- `brc://catalog/summary` -- JSON summary of total organisms, assemblies, workflows, and categories.
+- `brc://catalog/categories` -- JSON listing of all workflow categories and descriptions.
+- `brc://catalog/workflows` -- JSON list of all available assembly-scoped workflows and requirements.
+- `brc://catalog/organisms/{taxonomy_id}` -- JSON details for a specific organism by taxonomy ID.
+
+### Guided Prompts
+
+The server includes pre-configured workflow prompts:
+
+- `plan_pathogen_analysis(organism, analysis_type="variant_calling")` -- step-by-step guidance for looking up an organism, matching assemblies, validating workflows, and locating sequencing datasets.
+
+## Things to Try
 
 Once connected, try prompts like:
 
@@ -83,10 +142,10 @@ The assistant will chain tool calls together as needed -- e.g., look up an organ
 
 ## Limitations
 
-- **Read-only.** The server exposes catalog and ENA data but cannot launch workflows on Galaxy. Use the BRC Analytics web interface to actually start an analysis.
-- **Snapshot of the catalog.** Catalog data is the same as what powers the website -- it updates when we publish a new build, not in real time.
-- **ENA is a live external API.** ENA searches go directly to the European Nucleotide Archive and can fail or rate-limit independently of BRC.
+- **Read-only.** The server exposes catalog, resource, and sequencing data but cannot launch workflows on Galaxy. Use the BRC Analytics web interface to start an analysis.
+- **Snapshot of the catalog.** Catalog data updates when new catalog builds are published, matching what powers the website.
+- **External API dependencies.** ENA searches query the European Nucleotide Archive directly and may fail or rate-limit during upstream outages (the local SRA mirror provides resilience for BRC pathogens where enabled).
 
 ## Feedback
 
-The MCP server is new and we're actively iterating on the tool surface. If something is missing, broken, or confusing, email [help@brc-analytics.org](mailto:help@brc-analytics.org).
+The MCP server is actively evolving. If something is missing, broken, or confusing, email [help@brc-analytics.org](mailto:help@brc-analytics.org).
