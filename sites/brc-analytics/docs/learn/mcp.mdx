@@ -38,13 +38,20 @@ claude mcp add --transport http brc-analytics https://brc-analytics.org/api/v1/m
 
 ### Claude Desktop
 
-Edit your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and add:
+Claude Desktop connects to remote MCP servers as custom connectors. Open **Settings > Connectors**, choose **Add custom connector**, and paste the endpoint URL:
+
+```
+https://brc-analytics.org/api/v1/mcp/
+```
+
+Alternatively, `claude_desktop_config.json` can reach the server through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge. That file only launches local command-based servers, so a bare `url` entry won't work there. Edit the config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and add:
 
 ```json
 {
   "mcpServers": {
     "brc-analytics": {
-      "url": "https://brc-analytics.org/api/v1/mcp/"
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://brc-analytics.org/api/v1/mcp/"]
     }
   }
 }
@@ -77,6 +84,8 @@ http://localhost:8000/api/v1/mcp/
 ```
 
 (or `http://localhost:8080/api/v1/mcp/` when using the Docker stack).
+
+For Claude Desktop against a local backend, use the `mcp-remote` config above with the local URL.
 
 ## What You Can Do With It
 
