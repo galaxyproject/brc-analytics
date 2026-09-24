@@ -1,24 +1,25 @@
+import type { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import {
   findWorkflow,
-  findWorkflowCategories,
+  getGatedWorkflow,
 } from "@repo/shared/services/workflows/entities";
-import type { GatedWorkflow } from "@repo/shared/workflow/gates";
+import type { WorkflowGates } from "@repo/shared/workflow/gates";
 
 /**
- * Resolves the TRS ID from a URL to the workflow the gating rules read: the
- * workflow's raw catalog TRS ID — the rules match on that, not the URL form —
- * and the IDs of every catalog category holding it, none for a workflow outside
- * the catalog. Requires the workflows cache to be loaded.
+ * Determines whether the TRS ID from a URL names a workflow the page may show:
+ * one that exists, has the page's scope, and passes the gating rules. Requires
+ * the workflows cache to be loaded.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
- * @returns The gated workflow, or undefined when the TRS ID names no workflow.
+ * @param scope - Scope of the workflows the page configures.
+ * @param workflowGates - Gating rules bound to the current flag state.
+ * @returns True when the workflow is available.
  */
-export function resolveGatedWorkflow(trsId: string): GatedWorkflow | undefined {
+export function isWorkflowAvailable(
+  trsId: string,
+  scope: WORKFLOW_SCOPE,
+  workflowGates: WorkflowGates
+): boolean {
   const workflow = findWorkflow(trsId);
-  if (!workflow) return undefined;
-  return {
-    categoryIds: findWorkflowCategories(workflow.trsId).map(
-      ({ category }) => category
-    ),
-    trsId: workflow.trsId,
-  };
+  if (!workflow || workflow.scope !== scope) return false;
+  return workflowGates.isWorkflowAllowed(getGatedWorkflow(workflow));
 }
