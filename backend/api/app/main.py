@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager, suppress
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
     assistant,
@@ -36,6 +37,8 @@ from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
 
+MCP_MOUNT_PATH = "/api/v1/mcp"
+
 
 async def warm_kmindex_indexes() -> None:
     """Fill the index-list cache before a reader needs it.
@@ -56,6 +59,23 @@ async def warm_kmindex_indexes() -> None:
         # Never a reason to fail a boot. The search page still has the last
         # good answer, or the names shipped with the build.
         logger.warning("Could not warm the kmindex index list: %s", e)
+
+
+class MCPPathNormalizeMiddleware:
+    """Normalize MCP_MOUNT_PATH to MCP_MOUNT_PATH/ in ASGI scope to avoid 307
+    redirects on POST."""
+
+    def __init__(self, app: ASGIApp):
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and scope.get("path") == MCP_MOUNT_PATH:
+            # ASGI scopes shouldn't be mutated in place; pass a modified copy.
+            scope = dict(scope)
+            scope["path"] += "/"
+            if "raw_path" in scope:
+                scope["raw_path"] += b"/"
+        await self.app(scope, receive, send)
 
 
 def create_app() -> FastAPI:
@@ -138,6 +158,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(MCPPathNormalizeMiddleware)
 
     app.include_router(health.router, prefix="/api/v1", tags=["health"])
     app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
@@ -160,7 +181,7 @@ def create_app() -> FastAPI:
         tags=["workflow_runs"],
     )
 
-    app.mount("/api/v1/mcp", mcp_app)
+    app.mount(MCP_MOUNT_PATH, mcp_app)
 
     @app.get("/")
     async def root():
