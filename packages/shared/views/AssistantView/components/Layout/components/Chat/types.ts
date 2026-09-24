@@ -1,5 +1,3 @@
-import { type ReactNode } from "react";
+import { type ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
 
-export interface Props {
-  children: ReactNode;
-}
+export type Props = ChildrenProps;

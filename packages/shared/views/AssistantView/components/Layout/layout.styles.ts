@@ -10,7 +10,6 @@ export const StyledLayout = styled("div", {
   display: grid;
   grid-template-columns: 296px minmax(0, 1fr) 360px;
   height: calc(100dvh - ${({ bottom, top }) => top + bottom}px);
-  min-height: 500px;
   width: 100%;
 
   ${bpDownMd} {

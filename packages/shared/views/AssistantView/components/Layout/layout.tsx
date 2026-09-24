@@ -3,6 +3,7 @@ import { type JSX } from "react";
 import { Chat } from "./components/Chat/chat";
 import { History } from "./components/History/history";
 import { Setup } from "./components/Setup/setup";
+import { DEFAULT_HEIGHT } from "./constants";
 import { StyledLayout } from "./layout.styles";
 import type { LayoutProps } from "./types";
 
@@ -16,8 +17,12 @@ import type { LayoutProps } from "./types";
  */
 export const Layout = ({ slotProps }: LayoutProps): JSX.Element => {
   const { spacing } = useLayoutSpacing();
+
   return (
-    <StyledLayout {...spacing}>
+    <StyledLayout
+      bottom={spacing.bottom || DEFAULT_HEIGHT.BOTTOM}
+      top={spacing.top || DEFAULT_HEIGHT.TOP}
+    >
       <History {...slotProps.history} />
       <Chat {...slotProps.chat} />
       <Setup {...slotProps.setup} />
