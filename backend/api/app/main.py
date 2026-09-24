@@ -37,6 +37,8 @@ from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
 
+MCP_MOUNT_PATH = "/api/v1/mcp"
+
 
 async def warm_kmindex_indexes() -> None:
     """Fill the index-list cache before a reader needs it.
@@ -60,17 +62,19 @@ async def warm_kmindex_indexes() -> None:
 
 
 class MCPPathNormalizeMiddleware:
-    """Normalize /api/v1/mcp to /api/v1/mcp/ in ASGI scope to avoid 307
+    """Normalize MCP_MOUNT_PATH to MCP_MOUNT_PATH/ in ASGI scope to avoid 307
     redirects on POST."""
 
     def __init__(self, app: ASGIApp):
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] == "http" and scope.get("path") == "/api/v1/mcp":
-            scope["path"] = "/api/v1/mcp/"
+        if scope["type"] == "http" and scope.get("path") == MCP_MOUNT_PATH:
+            # ASGI scopes shouldn't be mutated in place; pass a modified copy.
+            scope = dict(scope)
+            scope["path"] += "/"
             if "raw_path" in scope:
-                scope["raw_path"] = b"/api/v1/mcp/"
+                scope["raw_path"] += b"/"
         await self.app(scope, receive, send)
 
 
@@ -177,7 +181,7 @@ def create_app() -> FastAPI:
         tags=["workflow_runs"],
     )
 
-    app.mount("/api/v1/mcp", mcp_app)
+    app.mount(MCP_MOUNT_PATH, mcp_app)
 
     @app.get("/")
     async def root():
