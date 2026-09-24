@@ -289,9 +289,12 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Return workflows compatible with the given organism ploidies and taxonomy."""
         results = []
+        # A workflow can be listed under several categories; report it once,
+        # under the first, matching get_workflow_details.
+        seen = set()
         for cat in self.workflows_by_category:
             for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
+                if not _is_assembly_scope(wf) or wf.get("iwcId") in seen:
                     continue
                 wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
                 wf_tax = wf.get("taxonomyId")
@@ -302,6 +305,7 @@ class CatalogData:
                 )
 
                 if ploidy_ok and tax_ok:
+                    seen.add(wf.get("iwcId"))
                     results.append(self._summarize_workflow(wf, cat.get("name", "")))
         return results
 

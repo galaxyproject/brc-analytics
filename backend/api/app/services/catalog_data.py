@@ -91,7 +91,9 @@ class CatalogData:
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
                 iwc_id = wf.get("iwcId", "")
-                if iwc_id:
+                # A workflow can be listed under several categories; the first
+                # one is its canonical category everywhere.
+                if iwc_id and iwc_id not in self._workflows_by_iwc_id:
                     self._workflows_by_iwc_id[iwc_id] = {
                         **wf,
                         "_category": cat.get("name", ""),
@@ -219,9 +221,10 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Find workflows compatible with given ploidies and optional taxonomy ID."""
         results = []
+        seen = set()
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
+                if not _is_assembly_scope(wf) or wf.get("iwcId") in seen:
                     continue
                 wf_ploidy = wf.get("ploidy")
                 wf_tax = wf.get("taxonomyId")
@@ -239,6 +242,7 @@ class CatalogData:
                     lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
                     if str(wf_tax) not in lineage:
                         continue
+                seen.add(wf.get("iwcId"))
                 results.append(self._condense_workflow(wf, cat.get("name", "")))
         return results
 

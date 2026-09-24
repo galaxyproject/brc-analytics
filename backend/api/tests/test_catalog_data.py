@@ -1,5 +1,6 @@
 """Tests for CatalogData search and lookup methods."""
 
+import copy
 import json
 import os
 import tempfile
@@ -595,3 +596,39 @@ class TestLineageTaxonomyMatching:
         assert lineage_catalog._workflow_taxon_matches(562, "2") is False
         # ...but a Bacteria (2) workflow still applies to E. coli (562).
         assert lineage_catalog._workflow_taxon_matches(2, "562") is True
+
+
+# ---------- Workflows listed under more than one category ----------
+
+
+@pytest.fixture
+def shared_workflow_catalog(tmp_path):
+    # Mirrors generic-non-segmented-viral-variant-calling, which the real
+    # catalog lists under two categories.
+    workflows = copy.deepcopy(SAMPLE_WORKFLOWS)
+    workflows[0]["workflows"].append(copy.deepcopy(workflows[1]["workflows"][0]))
+    (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
+    (tmp_path / "workflows.json").write_text(json.dumps(workflows))
+    return CatalogData(str(tmp_path))
+
+
+class TestSharedWorkflow:
+    def test_listed_once_in_compatible(self, shared_workflow_catalog):
+        # The first category the workflow appears under wins, same as details.
+        wfs = shared_workflow_catalog.get_compatible_workflows(["HAPLOID"])
+        assert [w["category"] for w in wfs if w["iwc_id"] == "varcall-haploid"] == [
+            "Transcriptomics"
+        ]
+
+    def test_details_takes_first_category(self, shared_workflow_catalog):
+        details = shared_workflow_catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Transcriptomics"
+
+    def test_listed_under_each_category(self, shared_workflow_catalog):
+        for key, name in [
+            ("TRANSCRIPTOMICS", "Transcriptomics"),
+            ("VARIANT_CALLING", "Variant Calling"),
+        ]:
+            wfs = shared_workflow_catalog.get_workflows_in_category(key)
+            by_id = {w["iwc_id"]: w["category"] for w in wfs}
+            assert by_id["varcall-haploid"] == name

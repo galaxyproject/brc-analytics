@@ -52,7 +52,7 @@ class TestMcpWorkflowCategory:
         details = mcp_catalog.get_workflow_details("rnaseq-pe")
         assert details["category"] == "Transcriptomics"
 
-    def test_shared_workflow_takes_iterated_category(self, shared_workflow_catalog):
+    def test_shared_workflow_listed_under_each_category(self, shared_workflow_catalog):
         transcriptomics = shared_workflow_catalog.get_workflows_in_category(
             "TRANSCRIPTOMICS"
         )
@@ -64,7 +64,15 @@ class TestMcpWorkflowCategory:
             "varcall-haploid"
         ] == "Variant Calling"
 
+    def test_shared_workflow_listed_once_in_compatible(self, shared_workflow_catalog):
+        # The first category the workflow appears under wins, same as details.
         compatible = shared_workflow_catalog.get_compatible_workflows(["HAPLOID"])
-        assert sorted(
+        assert [
             w["category"] for w in compatible if w["iwcId"] == "varcall-haploid"
-        ) == ["Transcriptomics", "Variant Calling"]
+        ] == ["Transcriptomics"]
+
+    def test_shared_workflow_details_takes_first_category(
+        self, shared_workflow_catalog
+    ):
+        details = shared_workflow_catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Transcriptomics"
