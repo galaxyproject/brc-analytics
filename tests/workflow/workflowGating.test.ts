@@ -133,3 +133,42 @@ describe("bindWorkflowGates", () => {
     }
   });
 });
+
+describe("filterCategories and isWorkflowAllowed", () => {
+  it("agree on every workflow in a mixed catalog, whatever the flag state", () => {
+    // The listing and the configure path must never disagree about whether a
+    // workflow is shown.
+    const SHARED_TRS_ID =
+      "#workflow/github.com/iwc-workflows/shared-across-categories/main";
+    const catalog = [
+      buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
+        UNGATED_TRS_ID,
+        SHARED_TRS_ID,
+        HYPHY_TRS_ID,
+      ]),
+      buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER, [
+        SHARED_TRS_ID,
+        HYPHY_TRS_ID,
+      ]),
+      buildWorkflowCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING, [
+        UNGATED_TRS_ID,
+      ]),
+    ];
+    const trsIds = new Set(
+      catalog.flatMap(({ workflows }) => workflows.map(({ trsId }) => trsId))
+    );
+
+    for (const gates of [buildWorkflowGates(), buildWorkflowGates(true)]) {
+      const listed = gates.filterCategories(catalog);
+      for (const trsId of trsIds) {
+        const categoryIds = catalog
+          .filter(({ workflows }) => workflows.some((w) => w.trsId === trsId))
+          .map(({ category }) => category);
+        const isListed = listed.some(({ workflows }) =>
+          workflows.some((w) => w.trsId === trsId)
+        );
+        expect(gates.isWorkflowAllowed({ categoryIds, trsId })).toBe(isListed);
+      }
+    }
+  });
+});
