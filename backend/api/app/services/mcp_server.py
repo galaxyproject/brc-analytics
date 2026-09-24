@@ -28,9 +28,9 @@ def create_mcp_server(
     sra_enabled = sra_mirror is not None and sra_mirror.is_available()
     logan_enabled = galaxy is not None and galaxy.is_available()
 
-    wf_count = sum(
-        len(c.get("workflows", [])) for c in catalog_data.workflow_categories
-    )
+    # Count only what the tools will actually return (assembly-scoped), so
+    # this matches brc://catalog/summary.
+    wf_count = sum(c["workflowCount"] for c in catalog_data.get_workflow_categories())
     instructions = (
         "BRC Analytics provides curated genomic data for infectious disease and "
         "eukaryotic pathogen research. This server exposes the full catalog "
@@ -367,8 +367,8 @@ def create_mcp_server(
             "get_compatible_workflows or check_compatibility.\n"
             "4. Resolve workflow inputs with resolve_workflow_inputs to see what "
             "reference files are provided and what sequencing datasets are needed.\n"
-            "5. Search for relevant sequencing runs using search_sra (if available) "
-            "or search_ena.\n"
+            "5. Search for relevant sequencing runs using "
+            f"{'search_sra or ' if sra_enabled else ''}search_ena.\n"
             "6. Provide a concise summary of the plan, selected assembly, "
             "workflow, and candidate runs."
         )

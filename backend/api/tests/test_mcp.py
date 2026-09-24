@@ -234,6 +234,8 @@ def test_mcp_resource_read_workflows_respects_scope(mcp_app):
     iwc_ids = {w["iwcId"] for w in workflows}
     # assembly-with-flye is ORGANISM-scope in SAMPLE_WORKFLOWS and must not appear
     assert "assembly-with-flye" not in iwc_ids
+    # ...while the ASSEMBLY-scope ones must, or the exclusion above proves nothing.
+    assert {"rnaseq-pe", "varcall-haploid", "varcall-diploid"} <= iwc_ids
 
 
 def test_mcp_prompts_list_and_get(mcp_app):
@@ -252,7 +254,25 @@ def test_mcp_prompts_list_and_get(mcp_app):
         )
         messages = get_res["result"]["messages"]
         assert len(messages) == 1
-        assert "Plasmodium falciparum" in messages[0]["content"]["text"]
+        text = messages[0]["content"]["text"]
+        assert "Plasmodium falciparum" in text
+        # No mirror configured, so the prompt must not steer toward a missing tool.
+        assert "search_sra" not in text
+        assert "search_ena" in text
+
+
+def test_mcp_prompt_mentions_search_sra_when_mirror_enabled(mcp_app_with_mirror):
+    with TestClient(mcp_app_with_mirror) as client:
+        get_res = _mcp_post(
+            client,
+            "prompts/get",
+            {
+                "name": "plan_pathogen_analysis",
+                "arguments": {"organism": "Plasmodium falciparum"},
+            },
+        )
+    text = get_res["result"]["messages"][0]["content"]["text"]
+    assert "search_sra" in text
 
 
 # -- SRA mirror exposure (opt-in, gated on mirror availability) --
