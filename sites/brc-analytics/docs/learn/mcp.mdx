@@ -26,8 +26,7 @@ The MCP endpoint is:
 https://brc-analytics.org/api/v1/mcp/
 ```
 
-> [!NOTE]
-> Include the trailing slash (`/`) in the endpoint URL.
+The trailing slash is the canonical form; the server also accepts the URL without it.
 
 ### Claude Code
 
@@ -109,7 +108,7 @@ Search repositories for raw sequencing reads to power your analyses:
 
 **SRA mirror tools** -- fast local queries _(available on deployments configured with an SRA metadata mirror)_:
 
-- `search_sra(organism, assay_type=None, platform=None, country=None, since=None, limit=50)` -- fast, structured multi-facet search over SRA runs scoped to BRC pathogens.
+- `search_sra(organism, assay_type=None, platform=None, country=None, since=None, limit=50)` -- fast, structured multi-facet search over every public SRA run as of the mirror's build.
 - `sra_data_summary(organism)` -- snapshot of available SRA data (run counts, top platforms, assays, BioProjects).
 - `get_sra_study_runs(accession, limit=200)` -- retrieve runs for an SRA study (`SRP*`, `ERP*`, `DRP*`) or BioProject (`PRJNA*`, `PRJEB*`, `PRJDB*`).
 
@@ -144,7 +143,7 @@ The assistant will chain tool calls together as needed -- e.g., look up an organ
 
 - **Read-only.** The server exposes catalog, resource, and sequencing data but cannot launch workflows on Galaxy. Use the BRC Analytics web interface to start an analysis.
 - **Snapshot of the catalog.** Catalog data updates when new catalog builds are published, matching what powers the website.
-- **External API dependencies.** ENA searches query the European Nucleotide Archive directly and may fail or rate-limit during upstream outages (the local SRA mirror provides resilience for BRC pathogens where enabled).
+- **External API dependencies.** ENA searches query the European Nucleotide Archive directly and may fail or rate-limit during upstream outages (where enabled, the local SRA mirror keeps working when ENA does not).
 
 ## Feedback
 
