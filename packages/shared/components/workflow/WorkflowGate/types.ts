@@ -4,6 +4,6 @@ import { type ReactNode } from "react";
 export interface Props {
   children: ReactNode;
   fallback: ReactNode;
-  scope: WORKFLOW_SCOPE;
+  scopes: readonly WORKFLOW_SCOPE[];
   trsId: string;
 }
