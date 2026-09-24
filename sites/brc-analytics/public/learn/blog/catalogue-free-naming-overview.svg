@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="314" viewBox="0 0 560 314">
+<rect width="560" height="314" fill="#ffffff"/>
+
+<!-- Heading -->
+<text x="28" y="26" font-size="9" font-weight="500" fill="#8a939e" font-family="DejaVu Sans, sans-serif">Naming a haplotype — central registry vs deterministic label</text>
+
+<!-- ============ LEFT: catalogue-dependent ============ -->
+<text x="28" y="58" font-size="8" font-weight="500" fill="#8a939e" font-family="DejaVu Sans, sans-serif">CATALOGUE</text>
+
+<!-- registry box -->
+<rect x="28" y="70" width="200" height="40" rx="2" fill="#f4f6f8" stroke="#b8bec6" stroke-width="0.6"/>
+<text x="128" y="88" font-size="7.5" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">central allele registry</text>
+<text x="128" y="101" font-size="6.5" fill="#a0a8b2" text-anchor="middle" font-family="DejaVu Sans, sans-serif">curated, arbitrated, synchronised</text>
+
+<!-- dependency arrows up to registry -->
+<line x1="78" y1="150" x2="78" y2="116" stroke="#b8bec6" stroke-width="0.8" stroke-dasharray="3 2"/>
+<polygon points="78,110 75.4,116 80.6,116" fill="#b8bec6"/>
+<line x1="178" y1="150" x2="178" y2="116" stroke="#b8bec6" stroke-width="0.8" stroke-dasharray="3 2"/>
+<polygon points="178,110 175.4,116 180.6,116" fill="#b8bec6"/>
+
+<!-- lab rows -->
+<rect x="28" y="152" width="90" height="26" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<text x="73" y="163" font-size="6.5" fill="#a0a8b2" text-anchor="middle" font-family="DejaVu Sans, sans-serif">lab A</text>
+<text x="73" y="174" font-size="8" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">allele 7</text>
+
+<rect x="133" y="152" width="90" height="26" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<text x="178" y="163" font-size="6.5" fill="#a0a8b2" text-anchor="middle" font-family="DejaVu Sans, sans-serif">lab B</text>
+<text x="178" y="174" font-size="8" fill="#8a939e" text-anchor="middle" font-family="DejaVu Sans, sans-serif">allele 7</text>
+
+<text x="28" y="204" font-size="6.5" fill="#a0a8b2" font-family="DejaVu Sans, sans-serif">integer means nothing without the registry</text>
+<text x="28" y="216" font-size="6.5" fill="#a0a8b2" font-family="DejaVu Sans, sans-serif">that issued it</text>
+
+<!-- ============ divider ============ -->
+<line x1="280" y1="52" x2="280" y2="262" stroke="#e3e6ea" stroke-width="0.6"/>
+
+<!-- ============ RIGHT: catalogue-free ============ -->
+<text x="312" y="58" font-size="8" font-weight="500" fill="#2c6fad" font-family="DejaVu Sans, sans-serif">VARIANT STRING</text>
+
+<!-- reference bar -->
+<rect x="312" y="72" width="216" height="14" rx="1.5" fill="#eef3f8" stroke="#b8bec6" stroke-width="0.5"/>
+<text x="318" y="82" font-size="6.5" fill="#8a939e" font-family="DejaVu Sans, sans-serif">reference window</text>
+<line x1="356" y1="86" x2="356" y2="96" stroke="#b8860b" stroke-width="0.8"/>
+<line x1="420" y1="86" x2="420" y2="96" stroke="#b8860b" stroke-width="0.8"/>
+
+<!-- haplotype rows -->
+<rect x="312" y="104" width="216" height="24" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<rect x="312" y="104" width="3" height="24" fill="#b8bec6"/>
+<text x="326" y="120" font-size="9" fill="#8a939e" font-family="DejaVu Sans, sans-serif">=</text>
+<text x="522" y="120" font-size="6.5" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">matches reference</text>
+
+<rect x="312" y="134" width="216" height="24" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<rect x="312" y="134" width="3" height="24" fill="#2c6fad"/>
+<text x="326" y="150" font-size="9" fill="#2c6fad" font-family="DejaVu Sans, sans-serif">14A&gt;G</text>
+<text x="522" y="150" font-size="6.5" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">one substitution</text>
+
+<rect x="312" y="164" width="216" height="24" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<rect x="312" y="164" width="3" height="24" fill="#2c6fad"/>
+<text x="326" y="180" font-size="9" fill="#2c6fad" font-family="DejaVu Sans, sans-serif">28_29insT</text>
+<text x="522" y="180" font-size="6.5" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">insertion</text>
+
+<rect x="312" y="194" width="216" height="24" rx="2" fill="#ffffff" stroke="#e3e6ea" stroke-width="0.6"/>
+<rect x="312" y="194" width="3" height="24" fill="#2c6fad"/>
+<text x="326" y="210" font-size="9" fill="#2c6fad" font-family="DejaVu Sans, sans-serif">14A&gt;G,31T&gt;C</text>
+<text x="522" y="210" font-size="6.5" fill="#a0a8b2" text-anchor="end" font-family="DejaVu Sans, sans-serif">linked pair, phased on one read</text>
+
+<text x="312" y="236" font-size="6.5" fill="#8a939e" font-family="DejaVu Sans, sans-serif">same reference and window definition</text>
+<text x="312" y="248" font-size="6.5" fill="#8a939e" font-family="DejaVu Sans, sans-serif">give the same label in every laboratory</text>
+
+<!-- ============ footer ============ -->
+<line x1="28" y1="274" x2="532" y2="274" stroke="#e3e6ea" stroke-width="0.5"/>
+<text x="28" y="292" font-size="7" fill="#a0a8b2" font-family="DejaVu Sans, sans-serif">PyEuk — 5 cohorts, 2 genera, panels of 1 to 495 amplicons</text>
+<text x="532" y="292" font-size="7" fill="#b8860b" text-anchor="end" font-family="DejaVu Sans, sans-serif">no registry to synchronise</text>
+</svg>
