@@ -74,12 +74,15 @@ Services:
 
 ## MCP Server
 
-The API embeds a Model Context Protocol server at `/api/v1/mcp`, giving AI
-clients (Claude Desktop, the Galaxy MCP integration) direct access to the BRC
-catalog and sequencing-data search.
+The API embeds a Model Context Protocol server at `/api/v1/mcp/`, giving AI
+clients (Claude Desktop, Claude Code, Cursor, Galaxy MCP) direct access to the
+BRC catalog, sequencing-data search, context resources, and guided prompts.
 
-**Catalog tools** -- organisms, assemblies, workflows, and compatibility checks
-(in-memory, always available).
+**Catalog tools** (`search_organisms`, `get_organism`, `get_assemblies`,
+`get_assembly_details`, `list_workflow_categories`, `get_workflows_in_category`,
+`get_compatible_workflows`, `get_workflow_details`, `check_compatibility`,
+`resolve_workflow_inputs`) -- organisms, assemblies, workflows, and
+compatibility checks (in-memory, always available).
 
 **ENA tools** (`search_ena`, `search_ena_keywords`) -- live sequencing-run
 search against the European Nucleotide Archive.
@@ -97,6 +100,12 @@ and pages of score-ranked hits with SRA metadata. Opt-in: registered only when
 `GALAXY_API_KEY` is set. Cache-only -- they read the merged result the results
 page assembled (cached for a day) and never rebuild it, so a tool that reports
 `expired` means opening that page first.
+
+**Catalog resources** (`brc://catalog/summary`, `brc://catalog/categories`,
+`brc://catalog/workflows`, `brc://catalog/organisms/{taxonomy_id}`) -- read-only
+structured context documents for models.
+
+**Prompts** (`plan_pathogen_analysis`) -- guided workflow templates.
 
 ## Configuration
 
