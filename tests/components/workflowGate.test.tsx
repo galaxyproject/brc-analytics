@@ -1,4 +1,7 @@
-import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
+import {
+  WORKFLOW_CATEGORY_ID,
+  WORKFLOW_SCOPE,
+} from "@repo/shared/apis/schema-types";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { formatTrsId } from "@repo/shared/workflow/utils";
@@ -25,10 +28,14 @@ const SHARED_TRS_ID =
 /**
  * Renders the gate for the given URL TRS ID.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
+ * @param scope - Scope of the workflows the page configures.
  */
-function renderGate(trsId: string): void {
+function renderGate(
+  trsId: string,
+  scope: WORKFLOW_SCOPE = WORKFLOW_SCOPE.ASSEMBLY
+): void {
   render(
-    <WorkflowGate fallback={<div>not found</div>} trsId={trsId}>
+    <WorkflowGate fallback={<div>not found</div>} scope={scope} trsId={trsId}>
       <div>content</div>
     </WorkflowGate>
   );
@@ -92,7 +99,7 @@ describe("WorkflowGate", () => {
   test("renders the fallback for a gated workflow outside the catalog", () => {
     // Stored under its raw TRS ID with no category; must fall through to the
     // workflow-level rule rather than fail the category lookup.
-    renderGate(LOGAN_SEARCH.trsId);
+    renderGate(LOGAN_SEARCH.trsId, LOGAN_SEARCH.scope);
 
     expect(screen.getByText("not found")).toBeTruthy();
     expect(screen.queryByText("content")).toBeNull();
@@ -101,7 +108,7 @@ describe("WorkflowGate", () => {
   test("renders children for a workflow outside the catalog when the demo flag is on", () => {
     mockUseFeatureFlag.mockReturnValue(true);
 
-    renderGate(LOGAN_SEARCH.trsId);
+    renderGate(LOGAN_SEARCH.trsId, LOGAN_SEARCH.scope);
 
     expect(screen.getByText("content")).toBeTruthy();
     expect(screen.queryByText("not found")).toBeNull();
