@@ -91,7 +91,9 @@ class CatalogData:
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
                 iwc_id = wf.get("iwcId", "")
-                if iwc_id:
+                # A workflow can be listed under several categories; the first
+                # one is its canonical category everywhere.
+                if iwc_id and iwc_id not in self._workflows_by_iwc_id:
                     self._workflows_by_iwc_id[iwc_id] = {
                         **wf,
                         "_category": cat.get("name", ""),
@@ -208,7 +210,7 @@ class CatalogData:
                 or cat.get("name", "").lower() == cat_lower
             ):
                 return [
-                    self._condense_workflow(wf)
+                    self._condense_workflow(wf, cat.get("name", ""))
                     for wf in cat.get("workflows", [])
                     if _is_assembly_scope(wf)
                 ]
@@ -219,9 +221,10 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Find workflows compatible with given ploidies and optional taxonomy ID."""
         results = []
+        seen = set()
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
+                if not _is_assembly_scope(wf) or wf.get("iwcId") in seen:
                     continue
                 wf_ploidy = wf.get("ploidy")
                 wf_tax = wf.get("taxonomyId")
@@ -239,13 +242,14 @@ class CatalogData:
                     lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
                     if str(wf_tax) not in lineage:
                         continue
-                results.append(self._condense_workflow(wf))
+                seen.add(wf.get("iwcId"))
+                results.append(self._condense_workflow(wf, cat.get("name", "")))
         return results
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         wf = self._workflows_by_iwc_id.get(iwc_id)
         if wf and _is_assembly_scope(wf):
-            return self._condense_workflow(wf)
+            return self._condense_workflow(wf, wf["_category"])
         return None
 
     def check_workflow_assembly_compatibility(
@@ -386,12 +390,14 @@ class CatalogData:
             f"{accession}/{accession}.fa.gz"
         )
 
-    def _condense_workflow(self, wf: Dict[str, Any]) -> Dict[str, Any]:
+    def _condense_workflow(
+        self, wf: Dict[str, Any], category_name: str
+    ) -> Dict[str, Any]:
         return {
             "iwcId": wf.get("iwcId"),
             "name": wf.get("workflowName"),
             "description": wf.get("workflowDescription"),
-            "category": wf.get("_category", ""),
+            "category": category_name,
             "ploidy": wf.get("ploidy"),
             "taxonomyId": wf.get("taxonomyId"),
             "trsId": wf.get("trsId"),
