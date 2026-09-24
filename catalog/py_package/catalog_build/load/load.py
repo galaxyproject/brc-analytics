@@ -18,6 +18,7 @@ def do_dlt_load(
     dlt_pipeline_prefix: str,
     assemblies_df: pd.DataFrame,
     organisms_df: pd.DataFrame,
+    taxa_df: pd.DataFrame | None,
     outbreaks_df: pd.DataFrame | None,
 ):
     """
@@ -28,6 +29,7 @@ def do_dlt_load(
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
       organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
+      taxa_df: DataFrame of source curated taxa (must include `taxonomy_id` and `other_names` columns), or None for catalogs without curated taxa
       outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
 
     Returns:
@@ -42,6 +44,7 @@ def do_dlt_load(
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_df=assemblies_df,
         organisms_df=organisms_df,
+        taxa_df=taxa_df,
         outbreaks_df=outbreaks_df,
     )
 
