@@ -2,7 +2,17 @@ import {
   WORKFLOW_CATEGORY_ID,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
+import {
+  ASSEMBLY_CONFIGURE_SCOPES,
+  ORGANISM_CONFIGURE_SCOPES,
+} from "@repo/shared/components/workflow/WorkflowGate/constants";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
+import { indexWorkflowsById } from "@repo/shared/services/workflows/loader";
+import {
+  getEntitiesById,
+  getEntitiesByType,
+  setEntitiesById,
+} from "@repo/shared/services/workflows/store";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import { render, screen } from "@testing-library/react";
@@ -22,20 +32,22 @@ jest.mock(
 
 const ASSEMBLY_TRS_ID =
   "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1";
+const ORGANISM_TRS_ID =
+  "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4";
 const SHARED_TRS_ID =
   "#workflow/github.com/iwc-workflows/shared-across-categories/main";
 
 /**
  * Renders the gate for the given URL TRS ID.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
- * @param scope - Scope of the workflows the page configures.
+ * @param scopes - Workflow scopes the page accepts.
  */
 function renderGate(
   trsId: string,
-  scope: WORKFLOW_SCOPE = WORKFLOW_SCOPE.ASSEMBLY
+  scopes: readonly WORKFLOW_SCOPE[] = ASSEMBLY_CONFIGURE_SCOPES
 ): void {
   render(
-    <WorkflowGate fallback={<div>not found</div>} scope={scope} trsId={trsId}>
+    <WorkflowGate fallback={<div>not found</div>} scopes={scopes} trsId={trsId}>
       <div>content</div>
     </WorkflowGate>
   );
@@ -55,6 +67,11 @@ describe("WorkflowGate", () => {
           ASSEMBLY_TRS_ID,
           SHARED_TRS_ID,
         ]),
+        buildWorkflowCategory(
+          WORKFLOW_CATEGORY_ID.GENOME_COMPARISONS,
+          [ORGANISM_TRS_ID],
+          WORKFLOW_SCOPE.ORGANISM
+        ),
       ],
       [LOGAN_SEARCH]
     );
@@ -99,7 +116,7 @@ describe("WorkflowGate", () => {
   test("renders the fallback for a gated workflow outside the catalog", () => {
     // Stored under its raw TRS ID with no category; must fall through to the
     // workflow-level rule rather than fail the category lookup.
-    renderGate(LOGAN_SEARCH.trsId, LOGAN_SEARCH.scope);
+    renderGate(LOGAN_SEARCH.trsId, [LOGAN_SEARCH.scope]);
 
     expect(screen.getByText("not found")).toBeTruthy();
     expect(screen.queryByText("content")).toBeNull();
@@ -108,7 +125,7 @@ describe("WorkflowGate", () => {
   test("renders children for a workflow outside the catalog when the demo flag is on", () => {
     mockUseFeatureFlag.mockReturnValue(true);
 
-    renderGate(LOGAN_SEARCH.trsId, LOGAN_SEARCH.scope);
+    renderGate(LOGAN_SEARCH.trsId, [LOGAN_SEARCH.scope]);
 
     expect(screen.getByText("content")).toBeTruthy();
     expect(screen.queryByText("not found")).toBeNull();
@@ -121,5 +138,51 @@ describe("WorkflowGate", () => {
 
     expect(screen.getByText("content")).toBeTruthy();
     expect(screen.queryByText("not found")).toBeNull();
+  });
+
+  test("renders the fallback for a workflow of a scope the page does not accept, even when the demo flag is on", () => {
+    mockUseFeatureFlag.mockReturnValue(true);
+
+    // An assembly-scope workflow opened on an organism page.
+    renderGate(formatTrsId(UNGATED_TRS_ID), ORGANISM_CONFIGURE_SCOPES);
+
+    expect(screen.getByText("not found")).toBeTruthy();
+    expect(screen.queryByText("content")).toBeNull();
+  });
+
+  test("renders children for an organism-scope workflow on the assembly page", () => {
+    // The assistant hands off every workflow to the assembly page.
+    renderGate(formatTrsId(ORGANISM_TRS_ID), ASSEMBLY_CONFIGURE_SCOPES);
+
+    expect(screen.getByText("content")).toBeTruthy();
+    expect(screen.queryByText("not found")).toBeNull();
+  });
+
+  test("renders children for an organism-scope workflow on the organism page", () => {
+    renderGate(formatTrsId(ORGANISM_TRS_ID), ORGANISM_CONFIGURE_SCOPES);
+
+    expect(screen.getByText("content")).toBeTruthy();
+    expect(screen.queryByText("not found")).toBeNull();
+  });
+
+  test("does not render a catalog workflow when its categories are not loaded", () => {
+    // Only the by-id lookup is loaded; the category list is missing. The gate
+    // must fail closed rather than read the workflow as in no category.
+    getEntitiesById().clear();
+    getEntitiesByType().clear();
+    setEntitiesById(
+      "workflows",
+      indexWorkflowsById([
+        buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [ASSEMBLY_TRS_ID]),
+      ])
+    );
+    const consoleError = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    expect(() => renderGate(formatTrsId(ASSEMBLY_TRS_ID))).toThrow();
+    expect(screen.queryByText("content")).toBeNull();
+
+    consoleError.mockRestore();
   });
 });

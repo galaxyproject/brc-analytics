@@ -5,7 +5,7 @@ import { isWorkflowAvailable } from "./utils";
 
 /**
  * Gate content on the TRS ID naming a workflow the user may see here: one that
- * exists in the catalog, has the scope the page configures, and is not held
+ * exists in the catalog, has a scope the page accepts, and is not held
  * back by the demo feature flag, whether through its own gate or its
  * category's. Renders `children` for a workflow that passes and `fallback`
  * otherwise, letting the page decide how a stale, unknown, out-of-scope or
@@ -14,17 +14,17 @@ import { isWorkflowAvailable } from "./utils";
  * @param props - Component props.
  * @param props.children - Content to render when the workflow is available.
  * @param props.fallback - Content to render for an unavailable TRS ID.
- * @param props.scope - Scope of the workflows the page configures.
+ * @param props.scopes - Workflow scopes the page accepts.
  * @param props.trsId - Workflow TRS ID.
  * @returns Children when the workflow is available, fallback otherwise.
  */
 export function WorkflowGate({
   children,
   fallback,
-  scope,
+  scopes,
   trsId,
 }: Props): JSX.Element {
   const workflowGates = useWorkflowGates();
-  const isAvailable = isWorkflowAvailable(trsId, scope, workflowGates);
+  const isAvailable = isWorkflowAvailable(trsId, scopes, workflowGates);
   return <>{isAvailable ? children : fallback}</>;
 }
