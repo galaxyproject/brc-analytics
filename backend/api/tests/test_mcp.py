@@ -83,9 +83,18 @@ def _parse_sse(body: str) -> dict:
     raise AssertionError(f"No SSE data frame in response:\n{body}")
 
 
-def _mcp_post(client: TestClient, method: str, params: dict | None = None) -> dict:
+def _mcp_post(
+    client: TestClient,
+    method: str,
+    params: dict | None = None,
+    path: str = "/api/v1/mcp/",
+    follow_redirects: bool | None = None,
+) -> dict:
+    kwargs = {}
+    if follow_redirects is not None:
+        kwargs["follow_redirects"] = follow_redirects
     response = client.post(
-        "/api/v1/mcp/",
+        path,
         json={
             "jsonrpc": "2.0",
             "method": method,
@@ -93,6 +102,7 @@ def _mcp_post(client: TestClient, method: str, params: dict | None = None) -> di
             "id": 1,
         },
         headers={"Accept": "application/json, text/event-stream"},
+        **kwargs,
     )
     assert response.status_code == 200, (
         f"MCP {method} returned {response.status_code}: {response.text}"
@@ -157,6 +167,92 @@ def test_mcp_tool_call_search_organisms(mcp_app):
     assert structured["count"] >= 1
     species = {org["species"] for org in structured["organisms"]}
     assert "Plasmodium falciparum" in species
+
+
+def test_mcp_endpoint_without_trailing_slash_succeeds(mcp_app):
+    """Regression test for the missing trailing slash issue.
+
+    Mounting FastMCP causes Starlette to issue a 307 redirect if the path lacks
+    a trailing slash, which breaks POST clients behind reverse proxies.
+    MCPPathNormalizeMiddleware normalizes /api/v1/mcp in ASGI scope so both work.
+    follow_redirects=False ensures the endpoint handles the request directly
+    without issuing an HTTP 307 redirect.
+    """
+    with TestClient(mcp_app, follow_redirects=False) as client:
+        result = _mcp_post(
+            client,
+            "initialize",
+            {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "pytest", "version": "1"},
+            },
+            path="/api/v1/mcp",
+            follow_redirects=False,
+        )
+    assert result.get("error") is None
+    assert result["result"]["serverInfo"]["name"] == "BRC Analytics"
+
+
+def test_mcp_resources_list_exposes_expected_resources(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(client, "resources/list")
+
+    uris = {r["uri"] for r in result["result"]["resources"]}
+    expected = {
+        "brc://catalog/summary",
+        "brc://catalog/categories",
+        "brc://catalog/workflows",
+    }
+    assert expected <= uris
+
+
+def test_mcp_resource_read_summary(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client,
+            "resources/read",
+            {"uri": "brc://catalog/summary"},
+        )
+    contents = result["result"]["contents"]
+    assert len(contents) == 1
+    summary = json.loads(contents[0]["text"])
+    assert summary["name"] == "BRC Analytics Catalog"
+    assert summary["organisms_count"] >= 1
+    assert "categories" in summary
+
+
+def test_mcp_resource_read_workflows_respects_scope(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client,
+            "resources/read",
+            {"uri": "brc://catalog/workflows"},
+        )
+    contents = result["result"]["contents"]
+    workflows = json.loads(contents[0]["text"])
+    iwc_ids = {w["iwcId"] for w in workflows}
+    # assembly-with-flye is ORGANISM-scope in SAMPLE_WORKFLOWS and must not appear
+    assert "assembly-with-flye" not in iwc_ids
+
+
+def test_mcp_prompts_list_and_get(mcp_app):
+    with TestClient(mcp_app) as client:
+        list_res = _mcp_post(client, "prompts/list")
+        prompt_names = {p["name"] for p in list_res["result"]["prompts"]}
+        assert "plan_pathogen_analysis" in prompt_names
+
+        get_res = _mcp_post(
+            client,
+            "prompts/get",
+            {
+                "name": "plan_pathogen_analysis",
+                "arguments": {"organism": "Plasmodium falciparum"},
+            },
+        )
+        messages = get_res["result"]["messages"]
+        assert len(messages) == 1
+        assert "Plasmodium falciparum" in messages[0]["content"]["text"]
 
 
 # -- SRA mirror exposure (opt-in, gated on mirror availability) --
