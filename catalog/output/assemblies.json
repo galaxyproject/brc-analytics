@@ -29540,7 +29540,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_001660665.1/",
     "gcPercent": 43.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/001/660/665/GCA_001660665.1/genes/GCA_001660665.1_Emmo_afri_EA111.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 29708924,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -34354,7 +34354,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_001883825.1/",
     "gcPercent": 44.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/001/883/825/GCA_001883825.1/genes/GCA_001883825.1_Emmo_past_UAMH9510_V1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 32410993,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -36492,7 +36492,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_002110485.1/",
     "gcPercent": 45.5,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/110/485/GCA_002110485.1/genes/GCA_002110485.1_ASM211048v1.augustus.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 35498521,
     "level": "Contig",
     "lineageTaxonomyIds": [
@@ -72815,7 +72815,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_009650685.1/",
     "gcPercent": 48,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/009/650/685/GCA_009650685.1/genes/GCA_009650685.1_Cryp_gatt_MF34.ncbiGene.gtf.gz",
-    "isRef": "No",
+    "isRef": "Yes",
     "length": 17886378,
     "level": "Chromosome",
     "lineageTaxonomyIds": [
@@ -72832,11 +72832,12 @@
       "1884633",
       "5206",
       "1884637",
-      "3111917",
       "2268382"
     ],
     "ncbiTaxonomyId": "2268382",
-    "otherNames": [],
+    "otherNames": [
+      "Cryptococcus gattii VGV"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -72862,8 +72863,8 @@
     "taxonomicLevelPhylum": "Basidiomycota",
     "taxonomicLevelRealm": "None",
     "taxonomicLevelSerotype": "None",
-    "taxonomicLevelSpecies": "Cryptococcus gattii VGV",
-    "taxonomicLevelStrain": "Cryptococcus gattii VGV strain MF34",
+    "taxonomicLevelSpecies": "Cryptococcus hyracis",
+    "taxonomicLevelStrain": "Cryptococcus hyracis strain MF34",
     "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_009650685.1"
   },
   {
@@ -125131,7 +125132,7 @@
     "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_015951145.1/",
     "gcPercent": 41,
     "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/015/951/145/GCA_015951145.1/genes/GCA_015951145.1_Croqu1.ncbiGene.gtf.gz",
-    "isRef": "Yes",
+    "isRef": "No",
     "length": 76567842,
     "level": "Scaffold",
     "lineageTaxonomyIds": [
@@ -245300,7 +245301,9 @@
       "5858"
     ],
     "ncbiTaxonomyId": "5858",
-    "otherNames": [],
+    "otherNames": [
+      "Haemamoeba malariae"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -245356,7 +245359,9 @@
       "5858"
     ],
     "ncbiTaxonomyId": "5858",
-    "otherNames": [],
+    "otherNames": [
+      "Haemamoeba malariae"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -263032,7 +263037,9 @@
       "5858"
     ],
     "ncbiTaxonomyId": "5858",
-    "otherNames": [],
+    "otherNames": [
+      "Haemamoeba malariae"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -263088,7 +263095,9 @@
       "5858"
     ],
     "ncbiTaxonomyId": "5858",
-    "otherNames": [],
+    "otherNames": [
+      "Haemamoeba malariae"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -285914,8 +285923,7 @@
       "H9N2",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -291770,8 +291778,7 @@
       "H5N1",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -292452,8 +292459,7 @@
       "H3N2",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -292703,8 +292709,7 @@
       "H1N1",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -293006,8 +293011,7 @@
       "Influenza A virus (STRAIN A/KOREA/426/68)",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -300870,8 +300874,7 @@
       "H7N9",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -302883,8 +302886,7 @@
       "H1N1",
       "FLUAV",
       "Human Influenza A Virus",
-      "Influenza virus type A",
-      "influenza A virus"
+      "Influenza virus type A"
     ],
     "otherTaxa": null,
     "ploidy": [
@@ -343710,7 +343712,9 @@
       "5858"
     ],
     "ncbiTaxonomyId": "5858",
-    "otherNames": [],
+    "otherNames": [
+      "Haemamoeba malariae"
+    ],
     "otherTaxa": null,
     "ploidy": [
       "HAPLOID"
@@ -345628,7 +345632,8 @@
     ],
     "ncbiTaxonomyId": "53552",
     "otherNames": [
-      "Culex cyaneus"
+      "Culex cyaneus",
+      "Sabethes (Sabethes) cyaneus"
     ],
     "otherTaxa": null,
     "ploidy": [
