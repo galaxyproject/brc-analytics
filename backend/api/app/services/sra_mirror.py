@@ -306,6 +306,22 @@ _SORTABLE_COLUMNS: Dict[str, str] = {
 # with non-zero runs in the mirror. NCBI's 2024 ICTV-aligned virus
 # renames produced new species-level taxids (HIV-1 = 3418650, not the
 # old 11676, etc.) -- using the new ones.
+#
+# Note: These aliases are being transitioned to living in the catalog
+# input (`other_names` in taxa.yml). Any new aliases should be
+# mirrored there, in display format. Currently, it's assumed that the
+# aliases in taxa.yml will be matched against loosely with respect
+# to punctuation (e.g. only "C. auris" is listed, not "C.auris"); when the
+# aliases below are retired in favor of the catalog data, it may be
+# necessary to update the matching algorithm and/or add some missing
+# name variants to taxa.yml.
+#
+# Additional notes regarding mirrored aliases:
+# - Aliases already received from NCBI are not included in the catalog input.
+# - All taxonomy IDs below are for species, as that's what organisms
+#   correspond to, but the catalog's aliases may be applied to taxa of
+#   any level, and so are narrowed as appropriate (e.g. "COVID-19" is linked
+#   specifically to SARS-CoV-2, not the entire SARS-CoV species).
 _ORGANISM_ALIASES: Dict[str, int] = {
     # Viruses
     "sars-cov-2": 3418604,

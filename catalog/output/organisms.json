@@ -20365,7 +20365,8 @@
           "Micrococcus pyogenes",
           "Staphylococcus aureus subsp. anaerobius",
           "Staphylococcus pyogenes aureus",
-          "Staphylococcus pyogenes citreus"
+          "Staphylococcus pyogenes citreus",
+          "S. aureus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -20427,7 +20428,8 @@
           "Micrococcus pyogenes",
           "Staphylococcus aureus subsp. anaerobius",
           "Staphylococcus pyogenes aureus",
-          "Staphylococcus pyogenes citreus"
+          "Staphylococcus pyogenes citreus",
+          "S. aureus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -20491,7 +20493,8 @@
           "Micrococcus pyogenes",
           "Staphylococcus aureus subsp. anaerobius",
           "Staphylococcus pyogenes aureus",
-          "Staphylococcus pyogenes citreus"
+          "Staphylococcus pyogenes citreus",
+          "S. aureus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -20555,7 +20558,8 @@
           "Micrococcus pyogenes",
           "Staphylococcus aureus subsp. anaerobius",
           "Staphylococcus pyogenes aureus",
-          "Staphylococcus pyogenes citreus"
+          "Staphylococcus pyogenes citreus",
+          "S. aureus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -20595,6 +20599,7 @@
       "Staphylococcus aureus subsp. anaerobius",
       "Staphylococcus pyogenes aureus",
       "Staphylococcus pyogenes citreus",
+      "S. aureus",
       "Staphylococcus aureus COL",
       "Staphylococcus aureus NCTC 8325",
       "Staphylococcus aureus subsp. aureus str. NCTC 8325",
@@ -48222,7 +48227,10 @@
           "Bacterium tuberculosis",
           "Mycobacterium tuberculosis (Zopf 1883) Lehmann and Neumann 1896 (Approved Lists 1980)",
           "Mycobacterium tuberculosis typus humanus",
-          "Mycobacterium tuberculosis var. hominis"
+          "Mycobacterium tuberculosis var. hominis",
+          "M. tuberculosis",
+          "MTB",
+          "TB"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -48287,7 +48295,10 @@
           "Bacterium tuberculosis",
           "Mycobacterium tuberculosis (Zopf 1883) Lehmann and Neumann 1896 (Approved Lists 1980)",
           "Mycobacterium tuberculosis typus humanus",
-          "Mycobacterium tuberculosis var. hominis"
+          "Mycobacterium tuberculosis var. hominis",
+          "M. tuberculosis",
+          "MTB",
+          "TB"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -48348,7 +48359,10 @@
           "Bacterium tuberculosis",
           "Mycobacterium tuberculosis (Zopf 1883) Lehmann and Neumann 1896 (Approved Lists 1980)",
           "Mycobacterium tuberculosis typus humanus",
-          "Mycobacterium tuberculosis var. hominis"
+          "Mycobacterium tuberculosis var. hominis",
+          "M. tuberculosis",
+          "MTB",
+          "TB"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -48409,7 +48423,10 @@
           "Bacterium tuberculosis",
           "Mycobacterium tuberculosis (Zopf 1883) Lehmann and Neumann 1896 (Approved Lists 1980)",
           "Mycobacterium tuberculosis typus humanus",
-          "Mycobacterium tuberculosis var. hominis"
+          "Mycobacterium tuberculosis var. hominis",
+          "M. tuberculosis",
+          "MTB",
+          "TB"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -48450,7 +48467,10 @@
       "Bacterium tuberculosis",
       "Mycobacterium tuberculosis (Zopf 1883) Lehmann and Neumann 1896 (Approved Lists 1980)",
       "Mycobacterium tuberculosis typus humanus",
-      "Mycobacterium tuberculosis var. hominis"
+      "Mycobacterium tuberculosis var. hominis",
+      "M. tuberculosis",
+      "MTB",
+      "TB"
     ],
     "otherTaxa": null,
     "priority": "CRITICAL",
@@ -65084,7 +65104,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_002572885.1/",
         "gcPercent": 47.5,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/002/572/885/GCA_002572885.1/genes/GCA_002572885.1_Emmon_parv_130.ncbiGene.gtf.gz",
-        "isRef": "No",
+        "isRef": "Yes",
         "length": 27837035,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -127337,7 +127357,8 @@
           "ZEBOV",
           "Ebola virus Zaire strain",
           "Zaire Ebola virus",
-          "Ebola"
+          "Ebola",
+          "EBOV"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -127374,7 +127395,8 @@
       "ZEBOV",
       "Ebola virus Zaire strain",
       "Zaire Ebola virus",
-      "Ebola"
+      "Ebola",
+      "EBOV"
     ],
     "otherTaxa": null,
     "priority": "CRITICAL",
@@ -148108,7 +148130,9 @@
           "Human coronavirus 2019",
           "SARS-2",
           "SARS-CoV2",
-          "SARS2"
+          "SARS2",
+          "COVID",
+          "COVID-19"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -148161,7 +148185,9 @@
       "Human coronavirus 2019",
       "SARS-2",
       "SARS-CoV2",
-      "SARS2"
+      "SARS2",
+      "COVID",
+      "COVID-19"
     ],
     "otherTaxa": null,
     "priority": "CRITICAL",
@@ -205329,7 +205355,8 @@
           "Saccharomyces diastaticus",
           "Saccharomyces italicus",
           "Saccharomyces oviformis",
-          "Saccharomyces uvarum var. melibiosus"
+          "Saccharomyces uvarum var. melibiosus",
+          "S. cerevisiae"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -205404,7 +205431,8 @@
           "Saccharomyces diastaticus",
           "Saccharomyces italicus",
           "Saccharomyces oviformis",
-          "Saccharomyces uvarum var. melibiosus"
+          "Saccharomyces uvarum var. melibiosus",
+          "S. cerevisiae"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -205452,7 +205480,8 @@
       "Saccharomyces diastaticus",
       "Saccharomyces italicus",
       "Saccharomyces oviformis",
-      "Saccharomyces uvarum var. melibiosus"
+      "Saccharomyces uvarum var. melibiosus",
+      "S. cerevisiae"
     ],
     "otherTaxa": null,
     "priority": null,
@@ -206396,7 +206425,8 @@
         "ncbiTaxonomyId": "3712126",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206457,7 +206487,8 @@
         "ncbiTaxonomyId": "498019",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206518,7 +206549,8 @@
         "ncbiTaxonomyId": "498019",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206579,7 +206611,8 @@
         "ncbiTaxonomyId": "498019",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206640,7 +206673,8 @@
         "ncbiTaxonomyId": "498019",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206701,7 +206735,8 @@
         "ncbiTaxonomyId": "498019",
         "otherNames": [
           "Candida auris",
-          "Candida auris Satoh & Makimura, 2009"
+          "Candida auris Satoh & Makimura, 2009",
+          "C. auris"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -206736,7 +206771,8 @@
     "ncbiTaxonomyId": "498019",
     "otherNames": [
       "Candida auris",
-      "Candida auris Satoh & Makimura, 2009"
+      "Candida auris Satoh & Makimura, 2009",
+      "C. auris"
     ],
     "otherTaxa": null,
     "priority": "HIGH",
@@ -273618,7 +273654,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -273692,7 +273729,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -273766,7 +273804,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -273840,7 +273879,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -273914,7 +273954,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -273988,7 +274029,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274062,7 +274104,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274136,7 +274179,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274210,7 +274254,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274284,7 +274329,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274358,7 +274404,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274432,7 +274479,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274506,7 +274554,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274580,7 +274629,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274654,7 +274704,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274728,7 +274779,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274802,7 +274854,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274876,7 +274929,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -274950,7 +275004,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275024,7 +275079,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275098,7 +275154,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275172,7 +275229,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275246,7 +275304,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275320,7 +275379,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275394,7 +275454,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275468,7 +275529,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275542,7 +275604,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275616,7 +275679,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275690,7 +275754,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275764,7 +275829,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275838,7 +275904,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275912,7 +275979,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -275986,7 +276054,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276060,7 +276129,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276134,7 +276204,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276207,7 +276278,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276280,7 +276352,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276353,7 +276426,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276426,7 +276500,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276499,7 +276574,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276572,7 +276648,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276645,7 +276722,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276718,7 +276796,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276791,7 +276870,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276864,7 +276944,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -276937,7 +277018,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277011,7 +277093,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277084,7 +277167,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277157,7 +277241,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277230,7 +277315,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277303,7 +277389,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277376,7 +277463,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277449,7 +277537,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277522,7 +277611,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277595,7 +277685,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277668,7 +277759,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277741,7 +277833,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277814,7 +277907,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277887,7 +277981,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -277960,7 +278055,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278033,7 +278129,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278106,7 +278203,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278179,7 +278277,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278252,7 +278351,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278325,7 +278425,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278398,7 +278499,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278471,7 +278573,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278544,7 +278647,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278617,7 +278721,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278690,7 +278795,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278763,7 +278869,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278836,7 +278943,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278910,7 +279018,8 @@
           "Procandida albicans",
           "Procandida stellatoidea",
           "Saccharomyces albicans",
-          "Syringospora albicans"
+          "Syringospora albicans",
+          "C. albicans"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -278957,7 +279066,8 @@
       "Procandida albicans",
       "Procandida stellatoidea",
       "Saccharomyces albicans",
-      "Syringospora albicans"
+      "Syringospora albicans",
+      "C. albicans"
     ],
     "otherTaxa": null,
     "priority": null,
@@ -343008,7 +343118,8 @@
           "Bacillus pneumoniae",
           "Bacterium pneumoniae crouposae",
           "Hyalococcus pneumoniae",
-          "Klebsiella pneumoniae aerogenes"
+          "Klebsiella pneumoniae aerogenes",
+          "K. pneumoniae"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -343075,7 +343186,8 @@
           "Bacillus pneumoniae",
           "Bacterium pneumoniae crouposae",
           "Hyalococcus pneumoniae",
-          "Klebsiella pneumoniae aerogenes"
+          "Klebsiella pneumoniae aerogenes",
+          "K. pneumoniae"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -343140,7 +343252,8 @@
           "Bacillus pneumoniae",
           "Bacterium pneumoniae crouposae",
           "Hyalococcus pneumoniae",
-          "Klebsiella pneumoniae aerogenes"
+          "Klebsiella pneumoniae aerogenes",
+          "K. pneumoniae"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -343181,6 +343294,7 @@
       "Bacterium pneumoniae crouposae",
       "Hyalococcus pneumoniae",
       "Klebsiella pneumoniae aerogenes",
+      "K. pneumoniae",
       "Klebsiella pneumoniae subsp. rhinoscleromatis str. ATCC 13884",
       "Klebsiella pneumoniae subsp. rhinoscleromatis strain ATCC 13884",
       "Bacterium rhinoscleromatis",
@@ -352741,7 +352855,8 @@
         "otherNames": [
           "Plasmodium falciparum (isolate 3D7)",
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -352800,7 +352915,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -352859,7 +352975,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -352918,7 +353035,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -352977,7 +353095,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353036,7 +353155,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353095,7 +353215,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353154,7 +353275,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353213,7 +353335,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353272,7 +353395,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353331,7 +353455,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353392,7 +353517,8 @@
         "otherNames": [
           "Plasmodium falciparum (isolate 3D7)",
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353451,7 +353577,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353510,7 +353637,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353569,7 +353697,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353628,7 +353757,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353687,7 +353817,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353746,7 +353877,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353805,7 +353937,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353864,7 +353997,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353923,7 +354057,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -353982,7 +354117,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354041,7 +354177,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354100,7 +354237,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354159,7 +354297,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354218,7 +354357,8 @@
         "ncbiTaxonomyId": "5833",
         "otherNames": [
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354279,7 +354419,8 @@
         "otherNames": [
           "Plasmodium falciparum (isolate 3D7)",
           "malaria parasite P. falciparum",
-          "Plasmodium (Laverania) falciparum"
+          "Plasmodium (Laverania) falciparum",
+          "P. falciparum"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -354315,7 +354456,8 @@
     "otherNames": [
       "Plasmodium falciparum (isolate 3D7)",
       "malaria parasite P. falciparum",
-      "Plasmodium (Laverania) falciparum"
+      "Plasmodium (Laverania) falciparum",
+      "P. falciparum"
     ],
     "otherTaxa": null,
     "priority": "HIGH",
@@ -355263,7 +355405,8 @@
         "ncbiTaxonomyId": "1077284",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355323,7 +355466,8 @@
         "ncbiTaxonomyId": "1033975",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355383,7 +355527,8 @@
         "ncbiTaxonomyId": "1035515",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355446,7 +355591,8 @@
           "Plasmodium vivax North Korea",
           "Plasmodium vivax strain North Korea",
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355505,7 +355651,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355564,7 +355711,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355623,7 +355771,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355682,7 +355831,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355741,7 +355891,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355800,7 +355951,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355859,7 +356011,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355918,7 +356071,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -355977,7 +356131,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356036,7 +356191,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356095,7 +356251,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356154,7 +356311,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356213,7 +356371,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356272,7 +356431,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356331,7 +356491,8 @@
         "ncbiTaxonomyId": "5855",
         "otherNames": [
           "malaria parasite P. vivax",
-          "Haemamoeba vivax"
+          "Haemamoeba vivax",
+          "P. vivax"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -356367,6 +356528,7 @@
     "otherNames": [
       "malaria parasite P. vivax",
       "Haemamoeba vivax",
+      "P. vivax",
       "North Korean strain of Plasmodium vivax",
       "Plasmodium vivax North Korea",
       "Plasmodium vivax strain North Korea"
@@ -368333,7 +368495,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_000341325.1/",
         "gcPercent": 44,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/341/325/GCA_000341325.1/genes/GCA_000341325.1_Pred3.augustus.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 65093147,
         "level": "Scaffold",
         "lineageTaxonomyIds": [
@@ -392919,7 +393081,8 @@
         "ncbiTaxonomyId": "7227",
         "otherNames": [
           "fruit fly",
-          "Sophophora melanogaster"
+          "Sophophora melanogaster",
+          "D. melanogaster"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -392954,7 +393117,8 @@
     "ncbiTaxonomyId": "7227",
     "otherNames": [
       "fruit fly",
-      "Sophophora melanogaster"
+      "Sophophora melanogaster",
+      "D. melanogaster"
     ],
     "otherTaxa": null,
     "priority": null,
@@ -395194,7 +395358,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395261,7 +395426,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395329,7 +395495,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395399,7 +395566,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395466,7 +395634,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395533,7 +395702,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395600,7 +395770,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395667,7 +395838,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395734,7 +395906,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395801,7 +395974,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395868,7 +396042,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -395935,7 +396110,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396002,7 +396178,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396069,7 +396246,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396136,7 +396314,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396203,7 +396382,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396270,7 +396450,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396337,7 +396518,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396404,7 +396586,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396471,7 +396654,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396538,7 +396722,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396605,7 +396790,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396672,7 +396858,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396739,7 +396926,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396806,7 +396994,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396873,7 +397062,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -396940,7 +397130,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397007,7 +397198,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397074,7 +397266,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397141,7 +397334,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397208,7 +397402,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397275,7 +397470,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397342,7 +397538,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397409,7 +397606,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397476,7 +397674,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397543,7 +397742,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397610,7 +397810,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397677,7 +397878,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397744,7 +397946,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397811,7 +398014,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397878,7 +398082,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -397945,7 +398150,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398012,7 +398218,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398079,7 +398286,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398146,7 +398354,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398213,7 +398422,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398280,7 +398490,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398347,7 +398558,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398414,7 +398626,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398481,7 +398694,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398548,7 +398762,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398615,7 +398830,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398682,7 +398898,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398749,7 +398966,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398816,7 +399034,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398883,7 +399102,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -398950,7 +399170,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399017,7 +399238,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399084,7 +399306,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399151,7 +399374,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399218,7 +399442,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399285,7 +399510,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399352,7 +399578,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399419,7 +399646,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399486,7 +399714,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399553,7 +399782,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399620,7 +399850,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399687,7 +399918,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399754,7 +399986,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399821,7 +400054,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399888,7 +400122,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -399955,7 +400190,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400022,7 +400258,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400089,7 +400326,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400156,7 +400394,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400223,7 +400462,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400290,7 +400530,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400357,7 +400598,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400424,7 +400666,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400491,7 +400734,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400558,7 +400802,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400625,7 +400870,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400692,7 +400938,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400759,7 +401006,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400826,7 +401074,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400893,7 +401142,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -400960,7 +401210,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401027,7 +401278,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401094,7 +401346,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401161,7 +401414,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401228,7 +401482,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401295,7 +401550,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401362,7 +401618,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401429,7 +401686,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401496,7 +401754,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401563,7 +401822,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401630,7 +401890,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401697,7 +401958,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401764,7 +402026,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401831,7 +402094,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401898,7 +402162,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -401965,7 +402230,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402032,7 +402298,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402099,7 +402366,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402166,7 +402434,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402233,7 +402502,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402300,7 +402570,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402368,7 +402639,8 @@
           "Aspergillus fumigatus var. ellipticus",
           "Aspergillus neoellipticus",
           "Neosartorya fumigata",
-          "Sartorya fumigata"
+          "Sartorya fumigata",
+          "A. fumigatus"
         ],
         "otherTaxa": null,
         "ploidy": [
@@ -402407,6 +402679,7 @@
       "Aspergillus neoellipticus",
       "Neosartorya fumigata",
       "Sartorya fumigata",
+      "A. fumigatus",
       "Aspergillus acolumnaris",
       "Aspergillus fumigatus var. acolumnaris"
     ],

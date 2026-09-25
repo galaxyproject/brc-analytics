@@ -1,0 +1,33 @@
+id: https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/taxa.yaml#
+name: taxa
+description: Schema for defining curated information about individual taxa, supplementing the taxonomic data that BRC Analytics derives from NCBI. Unlike organisms, taxa are not restricted to rank 'species'. This input is optional; catalogs that curate nothing (such as GA2) omit the file entirely.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+
+imports:
+  - linkml:types
+
+classes:
+  Taxa:
+    description: Root object containing a collection of curated taxon entries for the BRC Analytics platform.
+    tree_root: true
+    attributes:
+      taxa:
+        description: Collection of taxon entries supplying curated information that supplements NCBI's taxonomic data.
+        required: true
+        multivalued: true
+        range: Taxon
+
+  Taxon:
+    description: Curated information about a taxon, identified by NCBI Taxonomy ID. Curated values apply to the identified taxon alone; they reach an assembly when the taxon is the assembly's own taxon or one of its ancestors up to rank 'species', and reach an organism when they reach any of that organism's assemblies. A taxon above species rank therefore has no effect on assemblies.
+    attributes:
+      taxonomy_id:
+        description: An NCBI Taxonomy ID at any rank. In particular, this may be an infraspecific taxon, which `Organism.taxonomy_id` cannot express; SARS-CoV-2 (2697049) is the motivating case, sitting below its species in NCBI's taxonomy while the catalog's organism is the species.
+        required: true
+        range: integer
+      other_names:
+        description: Curated alternative names for the taxon, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the taxon's NCBI-derived other names in the built catalog. Should be given as display forms; consumers are responsible for normalizing case and punctuation as appropriate.
+        required: true
+        multivalued: true
+        range: string
