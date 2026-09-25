@@ -9,5 +9,6 @@
  * that registers nothing has no way to turn it on.
  */
 export const FEATURE_FLAGS = {
+  ASSISTANT_UI: "assistant-ui",
   DEMO: "demo",
 } as const;
