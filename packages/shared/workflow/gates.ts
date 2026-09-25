@@ -3,18 +3,23 @@ import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import { isLmlsWorkflow } from "@repo/shared/workflow/lmls";
 
 /**
- * A workflow whose visibility can be decided from its TRS ID alone — the only
- * field the gating rules read, so callers can pass a full workflow or a stub.
+ * A workflow as the gating rules see it: its raw catalog TRS ID and the IDs of
+ * every catalog category holding it — empty for a workflow outside the
+ * catalog. Both are required, so a caller has to say which categories hold the
+ * workflow rather than leave the question unasked. Only these fields are read,
+ * so a stub will do.
  */
 export interface GatedWorkflow {
+  categoryIds: readonly string[];
   trsId: string;
 }
 
 /**
  * The gating rules bound to a resolved flag state — the single answer to "may
  * this be shown". Each method is complete for what it takes: `filterCategories`
- * applies the category and the workflow rules together, so a caller holding
- * categories cannot apply half the rule.
+ * applies the category and the workflow rules together, and `isWorkflowAllowed`
+ * answers for a workflow's own gate and its category's, so a caller holding
+ * either cannot apply half the rule.
  */
 export interface WorkflowGates {
   filterCategories: (
@@ -96,10 +101,10 @@ function filterDemoGatedCategories(
 ): WorkflowCategory[] {
   const visibleCategories: WorkflowCategory[] = [];
   for (const workflowCategory of workflowCategories) {
-    if (isDemoGatedCategory(workflowCategory.category)) continue;
-    const { workflows } = workflowCategory;
-    const visibleWorkflows = workflows.filter(
-      (workflow) => !isDemoGatedWorkflow(workflow)
+    const { category, workflows } = workflowCategory;
+    if (isDemoGatedCategory(category)) continue;
+    const visibleWorkflows = workflows.filter((workflow) =>
+      isWorkflowVisibleInCategory(category, workflow.trsId)
     );
     visibleCategories.push(
       visibleWorkflows.length === workflows.length
@@ -120,15 +125,31 @@ function isDemoGatedCategory(category: string): boolean {
 }
 
 /**
- * Determines whether an individual workflow is one the demo gates. Independent
- * of its category's gate: a workflow in an ungated category can still be gated
- * in its own right.
+ * Determines whether a workflow's own rule gates it, regardless of its
+ * categories.
+ * @param trsId - TRS ID of the workflow.
+ * @returns True when a workflow-level rule matches.
+ */
+function isDemoGatedTrsId(trsId: string): boolean {
+  return DEMO_GATED_WORKFLOWS.some((matches) => matches(trsId));
+}
+
+/**
+ * Determines whether an individual workflow is one the demo gates, at either
+ * level: through its categories, or in its own right. A catalog workflow is
+ * allowed when any category holding it shows it — the same per-category check
+ * `filterCategories` applies, so the listing and the configure path cannot
+ * disagree. A workflow outside the catalog has only its own rule.
  * @param workflow - Workflow to check.
+ * @param workflow.categoryIds - IDs of the categories holding the workflow.
  * @param workflow.trsId - TRS ID of the workflow.
  * @returns True when the workflow is demo gated.
  */
-function isDemoGatedWorkflow({ trsId }: GatedWorkflow): boolean {
-  return DEMO_GATED_WORKFLOWS.some((matches) => matches(trsId));
+function isDemoGatedWorkflow({ categoryIds, trsId }: GatedWorkflow): boolean {
+  if (categoryIds.length === 0) return isDemoGatedTrsId(trsId);
+  return !categoryIds.some((category) =>
+    isWorkflowVisibleInCategory(category, trsId)
+  );
 }
 
 /**
@@ -138,4 +159,27 @@ function isDemoGatedWorkflow({ trsId }: GatedWorkflow): boolean {
  */
 function isHyphyWorkflow(trsId: string): boolean {
   return trsId.startsWith(HYPHY_TRS_ID_PREFIX);
+}
+
+/**
+ * Determines whether a workflow is shown under a category: the category is not
+ * gated and neither is the workflow in its own right. The one per-category
+ * check both `filterCategories` and `isWorkflowAllowed` apply.
+ * @param category - Workflow category ID.
+ * @param trsId - TRS ID of the workflow.
+ * @returns True when the workflow is shown under the category.
+ */
+function isWorkflowVisibleInCategory(category: string, trsId: string): boolean {
+  return !isDemoGatedCategory(category) && !isDemoGatedTrsId(trsId);
+}
+
+/**
+ * Describes a workflow outside the catalog to the gating rules: no category
+ * holds it, so only its own rule applies. Use for workflows that are not in any
+ * catalog category, never for a catalog workflow.
+ * @param trsId - TRS ID of the workflow.
+ * @returns The gated workflow, with no categories.
+ */
+export function nonCatalogWorkflow(trsId: string): GatedWorkflow {
+  return { categoryIds: [], trsId };
 }

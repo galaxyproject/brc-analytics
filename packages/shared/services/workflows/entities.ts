@@ -3,6 +3,7 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { GatedWorkflow } from "@repo/shared/workflow/gates";
 import { findEntity, getEntities, getEntity } from "./query";
 
 /**
@@ -43,6 +44,23 @@ export function getAssembly<T extends AssemblyContract>(entityId: string): T {
 }
 
 /**
+ * Gets a workflow as the gating rules see it: its raw catalog TRS ID — the
+ * rules match on that, not the URL form — and the IDs of every catalog category
+ * holding it, none for a workflow outside the catalog. Requires the workflows
+ * cache to be loaded.
+ * @param workflow - Workflow, as looked up by its URL TRS ID.
+ * @returns The gated workflow.
+ */
+export function getGatedWorkflow(workflow: Workflow): GatedWorkflow {
+  return {
+    categoryIds: getWorkflowCategories(workflow.trsId).map(
+      ({ category }) => category
+    ),
+    trsId: workflow.trsId,
+  };
+}
+
+/**
  * Gets organism by entity id.
  * @param entityId - Entity id.
  * @returns Organism.
@@ -66,6 +84,21 @@ export function getOrganisms<T extends OrganismContract>(): T[] {
  */
 export function getWorkflow(trsId: string): Workflow {
   return getEntity<Workflow>("workflows", trsId);
+}
+
+/**
+ * Gets every catalog category holding the workflow with the given raw TRS id
+ * — a workflow can be listed under more than one. Empty for a workflow no
+ * category holds, including one that exists outside the catalog. Throws when
+ * no workflows are loaded, so a missing cache fails closed rather than reading
+ * as "in no category".
+ * @param trsId - Raw TRS id, as the catalog records it.
+ * @returns Workflow categories holding the workflow.
+ */
+export function getWorkflowCategories(trsId: string): WorkflowCategory[] {
+  return getWorkflows().filter((category) =>
+    category.workflows.some((workflow) => workflow.trsId === trsId)
+  );
 }
 
 /**

@@ -8,7 +8,10 @@ import type {
 } from "@repo/shared/apis/workflow";
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import type { WorkflowGates } from "@repo/shared/workflow/gates";
+import {
+  nonCatalogWorkflow,
+  type WorkflowGates,
+} from "@repo/shared/workflow/gates";
 import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
@@ -114,7 +117,8 @@ export function getWorkflows(
   // Sequence Analysis workflows aren't in the catalog, so they're appended
   // here — through the same gate as every catalog workflow above.
   for (const workflow of LMLS_WORKFLOWS) {
-    if (!workflowGates.isWorkflowAllowed(workflow)) continue;
+    if (!workflowGates.isWorkflowAllowed(nonCatalogWorkflow(workflow.trsId)))
+      continue;
     workflows.push({
       ...workflow,
       assembly: mapAssembly(undefined),

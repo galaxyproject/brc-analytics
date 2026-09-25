@@ -59,8 +59,9 @@ describe("filterCategories - workflow gating within a category", () => {
       UNGATED_TRS_ID,
       HYPHY_TRS_ID,
     ]);
+    const [ungatedWorkflow] = category.workflows;
     expect(buildWorkflowGates().filterCategories([category])).toEqual([
-      { ...category, workflows: [{ trsId: UNGATED_TRS_ID }] },
+      { ...category, workflows: [ungatedWorkflow] },
     ]);
   });
 

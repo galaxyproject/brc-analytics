@@ -4,6 +4,7 @@ import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelB
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { ASSEMBLY_CONFIGURE_SCOPES } from "@repo/shared/components/workflow/WorkflowGate/constants";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
 import { ROUTES } from "@repo/shared/routes/constants";
@@ -45,6 +46,7 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
               href={replaceParameters(ROUTES.ANALYZE_WORKFLOWS, { entityId })}
             />
           }
+          scopes={ASSEMBLY_CONFIGURE_SCOPES}
           trsId={trsId}
         >
           <WorkflowInputsView
