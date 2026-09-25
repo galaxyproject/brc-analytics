@@ -203,86 +203,91 @@ def get_species_subtree(
     }
 
 
-def get_genomes_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
-    column_mapping = {
-        "organism__tax_id": "taxonomyId",
-        "assembly_info__release_date": "releaseDate",
-        "accession": "accession",
-        "current_accession": "currentAccession",
-        "assembly_info__assembly_level": "level",
-        "assembly_info__assembly_status": "assemblyStatus",
-        "assembly_stats__total_number_of_chromosomes": "chromosomeCount",
-        "assembly_stats__total_sequence_length": "length",
-        "assembly_stats__number_of_scaffolds": "scaffoldCount",
-        "assembly_stats__scaffold_n50": "scaffoldN50",
-        "assembly_stats__scaffold_l50": "scaffoldL50",
-        "assembly_stats__genome_coverage": "coverage",
-        "assembly_stats__gc_percent": "gcPercent",
-        "annotation_info__status": "annotationStatus",
-        "paired_accession": "pairedAccession",
+def get_genome_row(genome_info: pd.Series):
+    # Some values may be None; see NcbiGenome definition in ncbi_api.py
+    infraspecific_names = genome_info["organism"]["infraspecific_names"]
+    current_accession = genome_info["current_accession"]
+    refseq_category = genome_info["assembly_info"]["refseq_category"]
+    assembly_status = genome_info["assembly_info"]["assembly_status"]
+    annotation_info = genome_info["annotation_info"]
+    return {
+        "strain": None
+        if infraspecific_names is None
+        # infraspecific_names is a mapping of arbitrary strings, so the "strain" entry is not assumed to exist
+        else infraspecific_names.get("strain"),
+        "taxonomyId": str(genome_info["organism"]["tax_id"]),
+        "releaseDate": genome_info["assembly_info"]["release_date"],
+        "accession": genome_info["accession"],
+        "currentAccession": genome_info["accession"]
+        if current_accession is None
+        else current_accession,
+        "isRef": refseq_category == "reference genome",
+        "level": genome_info["assembly_info"]["assembly_level"],
+        "assemblyStatus": "ASSEMBLY_STATUS_UNKNOWN"
+        if assembly_status is None
+        else assembly_status,
+        "chromosomeCount": genome_info["assembly_stats"]["total_number_of_chromosomes"],
+        "length": genome_info["assembly_stats"]["total_sequence_length"],
+        "scaffoldCount": genome_info["assembly_stats"]["number_of_scaffolds"],
+        "scaffoldN50": genome_info["assembly_stats"]["scaffold_n50"],
+        "scaffoldL50": genome_info["assembly_stats"]["scaffold_l50"],
+        "coverage": genome_info["assembly_stats"]["genome_coverage"],
+        "gcPercent": genome_info["assembly_stats"]["gc_percent"],
+        "annotationStatus": None
+        if annotation_info is None
+        else annotation_info["status"],
+        "pairedAccession": genome_info["paired_accession"],
     }
-    genomes_df = (
-        ncbi_genomes_df[column_mapping.keys()]
-        .rename(columns=column_mapping)
-        .astype({"taxonomyId": "string"})
-    )
-    genomes_df = genomes_df.fillna(
-        {
-            "currentAccession": genomes_df["accession"],
-            "assemblyStatus": "ASSEMBLY_STATUS_UNKNOWN",
-        }
-    )
-    genomes_df["strain"] = ncbi_genomes_df["organism__infraspecific_names"].map(
-        lambda names: json.loads(names).get("strain"), na_action="ignore"
-    )
-    genomes_df["isRef"] = (
-        ncbi_genomes_df["assembly_info__refseq_category"] == "reference genome"
-    )
-    return genomes_df
 
 
-def get_biosample_df(ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
-    def get_sample_ids(biosample):
-        return ",".join(
+def get_biosample_data(genome_info: pd.Series):
+    sample_ids = genome_info["assembly_info"]["biosample"]["sample_ids"]
+    if sample_ids is None:
+        sample_ids = []
+    return {
+        "accession": genome_info["accession"],
+        "biosample": genome_info["assembly_info"]["biosample"]["accession"],
+        "sample_ids": ",".join(
             [
                 f"{sample['db']}:{sample['value']}"
-                for sample in biosample.get("sample_ids", "")
-                if "db" in sample
+                for sample in sample_ids
+                if sample["db"] is not None
             ]
-        )
-
-    # Restrict genomes to ones with biosamples
-    ncbi_genomes_df = ncbi_genomes_df[
-        ncbi_genomes_df["assembly_info__biosample"].notna()
-    ]
-
-    # Parse biosample JSON values
-    parsed_biosamples = ncbi_genomes_df["assembly_info__biosample"].map(
-        json.loads, na_action="ignore"
-    )
-
-    return pd.DataFrame(
-        {
-            "accession": ncbi_genomes_df["accession"],
-            "biosample": parsed_biosamples.map(
-                lambda biosample: biosample["accession"], na_action="ignore"
-            ),
-            "sample_ids": parsed_biosamples.map(get_sample_ids, na_action="ignore"),
-        }
-    )
+        ),
+    }
 
 
-def get_genomes_and_primarydata_df(ncbi_genomes_df: pd.DataFrame):
+def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
     """
     Takes loaded NCBI genomes and creates DataFrames for genomes and biosample data.
 
     Args:
-      ncbi_genomes_df: Dataframe of genome metadata loaded via dlt
+      source_ncbi_genomes_df: Dataframe of genome metadata loaded via dlt
 
     Returns:
       Tuple of (genomes_df, biosample_df)
     """
-    return (get_genomes_df(ncbi_genomes_df), get_biosample_df(ncbi_genomes_df))
+    json_column_names = [
+        "annotation_info",
+        "assembly_info",
+        "assembly_stats",
+        "organism",
+    ]
+    parsed_json_columns = source_ncbi_genomes_df[json_column_names].map(
+        lambda v: None if v is None else json.loads(v)
+    )
+    ncbi_genomes_df = source_ncbi_genomes_df.assign(**parsed_json_columns)
+    ncbi_genomes_having_biosamples_df = ncbi_genomes_df[
+        ncbi_genomes_df["assembly_info"].map(
+            lambda info: isinstance(info, dict) and "biosample" in info
+        )
+    ]
+    return (
+        ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand"),
+        ncbi_genomes_having_biosamples_df.apply(
+            get_biosample_data, axis="columns", result_type="expand"
+        ),
+    )
 
 
 def _get_gene_model_urls_from_genark_list():

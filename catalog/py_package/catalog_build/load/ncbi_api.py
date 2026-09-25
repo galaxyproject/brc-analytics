@@ -4,8 +4,56 @@ from pathlib import Path
 import dlt
 import duckdb
 import requests
+from pydantic import BaseModel
 
 from ..utils import get_db_path
+
+
+class NcbiGenomeAnnotationInfo(BaseModel):
+    status: str | None = None
+
+
+class NcbiGenomeAssemblyInfoBiosampleId(BaseModel):
+    db: str | None = None
+    value: str
+
+
+class NcbiGenomeAssemblyInfoBiosample(BaseModel):
+    accession: str
+    sample_ids: list[NcbiGenomeAssemblyInfoBiosampleId] | None = None
+
+
+class NcbiGenomeAssemblyInfo(BaseModel):
+    assembly_level: str
+    assembly_status: str | None = None
+    biosample: NcbiGenomeAssemblyInfoBiosample | None = None
+    refseq_category: str | None = None
+    release_date: str
+
+
+class NcbiGenomeAssemblyStats(BaseModel):
+    gc_percent: float | None = None
+    genome_coverage: str | None = None
+    number_of_scaffolds: int | None = None
+    scaffold_l50: int | None = None
+    scaffold_n50: int | None = None
+    total_number_of_chromosomes: int | None = None
+    total_sequence_length: int
+
+
+class NcbiGenomeOrganism(BaseModel):
+    infraspecific_names: dict[str, str] | None = None
+    tax_id: int
+
+
+class NcbiGenome(BaseModel):
+    accession: str
+    annotation_info: NcbiGenomeAnnotationInfo | None = None
+    assembly_info: NcbiGenomeAssemblyInfo
+    assembly_stats: NcbiGenomeAssemblyStats
+    current_accession: str | None = None
+    organism: NcbiGenomeOrganism
+    paired_accession: str | None = None
 
 
 def rate_limit_handler(request_call, max_retries=5):
@@ -182,22 +230,12 @@ def post_ncbi_request(url: str, json_data, batch_size=1000, min_batch_size=50):
     name="genomes",
     write_disposition="replace",
     max_table_nesting=1,
-    schema_contract={"data_type": "discard_row"},
-    columns={"assembly_stats__gc_percent": {"data_type": "double"}},
+    schema_contract={"data_type": "freeze"},
+    columns=NcbiGenome,
 )
 def ncbi_genomes(accessions: list[str]):
-    url = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report"
-    keep_keys = {
-        "accession",
-        "annotation_info",
-        "assembly_info",
-        "assembly_stats",
-        "current_accession",
-        "organism",
-        "paired_accession",
-    }
-    genomes = post_ncbi_request(
-        url,
+    yield from post_ncbi_request(
+        "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/dataset_report",
         {
             "accessions": accessions,
             "filters": {
@@ -206,8 +244,6 @@ def ncbi_genomes(accessions: list[str]):
             "page_size": 500,  # Initial page size for pagination
         },
     )
-    for genome_info in genomes:
-        yield {k: genome_info[k] for k in keep_keys if k in genome_info}
 
 
 @dlt.source
