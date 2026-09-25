@@ -5,6 +5,7 @@ import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/Galaxy
 import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SmartToyIcon } from "@repo/shared/components/CustomIcon/components/SmartToyIcon/smartToyIcon";
+import { SparkleIcon } from "@repo/shared/components/CustomIcon/components/SparkleIcon/sparkleIcon";
 import { YouTubeIcon } from "@repo/shared/components/CustomIcon/components/YouTubeIcon/youTubeIcon";
 import type { LearnCard } from "./types";
 
@@ -72,5 +73,12 @@ export const CARDS: LearnCard[] = [
     secondaryText:
       "Connect AI assistants like Claude to the BRC catalog and ENA search via the Model Context Protocol.",
     title: "MCP Server",
+  },
+  {
+    StartIcon: SparkleIcon,
+    href: "/learn/primaeon",
+    secondaryText:
+      "Run selection analysis in your browser with PrimAeon, and learn when to use HyphAeon, ChronAeon, or HyPhy.",
+    title: "PrimAeon",
   },
 ];

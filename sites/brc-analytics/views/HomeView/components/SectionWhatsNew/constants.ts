@@ -5,11 +5,15 @@ export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
   {
     cardActions: [
       {
-        label: "Learn more & apply",
-        url: "https://niaid-brc-codeathons.github.io/",
+        label: "Try PrimAeon",
+        url: "https://primaeon.org",
+      },
+      {
+        label: "Learn more",
+        url: "/learn/primaeon",
       },
     ],
-    text: MDX.AICodeathon2({}),
+    text: MDX.PrimAeon({}),
   },
   {
     cardActions: [
