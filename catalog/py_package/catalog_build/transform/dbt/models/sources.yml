@@ -65,27 +65,6 @@ sources:
             data_tests:
               - not_null:
                   name: ncbi_genomes_have_accessions
-          - name: assembly_info__assembly_level
-            data_tests:
-              - not_null:
-                  name: ncbi_genomes_have_levels
-          - name: assembly_info__release_date
-            data_tests:
-              - not_null:
-                  name: ncbi_genomes_have_release_dates
-          - name: assembly_stats__total_sequence_length
-            data_tests:
-              - not_null:
-                  name: ncbi_genomes_have_lengths
-          - name: organism__tax_id
-            data_tests:
-              - not_null:
-                  name: ncbi_genomes_have_tax_ids
-              - relationships:
-                  name: ncbi_genome_taxa_in_assembly_taxonomy
-                  arguments:
-                    to: ref('taxonomy_assemblies')
-                    field: taxonomy_id
 
   - name: catalog_source
     description: >

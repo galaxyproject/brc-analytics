@@ -279,7 +279,7 @@ def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
     ncbi_genomes_df = source_ncbi_genomes_df.assign(**parsed_json_columns)
     ncbi_genomes_having_biosamples_df = ncbi_genomes_df[
         ncbi_genomes_df["assembly_info"].map(
-            lambda info: isinstance(info, dict) and "biosample" in info
+            lambda info: isinstance(info, dict) and info["biosample"] is not None
         )
     ]
     return (
