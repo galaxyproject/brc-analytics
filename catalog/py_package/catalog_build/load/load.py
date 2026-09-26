@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-import pandas as pd
-
 from .catalog_source import load_catalog_source_data
 from .ncbi_api import load_ncbi_api_data
 from .ncbi_taxonomy import load_ncbi_taxonomy
