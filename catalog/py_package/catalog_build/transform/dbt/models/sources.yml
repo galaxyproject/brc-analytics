@@ -54,26 +54,37 @@ sources:
               - not_null:
                   name: ncbi_merged_have_new_id
 
+  - name: ncbi_api
+    description: >
+      Data fetched from the NCBI API.
+    schema: ncbi_api
+    tables:
+      - name: genomes
+        columns:
+          - name: accession
+            data_tests:
+              - not_null:
+                  name: ncbi_genomes_have_accessions
+
   - name: catalog_source
     description: >
       Catalog inputs written into DuckDB by build.py before the dbt run.
     schema: catalog_source
     tables:
-      - name: assembly_taxa
+      - name: assemblies
         columns:
-          - name: taxonomy_id
+          - name: accession
             data_tests:
+              - unique:
+                  name: catalog_assemblies_unique_accessions
               - not_null:
-                  name: catalog_assemblies_have_tax_ids
-              - relationships:
-                  name: catalog_assembly_taxa_in_assembly_taxonomy
-                  arguments:
-                    to: ref('taxonomy_assemblies')
-                    field: taxonomy_id
-      - name: organism_taxa
+                  name: catalog_assemblies_have_accessions
+      - name: organisms
         columns:
           - name: taxonomy_id
             data_tests:
+              - unique:
+                  name: catalog_organisms_unique_tax_ids
               - not_null:
                   name: catalog_organisms_have_tax_ids
               - relationships:
@@ -101,11 +112,15 @@ sources:
                     field: tax_id
                   config:
                     enabled: "{{ var('has_curated_taxa', false) }}"
-      - name: outbreak_taxa
+      - name: outbreaks
         # Only tested when the catalog has outbreaks
         columns:
           - name: taxonomy_id
             data_tests:
+              - unique:
+                  name: catalog_outbreaks_unique_tax_ids
+                  config:
+                    enabled: "{{ var('has_outbreaks', false) }}"
               - not_null:
                   name: catalog_outbreaks_have_tax_ids
                   config:
