@@ -1344,14 +1344,14 @@ def load_and_transform(
       temp_folder_path_string: Path of the temporary folder to hold downloads and the DuckDB database
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       taxonomic_levels: Taxonomic levels to build columns for during transformation
-      assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
-      taxa_df: DataFrame of source curated taxa (must include `taxonomy_id` and `other_names` columns), or None for catalogs without curated taxa
-      outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
+      assemblies_path: Path to source assemblies YAML
+      organisms_path: Path to source organisms YAML
+      taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
+      outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
     Returns:
-      A LoadAndTransformResult with the transformed taxonomy DataFrames, the NCBI taxdump
-      MD5, and the dbt test results
+      A LoadAndTransformResult containing the loaded and transformed data (as dataframes), the NCBI
+      taxdump MD5, and the dbt test results
     """
     temp_folder_path = Path(temp_folder_path_string).resolve()
 

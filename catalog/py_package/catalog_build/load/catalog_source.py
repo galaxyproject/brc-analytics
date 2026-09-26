@@ -92,7 +92,7 @@ def load_catalog_source_data(
     outbreaks_path: Path | None,
 ):
     """
-    Load unique taxonomy IDs for the catalog's assemblies, organisms, and outbreaks into
+    Load source data for the catalog's assemblies, organisms, and outbreaks into
     DuckDB, along with the curated information provided for individual taxa.
 
     Args:

@@ -26,10 +26,10 @@ def do_dlt_load(
     Args:
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
-      assemblies_df: DataFrame of source assemblies (must include a `taxonomy_id` column)
-      organisms_df: DataFrame of source organisms (must include a `taxonomy_id` column)
-      taxa_df: DataFrame of source curated taxa (must include `taxonomy_id` and `other_names` columns), or None for catalogs without curated taxa
-      outbreaks_df: DataFrame of source outbreaks (must include a `taxonomy_id` column), or None for catalogs without outbreaks
+      assemblies_path: Path to source assemblies YAML
+      organisms_path: Path to source organisms YAML
+      taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
+      outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
     Returns:
       A LoadResult with the verified NCBI taxdump MD5 digest
