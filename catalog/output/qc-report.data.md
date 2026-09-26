@@ -23,7 +23,6 @@ None
 - GCF_000008445.1
 - GCF_000017685.1
 - GCF_000018225.1
-- GCF_000018225.1
 
 ## Species and strain combinations with multiple taxonomy IDs
 
@@ -52,8 +51,8 @@ None
 - Enterovirus alphacoxsackie: 150846, 156647
 - Enterovirus betarhino: 12131, 44130
 - Fusarium fujikuroi strain B14: 5127, 1215603
-- Fusarium oxysporum: 5507, 61366, 61374, 224912, 299031, 330941, 396575, 654392, 1229664, 1940294
 - Fusarium oxysporum strain Fo5176: 5507, 100902
+- Fusarium oxysporum: 5507, 61366, 61374, 224912, 299031, 330941, 396575, 654392, 1229664, 1940294
 - Fusarium vanettenii: 660122, 2747968
 - Fusarium verticillioides strain 7600: 117187, 334819
 - Gammapapillomavirus 11: 1070409, 1070413, 1195796
@@ -521,6 +520,35 @@ List of taxa with assembly count 0: None
 List of taxonomic levels specified in parameters but absent in tree: None
 
 ## Unsuccessful dbt tests
+
+### `catalog_assemblies_unique_accessions` — status `warn`, 56 failing rows
+
+Got 56 results, configured to warn if != 0
+
+| unique_field | n_records |
+| --- | --- |
+| GCA_004786555.1 | 2 |
+| GCA_023969395.1 | 2 |
+| GCA_031116565.1 | 2 |
+| GCA_900537975.2 | 2 |
+| GCA_964014045.1 | 2 |
+| GCF_000002765.6 | 2 |
+| GCF_000003225.4 | 2 |
+| GCF_000007025.1 | 2 |
+| GCF_000007765.2 | 2 |
+| GCF_000008045.1 | 2 |
+| GCF_000012565.1 | 2 |
+| GCF_000013145.1 | 2 |
+| GCF_000013165.1 | 2 |
+| GCF_000018205.1 | 2 |
+| GCF_000018225.1 | 2 |
+| GCF_000026005.1 | 2 |
+| GCF_000165365.1 | 2 |
+| GCF_000165395.2 | 2 |
+| GCF_000166935.1 | 2 |
+| GCF_000237845.1 | 2 |
+
+_Showing 20 of 56 failing rows._
 
 ### `catalog_organism_taxa_in_organism_taxonomy` — status `warn`, 2 failing rows
 
