@@ -1,8 +1,8 @@
 {
-    "assembly_count": 5506,
+    "assembly_count": 5505,
     "children": [
         {
-            "assembly_count": 398,
+            "assembly_count": 397,
             "children": [
                 {
                     "assembly_count": 65,
@@ -1220,7 +1220,7 @@
                     "rank": "kingdom"
                 },
                 {
-                    "assembly_count": 331,
+                    "assembly_count": 330,
                     "children": [
                         {
                             "assembly_count": 10,
@@ -1485,7 +1485,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 228,
+                            "assembly_count": 227,
                             "children": [
                                 {
                                     "assembly_count": 93,
@@ -2584,7 +2584,7 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 88,
+                                    "assembly_count": 87,
                                     "children": [
                                         {
                                             "assembly_count": 28,
@@ -2887,13 +2887,13 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 60,
+                                            "assembly_count": 59,
                                             "children": [
                                                 {
-                                                    "assembly_count": 44,
+                                                    "assembly_count": 43,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 43,
+                                                            "assembly_count": 42,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -3271,13 +3271,6 @@
                                                                     "children": [],
                                                                     "name": "Rickettsia endosymbiont of Pantilius tunicatus",
                                                                     "ncbi_tax_id": "3066267",
-                                                                    "rank": "species"
-                                                                },
-                                                                {
-                                                                    "assembly_count": 1,
-                                                                    "children": [],
-                                                                    "name": "Rickettsia endosymbiont of Nabis limbatus",
-                                                                    "ncbi_tax_id": "3066268",
                                                                     "rank": "species"
                                                                 },
                                                                 {
@@ -12963,7 +12956,7 @@
                                                                 {
                                                                     "assembly_count": 1,
                                                                     "children": [],
-                                                                    "name": "Cryptococcus gattii VGV",
+                                                                    "name": "Cryptococcus hyracis",
                                                                     "ncbi_tax_id": "2268382",
                                                                     "rank": "species"
                                                                 }
