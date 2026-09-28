@@ -94,6 +94,7 @@ async def open_saved_analysis(
                 ChatMessage.model_validate(message)
                 for message in saved_analysis.messages
             ],
+            metadata=saved_analysis.session_metadata,
             owner_keycloak_sub=current_user_db.keycloak_sub,
             saved_analysis_id=durable_id,
             schema_state=AnalysisSchema.model_validate(saved_analysis.schema),

@@ -123,6 +123,7 @@ class FakeAssistantAgent:
         self,
         *,
         agent_message_history: list | None = None,
+        metadata: dict | None = None,
         owner_keycloak_sub: str,
         saved_analysis_id: str,
         schema_state: AnalysisSchema,
@@ -130,6 +131,7 @@ class FakeAssistantAgent:
     ) -> SessionState:
         session_id = uuid4().hex
         state = SessionState(
+            metadata=dict(metadata or {}),
             session_id=session_id,
             owner_keycloak_sub=owner_keycloak_sub,
             saved_analysis_id=saved_analysis_id,
@@ -284,6 +286,7 @@ def test_saved_analyses_are_scoped_to_current_user(persistence_client):
                         role=MessageRole.USER, content="analyze plasmodium"
                     ).model_dump(mode="json")
                 ],
+                session_metadata={},
                 schema=AnalysisSchema().model_dump(mode="json"),
                 source_session="session-a",
                 title="User A analysis",
@@ -854,6 +857,30 @@ def test_open_rehydrates_the_agent_history(persistence_client):
 
     restored = agent.session_service.sessions[opened.json()["session_id"]]
     assert restored.agent_message_history == [{"kind": "request"}]
+
+
+def test_open_after_expiry_keeps_the_logan_binding(persistence_client):
+    """The Logan job a conversation was opened from lives in session metadata,
+    in neither transcript. A session rehydrated after its TTL would otherwise
+    come back without its Logan instructions and suggestions."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    logan = {"logan": {"job_id": "abc"}, "turn_count": 1}
+    agent.session_service.sessions[session_id].metadata = dict(logan)
+    client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "and again", "session_id": session_id},
+    )
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    del agent.session_service.sessions[session_id]
+
+    opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+
+    restored = agent.session_service.sessions[opened.json()["session_id"]]
+    assert restored.session_id != session_id
+    assert restored.metadata == logan
 
 
 def test_a_session_read_failure_does_not_cost_the_reply(persistence_client):

@@ -198,6 +198,7 @@ async def upsert_saved_analysis(
     messages: list[dict[str, Any]],
     saved_analysis_id: str | None = None,
     schema: dict[str, Any],
+    session_metadata: dict[str, Any],
     source_session: str,
     title: str,
 ) -> SavedAnalysis:
@@ -230,6 +231,7 @@ async def upsert_saved_analysis(
             agent_message_history=agent_message_history,
             messages=messages,
             schema=schema,
+            session_metadata=session_metadata,
             source_session=source_session,
             title=title,
             user_id=user_id,
@@ -258,6 +260,7 @@ async def upsert_saved_analysis(
     existing.agent_message_history = agent_message_history
     existing.messages = messages
     existing.schema = schema
+    existing.session_metadata = session_metadata
     if existing.source_session != source_session and by_session in (None, existing):
         # This session resumed the analysis, so point the row back at it. Only
         # safe while no *other* row holds this session id -- the partial unique

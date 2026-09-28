@@ -1,4 +1,5 @@
-"""Add agent message history and one-row-per-conversation uniqueness."""
+"""Add agent message history, session metadata and one-row-per-conversation
+uniqueness."""
 
 import sqlalchemy as sa
 from alembic import op
@@ -25,6 +26,15 @@ def upgrade() -> None:
             _json_type(),
             nullable=False,
             server_default="[]",
+        ),
+    )
+    op.add_column(
+        "saved_analyses",
+        sa.Column(
+            "session_metadata",
+            _json_type(),
+            nullable=False,
+            server_default="{}",
         ),
     )
     # Existing rows are pre-auto-save snapshots and can collide on
@@ -61,4 +71,5 @@ def downgrade() -> None:
     # One-way: the DDL reverses, but the source_session values the upgrade
     # nulled to break duplicates are gone and are not recoverable here.
     op.drop_index("uq_saved_analyses_user_session", table_name="saved_analyses")
+    op.drop_column("saved_analyses", "session_metadata")
     op.drop_column("saved_analyses", "agent_message_history")

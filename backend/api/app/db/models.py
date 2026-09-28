@@ -117,6 +117,12 @@ class SavedAnalysis(Base):
     agent_message_history: Mapped[list] = mapped_column(
         JSON_COLUMN, default=list, nullable=False, server_default="[]"
     )
+    # The live session's metadata -- notably the Logan job a conversation was
+    # opened from. It is not in either transcript, so a session rehydrated
+    # after its TTL would otherwise come back unbound from that job.
+    session_metadata: Mapped[dict] = mapped_column(
+        JSON_COLUMN, default=dict, nullable=False, server_default="{}"
+    )
     source_session: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

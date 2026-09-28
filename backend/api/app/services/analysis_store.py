@@ -154,6 +154,7 @@ async def _write(state: SessionState) -> str | None:
             ),
             saved_analysis_id=state.saved_analysis_id,
             schema=strip_nuls(state.schema_state.model_dump(mode="json")),
+            session_metadata=strip_nuls(state.metadata),
             source_session=state.session_id,
             title=strip_nuls(_build_title(state)),
         )

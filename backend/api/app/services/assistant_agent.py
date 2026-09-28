@@ -1443,6 +1443,7 @@ class AssistantAgent:
         self,
         *,
         agent_message_history: list | None = None,
+        metadata: dict | None = None,
         owner_keycloak_sub: str,
         messages: list[ChatMessage],
         saved_analysis_id: str,
@@ -1456,8 +1457,13 @@ class AssistantAgent:
 
         saved_analysis_id travels with the session so auto-saves from it land
         back on the same row, however many times the analysis is reopened.
+
+        metadata carries what neither transcript does, like the Logan job a
+        conversation was opened from; without it the resumed session loses
+        its Logan instructions and suggestions.
         """
         state = await self.session_service.create_session(
+            metadata=metadata,
             owner_keycloak_sub=owner_keycloak_sub,
             schema_state=schema_state,
             messages=messages,
