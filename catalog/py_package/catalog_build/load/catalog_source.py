@@ -20,7 +20,10 @@ def read_entity_list_from_yaml(yaml_path: Path, list_key: str):
     """
     with yaml_path.open() as f:
         yaml_data = yaml.safe_load(f)
-    return yaml_data[list_key]
+    entities = yaml_data[list_key]
+    if not entities:
+        raise Exception(f'No entities found under "{list_key}" in {yaml_path.name}')
+    return entities
 
 
 def read_assemblies(assemblies_path: Path):
