@@ -255,7 +255,7 @@ def load_ncbi_api_data(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
         # Query a list of unique accessions and select the list from the first item of the first row
         accessions = con.query(
-            "select list(distinct accession) from catalog_source.assemblies"
+            "select list(distinct accession order by accession) from catalog_source.assemblies"
         ).fetchall()[0][0]
         pipeline = dlt.pipeline(
             pipeline_name=dlt_pipeline_prefix + "ncbi_api",
