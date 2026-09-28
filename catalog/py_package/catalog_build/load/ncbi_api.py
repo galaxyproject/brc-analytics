@@ -229,7 +229,6 @@ def post_ncbi_request(url: str, json_data, batch_size=1000, min_batch_size=50):
 @dlt.resource(
     name="genomes",
     write_disposition="replace",
-    max_table_nesting=1,
     schema_contract={"data_type": "freeze"},
     columns=NcbiGenome,
 )
