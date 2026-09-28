@@ -1,19 +1,22 @@
-import {
-  WORKFLOW_CATEGORY_ID,
-  WORKFLOW_SCOPE,
-} from "@repo/shared/apis/schema-types";
+import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import {
+  DIFFERENTIAL_EXPRESSION_ANALYSIS,
+  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+} from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
 import {
+  categoriesIncludeWorkflow,
   workflowPloidyMatchesOrganismPloidy,
   workflowRequiresAssemblyId,
 } from "@repo/shared/workflow/utils";
 
 /**
- * Builds workflow categories for the given assembly.
- * Differential Expression Analysis is added to the Transcriptomics category.
+ * Builds workflow categories for the given assembly: the list the assembly's
+ * analyze page offers, and so the one set of workflows its configure page may
+ * open. Differential Expression Analysis is added to its category, gated as a
+ * member of it.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
  * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
@@ -41,8 +44,14 @@ export function buildAssemblyWorkflows(
         workflow.scope === WORKFLOW_SCOPE.ASSEMBLY
     );
 
-    if (workflowCategory.category === WORKFLOW_CATEGORY_ID.TRANSCRIPTOMICS) {
-      compatibleWorkflows.unshift(DIFFERENTIAL_EXPRESSION_ANALYSIS);
+    if (
+      workflowCategory.category === DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY
+    ) {
+      compatibleWorkflows.unshift(
+        ...workflowGates.filterWorkflows(workflowCategory.category, [
+          DIFFERENTIAL_EXPRESSION_ANALYSIS,
+        ])
+      );
     }
 
     // If no workflows are compatible with the assembly and the category is not marked as "showComingSoon", skip it.
@@ -58,6 +67,28 @@ export function buildAssemblyWorkflows(
 
   // Sort workflow categories (coming soon categories last).
   return workflowCategories.sort(sortWorkflowCategories);
+}
+
+/**
+ * Determines whether a workflow is one the assembly's analyze page lists — the
+ * check its configure page applies to a workflow named in the URL, so the two
+ * pages cannot disagree on scope, entity fit or gating.
+ * @param workflow - Workflow.
+ * @param assembly - Assembly.
+ * @param allWorkflowCategories - Workflow categories.
+ * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
+ * @returns True when the assembly's workflow list includes the workflow.
+ */
+export function isWorkflowListedForAssembly(
+  workflow: Workflow,
+  assembly: AssemblyContract,
+  allWorkflowCategories: WorkflowCategory[],
+  workflowGates: WorkflowGates
+): boolean {
+  return categoriesIncludeWorkflow(
+    buildAssemblyWorkflows(assembly, allWorkflowCategories, workflowGates),
+    workflow
+  );
 }
 
 /**
