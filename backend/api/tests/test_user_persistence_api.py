@@ -39,8 +39,9 @@ class FakeSessionService:
         self.get_session_calls = 0
         self.touched: list[str] = []
 
-    async def touch_session(self, session_id: str) -> None:
+    async def touch_session(self, session_id: str) -> bool:
         self.touched.append(session_id)
+        return session_id in self.sessions
 
     async def require_session(
         self, session_id: str, owner_keycloak_sub: str | None
@@ -489,6 +490,28 @@ def test_open_resets_the_ttl_of_a_reused_session(persistence_client):
     assert opened.status_code == 200, opened.text
 
     assert agent.session_service.touched == [session_id]
+
+
+def test_open_repoints_when_the_session_lapses_before_its_touch(persistence_client):
+    """The read and the TTL reset are two Redis calls. A key that expires
+    between them was not live after all, and handing it back would send the
+    user into a conversation whose next restore 404s."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    async def lapsed(_session_id: str) -> bool:
+        return False
+
+    agent.session_service.touch_session = lapsed
+
+    opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+    assert opened.status_code == 200, opened.text
+    assert opened.json()["session_id"] != session_id
+    listed = client.get("/api/v1/saved_analyses").json()
+    assert listed[0]["source_session"] == opened.json()["session_id"]
 
 
 def test_autosave_carries_the_analysis_id_onto_the_session(persistence_client):

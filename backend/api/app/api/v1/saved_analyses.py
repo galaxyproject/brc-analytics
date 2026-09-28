@@ -107,12 +107,6 @@ async def open_saved_analysis(
         # later reopen elsewhere cannot orphan it.
         restored_state.saved_analysis_id = durable_id
         await agent.session_service.save_session(restored_state)
-    else:
-        # Reading a session leaves its TTL alone, so one handed back minutes
-        # from expiry would lapse before the next turn and fork the analysis
-        # (#1691). Touch rather than re-save: writing back the copy read above
-        # could clobber a turn another device has committed since.
-        await agent.session_service.touch_session(restored_state.session_id)
     # Bind the session to this browser so the frontend can hydrate computed
     # handoff state from GET /assistant/session/{id}.
     set_session_cookie(response, restored_state.session_id)
@@ -136,6 +130,14 @@ async def _live_session(
     if state.owner_keycloak_sub != user.keycloak_sub:
         # Not reachable through the row (it is user-scoped), but reusing a
         # session is handing someone a live conversation -- check anyway.
+        return None
+    # Reading a session leaves its TTL alone, so one handed back minutes from
+    # expiry would lapse before the next turn and fork the analysis (#1691).
+    # Touch rather than re-save: writing back the copy read above could
+    # clobber a turn another device has committed since. A touch that fails
+    # means the key lapsed after the read, so the session is not live after
+    # all.
+    if not await agent.session_service.touch_session(state.session_id):
         return None
     return state
 

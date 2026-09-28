@@ -164,7 +164,14 @@ async def test_touch_session_resets_the_ttl_without_rewriting_the_session():
     key = service._key(state.session_id)
     stored = cache.values[key]
 
-    await service.touch_session(state.session_id)
+    assert await service.touch_session(state.session_id) is True
 
     assert cache.expired == {key: SESSION_TTL}
     assert cache.values[key] is stored
+
+
+@pytest.mark.asyncio
+async def test_touch_session_reports_a_session_that_is_already_gone():
+    service = SessionService(FakeCache())
+
+    assert await service.touch_session("expired-session") is False
