@@ -34,7 +34,7 @@ grouped as (
             list(l.other_names order by l.depth)
             filter (l.depth <= l.species_depth)
         ) as all_other_names
-    from {{ source("catalog_source", "assembly_taxa") }} t
+    from {{ ref("taxonomy_assembly_taxa") }} t
     join lineage l on l.query_tax_id = t.taxonomy_id
     group by t.taxonomy_id
 
