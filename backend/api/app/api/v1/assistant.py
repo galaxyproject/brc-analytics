@@ -290,6 +290,7 @@ async def _stamp_analysis_id(
 async def restore_session(
     session_id: str,
     session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    current_user: UserMeResponse | None = Depends(get_optional_current_user),
     agent=Depends(get_assistant_agent),
 ):
     """Restore a previous assistant session (messages, schema, suggestions)."""
@@ -325,7 +326,14 @@ async def restore_session(
         is_complete=is_complete,
         handoff_url=handoff_url,
         logan=logan_context_from(state.metadata),
-        saved=state.saved_analysis_id is not None,
+        # The cookie proves this browser holds the conversation, not whose
+        # account it is saved to. Signed out, or signed in as someone else,
+        # "saved to your account" is not true of the caller.
+        saved=(
+            state.saved_analysis_id is not None
+            and current_user is not None
+            and state.owner_keycloak_sub == current_user.sub
+        ),
     )
 
 

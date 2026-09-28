@@ -676,6 +676,33 @@ def test_restore_reports_whether_the_conversation_is_already_saved(
     assert unsaved.json()["saved"] is False
 
 
+def test_restore_reports_saved_only_to_the_account_it_is_saved_to(
+    persistence_client,
+):
+    """The session cookie outlives a sign-out, so the same browser can restore
+    the conversation signed out or as someone else. Neither of them has it
+    saved, and telling them so would show "Saved to your account" beside the
+    offer to sign in and keep it."""
+    client, _session_factory, current_sub, _agent = persistence_client
+    from app.core import dependencies
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+
+    current_sub["value"] = "user-b"
+    other_user = client.get(f"/api/v1/assistant/session/{session_id}")
+    assert other_user.json()["saved"] is False
+
+    client.app.dependency_overrides[dependencies.get_optional_current_user] = (
+        lambda: None
+    )
+    try:
+        signed_out = client.get(f"/api/v1/assistant/session/{session_id}")
+    finally:
+        client.app.dependency_overrides.pop(dependencies.get_optional_current_user)
+    assert signed_out.json()["saved"] is False
+
+
 def test_autosave_writes_from_the_turn_rather_than_rereading_redis(
     persistence_client,
 ):
