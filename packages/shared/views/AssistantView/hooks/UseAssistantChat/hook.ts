@@ -9,13 +9,25 @@ import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
 import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 // A save that failed for one of these will fail the same way next time: the
 // deployment cannot save at all, there is nothing to save, the session is not
 // ours, or it is gone. Anything else -- a network drop, a 500 -- is worth
 // another attempt when the effect next runs.
 const PERMANENT_SAVE_FAILURES = new Set([403, 404, 409, 501]);
+
+// Backoff for a save that failed in a way a retry could fix. Bounded per
+// session: past the last one the latch holds, so a failure that only looks
+// transient (an unprovisioned user answers 503 every time) costs a handful of
+// requests rather than one per turn for the life of the conversation.
+const SAVE_RETRY_DELAYS_MS = [5_000, 30_000, 120_000];
 
 /**
  * Whether a failed save is worth attempting again.
@@ -98,6 +110,19 @@ export const useAssistantChat = ({
   // re-arm the restore effect against the id we just wrote.
   const loganOpenedRef = useRef(false);
   const saveAttemptRef = useRef<string | null>(null);
+  const saveRetriesRef = useRef<{ count: number; sessionId: string | null }>({
+    count: 0,
+    sessionId: null,
+  });
+  const saveRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Bumped by the retry timer: clearing the latch alone re-runs nothing, so
+  // without it a failed save waited for the user's next turn -- which the
+  // person who signed in only to keep this conversation may never send.
+  const [saveRetryTick, setSaveRetryTick] = useState(0);
+  const retrySave = useCallback((): void => {
+    saveRetryTimerRef.current = null;
+    setSaveRetryTick((tick) => tick + 1);
+  }, []);
   const router = useRouter();
   const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
   // A question of whitespace is no question: it would neither be asked nor
@@ -266,7 +291,18 @@ export const useAssistantChat = ({
         // that a retry could fix means this session is never saved again --
         // and this effect exists for the user who signs in to keep what is on
         // screen and then sends nothing more.
-        if (isRetryableSaveFailure(error)) saveAttemptRef.current = null;
+        if (!isRetryableSaveFailure(error)) return;
+        const retries = saveRetriesRef.current;
+        if (retries.sessionId !== sessionId) {
+          retries.sessionId = sessionId;
+          retries.count = 0;
+        }
+        if (retries.count >= SAVE_RETRY_DELAYS_MS.length) return;
+        const delay = SAVE_RETRY_DELAYS_MS[retries.count];
+        retries.count += 1;
+        saveAttemptRef.current = null;
+        clearSaveRetry(saveRetryTimerRef);
+        saveRetryTimerRef.current = setTimeout(retrySave, delay);
       });
 
     return (): void => {
@@ -280,7 +316,11 @@ export const useAssistantChat = ({
     isSaved,
     loading,
     messages.length,
+    retrySave,
+    saveRetryTick,
   ]);
+
+  useEffect(() => (): void => clearSaveRetry(saveRetryTimerRef), []);
 
   // Signing out doesn't unsave anything server-side, but it ends this
   // browser's claim to the conversation: AuthProvider.logout only clears the
@@ -291,6 +331,8 @@ export const useAssistantChat = ({
   useEffect(() => {
     if (isAuthLoading || !isConfigured || isAuthenticated) return;
     saveAttemptRef.current = null;
+    saveRetriesRef.current = { count: 0, sessionId: null };
+    clearSaveRetry(saveRetryTimerRef);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setIsSaved(false);
   }, [isAuthLoading, isAuthenticated, isConfigured]);
@@ -458,6 +500,18 @@ function loganSessionErrorMessage(error: unknown, jobId: string): string {
     return `That search failed in Galaxy. Check it at ${resultsPath}.`;
   }
   return handleChatError(error);
+}
+
+/**
+ * Cancel a pending save retry, if one is scheduled.
+ * @param timerRef - Ref holding the retry timer.
+ */
+function clearSaveRetry(
+  timerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>
+): void {
+  if (timerRef.current === null) return;
+  clearTimeout(timerRef.current);
+  timerRef.current = null;
 }
 
 /**

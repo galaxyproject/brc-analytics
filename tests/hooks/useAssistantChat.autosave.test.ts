@@ -222,6 +222,65 @@ describe("useAssistantChat auto-save", () => {
     );
   });
 
+  test("a failed save retries on its own, without waiting for a turn", async () => {
+    jest.useFakeTimers();
+    try {
+      auth(true);
+      mockClient.assistantSaveSession
+        .mockRejectedValueOnce(new Error("network down"))
+        .mockResolvedValue({ saved_analysis_id: "analysis-1" });
+
+      const { result } = renderHook(() =>
+        useAssistantChat({ sessionKey: SESSION_KEY })
+      );
+      await waitFor(() =>
+        expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+      );
+
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(5_000);
+      });
+
+      await waitFor(() => expect(result.current.isSaved).toBe(true));
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(2);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("a save that keeps failing stops after a bounded number of tries", async () => {
+    // An unprovisioned user answers 503 every time. Retrying without a bound
+    // would send one more doomed save per turn for the whole conversation.
+    jest.useFakeTimers();
+    try {
+      auth(true);
+      mockClient.assistantSaveSession.mockRejectedValue(httpError(503));
+
+      renderHook(() => useAssistantChat({ sessionKey: SESSION_KEY }));
+      await waitFor(() =>
+        expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+      );
+
+      // One step per scheduled retry: each is armed only after the previous
+      // attempt has re-rendered and failed.
+      for (const calls of [2, 3, 4]) {
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(2 * 60_000);
+        });
+        await waitFor(() =>
+          expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(calls)
+        );
+      }
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(10 * 60_000);
+      });
+
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(4);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   test("a deployment that cannot save is not asked twice", async () => {
     // 501 is the answer for a deployment with OIDC on and no database. No
     // retry changes it, so the latch stays down and the requests stop.
