@@ -30,6 +30,29 @@ export function favoriteKey(
   return `${entityType}:${entityId}`;
 }
 
+/**
+ * Composite key for a favorite row.
+ * @param favorite - Favorite as returned by the API.
+ * @returns the lookup key.
+ */
+function keyOf(favorite: FavoriteResponse): string {
+  return favoriteKey(
+    favorite.entity_type as FavoriteEntityType,
+    favorite.entity_id
+  );
+}
+
+/**
+ * HTTP status of a failed request, if it got a response.
+ * @param error - Rejection from the API client.
+ * @returns the status code, or undefined.
+ */
+function httpStatus(error: unknown): number | undefined {
+  const status = (error as { response?: { status?: unknown } } | null)?.response
+    ?.status;
+  return typeof status === "number" ? status : undefined;
+}
+
 const FavoritesContext = createContext<FavoritesContextValue>({
   error: null,
   favorites: [],
@@ -37,6 +60,7 @@ const FavoritesContext = createContext<FavoritesContextValue>({
   isFavorited: () => false,
   isLoading: false,
   isToggling: false,
+  reload: () => {},
   toggleFavorite: async () => {},
   togglingKeys: new Set<string>(),
 });
@@ -70,6 +94,10 @@ export function FavoritesProvider({
     () => new Set()
   );
   const [error, setError] = useState<Error | null>(null);
+  // Bumped to re-run the load. Nothing else re-runs it short of an auth
+  // change, so without this one failed GET leaves every control disabled
+  // until a full page reload.
+  const [loadAttempt, setLoadAttempt] = useState(0);
   // Mirrors togglingKeys for the re-entry check below, which has to be
   // synchronous: setState is not, so two clicks in one tick would both read
   // an empty set and both fire.
@@ -81,18 +109,7 @@ export function FavoritesProvider({
   // cannot read hasLoaded from a closure.
   const hasLoadedRef = useRef(false);
 
-  const keys = useMemo(
-    () =>
-      new Set(
-        favorites.map((favorite) =>
-          favoriteKey(
-            favorite.entity_type as FavoriteEntityType,
-            favorite.entity_id
-          )
-        )
-      ),
-    [favorites]
-  );
+  const keys = useMemo(() => new Set(favorites.map(keyOf)), [favorites]);
   // Written post-commit, not during render -- an interrupted render that
   // never commits must not mutate this shared ref. toggleFavorite only runs
   // from event handlers, which always fire after effects have flushed, so it
@@ -155,7 +172,11 @@ export function FavoritesProvider({
     return (): void => {
       isMounted = false;
     };
-  }, [isAuthLoading, isAuthenticated, isConfigured]);
+  }, [isAuthLoading, isAuthenticated, isConfigured, loadAttempt]);
+
+  const reload = useCallback((): void => {
+    setLoadAttempt((attempt) => attempt + 1);
+  }, []);
 
   const toggleFavorite = useCallback(
     async (entityType: FavoriteEntityType, entityId: string): Promise<void> => {
@@ -175,19 +196,26 @@ export function FavoritesProvider({
       try {
         if (!keysRef.current.has(key)) {
           const favorite = await apiClient.createFavorite(entityId, entityType);
-          setFavorites((current) => [favorite, ...current]);
+          // Keyed replace rather than a bare prepend, so the list holds each
+          // favorite once whatever it looked like before -- the API is
+          // idempotent and may hand back a row another tab already created.
+          setFavorites((current) => [
+            favorite,
+            ...current.filter((existing) => keyOf(existing) !== key),
+          ]);
           return;
         }
 
-        await apiClient.deleteFavorite(entityId, entityType);
+        try {
+          await apiClient.deleteFavorite(entityId, entityType);
+        } catch (err) {
+          // Already removed, likely from another tab. What the user asked for
+          // is true, so drop the row rather than leaving a star that 404s on
+          // every click.
+          if (httpStatus(err) !== 404) throw err;
+        }
         setFavorites((current) =>
-          current.filter(
-            (favorite) =>
-              favoriteKey(
-                favorite.entity_type as FavoriteEntityType,
-                favorite.entity_id
-              ) !== key
-          )
+          current.filter((favorite) => keyOf(favorite) !== key)
         );
       } catch (err) {
         // Callers use `void toggleFavorite(...)`; without this catch the
@@ -216,6 +244,7 @@ export function FavoritesProvider({
       isFavorited,
       isLoading,
       isToggling: togglingKeys.size > 0,
+      reload,
       toggleFavorite,
       togglingKeys,
     }),
@@ -225,6 +254,7 @@ export function FavoritesProvider({
       hasLoaded,
       isFavorited,
       isLoading,
+      reload,
       toggleFavorite,
       togglingKeys,
     ]

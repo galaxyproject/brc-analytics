@@ -45,6 +45,7 @@ function setFavorites(overrides = {}): jest.Mock {
     isFavorited: () => false,
     isLoading: false,
     isToggling: false,
+    reload: jest.fn(),
     toggleFavorite,
     togglingKeys: new Set<string>(),
     ...overrides,

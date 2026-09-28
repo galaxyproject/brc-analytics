@@ -1,4 +1,10 @@
-import { Alert, CircularProgress, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useUserResource } from "@repo/shared/hooks/UseUserResource/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
@@ -32,7 +38,9 @@ export function AccountView(): JSX.Element {
   const {
     error: favoritesError,
     favorites,
+    hasLoaded: hasFavoritesLoaded,
     isLoading: isFavoritesLoading,
+    reload: reloadFavorites,
   } = useFavorites();
   const analyses = useUserResource<SavedAnalysisSummary>(fetchAnalyses);
   const launches = useUserResource<WorkflowRunResponse>(fetchLaunches);
@@ -98,7 +106,24 @@ export function AccountView(): JSX.Element {
             of that content, not as its own wide-gapped section. */}
         {favoritesError ? (
           <Stack spacing={2}>
-            <Alert severity="error">{favoritesError.message}</Alert>
+            <Alert
+              action={
+                // A failed toggle leaves the list intact; only a failed load
+                // leaves every control disabled with nothing to recover it.
+                hasFavoritesLoaded ? undefined : (
+                  <Button
+                    color="inherit"
+                    onClick={reloadFavorites}
+                    size="small"
+                  >
+                    Retry
+                  </Button>
+                )
+              }
+              severity="error"
+            >
+              {favoritesError.message}
+            </Alert>
             <FavoritesSection entityType={ENTITY_TYPE.ASSEMBLY} />
             <FavoritesSection entityType={ENTITY_TYPE.ORGANISM} />
           </Stack>

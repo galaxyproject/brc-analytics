@@ -56,6 +56,7 @@ function renderSection(
     isFavorited: () => false,
     isLoading: false,
     isToggling: false,
+    reload: jest.fn(),
     toggleFavorite: jest.fn(),
     togglingKeys: new Set<string>(),
     ...overrides,

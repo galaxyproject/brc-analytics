@@ -10,6 +10,7 @@ export interface FavoritesContextValue {
   isFavorited: (entityType: FavoriteEntityType, entityId: string) => boolean;
   isLoading: boolean;
   isToggling: boolean;
+  reload: () => void;
   toggleFavorite: (
     entityType: FavoriteEntityType,
     entityId: string

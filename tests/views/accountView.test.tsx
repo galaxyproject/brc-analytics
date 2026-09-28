@@ -4,7 +4,7 @@ import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { useFavorites } from "@repo/shared/providers/favorites/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { AccountView } from "@repo/shared/views/AccountView/accountView";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 // jest-dom matchers (toBeInTheDocument, toHaveTextContent) aren't registered
 // globally in this repo's jest config; opt in locally as the sibling account
 // suites do.
@@ -72,6 +72,7 @@ function setFavorites(favorites: unknown[] = []): void {
     isFavorited: () => false,
     isLoading: false,
     isToggling: false,
+    reload: jest.fn(),
     toggleFavorite: jest.fn(),
     togglingKeys: new Set<string>(),
   } as unknown as ReturnType<typeof useFavorites>);
@@ -266,6 +267,7 @@ describe("AccountView", () => {
       isFavorited: () => false,
       isLoading: false,
       isToggling: false,
+      reload: jest.fn(),
       toggleFavorite: jest.fn(),
       togglingKeys: new Set<string>(),
     } as unknown as ReturnType<typeof useFavorites>);
@@ -276,6 +278,47 @@ describe("AccountView", () => {
       expect(screen.getAllByText("favorites unavailable")).toHaveLength(1)
     );
     expect(screen.getAllByRole("alert")).toHaveLength(1);
+  });
+
+  test("offers a retry when the favorites never loaded", async () => {
+    const reload = jest.fn();
+    mockUseFavorites.mockReturnValue({
+      error: new Error("favorites unavailable"),
+      favorites: [],
+      hasLoaded: false,
+      isFavorited: () => false,
+      isLoading: false,
+      isToggling: false,
+      reload,
+      toggleFavorite: jest.fn(),
+      togglingKeys: new Set<string>(),
+    } as unknown as ReturnType<typeof useFavorites>);
+
+    renderAccountView();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Retry" }));
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  test("no retry for a failed toggle, which left the list intact", async () => {
+    mockUseFavorites.mockReturnValue({
+      error: new Error("could not save"),
+      favorites: [],
+      hasLoaded: true,
+      isFavorited: () => false,
+      isLoading: false,
+      isToggling: false,
+      reload: jest.fn(),
+      toggleFavorite: jest.fn(),
+      togglingKeys: new Set<string>(),
+    } as unknown as ReturnType<typeof useFavorites>);
+
+    renderAccountView();
+
+    await screen.findByText("could not save");
+    expect(
+      screen.queryByRole("button", { name: "Retry" })
+    ).not.toBeInTheDocument();
   });
 
   test("prompts a signed-out visitor to sign in", () => {

@@ -112,6 +112,63 @@ describe("useFavorites", () => {
     );
   });
 
+  test("a delete another tab already made still clears the row", async () => {
+    mockClient.getFavorites.mockResolvedValue([
+      { entity_id: ACCESSION, entity_type: "assembly" } as FavoriteResponse,
+    ]);
+    mockClient.deleteFavorite.mockRejectedValue({ response: { status: 404 } });
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION);
+    });
+
+    expect(result.current.isFavorited(ENTITY_TYPE.ASSEMBLY, ACCESSION)).toBe(
+      false
+    );
+    expect(result.current.error).toBeNull();
+  });
+
+  test("any other delete failure keeps the row", async () => {
+    mockClient.getFavorites.mockResolvedValue([
+      { entity_id: ACCESSION, entity_type: "assembly" } as FavoriteResponse,
+    ]);
+    mockClient.deleteFavorite.mockRejectedValue(new Error("boom"));
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.toggleFavorite(ENTITY_TYPE.ASSEMBLY, ACCESSION);
+    });
+
+    expect(result.current.isFavorited(ENTITY_TYPE.ASSEMBLY, ACCESSION)).toBe(
+      true
+    );
+    expect(result.current.error?.message).toBe("boom");
+  });
+
+  test("reload recovers from a failed load", async () => {
+    mockClient.getFavorites.mockRejectedValueOnce(new Error("blip"));
+
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.hasLoaded).toBe(false);
+
+    mockClient.getFavorites.mockResolvedValue([
+      { entity_id: ACCESSION, entity_type: "assembly" } as FavoriteResponse,
+    ]);
+    act(() => result.current.reload());
+
+    await waitFor(() => expect(result.current.hasLoaded).toBe(true));
+    expect(result.current.error).toBeNull();
+    expect(result.current.isFavorited(ENTITY_TYPE.ASSEMBLY, ACCESSION)).toBe(
+      true
+    );
+  });
+
   test("a toggle in one consumer is visible to every other consumer", async () => {
     mockClient.createFavorite.mockResolvedValue({
       entity_id: ACCESSION,
