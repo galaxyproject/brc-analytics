@@ -1,6 +1,8 @@
 import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { WorkflowGates } from "@repo/shared/workflow/gates";
+import { categoriesIncludeWorkflow } from "@repo/shared/workflow/utils";
 
 /**
  * Builds workflow categories for the given organism.
@@ -36,6 +38,31 @@ export function buildOrganismWorkflows(
   }
 
   return workflowCategories;
+}
+
+/**
+ * Determines whether a workflow is one the organism's page lists — the check
+ * its configure page applies to a workflow named in the URL, so the two pages
+ * cannot disagree on scope, entity fit or gating. Gates the same way the
+ * organism page does: after the compatible categories are built.
+ * @param workflow - Workflow.
+ * @param organism - Organism.
+ * @param allWorkflowCategories - Workflow categories.
+ * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
+ * @returns True when the organism's workflow list includes the workflow.
+ */
+export function isWorkflowListedForOrganism(
+  workflow: Workflow,
+  organism: OrganismContract,
+  allWorkflowCategories: WorkflowCategory[],
+  workflowGates: WorkflowGates
+): boolean {
+  return categoriesIncludeWorkflow(
+    workflowGates.filterCategories(
+      buildOrganismWorkflows(organism, allWorkflowCategories)
+    ),
+    workflow
+  );
 }
 
 /**

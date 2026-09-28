@@ -2,9 +2,9 @@ import { BackPageContentMainColumn } from "@databiosphere/findable-ui/lib/compon
 import { WorkflowCategory } from "@repo/shared/components/workflow/WorkflowCategory/workflowCategory";
 import { useWorkflowGates } from "@repo/shared/hooks/UseWorkflowGates/hook";
 import { getWorkflows } from "@repo/shared/services/workflows/entities";
+import { buildAssemblyWorkflows } from "@repo/shared/workflow/assemblyWorkflows";
 import { type JSX } from "react";
 import { type Props } from "./types";
-import { buildAssemblyWorkflows } from "./utils";
 
 /**
  * Main component for the AnalyzeWorkflowsView, which displays compatible workflows for a given assembly.

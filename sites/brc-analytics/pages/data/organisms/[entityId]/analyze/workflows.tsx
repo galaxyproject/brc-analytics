@@ -3,7 +3,7 @@ import { BRC_PAGE_META } from "@brc/meta/constants";
 import { buildOrganismDetails as buildBRCOrganismDetails } from "@brc/viewModelBuilders/viewModelBuilders";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
-import { ORGANISM_CONFIGURE_SCOPES } from "@repo/shared/components/workflow/WorkflowGate/constants";
+import { isOrganismWorkflowAvailable } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
 import { ROUTES } from "@repo/shared/routes/constants";
@@ -35,13 +35,14 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   return (
     <EntityDataGate>
       <WorkflowGate
+        entityId={entityId}
         fallback={
           <WorkflowNotFound
             entityContext="organism"
             href={replaceParameters(ROUTES.ORGANISM, { entityId })}
           />
         }
-        scopes={ORGANISM_CONFIGURE_SCOPES}
+        isWorkflowAvailable={isOrganismWorkflowAvailable}
         trsId={trsId}
       >
         <OrganismWorkflowInputsView

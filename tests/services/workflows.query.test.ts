@@ -1,6 +1,7 @@
 import {
+  findAssembly,
   findWorkflow,
-  getWorkflowCategories,
+  findWorkflows,
 } from "@repo/shared/services/workflows/entities";
 import { getEntities, getEntity } from "@repo/shared/services/workflows/query";
 import {
@@ -68,23 +69,26 @@ describe("workflows query", () => {
     expect(findWorkflow("stale-workflow-id")).toBeUndefined();
   });
 
-  test("getWorkflowCategories returns every category holding the workflow", () => {
-    const trsId = "#workflow/github.com/iwc-workflows/something/main";
-    const first = { category: "OTHER", workflows: [{ trsId }] };
-    const second = { category: "ASSEMBLY", workflows: [{ trsId }] };
-    const other = { category: "VARIANT_CALLING", workflows: [] };
-    setEntitiesByType("workflows", [first, other, second]);
+  test("findWorkflows returns the workflow categories", () => {
+    const categories = [{ category: "OTHER", workflows: [] }];
+    setEntitiesByType("workflows", categories);
 
-    expect(getWorkflowCategories(trsId)).toEqual([first, second]);
+    expect(findWorkflows()).toEqual(categories);
   });
 
-  test("getWorkflowCategories returns empty when no category holds the workflow", () => {
-    setEntitiesByType("workflows", [{ category: "OTHER", workflows: [] }]);
-
-    expect(getWorkflowCategories("logan-search")).toEqual([]);
+  test("findWorkflows returns undefined when no workflows are loaded", () => {
+    expect(findWorkflows()).toBeUndefined();
   });
 
-  test("getWorkflowCategories throws when no workflows are loaded", () => {
-    expect(() => getWorkflowCategories("logan-search")).toThrow();
+  test("findAssembly returns an assembly by entity id", () => {
+    setEntitiesById("assemblies", new Map([["asm1", { id: "asm1" }]]));
+
+    expect(findAssembly("asm1")).toEqual({ id: "asm1" });
+  });
+
+  test("findAssembly returns undefined for an unknown entity id", () => {
+    setEntitiesById("assemblies", new Map([["asm1", { id: "asm1" }]]));
+
+    expect(findAssembly("missing")).toBeUndefined();
   });
 });

@@ -1,92 +1,87 @@
 import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
-import { nonCatalogWorkflow } from "@repo/shared/workflow/gates";
-import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import {
+  DIFFERENTIAL_EXPRESSION_ANALYSIS,
+  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+} from "@repo/shared/workflow/differentialExpressionAnalysis";
+import {
+  LMLS_WORKFLOW_CATEGORY,
+  LMLS_WORKFLOWS,
+} from "@repo/shared/workflow/lmls";
+import {
+  buildWorkflow,
   buildWorkflowCategory,
   buildWorkflowGates,
   HYPHY_TRS_ID,
   UNGATED_TRS_ID,
 } from "./gates";
 
-describe("isWorkflowAllowed", () => {
-  it("allows a workflow that no gate matches, whatever the flag state", () => {
-    expect(
-      buildWorkflowGates().isWorkflowAllowed(nonCatalogWorkflow(UNGATED_TRS_ID))
-    ).toBe(true);
+const HYPHY = buildWorkflow(HYPHY_TRS_ID);
+const UNGATED = buildWorkflow(UNGATED_TRS_ID);
+
+describe("filterWorkflows", () => {
+  it("keeps a workflow that no gate matches, whatever the flag state", () => {
+    for (const gates of [buildWorkflowGates(), buildWorkflowGates(true)]) {
+      expect(
+        gates.filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, [UNGATED])
+      ).toEqual([UNGATED]);
+    }
   });
 
   it("gates the Hyphy workflow on the demo flag", () => {
     expect(
-      buildWorkflowGates().isWorkflowAllowed(nonCatalogWorkflow(HYPHY_TRS_ID))
-    ).toBe(false);
+      buildWorkflowGates().filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, [HYPHY])
+    ).toEqual([]);
     expect(
-      buildWorkflowGates(true).isWorkflowAllowed(
-        nonCatalogWorkflow(HYPHY_TRS_ID)
-      )
-    ).toBe(true);
+      buildWorkflowGates(true).filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, [
+        HYPHY,
+      ])
+    ).toEqual([HYPHY]);
   });
 
   it("matches Hyphy by prefix, so a new version stays gated", () => {
     // The trailing segment is a version, so the rule cannot be an exact match.
     expect(
-      buildWorkflowGates().isWorkflowAllowed(
-        nonCatalogWorkflow(`${HYPHY_TRS_ID}-a-later-version`)
+      buildWorkflowGates().filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, [
+        buildWorkflow(`${HYPHY_TRS_ID}-a-later-version`),
+      ])
+    ).toEqual([]);
+  });
+
+  it("gates workflows through their category, whatever their own rules say", () => {
+    expect(
+      buildWorkflowGates().filterWorkflows(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
+        UNGATED,
+      ])
+    ).toEqual([]);
+    expect(
+      buildWorkflowGates(true).filterWorkflows(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
+        UNGATED,
+      ])
+    ).toEqual([UNGATED]);
+  });
+
+  it("gates every LMLS workflow on the demo flag, under the LMLS category", () => {
+    expect(
+      buildWorkflowGates().filterWorkflows(
+        LMLS_WORKFLOW_CATEGORY,
+        LMLS_WORKFLOWS
       )
-    ).toBe(false);
-  });
-
-  it("gates a workflow through its category, whatever its own rules say", () => {
-    const workflow = {
-      categoryIds: [WORKFLOW_CATEGORY_ID.ASSEMBLY],
-      trsId: UNGATED_TRS_ID,
-    };
-    expect(buildWorkflowGates().isWorkflowAllowed(workflow)).toBe(false);
-    expect(buildWorkflowGates(true).isWorkflowAllowed(workflow)).toBe(true);
-  });
-
-  it("allows a workflow in an ungated category, and one in no category at all", () => {
-    const disabled = buildWorkflowGates();
+    ).toEqual([]);
     expect(
-      disabled.isWorkflowAllowed({
-        categoryIds: [WORKFLOW_CATEGORY_ID.OTHER],
-        trsId: UNGATED_TRS_ID,
-      })
-    ).toBe(true);
-    expect(disabled.isWorkflowAllowed(nonCatalogWorkflow(UNGATED_TRS_ID))).toBe(
-      true
-    );
+      buildWorkflowGates(true).filterWorkflows(
+        LMLS_WORKFLOW_CATEGORY,
+        LMLS_WORKFLOWS
+      )
+    ).toEqual(LMLS_WORKFLOWS);
   });
 
-  it("keeps a workflow listed under a gated and an ungated category, as the listings do", () => {
-    // filterCategories still shows it under the ungated category, so the
-    // configure path must agree rather than depend on catalog ordering.
+  it("keeps Differential Expression Analysis under its category", () => {
     expect(
-      buildWorkflowGates().isWorkflowAllowed({
-        categoryIds: [
-          WORKFLOW_CATEGORY_ID.ASSEMBLY,
-          WORKFLOW_CATEGORY_ID.OTHER,
-        ],
-        trsId: UNGATED_TRS_ID,
-      })
-    ).toBe(true);
-  });
-
-  it("still gates a workflow by its own rule inside an ungated category", () => {
-    expect(
-      buildWorkflowGates().isWorkflowAllowed({
-        categoryIds: [WORKFLOW_CATEGORY_ID.OTHER],
-        trsId: HYPHY_TRS_ID,
-      })
-    ).toBe(false);
-  });
-
-  it("gates every LMLS workflow on the demo flag", () => {
-    const disabled = buildWorkflowGates();
-    const enabled = buildWorkflowGates(true);
-    for (const { trsId } of LMLS_WORKFLOWS) {
-      expect(disabled.isWorkflowAllowed(nonCatalogWorkflow(trsId))).toBe(false);
-      expect(enabled.isWorkflowAllowed(nonCatalogWorkflow(trsId))).toBe(true);
-    }
+      buildWorkflowGates().filterWorkflows(
+        DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+        [DIFFERENTIAL_EXPRESSION_ANALYSIS]
+      )
+    ).toEqual([DIFFERENTIAL_EXPRESSION_ANALYSIS]);
   });
 });
 
@@ -95,25 +90,22 @@ describe("bindWorkflowGates", () => {
     // The single-flag guarantee, asserted in both directions: the off half
     // pins that each named gate is actually shut, the on half that the one
     // flag opens all of them — at both gating levels together.
-    const gatedTrsIds = [
-      HYPHY_TRS_ID,
-      ...LMLS_WORKFLOWS.map(({ trsId }) => trsId),
-    ];
+    const gatedWorkflows = [HYPHY, ...LMLS_WORKFLOWS];
     const gatedCategory = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
-      UNGATED_TRS_ID,
-      ...gatedTrsIds,
+      UNGATED,
+      ...gatedWorkflows,
     ]);
 
     const disabled = buildWorkflowGates();
-    for (const trsId of gatedTrsIds) {
-      expect(disabled.isWorkflowAllowed(nonCatalogWorkflow(trsId))).toBe(false);
-    }
+    expect(
+      disabled.filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, gatedWorkflows)
+    ).toEqual([]);
     expect(disabled.filterCategories([gatedCategory])).toEqual([]);
 
     const enabled = buildWorkflowGates(true);
-    for (const trsId of gatedTrsIds) {
-      expect(enabled.isWorkflowAllowed(nonCatalogWorkflow(trsId))).toBe(true);
-    }
+    expect(
+      enabled.filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, gatedWorkflows)
+    ).toEqual(gatedWorkflows);
     expect(enabled.filterCategories([gatedCategory])).toEqual([gatedCategory]);
   });
 
@@ -128,46 +120,41 @@ describe("bindWorkflowGates", () => {
     // Both flag states: the views filter prerendered page props, so neither
     // path may return the caller's own array.
     const categories = [buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER)];
+    const workflows = [UNGATED];
     for (const gates of [buildWorkflowGates(), buildWorkflowGates(true)]) {
       expect(gates.filterCategories(categories)).not.toBe(categories);
+      expect(
+        gates.filterWorkflows(WORKFLOW_CATEGORY_ID.OTHER, workflows)
+      ).not.toBe(workflows);
     }
   });
 });
 
-describe("filterCategories and isWorkflowAllowed", () => {
-  it("agree on every workflow in a mixed catalog, whatever the flag state", () => {
-    // The listing and the configure path must never disagree about whether a
-    // workflow is shown.
-    const SHARED_TRS_ID =
-      "#workflow/github.com/iwc-workflows/shared-across-categories/main";
+describe("filterCategories and filterWorkflows", () => {
+  it("agree on every category in a mixed catalog, whatever the flag state", () => {
+    // A workflow listed under a category outside the catalog must be gated
+    // exactly as that category's own workflows are.
     const catalog = [
       buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
         UNGATED_TRS_ID,
-        SHARED_TRS_ID,
         HYPHY_TRS_ID,
       ]),
       buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER, [
-        SHARED_TRS_ID,
+        UNGATED_TRS_ID,
         HYPHY_TRS_ID,
       ]),
       buildWorkflowCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING, [
         UNGATED_TRS_ID,
       ]),
     ];
-    const trsIds = new Set(
-      catalog.flatMap(({ workflows }) => workflows.map(({ trsId }) => trsId))
-    );
 
     for (const gates of [buildWorkflowGates(), buildWorkflowGates(true)]) {
       const listed = gates.filterCategories(catalog);
-      for (const trsId of trsIds) {
-        const categoryIds = catalog
-          .filter(({ workflows }) => workflows.some((w) => w.trsId === trsId))
-          .map(({ category }) => category);
-        const isListed = listed.some(({ workflows }) =>
-          workflows.some((w) => w.trsId === trsId)
+      for (const { category, workflows } of catalog) {
+        const listedCategory = listed.find((c) => c.category === category);
+        expect(gates.filterWorkflows(category, workflows)).toEqual(
+          listedCategory?.workflows ?? []
         );
-        expect(gates.isWorkflowAllowed({ categoryIds, trsId })).toBe(isListed);
       }
     }
   });
