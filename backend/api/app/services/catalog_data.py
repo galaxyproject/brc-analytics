@@ -88,16 +88,25 @@ class CatalogData:
                     else:
                         existing.update(lineage_strs)
 
+        # A workflow can be listed under several categories. Index it once,
+        # preferring an ASSEMBLY-scope copy (the only kind the tools serve),
+        # and remember every category that lists an ASSEMBLY-scope copy --
+        # the same ones get_workflows_in_category returns it under.
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
-                iwc_id = wf.get("iwcId", "")
-                # A workflow can be listed under several categories; the first
-                # one is its canonical category everywhere.
-                if iwc_id and iwc_id not in self._workflows_by_iwc_id:
-                    self._workflows_by_iwc_id[iwc_id] = {
-                        **wf,
-                        "_category": cat.get("name", ""),
-                    }
+                iwc_id = wf.get("iwcId")
+                if not iwc_id:
+                    continue
+                existing = self._workflows_by_iwc_id.get(iwc_id)
+                if existing is None or (
+                    not _is_assembly_scope(existing) and _is_assembly_scope(wf)
+                ):
+                    categories = existing["_categories"] if existing else []
+                    existing = {**wf, "_categories": categories}
+                    self._workflows_by_iwc_id[iwc_id] = existing
+                name = cat.get("name", "")
+                if _is_assembly_scope(wf) and name not in existing["_categories"]:
+                    existing["_categories"].append(name)
 
     # -- Organism methods --
 
@@ -221,35 +230,36 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Find workflows compatible with given ploidies and optional taxonomy ID."""
         results = []
-        seen = set()
-        for cat in self.workflow_categories:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf) or wf.get("iwcId") in seen:
+        for wf in self._assembly_workflows():
+            wf_ploidy = wf.get("ploidy")
+            wf_tax = wf.get("taxonomyId")
+            # Ploidy must match (None/ANY = universal)
+            if (
+                wf_ploidy is not None
+                and wf_ploidy != "ANY"
+                and wf_ploidy not in ploidies
+            ):
+                continue
+            # Taxonomy must match if specified on both sides;
+            # check against the full lineage so a workflow targeting
+            # e.g. Bacteria (2) matches E. coli (562)
+            if taxonomy_id and wf_tax is not None:
+                lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
+                if str(wf_tax) not in lineage:
                     continue
-                wf_ploidy = wf.get("ploidy")
-                wf_tax = wf.get("taxonomyId")
-                # Ploidy must match (None/ANY = universal)
-                if (
-                    wf_ploidy is not None
-                    and wf_ploidy != "ANY"
-                    and wf_ploidy not in ploidies
-                ):
-                    continue
-                # Taxonomy must match if specified on both sides;
-                # check against the full lineage so a workflow targeting
-                # e.g. Bacteria (2) matches E. coli (562)
-                if taxonomy_id and wf_tax is not None:
-                    lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
-                    if str(wf_tax) not in lineage:
-                        continue
-                seen.add(wf.get("iwcId"))
-                results.append(self._condense_workflow(wf, cat.get("name", "")))
+            results.append(self._condense_workflow(wf))
         return results
+
+    def _assembly_workflows(self) -> List[Dict[str, Any]]:
+        """Each ASSEMBLY-scope workflow once, in catalog order."""
+        return [
+            wf for wf in self._workflows_by_iwc_id.values() if _is_assembly_scope(wf)
+        ]
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         wf = self._workflows_by_iwc_id.get(iwc_id)
         if wf and _is_assembly_scope(wf):
-            return self._condense_workflow(wf, wf["_category"])
+            return self._condense_workflow(wf)
         return None
 
     def check_workflow_assembly_compatibility(
@@ -391,13 +401,17 @@ class CatalogData:
         )
 
     def _condense_workflow(
-        self, wf: Dict[str, Any], category_name: str
+        self, wf: Dict[str, Any], category_name: Optional[str] = None
     ) -> Dict[str, Any]:
+        indexed = self._workflows_by_iwc_id.get(wf.get("iwcId") or "", {})
+        categories = indexed.get("_categories", [])
         return {
             "iwcId": wf.get("iwcId"),
             "name": wf.get("workflowName"),
             "description": wf.get("workflowDescription"),
-            "category": category_name,
+            # The category it was looked up under, else the first that lists it.
+            "category": category_name or (categories[0] if categories else ""),
+            "categories": list(categories),
             "ploidy": wf.get("ploidy"),
             "taxonomyId": wf.get("taxonomyId"),
             "trsId": wf.get("trsId"),

@@ -41,12 +41,29 @@ class CatalogData:
         # workflow annotated with an ancestor taxon (e.g. Bacteria=2) matches
         # every organism below it (e.g. E. coli=562). Built from genome lineages.
         self._lineage_by_tax_id: Dict[str, Set[str]] = {}
+        # Each ASSEMBLY-scope workflow once, in catalog order, with every
+        # category that lists it.
+        self._workflows_by_iwc_id: Dict[str, Dict[str, Any]] = {}
+        self._categories_by_iwc_id: Dict[str, List[str]] = {}
         self._load()
 
     def _load(self) -> None:
         self._load_organisms()
         self._load_workflows()
         self._build_lineage_index()
+        self._build_workflow_index()
+
+    def _build_workflow_index(self) -> None:
+        for cat in self.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                iwc_id = wf.get("iwcId")
+                if not iwc_id or not _is_assembly_scope(wf):
+                    continue
+                self._workflows_by_iwc_id.setdefault(iwc_id, wf)
+                categories = self._categories_by_iwc_id.setdefault(iwc_id, [])
+                name = cat.get("name", "")
+                if name not in categories:
+                    categories.append(name)
 
     def _build_lineage_index(self) -> None:
         """Index each taxonomy ID to its own ancestor lineage (root..tid).
@@ -289,41 +306,30 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Return workflows compatible with the given organism ploidies and taxonomy."""
         results = []
-        # A workflow can be listed under several categories; report it once,
-        # under the first, matching get_workflow_details.
-        seen = set()
-        for cat in self.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf) or wf.get("iwcId") in seen:
-                    continue
-                wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
-                wf_tax = wf.get("taxonomyId")
+        for wf in self._workflows_by_iwc_id.values():
+            wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
+            wf_tax = wf.get("taxonomyId")
 
-                ploidy_ok = wf_ploidy == _PLOIDY_ANY or wf_ploidy in organism_ploidies
-                tax_ok = wf_tax is None or self._workflow_taxon_matches(
-                    wf_tax, taxonomy_id
-                )
+            ploidy_ok = wf_ploidy == _PLOIDY_ANY or wf_ploidy in organism_ploidies
+            tax_ok = wf_tax is None or self._workflow_taxon_matches(wf_tax, taxonomy_id)
 
-                if ploidy_ok and tax_ok:
-                    seen.add(wf.get("iwcId"))
-                    results.append(self._summarize_workflow(wf, cat.get("name", "")))
+            if ploidy_ok and tax_ok:
+                results.append(self._summarize_workflow(wf))
         return results
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
-        for cat in self.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if wf.get("iwcId") == iwc_id and _is_assembly_scope(wf):
-                    return self._summarize_workflow(
-                        wf, cat.get("name", ""), include_params=True
-                    )
-        return None
+        wf = self._workflows_by_iwc_id.get(iwc_id)
+        if wf is None:
+            return None
+        return self._summarize_workflow(wf, include_params=True)
 
     def _summarize_workflow(
         self,
         wf: Dict[str, Any],
-        category_name: str,
+        category_name: Optional[str] = None,
         include_params: bool = False,
     ) -> Dict[str, Any]:
+        categories = self._categories_by_iwc_id.get(wf.get("iwcId") or "", [])
         params = wf.get("parameters", [])
         needs_paired = any(
             p.get("data_requirements", {}).get("library_layout") == "PAIRED"
@@ -338,7 +344,9 @@ class CatalogData:
             "iwc_id": wf.get("iwcId"),
             "name": wf.get("workflowName"),
             "description": wf.get("workflowDescription"),
-            "category": category_name,
+            # The category it was looked up under, else the first that lists it.
+            "category": category_name or (categories[0] if categories else ""),
+            "categories": list(categories),
             "ploidy": wf.get("ploidy"),
             "taxonomy_id": wf.get("taxonomyId"),
             "trs_id": wf.get("trsId"),
