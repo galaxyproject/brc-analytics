@@ -12,7 +12,7 @@ title: "MCP Server"
 
 ## What is MCP?
 
-The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that lets AI assistants -- like Claude Desktop, Claude Code, Cursor, and other MCP-aware clients -- connect to external data sources and tools. BRC Analytics runs a public MCP server that exposes our full catalog (organisms, assemblies, workflows), raw sequencing-data search via the European Nucleotide Archive (ENA) and NCBI SRA, as well as read-only context resources and guided analysis prompts.
+The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that lets AI assistants -- like Claude Desktop, Claude Code, Cursor, and other MCP-aware clients -- connect to external data sources and tools. BRC Analytics runs a public MCP server that exposes our full catalog (organisms, assemblies, workflows), raw sequencing-data search via the European Nucleotide Archive (ENA) -- plus NCBI SRA where a local mirror is configured -- as well as read-only context resources and guided analysis prompts.
 
 Once connected, you can ask questions like _"What assemblies do you have for Plasmodium falciparum?"_ or _"Find me Illumina RNA-seq runs for taxonomy ID 5833"_ in plain language, and the assistant will pull live answers from BRC Analytics instead of guessing.
 
@@ -73,7 +73,7 @@ For Cursor, add the server to `~/.cursor/mcp.json` or configure it via Cursor Se
 }
 ```
 
-Any MCP-compliant client that supports HTTP/SSE transport can connect using the same URL. Consult your client's documentation for the exact configuration format.
+Any MCP-compliant client that supports the Streamable HTTP transport can connect using the same URL. The older SSE transport is not supported. Consult your client's documentation for the exact configuration format.
 
 ### Running Locally
 
@@ -101,7 +101,7 @@ Explore curated BRC Analytics content:
 - `get_assembly_details(accession)` -- get full metadata for a specific genome assembly (e.g. `GCF_000005845.2`).
 - `list_workflow_categories()` -- list all analysis workflow categories with workflow counts.
 - `get_workflows_in_category(category)` -- list all workflows within a category using its key (e.g. `VARIANT_CALLING`) or display name.
-- `get_compatible_workflows(ploidies, taxonomy_id="")` -- discover workflows compatible with specific ploidy levels (e.g. `haploid`, `diploid`) and optional taxonomy filters.
+- `get_compatible_workflows(ploidies, taxonomy_id="")` -- discover workflows compatible with specific ploidy levels (e.g. `HAPLOID`, `DIPLOID`; case-insensitive) and optional taxonomy filters.
 - `get_workflow_details(iwc_id)` -- get full workflow metadata, TRS ID, and step information by IWC ID.
 - `check_compatibility(iwc_id, accession)` -- check whether a workflow and genome assembly are compatible, returning ploidy, taxonomy, or annotation issues.
 - `resolve_workflow_inputs(iwc_id, accession)` -- resolve deterministic inputs (reference genome FASTA, gene models) and identify required user data (sequencing reads).
@@ -121,20 +121,28 @@ Search repositories for raw sequencing reads to power your analyses:
 - `sra_data_summary(organism)` -- snapshot of available SRA data (run counts, top platforms, assays, BioProjects).
 - `get_sra_study_runs(accession, limit=200)` -- retrieve runs for an SRA study (`SRP*`, `ERP*`, `DRP*`) or BioProject (`PRJNA*`, `PRJEB*`, `PRJDB*`).
 
+**Logan search tools** -- read-only access to Logan sequence searches run from the Logan search page _(available on deployments configured with a Galaxy API key)_:
+
+- `logan_job_status(job_id)` -- check whether a Logan search has finished.
+- `logan_cohort(job_id)` -- whole-match-set counts and facets for a finished search.
+- `logan_hits(job_id, offset=0, limit=25)` -- a page of score-ranked hits with SRA metadata (`limit` is capped at 100).
+
+These read the results the search page already assembled and cached for a day; if a tool reports the results as `expired`, open that search's results page again first.
+
 ### Catalog Resources
 
 Clients supporting MCP resources can read catalog context directly via standard URIs without consuming tool execution steps:
 
 - `brc://catalog/summary` -- JSON summary of total organisms, assemblies, workflows, and categories.
 - `brc://catalog/categories` -- JSON listing of all workflow categories and descriptions.
-- `brc://catalog/workflows` -- JSON list of all available assembly-scoped workflows and requirements.
+- `brc://catalog/workflows` -- JSON list of all available assembly-scoped workflows and requirements, each listed once with every category it belongs to.
 - `brc://catalog/organisms/{taxonomy_id}` -- JSON details for a specific organism by taxonomy ID.
 
 ### Guided Prompts
 
 The server includes pre-configured workflow prompts:
 
-- `plan_pathogen_analysis(organism, analysis_type="variant_calling")` -- step-by-step guidance for looking up an organism, matching assemblies, validating workflows, and locating sequencing datasets.
+- `plan_pathogen_analysis(organism, analysis_type="VARIANT_CALLING")` -- step-by-step guidance for looking up an organism, matching assemblies, choosing a workflow from the given category, and locating sequencing datasets. `analysis_type` is a workflow category key, as listed by `list_workflow_categories`.
 
 ## Things to Try
 
