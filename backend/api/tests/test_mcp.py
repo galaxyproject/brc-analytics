@@ -83,9 +83,14 @@ def _parse_sse(body: str) -> dict:
     raise AssertionError(f"No SSE data frame in response:\n{body}")
 
 
-def _mcp_post(client: TestClient, method: str, params: dict | None = None) -> dict:
+def _mcp_post(
+    client: TestClient,
+    method: str,
+    params: dict | None = None,
+    path: str = "/api/v1/mcp/",
+) -> dict:
     response = client.post(
-        "/api/v1/mcp/",
+        path,
         json={
             "jsonrpc": "2.0",
             "method": method,
@@ -157,6 +162,193 @@ def test_mcp_tool_call_search_organisms(mcp_app):
     assert structured["count"] >= 1
     species = {org["species"] for org in structured["organisms"]}
     assert "Plasmodium falciparum" in species
+
+
+def test_mcp_endpoint_without_trailing_slash_succeeds(mcp_app):
+    """Regression test for the missing trailing slash issue.
+
+    Mounting FastMCP causes Starlette to issue a 307 redirect if the path lacks
+    a trailing slash, which breaks POST clients behind reverse proxies.
+    MCPPathNormalizeMiddleware normalizes /api/v1/mcp in ASGI scope so both work.
+    follow_redirects=False ensures the endpoint handles the request directly
+    without issuing an HTTP 307 redirect.
+    """
+    with TestClient(mcp_app, follow_redirects=False) as client:
+        result = _mcp_post(
+            client,
+            "initialize",
+            {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "pytest", "version": "1"},
+            },
+            path="/api/v1/mcp",
+        )
+    assert result.get("error") is None
+    assert result["result"]["serverInfo"]["name"] == "BRC Analytics"
+
+
+def test_mcp_resources_list_exposes_expected_resources(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(client, "resources/list")
+
+    uris = {r["uri"] for r in result["result"]["resources"]}
+    expected = {
+        "brc://catalog/summary",
+        "brc://catalog/categories",
+        "brc://catalog/workflows",
+    }
+    assert expected <= uris
+
+
+def test_mcp_resource_read_summary(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client,
+            "resources/read",
+            {"uri": "brc://catalog/summary"},
+        )
+    contents = result["result"]["contents"]
+    assert len(contents) == 1
+    summary = json.loads(contents[0]["text"])
+    assert summary["name"] == "BRC Analytics Catalog"
+    assert summary["organisms_count"] >= 1
+    assert "categories" in summary
+
+
+def test_mcp_resource_read_workflows_respects_scope(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client,
+            "resources/read",
+            {"uri": "brc://catalog/workflows"},
+        )
+    contents = result["result"]["contents"]
+    workflows = json.loads(contents[0]["text"])
+    iwc_ids = {w["iwcId"] for w in workflows}
+    # assembly-with-flye is ORGANISM-scope in SAMPLE_WORKFLOWS and must not appear
+    assert "assembly-with-flye" not in iwc_ids
+    # ...while the ASSEMBLY-scope ones must, or the exclusion above proves nothing.
+    assert {"rnaseq-pe", "varcall-haploid", "varcall-diploid"} <= iwc_ids
+
+
+def test_mcp_organism_resource_template_is_listed(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(client, "resources/templates/list")
+    templates = {t["uriTemplate"] for t in result["result"]["resourceTemplates"]}
+    assert "brc://catalog/organisms/{taxonomy_id}" in templates
+
+
+def test_mcp_organism_resource_reads_by_taxonomy_id(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client, "resources/read", {"uri": "brc://catalog/organisms/5833"}
+        )
+    org = json.loads(result["result"]["contents"][0]["text"])
+    assert org["ncbiTaxonomyId"] == 5833
+
+
+def test_mcp_organism_resource_unknown_id_is_an_error(mcp_app):
+    with TestClient(mcp_app) as client:
+        result = _mcp_post(
+            client, "resources/read", {"uri": "brc://catalog/organisms/999999999"}
+        )
+    assert "result" not in result
+    assert result["error"]
+
+
+def test_mcp_prompts_list_and_get(mcp_app):
+    with TestClient(mcp_app) as client:
+        list_res = _mcp_post(client, "prompts/list")
+        prompt_names = {p["name"] for p in list_res["result"]["prompts"]}
+        assert "plan_pathogen_analysis" in prompt_names
+
+        get_res = _mcp_post(
+            client,
+            "prompts/get",
+            {
+                "name": "plan_pathogen_analysis",
+                "arguments": {"organism": "Plasmodium falciparum"},
+            },
+        )
+        messages = get_res["result"]["messages"]
+        assert len(messages) == 1
+        text = messages[0]["content"]["text"]
+        assert "Plasmodium falciparum" in text
+        # No mirror configured, so the prompt must not steer toward a missing tool.
+        assert "search_sra" not in text
+        assert "search_ena" in text
+
+
+def test_mcp_prompt_mentions_search_sra_when_mirror_enabled(mcp_app_with_mirror):
+    with TestClient(mcp_app_with_mirror) as client:
+        get_res = _mcp_post(
+            client,
+            "prompts/get",
+            {
+                "name": "plan_pathogen_analysis",
+                "arguments": {"organism": "Plasmodium falciparum"},
+            },
+        )
+    text = get_res["result"]["messages"][0]["content"]["text"]
+    assert "search_sra" in text
+
+
+def _read_resource(mcp, uri) -> object:
+    async def go():
+        async with Client(mcp) as client:
+            return await client.read_resource(uri)
+
+    return json.loads(asyncio.run(go())[0].text)
+
+
+class TestSharedWorkflowCounts:
+    """A workflow listed under two categories is one workflow: the workflows
+    resource lists it once, and every workflow count agrees on that."""
+
+    @pytest.fixture
+    def mcp(self, catalog_dir, shared_workflows):
+        return create_mcp_server(
+            CatalogData(catalog_dir(shared_workflows)), MagicMock()
+        )
+
+    def test_workflows_resource_lists_shared_workflow_once(self, mcp):
+        workflows = _read_resource(mcp, "brc://catalog/workflows")
+        iwc_ids = [w["iwcId"] for w in workflows]
+        assert iwc_ids.count("varcall-haploid") == 1
+        shared = next(w for w in workflows if w["iwcId"] == "varcall-haploid")
+        assert shared["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_counts_are_distinct_workflows(self, mcp):
+        # rnaseq-pe, varcall-haploid, varcall-diploid; flye is ORGANISM-scope.
+        summary = _read_resource(mcp, "brc://catalog/summary")
+        assert summary["workflows_count"] == 3
+        assert "3 analysis workflows" in mcp.instructions
+
+    def test_compatible_workflows_accepts_lowercase_ploidy(self, mcp):
+        lower = _call_tool(mcp, "get_compatible_workflows", {"ploidies": ["haploid"]})
+        upper = _call_tool(mcp, "get_compatible_workflows", {"ploidies": ["HAPLOID"]})
+        assert lower == upper
+        assert "varcall-haploid" in {w["iwcId"] for w in lower["workflows"]}
+
+
+class TestPlanPrompt:
+    def test_prompt_steers_to_the_requested_category(self, tmp_path):
+        mcp = create_mcp_server(_catalog_data(tmp_path), MagicMock())
+
+        async def go():
+            async with Client(mcp) as client:
+                return await client.get_prompt(
+                    "plan_pathogen_analysis",
+                    {
+                        "organism": "Plasmodium falciparum",
+                        "analysis_type": "TRANSCRIPTOMICS",
+                    },
+                )
+
+        text = asyncio.run(go()).messages[0].content.text
+        assert "'TRANSCRIPTOMICS' category" in text
+        assert "get_workflows_in_category" in text
 
 
 # -- SRA mirror exposure (opt-in, gated on mirror availability) --

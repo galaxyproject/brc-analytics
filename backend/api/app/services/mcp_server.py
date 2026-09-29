@@ -28,9 +28,10 @@ def create_mcp_server(
     sra_enabled = sra_mirror is not None and sra_mirror.is_available()
     logan_enabled = galaxy is not None and galaxy.is_available()
 
-    wf_count = sum(
-        len(c.get("workflows", [])) for c in catalog_data.workflow_categories
-    )
+    # Count only what the tools will actually return (assembly-scoped, each
+    # workflow once even when it's in several categories), so this matches
+    # brc://catalog/summary.
+    wf_count = len(catalog_data.get_all_workflows())
     instructions = (
         "BRC Analytics provides curated genomic data for infectious disease and "
         "eukaryotic pathogen research. This server exposes the full catalog "
@@ -122,7 +123,7 @@ def create_mcp_server(
     @mcp.tool()
     def get_compatible_workflows(ploidies: List[str], taxonomy_id: str = "") -> dict:
         """Find workflows compatible with given ploidy values and optional taxonomy ID.
-        Ploidy values are e.g. 'haploid', 'diploid'."""
+        Ploidy values are e.g. 'HAPLOID', 'DIPLOID' (case-insensitive)."""
         results = catalog_data.get_compatible_workflows(ploidies, taxonomy_id)
         return {"count": len(results), "workflows": results}
 
@@ -299,6 +300,79 @@ def create_mcp_server(
             )
 
         logger.info("Logan search tools registered on MCP server")
+
+    # -- Catalog resources (read-only context documents) --
+
+    @mcp.resource("brc://catalog/summary", mime_type="application/json")
+    def get_catalog_summary() -> str:
+        """High-level summary of the BRC Analytics catalog including counts and
+        available categories."""
+        categories = catalog_data.get_workflow_categories()
+        summary = {
+            "name": "BRC Analytics Catalog",
+            "organisms_count": len(catalog_data.organisms),
+            "assemblies_count": len(catalog_data.assemblies),
+            "workflows_count": wf_count,
+            "categories": [
+                {
+                    "name": c.get("name"),
+                    "key": c.get("category"),
+                    "workflow_count": c.get("workflowCount"),
+                }
+                for c in categories
+            ],
+            "sra_mirror_available": sra_enabled,
+        }
+        return json.dumps(summary, indent=2)
+
+    @mcp.resource("brc://catalog/categories", mime_type="application/json")
+    def get_workflow_categories() -> str:
+        """List all workflow categories in the BRC Analytics catalog."""
+        return json.dumps(catalog_data.get_workflow_categories(), indent=2)
+
+    @mcp.resource("brc://catalog/workflows", mime_type="application/json")
+    def get_workflows() -> str:
+        """List all assembly-scoped workflows in the BRC Analytics catalog."""
+        return json.dumps(catalog_data.get_all_workflows(), indent=2)
+
+    @mcp.resource("brc://catalog/organisms/{taxonomy_id}", mime_type="application/json")
+    def get_organism_resource(taxonomy_id: str) -> str:
+        """Get details for a specific organism by NCBI taxonomy ID."""
+        org = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
+        if not org:
+            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+        return json.dumps(org, indent=2)
+
+    # -- Guided prompts --
+
+    @mcp.prompt()
+    def plan_pathogen_analysis(
+        organism: str,
+        analysis_type: str = "VARIANT_CALLING",
+    ) -> str:
+        """Guided workflow prompt for planning a genomic analysis on a
+        pathogen organism. analysis_type is a workflow category key (see
+        list_workflow_categories), e.g. VARIANT_CALLING or TRANSCRIPTOMICS."""
+        return (
+            f"I want to plan a {analysis_type} analysis for the organism "
+            f"'{organism}' using BRC Analytics.\n\n"
+            "Please follow these steps using the available MCP tools:\n"
+            f"1. Search for '{organism}' using search_organisms (or get_organism) "
+            "to resolve its NCBI taxonomy ID.\n"
+            "2. Retrieve the genome assemblies for that taxonomy ID using "
+            "get_assemblies.\n"
+            f"3. List the workflows in the '{analysis_type}' category with "
+            "get_workflows_in_category (use list_workflow_categories if that "
+            "category isn't found), then keep only those that suit the chosen "
+            "assembly, confirming each with check_compatibility. Don't pick a "
+            "workflow from another category.\n"
+            "4. Resolve workflow inputs with resolve_workflow_inputs to see what "
+            "reference files are provided and what sequencing datasets are needed.\n"
+            "5. Search for relevant sequencing runs using "
+            f"{'search_sra or ' if sra_enabled else ''}search_ena.\n"
+            "6. Provide a concise summary of the plan, selected assembly, "
+            "workflow, and candidate runs."
+        )
 
     logger.info("MCP server created")
     return mcp
