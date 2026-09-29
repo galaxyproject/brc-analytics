@@ -6,6 +6,7 @@ one test file can build on them without importing fixtures across modules.
 
 from __future__ import annotations
 
+import copy
 import json
 from unittest.mock import AsyncMock, MagicMock
 
@@ -118,3 +119,35 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
 @pytest.fixture()
 def client(app_with_stubbed_agent):
     return TestClient(app_with_stubbed_agent)
+
+
+# ---------- Catalog fixtures shared by the MCP and assistant CatalogData tests ----------
+
+
+@pytest.fixture()
+def catalog_dir(tmp_path):
+    """Write SAMPLE_ORGANISMS plus the given workflows; return the directory."""
+
+    def _write(workflows):
+        (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
+        (tmp_path / "workflows.json").write_text(json.dumps(workflows))
+        return str(tmp_path)
+
+    return _write
+
+
+@pytest.fixture()
+def shared_workflows():
+    """varcall-haploid listed under Transcriptomics as well as Variant Calling,
+    like generic-non-segmented-viral-variant-calling in the real catalog."""
+    workflows = copy.deepcopy(SAMPLE_WORKFLOWS)
+    workflows[0]["workflows"].append(copy.deepcopy(workflows[1]["workflows"][0]))
+    return workflows
+
+
+@pytest.fixture()
+def scope_split_workflows(shared_workflows):
+    """Like shared_workflows, but the first (Transcriptomics) copy is
+    ORGANISM-scope, so only the later Variant Calling copy is servable."""
+    shared_workflows[0]["workflows"][-1]["scope"] = "ORGANISM"
+    return shared_workflows

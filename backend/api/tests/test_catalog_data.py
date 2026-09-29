@@ -1,5 +1,6 @@
 """Tests for CatalogData search and lookup methods."""
 
+import copy
 import json
 import os
 import tempfile
@@ -595,3 +596,54 @@ class TestLineageTaxonomyMatching:
         assert lineage_catalog._workflow_taxon_matches(562, "2") is False
         # ...but a Bacteria (2) workflow still applies to E. coli (562).
         assert lineage_catalog._workflow_taxon_matches(2, "562") is True
+
+
+# ---------- Workflows listed under more than one category ----------
+
+
+class TestSharedWorkflow:
+    @pytest.fixture
+    def shared_catalog(self, catalog_dir, shared_workflows):
+        return CatalogData(catalog_dir(shared_workflows))
+
+    def test_listed_once_in_compatible(self, shared_catalog):
+        wfs = shared_catalog.get_compatible_workflows(["HAPLOID"])
+        matches = [w for w in wfs if w["iwc_id"] == "varcall-haploid"]
+        assert len(matches) == 1
+        assert matches[0]["category"] == "Transcriptomics"
+        assert matches[0]["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_details_carries_every_category(self, shared_catalog):
+        details = shared_catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Transcriptomics"
+        assert details["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_listed_under_each_category(self, shared_catalog):
+        for key, name in [
+            ("TRANSCRIPTOMICS", "Transcriptomics"),
+            ("VARIANT_CALLING", "Variant Calling"),
+        ]:
+            wfs = shared_catalog.get_workflows_in_category(key)
+            by_id = {w["iwc_id"]: w["category"] for w in wfs}
+            assert by_id["varcall-haploid"] == name
+
+    def test_organism_scope_first_copy_is_skipped(
+        self, catalog_dir, scope_split_workflows
+    ):
+        catalog = CatalogData(catalog_dir(scope_split_workflows))
+        details = catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Variant Calling"
+        assert details["categories"] == ["Variant Calling"]
+        compatible = catalog.get_compatible_workflows(["HAPLOID"])
+        assert [
+            w["categories"] for w in compatible if w["iwc_id"] == "varcall-haploid"
+        ] == [["Variant Calling"]]
+
+    def test_workflows_without_iwc_id_are_not_collapsed(self, catalog_dir):
+        workflows = copy.deepcopy(SAMPLE_WORKFLOWS)
+        for wf in workflows[0]["workflows"] + workflows[1]["workflows"]:
+            wf.pop("iwcId", None)
+        catalog = CatalogData(catalog_dir(workflows))
+        # No id means it can't be de-duplicated or looked up, so it isn't indexed
+        # -- but one missing id must not swallow the others.
+        assert catalog.get_compatible_workflows(["HAPLOID"]) == []
