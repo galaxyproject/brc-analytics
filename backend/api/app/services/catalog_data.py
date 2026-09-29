@@ -229,6 +229,8 @@ class CatalogData:
         self, ploidies: List[str], taxonomy_id: str = ""
     ) -> List[Dict[str, Any]]:
         """Find workflows compatible with given ploidies and optional taxonomy ID."""
+        # The catalog stores ploidy upper-case; accept 'haploid' too.
+        ploidies = [p.upper() for p in ploidies]
         results = []
         for wf in self._assembly_workflows():
             wf_ploidy = wf.get("ploidy")
@@ -249,6 +251,10 @@ class CatalogData:
                     continue
             results.append(self._condense_workflow(wf))
         return results
+
+    def get_all_workflows(self) -> List[Dict[str, Any]]:
+        """Every ASSEMBLY-scope workflow once, with all its categories."""
+        return [self._condense_workflow(wf) for wf in self._assembly_workflows()]
 
     def _assembly_workflows(self) -> List[Dict[str, Any]]:
         """Each ASSEMBLY-scope workflow once, in catalog order."""

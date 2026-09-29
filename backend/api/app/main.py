@@ -73,7 +73,7 @@ class MCPPathNormalizeMiddleware:
             # ASGI scopes shouldn't be mutated in place; pass a modified copy.
             scope = dict(scope)
             scope["path"] += "/"
-            if "raw_path" in scope:
+            if scope.get("raw_path") is not None:
                 scope["raw_path"] += b"/"
         await self.app(scope, receive, send)
 

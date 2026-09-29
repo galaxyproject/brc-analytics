@@ -28,9 +28,10 @@ def create_mcp_server(
     sra_enabled = sra_mirror is not None and sra_mirror.is_available()
     logan_enabled = galaxy is not None and galaxy.is_available()
 
-    # Count only what the tools will actually return (assembly-scoped), so
-    # this matches brc://catalog/summary.
-    wf_count = sum(c["workflowCount"] for c in catalog_data.get_workflow_categories())
+    # Count only what the tools will actually return (assembly-scoped, each
+    # workflow once even when it's in several categories), so this matches
+    # brc://catalog/summary.
+    wf_count = len(catalog_data.get_all_workflows())
     instructions = (
         "BRC Analytics provides curated genomic data for infectious disease and "
         "eukaryotic pathogen research. This server exposes the full catalog "
@@ -122,7 +123,7 @@ def create_mcp_server(
     @mcp.tool()
     def get_compatible_workflows(ploidies: List[str], taxonomy_id: str = "") -> dict:
         """Find workflows compatible with given ploidy values and optional taxonomy ID.
-        Ploidy values are e.g. 'haploid', 'diploid'."""
+        Ploidy values are e.g. 'HAPLOID', 'DIPLOID' (case-insensitive)."""
         results = catalog_data.get_compatible_workflows(ploidies, taxonomy_id)
         return {"count": len(results), "workflows": results}
 
@@ -311,7 +312,7 @@ def create_mcp_server(
             "name": "BRC Analytics Catalog",
             "organisms_count": len(catalog_data.organisms),
             "assemblies_count": len(catalog_data.assemblies),
-            "workflows_count": sum(c.get("workflowCount", 0) for c in categories),
+            "workflows_count": wf_count,
             "categories": [
                 {
                     "name": c.get("name"),
@@ -332,11 +333,7 @@ def create_mcp_server(
     @mcp.resource("brc://catalog/workflows", mime_type="application/json")
     def get_workflows() -> str:
         """List all assembly-scoped workflows in the BRC Analytics catalog."""
-        workflows = []
-        for cat in catalog_data.get_workflow_categories():
-            for wf in catalog_data.get_workflows_in_category(cat.get("category", "")):
-                workflows.append(wf)
-        return json.dumps(workflows, indent=2)
+        return json.dumps(catalog_data.get_all_workflows(), indent=2)
 
     @mcp.resource("brc://catalog/organisms/{taxonomy_id}", mime_type="application/json")
     def get_organism_resource(taxonomy_id: str) -> str:
@@ -351,10 +348,11 @@ def create_mcp_server(
     @mcp.prompt()
     def plan_pathogen_analysis(
         organism: str,
-        analysis_type: str = "variant_calling",
+        analysis_type: str = "VARIANT_CALLING",
     ) -> str:
         """Guided workflow prompt for planning a genomic analysis on a
-        pathogen organism."""
+        pathogen organism. analysis_type is a workflow category key (see
+        list_workflow_categories), e.g. VARIANT_CALLING or TRANSCRIPTOMICS."""
         return (
             f"I want to plan a {analysis_type} analysis for the organism "
             f"'{organism}' using BRC Analytics.\n\n"
@@ -363,8 +361,11 @@ def create_mcp_server(
             "to resolve its NCBI taxonomy ID.\n"
             "2. Retrieve the genome assemblies for that taxonomy ID using "
             "get_assemblies.\n"
-            "3. Find compatible workflows for the assembly using "
-            "get_compatible_workflows or check_compatibility.\n"
+            f"3. List the workflows in the '{analysis_type}' category with "
+            "get_workflows_in_category (use list_workflow_categories if that "
+            "category isn't found), then keep only those that suit the chosen "
+            "assembly, confirming each with check_compatibility. Don't pick a "
+            "workflow from another category.\n"
             "4. Resolve workflow inputs with resolve_workflow_inputs to see what "
             "reference files are provided and what sequencing datasets are needed.\n"
             "5. Search for relevant sequencing runs using "
