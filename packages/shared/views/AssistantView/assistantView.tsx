@@ -8,6 +8,7 @@ import type { AssistantInfoResponse } from "@repo/shared/services/api-client/typ
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
 import { type JSX, useEffect, useState } from "react";
+import { AnalysisSetup } from "./components/AnalysisSetup/analysisSetup";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Layout as AssistantUILayout } from "./components/Layout/layout";
 import { LegacyLayout } from "./components/LegacyLayout/legacyLayout";
@@ -125,7 +126,15 @@ export const AssistantView = ({
           ),
         },
         setup: {
-          children: (
+          // The new UI leaves out the Logan cohort card for now.
+          children: isAssistantUIEnabled ? (
+            <AnalysisSetup
+              handoffUrl={handoffUrl}
+              loading={loading}
+              onSend={sendMessage}
+              schema={schema}
+            />
+          ) : (
             <>
               {logan && <LoganCohortCard logan={logan} />}
               <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
