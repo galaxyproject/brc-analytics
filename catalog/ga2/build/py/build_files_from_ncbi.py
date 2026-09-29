@@ -98,7 +98,6 @@ def build_ncbi_data():
         },
         temp_folder_path=TEMP_FOLDER_PATH,
         dlt_pipeline_prefix="ga2_catalog_",
-        do_gene_model_urls=False,
         organisms_path=ORGANISMS_PATH,
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,

@@ -10,7 +10,8 @@ None
 
 ## Assemblies with gene model URLs not found
 
-N/A
+- GCF_000001405.40
+- GCF_902713435.1
 
 ## Assemblies with datacache URLs not found
 
