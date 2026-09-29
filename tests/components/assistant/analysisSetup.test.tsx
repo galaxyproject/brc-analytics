@@ -18,17 +18,19 @@ jest.mock(
   })
 );
 
-// jsdom has no ResizeObserver; the chip's tooltip hook only needs it to exist.
-beforeAll(() => {
-  global.ResizeObserver = class {
-    disconnect(): void {}
-    observe(): void {}
-    unobserve(): void {}
-  };
-});
+// jsdom does no layout, so a chip never reads as truncated; tests set the
+// tooltip title directly to stand in for a truncated label.
+let mockTooltipTitle: string | null = null;
+jest.mock("@repo/shared/hooks/UseChipTooltipTitle/hook", () => ({
+  useChipTooltipTitle: (): {
+    ref: { current: null };
+    title: string | null;
+  } => ({ ref: { current: null }, title: mockTooltipTitle }),
+}));
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockTooltipTitle = null;
 });
 
 const ORGANISM: SchemaFieldState = {
@@ -54,11 +56,31 @@ describe("FilledValue", () => {
         onSend={onSend}
       />
     );
-    fireEvent.click(getDeleteIcon(screen.getByRole("button")));
+    fireEvent.click(
+      getDeleteIcon(
+        screen.getByRole("button", {
+          name: "Remove organism: Plasmodium falciparum",
+        })
+      )
+    );
     expect(onSend).toHaveBeenCalledTimes(1);
     expect(onSend).toHaveBeenCalledWith(
       "Let's not use that organism; I'll choose a different one."
     );
+  });
+
+  test("clears from the keyboard, as the remove control it is named", () => {
+    const onSend = jest.fn().mockResolvedValue(undefined);
+    render(
+      <FilledValue
+        field={ORGANISM}
+        fieldKey="organism"
+        loading={false}
+        onSend={onSend}
+      />
+    );
+    fireEvent.keyDown(screen.getByRole("button"), { key: "Enter" });
+    expect(onSend).toHaveBeenCalledTimes(1);
   });
 
   test("does not clear when the chip itself is clicked", () => {
@@ -91,6 +113,7 @@ describe("FilledValue", () => {
     // delete from the keyboard, so the handler itself must hold off too.
     fireEvent.click(getDeleteIcon(chip));
     fireEvent.keyUp(chip, { key: "Backspace" });
+    fireEvent.keyDown(chip, { key: "Enter" });
     expect(onSend).not.toHaveBeenCalled();
   });
 
@@ -109,6 +132,56 @@ describe("FilledValue", () => {
     );
     expect(screen.getByText("Paired-end WGS reads")).toBeTruthy();
     expect(container.querySelector(".MuiChip-deleteIcon")).toBeNull();
+  });
+});
+
+describe("FilledValue tooltip focus", () => {
+  const DERIVED: SchemaFieldState = {
+    detail: null,
+    status: "filled",
+    value: "Paired-end WGS reads",
+  };
+
+  function getWrapper(container: HTMLElement): Element | null | undefined {
+    return container.querySelector(".MuiChip-root")?.parentElement;
+  }
+
+  test("makes a truncated derived chip focusable, so its tooltip opens on focus", () => {
+    mockTooltipTitle = "Paired-end WGS reads";
+    const { container } = render(
+      <FilledValue
+        field={DERIVED}
+        fieldKey="data_characteristics"
+        loading={false}
+        onSend={jest.fn()}
+      />
+    );
+    expect(getWrapper(container)?.getAttribute("tabindex")).toBe("0");
+  });
+
+  test("leaves an untruncated derived chip out of the tab order", () => {
+    const { container } = render(
+      <FilledValue
+        field={DERIVED}
+        fieldKey="data_characteristics"
+        loading={false}
+        onSend={jest.fn()}
+      />
+    );
+    expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
+  });
+
+  test("doesn't add a tab stop for a removable chip, which takes focus itself", () => {
+    mockTooltipTitle = "Plasmodium falciparum";
+    const { container } = render(
+      <FilledValue
+        field={ORGANISM}
+        fieldKey="organism"
+        loading={false}
+        onSend={jest.fn()}
+      />
+    );
+    expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
   });
 });
 
