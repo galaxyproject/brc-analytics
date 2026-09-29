@@ -74,6 +74,9 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
             user_message="hello",
             assistant_reply="hi",
         ),
+        # The state the turn left behind, which the agent hands back rather
+        # than making the endpoint re-read it.
+        SessionState(session_id="sess-abc"),
     )
 
     # Recording lives in the agent now, so the stub has to honour the sink.

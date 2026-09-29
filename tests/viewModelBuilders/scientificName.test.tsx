@@ -7,6 +7,14 @@ import { renderWorkflowSpecies } from "@repo/shared/viewModelBuilders/viewModelB
 import { type CellContext } from "@tanstack/react-table";
 import { isValidElement, type ReactElement } from "react";
 
+// buildOrganismHero in the BRC viewModelBuilders module now pulls in
+// FavoriteButton, which imports the real api-client at module scope -- and
+// that imports ky, an ESM-only package Jest can't parse. Stub api-client;
+// nothing in this suite calls it.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: {},
+}));
+
 /**
  * Builds a minimal cell context exposing just the value the renderers read.
  * @param value - Cell value.

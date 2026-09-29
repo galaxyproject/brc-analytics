@@ -93,6 +93,14 @@ class CacheService:
             logger.error(f"Cache TTL error for key {key}: {e}")
             return -2
 
+    async def expire(self, key: str, ttl: int) -> bool:
+        """Reset a key's TTL without rewriting its value"""
+        try:
+            return bool(await self.redis.expire(key, ttl))
+        except redis.RedisError as e:
+            logger.error(f"Cache expire error for key {key}: {e}")
+            return False
+
     async def clear_pattern(self, pattern: str) -> int:
         """Clear all keys matching a pattern.
 
