@@ -2922,6 +2922,83 @@ class TestAggregatingMarker:
         service._aggregate_shards.assert_not_awaited()
 
 
+class TestAggregationLanes:
+    """
+    Partner merges and BRC merges hold separate locks.
+
+    A partner search covers every index, so its cold merge can run for
+    minutes; with one process-wide lock, every BRC user's cold read would sit
+    behind it. And a partner caller polls, so when its own lane is busy it is
+    told to come back rather than parked on the lock.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _fresh_locks(self, monkeypatch):
+        monkeypatch.setattr(
+            galaxy_service,
+            "_AGGREGATION_LOCKS",
+            {"native": asyncio.Lock(), "partner": asyncio.Lock()},
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_partner_merge_does_not_hold_up_a_native_read(self, service):
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        release = asyncio.Event()
+
+        async def _aggregate(job_id):
+            if job_id == "partner_job":
+                await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        partner = asyncio.create_task(
+            service.get_kmindex_results("partner_job", lane="partner")
+        )
+        await asyncio.sleep(0)
+        assert galaxy_service._AGGREGATION_LOCKS["partner"].locked()
+
+        native = await asyncio.wait_for(
+            service.get_kmindex_results("native_job"), timeout=1
+        )
+
+        assert native.total_hits == 1
+        release.set()
+        await partner
+
+    @pytest.mark.asyncio
+    async def test_a_busy_partner_lane_answers_come_back_later(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock()
+        lock = galaxy_service._AGGREGATION_LOCKS["partner"]
+
+        await lock.acquire()
+        try:
+            with pytest.raises(GalaxyJobAggregating, match="queued"):
+                await service.get_kmindex_results("job2", lane="partner")
+        finally:
+            lock.release()
+
+        service._aggregate_shards.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_busy_native_lane_still_waits_its_turn(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock(return_value=_listing(1))
+        lock = galaxy_service._AGGREGATION_LOCKS["native"]
+
+        await lock.acquire()
+        reader = asyncio.create_task(service.get_kmindex_results("job3"))
+        await asyncio.sleep(0.01)
+        assert not reader.done()
+        lock.release()
+
+        assert (await reader).total_hits == 1
+
+
 class TestResultsEndpoint:
     """
     The results endpoint over HTTP.

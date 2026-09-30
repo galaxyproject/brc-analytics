@@ -9,7 +9,7 @@ import tempfile
 import time
 import zipfile
 from collections import Counter, defaultdict
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import requests
 from bioblend import ConnectionError as BioblendConnectionError
@@ -226,10 +226,16 @@ KMINDEX_INDEX_READ_TIMEOUT = 30.0
 # call site, both short RPCs and long dataset downloads.
 GALAXY_REQUEST_TIMEOUT = 30.0
 
-# Aggregation is process-wide serialized: it is I/O bound against a service that
+# Aggregation is serialized per lane: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
-# with a different partial view of the same job.
-_AGGREGATION_LOCK = asyncio.Lock()
+# with a different partial view of the same job. There are two lanes rather than
+# one lock so that partner traffic, which searches every index and so merges
+# thousands of shards a job, never parks a BRC user's results behind it.
+AggregationLane = Literal["native", "partner"]
+_AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
+    "native": asyncio.Lock(),
+    "partner": asyncio.Lock(),
+}
 
 # Finding or creating the history jobs land in is a read-then-write against
 # Galaxy, and the router builds a GalaxyService per request, so the per-instance
@@ -732,8 +738,16 @@ class GalaxyService:
         offset: int = 0,
         sort: KmindexSort = "score",
         order: Optional[KmindexOrder] = None,
+        lane: AggregationLane = "native",
     ) -> KmindexResults:
-        """Merge a kmindex job's per-shard outputs into one ranked hit list."""
+        """Merge a kmindex job's per-shard outputs into one ranked hit list.
+
+        @param lane: whose aggregation lock a cold merge takes. The native lane
+            waits its turn, as it always has; the partner lane answers
+            GalaxyJobAggregating instead of waiting, because its callers poll
+            and a connection parked behind another partner merge is one the
+            proxy will cut anyway.
+        """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
@@ -751,12 +765,19 @@ class GalaxyService:
                     f"Results for job {job_id} are still being merged"
                 )
 
-            # Serialize aggregation across the whole process. Without this,
-            # several callers landing on a cold cache each pull every shard at
-            # once, which multiplies the load Galaxy is already rate-limiting
-            # and leaves them racing to overwrite the same cache entry with
-            # partial results.
-            async with _AGGREGATION_LOCK:
+            # Serialize aggregation within the lane. Without this, several
+            # callers landing on a cold cache each pull every shard at once,
+            # which multiplies the load Galaxy is already rate-limiting and
+            # leaves them racing to overwrite the same cache entry with partial
+            # results.
+            lock = _AGGREGATION_LOCKS[lane]
+            # No await between this check and the acquire below, so on one event
+            # loop a free lock is still free when async-with takes it.
+            if lane == "partner" and lock.locked():
+                raise GalaxyJobAggregating(
+                    f"Results for job {job_id} are queued behind another merge"
+                )
+            async with lock:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
