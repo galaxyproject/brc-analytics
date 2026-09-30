@@ -37,7 +37,7 @@ submit are the same as on brc-analytics.org:
 
 ```
 POST /jobs                 -> 202 {job_id, status_url, results_url, export_url}
-GET  /jobs/{id}            -> state; Retry-After while running
+GET  /jobs/{id}            -> 202 + Retry-After while running, 200 when done
 GET  /jobs/{id}/results    -> 202 until merged, then a page of hits
 GET  /jobs/{id}/export     -> every hit, as TSV (or parquet)
 ```
@@ -70,16 +70,27 @@ curl -X POST -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
 **Send an `Idempotency-Key`.** A submission can time out after the job has
 already started. If you retry with the same key and the same body within 24
 hours, you get the original `job_id` back instead of a second search across
-every index. Reusing a key with a different body returns `409`. So does a
-retry that arrives while the first submission is still in flight; wait a few
-seconds and send it again.
+every index. A `409` means one of these:
+
+- The key was reused with a different body.
+- The first submission is still in flight. Wait a few seconds and send it
+  again.
+- The first submission failed in a way that leaves it unclear whether Galaxy
+  started the job. We won't guess, so check your earlier responses, and send a
+  new key if you do want to submit again.
+
+If we can't record the key at all, the submit is refused with `503` rather
+than run without that protection.
 
 ### Poll
 
 ```sh
 curl -H "X-API-Key: $KEY" $BASE/jobs/$JOB_ID
-# {"job_id": "...", "state": "running", "is_complete": false, "is_successful": false, ...}
+# 202 {"job_id": "...", "state": "running", "is_complete": false, "is_successful": false, ...}
 ```
+
+The response is `202` while the job runs and `200` once it has finished,
+successfully or not.
 
 **Honor `Retry-After`.** Status only changes every ten seconds or so, and
 searches take anywhere from a couple of minutes to more than half an hour when
@@ -146,11 +157,11 @@ sooner when disk is tight. After that `/export` returns `404` until a
 | 400 / 422 | The request or job id is malformed, or the job failed (`/results`)                   |
 | 401       | Missing or wrong API key                                                             |
 | 404       | No such job, or no export for it right now                                           |
-| 409       | `Idempotency-Key` reused for a different request, or still in flight                 |
+| 409       | `Idempotency-Key` conflict: different body, still in flight, or outcome unknown      |
 | 410       | The API has passed its sunset date                                                   |
 | 429       | Over a rate limit                                                                    |
 | 502       | Galaxy failed underneath us; retry later                                             |
-| 503       | New submissions are paused (status and results still work), or Galaxy is unavailable |
+| 503       | Submissions paused, Galaxy unavailable, or the Idempotency-Key could not be recorded |
 
 ## Operating it (BRC side)
 

@@ -26,6 +26,7 @@ from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotFound,
+    GalaxySubmitNotStarted,
 )
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
@@ -225,11 +226,11 @@ class TestIdempotency:
         assert response.status_code == 409
         galaxy.submit_kmindex_query.assert_awaited_once()
 
-    def test_a_failed_submit_frees_the_key_for_a_retry(self, partner_env):
+    def test_a_submit_that_never_reached_galaxy_frees_the_key(self, partner_env):
         client, galaxy, _ = partner_env
         headers = {**HEADERS, "Idempotency-Key": "abc"}
         galaxy.submit_kmindex_query.side_effect = [
-            RuntimeError("galaxy down"),
+            GalaxySubmitNotStarted("history lookup failed"),
             GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1"),
         ]
 
@@ -238,6 +239,48 @@ class TestIdempotency:
 
         assert failed.status_code == 502
         assert retried.json()["job_id"] == JOB_ID
+
+    def test_an_ambiguous_failure_keeps_the_key_so_a_retry_cannot_duplicate(
+        self, partner_env
+    ):
+        # run_tool can queue the job and then time out on the reply; a blind
+        # retry under the same key must not start a second search.
+        client, galaxy, _ = partner_env
+        headers = {**HEADERS, "Idempotency-Key": "abc"}
+        galaxy.submit_kmindex_query.side_effect = RuntimeError("read timed out")
+
+        failed = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+        retried = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+
+        assert failed.status_code == 502
+        assert retried.status_code == 409
+        assert "new Idempotency-Key" in retried.json()["detail"]
+        galaxy.submit_kmindex_query.assert_awaited_once()
+
+    def test_no_claim_means_no_keyed_submit(self, partner_env):
+        import redis.asyncio as redis
+
+        client, galaxy, _ = partner_env
+        cache = dependencies.get_cache_service()
+        cache.redis.set = AsyncMock(side_effect=redis.ConnectionError("down"))
+
+        response = client.post(
+            f"{BASE}/jobs", json=PAYLOAD, headers={**HEADERS, "Idempotency-Key": "a"}
+        )
+
+        assert response.status_code == 503
+        galaxy.submit_kmindex_query.assert_not_awaited()
+
+    def test_an_unkeyed_submit_does_not_need_redis(self, partner_env):
+        import redis.asyncio as redis
+
+        client, galaxy, _ = partner_env
+        cache = dependencies.get_cache_service()
+        cache.redis.set = AsyncMock(side_effect=redis.ConnectionError("down"))
+
+        response = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=HEADERS)
+
+        assert response.status_code == 202
 
     def test_a_submit_still_in_flight_says_so(self, partner_env):
         client, galaxy, _ = partner_env
@@ -265,6 +308,7 @@ class TestStatus:
 
         response = client.get(f"{BASE}/jobs/{JOB_ID}", headers=HEADERS)
 
+        assert response.status_code == 202
         assert response.json()["state"] == "running"
         assert response.headers["Retry-After"] == partner_module.STATUS_RETRY_AFTER
 
@@ -285,6 +329,7 @@ class TestStatus:
 
         response = client.get(f"{BASE}/jobs/{JOB_ID}", headers=HEADERS)
 
+        assert response.status_code == 200
         assert response.json()["error"] is None
         assert "Retry-After" not in response.headers
 
@@ -349,3 +394,28 @@ def test_a_request_is_charged_to_the_budget_once(partner_env):
     client.get(f"{BASE}/jobs/{JOB_ID}", headers=HEADERS)
 
     assert limiter.check.await_count == 1
+
+
+@pytest.mark.parametrize("fmt", ["tsv", "parquet"])
+def test_an_export_streams_with_its_sunset(partner_env, tmp_path, monkeypatch, fmt):
+    import duckdb
+
+    from app.api.v1 import galaxy as galaxy_module
+
+    client, _, _ = partner_env
+    path = tmp_path / "export.parquet"
+    duckdb.sql(
+        "COPY (SELECT * FROM (VALUES ('SRR1', 0.9), ('SRR2', 0.8)) "
+        f"t(accession, score)) TO '{path}' (FORMAT parquet)"
+    )
+    monkeypatch.setattr(galaxy_module, "export_file_path", lambda _d, _j: path)
+    monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/export?format={fmt}", headers=HEADERS)
+
+    assert response.status_code == 200
+    assert response.headers["Sunset"] == sunset_header(SUNSET)
+    if fmt == "tsv":
+        assert response.text.splitlines()[1].startswith("SRR1")
+    else:
+        assert response.content == path.read_bytes()

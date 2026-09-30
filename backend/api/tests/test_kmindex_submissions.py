@@ -8,6 +8,7 @@ all still hand the caller their job id.
 from __future__ import annotations
 
 import asyncio
+import time
 import uuid
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock
@@ -138,8 +139,13 @@ async def test_a_job_is_counted_once(session_factory):
             zvalue=6,
         )
         await create_kmindex_submission(session, **kwargs)
+        await session.commit()
         with pytest.raises(IntegrityError):
             await create_kmindex_submission(session, **kwargs)
+        await session.rollback()
+
+    [row] = await _rows(session_factory)
+    assert row.galaxy_job_id == "job4"
 
 
 @pytest.mark.asyncio
@@ -161,18 +167,11 @@ async def test_no_database_means_no_write(monkeypatch):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("failure", ["raises", "stalls"])
-async def test_a_broken_write_never_raises(monkeypatch, failure):
+async def test_a_failing_write_never_raises(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
     get_settings.cache_clear()
-    monkeypatch.setattr(kmindex_submissions, "WRITE_TIMEOUT_SECONDS", 0.05)
-
-    async def _write(*_args):
-        if failure == "raises":
-            raise RuntimeError("db down")
-        await asyncio.sleep(1)
-
-    monkeypatch.setattr(kmindex_submissions, "_write", _write)
+    write = AsyncMock(side_effect=RuntimeError("db down"))
+    monkeypatch.setattr(kmindex_submissions, "_write", write)
 
     await kmindex_submissions.record_submission(
         credential=None,
@@ -180,6 +179,38 @@ async def test_a_broken_write_never_raises(monkeypatch, failure):
         source="native",
         submission=_submission(),
     )
+
+    write.assert_awaited_once()
+    get_settings.cache_clear()
+
+
+@pytest.mark.asyncio
+async def test_a_stalled_write_is_cut_off_at_the_timeout(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    get_settings.cache_clear()
+    monkeypatch.setattr(kmindex_submissions, "WRITE_TIMEOUT_SECONDS", 0.05)
+    events = []
+
+    async def _write(*_args):
+        events.append("entered")
+        try:
+            await asyncio.sleep(10)
+        except asyncio.CancelledError:
+            events.append("cancelled")
+            raise
+
+    monkeypatch.setattr(kmindex_submissions, "_write", _write)
+
+    started = time.monotonic()
+    await kmindex_submissions.record_submission(
+        credential=None,
+        galaxy_job_id="job6",
+        source="native",
+        submission=_submission(),
+    )
+
+    assert events == ["entered", "cancelled"]
+    assert time.monotonic() - started < 1
     get_settings.cache_clear()
 
 

@@ -44,6 +44,7 @@ class TestParsing:
             "logan:k1:" + "a" * 63,
             "logan:k1:" + "g" * 64,
             f"a:k1:{'a' * 64},b:k1:{'b' * 64}",
+            f"a:k1:{'a' * 64},b:k2:{'a' * 64}",
         ],
     )
     def test_malformed_entries_are_refused(self, raw):

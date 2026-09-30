@@ -43,6 +43,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    GalaxySubmitNotStarted,
 )
 from app.services.kmindex_submissions import record_submission
 from app.services.sra_mirror import SRAMirrorService
@@ -130,6 +131,15 @@ def _replay(existing: dict, fingerprint: str) -> str:
             status_code=409,
             detail="Idempotency-Key was already used for a different request",
         )
+    if existing.get("outcome") == "unknown":
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The submission under this Idempotency-Key failed after Galaxy "
+                "was asked to run it, so it may be running anyway. Send a new "
+                "Idempotency-Key to submit it again."
+            ),
+        )
     job_id = existing.get("job_id")
     if not job_id:
         raise HTTPException(
@@ -195,27 +205,57 @@ async def submit_job(
                 nx=True,
             )
         except redis.RedisError as e:
-            # Losing replay protection beats refusing the search outright.
-            logger.warning(f"Idempotency claim failed, submitting anyway: {e}")
-            claimed, idem_key = True, None
+            # The caller asked for a retry-safe submit; going ahead without the
+            # claim would make it quietly unsafe.
+            logger.error(f"Idempotency claim failed for {partner.partner_id}: {e}")
+            raise HTTPException(
+                status_code=503,
+                detail="Could not reserve the Idempotency-Key; try again shortly",
+                headers={"Retry-After": STATUS_RETRY_AFTER},
+            ) from e
         if not claimed:
             return _created(_replay(await cache.get(idem_key) or {}, fingerprint))
 
     try:
         response = await galaxy.submit_kmindex_query(submission)
-    except Exception as e:
+    except GalaxySubmitNotStarted as e:
+        # Nothing reached run_tool, so no job exists and a retry is safe.
         if idem_key is not None:
             await cache.delete(idem_key)
         logger.error(f"Partner {partner.partner_id} submit failed: {e}")
         raise HTTPException(
             status_code=502, detail="Failed to submit kmindex query"
         ) from e
+    except Exception as e:
+        # Galaxy may have queued the job and lost the reply. Keep the key, so a
+        # blind retry can't start a second search across every index.
+        if idem_key is not None:
+            await cache.set(
+                idem_key,
+                {"fingerprint": fingerprint, "outcome": "unknown"},
+                IDEMPOTENCY_TTL,
+            )
+        logger.error(
+            f"Partner {partner.partner_id} submit ended ambiguously "
+            f"(Galaxy may have started it): {e}"
+        )
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "The kmindex query may or may not have started; Galaxy did not "
+                "confirm it"
+            ),
+        ) from e
 
-    if idem_key is not None:
-        await cache.set(
-            idem_key,
-            {"fingerprint": fingerprint, "job_id": response.job_id},
-            IDEMPOTENCY_TTL,
+    if idem_key is not None and not await cache.set(
+        idem_key,
+        {"fingerprint": fingerprint, "job_id": response.job_id},
+        IDEMPOTENCY_TTL,
+    ):
+        # The job exists either way; only a retry within the next few minutes
+        # is affected, and it gets a 409 rather than a second job.
+        logger.error(
+            f"Could not record job {response.job_id} under its Idempotency-Key"
         )
     await record_submission(
         credential=galaxy.credential,
@@ -233,7 +273,7 @@ async def job_status(
     job_id: str = JobId,
     galaxy: GalaxyService = Depends(get_partner_galaxy_service),
 ):
-    """Where the search has got to. Carries Retry-After until it finishes."""
+    """Where the search has got to: 202 with Retry-After until it finishes."""
     _require_galaxy(galaxy)
     try:
         status = await galaxy.get_job_status(job_id)
@@ -244,6 +284,7 @@ async def job_status(
         raise HTTPException(status_code=502, detail="Failed to get job status") from e
 
     if not status.is_complete:
+        response.status_code = 202
         response.headers["Retry-After"] = STATUS_RETRY_AFTER
     error = None
     if status.is_complete and not status.is_successful:

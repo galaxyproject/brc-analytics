@@ -70,6 +70,7 @@ def parse_partner_keys(raw: str) -> tuple[PartnerKey, ...]:
     """
     keys: list[PartnerKey] = []
     seen: set[str] = set()
+    digests: set[str] = set()
     for entry in (e.strip() for e in raw.split(",")):
         if not entry:
             continue
@@ -89,6 +90,11 @@ def parse_partner_keys(raw: str) -> tuple[PartnerKey, ...]:
         if key_id in seen:
             raise ValueError(f"PARTNER_API_KEYS repeats key_id {key_id!r}")
         seen.add(key_id)
+        # One key must name one partner, or whichever entry matched last would
+        # decide whose budget, history and analytics a request lands in.
+        if digest in digests:
+            raise ValueError("PARTNER_API_KEYS lists the same key twice")
+        digests.add(digest)
         keys.append(PartnerKey(digest=digest, key_id=key_id, partner_id=partner_id))
     return tuple(keys)
 
