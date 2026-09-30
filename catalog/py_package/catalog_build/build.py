@@ -14,7 +14,9 @@ import duckdb
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from pydantic_core import to_jsonable_python
 
+from .generated_schema.schema import Workflow
 from .load import do_dlt_load
 from .qc_utils import (
     format_list_section,
@@ -28,6 +30,11 @@ from .utils import get_db_path
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
 log = logging.getLogger(__name__)
+
+
+def save_json_file(path: str | Path, obj, **json_opts):
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(obj, file, **json_opts)
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -1305,9 +1312,7 @@ class BuildMetadata:
 
 
 def save_build_metadata(path: str, meta: BuildMetadata):
-    meta_dict = asdict(meta)
-    with open(path, mode="w", encoding="utf-8") as fh:
-        json.dump(meta_dict, fh, indent=2)
+    save_json_file(path, asdict(meta), indent=2)
 
 
 @dataclass
@@ -1481,8 +1486,19 @@ def build_files(
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
     # Output normalized input workflows
-    load_and_transform_result.workflows_source.to_json(
-        workflows_output_path, orient="records"
+    parsed_workflows = (
+        load_and_transform_result.workflows_source[Workflow.model_fields.keys()]
+        .assign(
+            **load_and_transform_result.workflows_source[
+                ["categories", "parameters"]
+            ].map(json.loads, na_action="ignore")
+        )
+        .to_dict(orient="records")
+    )
+    save_json_file(
+        workflows_output_path,
+        to_jsonable_python([Workflow(**w) for w in parsed_workflows]),
+        indent=2,
     )
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
@@ -1752,9 +1768,8 @@ def build_files(
     if len(taxonomic_levels_for_tree) > 0:
         # Use the assemblies info from genomes_df to build the species tree
         species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
-        with open(tree_output_path, "w") as outfile:
-            # Dump with sorted keys and consistent indentation
-            json.dump(species_tree, outfile, indent=4, sort_keys=True)
+        # Dump with sorted keys and consistent indentation
+        save_json_file(tree_output_path, species_tree, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
         qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
