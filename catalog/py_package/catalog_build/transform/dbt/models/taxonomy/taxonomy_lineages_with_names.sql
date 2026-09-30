@@ -28,7 +28,7 @@ with source_names as (
         unnest(from_json(other_names, '"varchar[]"')) as name_txt,
         null as ncbi_class,
         true as is_curated
-    from {{ source("catalog_input_curated_taxa") }}
+    from {{ ref("catalog_input_curated_taxa") }}
     {% endif %}
 
 ),

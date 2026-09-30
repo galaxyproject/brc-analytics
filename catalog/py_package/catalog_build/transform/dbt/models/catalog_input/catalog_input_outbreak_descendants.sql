@@ -2,8 +2,10 @@
 
 with source_descendants as (
   select
-    outbreak_taxonomy_id,
-    unnest(highlight_descendant_taxonomy_ids) as taxonomy_id
+    taxonomy_id as outbreak_taxonomy_id,
+    unnest(
+      from_json(highlight_descendant_taxonomy_ids, '"bigint[]"')
+    ) as taxonomy_id
   from {{ source("catalog_source", "outbreaks") }}
 )
 
