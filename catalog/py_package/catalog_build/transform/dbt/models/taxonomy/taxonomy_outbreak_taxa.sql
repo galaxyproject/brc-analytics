@@ -1,3 +1,3 @@
 {{ config(materialized="ephemeral") }}
 
-select distinct taxonomy_id from {{ source("catalog_source", "outbreaks") }} where taxonomy_id is not null
+select distinct taxonomy_id from {{ ref("catalog_input_outbreaks") }} where taxonomy_id is not null

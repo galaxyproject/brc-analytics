@@ -1385,11 +1385,11 @@ def load_and_transform(
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
         return LoadAndTransformResult(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
-            organisms_source=con.query("select * from catalog_source.organisms").df(),
+            organisms_source=con.query("select * from catalog_input_organisms").df(),
             outbreaks_source=(
                 None
                 if outbreaks_path is None
-                else con.query("select * from catalog_source.outbreaks").df()
+                else con.query("select * from catalog_input_outbreaks").df()
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
