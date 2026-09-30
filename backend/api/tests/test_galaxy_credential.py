@@ -412,3 +412,44 @@ async def test_submit_response_carries_credential_identity():
 
     assert response.identity == "user"
     assert response.job_id == "job1"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("step", ["history", "upload"])
+async def test_a_failure_before_run_tool_is_known_not_to_have_started(step):
+    # Nothing asked Galaxy to run the tool, so no job can exist and the partner
+    # API is free to release the caller's Idempotency-Key.
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
+        )
+    svc._get_or_create_shared_history = AsyncMock(
+        side_effect=RuntimeError("boom") if step == "history" else None,
+        return_value="h1",
+    )
+    svc._upload_fasta = AsyncMock(side_effect=RuntimeError("boom"))
+    svc._run_kmindex_query = AsyncMock()
+
+    with pytest.raises(GalaxySubmitNotStarted):
+        await svc.submit_kmindex_query(_submission())
+    svc._run_kmindex_query.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_a_failure_from_run_tool_on_is_ambiguous():
+    # Galaxy may have queued the job and lost the reply.
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
+        )
+    svc._get_or_create_shared_history = AsyncMock(return_value="h1")
+    svc._upload_fasta = AsyncMock(return_value="ds1")
+    svc._run_kmindex_query = AsyncMock(side_effect=RuntimeError("read timed out"))
+
+    with pytest.raises(Exception) as excinfo:
+        await svc.submit_kmindex_query(_submission())
+    assert not isinstance(excinfo.value, GalaxySubmitNotStarted)
