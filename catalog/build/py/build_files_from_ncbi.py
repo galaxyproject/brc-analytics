@@ -2,12 +2,14 @@ from ...py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/source/assemblies.yml"
 ORGANISMS_PATH = "catalog/source/organisms.yml"
+WORKFLOWS_PATH = "catalog/source/workflows.yml"
 TAXA_PATH = "catalog/source/taxa.yml"
 OUTBREAKS_PATH = "catalog/source/outbreaks.yml"
 
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
+WORKFLOWS_OUTPUT_PATH = "catalog/build/intermediate/normalized-workflows.json"
 OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
@@ -66,6 +68,8 @@ if __name__ == "__main__":
         TAXANOMIC_LEVELS_FOR_TREE,
         temp_folder_path=TEMP_FOLDER_PATH,
         dlt_pipeline_prefix="brc_catalog_",
+        workflows_path=WORKFLOWS_PATH,
+        workflows_output_path=WORKFLOWS_OUTPUT_PATH,
         taxonomic_group_sets={"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,

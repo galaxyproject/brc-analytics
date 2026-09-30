@@ -92,6 +92,14 @@ sources:
                   arguments:
                     to: ref('taxonomy_organisms')
                     field: taxonomy_id
+      - name: workflows
+        columns:
+          - name: trs_id
+            data_tests:
+              - unique:
+                  name: catalog_workflows_unique_trs_ids
+              - not_null:
+                  name: catalog_workflows_have_trs_ids
       - name: curated_taxa
         # Only tested when the catalog curates information for individual taxa
         columns:
