@@ -441,8 +441,15 @@ class GalaxyService:
         cache: CacheService,
         sra_mirror: Optional[SRAMirrorService] = None,
         credential: Optional[GalaxyCredential] = None,
+        history_name: Optional[str] = None,
     ):
+        """
+        @param history_name: where service-account jobs land, in place of the
+            shared "BRC ANALYTICS JOBS". Ignored for a user credential, whose
+            jobs always go to their own account's history.
+        """
         self.cache = cache
+        self.history_name = history_name
         self.sra_mirror = sra_mirror
         self.settings = get_settings()
 
@@ -1902,16 +1909,19 @@ class GalaxyService:
     async def _get_or_create_shared_history(self) -> str:
         """Find or create the history jobs land in.
 
-        Service-account jobs share one "BRC ANALYTICS JOBS" history; a signed-in
-        user's jobs go to a "BRC Logan Search" history in their own account --
-        the bearer token scopes get_histories()/create_history to that user.
+        Service-account jobs share one "BRC ANALYTICS JOBS" history, unless the
+        service was built with a history_name; a signed-in user's jobs go to a
+        "BRC Logan Search" history in their own account -- the bearer token
+        scopes get_histories()/create_history to that user.
         """
         if self.credential is not None and self.credential.kind == "user":
             shared_history_name = "BRC Logan Search"
             account = self.credential.user_sub
         else:
-            shared_history_name = "BRC ANALYTICS JOBS"
-            account = None
+            shared_history_name = self.history_name or "BRC ANALYTICS JOBS"
+            # Keyed by name too: two service histories on one account are
+            # separate find-or-creates, and must not wait on each other.
+            account = ("service", shared_history_name)
 
         if self._shared_history_id:
             return self._shared_history_id

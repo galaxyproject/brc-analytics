@@ -179,6 +179,66 @@ async def test_service_jobs_keep_shared_history_name():
 
 
 @pytest.mark.asyncio
+async def test_a_named_service_history_replaces_the_shared_one():
+    cache = MagicMock()
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            cache,
+            credential=GalaxyCredential(kind="service", secret="k"),
+            history_name="BRC Logan Partner - logan",
+        )
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(
+        return_value=[{"id": "shared", "name": "BRC ANALYTICS JOBS"}]
+    )
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h3"})
+
+    assert await svc._get_or_create_shared_history() == "h3"
+    svc.gi.histories.create_history.assert_called_once_with(
+        name="BRC Logan Partner - logan"
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_history_name_does_not_move_a_users_jobs():
+    cache = MagicMock()
+    with patch("app.services.galaxy_service.GalaxyInstance"):
+        svc = GalaxyService(
+            cache,
+            credential=GalaxyCredential(kind="user", secret="tok", user_sub="u1"),
+            history_name="BRC Logan Partner - logan",
+        )
+    svc.gi = MagicMock()
+    svc.gi.histories.get_histories = MagicMock(return_value=[])
+    svc.gi.histories.create_history = MagicMock(return_value={"id": "h4"})
+    await svc._get_or_create_shared_history()
+    svc.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
+
+
+@pytest.mark.asyncio
+async def test_named_service_histories_do_not_share_a_lock(monkeypatch):
+    locks = defaultdict(asyncio.Lock)
+    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", locks)
+
+    for name in (None, "BRC Logan Partner - logan"):
+        with patch("app.services.galaxy_service.GalaxyInstance"):
+            svc = GalaxyService(
+                MagicMock(),
+                credential=GalaxyCredential(kind="service", secret="k"),
+                history_name=name,
+            )
+        svc.gi = MagicMock()
+        svc.gi.histories.get_histories = MagicMock(return_value=[])
+        svc.gi.histories.create_history = MagicMock(return_value={"id": "h"})
+        await svc._get_or_create_shared_history()
+
+    assert set(locks) == {
+        ("service", "BRC ANALYTICS JOBS"),
+        ("service", "BRC Logan Partner - logan"),
+    }
+
+
+@pytest.mark.asyncio
 async def test_concurrent_first_submissions_create_one_shared_history(monkeypatch):
     # The router builds a GalaxyService per request, so the per-instance memo
     # can't stop two first submissions each finding nothing and each creating
