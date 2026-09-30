@@ -76,9 +76,35 @@ class GalaxyJobNotFound(Exception):
     """Galaxy has no job under this id (or could not decode it as one)."""
 
 
-# Galaxy answers 400 for an id it cannot decode and 404 for one that decodes to
-# nothing. Both mean the caller has the wrong id, not that Galaxy is broken.
-NOT_FOUND_STATUS_CODES = frozenset({400, 404})
+class GalaxySubmitNotStarted(Exception):
+    """A submission failed before the tool was asked to run.
+
+    So no job can exist for it, and the caller is free to try again. Anything
+    that fails from the run_tool call on is ambiguous -- Galaxy may have queued
+    the job and lost the reply -- and is raised as a plain Exception instead.
+    """
+
+
+# Galaxy answers 404 for an id that decodes to nothing, and 400 with its
+# MalformedId error (err_code 400009) for one it cannot decode. Both mean the
+# caller has the wrong id. Any other 400 is Galaxy refusing something else, and
+# must not read as "no such job".
+MALFORMED_ID_MARKERS = ("400009", "malformed id", "invalid id")
+
+
+def is_missing_job_error(e: BioblendConnectionError) -> bool:
+    """Whether Galaxy is saying this job id names no job."""
+    status = getattr(e, "status_code", None)
+    if status == 404:
+        return True
+    if status != 400:
+        return False
+    body = getattr(e, "body", None) or ""
+    if isinstance(body, bytes):
+        body = body.decode("utf-8", errors="replace")
+    lowered = str(body).lower()
+    return any(marker in lowered for marker in MALFORMED_ID_MARKERS)
+
 
 # A running job's status is cached only this long. Every open search polls, and
 # Galaxy already 429s us, but a completion should still show up promptly.
@@ -646,11 +672,13 @@ class GalaxyService:
             f"index(es) ({len(submission.sequence)} chars)"
         )
 
+        tool_requested = False
         try:
             history_id = await self._get_or_create_shared_history()
             upload_dataset_id = await self._upload_fasta(
                 submission.sequence, submission.filename, history_id
             )
+            tool_requested = True
             job_id = await self._run_kmindex_query(
                 upload_dataset_id, submission, history_id
             )
@@ -682,6 +710,10 @@ class GalaxyService:
                 if is_unlinked_account_error(e):
                     raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
+            if not tool_requested:
+                raise GalaxySubmitNotStarted(
+                    f"kmindex query submission failed: {str(e)}"
+                ) from e
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
 
     def _fetch_shard(self, dataset_id: str) -> bytes:
@@ -781,7 +813,14 @@ class GalaxyService:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
-                    await self.cache.set(marker_key, "1", CacheTTL.ONE_HOUR)
+                    # The lane lock only serializes its own lane, and the check
+                    # above races, so the job itself is claimed atomically: one
+                    # merge per job across both lanes, and whoever loses is told
+                    # to come back rather than merging it a second time.
+                    if not await self.cache.claim(marker_key, CacheTTL.ONE_HOUR):
+                        raise GalaxyJobAggregating(
+                            f"Results for job {job_id} are still being merged"
+                        )
                     try:
                         aggregate = await self._aggregate_shards(job_id)
                     finally:
@@ -1678,7 +1717,7 @@ class GalaxyService:
             return status
 
         except BioblendConnectionError as e:
-            if getattr(e, "status_code", None) in NOT_FOUND_STATUS_CODES:
+            if is_missing_job_error(e):
                 raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
             logger.error(f"BioBLEND error getting job status: {e}")
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e

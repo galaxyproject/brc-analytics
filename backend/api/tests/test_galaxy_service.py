@@ -62,6 +62,7 @@ def service(monkeypatch):
     get_settings.cache_clear()
 
     cache = MagicMock()
+    cache.claim = AsyncMock(return_value=True)
     cache.delete = AsyncMock(return_value=True)
     cache.get = AsyncMock(return_value=None)
     cache.set = AsyncMock(return_value=True)
@@ -204,23 +205,38 @@ class TestJobStatusStates:
         service.gi.jobs.show_job.assert_not_called()
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("code", [400, 404])
-    async def test_an_id_galaxy_does_not_know_is_not_found(self, service, code):
+    @pytest.mark.parametrize(
+        "code, body",
+        [
+            (404, '{"err_msg": "Object not found", "err_code": 404001}'),
+            (400, '{"err_msg": "Malformed id", "err_code": 400009}'),
+        ],
+    )
+    async def test_an_id_galaxy_does_not_know_is_not_found(self, service, code, body):
         from bioblend import ConnectionError as BioblendConnectionError
 
         service.gi.jobs.show_job = MagicMock(
-            side_effect=BioblendConnectionError("nope", status_code=code)
+            side_effect=BioblendConnectionError("nope", status_code=code, body=body)
         )
 
         with pytest.raises(GalaxyJobNotFound):
             await service.get_job_status("0123456789abcdef")
 
     @pytest.mark.asyncio
-    async def test_a_galaxy_outage_is_not_mistaken_for_a_missing_job(self, service):
+    @pytest.mark.parametrize(
+        "code, body",
+        [
+            (502, "Bad Gateway"),
+            (400, '{"err_msg": "Request validation failed", "err_code": 400008}'),
+        ],
+    )
+    async def test_other_galaxy_errors_are_not_mistaken_for_a_missing_job(
+        self, service, code, body
+    ):
         from bioblend import ConnectionError as BioblendConnectionError
 
         service.gi.jobs.show_job = MagicMock(
-            side_effect=BioblendConnectionError("down", status_code=502)
+            side_effect=BioblendConnectionError("down", status_code=code, body=body)
         )
 
         with pytest.raises(Exception) as excinfo:
@@ -2880,7 +2896,7 @@ class TestAggregatingMarker:
         during = {}
 
         async def _aggregate(_job_id):
-            during["set"] = list(service.cache.set.call_args_list)
+            during["claimed"] = list(service.cache.claim.call_args_list)
             during["deleted"] = list(service.cache.delete.call_args_list)
             return _listing(3)
 
@@ -2888,9 +2904,24 @@ class TestAggregatingMarker:
 
         await service.get_kmindex_results("job1")
 
-        assert during["set"] == [call(marker_key, "1", CacheTTL.ONE_HOUR)]
+        assert during["claimed"] == [call(marker_key, CacheTTL.ONE_HOUR)]
         assert during["deleted"] == []
         service.cache.delete.assert_awaited_once_with(marker_key)
+
+    @pytest.mark.asyncio
+    async def test_a_lost_claim_is_told_to_come_back_not_merged_again(self, service):
+        # The marker check before the lane lock races, and the two lanes don't
+        # share a lock, so the claim is what stops one job merging twice.
+        marker_key = self._keyed(service)
+        service.cache.claim = AsyncMock(return_value=False)
+        service._aggregate_shards = AsyncMock()
+
+        with pytest.raises(GalaxyJobAggregating, match="still being merged"):
+            await service.get_kmindex_results("job1", lane="partner")
+
+        service._aggregate_shards.assert_not_awaited()
+        # Not ours to clear: the winner is still merging under it.
+        assert call(marker_key) not in service.cache.delete.call_args_list
 
     @pytest.mark.asyncio
     async def test_a_failed_aggregation_still_clears_the_marker(self, service):
@@ -2968,6 +2999,37 @@ class TestAggregationLanes:
         assert native.total_hits == 1
         release.set()
         await partner
+
+    @pytest.mark.asyncio
+    async def test_one_job_is_merged_once_across_both_lanes(self, service):
+        # A native reader and a partner reader both miss the aggregate and the
+        # marker, then take their own lane locks. Only one may merge.
+        service.sra_mirror = None
+        claimed: set = set()
+
+        async def _claim(key, _ttl):
+            if key in claimed:
+                return False
+            claimed.add(key)
+            return True
+
+        service.cache.claim = AsyncMock(side_effect=_claim)
+        release = asyncio.Event()
+
+        async def _aggregate(_job_id):
+            await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        native = asyncio.create_task(service.get_kmindex_results("job1"))
+        await asyncio.sleep(0)
+        with pytest.raises(GalaxyJobAggregating):
+            await service.get_kmindex_results("job1", lane="partner")
+        release.set()
+        await native
+
+        service._aggregate_shards.assert_awaited_once()
 
     @pytest.mark.asyncio
     async def test_a_busy_partner_lane_answers_come_back_later(self, service):

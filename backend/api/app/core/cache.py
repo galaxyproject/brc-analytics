@@ -85,6 +85,19 @@ class CacheService:
             logger.error(f"Cache exists error for key {key}: {e}")
             return False
 
+    async def claim(self, key: str, ttl: int) -> bool:
+        """Set a marker only if it is absent (SET NX); True if this call set it.
+
+        Also True when Redis can't be reached: the callers are coordinating
+        work that would otherwise just be duplicated, so an outage should fall
+        back to that rather than refuse the work outright.
+        """
+        try:
+            return bool(await self.redis.set(key, "1", ex=ttl, nx=True))
+        except redis.RedisError as e:
+            logger.error(f"Cache claim error for key {key}: {e}")
+            return True
+
     async def get_ttl(self, key: str) -> int:
         """Get remaining TTL for a key (-1 if no TTL, -2 if key doesn't exist)"""
         try:
