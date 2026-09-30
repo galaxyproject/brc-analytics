@@ -157,8 +157,8 @@ class Settings:
             os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
         )
 
-        # Temporary partner API (logan-search.org, while their hosting winds
-        # down). Off unless enabled, and refuses to start enabled without keys
+        # Partner API, for an external service running Logan searches through
+        # us. Off unless enabled, and refuses to start enabled without keys
         # or a sunset date: the date is what makes it temporary.
         self.PARTNER_API_ENABLED: bool = os.getenv(
             "PARTNER_API_ENABLED", "false"

@@ -1,11 +1,10 @@
 # Logan partner API
 
-This is a temporary API that lets logan-search.org run Logan searches on
-BRC Analytics while its own hosting winds down. It runs the same pipeline as
-the Logan search on brc-analytics.org: `kmindex_query` on Galaxy, with the
+This API lets a partner service run Logan searches on BRC Analytics. It runs
+the same pipeline as the Logan search on brc-analytics.org: `kmindex_query` on Galaxy, with the
 per-index outputs merged, FP-corrected and joined to SRA run metadata.
 
-The API is **temporary**. Every response carries a `Sunset` header with the
+Access is **time-boxed**. Every response carries a `Sunset` header with the
 agreed end date. After that date every call returns `410 Gone`.
 
 Base URL: `https://brc-analytics.org/api/v1/partner/logan`

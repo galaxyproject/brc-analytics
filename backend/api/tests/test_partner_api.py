@@ -92,7 +92,9 @@ def partner_env(tmp_path, monkeypatch):
     (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
     monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
     monkeypatch.setenv("PARTNER_API_ENABLED", "true")
-    monkeypatch.setenv("PARTNER_API_KEYS", f"logan-search:k1:{hash_partner_key(KEY)}")
+    monkeypatch.setenv(
+        "PARTNER_API_KEYS", f"example-partner:k1:{hash_partner_key(KEY)}"
+    )
     monkeypatch.setenv("PARTNER_API_SUNSET", SUNSET.isoformat())
     monkeypatch.delenv("PARTNER_SUBMIT_PAUSED", raising=False)
     get_settings.cache_clear()
@@ -190,7 +192,7 @@ def test_a_submit_starts_a_job_and_records_it_as_partner_traffic(partner_env):
     assert body["export_url"].endswith(f"{BASE}/jobs/{JOB_ID}/export")
     galaxy.submit_kmindex_query.assert_awaited_once()
     kwargs = record.await_args.kwargs
-    assert (kwargs["source"], kwargs["partner_id"]) == ("partner", "logan-search")
+    assert (kwargs["source"], kwargs["partner_id"]) == ("partner", "example-partner")
 
 
 def test_a_paused_api_takes_no_new_searches(partner_env, monkeypatch):
@@ -375,14 +377,14 @@ def test_the_galaxy_service_ignores_any_session_and_uses_its_own_history(
     galaxy = asyncio.run(
         partner_module.get_partner_galaxy_service(
             cache=MagicMock(),
-            partner=Partner(key_id="k1", partner_id="logan-search"),
+            partner=Partner(key_id="k1", partner_id="example-partner"),
             sra_mirror=None,
         )
     )
 
     assert galaxy.credential.kind == "service"
     assert galaxy.credential.secret == "service-key"
-    assert galaxy.history_name == "BRC Logan Partner - logan-search"
+    assert galaxy.history_name == "BRC Logan Partner - example-partner"
     get_settings.cache_clear()
 
 

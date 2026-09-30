@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Mint a partner API key.
 
-    python -m scripts.generate_partner_key logan-search 2026-09
+    python -m scripts.generate_partner_key example-partner 2026-09
 
 Prints the plaintext key once -- hand it to the partner and don't keep it --
 and the PARTNER_API_KEYS entry to put in the vault, which holds only its hash.
@@ -19,7 +19,7 @@ from app.core.partner_keys import (
 def main() -> None:
     """Print a new key and its config entry."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("partner_id", help="stable partner name, e.g. logan-search")
+    parser.add_argument("partner_id", help="stable partner name, e.g. example-partner")
     parser.add_argument("key_id", help="name for this key, e.g. 2026-09")
     args = parser.parse_args()
 

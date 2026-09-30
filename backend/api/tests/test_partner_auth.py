@@ -24,14 +24,14 @@ from app.core.rate_limit import RateLimiter
 
 KEY = generate_partner_key()
 OTHER_KEY = generate_partner_key()
-ENTRY = f"logan-search:k1:{hash_partner_key(KEY)}"
+ENTRY = f"example-partner:k1:{hash_partner_key(KEY)}"
 
 
 class TestParsing:
     def test_entries_parse(self):
         [key] = parse_partner_keys(f" {ENTRY} ,")
 
-        assert (key.partner_id, key.key_id) == ("logan-search", "k1")
+        assert (key.partner_id, key.key_id) == ("example-partner", "k1")
 
     def test_empty_means_no_keys(self):
         assert parse_partner_keys("") == ()
@@ -39,7 +39,7 @@ class TestParsing:
     @pytest.mark.parametrize(
         "raw",
         [
-            "logan-search:" + "a" * 64,
+            "example-partner:" + "a" * 64,
             "Logan:k1:" + "a" * 64,
             "logan:k1:" + "a" * 63,
             "logan:k1:" + "g" * 64,
@@ -60,7 +60,7 @@ class TestMatching:
         keys = parse_partner_keys(ENTRY)
 
         assert match_partner_key(KEY, keys) == Partner(
-            key_id="k1", partner_id="logan-search"
+            key_id="k1", partner_id="example-partner"
         )
 
     @pytest.mark.parametrize("presented", [None, "", "not-a-key"])
@@ -69,10 +69,10 @@ class TestMatching:
 
     def test_a_rotated_key_still_resolves_to_the_same_partner(self):
         keys = parse_partner_keys(
-            f"{ENTRY},logan-search:k2:{hash_partner_key(OTHER_KEY)}"
+            f"{ENTRY},example-partner:k2:{hash_partner_key(OTHER_KEY)}"
         )
 
-        assert match_partner_key(OTHER_KEY, keys).partner_id == "logan-search"
+        assert match_partner_key(OTHER_KEY, keys).partner_id == "example-partner"
 
 
 class TestSunset:
@@ -161,8 +161,8 @@ class TestDependency:
 
         response = client.get("/who", headers={"X-API-Key": KEY})
 
-        assert response.json() == {"partner": "logan-search"}
-        assert general.check.await_args.kwargs["principal"] == "logan-search"
+        assert response.json() == {"partner": "example-partner"}
+        assert general.check.await_args.kwargs["principal"] == "example-partner"
 
     @pytest.mark.parametrize("headers", [{}, {"X-API-Key": "wrong"}])
     def test_no_key_or_a_bad_one_is_401(self, partner_app, headers):
@@ -185,7 +185,7 @@ class TestDependency:
         client.post("/submit", headers={"X-API-Key": KEY})
 
         general.check.assert_awaited_once()
-        assert submit.check.await_args.kwargs["principal"] == "logan-search"
+        assert submit.check.await_args.kwargs["principal"] == "example-partner"
 
 
 def test_partner_budgets_do_not_share_a_counter_with_anyone(monkeypatch):

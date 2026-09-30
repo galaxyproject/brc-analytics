@@ -98,13 +98,13 @@ async def test_a_partner_search_is_tagged_with_the_partner(session_factory):
     await kmindex_submissions.record_submission(
         credential=GalaxyCredential(kind="service", secret="k"),
         galaxy_job_id="job2",
-        partner_id="logan-search",
+        partner_id="example-partner",
         source="partner",
         submission=_submission(),
     )
 
     [row] = await _rows(session_factory)
-    assert (row.source, row.partner_id) == ("partner", "logan-search")
+    assert (row.source, row.partner_id) == ("partner", "example-partner")
 
 
 @pytest.mark.asyncio

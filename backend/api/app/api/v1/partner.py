@@ -1,4 +1,4 @@
-"""Temporary partner API: Logan searches run on behalf of logan-search.org.
+"""Partner API: Logan searches run on behalf of an external partner service.
 
 A thin, keyed layer over the same GalaxyService the site uses, so partner
 traffic has its own identity, budgets, Galaxy history and analytics tag, and
