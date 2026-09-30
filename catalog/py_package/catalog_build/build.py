@@ -1475,11 +1475,13 @@ def build_files(
         outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
     )
     source_list_df = load_and_transform_result.assemblies_source
-    source_organisms_df = load_and_transform_result.organisms_source.astype(
-        {"taxonomy_id": "string"}
-    )
+    source_organisms_df = load_and_transform_result.organisms_source.sort_values(
+        by="taxonomy_id"
+    ).astype({"taxonomy_id": "string"})
     # Outbreaks are optional (only some catalogs use them), so source_outbreaks_df is None when no path is given
     source_outbreaks_df = load_and_transform_result.outbreaks_source
+    if source_outbreaks_df is not None:
+        source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
@@ -1493,6 +1495,7 @@ def build_files(
                 ["categories", "parameters"]
             ].map(json.loads, na_action="ignore")
         )
+        .sort_values(by="trs_id")
         .to_dict(orient="records")
     )
     save_json_file(
