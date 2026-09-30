@@ -1315,6 +1315,7 @@ def save_build_metadata(path: str, meta: BuildMetadata):
 class LoadAndTransformResult:
     assemblies_source: pd.DataFrame
     organisms_source: pd.DataFrame
+    workflows_source: pd.DataFrame
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
@@ -1331,6 +1332,7 @@ def load_and_transform(
     taxonomic_levels: list[str],
     assemblies_path: Path,
     organisms_path: Path,
+    workflows_path: Path,
     taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -1346,6 +1348,7 @@ def load_and_transform(
       taxonomic_levels: Taxonomic levels to build columns for during transformation
       assemblies_path: Path to source assemblies YAML
       organisms_path: Path to source organisms YAML
+      workflows_path: Path to source workflows YAML
       taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
@@ -1369,6 +1372,7 @@ def load_and_transform(
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_path=assemblies_path,
         organisms_path=organisms_path,
+        workflows_path=workflows_path,
         taxa_path=taxa_path,
         outbreaks_path=outbreaks_path,
     )
@@ -1386,6 +1390,7 @@ def load_and_transform(
         return LoadAndTransformResult(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
             organisms_source=con.query("select * from catalog_input_organisms").df(),
+            workflows_source=con.query("select * from catalog_input_workflows").df(),
             outbreaks_source=(
                 None
                 if outbreaks_path is None
@@ -1409,6 +1414,8 @@ def build_files(
     *,
     temp_folder_path,
     dlt_pipeline_prefix,
+    workflows_path,
+    workflows_output_path,
     build_meta_output_path,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
@@ -1459,6 +1466,7 @@ def build_files(
         taxonomic_levels=taxonomic_levels_for_tree,
         assemblies_path=Path(assemblies_path),
         organisms_path=Path(organisms_path),
+        workflows_path=Path(workflows_path),
         taxa_path=None if taxa_path is None else Path(taxa_path),
         outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
     )
@@ -1472,6 +1480,11 @@ def build_files(
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
+
+    # Output normalized input workflows
+    load_and_transform_result.workflows_source.to_json(
+        workflows_output_path, orient="records"
+    )
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
         load_and_transform_result.ncbi_genomes

@@ -42,6 +42,15 @@ def read_outbreaks(outbreaks_path: Path):
     return read_entity_list_from_yaml(outbreaks_path, "outbreaks")
 
 
+def read_workflows(workflows_path: Path):
+    return read_entity_list_from_yaml(workflows_path, "workflows")
+
+
+@dlt.resource(name="workflows", write_disposition="replace", columns=schema.Workflow)
+def workflows_source(workflows_path: Path):
+    yield read_workflows(workflows_path)
+
+
 @dlt.resource(name="outbreaks", write_disposition="replace", columns=schema.Outbreak)
 def outbreaks_source(outbreaks_path: Path):
     yield read_outbreaks(outbreaks_path)
@@ -67,12 +76,14 @@ def catalog_source(
     *,
     assemblies_path: Path,
     organisms_path: Path,
+    workflows_path: Path,
     curated_taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
     resources = [
         assemblies_source(assemblies_path),
         organisms_source(organisms_path),
+        workflows_source(workflows_path),
     ]
     # Only load curated taxa for catalogs that curate any; when absent, the shared
     # dbt models skip the curated_taxa source entirely (see has_curated_taxa var)
@@ -91,6 +102,7 @@ def load_catalog_source_data(
     dlt_pipeline_prefix: str,
     assemblies_path: Path,
     organisms_path: Path,
+    workflows_path: Path,
     curated_taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -103,6 +115,7 @@ def load_catalog_source_data(
       dlt_pipeline_prefix: Catalog-specific prefix applied to the dlt pipeline name
       assemblies_path: Path of source assemblies YAML
       organisms_path: Path of source organisms YAML
+      workflows_path: Path of source workflows YAML
       curated_taxa_path: Path of source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path of source outbreaks YAML, or None for catalogs without outbreaks
     """
@@ -115,6 +128,7 @@ def load_catalog_source_data(
         catalog_source(
             assemblies_path=assemblies_path,
             organisms_path=organisms_path,
+            workflows_path=workflows_path,
             curated_taxa_path=curated_taxa_path,
             outbreaks_path=outbreaks_path,
         )
