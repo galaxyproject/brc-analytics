@@ -16,6 +16,13 @@ models:
               name: curated_taxa_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_curated_taxa_in_lineages
+              arguments:
+                to: ref('taxonomy_lineages')
+                field: tax_id
+              config:
+                enabled: "{{ var('has_curated_taxa', false) }}"
   - name: catalog_input_organisms
     columns:
       - name: taxonomy_id
@@ -24,6 +31,11 @@ models:
               name: organism_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_organism_taxa_in_organism_taxonomy
+              arguments:
+                to: ref('taxonomy_organisms')
+                field: taxonomy_id
   - name: catalog_input_outbreaks
     columns:
       - name: taxonomy_id
@@ -32,6 +44,13 @@ models:
               name: outbreak_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_outbreak_taxa_in_outbreak_taxonomy
+              arguments:
+                to: ref('taxonomy_outbreaks')
+                field: taxonomy_id
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
   - name: catalog_input_outbreak_descendants
     columns:
       - name: taxonomy_id

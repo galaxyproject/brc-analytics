@@ -87,11 +87,6 @@ sources:
                   name: catalog_organisms_unique_tax_ids
               - not_null:
                   name: catalog_organisms_have_tax_ids
-              - relationships:
-                  name: catalog_organism_taxa_in_organism_taxonomy
-                  arguments:
-                    to: ref('taxonomy_organisms')
-                    field: taxonomy_id
       - name: workflows
         columns:
           - name: trs_id
@@ -113,13 +108,6 @@ sources:
                   name: catalog_curated_taxa_unique_ids
                   config:
                     enabled: "{{ var('has_curated_taxa', false) }}"
-              - relationships:
-                  name: catalog_curated_taxa_in_lineages
-                  arguments:
-                    to: ref('taxonomy_lineages')
-                    field: tax_id
-                  config:
-                    enabled: "{{ var('has_curated_taxa', false) }}"
       - name: outbreaks
         # Only tested when the catalog has outbreaks
         columns:
@@ -131,12 +119,5 @@ sources:
                     enabled: "{{ var('has_outbreaks', false) }}"
               - not_null:
                   name: catalog_outbreaks_have_tax_ids
-                  config:
-                    enabled: "{{ var('has_outbreaks', false) }}"
-              - relationships:
-                  name: catalog_outbreak_taxa_in_outbreak_taxonomy
-                  arguments:
-                    to: ref('taxonomy_outbreaks')
-                    field: taxonomy_id
                   config:
                     enabled: "{{ var('has_outbreaks', false) }}"
