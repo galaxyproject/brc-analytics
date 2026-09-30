@@ -263,6 +263,13 @@ _AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
     "partner": asyncio.Lock(),
 }
 
+# How long a partner job's aggregate and sort orders may sit in Redis. A partner
+# pulls a job's results once and takes the export, which lives on disk rather
+# than in Redis, so a day of cache buys nothing. At several MB per all-index
+# aggregate and 20 submits an hour, a day's worth would crowd BRC users' cached
+# results out of a 256-768 MB Redis.
+PARTNER_AGGREGATE_TTL = CacheTTL.ONE_HOUR
+
 # Finding or creating the history jobs land in is a read-then-write against
 # Galaxy, and the router builds a GalaxyService per request, so the per-instance
 # memo cannot stop two first submissions each finding nothing and each creating
@@ -309,6 +316,10 @@ def _output_collection_id(job_data: dict) -> Optional[str]:
         if isinstance(c, dict) and c.get("src") == "hdca"
     ]
     return collections[0] if len(collections) == 1 else None
+
+
+def _capped(ttl: int, cap: Optional[int]) -> int:
+    return ttl if cap is None else min(ttl, cap)
 
 
 def _tie_break(accession: str) -> str:
@@ -785,6 +796,7 @@ class GalaxyService:
 
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
+        ttl_cap = PARTNER_AGGREGATE_TTL if lane == "partner" else None
 
         if aggregate is None:
             # Someone else is already merging this job. Say so rather than
@@ -822,12 +834,14 @@ class GalaxyService:
                             f"Results for job {job_id} are still being merged"
                         )
                     try:
-                        aggregate = await self._aggregate_shards(job_id)
+                        aggregate = await self._aggregate_shards(
+                            job_id, ttl_cap=ttl_cap
+                        )
                     finally:
                         await self.cache.delete(marker_key)
 
         ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort)
+            aggregate, job_id, sort, order or _default_order(sort), ttl_cap=ttl_cap
         )
         # Single exit, so a cache hit can't skip annotation -- an earlier
         # version returned straight from the pre-lock hit and silently served
@@ -906,7 +920,12 @@ class GalaxyService:
         return self.cache.make_key(KMINDEX_AGGREGATING_PREFIX, {"job_id": job_id})
 
     async def _ordering_for(
-        self, aggregate: dict, job_id: str, sort: KmindexSort, order: KmindexOrder
+        self,
+        aggregate: dict,
+        job_id: str,
+        sort: KmindexSort,
+        order: KmindexOrder,
+        ttl_cap: Optional[int] = None,
     ) -> Tuple[Optional[List[int]], KmindexSort, KmindexOrder]:
         """
         How to walk the listed hits for a sort, and which sort that turned out
@@ -983,7 +1002,7 @@ class GalaxyService:
             # still come back.
             logger.warning(f"kmindex job {job_id}: could not order by {sort}: {e}")
             return None, "score", "desc"
-        await self.cache.set(key, ordering, CacheTTL.ONE_DAY)
+        await self.cache.set(key, ordering, _capped(CacheTTL.ONE_DAY, ttl_cap))
         return ordering, sort, order
 
     def _mirror_can(self, capability: str) -> bool:
@@ -1274,8 +1293,13 @@ class GalaxyService:
 
         return shards
 
-    async def _aggregate_shards(self, job_id: str) -> dict:
-        """Download and merge every shard for a completed kmindex job."""
+    async def _aggregate_shards(
+        self, job_id: str, ttl_cap: Optional[int] = None
+    ) -> dict:
+        """Download and merge every shard for a completed kmindex job.
+
+        @param ttl_cap: an upper bound on how long the aggregate is cached.
+        """
         cache_key = self._agg_cache_key(job_id)
 
         status = await self.get_job_status(job_id)
@@ -1452,7 +1476,7 @@ class GalaxyService:
                 f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
                 f"failed to download; returning a partial result cached for {ttl}s"
             )
-            await self.cache.set(cache_key, aggregate, ttl)
+            await self.cache.set(cache_key, aggregate, _capped(ttl, ttl_cap))
         elif submitted_indexes is None:
             logger.error(
                 f"kmindex job {job_id}: submitted index list unreadable; "
@@ -1507,7 +1531,7 @@ class GalaxyService:
                     f"returning the hit list without, cached for {ttl}s so the "
                     "work is retried rather than repeated on every request"
                 )
-            await self.cache.set(cache_key, aggregate, ttl)
+            await self.cache.set(cache_key, aggregate, _capped(ttl, ttl_cap))
 
         return aggregate
 

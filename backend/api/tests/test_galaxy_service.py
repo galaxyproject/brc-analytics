@@ -2895,7 +2895,7 @@ class TestAggregatingMarker:
         marker_key = self._keyed(service)
         during = {}
 
-        async def _aggregate(_job_id):
+        async def _aggregate(_job_id, **_):
             during["claimed"] = list(service.cache.claim.call_args_list)
             during["deleted"] = list(service.cache.delete.call_args_list)
             return _listing(3)
@@ -2979,7 +2979,7 @@ class TestAggregationLanes:
         )
         release = asyncio.Event()
 
-        async def _aggregate(job_id):
+        async def _aggregate(job_id, **_):
             if job_id == "partner_job":
                 await release.wait()
             return _listing(1)
@@ -3016,7 +3016,7 @@ class TestAggregationLanes:
         service.cache.claim = AsyncMock(side_effect=_claim)
         release = asyncio.Event()
 
-        async def _aggregate(_job_id):
+        async def _aggregate(_job_id, **_):
             await release.wait()
             return _listing(1)
 
@@ -3059,6 +3059,39 @@ class TestAggregationLanes:
         lock.release()
 
         assert (await reader).total_hits == 1
+
+
+class TestPartnerAggregateTTL:
+    """
+    A partner job's aggregate is cached for an hour, not a day.
+
+    A partner reads a job's results once and takes the export off disk, and an
+    all-index aggregate is several MB. A day of them at the partner's submit
+    budget would crowd BRC users' cached results out of Redis.
+    """
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "lane, cap",
+        [("native", None), ("partner", galaxy_service.PARTNER_AGGREGATE_TTL)],
+    )
+    async def test_each_lane_passes_its_cap_to_the_merge(self, service, lane, cap):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock(return_value=_listing(1))
+
+        await service.get_kmindex_results("job1", lane=lane)
+
+        assert service._aggregate_shards.await_args.kwargs["ttl_cap"] == cap
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("cap, ttl", [(None, CacheTTL.ONE_DAY), (3600, 3600)])
+    async def test_the_merge_caches_for_at_most_the_cap(self, service, cap, ttl):
+        service.sra_mirror = None
+        TestCohortOverTheFullHitSet._wire(TestCohortOverTheFullHitSet(), service)
+
+        await service._aggregate_shards("job1", ttl_cap=cap)
+
+        assert service.cache.set.await_args.args[2] == ttl
 
 
 class TestResultsEndpoint:
