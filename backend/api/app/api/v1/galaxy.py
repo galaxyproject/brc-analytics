@@ -360,6 +360,19 @@ async def export_kmindex_results(
     @param format: parquet or tsv.
     @returns: the export as an attachment, named for the job and its row count.
     """
+    return await serve_kmindex_export(job_id, format)
+
+
+async def serve_kmindex_export(job_id: str, format: str) -> Response:
+    """
+    The export as an attachment, or a 404 if there is no current one.
+
+    Shared with the partner API, which serves the same files.
+
+    @param job_id: the completed kmindex job.
+    @param format: parquet or tsv.
+    @returns: the file response.
+    """
     path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
     if path is None or not path.is_file():
         raise HTTPException(

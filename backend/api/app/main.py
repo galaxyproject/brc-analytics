@@ -16,6 +16,7 @@ from app.api.v1 import (
     galaxy,
     health,
     links,
+    partner,
     saved_analyses,
     user,
     version,
@@ -175,6 +176,11 @@ def create_app() -> FastAPI:
         tags=["saved_analyses"],
     )
     app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
+    if settings.PARTNER_API_ENABLED:
+        app.include_router(
+            partner.router, prefix=partner.PARTNER_PREFIX, tags=["partner"]
+        )
+        app.middleware("http")(partner.add_sunset_header)
     app.include_router(
         workflow_runs.router,
         prefix="/api/v1/workflow_runs",
