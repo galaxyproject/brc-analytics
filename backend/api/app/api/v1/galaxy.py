@@ -40,6 +40,7 @@ from app.services.galaxy_service import (
     GalaxyService,
     is_unlinked_account_error,
 )
+from app.services.kmindex_submissions import record_submission
 from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
@@ -246,6 +247,13 @@ async def submit_kmindex_query(
                 logger.exception(
                     "Failed to record ownership for job %s", response.job_id
                 )
+
+        await record_submission(
+            credential=credential,
+            galaxy_job_id=response.job_id,
+            source="native",
+            submission=submission,
+        )
 
         return response
 

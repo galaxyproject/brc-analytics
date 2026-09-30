@@ -75,6 +75,13 @@ class GalaxyJobSubmission(BaseModel):
 MAX_QUERY_BASES = 2500
 
 
+def query_bases(sequence: str) -> int:
+    """Bases in a FASTA query, not counting header lines or whitespace."""
+    return sum(
+        len(line.strip()) for line in sequence.splitlines() if not line.startswith(">")
+    )
+
+
 class KmindexQuerySubmission(BaseModel):
     """Request model for a Logan/kmindex sequence search."""
 
@@ -153,9 +160,7 @@ class KmindexQuerySubmission(BaseModel):
         without this the limit is advisory and a direct API request can hand
         an arbitrarily long query to a 96-core node.
         """
-        bases = sum(
-            len(line.strip()) for line in value.splitlines() if not line.startswith(">")
-        )
+        bases = query_bases(value)
         if bases > MAX_QUERY_BASES:
             raise ValueError(f"Query is {bases} bases; the limit is {MAX_QUERY_BASES}")
         return value
