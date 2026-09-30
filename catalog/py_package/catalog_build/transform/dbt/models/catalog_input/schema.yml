@@ -1,0 +1,50 @@
+version: 2
+
+# Each data test is given an explicit, short `name`. dbt derives the test's
+# node name (reported back by dlt's dbt runner) and its stored-failures table
+# name from this; the default generated names are long enough that dbt
+# truncates and hashes them, which makes both the runner results and the
+# `store_failures` audit tables hard to read and correlate. Keep these unique
+# across the project and comfortably under 63 bytes (for compatibility with
+# Postgres).
+models:
+  - name: catalog_input_curated_taxa
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: curated_taxa_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+  - name: catalog_input_organisms
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: organism_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+  - name: catalog_input_outbreaks
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: outbreak_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+  - name: catalog_input_outbreak_descendants
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: outbreak_descendant_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+  - name: catalog_input_workflows
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: workflow_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
