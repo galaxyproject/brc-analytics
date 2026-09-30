@@ -6,21 +6,21 @@ import type {
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
-  Workflows as SourceWorkflows,
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
-import { readYamlFile } from "./utils";
+import { readJsonFile, readYamlFile } from "./utils";
 
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
-const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
+const SOURCE_PATH_WORKFLOWS =
+  "catalog/build/intermediate/normalized-workflows.json";
 
 export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
     SOURCE_PATH_WORKFLOW_CATEGORIES
   );
-  const sourceWorkflows = await readYamlFile<SourceWorkflows>(
+  const sourceWorkflowList = await readJsonFile<SourceWorkflow[]>(
     SOURCE_PATH_WORKFLOWS
   );
 
@@ -35,7 +35,7 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
       })
     );
 
-  for (const sourceWorkflow of sourceWorkflows.workflows) {
+  for (const sourceWorkflow of sourceWorkflowList) {
     if (sourceWorkflow.active) {
       buildWorkflow(workflowCategories, sourceWorkflow);
     }

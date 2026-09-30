@@ -114,6 +114,11 @@ export async function readMdxFile(
   return await serialize(await fsp.readFile(filePath));
 }
 
+export async function readJsonFile<T>(filePath: string): Promise<T> {
+  const content = await fsp.readFile(filePath, "utf8");
+  return JSON.parse(content);
+}
+
 export async function saveJson(filePath: string, data: unknown): Promise<void> {
   await fsp.writeFile(filePath, JSON.stringify(data, undefined, 2) + "\n");
 }
