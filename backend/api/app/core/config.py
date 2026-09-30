@@ -4,6 +4,8 @@ from typing import List
 
 from dotenv import load_dotenv
 
+from app.core.partner_keys import parse_partner_keys, parse_sunset
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -154,6 +156,33 @@ class Settings:
         self.SUBMIT_RATE_LIMIT_USER_REQUESTS: int = int(
             os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
         )
+
+        # Temporary partner API (logan-search.org, while their hosting winds
+        # down). Off unless enabled, and refuses to start enabled without keys
+        # or a sunset date: the date is what makes it temporary.
+        self.PARTNER_API_ENABLED: bool = os.getenv(
+            "PARTNER_API_ENABLED", "false"
+        ).lower() in ("1", "true", "yes")
+        self.PARTNER_API_KEYS = parse_partner_keys(os.getenv("PARTNER_API_KEYS", ""))
+        self.PARTNER_API_SUNSET = parse_sunset(os.getenv("PARTNER_API_SUNSET", ""))
+        # Stops new submissions while status and results keep answering, so
+        # jobs already running can be collected.
+        self.PARTNER_SUBMIT_PAUSED: bool = os.getenv(
+            "PARTNER_SUBMIT_PAUSED", "false"
+        ).lower() in ("1", "true", "yes")
+        # Per partner. Submits share SUBMIT_RATE_LIMIT_WINDOW (an hour);
+        # everything else shares RATE_LIMIT_WINDOW (a minute), and is roomier
+        # than the per-IP default because partners poll from one server.
+        self.PARTNER_SUBMIT_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_SUBMIT_RATE_LIMIT_REQUESTS", "20")
+        )
+        self.PARTNER_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_RATE_LIMIT_REQUESTS", "300")
+        )
+        if self.PARTNER_API_ENABLED and not self.PARTNER_API_KEYS:
+            raise ValueError("PARTNER_API_ENABLED needs at least one PARTNER_API_KEYS")
+        if self.PARTNER_API_ENABLED and self.PARTNER_API_SUNSET is None:
+            raise ValueError("PARTNER_API_ENABLED needs a PARTNER_API_SUNSET date")
 
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
