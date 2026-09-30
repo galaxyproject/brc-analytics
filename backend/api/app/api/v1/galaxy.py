@@ -36,6 +36,7 @@ from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
+    GalaxyJobNotFound,
     GalaxyService,
     is_unlinked_account_error,
 )
@@ -318,6 +319,8 @@ async def get_kmindex_results(
         raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobFailed as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get kmindex results for {job_id}: {str(e)}")
         raise HTTPException(
@@ -419,6 +422,8 @@ async def get_job_status(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get job status for {job_id}: {str(e)}")
         raise HTTPException(

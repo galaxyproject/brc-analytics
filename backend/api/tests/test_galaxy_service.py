@@ -43,6 +43,7 @@ from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
+    GalaxyJobNotFound,
     GalaxyService,
     _default_order,
     _submitted_index_names,
@@ -167,12 +168,65 @@ class TestJobStatusStates:
         service.gi.jobs.show_job.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_a_paused_job_is_not_cached_because_it_can_be_resumed(self, service):
-        service.gi.jobs.show_job = MagicMock(return_value=self._job("paused"))
+    @pytest.mark.parametrize("state", ["paused", "queued", "running"])
+    async def test_an_unsettled_job_is_cached_only_briefly(self, service, state):
+        # Paused can be resumed and the others are still moving, so none of
+        # them earns the hour a settled state gets -- but every open search
+        # polls, and a few seconds of staleness is what keeps that off Galaxy.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
 
         await service.get_job_status("job1")
 
-        service.cache.set.assert_not_awaited()
+        service.cache.set.assert_awaited_once()
+        assert service.cache.set.await_args.args[2] == (
+            galaxy_service.LIVE_JOB_STATUS_TTL
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_briefly_cached_running_status_is_served_without_galaxy(
+        self, service
+    ):
+        service.cache.get = AsyncMock(
+            return_value={
+                "created_time": "t0",
+                "is_complete": False,
+                "is_successful": False,
+                "job_id": "job1",
+                "state": "running",
+                "updated_time": "t1",
+            }
+        )
+        service.gi.jobs.show_job = MagicMock()
+
+        status = await service.get_job_status("job1")
+
+        assert status.state == "running"
+        service.gi.jobs.show_job.assert_not_called()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("code", [400, 404])
+    async def test_an_id_galaxy_does_not_know_is_not_found(self, service, code):
+        from bioblend import ConnectionError as BioblendConnectionError
+
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=BioblendConnectionError("nope", status_code=code)
+        )
+
+        with pytest.raises(GalaxyJobNotFound):
+            await service.get_job_status("0123456789abcdef")
+
+    @pytest.mark.asyncio
+    async def test_a_galaxy_outage_is_not_mistaken_for_a_missing_job(self, service):
+        from bioblend import ConnectionError as BioblendConnectionError
+
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=BioblendConnectionError("down", status_code=502)
+        )
+
+        with pytest.raises(Exception) as excinfo:
+            await service.get_job_status("0123456789abcdef")
+
+        assert not isinstance(excinfo.value, GalaxyJobNotFound)
 
     @pytest.mark.asyncio
     async def test_only_a_successful_job_fetches_its_outputs(self, service):

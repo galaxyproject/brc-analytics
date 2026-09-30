@@ -72,6 +72,19 @@ class GalaxyJobAggregating(Exception):
     """The job finished, and its shards are being merged by another request."""
 
 
+class GalaxyJobNotFound(Exception):
+    """Galaxy has no job under this id (or could not decode it as one)."""
+
+
+# Galaxy answers 400 for an id it cannot decode and 404 for one that decodes to
+# nothing. Both mean the caller has the wrong id, not that Galaxy is broken.
+NOT_FOUND_STATUS_CODES = frozenset({400, 404})
+
+# A running job's status is cached only this long. Every open search polls, and
+# Galaxy already 429s us, but a completion should still show up promptly.
+LIVE_JOB_STATUS_TTL = 10
+
+
 # Galaxy answers 401 for two very different things: a token it decoded but
 # has no linked account for ("Cannot locate user by access token. The user
 # should log into Galaxy at least once with this OIDC provider.") and a token
@@ -1583,7 +1596,9 @@ class GalaxyService:
         cache_key = self.cache.make_key("galaxy:job_status", {"job_id": job_id})
         cached_status = await self.cache.get(cache_key)
 
-        if cached_status and cached_status.get("state") in SETTLED_JOB_STATES:
+        # A settled entry lives an hour; anything else was written with the
+        # short live TTL, so finding it at all means it is fresh enough.
+        if cached_status:
             return GalaxyJobStatus(**cached_status)
 
         try:
@@ -1627,9 +1642,18 @@ class GalaxyService:
                 status.output_collection_id = _output_collection_id(job_data)
             if state in SETTLED_JOB_STATES:
                 await self.cache.set(cache_key, status.model_dump(), CacheTTL.ONE_HOUR)
+            else:
+                await self.cache.set(
+                    cache_key, status.model_dump(), LIVE_JOB_STATUS_TTL
+                )
 
             return status
 
+        except BioblendConnectionError as e:
+            if getattr(e, "status_code", None) in NOT_FOUND_STATUS_CODES:
+                raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
+            logger.error(f"BioBLEND error getting job status: {e}")
+            raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
         except Exception as e:
             logger.error(f"BioBLEND error getting job status: {e}")
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
