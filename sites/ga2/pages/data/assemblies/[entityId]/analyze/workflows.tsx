@@ -3,6 +3,7 @@ import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { Side as GA2Side } from "@ga2/views/EntityView/assembly/components/Side/ga2/side";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { isAssemblyWorkflowAvailable } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
 import { ROUTES } from "@repo/shared/routes/constants";
@@ -30,12 +31,14 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
     <EntityDataGate>
       {trsId ? (
         <WorkflowGate
+          entityId={entityId}
           fallback={
             <WorkflowNotFound
               entityContext="assembly"
               href={replaceParameters(ROUTES.ANALYZE_WORKFLOWS, { entityId })}
             />
           }
+          isWorkflowAvailable={isAssemblyWorkflowAvailable}
           trsId={trsId}
         >
           <WorkflowInputsView entityId={entityId} trsId={trsId} />

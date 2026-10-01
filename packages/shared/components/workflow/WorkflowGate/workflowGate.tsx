@@ -1,30 +1,33 @@
 import { useWorkflowGates } from "@repo/shared/hooks/UseWorkflowGates/hook";
-import { findWorkflow } from "@repo/shared/services/workflows/entities";
-import { type JSX } from "react";
+import { type JSX, useMemo } from "react";
 import type { Props } from "./types";
 
 /**
- * Gate content on the TRS ID naming a workflow the user may see: one that
- * exists in the catalog and is not held back by the demo feature flag.
- * Only the workflow's own gates apply — a TRS ID doesn't name a category, so
- * a workflow held back by its category's gate is not caught here. Renders
- * `children` for a workflow that passes and `fallback` otherwise, letting the
- * page decide how a stale, unknown or gated workflow URL is surfaced. Must be
- * rendered below EntityDataGate, which guarantees the workflows cache is loaded
- * before the lookup runs.
+ * Gate content on the TRS ID naming a workflow the user may open here: one the
+ * entity's own workflow list offers, so the configure page and the listing
+ * agree on scope, entity fit and feature-flag gating. Renders `children` for a
+ * workflow that passes and `fallback` otherwise, letting the page decide how a
+ * stale, unknown, incompatible or gated workflow URL is surfaced. Rendered
+ * below EntityDataGate, which loads the workflows and entities the check reads.
  * @param props - Component props.
  * @param props.children - Content to render when the workflow is available.
- * @param props.fallback - Content to render for an unknown or gated TRS ID.
+ * @param props.entityId - ID of the entity the page configures a workflow for.
+ * @param props.fallback - Content to render for an unavailable TRS ID.
+ * @param props.isWorkflowAvailable - The page's availability check.
  * @param props.trsId - Workflow TRS ID.
  * @returns Children when the workflow is available, fallback otherwise.
  */
 export function WorkflowGate({
   children,
+  entityId,
   fallback,
+  isWorkflowAvailable,
   trsId,
 }: Props): JSX.Element {
-  const { isWorkflowAllowed } = useWorkflowGates();
-  const isAvailable =
-    Boolean(findWorkflow(trsId)) && isWorkflowAllowed({ trsId });
+  const workflowGates = useWorkflowGates();
+  const isAvailable = useMemo(
+    () => isWorkflowAvailable(trsId, entityId, workflowGates),
+    [entityId, isWorkflowAvailable, trsId, workflowGates]
+  );
   return <>{isAvailable ? children : fallback}</>;
 }

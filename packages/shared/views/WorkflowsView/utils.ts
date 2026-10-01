@@ -7,9 +7,15 @@ import type {
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
+import {
+  DIFFERENTIAL_EXPRESSION_ANALYSIS,
+  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+} from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
-import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
+import {
+  LMLS_WORKFLOW_CATEGORY,
+  LMLS_WORKFLOWS,
+} from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
@@ -57,9 +63,10 @@ function getTaxonomicLevelRealm(
 /**
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
- * Differential Expression Analysis is always included as an interim measure.
- * Sequence Analysis workflows (Logan Search and Lexicmap) are appended rather
- * than sourced from the catalog, and gate through the same rules as the rest.
+ * Differential Expression Analysis is included as an interim measure, and
+ * Sequence Analysis workflows (Logan Search and Lexicmap) are appended; neither
+ * is sourced from the catalog, and both gate through the same rules as the
+ * rest, as members of the category they are listed under.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
@@ -102,19 +109,27 @@ export function getWorkflows(
     }
   }
 
-  // Add Differential Expression Analysis workflow (interim measure).
-  workflows.push({
-    ...DIFFERENTIAL_EXPRESSION_ANALYSIS,
-    assembly: mapAssembly(undefined),
-    category: "Transcriptomics",
-    scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope),
-    taxonomyId: TAXON_ANY,
-  } as WorkflowEntity);
+  // Add Differential Expression Analysis workflow (interim measure), gated as
+  // a member of the category it is listed under.
+  for (const workflow of workflowGates.filterWorkflows(
+    DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+    [DIFFERENTIAL_EXPRESSION_ANALYSIS]
+  )) {
+    workflows.push({
+      ...workflow,
+      assembly: mapAssembly(undefined),
+      category: "Transcriptomics",
+      scope: String(workflow.scope),
+      taxonomyId: TAXON_ANY,
+    } as WorkflowEntity);
+  }
 
   // Sequence Analysis workflows aren't in the catalog, so they're appended
   // here — through the same gate as every catalog workflow above.
-  for (const workflow of LMLS_WORKFLOWS) {
-    if (!workflowGates.isWorkflowAllowed(workflow)) continue;
+  for (const workflow of workflowGates.filterWorkflows(
+    LMLS_WORKFLOW_CATEGORY,
+    LMLS_WORKFLOWS
+  )) {
     workflows.push({
       ...workflow,
       assembly: mapAssembly(undefined),
