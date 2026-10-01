@@ -114,7 +114,13 @@ export function getWorkflows(
   // Sequence Analysis workflows aren't in the catalog, so they're appended
   // here — through the same gate as every catalog workflow above.
   for (const workflow of LMLS_WORKFLOWS) {
-    if (!workflowGates.isWorkflowAllowed(workflow)) continue;
+    if (
+      !workflowGates.isWorkflowAllowed({
+        categoryIds: [],
+        trsId: workflow.trsId,
+      })
+    )
+      continue;
     workflows.push({
       ...workflow,
       assembly: mapAssembly(undefined),
