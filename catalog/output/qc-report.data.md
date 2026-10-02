@@ -282,7 +282,6 @@ None
 - 126728: Bonamia ostreae
 - 138297: Plasmodium vinckei lentum
 - 138298: Plasmodium vinckei petteri
-- 178876: Cryptococcus neoformans
 - 180454: Anopheles gambiae str. PEST
 - 185431: Trypanosoma brucei brucei TREU927
 - 194440: Primate T-lymphotropic virus 1
@@ -321,7 +320,6 @@ None
 - 508771: Toxoplasma gondii ME49
 - 544711: Histoplasma capsulatum var. duboisii H88
 - 544712: Histoplasma capsulatum H143
-- 572307: Neospora caninum
 - 578460: Vairimorpha ceranae BRL01
 - 598745: Giardia duodenalis ATCC 50581
 - 658858: Giardia lamblia P15
@@ -561,6 +559,15 @@ Got 2 results, configured to warn if != 0
 | 3703201 |
 | 3703354 |
 
+### `catalog_organisms_unique_tax_ids` — status `warn`, 2 failing rows
+
+Got 2 results, configured to warn if != 0
+
+| unique_field | n_records |
+| --- | --- |
+| 5207 | 2 |
+| 29176 | 2 |
+
 ### `catalog_taxa_in_taxonomy_lineages` — status `warn`, 2 failing rows
 
 Got 2 results, configured to warn if != 0
@@ -569,3 +576,12 @@ Got 2 results, configured to warn if != 0
 | --- |
 | 3703201 |
 | 3703354 |
+
+### `organism_tax_ids_are_latest` — status `warn`, 2 failing rows
+
+Got 2 results, configured to warn if != 0
+
+| taxonomy_id | source_taxonomy_id |
+| --- | --- |
+| 5207 | 178876 |
+| 29176 | 572307 |

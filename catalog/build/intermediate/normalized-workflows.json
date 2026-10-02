@@ -1,0 +1,3576 @@
+[
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/amr_gene_detection/main/versions/v1.1.7",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "AMR Gene Detection",
+    "workflow_description": "Antimicrobial resistance gene detection from assembled bacterial genomes",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 2,
+    "parameters": [
+      {
+        "key": "Input sequence fasta",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Taxonomy group point mutation",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "AMR genes detection database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Virulence genes detection database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "StarAMR database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Species for point mutation analysis using PointFinder",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "amr_gene_detection-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/annotation-braker3/main/versions/v0.1",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "Genome annotation with Braker3",
+    "workflow_description": "This workflow performs genome annotation using Braker3 and evaluates the quality of the annotation with BUSCO and genome annotation statistics.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 2759,
+    "parameters": [
+      {
+        "key": "BUSCO database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Include BUSCO",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "BUSCO lineage",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Soft masked Genome sequence",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      },
+      {
+        "key": "Alignments from RNA-seq",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "bam"
+        }
+      },
+      {
+        "key": "Protein sequences",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      },
+      {
+        "key": "Fungus genome",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "annotation-braker3-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/annotation-maker/main/versions/v0.1",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "Genome annotation with Maker",
+    "workflow_description": "This workflow allows for genome annotation using Maker and evaluates the quality of the annotation.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 2759,
+    "parameters": [
+      {
+        "key": "BUSCO lineage",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Genome sequence",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Genome assembly",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      },
+      {
+        "key": "Protein sequences",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Augustus training",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "SNAP training",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "annotation-maker-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4",
+    "categories": [
+      "ASSEMBLY"
+    ],
+    "workflow_name": "Genome assembly with Flye",
+    "workflow_description": "Assemble long reads with Flye, then view assembly statistics and assembly graph",
+    "ploidy": "ANY",
+    "scope": "ORGANISM",
+    "assembly_count_min": 0,
+    "assembly_count_max": 0,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Input sequence reads",
+        "variable": "SANGER_READ_RUN_SINGLE_FILE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": null,
+          "library_layout": "SINGLE",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "File"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "assembly-with-flye-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/atacseq/main/versions/v2.1",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "ATAC-seq Analysis: Chromatin Accessibility Profiling",
+    "workflow_description": "Complete ATAC-seq analysis pipeline for paired-end reads. Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment (Bowtie2 end-to-end), and filtering (removes MT reads, discordant pairs, low mapping quality below 30, PCR duplicates). Generates 5' cut site pileups (\u00b1100bp), performs peak calling, and quantifies reads in 1kb summit-centered regions. Produces two normalized coverage tracks (per million mapped reads and per million reads in peaks) and fragment length distribution plots for quality assessment.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Reference Genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "ATAC-seq"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "Effective genome size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Bin size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Percentage of bad quality bases per read",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "atacseq-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/average-bigwig-between-replicates/main/versions/v0.2",
+    "categories": [
+      "REGULATION",
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "BigWig Replicates Averaging Workflow",
+    "workflow_description": "Calculates average signal values across replicate BigWig files to generate a single consolidated track. Requires input file identifiers formatted as \"sample_name_replicateID\". The tool automatically groups files by sample name, computes the mean signal at each position, and outputs consolidated BigWig files named after the common sample prefix (without the replicate ID suffix).",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Bigwig to average",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "bin_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "average-bigwig-between-replicates-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/bacterial-genome-assembly/main/versions/v2.0.1",
+    "categories": [
+      "ASSEMBLY"
+    ],
+    "workflow_name": "Bacterial Genome Assembly using Shovill",
+    "workflow_description": "Assembly of bacterial paired-end short read data",
+    "ploidy": "ANY",
+    "scope": "ORGANISM",
+    "assembly_count_min": 0,
+    "assembly_count_max": 0,
+    "taxonomy_id": 2,
+    "parameters": [
+      {
+        "key": "Input adapter trimmed sequence reads (forward)",
+        "variable": "SANGER_READ_RUN_FORWARD_FILE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": null,
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "fastq",
+            "fastq.gz",
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "Input adapter trimmed sequence reads (reverse)",
+        "variable": "SANGER_READ_RUN_REVERSE_FILE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": null,
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "fastq",
+            "fastq.gz",
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "bacterial-genome-assembly-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/bacterial_genome_annotation/main/versions/v1.2.0",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "Bacterial Genome Annotation",
+    "workflow_description": "Annotation of an assembled bacterial genomes to detect genes, potential plasmids, integrons and Insertion sequence (IS) elements.",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 2,
+    "parameters": [
+      {
+        "key": "Input sequence fasta",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Plasmid detection database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Bacterial genome annotation database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "AMRFinderPlus database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Run Bakta",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "bacterial_genome_annotation-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/baredsc/baredSC-1d-logNorm/versions/v0.7",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Single-Cell Mixture Analysis: baredSC 1D Log-Normalized Models",
+    "workflow_description": "Applies baredSC algorithm to fit and combine one-dimensional Gaussian mixture models (from 1 to N components) on log-normalized single-cell gene expression data. Enables identification of subpopulations based on expression of genes of interest and provides statistical assessment of the optimal number of components in heterogeneous cell populations.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Tabular with raw expression values",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      },
+      {
+        "key": "Gene name",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Maximum value in logNorm",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Maximum number of Gaussians to study",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "baredsc-baredsc-1d-lognorm"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/baredsc/baredSC-2d-logNorm/versions/v0.7",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Single-Cell Mixture Analysis: baredSC 2D Log-Normalized Models",
+    "workflow_description": "Applies baredSC algorithm to fit and combine two-dimensional Gaussian mixture models (from 1 to N components) on log-normalized single-cell gene expression data. Enables identification of subpopulations based on co-expression patterns of two genes of interest and provides statistical assessment of the optimal number of components in heterogeneous cell populations.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Tabular with raw expression values",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      },
+      {
+        "key": "Gene name for x axis",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "maximum value in logNorm for x-axis",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Gene name for y axis",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "maximum value in logNorm for y-axis",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Maximum number of Gaussians to study",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "compute p-value",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "baredsc-baredsc-2d-lognorm"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/brew3r/main/versions/v0.3",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "BREW3R",
+    "workflow_description": "Extends 3' ends of gene annotations using BAM files (from STAR alignments) and a reference GTF. Specifically designed for 3'-biased sequencing techniques like 10X scRNA-seq or BRB-seq that primarily capture transcript 3' ends. The BREW3R tool enhances annotations by using evidence from RNA-seq data to improve 3' UTR definitions, which is particularly important for accurate quantification in single-cell and bulk RNA-seq experiments.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Input gtf",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "gtf"
+        }
+      },
+      {
+        "key": "BAM collection",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "bam"
+        }
+      },
+      {
+        "key": "strandedness",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "minimum coverage",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "minimum FPKM for merge",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "brew3r-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/chipseq-pe/main/versions/v1.2",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "ChIP-seq Analysis: Paired-End Read Processing",
+    "workflow_description": "Complete ChIP-seq analysis for paired-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and stringent quality filtering (MAPQ greater than 30, concordant pairs only). Peak calling with MACS2 optimized for paired-end reads identifies protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "ChIP-Seq"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "Effective genome size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Normalize profile",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Percentage of bad quality bases per read",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "chipseq-pe-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/chipseq-sr/main/versions/v1.2",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "ChIP-seq Analysis: Single-End Read Processing",
+    "workflow_description": "Complete ChIP-seq analysis for single-end sequencing data. Processes raw FASTQ files through adapter removal (fastp), alignment to reference genome (Bowtie2), and quality filtering (MAPQ greater than 30). Peak calling with MACS2 uses a fixed extension of 200bp to identify protein-DNA binding sites. Generates alignment files, coverage, peak calls, and quality metrics for downstream analysis.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "SR fastq input",
+        "variable": "SANGER_READ_RUN_SINGLE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "ChIP-Seq"
+          ],
+          "library_layout": "SINGLE",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Adapter sequence",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Effective genome size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Normalize profile",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Percentage of bad quality bases per read",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "chipseq-sr-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-atac-cutandrun/versions/v1.6",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Consensus Peak Calling for ATAC-seq and CUT and RUN Replicates",
+    "workflow_description": "Identifies high-confidence consensus peaks from ATAC-seq or CUT and RUN replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "n rmDup BAM",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "bam",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Minimum number of overlap",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "effective_genome_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "bin_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "consensus-peaks-consensus-peaks-atac-cutandrun"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-pe/versions/v1.6",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Consensus Peak Calling for ChIP-seq Paired-End Replicates",
+    "workflow_description": "Identifies high-confidence consensus peaks from ChIP-seq paired-end replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "n rmDup BAMPE",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "bam",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Minimum number of overlap",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "effective_genome_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "bin_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "consensus-peaks-consensus-peaks-chip-pe"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/consensus-peaks/consensus-peaks-chip-sr/versions/v1.6",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Consensus Peak Calling for ChIP-seq Single-End Replicates",
+    "workflow_description": "Identifies high-confidence consensus peaks from ChIP-seq single-end replicate experiments. The workflow calls peaks on individual replicates and identifies their intersection. To control for sequencing depth differences, it subsamples all replicates to the smallest library size, performs peak calling on the combined normalized data, and retains only peaks whose summits overlap with intersections from a user-defined minimum number of replicates.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "n rmDup BAMSR",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "bam",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Minimum number of overlap",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "effective_genome_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "bin_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "consensus-peaks-consensus-peaks-chip-sr"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/cutandrun/main/versions/v0.19",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping",
+    "workflow_description": "Complete CUT&amp;RUN/CUT&amp;TAG analysis workflow for paired-end sequencing data. Processes raw FASTQ files through adapter removal (cutadapt) and alignment (Bowtie2 with dovetail option enabled). Applies quality filtering (MAPQ \u2265 30, concordant pairs only), converts BAM to BED format, and performs peak calling using MACS2 with parameters optimized for the punctate signal profile characteristic of CUT&amp;RUN/CUT&amp;TAG experiments.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "reference_genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "OTHER"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": "CUT&RUN"
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "adapter_forward",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "adapter_reverse",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "effective_genome_size",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "normalize_profile",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "cutandrun-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-cellplex/versions/v0.6.6",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Single-Cell RNA-seq Preprocessing: 10X Genomics CellPlex Multiplexed Samples",
+    "workflow_description": "Comprehensive preprocessing for 10X Genomics CellPlex multiplexed single-cell RNA-seq data. Processes Cell Multiplexing Oligo (CMO) FASTQ files with CITE-seq-Count including required CellPlex-specific translation steps. Simultaneously processes gene expression FASTQ files with STARsolo and DropletUtils for alignment and cell filtering, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "gtf",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "fastq PE collection GEX",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": null,
+          "library_layout": "PAIRED",
+          "library_source": [
+            "TRANSCRIPTOMIC SINGLE CELL"
+          ],
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "cellranger_barcodes_3M-february-2018.txt",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Barcode Size is same size of the Read",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "fastq PE collection CMO",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "sample name and CMO sequence collection",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "csv",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Number of expected cells",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-cellplex"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/fastq-to-matrix-10x/scrna-seq-fastq-to-matrix-10x-v3/versions/v0.6.6",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Single-Cell RNA-seq Preprocessing: 10X Genomics v3 to Seurat and Scanpy Compatible Format",
+    "workflow_description": "Complete preprocessing pipeline for 10X Genomics v3 single-cell RNA-seq data. Aligns raw FASTQ files using STARsolo, performs cell calling and quality filtering with DropletUtils, and formats outputs for seamless import into Seurat/Scanpy (Read10X function).",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "gtf",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "fastq PE collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": null,
+          "library_layout": "PAIRED",
+          "library_source": [
+            "TRANSCRIPTOMIC SINGLE CELL"
+          ],
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "cellranger_barcodes_3M-february-2018.txt",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Barcode Size is same size of the Read",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "fastq-to-matrix-10x-scrna-seq-fastq-to-matrix-10x-v3"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/generic-non-segmented-viral-variant-calling/main/versions/v0.2",
+    "categories": [
+      "CONSENSUS_SEQUENCES",
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "Variant calling and consensus construction from paired end short read data of non-segmented viral genomes",
+    "workflow_description": "Variant calling and consensus sequence generation for batches of Illumina PE sequenced viruses with uncomplicated and stable genome structure (like e.g. Morbilliviruses).",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 11158,
+    "parameters": [
+      {
+        "key": "Paired collection of sequencing data",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS",
+            "AMPLICON"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "Reference annotation",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Fasta reference genome",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Primer scheme (optional)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Supporting read fraction to call variant",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Minimum quality score to consider base for variant calling",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "generic-non-segmented-viral-variant-calling-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/generic-variant-calling-wgs-pe/main/versions/v0.1.1",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "Generic variation analysis on WGS PE data",
+    "workflow_description": "Workflow for variant analysis against  a reference genome in GenBank format",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Paired Collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "GenBank genome",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "genbank"
+        }
+      },
+      {
+        "key": "Name for genome database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "generic-variant-calling-wgs-pe-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/goseq/main/versions/v0.1",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Gene Ontology and KEGG Pathway Enrichment Analysis",
+    "workflow_description": "Performs functional enrichment analysis of gene sets using GOseq, identifying over-represented Gene Ontology terms and KEGG pathways. This workflow accounts for gene length bias in RNA-seq data when calculating enrichment statistics. Input requires differentially expressed genes and gene lengths. Generates comprehensive tables and visualizations of enriched GO terms across all three ontologies (Biological Process, Molecular Function, Cellular Component) as well as KEGG pathway enrichment results.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Select genome to use",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Differential expression result",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      },
+      {
+        "key": "Select gene ID format",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "gene length",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      },
+      {
+        "key": "KEGG pathways",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "goseq-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main/versions/v0.1",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "Paired end variant calling in haploid system",
+    "workflow_description": "Workflow for variant analysis against a reference genome in GenBank format",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Paired Collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "Annotation GTF",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Genome fasta",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      }
+    ],
+    "active": true,
+    "iwc_id": "haploid-variant-calling-wgs-pe-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/chic-fastq-to-cool-hicup-cooler/versions/v0.4",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Capture Hi-C Processing: FASTQ to Balanced Cool Files",
+    "workflow_description": "End-to-end processing of Capture Hi-C paired-end sequencing data. Transforms raw FASTQ files into balanced contact matrices using HiCUP for processing Hi-C reads (adapter trimming, mapping, filtering for valid pairs) with additional filtering for MAPQ and captured regions. The workflow generates sorted tabix files via cooler and produces balanced cool files at user-specified resolution for downstream analysis and visualization.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 131567,
+    "parameters": [
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "Hi-C"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "genome name",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Restriction enzyme",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "No fill-in",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "minimum MAPQ",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Bin size in bp",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Interactions to consider to calculate weights in normalization step",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "capture region (chromosome)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "capture region (start)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "capture region (end)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "hic-hicup-cooler-chic-fastq-to-cool-hicup-cooler"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-cool-hicup-cooler/versions/v0.4",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Hi-C Processing: FASTQ to Balanced Cool Files",
+    "workflow_description": "Comprehensive Hi-C data processing workflow that converts paired-end FASTQ files to balanced contact matrices. Uses HiCUP for pre-processing (adapter trimming, mapping, filtering) with fragment midpoint coordinate assignment, filters reads by mapping quality, and generates sorted tabix files. The final output is a balanced cool file at user-specified resolution created with cooler, ready for multi-resolution contact matrix analysis.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 131567,
+    "parameters": [
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "Hi-C"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "genome name",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Restriction enzyme",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "No fill-in",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "minimum MAPQ",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Bin size in bp",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Interactions to consider to calculate weights in normalization step",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "region for matrix plotting",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "hic-hicup-cooler-hic-fastq-to-cool-hicup-cooler"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-fastq-to-pairs-hicup/versions/v0.4",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Hi-C Data Processing: FASTQ to Valid Interaction Pairs",
+    "workflow_description": "Processes Hi-C paired-end FASTQ files to generate validated interaction pairs using HiCUP. The workflow truncates reads at ligation junctions, maps to reference genome, assigns to restriction fragments, and filters out experimental artifacts (self-ligated, dangling ends, internal fragments, and size outliers). Removes duplicates and converts outputs to formats compatible with Juicebox/cooler using fragment midpoints as coordinates. Final filtering by mapping quality ensures high-confidence interaction data.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 131567,
+    "parameters": [
+      {
+        "key": "PE fastq input",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "Hi-C"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "genome name",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Restriction enzyme",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "No fill-in",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "minimum MAPQ",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "hic-hicup-cooler-hic-fastq-to-pairs-hicup"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hic-hicup-cooler/hic-juicermediumtabix-to-cool-cooler/versions/v0.4",
+    "categories": [
+      "REGULATION"
+    ],
+    "workflow_name": "Hi-C Format Conversion: Juicer Medium to Cooler Files",
+    "workflow_description": "Converts Hi-C interaction data from Juicer medium format (tabix files) to balanced cooler format. This streamlined workflow takes a collection of Juicer medium tabix files and a reference genome name as input and generates balanced cool files at user-specified resolution. Enables seamless transition between different Hi-C analysis ecosystems while maintaining data integrity.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Bin size in bp",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "genome name",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Juicer Medium Tabix with validPairs",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Interactions to consider to calculate weights in normalization step",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "hic-hicup-cooler-hic-juicermediumtabix-to-cool-cooler"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2",
+    "categories": [
+      "COMPARATIVE_GENOMICS"
+    ],
+    "workflow_name": "CAPHEINE: Combined HyPhy Core and Compare",
+    "workflow_description": "Runs CAPHEINE selection analyses with optional foreground/background branch labeling for branch comparisons.",
+    "ploidy": "ANY",
+    "scope": "ORGANISM",
+    "assembly_count_min": 2,
+    "assembly_count_max": null,
+    "taxonomy_id": 10239,
+    "parameters": [
+      {
+        "key": "reference Fasta",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      },
+      {
+        "key": "reference GTF",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "gtf"
+        }
+      },
+      {
+        "key": "unaligned sequences",
+        "variable": "FASTA_COLLECTION",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "fasta",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "foreground regexp (optional)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "foreground list (optional)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "txt",
+            "tabular"
+          ]
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "hyphy-capheine-core-and-compare"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hyphy/hyphy-compare/versions/v0.2",
+    "categories": [
+      "COMPARATIVE_GENOMICS"
+    ],
+    "workflow_name": "HyPhy: Compare",
+    "workflow_description": "This workflow runs HyPhy analyses Contrast-FEL and RELAX comparing foreground and reference branches. It consumes the per-gene codon-aware alignments and IQ-TREE phylogenies produced by the HyPhy preprocessing workflow.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Codon-aware alignment(s)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "fasta",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Phylogenetic tree(s)",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "nhx",
+            "newick"
+          ],
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Foreground Sequences List",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "txt",
+            "tabular"
+          ]
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "hyphy-hyphy-compare"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hyphy/hyphy-core/versions/v0.2",
+    "categories": [
+      "COMPARATIVE_GENOMICS"
+    ],
+    "workflow_name": "HyPhy: Core",
+    "workflow_description": "Runs HyPhy BUSTED, FEL, MEME and PRIME analyses on a collection of fasta.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "unaligned sequences",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "fasta",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "reference GTF",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "gtf"
+        }
+      },
+      {
+        "key": "reference Fasta",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "hyphy-hyphy-core"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/hyphy/hyphy-preprocessing/versions/v0.2",
+    "categories": [
+      "COMPARATIVE_GENOMICS"
+    ],
+    "workflow_name": "HyPhy: Preprocessing ",
+    "workflow_description": "Generates codon-aware alignments and phylogenetic trees compatible with downstream HyPhy analyses.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "unaligned sequences",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": "fasta",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "reference GTF",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "gtf"
+        }
+      },
+      {
+        "key": "reference Fasta",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "fasta"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "hyphy-hyphy-preprocessing"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/influenza-isolates-consensus-and-subtyping/main/versions/v0.3",
+    "categories": [
+      "CONSENSUS_SEQUENCES"
+    ],
+    "workflow_name": "Influenza A isolate subtyping and consensus sequence generation",
+    "workflow_description": "This workflow performs subtyping and consensus sequence generation for batches of Illumina PE sequenced Influenza A isolates.",
+    "ploidy": "ANY",
+    "scope": "ORGANISM",
+    "assembly_count_min": 0,
+    "assembly_count_max": 0,
+    "taxonomy_id": 2955291,
+    "parameters": [
+      {
+        "key": "References per segment collection",
+        "variable": null,
+        "collection_spec": {
+          "collection_type": "list",
+          "elements": [
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_1_pb2.fasta",
+              "db_key": null,
+              "md5": "0cc350480c0ef6d2583b4764adaabb5a"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_2_pb1.fasta",
+              "db_key": null,
+              "md5": "a8c9d6aa3c21ec24c42f480750dc4eca"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_3_pa.fasta",
+              "db_key": null,
+              "md5": "a5f373e913c0f84ea00cba35ea81c703"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_4_ha.fasta",
+              "db_key": null,
+              "md5": "9476d2c02a0429e6b0e5a70ea2a94ef2"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_5_np.fasta",
+              "db_key": null,
+              "md5": "3d0e28d72bba2c8b352d64052524473d"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_6_na.fasta",
+              "db_key": null,
+              "md5": "d8c21026a3defe01e020628e5b76227c"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_7_mp.fasta",
+              "db_key": null,
+              "md5": "13b0b6900807d5e557348b0e69dc79ad"
+            },
+            {
+              "ext": "fasta",
+              "src": "url",
+              "url": "https://zenodo.org/records/14628364/files/ref_8_ns.fasta",
+              "db_key": null,
+              "md5": "e98fc11ed2c825e54d8d88b295449f41"
+            }
+          ],
+          "name": "Influenza A Segment References"
+        },
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Sequenced paired-end data",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "influenza-isolates-consensus-and-subtyping-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/lncRNAs-annotation/main/versions/v0.1",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "lncRNAs annotation workflow",
+    "workflow_description": "This workflow runs the FEELnc tool to annotate long non-coding RNAs. Before annotating these long non-coding RNAs, StringTie will be used to assemble the RNA-seq alignments into potential trancriptions. The gffread tool provides a genome annotation file in GTF format.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 2759,
+    "parameters": [
+      {
+        "key": "strandedness",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Genome assembly",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Genome annotation",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Alignments from RNA-seq",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "bam"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "lncrnas-annotation-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/metagenomic-genes-catalogue/main/versions/v1.2.1",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "Metagenomic Genes Catalogue Analysis",
+    "workflow_description": "Metagenomic analysis, from raw reads to gene catalog. Uses Megahit to assemble contigs and Prodgial to predict CDSs on contigs to provide the gene catalog. Finally, functional, taxonomic, and antimicrobial resistance information is provided.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Metagenomics Trimmed reads",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastq",
+            "fastq.gz",
+            "fastqsanger",
+            "fastqsanger.gz"
+          ],
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "AMR genes detection database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Virulence genes detection database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "starAMR database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "mmseqs2 taxonomy DB",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "eggNOG database",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Full genes catalogue",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "metagenomic-genes-catalogue-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/ploidy-aware-genotype-calling/main/versions/v0.1.2",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "Paired end variant and ploidy-aware genotype calling",
+    "workflow_description": "This workflow performs variant and genotype calling on whole-genome paired-end sequencing data from organisms of any ploidy to produce annotated VCF and TSV files",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Paired Collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ],
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "Reference Genome fasta",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Set Ploidy for FreeBayes Variant Calling",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Annotation GTF",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "ploidy-aware-genotype-calling-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/polish-with-long-reads/main/versions/v0.1",
+    "categories": [
+      "ASSEMBLY"
+    ],
+    "workflow_name": "Assembly polishing with long reads",
+    "workflow_description": "Racon polish with long reads, x4",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Assembly to be polished",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "long reads",
+        "variable": "SANGER_READ_RUN_SINGLE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "minimap setting (for long reads) ",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "polish-with-long-reads-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/pox-virus-amplicon/main/versions/v0.4",
+    "categories": [
+      "CONSENSUS_SEQUENCES"
+    ],
+    "workflow_name": "Pox Virus Illumina Amplicon Workflow from half-genomes",
+    "workflow_description": "A workflow for the analysis of pox virus genomes sequenced as half-genomes (for ITR resolution) in a tiled-amplicon approach",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 3431483,
+    "parameters": [
+      {
+        "key": "Reference FASTA",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Primer Scheme",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "PE Reads Pool1",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "PE Reads Pool2",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Minimum quality score to call base",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Allele frequency to call SNV",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Allele frequency to call indel",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "pox-virus-amplicon-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/pseudobulk-worflow-decoupler-edger/main/versions/v0.1.1",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "Single-Cell Pseudobulk Differential Expression Analysis with edgeR",
+    "workflow_description": "Performs differential gene expression analysis on single-cell data using a pseudobulk approach. Aggregates cell-level counts from an annotated AnnData object by cell type or other metadata using Decoupler, then applies edgeR for robust statistical testing between conditions. Includes data preprocessing steps for compatibility with edgeR and generates interactive volcano plots to visualize significantly differentially expressed genes.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Source AnnData file",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "h5",
+            "h5ad"
+          ]
+        }
+      },
+      {
+        "key": "Pseudo-bulk: Fields to merge",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Group by column",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Sample key column",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Name Your Raw Counts Layer",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Factor fields",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Formula",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Gene symbol column",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "pseudobulk-worflow-decoupler-edger-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/repeatmasking/main/versions/v0.1",
+    "categories": [
+      "ANNOTATION"
+    ],
+    "workflow_name": "Repeat masking with RepeatModeler and RepeatMasker",
+    "workflow_description": "",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "input",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "repeatmasking-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/rnaseq-de/main/versions/v0.9",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "RNA-Seq Differential Expression Analysis with Visualization",
+    "workflow_description": "Identifies differentially expressed genes between exactly two experimental conditions from count tables. The workflow performs statistical testing, applies filters based on adjusted p-value and log2 fold change thresholds, and generates publication-quality visualizations including volcano plots, MA plots, and heatmaps. Takes two collections of count tables as input and produces filtered gene lists and interactive plots for interpreting expression differences. Optimal for simple two-condition experimental designs.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Counts from changed condition",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Counts from reference condition",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Count files have header",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Gene Annotaton",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Adjusted p-value threshold",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "log2 fold change threshold",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "rnaseq-de-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "RNA-Seq Analysis: Paired-End Read Processing and Quantification",
+    "workflow_description": "Complete RNA-Seq analysis for paired-end data: Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "GTF file of annotation",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Collection paired FASTQ files",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "RNA-Seq"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list:paired"
+        }
+      },
+      {
+        "key": "Forward adapter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Reverse adapter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Generate additional QC reports",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Strandedness",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Use featureCounts for generating count tables",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Compute Cufflinks FPKM",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "GTF with regions to exclude from FPKM normalization with Cufflinks",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Compute StringTie FPKM",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "rnaseq-pe-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/rnaseq-sr/main/versions/v1.4",
+    "categories": [
+      "TRANSCRIPTOMICS"
+    ],
+    "workflow_name": "RNA-Seq Analysis: Single-End Read Processing and Quantification",
+    "workflow_description": "Complete RNA-Seq analysis for single-end data:  Processes raw FASTQ data through adapter and bad quality removal (fastp), alignment with STAR using ENCODE parameters, gene quantification via multiple methods (STAR and featureCounts), and expression calculation (FPKM with Cufflinks/StringTie, normalized coverage with bedtools). Produces count tables, normalized expression values, and genomic coverage tracks. Supports stranded and unstranded libraries, generating both HTSeq-compatible counts and normalized measures for downstream analysis.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Reference genome",
+        "variable": "ASSEMBLY_ID",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "GTF file of annotation",
+        "variable": "GENE_MODEL_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Collection of FASTQ files",
+        "variable": "SANGER_READ_RUN_SINGLE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "RNA-Seq"
+          ],
+          "library_layout": "SINGLE",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "collection_type": "list"
+        }
+      },
+      {
+        "key": "Forward adapter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Generate additional QC reports",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Strandedness",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      },
+      {
+        "key": "Use featureCounts for generating count tables",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "Compute Cufflinks FPKM",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      },
+      {
+        "key": "GTF with regions to exclude from FPKM normalization with Cufflinks",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Compute StringTie FPKM",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "boolean"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "rnaseq-sr-main"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-ont-artic-variant-calling/COVID-19-ARTIC-ONT/versions/v0.3.2",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "COVID-19: variation analysis of ARTIC ONT data",
+    "workflow_description": "This workflow for ONT-sequenced ARTIC data is modeled after the alignment/variant-calling steps of the [ARTIC pipeline](https://artic.readthedocs.io/en/latest/). It performs, essentially, the same steps as that pipeline\u2019s minion command, i.e. read mapping with minimap2 and variant calling with medaka. Like the Illumina ARTIC workflow it uses ivar for primer trimming. Since ONT-sequenced reads have a much higher error rate than Illumina-sequenced reads and are therefor plagued more by false-positive variant calls, this workflow does make no attempt to handle amplicons affected by potential primer-binding site mutations.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "ONT-sequenced reads",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "Minimum read length",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Maximum read length",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": [
+            "fasta",
+            "fasta.gz"
+          ]
+        }
+      },
+      {
+        "key": "Primer binding sites info in BED format",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "bed"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "sars-cov-2-ont-artic-variant-calling-covid-19-artic-ont"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-ivar-analysis/SARS-COV-2-ILLUMINA-AMPLICON-IVAR-PANGOLIN-NEXTCLADE/versions/v0.4",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "SARS-CoV-2 Illumina Amplicon pipeline - iVar based",
+    "workflow_description": "Find and annotate variants in ampliconic SARS-CoV-2 Illumina sequencing data and classify samples with pangolin and nextclade",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Paired read collection for samples",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection"
+        }
+      },
+      {
+        "key": "Reference FASTA",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Primer BED",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File"
+        }
+      },
+      {
+        "key": "Read fraction to call variant",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Minimum quality score to call base",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Version of pangolin-data to use",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "text"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "sars-cov-2-pe-illumina-artic-ivar-analysis-sars-cov-2-illumina-amplicon-ivar-pangolin-nextclade"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-artic-variant-calling/COVID-19-PE-ARTIC-ILLUMINA/versions/v0.5.5",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "COVID-19: variation analysis on ARTIC PE data",
+    "workflow_description": "The workflow for Illumina-sequenced ARTIC data builds on the RNASeq workflow for paired-end data using the same steps for mapping and variant calling, but adds extra logic for trimming ARTIC primer sequences off reads with the ivar package. In addition, this workflow uses ivar also to identify amplicons affected by ARTIC primer-binding site mutations and tries to exclude reads derived from such tainted amplicons when calculating allele-frequencies of other variants.",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 3418604,
+    "parameters": [
+      {
+        "key": "Paired Collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "ARTIC primer BED",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": {
+          "ext": "bed",
+          "src": "url",
+          "url": "https://zenodo.org/record/4555735/files/ARTIC_nCoV-2019_v3.bed",
+          "db_key": null,
+          "md5": null
+        },
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "ARTIC primers to amplicon assignments",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": {
+          "ext": "tabular",
+          "src": "url",
+          "url": "https://zenodo.org/record/4555735/files/ARTIC_amplicon_info_v3.tsv",
+          "db_key": null,
+          "md5": null
+        },
+        "data_requirements": null,
+        "type_guide": null
+      },
+      {
+        "key": "Read removal minimum AF",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Read removal maximum AF",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "Minimum DP required after amplicon bias correction",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "Minimum DP_ALT required after amplicon bias correction",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": true,
+    "iwc_id": "sars-cov-2-pe-illumina-artic-variant-calling-covid-19-pe-artic-illumina"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-pe-illumina-wgs-variant-calling/COVID-19-PE-WGS-ILLUMINA/versions/v0.2.4",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "COVID-19: variation analysis on WGS PE data",
+    "workflow_description": "This workflows performs paired end read mapping with bwa-mem followed by sensitive variant calling across a wide range of AFs with lofreq",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 3418604,
+    "parameters": [
+      {
+        "key": "Paired Collection",
+        "variable": "SANGER_READ_RUN_PAIRED",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS"
+          ],
+          "library_layout": "PAIRED",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      }
+    ],
+    "active": true,
+    "iwc_id": "sars-cov-2-pe-illumina-wgs-variant-calling-covid-19-pe-wgs-illumina"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-se-illumina-wgs-variant-calling/COVID-19-SE-WGS-ILLUMINA/versions/v0.1.6",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "COVID-19: variation analysis on WGS SE data",
+    "workflow_description": "This workflows performs single end read mapping with bowtie2 followed by sensitive variant calling across a wide range of AFs with lofreq",
+    "ploidy": "HAPLOID",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": 3418604,
+    "parameters": [
+      {
+        "key": "Single End Collection",
+        "variable": "SANGER_READ_RUN_SINGLE",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": {
+          "library_strategy": [
+            "WGS"
+          ],
+          "library_layout": "SINGLE",
+          "library_source": null,
+          "description": null
+        },
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "fastqsanger",
+            "fastqsanger.gz"
+          ]
+        }
+      },
+      {
+        "key": "NC_045512.2 FASTA sequence of SARS-CoV-2",
+        "variable": "ASSEMBLY_FASTA_URL",
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": null
+      }
+    ],
+    "active": true,
+    "iwc_id": "sars-cov-2-se-illumina-wgs-variant-calling-covid-19-se-wgs-illumina"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/sars-cov-2-variation-reporting/COVID-19-VARIATION-REPORTING/versions/v0.3.4",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "COVID-19: variation analysis reporting",
+    "workflow_description": "This workflow takes a VCF dataset of variants produced by any of the *-variant-calling workflows in https://github.com/galaxyproject/iwc/tree/main/workflows/sars-cov-2-variant-calling and generates tabular lists of variants by Samples and by Variant, and an overview plot of variants and their allele-frequencies.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Variation data to report",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "vcf",
+            "vcf_bgzip"
+          ]
+        }
+      },
+      {
+        "key": "AF Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "DP Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "DP_ALT Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "gene products translations",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "File",
+          "ext": "tabular"
+        }
+      },
+      {
+        "key": "Number of Clusters",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "sars-cov-2-variation-reporting-covid-19-variation-reporting"
+  },
+  {
+    "trs_id": "#workflow/github.com/iwc-workflows/variation-reporting/main/versions/v0.1.1",
+    "categories": [
+      "VARIANT_CALLING"
+    ],
+    "workflow_name": "Generic variation analysis reporting",
+    "workflow_description": "This workflow takes a VCF dataset of variants produced by any of the variant calling workflows in https://github.com/galaxyproject/iwc/tree/main/workflows/sars-cov-2-variant-calling and generates tabular lists of variants by Samples and by Variant, and an overview plot of variants and their allele-frequencies.",
+    "ploidy": "ANY",
+    "scope": null,
+    "assembly_count_min": null,
+    "assembly_count_max": null,
+    "taxonomy_id": null,
+    "parameters": [
+      {
+        "key": "Variation data to report",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "Collection",
+          "ext": [
+            "vcf",
+            "vcf_bgzip"
+          ]
+        }
+      },
+      {
+        "key": "AF Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "float"
+        }
+      },
+      {
+        "key": "DP Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      },
+      {
+        "key": "DP_ALT Filter",
+        "variable": null,
+        "collection_spec": null,
+        "url_spec": null,
+        "data_requirements": null,
+        "type_guide": {
+          "class": "integer"
+        }
+      }
+    ],
+    "active": false,
+    "iwc_id": "variation-reporting-main"
+  }
+]
