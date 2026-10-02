@@ -501,8 +501,11 @@ class GalaxyDataset(BaseModel):
 
     id: str
     name: str
-    state: str
-    file_ext: str
+    # Only filled where a caller has a dataset record to hand; a job's output
+    # list carries ids and names, and fetching a record per output is what
+    # rate-limited kmindex status reads.
+    state: Optional[str] = None
+    file_ext: Optional[str] = None
     file_size: Optional[int] = None
     created_time: Optional[str] = None
     updated_time: Optional[str] = None
@@ -547,6 +550,10 @@ class GalaxyJobStatus(BaseModel):
         default=False, description="Whether the job completed successfully"
     )
     outputs: List[GalaxyJobOutput] = []
+    # The collection the outputs belong to, when the tool writes one: kmindex
+    # does, and downloading it as one archive is one request instead of one per
+    # shard.
+    output_collection_id: Optional[str] = None
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
