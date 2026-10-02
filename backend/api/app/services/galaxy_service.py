@@ -1448,11 +1448,9 @@ class GalaxyService:
                 status.is_successful,
             )
 
-            # Only a successful job's outputs are ever read. A paused one isn't
-            # cached, so fetching them there would repeat a show_dataset per
-            # output on every poll, and one failed fetch would 500 the status.
-            # Hand over the job dict already fetched above rather than making
-            # _get_job_outputs re-fetch it.
+            # Only a successful job's outputs are ever read. Hand over the job
+            # dict already fetched above rather than making _get_job_outputs
+            # re-fetch it.
             if status.is_successful:
                 status.outputs = await self._get_job_outputs(job_id, job_data)
             if state in SETTLED_JOB_STATES:
@@ -1664,36 +1662,23 @@ class GalaxyService:
         @returns: one entry per output dataset.
         """
         try:
-            # Get job outputs using BioBLEND
             if job_details is None:
                 job_details = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
-            outputs = []
 
-            # Get outputs from job details
-            job_outputs = job_details.get("outputs", {})
-
-            for output_name, output_data in job_outputs.items():
-                # Get dataset details using BioBLEND
-                dataset_details = await asyncio.to_thread(
-                    self.gi.datasets.show_dataset, output_data["id"]
+            # Built from the job dict alone. A show_dataset per output was one
+            # serial GET per shard -- thousands for an all-index search -- fired
+            # on the poll that first sees the job finish. Galaxy 429'd partway
+            # through, the status 500'd uncached, and the next poll restarted
+            # the burst, so a finished job could never be read. Nothing reads
+            # the extra fields; the id is all a shard download needs.
+            return [
+                GalaxyJobOutput(
+                    id=output_data["id"],
+                    name=output_name,
+                    dataset=GalaxyDataset(id=output_data["id"], name=output_name),
                 )
-
-                dataset_info = GalaxyDataset(
-                    id=dataset_details["id"],
-                    name=dataset_details["name"],
-                    state=dataset_details["state"],
-                    file_ext=dataset_details.get("file_ext", "txt"),
-                    file_size=dataset_details.get("file_size"),
-                    created_time=dataset_details.get("created_time"),
-                    updated_time=dataset_details.get("updated_time"),
-                )
-
-                output = GalaxyJobOutput(
-                    id=dataset_details["id"], name=output_name, dataset=dataset_info
-                )
-                outputs.append(output)
-
-            return outputs
+                for output_name, output_data in job_details.get("outputs", {}).items()
+            ]
 
         except Exception as e:
             # Never degrade to an empty list here. A kmindex job's outputs ARE

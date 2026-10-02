@@ -77,18 +77,21 @@ class TestJobOutputsFailFast:
     """A failure reading outputs must not look like 'this job had no outputs'."""
 
     @pytest.mark.asyncio
-    async def test_show_dataset_failure_raises_rather_than_returning_empty(
+    async def test_outputs_come_from_the_job_dict_without_a_get_per_output(
         self, service
     ):
+        # An all-index search has thousands of outputs. One show_dataset each,
+        # on the poll that sees the job finish, is the burst Galaxy 429s.
         service.gi.jobs.show_job = MagicMock(
-            return_value={"outputs": {"out1": {"id": "ds1"}}}
+            return_value={"outputs": {f"out{i}": {"id": f"ds{i}"} for i in range(2869)}}
         )
-        service.gi.datasets.show_dataset = MagicMock(
-            side_effect=RuntimeError("429 Too Many Requests")
-        )
+        service.gi.datasets.show_dataset = MagicMock()
 
-        with pytest.raises(Exception, match="Failed to get outputs"):
-            await service._get_job_outputs("job1")
+        outputs = await service._get_job_outputs("job1")
+
+        assert len(outputs) == 2869
+        assert (outputs[7].name, outputs[7].dataset.id) == ("out7", "ds7")
+        service.gi.datasets.show_dataset.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_show_job_failure_raises(self, service):
