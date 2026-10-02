@@ -610,6 +610,29 @@ class GalaxyService:
             logger.error(f"Failed to submit kmindex query: {str(e)}")
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
 
+    def _fetch_shard(self, dataset_id: str) -> bytes:
+        """
+        One GET for a shard's content.
+
+        bioblend's download_dataset polls show_dataset for an ok state before
+        every download, and a retry repeats both -- two requests per shard
+        against a Galaxy that is already rate-limiting us. A shard is only read
+        once its job is ok, so the state check buys nothing.
+
+        @param dataset_id: the shard's dataset.
+        @returns: the raw content.
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/datasets/{dataset_id}/display",
+            params={"preview": "false"},
+        )
+        if r.status_code != 200:
+            # The status goes in the message: _download_shard retries on "429".
+            raise ConnectionError(
+                f"GET dataset {dataset_id}: error {r.status_code}: {r.text[:200]}"
+            )
+        return r.content
+
     async def _download_shard(
         self, dataset_id: str, semaphore: asyncio.Semaphore
     ) -> Optional[dict]:
@@ -618,11 +641,7 @@ class GalaxyService:
         for attempt in range(KMINDEX_DOWNLOAD_ATTEMPTS):
             try:
                 async with semaphore:
-                    content = await asyncio.to_thread(
-                        self.gi.datasets.download_dataset, dataset_id
-                    )
-                if isinstance(content, bytes):
-                    content = content.decode("utf-8")
+                    content = await asyncio.to_thread(self._fetch_shard, dataset_id)
                 return json.loads(content)
             except Exception as e:
                 # Sleep outside the semaphore so a backing-off task doesn't

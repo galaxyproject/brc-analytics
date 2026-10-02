@@ -3041,7 +3041,7 @@ class TestGalaxyServiceTimeouts:
 
             start = time.monotonic()
             with pytest.raises(Exception) as exc:
-                await asyncio.to_thread(svc.gi.datasets.download_dataset, "fake_ds")
+                await asyncio.to_thread(svc._fetch_shard, "fake_ds")
             duration = time.monotonic() - start
 
             # Should fail well before the thread's 1.0s sleep
@@ -3058,15 +3058,48 @@ class TestGalaxyServiceTimeouts:
         monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
 
         # Make the first call fail with a timeout, and the second succeed
-        service.gi.datasets.download_dataset = MagicMock(
+        service.gi.make_get_request = MagicMock(
             side_effect=[
                 requests.exceptions.ReadTimeout("Read timed out"),
-                '{"IDX_1": {"q": {"SRR1": 1.0}}}'.encode("utf-8"),
+                MagicMock(status_code=200, content=b'{"IDX_1": {"q": {"SRR1": 1.0}}}'),
             ]
         )
 
         sem = asyncio.Semaphore(1)
         result = await service._download_shard("ds1", sem)
 
-        assert service.gi.datasets.download_dataset.call_count == 2
+        assert service.gi.make_get_request.call_count == 2
         assert result == {"IDX_1": {"q": {"SRR1": 1.0}}}
+
+    @pytest.mark.asyncio
+    async def test_a_shard_is_one_get_and_a_429_is_retried(self, service, monkeypatch):
+        # bioblend's download_dataset asks show_dataset for the state first,
+        # doubling the requests a rate-limited Galaxy sees for every shard.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            side_effect=[
+                MagicMock(status_code=429, text="Too Many Requests"),
+                MagicMock(status_code=200, content=b'{"IDX_1": {"q": {"SRR1": 1.0}}}'),
+            ]
+        )
+        service.gi.datasets.show_dataset = MagicMock()
+
+        result = await service._download_shard("ds1", asyncio.Semaphore(1))
+
+        assert result == {"IDX_1": {"q": {"SRR1": 1.0}}}
+        assert service.gi.make_get_request.call_count == 2
+        assert service.gi.make_get_request.call_args.args == (
+            "https://galaxy.example/api/datasets/ds1/display",
+        )
+        service.gi.datasets.show_dataset.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_a_non_retryable_shard_error_gives_up(self, service):
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            return_value=MagicMock(status_code=403, text="Forbidden")
+        )
+
+        assert await service._download_shard("ds1", asyncio.Semaphore(1)) is None
+        assert service.gi.make_get_request.call_count == 1
