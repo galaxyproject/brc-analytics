@@ -29,7 +29,7 @@ University, University Park, PA, USA\
 
 Everything here uses the benchmark defined in Part 1: **203 clinical specimens from
 BioProject `PRJNA578931` [19], labelled by two epidemiologically-defined 2018 outbreaks**—Vendor A
-(salads, 99 specimens) and Vendor B (vegetable trays, 104) [4]—taken from
+(salads, 99 specimens) and Vendor B (vegetable trays, 104) [2, 4]—taken from
 `REFERENCE_CLUSTER_LIST/2018_gold_clusters.txt` in CDC's typing repository [6]. Those labels come
 from food-exposure investigation and are independent of any sequence data. **153 of the 203** appear
 in CDC's deposited haplotype sheet [8], 98 Vendor A and 55 Vendor B, and that is the set most
@@ -216,7 +216,7 @@ Then the weights. This locus has entropy `H = 1.51` bits, carrying four alleles 
 138 of the 145 specimens with data, so `P = (138/145)² = 0.91` — sharing it is barely evidence of
 anything, and the weight says so. The locus contributes
 
-> δ = H × `δ_raw` × P = 1.51 × 2 × 0.91 = **2.73**
+> δ = H × `δ_raw` × P = 1.51 × 2 × 0.91 = **2.75**
 
 One locus, one pair. The same runs at every locus, and the scores are averaged.
 
@@ -305,13 +305,13 @@ The returned value is the expected number of shared strains,
 `0×0.055 + 1×0.903 + 2×0.042 =` **0.99**, which `run.r` flips to `2 − 0.99 =` **1.01** so larger
 means further apart.
 
+</Alert>
+
 **The ensemble** [2] is not the 50/50 average of two rank matrices the audit documents describe. `run.r`
 line 32 computes `D = sort(Bayesian_norm)[rank(Heuristic_norm, ties.method = "random")]` — the
 sorted Bayesian _values_ re-indexed by the heuristic's rank order — then averages `D` with the
 normalised heuristic matrix. The Bayesian contributes its spread of values; its ordering, the part
 carrying its opinion about which specimens are related, is discarded.
-
-</Alert>
 
 <Alert icon={false} severity="success">
 
@@ -483,7 +483,7 @@ Clinical specimens frequently suffer from partial sequencing dropouts due to low
 1. **Binary Encoding:** The sheet holds two values: `X` and empty. The code applies `X = (values == "X")`, turning `X` into 1 (present) and empty into 0 (absent).
 2. **Locus Grouping:** Each column represents one named haplotype (e.g. `Nu_378_PART_D_Hap_7`). The code parses the name at `_Hap_` and groups the 165 columns into 25 locus groups representing the 8 core genomic targets (`Mt_Cmt`, `Mt_MSR`, `Nu_360i2`, `Nu_378`, and `Nu_CDS1` through `Nu_CDS4`). The mitochondrial junction's 37 columns across 8 windows (`Mt_Cmt127` to `Mt_Cmt229`) are unified into a single locus block (`Mt_Cmt`).
 3. **Dropout Inference:** The sheet has no explicit symbol for an unamplified locus, so PyEuk infers it per locus group: a group with at least one `X` was typed; a group with no `X` at all was not. Inside a typed group, an empty cell means that specific haplotype was absent.
-4. **Multi-Locus Completeness Filter:** Specimens with `X` in fewer than 10% of the sheet's columns (or failing base diagnostic locus coverage) are filtered out before distance estimation to prevent skewed population frequencies. On CDC's 153-specimen sheet, this removes 9 low-coverage specimens, retaining 144.
+4. **Multi-Locus Completeness Filter:** Specimens with `X` in fewer than 10% of the sheet's columns are filtered out before distance estimation to prevent skewed population frequencies. On CDC's 153-specimen sheet, this removes 9 low-coverage specimens, retaining 144.
 
 ### Step 2: Population genetics allele weighting (KING framework)
 
@@ -505,7 +505,7 @@ In molecular surveillance, sharing a rare haplotype provides strong evidence of 
 
 Three nuances follow from computing weights this way:
 
-- It depends strictly on frequency: rare outbreak markers, rarely amplifying loci, and sequencing artifacts receive identical weights.
+- It depends strictly on frequency among typed specimens: rare outbreak markers and sequencing artifacts receive identical weights.
 - It is computed across the current surveillance batch, making weights batch-dependent.
 - It is a standardised weighted mismatch count rather than the full KING kinship estimator (which incorporates heterozygote ratios) [13].
 
@@ -521,8 +521,8 @@ The index `k` runs strictly over columns in locus groups typed in **both** speci
 
 #### Key Characteristics:
 
-- **Resolving the Multiplicity of Infection (MOI) Paradox:** _Cyclospora_ infections often contain multiple distinct parasite strains within a single patient. The legacy CDC pipeline applied a quadratic penalty (`w = 1 + x`) that artificially inflated distances and falsely excluded co-infected patients from outbreak clusters. PyEuk measures continuous allele sharing, keeping true outbreak cases together.
-- **Pairwise-Complete vs. Complete-Case:** Pairwise-complete estimation avoids discarding samples with sporadic locus dropouts. Pairs with no shared loci default to zero distance.
+- **Multiplicity of Infection (MOI):** _Cyclospora_ infections often contain multiple distinct parasite strains within a single patient. As the worked example above shows, the legacy heuristic actually rewards co-infection — a pair sharing one strain scores lower when one specimen carries additional strains. The heuristic's step-function scoring (capped at 2 when any allele is shared, starting at 4 when none is) does not measure continuous allele sharing. PyEuk's wIBS distance does, keeping true outbreak cases together.
+- **Pairwise-Complete vs. Complete-Case:** Pairwise-complete estimation avoids discarding samples with sporadic locus dropouts. Pairs with no shared loci default to zero distance — a clustering hazard, since two specimens with no comparable loci are treated as maximally similar rather than unknown. The 10% completeness filter reduces but does not guarantee against this case.
 - **Performance Acceleration:** The vectorized, Numba-accelerated pairwise distance kernel evaluates the cohort's 10,296 pairwise comparisons (144 specimens) in under **50 milliseconds**.
 
 ### Step 4: Euclidean metric guarantee & positive semi-definite (PSD) repair
@@ -549,9 +549,11 @@ PyEuk guarantees positive semi-definiteness (PSD) through double-centring and ei
 
 <Alert icon={false} severity="info">
   **Geometric verification:** Prior to this repair, the empirical distance
-  matrix had `λ_min = -1.9453` with 152 of 153 eigenvalues negative. The
-  eigenvalue clipping step ensures `λ_min ≥ 0.0`, strictly satisfying the
-  mathematical prerequisites of Ward's variance minimization [14, 15].
+  matrix had `λ_min = -1.9453` with 152 of 153 eigenvalues negative (measured at
+  the pre-fix commit `8c208ca`, before the completeness filter was simplified;
+  see Methods). The eigenvalue clipping step ensures `λ_min ≥ 0.0`, strictly
+  satisfying the mathematical prerequisites of Ward's variance minimization [14,
+  15].
 </Alert>
 
 ### Step 5: Deterministic Ward hierarchical clustering
@@ -564,7 +566,7 @@ Ward's agglomerative hierarchical clustering iteratively merges clusters to mini
 ΔESS(A, B) = [ (|A| · |B|) / (|A| + |B|) ] · ||m_A − m_B||²
 ```
 
-- **100% Deterministic Tie-Breaking:** Legacy R implementations resolved tied distances using random selection (`ties.method = "random"`), causing cluster memberships to fluctuate between runs. PyEuk enforces strict lexicographical index ordering for all tied distances, ensuring byte-for-byte identical dendrograms across independent executions.
+- **100% Deterministic Tie-Breaking:** Legacy R implementations resolved tied distances using random selection (`ties.method = "random"`), causing cluster memberships to fluctuate between runs. PyEuk eliminates the random tie-breaking and passes a deterministic, exactly symmetric PSD distance matrix to SciPy's Ward linkage, producing identical dendrograms across independent runs on the same input.
 
 <Alert icon={false} severity="success">
 
@@ -617,7 +619,7 @@ The dendrogram alone does not specify the number of discrete outbreak clusters. 
 
 In routine surveillance where no outbreak labels are known in advance, PyEuk evaluates the relative jump in merge heights across the dendrogram:
 
-- Consecutive merge heights are ranked by relative gap: `rel_gap = (h_k − h_{k-1}) / h_k`.
+- Consecutive merge heights are ranked by relative gap: `rel_gap = (h_k − h_{k-1}) / h_root`, where `h_root` is the full tree height.
 - Candidate cluster counts `k ≥ 2` are accepted if the gap exceeds 22% of total tree height and the smallest cluster contains at least `max(5, 10% of N)` specimens.
 - If no partition meets these criteria, the cohort is returned as a single unpartitioned cluster (`k = 1`).
 
@@ -629,7 +631,7 @@ When epidemiological gold-standard reference pairs are available (`2018_gold_clu
 Threshold = Median_gold + 3 × 1.4826 × MAD_gold
 ```
 
-The tree is cut at the smallest `k ∈ {1, ..., 50}` where at least 95% of within-cluster pairwise distances fall below this calibrated threshold.
+The tree is cut at the smallest `k ∈ {2, ..., 50}` where at least 95% of within-cluster pairwise distances fall below this calibrated threshold.
 
 <Alert icon={false} severity="info">
   **Why cluster-tightness measures were not used.** The obvious label-free
@@ -651,15 +653,17 @@ The tree is cut at the smallest `k ∈ {1, ..., 50}` where at least 95% of withi
 
 ### Summary of surveillance outputs
 
-The pipeline produces a clean tabular report mapping each patient specimen to a deterministic cluster assignment:
+PyEuk outputs a tabular report mapping each specimen to a numeric cluster assignment (`Assigned_cluster`), with `-1` marking specimens excluded by the completeness filter:
 
-| Specimen ID      | Assigned Cluster      | Surveillance Interpretation         |
-| :--------------- | :-------------------- | :---------------------------------- |
-| `CDC_2018_IL036` | Cluster 1             | Verified Outbreak Case (Vendor A)   |
-| `CDC_2018_IL126` | Cluster 1             | Verified Outbreak Case (Vendor A)   |
-| `CDC_2018_WI100` | Cluster 2             | Verified Outbreak Case (Vendor B)   |
-| `CDC_2018_WI008` | Cluster 2             | Verified Outbreak Case (Vendor B)   |
-| `CDC_2018_SP012` | Sporadic / Unassigned | Low-coverage or unclustered isolate |
+| Specimen ID      | Assigned Cluster | Epidemiological Interpretation  |
+| :--------------- | :--------------- | :------------------------------ |
+| `CDC_2018_IL036` | 1                | Vendor A outbreak               |
+| `CDC_2018_IL126` | 1                | Vendor A outbreak               |
+| `CDC_2018_WI100` | 2                | Vendor B outbreak               |
+| `CDC_2018_WI008` | 2                | Vendor B outbreak               |
+| `CDC_2018_SP012` | -1               | Excluded by completeness filter |
+
+Cluster numbers are tool output; vendor labels are downstream epidemiological interpretation, not pipeline output.
 
 ### How the results are scored
 
@@ -836,11 +840,11 @@ independently reproduced here, it is not quoted at all.
     [www.ncbi.nlm.nih.gov/bioproject/PRJNA578931](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA578931)
 20. Shah N, Nute MG, Warnow T, Pop M (2019) Misunderstood parameter of NCBI BLAST impacts the
     correctness of bioinformatics workflows. _Bioinformatics_ 35(9):1613–1614.
-    [doi.org/10.1093/bioinformatics/bty833](https://doi.org/10.1093/bioinformatics/bty833)
+    doi:[10.1093/bioinformatics/bty833](https://doi.org/10.1093/bioinformatics/bty833)
 21. Reference files for _Cyclospora cayetanensis_ amplicon genotyping (CDC 8-marker panel):
     `markers.fa`, `parts.bed`, `haplotypes78.fa` and `junction.fa`, redeposited unmodified from
     CDC's release with checksums and provenance. Zenodo, CC0.
-    [doi.org/10.5281/zenodo.21924355](https://doi.org/10.5281/zenodo.21924355)
+    doi:[10.5281/zenodo.21924355](https://doi.org/10.5281/zenodo.21924355)
 
 _Data: BioProject `PRJNA578931` [19]. Labels, module source, reference sequences and the published
 1,078-specimen distance matrix from CDC's typing workflow repository [6]. Deposited haplotype calls
