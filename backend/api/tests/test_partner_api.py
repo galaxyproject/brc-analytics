@@ -179,6 +179,12 @@ def test_the_native_routes_carry_no_sunset(partner_env):
     assert "Sunset" not in client.get("/api/v1/health").headers
 
 
+def test_a_path_that_only_shares_the_prefix_carries_no_sunset(partner_env):
+    client, _, _ = partner_env
+
+    assert "Sunset" not in client.get("/api/v1/partner/loganx/indexes").headers
+
+
 def test_a_submit_starts_a_job_and_records_it_as_partner_traffic(partner_env):
     client, galaxy, record = partner_env
 

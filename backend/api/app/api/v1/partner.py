@@ -356,6 +356,9 @@ async def add_sunset_header(request: Request, call_next):
     """Stamp every partner response, errors included, with the Sunset date."""
     response = await call_next(request)
     sunset = get_settings().PARTNER_API_SUNSET
-    if sunset is not None and request.url.path.startswith(PARTNER_PREFIX):
+    path = request.url.path
+    if sunset is not None and (
+        path == PARTNER_PREFIX or path.startswith(f"{PARTNER_PREFIX}/")
+    ):
         response.headers["Sunset"] = sunset_header(sunset)
     return response
