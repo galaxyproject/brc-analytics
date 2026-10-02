@@ -111,6 +111,18 @@ KMINDEX_RETRY_SWEEP_DELAY = 20.0
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
 
+# Statuses worth backing off and asking again for, rather than dropping the shard.
+RETRYABLE_SHARD_STATUSES = frozenset({429, 502, 503, 504})
+
+
+class ShardFetchError(Exception):
+    """A shard GET that came back with something other than 200."""
+
+    def __init__(self, status: int, detail: str):
+        super().__init__(f"error {status}: {detail}")
+        self.status = status
+
+
 # Bucket for hits whose shard key matches no known index name. Guessing an
 # attribution would corrupt the very number the caller is trusting to tell them
 # how much the cap dropped, so name the uncertainty instead.
@@ -627,10 +639,7 @@ class GalaxyService:
             params={"preview": "false"},
         )
         if r.status_code != 200:
-            # The status goes in the message: _download_shard retries on "429".
-            raise ConnectionError(
-                f"GET dataset {dataset_id}: error {r.status_code}: {r.text[:200]}"
-            )
+            raise ShardFetchError(r.status_code, f"{dataset_id}: {r.text[:200]}")
         return r.content
 
     async def _download_shard(
@@ -645,14 +654,13 @@ class GalaxyService:
                 return json.loads(content)
             except Exception as e:
                 # Sleep outside the semaphore so a backing-off task doesn't
-                # hold a slot the other shards could be using.
-                # A rate limit is matched on the message because bioblend wraps the
-                # HTTP status into one of its own errors, but a socket timeout is
-                # requests' own exception and reaches us intact -- so match the type
-                # rather than hunting for "timed out" in prose that may not say it.
-                is_retryable = isinstance(
-                    e, requests.exceptions.Timeout
-                ) or "429" in str(e)
+                # hold a slot the other shards could be using. A gateway error is
+                # as transient as a rate limit, and a shard given up on is a
+                # hole in the hit list until the hourly re-aggregation.
+                is_retryable = isinstance(e, requests.exceptions.Timeout) or (
+                    isinstance(e, ShardFetchError)
+                    and e.status in RETRYABLE_SHARD_STATUSES
+                )
                 if not is_retryable or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1:
                     logger.warning(f"Shard {dataset_id} download failed: {e}")
                     return None

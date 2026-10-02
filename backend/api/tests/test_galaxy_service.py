@@ -3095,6 +3095,24 @@ class TestGalaxyServiceTimeouts:
         service.gi.datasets.show_dataset.assert_not_called()
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize("status", [502, 503, 504])
+    async def test_a_gateway_error_is_retried_like_a_rate_limit(
+        self, service, monkeypatch, status
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            side_effect=[
+                MagicMock(status_code=status, text="Bad Gateway"),
+                MagicMock(status_code=200, content=b'{"IDX_1": {"q": {"SRR1": 1.0}}}'),
+            ]
+        )
+
+        result = await service._download_shard("ds1", asyncio.Semaphore(1))
+
+        assert result == {"IDX_1": {"q": {"SRR1": 1.0}}}
+
+    @pytest.mark.asyncio
     async def test_a_non_retryable_shard_error_gives_up(self, service):
         service.gi.url = "https://galaxy.example/api"
         service.gi.make_get_request = MagicMock(
