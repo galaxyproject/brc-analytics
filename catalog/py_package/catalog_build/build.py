@@ -1311,12 +1311,12 @@ def save_build_metadata(path: str, meta: BuildMetadata):
 class LoadAndTransformResult:
     assemblies_source: pd.DataFrame
     organisms_source: pd.DataFrame
-    workflows_source: pd.DataFrame
+    workflows_source: pd.DataFrame | None
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
-    taxonomy_outbreaks: pd.DataFrame
+    taxonomy_outbreaks: pd.DataFrame | None
     ncbi_taxdump_md5: str
     dbt_test_results: list[DBTTestResult]
 
@@ -1328,7 +1328,7 @@ def load_and_transform(
     taxonomic_levels: list[str],
     assemblies_path: Path,
     organisms_path: Path,
-    workflows_path: Path,
+    workflows_path: Path | None,
     taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -1344,7 +1344,7 @@ def load_and_transform(
       taxonomic_levels: Taxonomic levels to build columns for during transformation
       assemblies_path: Path to source assemblies YAML
       organisms_path: Path to source organisms YAML
-      workflows_path: Path to source workflows YAML
+      workflows_path: Path to source workflows YAML, or None for catalogs that don't build workflows
       taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
@@ -1379,6 +1379,7 @@ def load_and_transform(
         taxonomic_levels=taxonomic_levels,
         has_curated_taxa=taxa_path is not None,
         has_outbreaks=outbreaks_path is not None,
+        has_workflows=workflows_path is not None,
     )
 
     # Get transformed data and return along with metadata
@@ -1386,7 +1387,11 @@ def load_and_transform(
         return LoadAndTransformResult(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
             organisms_source=con.query("select * from catalog_input_organisms").df(),
-            workflows_source=con.query("select * from catalog_input_workflows").df(),
+            workflows_source=(
+                None
+                if workflows_path is None
+                else con.query("select * from catalog_input_workflows").df()
+            ),
             outbreaks_source=(
                 None
                 if outbreaks_path is None
@@ -1395,7 +1400,11 @@ def load_and_transform(
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
-            taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
+            taxonomy_outbreaks=(
+                None
+                if outbreaks_path is None
+                else con.query("select * from taxonomy_outbreaks").df()
+            ),
             ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
             dbt_test_results=transform_result.dbt_test_results,
         )
@@ -1410,8 +1419,6 @@ def build_files(
     *,
     temp_folder_path,
     dlt_pipeline_prefix,
-    workflows_path,
-    workflows_output_path,
     build_meta_output_path,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
@@ -1422,6 +1429,8 @@ def build_files(
     taxa_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    workflows_path=None,
+    workflows_output_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
     datacache_base_url=None,
@@ -1462,7 +1471,7 @@ def build_files(
         taxonomic_levels=taxonomic_levels_for_tree,
         assemblies_path=Path(assemblies_path),
         organisms_path=Path(organisms_path),
-        workflows_path=Path(workflows_path),
+        workflows_path=None if workflows_path is None else Path(workflows_path),
         taxa_path=None if taxa_path is None else Path(taxa_path),
         outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
     )
@@ -1470,31 +1479,33 @@ def build_files(
     source_organisms_df = load_and_transform_result.organisms_source.sort_values(
         by="taxonomy_id"
     ).astype({"taxonomy_id": "string"})
-    # Outbreaks are optional (only some catalogs use them), so source_outbreaks_df is None when no path is given
+    # Outbreaks and workflows are optional (only some catalogs use them), so the corresponding dataframes below are None when no path is given
     source_outbreaks_df = load_and_transform_result.outbreaks_source
     if source_outbreaks_df is not None:
         source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
+    source_workflows_df = load_and_transform_result.workflows_source
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
-    # Output normalized input workflows
-    parsed_workflows = (
-        load_and_transform_result.workflows_source[Workflow.model_fields.keys()]
-        .assign(
-            **load_and_transform_result.workflows_source[
-                ["categories", "parameters"]
-            ].map(json.loads, na_action="ignore")
+    if workflows_output_path is not None and source_workflows_df is not None:
+        # Output normalized input workflows
+        parsed_workflows = (
+            source_workflows_df[Workflow.model_fields.keys()]
+            .assign(
+                **source_workflows_df[["categories", "parameters"]].map(
+                    json.loads, na_action="ignore"
+                )
+            )
+            .sort_values(by="trs_id")
+            .to_dict(orient="records")
         )
-        .sort_values(by="trs_id")
-        .to_dict(orient="records")
-    )
-    save_json_file(
-        workflows_output_path,
-        to_jsonable_python([Workflow(**w) for w in parsed_workflows]),
-        indent=2,
-    )
+        save_json_file(
+            workflows_output_path,
+            to_jsonable_python([Workflow(**w) for w in parsed_workflows]),
+            indent=2,
+        )
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
         load_and_transform_result.ncbi_genomes

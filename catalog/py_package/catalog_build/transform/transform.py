@@ -156,6 +156,7 @@ def do_dbt_transformations(
     taxonomic_levels: list[str],
     has_curated_taxa: bool,
     has_outbreaks: bool,
+    has_workflows: bool,
 ) -> TransformResult:
     """
     Run the dbt transformations against the loaded DuckDB database.
@@ -185,6 +186,7 @@ def do_dbt_transformations(
                 "taxonomic_levels": taxonomic_levels,
                 "has_curated_taxa": has_curated_taxa,
                 "has_outbreaks": has_outbreaks,
+                "has_workflows": has_workflows,
             },
         ),
     )

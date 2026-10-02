@@ -78,6 +78,7 @@ models:
               config:
                 enabled: "{{ var('has_outbreaks', false) }}"
   - name: catalog_input_outbreak_descendants
+    # Only tested when the catalog has outbreaks
     columns:
       - name: taxonomy_id
         data_tests:
@@ -86,6 +87,7 @@ models:
               arguments:
                 other_column: source_taxonomy_id
   - name: catalog_input_workflows
+    # Only tested when the catalog has workflows
     columns:
       - name: taxonomy_id
         data_tests:
@@ -93,3 +95,5 @@ models:
               name: workflow_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+              config:
+                enabled: "{{ var('has_workflows', false) }}"

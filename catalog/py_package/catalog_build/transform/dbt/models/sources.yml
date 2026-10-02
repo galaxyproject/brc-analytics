@@ -81,12 +81,17 @@ sources:
                   name: catalog_assemblies_have_accessions
       - name: organisms
       - name: workflows
+        # Only tested when the catalog has workflows
         columns:
           - name: trs_id
             data_tests:
               - unique:
                   name: catalog_workflows_unique_trs_ids
+                  config:
+                    enabled: "{{ var('has_workflows', false) }}"
               - not_null:
                   name: catalog_workflows_have_trs_ids
+                  config:
+                    enabled: "{{ var('has_workflows', false) }}"
       - name: curated_taxa
       - name: outbreaks
