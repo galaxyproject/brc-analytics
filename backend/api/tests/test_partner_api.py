@@ -95,6 +95,8 @@ def partner_env(tmp_path, monkeypatch):
     (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
     monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
     monkeypatch.setenv("PARTNER_API_ENABLED", "true")
+    # Partner jobs need the service account; config refuses to start without it.
+    monkeypatch.setenv("GALAXY_API_KEY", "service-key")
     monkeypatch.setenv(
         "PARTNER_API_KEYS", f"example-partner:k1:{hash_partner_key(KEY)}"
     )
