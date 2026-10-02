@@ -1,50 +1,46 @@
+import { ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
 import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
-import {
-  OrganismPloidy,
-  Organism as SourceOrganism,
-  Organisms as SourceOrganisms,
-} from "../../schema/generated/schema";
+import { OrganismPloidy } from "../../schema/generated/schema";
 
-export async function getSourceOrganismsByTaxonomyId(
-  sourceOrganismsPath: string
-): Promise<Map<string, SourceOrganism>> {
-  const sourceOrganisms =
-    await readYamlFile<SourceOrganisms>(sourceOrganismsPath);
-  return new Map(
-    sourceOrganisms.organisms.map((sourceOrganism) => [
-      String(sourceOrganism.taxonomy_id),
-      sourceOrganism,
-    ])
-  );
-}
+const ORGANISM_PLOIDIES = Object.values(ORGANISM_PLOIDY);
 
 /**
- * Get the ploidy for an assembly, logging a message if the assembly will be skipped.
- * @param sourceOrganismsByTaxonomyId - Source organisms mapped by species taxonomy ID, to get ploidy from.
- * @param speciesTaxonomyId - Species taxonomy ID of the assembly.
- * @param willSkipIfNull - Whether the assembly will be skipped if the returned ploidy is null.
- * @param assemblyAccession - Assembly accession to reference in the log message.
- * @returns array of ploidy values, or null if organism info was not found.
+ * Get the ploidy for an assembly, logging a message and returning null if the value is invalid and the assembly should be skipped.
+ * @param assemblyRow - Source row from the genomes TSV.
+ * @returns array of ploidy values, or null if the ploidies are missing or include an invalid value.
  */
-export function getPloidyForAssembly(
-  sourceOrganismsByTaxonomyId: Map<string, SourceOrganism>,
-  speciesTaxonomyId: string,
-  willSkipIfNull: boolean = false,
-  assemblyAccession?: string
-): OrganismPloidy[] | null {
-  const ploidy =
-    sourceOrganismsByTaxonomyId.get(speciesTaxonomyId)?.ploidy ?? null;
-  if (willSkipIfNull && ploidy === null) {
+export function parsePloidyForAssembly(assemblyRow: {
+  accession: string;
+  ploidy: string;
+  speciesTaxonomyId: string;
+}): OrganismPloidy[] | null {
+  const unverifiedPloidies = parseJsonListOrNull(assemblyRow.ploidy);
+  if (unverifiedPloidies === null) {
     console.log(
-      `Skipping assembly${assemblyAccession ? " " + assemblyAccession : ""} [tax_id: ${speciesTaxonomyId}] - ploidy not found`
+      `Skipping assembly ${assemblyRow.accession} [tax_id: ${assemblyRow.speciesTaxonomyId}] - ploidy not found`
     );
+    return null;
   }
-  return ploidy;
+  const ploidies: ORGANISM_PLOIDY[] = [];
+  for (const ploidy of unverifiedPloidies) {
+    if (!isPloidy(ploidy)) {
+      console.log(
+        `Skipping assembly ${assemblyRow.accession} [tax_id: ${assemblyRow.speciesTaxonomyId}] - found unknown ploidy value ${ploidy}`
+      );
+      return null;
+    }
+    ploidies.push(ploidy);
+  }
+  return ploidies;
+}
+
+function isPloidy(value: string): value is ORGANISM_PLOIDY {
+  return ORGANISM_PLOIDIES.includes(value as ORGANISM_PLOIDY);
 }
 
 export function getSpeciesStrainName(
@@ -197,6 +193,11 @@ export function accumulateArrayValue<T>(
 
 export function defaultStringToNone(value: string): string {
   return value || "None";
+}
+
+export function parseJsonListOrNull(value: string): string[] | null {
+  if (!value) return null;
+  return parseJsonList(value);
 }
 
 export function parseJsonList(value: string): string[] {
