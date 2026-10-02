@@ -1,4 +1,3 @@
-import { type Navigation } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import { type NavLinkItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/navigation";
 import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
@@ -32,15 +31,18 @@ function removeHeaderLinks(
   const { layout } = appConfig;
   const { navigation } = layout.header;
   if (!navigation) return appConfig;
+  const [left, centre, right] = navigation;
   return {
     ...appConfig,
     layout: {
       ...layout,
       header: {
         ...layout.header,
-        navigation: navigation.map(
-          (links) => links && removeLinks(links, url)
-        ) as Navigation,
+        navigation: [
+          left && removeLinks(left, url),
+          centre && removeLinks(centre, url),
+          right && removeLinks(right, url),
+        ],
       },
     },
   };

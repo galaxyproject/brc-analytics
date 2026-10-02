@@ -20,6 +20,29 @@ const VISIBLE_AT_SM = visibleOnly("sm");
 const VISIBLE_AT_SM_MD = visibleOnly("sm", "md");
 
 /**
+ * Returns the Genes navigation link.
+ * @param visible - Breakpoints the link is visible at.
+ * @returns Genes link.
+ */
+function getGenesLink(visible?: NavLinkItem["visible"]): NavLinkItem {
+  return { label: "Genes", url: ROUTES.GENES, visible };
+}
+
+/**
+ * Returns the Logan Search navigation link, when the feature is enabled.
+ * @param loganSearchEnabled - Whether Logan Search is enabled.
+ * @param visible - Breakpoints the link is visible at.
+ * @returns Logan Search link, or an empty list when disabled.
+ */
+function getLoganSearchLinks(
+  loganSearchEnabled: boolean,
+  visible?: NavLinkItem["visible"]
+): NavLinkItem[] {
+  if (!loganSearchEnabled) return [];
+  return [{ label: "Logan Search", url: SITE_ROUTES.LOGAN_SEARCH, visible }];
+}
+
+/**
  * Header navigation links.
  * @param loganSearchEnabled - Whether to show the Logan Search entry.
  * @remarks
@@ -71,35 +94,6 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
     ],
     undefined,
   ];
-}
-
-/**
- * Returns the Genes navigation link, selected on the genes list and any gene
- * page beneath it.
- * @param visible - Breakpoints the link is visible at.
- * @returns Genes link.
- */
-function getGenesLink(visible?: NavLinkItem["visible"]): NavLinkItem {
-  return {
-    label: "Genes",
-    selectedPatterns: [`^${ROUTES.GENES}(/.*)?$`],
-    url: ROUTES.GENES,
-    visible,
-  };
-}
-
-/**
- * Returns the Logan Search navigation link, when the feature is enabled.
- * @param loganSearchEnabled - Whether Logan Search is enabled.
- * @param visible - Breakpoints the link is visible at.
- * @returns Logan Search link, or an empty list when disabled.
- */
-function getLoganSearchLinks(
-  loganSearchEnabled: boolean,
-  visible?: NavLinkItem["visible"]
-): NavLinkItem[] {
-  if (!loganSearchEnabled) return [];
-  return [{ label: "Logan Search", url: SITE_ROUTES.LOGAN_SEARCH, visible }];
 }
 
 /**
