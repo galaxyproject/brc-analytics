@@ -236,6 +236,10 @@ class Settings:
         # would also eat an "/api" in the middle of a hostname or path.
         self.GALAXY_BASE_URL: str = self.GALAXY_API_URL.rstrip("/").removesuffix("/api")
         self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+        # Partner jobs only ever run on the service account, so without its key
+        # every partner call would 503.
+        if self.PARTNER_API_ENABLED and not self.GALAXY_API_KEY:
+            raise ValueError("PARTNER_API_ENABLED needs GALAXY_API_KEY")
 
         # Galaxy tool IDs
         self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")

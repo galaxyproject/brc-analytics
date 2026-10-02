@@ -64,7 +64,7 @@ curl -X POST -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
 | `sequence`  | --      | One FASTA record, up to 2,500 bases                       |
 | `indexes`   | --      | Index names from `/indexes`                               |
 | `threshold` | 0.0     | Minimum share of k-mers a run must contain (kmindex `-r`) |
-| `zvalue`    | 6       | kmindex findere z (`-z`)                                  |
+| `zvalue`    | 6       | z for findere, kmindex's false-positive filter (`-z`)     |
 
 **Send an `Idempotency-Key`.** A submission can time out after the job has
 already started. If you retry with the same key and the same body within 24
@@ -73,7 +73,8 @@ every index. A `409` means one of these:
 
 - The key was reused with a different body.
 - The first submission is still in flight. Wait a few seconds and send it
-  again.
+  again. If it's still in flight after a minute, it was interrupted and is in
+  the same spot as the next case.
 - The first submission failed in a way that leaves it unclear whether Galaxy
   started the job. We won't guess, so check your earlier responses, and send a
   new key if you do want to submit again.

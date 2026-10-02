@@ -61,9 +61,10 @@ PARTNER_PREFIX = "/api/v1/partner/logan"
 STATUS_RETRY_AFTER = "10"
 RESULTS_RETRY_AFTER = "15"
 
-# A claimed key with no job yet is a submit in flight; if the process dies
-# mid-submit, the claim lapses rather than blocking the key for a day.
-IDEMPOTENCY_PENDING_TTL = 600
+# A claim with no job recorded yet is held for the whole day, like a recorded
+# job. A submit normally fills it in within seconds; one that never does died
+# somewhere around run_tool, which is as ambiguous as a submit that failed
+# there, and letting the claim lapse would let a retry start a second search.
 IDEMPOTENCY_TTL = CacheTTL.ONE_DAY
 STDERR_TAIL = 2000
 
@@ -122,9 +123,8 @@ def _fingerprint(submission: KmindexQuerySubmission) -> str:
 def _replay(existing: dict, fingerprint: str) -> str:
     """The job an earlier submit under this key made, or why there isn't one.
 
-    An empty record is a claim that lapsed between our read and our write, so
-    it reads as in progress: asking again will either find the job or claim
-    the key afresh.
+    A claim with no job yet reads as in progress. Normally that clears within
+    seconds; a claim that never does belongs to a submit that was interrupted.
     """
     if existing and existing.get("fingerprint") != fingerprint:
         raise HTTPException(
@@ -144,7 +144,11 @@ def _replay(existing: dict, fingerprint: str) -> str:
     if not job_id:
         raise HTTPException(
             status_code=409,
-            detail="A submission with this Idempotency-Key is still in progress",
+            detail=(
+                "A submission with this Idempotency-Key is still in progress. If "
+                "this persists past a minute, it was interrupted and may or may "
+                "not have started; send a new Idempotency-Key to submit again."
+            ),
             headers={"Retry-After": STATUS_RETRY_AFTER},
         )
     return job_id
@@ -198,11 +202,8 @@ async def submit_job(
         if existing:
             return _created(_replay(existing, fingerprint))
         try:
-            claimed = await cache.redis.set(
-                idem_key,
-                json.dumps({"fingerprint": fingerprint}),
-                ex=IDEMPOTENCY_PENDING_TTL,
-                nx=True,
+            claimed = await cache.set_if_absent(
+                idem_key, {"fingerprint": fingerprint}, IDEMPOTENCY_TTL
             )
         except redis.RedisError as e:
             # The caller asked for a retry-safe submit; going ahead without the
@@ -341,7 +342,6 @@ async def job_results(
 async def job_export(
     job_id: str = JobId,
     format: str = Query(default="tsv", pattern="^(parquet|tsv)$"),
-    _partner: Partner = Depends(get_partner),
 ) -> Response:
     """
     Every hit the search matched, not just the pages results serves.

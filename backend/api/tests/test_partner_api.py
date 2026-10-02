@@ -60,6 +60,9 @@ class FakeCache:
         self.store[key] = json.dumps(value)
         return True
 
+    async def set_if_absent(self, key, value, ttl):
+        return bool(await self.redis.set(key, json.dumps(value), ex=ttl, nx=True))
+
     async def delete(self, key):
         return self.store.pop(key, None) is not None
 
@@ -289,6 +292,19 @@ class TestIdempotency:
         response = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=HEADERS)
 
         assert response.status_code == 202
+
+    def test_the_claim_is_held_for_the_whole_idempotency_window(self, partner_env):
+        # A claim that lapsed early would let a retry after a crash mid-submit
+        # start a second search across every index.
+        client, _, _ = partner_env
+        cache = dependencies.get_cache_service()
+
+        client.post(
+            f"{BASE}/jobs", json=PAYLOAD, headers={**HEADERS, "Idempotency-Key": "a"}
+        )
+
+        assert cache.redis.set.await_args.kwargs["ex"] == 86400
+        assert cache.redis.set.await_args.kwargs["nx"] is True
 
     def test_a_submit_still_in_flight_says_so(self, partner_env):
         client, galaxy, _ = partner_env

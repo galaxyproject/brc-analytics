@@ -118,6 +118,15 @@ class TestSettings:
         with pytest.raises(ValueError, match="PARTNER_API_SUNSET"):
             Settings()
 
+    def test_enabled_without_the_service_key_refuses_to_start(self, monkeypatch):
+        monkeypatch.setenv("PARTNER_API_ENABLED", "true")
+        monkeypatch.setenv("PARTNER_API_KEYS", ENTRY)
+        monkeypatch.setenv("PARTNER_API_SUNSET", "2027-03-31")
+        monkeypatch.delenv("GALAXY_API_KEY", raising=False)
+
+        with pytest.raises(ValueError, match="GALAXY_API_KEY"):
+            Settings()
+
     def test_disabled_is_the_default(self, monkeypatch):
         monkeypatch.delenv("PARTNER_API_ENABLED", raising=False)
 

@@ -85,6 +85,16 @@ class CacheService:
             logger.error(f"Cache exists error for key {key}: {e}")
             return False
 
+    async def set_if_absent(self, key: str, value: Any, ttl: int) -> bool:
+        """Store value only if key is absent (SET NX); True if this call stored it.
+
+        Redis errors propagate rather than being logged and swallowed: callers
+        use this where going ahead without the reservation would be unsafe.
+        """
+        return bool(
+            await self.redis.set(key, json.dumps(value, default=str), ex=ttl, nx=True)
+        )
+
     async def claim(self, key: str, ttl: int) -> bool:
         """Set a marker only if it is absent (SET NX).
 
@@ -94,7 +104,7 @@ class CacheService:
         back to that rather than refuse the work outright.
         """
         try:
-            return bool(await self.redis.set(key, "1", ex=ttl, nx=True))
+            return await self.set_if_absent(key, 1, ttl)
         except redis.RedisError as e:
             logger.error(f"Cache claim error for key {key}: {e}")
             return True
