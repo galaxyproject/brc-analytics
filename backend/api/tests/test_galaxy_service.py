@@ -3208,6 +3208,46 @@ class TestCollectionDownload:
         assert len(shards) == 2
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "drop",
+        [
+            requests.exceptions.ConnectionError("Connection reset by peer"),
+            requests.exceptions.ChunkedEncodingError("Connection broken"),
+        ],
+    )
+    async def test_a_stream_dropped_midway_is_retried_not_abandoned(
+        self, service, monkeypatch, drop
+    ):
+        # Falling back here would be the per-shard flood the archive avoids.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        service.gi.url = "https://galaxy.example/api"
+        dropped = _archive_response(b"")
+        dropped.iter_content = MagicMock(side_effect=drop)
+        service.gi.make_get_request = MagicMock(
+            side_effect=[dropped, _archive_response(_zip_of(self._shards(2)))]
+        )
+        service._download_shard = AsyncMock()
+
+        shards = await service._download_collection("job1", self._status(2))
+
+        assert len(shards) == 2
+        service._download_shard.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_truncated_archive_is_retried(self, service, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        service.gi.url = "https://galaxy.example/api"
+        whole = _zip_of(self._shards(2))
+        service.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(whole[: len(whole) // 2]),
+                _archive_response(whole),
+            ]
+        )
+
+        assert len(await service._download_collection("job1", self._status(2))) == 2
+
+    @pytest.mark.asyncio
     async def test_a_short_archive_falls_back_rather_than_reading_as_no_hits(
         self, service
     ):

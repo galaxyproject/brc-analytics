@@ -236,9 +236,22 @@ _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 _INDEX_LOCKS = defaultdict(asyncio.Lock)
 
 
+# Transport failures worth another try. A dropped connection is the likeliest
+# way a long archive stream dies -- partway through iter_content it surfaces as
+# ChunkedEncodingError, and an archive cut short without one fails to open as a
+# zip -- and giving up on it falls back to the per-shard flood the archive is
+# there to avoid.
+_RETRYABLE_TRANSPORT_ERRORS = (
+    requests.exceptions.Timeout,
+    requests.exceptions.ConnectionError,
+    requests.exceptions.ChunkedEncodingError,
+    zipfile.BadZipFile,
+)
+
+
 def _is_retryable_fetch_error(e: Exception) -> bool:
-    """A timeout, or a status worth backing off for; shared by both download paths."""
-    return isinstance(e, requests.exceptions.Timeout) or (
+    """A transport failure or status worth backing off for, on either path."""
+    return isinstance(e, _RETRYABLE_TRANSPORT_ERRORS) or (
         isinstance(e, ShardFetchError) and e.status in RETRYABLE_SHARD_STATUSES
     )
 
