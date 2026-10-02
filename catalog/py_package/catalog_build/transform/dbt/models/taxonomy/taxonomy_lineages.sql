@@ -23,10 +23,8 @@ with recursive lineage as (
         0 as depth,
         true as is_query_taxon
     from {{ ref("taxonomy_catalog_taxa") }} c
-    left join {{ source("ncbi", "taxonomy_merged") }} m
-        on m.old_tax_id = c.taxonomy_id
     join {{ source("ncbi", "taxonomy_nodes") }} n
-        on n.tax_id = coalesce(m.new_tax_id, c.taxonomy_id)
+        on n.tax_id = c.taxonomy_id
 
     union all
 
