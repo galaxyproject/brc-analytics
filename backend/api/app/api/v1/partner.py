@@ -195,6 +195,10 @@ async def submit_job(
     if not submission.sequence.strip():
         raise HTTPException(status_code=400, detail="Query sequence cannot be empty")
 
+    if idempotency_key is not None and not idempotency_key.strip():
+        # A blank key would otherwise read as no key at all, and the caller
+        # would believe its retries were protected when they aren't.
+        raise HTTPException(status_code=400, detail="Idempotency-Key is empty")
     idem_key = _idempotency_key(partner, idempotency_key) if idempotency_key else None
     fingerprint = _fingerprint(submission)
     if idem_key is not None:

@@ -284,6 +284,17 @@ class TestIdempotency:
         assert response.status_code == 503
         galaxy.submit_kmindex_query.assert_not_awaited()
 
+    @pytest.mark.parametrize("blank", ["", "   "])
+    def test_a_blank_key_is_refused_rather_than_ignored(self, partner_env, blank):
+        client, galaxy, _ = partner_env
+
+        response = client.post(
+            f"{BASE}/jobs", json=PAYLOAD, headers={**HEADERS, "Idempotency-Key": blank}
+        )
+
+        assert response.status_code == 400
+        galaxy.submit_kmindex_query.assert_not_awaited()
+
     def test_an_unkeyed_submit_does_not_need_redis(self, partner_env):
         import redis.asyncio as redis
 
