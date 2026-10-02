@@ -725,30 +725,18 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
     return data
 
 
-def report_missing_ploidy_info(genomes_df, organisms_df):
+def report_missing_ploidy_info(genomes_df: pd.DataFrame):
     """
     Reports assemblies that are missing ploidy information.
 
     Args:
-        genomes_df: DataFrame containing genome information
-        organisms_df: DataFrame containing organism information, including ploidy information
+        genomes_df: DataFrame containing genome information and ploidy information
 
     Returns:
         A list of tuples containing (accession, speciesTaxonomyId) for assemblies without ploidy information
     """
-    # Create a mapping from taxonomy_id to ploidy
-    ploidy_map = organisms_df.set_index("taxonomy_id")["ploidy"].to_dict()
-
-    # Create a DataFrame with just the relevant columns for the check
-    check_df = genomes_df[["accession", "speciesTaxonomyId", "species"]].copy()
-
-    # Check which species tax IDs we have ploidy information for
-    check_df["has_ploidy"] = check_df["speciesTaxonomyId"].apply(
-        lambda tax_id: tax_id in ploidy_map
-    )
-
     # Find assemblies where we have no ploidy information
-    missing_ploidy = check_df[~check_df["has_ploidy"]]
+    missing_ploidy = genomes_df[genomes_df["ploidy"].isna()]
     missing_count = len(missing_ploidy)
 
     if missing_count > 0:
@@ -1649,6 +1637,17 @@ def build_files(
         assemblies_df["refSeq"],
     )
 
+    genomes_df = genomes_df.merge(
+        source_organisms_df[["taxonomy_id", "ploidy"]],
+        how="left",
+        left_on="taxonomicLevelSpeciesId",
+        right_on="taxonomy_id",
+    )
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
+        genomes_df
+    )
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
     if do_gene_model_urls:
         genomes_df = add_gene_model_url(genomes_df)
         qc_report_params["missing_gene_model_urls"] = report_missing_values(
@@ -1777,11 +1776,6 @@ def build_files(
         qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
-
-    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
-        genomes_df, source_organisms_df
-    )
-    print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
     organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
         organism_taxonomy_df

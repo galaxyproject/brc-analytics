@@ -13,14 +13,13 @@ import {
 import {
   defaultStringToNone,
   getMaxDefined,
-  getPloidyForAssembly,
-  getSourceOrganismsByTaxonomyId,
   getSpeciesStrainName,
   incrementValue,
   parseBoolean,
   parseList,
   parseNumber,
   parseNumberOrNull,
+  parsePloidyForAssembly,
   parseStringOrNull,
   readValuesFile,
   saveJson,
@@ -28,8 +27,6 @@ import {
 } from "../../../build/ts/utils";
 import { SOURCE_GENOME_KEYS } from "./constants";
 import { SourceGenome } from "./entities";
-
-const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
@@ -120,18 +117,10 @@ async function buildAssemblies(): Promise<GA2AssemblyEntity[]> {
     undefined,
     SOURCE_GENOME_KEYS
   );
-  const sourceOrganismsByTaxonomyId = await getSourceOrganismsByTaxonomyId(
-    SOURCE_PATH_ORGANISMS
-  );
 
   const mappedRows: GA2AssemblyEntity[] = [];
   for (const row of sourceRows) {
-    const ploidy = getPloidyForAssembly(
-      sourceOrganismsByTaxonomyId,
-      row.speciesTaxonomyId,
-      true,
-      row.accession
-    );
+    const ploidy = parsePloidyForAssembly(row);
     if (ploidy === null) continue;
     const tolIds = parseList(row.tolId);
     if (tolIds.length > 1)
