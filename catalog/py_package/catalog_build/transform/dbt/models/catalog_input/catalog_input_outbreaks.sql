@@ -3,7 +3,7 @@
 with grouped_descendants as (
   select
     outbreak_taxonomy_id,
-    list(taxonomy_id) as taxonomy_ids
+    list(taxonomy_id order by taxonomy_id) as taxonomy_ids
   from {{ ref("catalog_input_outbreak_descendants") }}
   group by outbreak_taxonomy_id
 )
