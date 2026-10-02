@@ -76,23 +76,23 @@ def catalog_source(
     *,
     assemblies_path: Path,
     organisms_path: Path,
-    workflows_path: Path,
+    workflows_path: Path | None,
     curated_taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
     resources = [
         assemblies_source(assemblies_path),
         organisms_source(organisms_path),
-        workflows_source(workflows_path),
     ]
-    # Only load curated taxa for catalogs that curate any; when absent, the shared
-    # dbt models skip the curated_taxa source entirely (see has_curated_taxa var)
+    # Optional entity types that may not be used or built by a catalog; when absent,
+    # the shared dbt models skip the omitted sources entirely based on variables passed
+    # to dbt (has_curated_taxa, has_outbreaks, has_workflows)
     if curated_taxa_path is not None:
         resources.append(curated_taxa_source(curated_taxa_path))
-    # Only load outbreaks for catalogs that have them; when absent, the shared
-    # dbt models skip using outbreaks data entirely (see has_outbreaks var)
     if outbreaks_path is not None:
         resources.append(outbreaks_source(outbreaks_path))
+    if workflows_path is not None:
+        resources.append(workflows_source(workflows_path))
     return resources
 
 
@@ -102,7 +102,7 @@ def load_catalog_source_data(
     dlt_pipeline_prefix: str,
     assemblies_path: Path,
     organisms_path: Path,
-    workflows_path: Path,
+    workflows_path: Path | None,
     curated_taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -115,7 +115,7 @@ def load_catalog_source_data(
       dlt_pipeline_prefix: Catalog-specific prefix applied to the dlt pipeline name
       assemblies_path: Path of source assemblies YAML
       organisms_path: Path of source organisms YAML
-      workflows_path: Path of source workflows YAML
+      workflows_path: Path of source workflows YAML, or None for catalogs that don't build workflows
       curated_taxa_path: Path of source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path of source outbreaks YAML, or None for catalogs without outbreaks
     """

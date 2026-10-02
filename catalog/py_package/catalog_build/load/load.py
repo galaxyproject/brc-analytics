@@ -17,7 +17,7 @@ def do_dlt_load(
     dlt_pipeline_prefix: str,
     assemblies_path: Path,
     organisms_path: Path,
-    workflows_path: Path,
+    workflows_path: Path | None,
     taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -29,7 +29,7 @@ def do_dlt_load(
       dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
       assemblies_path: Path to source assemblies YAML
       organisms_path: Path to source organisms YAML
-      workflows_path: Path to source workflows YAML
+      workflows_path: Path to source workflows YAML, or None for catalogs that don't build workflows
       taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
