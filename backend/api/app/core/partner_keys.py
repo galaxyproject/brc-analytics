@@ -69,7 +69,7 @@ def parse_partner_keys(raw: str) -> tuple[PartnerKey, ...]:
     @returns: the configured keys.
     """
     keys: list[PartnerKey] = []
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     digests: set[str] = set()
     for entry in (e.strip() for e in raw.split(",")):
         if not entry:
@@ -87,9 +87,13 @@ def parse_partner_keys(raw: str) -> tuple[PartnerKey, ...]:
             )
         if not _DIGEST_PATTERN.match(digest):
             raise ValueError("PARTNER_API_KEYS digests must be 64 hex characters")
-        if key_id in seen:
-            raise ValueError(f"PARTNER_API_KEYS repeats key_id {key_id!r}")
-        seen.add(key_id)
+        # A key_id names one of a partner's keys, so two partners can both
+        # rotate to "2026-09" without colliding.
+        if (partner_id, key_id) in seen:
+            raise ValueError(
+                f"PARTNER_API_KEYS repeats key_id {key_id!r} for {partner_id!r}"
+            )
+        seen.add((partner_id, key_id))
         # One key must name one partner, or whichever entry matched last would
         # decide whose budget, history and analytics a request lands in.
         if digest in digests:

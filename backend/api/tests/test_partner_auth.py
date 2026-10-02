@@ -43,13 +43,21 @@ class TestParsing:
             "Logan:k1:" + "a" * 64,
             "logan:k1:" + "a" * 63,
             "logan:k1:" + "g" * 64,
-            f"a:k1:{'a' * 64},b:k1:{'b' * 64}",
+            f"a:k1:{'a' * 64},a:k1:{'b' * 64}",
             f"a:k1:{'a' * 64},b:k2:{'a' * 64}",
         ],
     )
     def test_malformed_entries_are_refused(self, raw):
         with pytest.raises(ValueError):
             parse_partner_keys(raw)
+
+    def test_two_partners_can_share_a_key_id(self):
+        keys = parse_partner_keys(f"a:2026-09:{'a' * 64},b:2026-09:{'b' * 64}")
+
+        assert {(k.partner_id, k.key_id) for k in keys} == {
+            ("a", "2026-09"),
+            ("b", "2026-09"),
+        }
 
     def test_a_generated_key_has_the_entropy_the_hash_relies_on(self):
         assert len(generate_partner_key()) >= 43

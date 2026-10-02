@@ -361,7 +361,9 @@ class KmindexSubmission(Base):
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    indexes: Mapped[list] = mapped_column(JSON_COLUMN, default=list, nullable=False)
+    indexes: Mapped[list[str]] = mapped_column(
+        JSON_COLUMN, default=list, nullable=False
+    )
     query_bases: Mapped[int] = mapped_column(Integer, nullable=False)
     threshold: Mapped[float] = mapped_column(Float, nullable=False)
     zvalue: Mapped[int] = mapped_column(Integer, nullable=False)

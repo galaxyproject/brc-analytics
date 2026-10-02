@@ -86,9 +86,10 @@ class CacheService:
             return False
 
     async def claim(self, key: str, ttl: int) -> bool:
-        """Set a marker only if it is absent (SET NX); True if this call set it.
+        """Set a marker only if it is absent (SET NX).
 
-        Also True when Redis can't be reached: the callers are coordinating
+        True if this call set it -- and also True, though nothing was set, when
+        Redis can't be reached: the callers are coordinating
         work that would otherwise just be duplicated, so an outage should fall
         back to that rather than refuse the work outright.
         """
