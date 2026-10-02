@@ -236,6 +236,13 @@ _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 _INDEX_LOCKS = defaultdict(asyncio.Lock)
 
 
+def _is_retryable_fetch_error(e: Exception) -> bool:
+    """A timeout, or a status worth backing off for; shared by both download paths."""
+    return isinstance(e, requests.exceptions.Timeout) or (
+        isinstance(e, ShardFetchError) and e.status in RETRYABLE_SHARD_STATUSES
+    )
+
+
 def _output_collection_id(job_data: dict) -> Optional[str]:
     """The job's one output collection, or None if it has none or several."""
     collections = [
@@ -673,11 +680,10 @@ class GalaxyService:
                 # hold a slot the other shards could be using. A gateway error is
                 # as transient as a rate limit, and a shard given up on is a
                 # hole in the hit list until the hourly re-aggregation.
-                is_retryable = isinstance(e, requests.exceptions.Timeout) or (
-                    isinstance(e, ShardFetchError)
-                    and e.status in RETRYABLE_SHARD_STATUSES
-                )
-                if not is_retryable or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1:
+                if (
+                    not _is_retryable_fetch_error(e)
+                    or attempt == KMINDEX_DOWNLOAD_ATTEMPTS - 1
+                ):
                     logger.warning(f"Shard {dataset_id} download failed: {e}")
                     return None
                 await asyncio.sleep(
@@ -1067,11 +1073,10 @@ class GalaxyService:
                     self._fetch_collection, status.output_collection_id
                 )
             except Exception as e:
-                retryable = isinstance(e, requests.exceptions.Timeout) or (
-                    isinstance(e, ShardFetchError)
-                    and e.status in RETRYABLE_SHARD_STATUSES
-                )
-                if not retryable or attempt == KMINDEX_COLLECTION_ATTEMPTS - 1:
+                if (
+                    not _is_retryable_fetch_error(e)
+                    or attempt == KMINDEX_COLLECTION_ATTEMPTS - 1
+                ):
                     logger.warning(
                         f"kmindex job {job_id}: collection download failed, "
                         f"falling back to per-shard downloads: {e}"
@@ -1119,7 +1124,10 @@ class GalaxyService:
                 shards: List[Optional[dict]] = []
                 with zipfile.ZipFile(archive) as z:
                     for member in z.infolist():
-                        if member.is_dir():
+                        # Shards are the .json members; anything else Galaxy
+                        # adds to the archive would inflate the count and
+                        # force the per-shard fallback for nothing.
+                        if member.is_dir() or not member.filename.endswith(".json"):
                             continue
                         try:
                             shards.append(json.loads(z.read(member)))

@@ -3219,6 +3219,25 @@ class TestCollectionDownload:
         assert await service._download_collection("job1", self._status(3)) is None
 
     @pytest.mark.asyncio
+    async def test_non_json_members_are_not_counted_as_shards(self, service):
+        import io
+        import zipfile
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as z:
+            for name, body in self._shards(2).items():
+                z.writestr(f"results/{name}.json", body)
+            z.writestr("results/manifest.txt", "two shards")
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            return_value=_archive_response(buffer.getvalue())
+        )
+
+        shards = await service._download_collection("job1", self._status(2))
+
+        assert len(shards) == 2
+
+    @pytest.mark.asyncio
     async def test_a_bad_member_counts_as_a_failed_shard(self, service):
         shards = self._shards(2)
         shards["IDX_1"] = "{not json"
