@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import asyncio
 import time
-import uuid
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock
 
