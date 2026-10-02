@@ -9,13 +9,24 @@ version: 2
 # Postgres).
 models:
   - name: catalog_input_curated_taxa
+    # Only tested when the catalog curates information for individual taxa
     columns:
       - name: taxonomy_id
         data_tests:
+          - not_null:
+              name: catalog_curated_taxa_have_tax_ids
+              config:
+                enabled: "{{ var('has_curated_taxa', false) }}"
+          - unique:
+              name: catalog_curated_taxa_unique_ids
+              config:
+                enabled: "{{ var('has_curated_taxa', false) }}"
           - columns_equal:
               name: curated_taxa_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+              config:
+                enabled: "{{ var('has_curated_taxa', false) }}"
           - relationships:
               name: catalog_curated_taxa_in_lineages
               arguments:
@@ -27,6 +38,10 @@ models:
     columns:
       - name: taxonomy_id
         data_tests:
+          - unique:
+              name: catalog_organisms_unique_tax_ids
+          - not_null:
+              name: catalog_organisms_have_tax_ids
           - columns_equal:
               name: organism_tax_ids_are_latest
               arguments:
@@ -37,13 +52,24 @@ models:
                 to: ref('taxonomy_organisms')
                 field: taxonomy_id
   - name: catalog_input_outbreaks
+    # Only tested when the catalog has outbreaks
     columns:
       - name: taxonomy_id
         data_tests:
+          - unique:
+              name: catalog_outbreaks_unique_tax_ids
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
+          - not_null:
+              name: catalog_outbreaks_have_tax_ids
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
           - columns_equal:
               name: outbreak_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
+              config:
+                enabled: "{{ var('has_outbreaks', false) }}"
           - relationships:
               name: catalog_outbreak_taxa_in_outbreak_taxonomy
               arguments:

@@ -80,13 +80,6 @@ sources:
               - not_null:
                   name: catalog_assemblies_have_accessions
       - name: organisms
-        columns:
-          - name: taxonomy_id
-            data_tests:
-              - unique:
-                  name: catalog_organisms_unique_tax_ids
-              - not_null:
-                  name: catalog_organisms_have_tax_ids
       - name: workflows
         columns:
           - name: trs_id
@@ -96,28 +89,4 @@ sources:
               - not_null:
                   name: catalog_workflows_have_trs_ids
       - name: curated_taxa
-        # Only tested when the catalog curates information for individual taxa
-        columns:
-          - name: taxonomy_id
-            data_tests:
-              - not_null:
-                  name: catalog_curated_taxa_have_tax_ids
-                  config:
-                    enabled: "{{ var('has_curated_taxa', false) }}"
-              - unique:
-                  name: catalog_curated_taxa_unique_ids
-                  config:
-                    enabled: "{{ var('has_curated_taxa', false) }}"
       - name: outbreaks
-        # Only tested when the catalog has outbreaks
-        columns:
-          - name: taxonomy_id
-            data_tests:
-              - unique:
-                  name: catalog_outbreaks_unique_tax_ids
-                  config:
-                    enabled: "{{ var('has_outbreaks', false) }}"
-              - not_null:
-                  name: catalog_outbreaks_have_tax_ids
-                  config:
-                    enabled: "{{ var('has_outbreaks', false) }}"
