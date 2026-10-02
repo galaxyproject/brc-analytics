@@ -36,8 +36,6 @@ const LOGIN_ENABLED = process.env.NEXT_PUBLIC_LOGIN_ENABLED === "true";
 // a Galaxy API key and an SRA mirror, which production does not have yet.
 const LOGAN_SEARCH_ENABLED =
   process.env.NEXT_PUBLIC_LOGAN_SEARCH_ENABLED === "true";
-const GENE_PAGES_ENABLED =
-  process.env.NEXT_PUBLIC_GENE_PAGES_ENABLED === "true";
 
 /**
  * Removes the SAVED column from an entity's list config when login is
@@ -71,7 +69,6 @@ function withSavedColumnGated<T>(
  * @param gitHubUrl - GitHub URL.
  * @param loginEnabled - Whether to show the login button.
  * @param loganSearchEnabled - Whether to show the Logan Search header entry.
- * @param genePagesEnabled - Whether to show the Genes header entry.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -87,8 +84,7 @@ export function makeConfig(
   browserUrl: string,
   gitHubUrl = GIT_HUB_REPO_URL,
   loginEnabled = LOGIN_ENABLED,
-  loganSearchEnabled = LOGAN_SEARCH_ENABLED,
-  genePagesEnabled = GENE_PAGES_ENABLED
+  loganSearchEnabled = LOGAN_SEARCH_ENABLED
 ): AppSiteConfig {
   return {
     appTitle: APP_TITLE,
@@ -136,7 +132,7 @@ export function makeConfig(
           link: "/",
           src: "/logo/brc.svg",
         }),
-        navigation: headerNavigation(loganSearchEnabled, genePagesEnabled),
+        navigation: headerNavigation(loganSearchEnabled),
         socialMedia: socialMedia,
       },
     },

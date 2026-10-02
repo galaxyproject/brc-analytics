@@ -23,7 +23,7 @@ function flattenLink(link: NavLinkItem): { label: string; url: string }[] {
 function headerLinks(
   loganSearchEnabled: boolean
 ): { label: string; url: string }[] {
-  return headerNavigation(loganSearchEnabled, true).flatMap((group) =>
+  return headerNavigation(loganSearchEnabled).flatMap((group) =>
     (group ?? []).flatMap(flattenLink)
   );
 }
