@@ -1,16 +1,25 @@
 import path from "path";
 import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
-import { Outbreaks as SourceOutbreaks } from "../../schema/generated/schema";
-import { readMdxFile, readValuesFile, readYamlFile } from "./utils";
+import {
+  Outbreak as SourceOutbreak,
+  Outbreaks as SourceOutbreaks,
+} from "../../schema/generated/schema";
+import {
+  parseListOrNull,
+  readMdxFile,
+  readValuesFile,
+  readYamlFile,
+} from "./utils";
 
-/**
- * Interface for taxonomy mapping data from the TSV file
- */
-interface TaxonomyMapping {
-  name: string;
-  rank: string;
-  taxonomy_id: number;
-}
+const TAXONOMY_MAPPING_KEYS = [
+  "source_taxonomy_id",
+  "taxonomy_id",
+  "highlight_descendant_taxonomy_ids",
+  "name",
+  "rank",
+] as const;
+
+type TaxonomyMapping = Record<(typeof TAXONOMY_MAPPING_KEYS)[number], string>;
 
 const SOURCE_PATH_ROOT = "catalog/source";
 const SOURCE_PATH_OUTBREAKS = "catalog/source/outbreaks.yml";
@@ -37,25 +46,43 @@ const STANDARD_TAXONOMIC_RANKS = [
  * @param taxonomyMappings - Array of taxonomy mappings to look up the taxonomy name and rank
  * @returns An object containing the field name and value to use for filtering, or null if no mapping is found
  */
-function determineTaxonFieldAndName(
-  outbreak: Outbreak,
+function getTaxonomyInfo(
+  sourceOutbreak: SourceOutbreak,
   taxonomyMappings: TaxonomyMapping[]
-): { taxonName: string; taxonNameField: string } | null {
+): Pick<
+  Outbreak,
+  | "taxonomy_id"
+  | "highlight_descendant_taxonomy_ids"
+  | "taxonName"
+  | "taxonNameField"
+> | null {
   // make sure is string
-  const taxonomyId = String(outbreak.taxonomy_id);
+  const sourceTaxonomyId = String(sourceOutbreak.taxonomy_id);
 
   // Find the mapping for this taxonomy ID
   const mapping = taxonomyMappings.find(
-    (m) => String(m.taxonomy_id) === taxonomyId
+    (m) => m.source_taxonomy_id === sourceTaxonomyId
   );
   if (!mapping) {
     return null;
   }
 
+  const taxIdsInfo: Pick<
+    Outbreak,
+    "taxonomy_id" | "highlight_descendant_taxonomy_ids"
+  > = {
+    taxonomy_id: Number(mapping.taxonomy_id),
+    highlight_descendant_taxonomy_ids:
+      parseListOrNull(mapping.highlight_descendant_taxonomy_ids)?.map((id) =>
+        Number(id)
+      ) ?? null,
+  };
+
   // If the rank is a standard taxonomic rank, use the corresponding taxonomic level field
   const rank = mapping.rank.toLowerCase();
   if (STANDARD_TAXONOMIC_RANKS.includes(rank)) {
     return {
+      ...taxIdsInfo,
       taxonName: mapping.name,
       taxonNameField: `taxonomicLevel${rank.charAt(0).toUpperCase()}${rank.slice(1)}`,
     };
@@ -63,6 +90,7 @@ function determineTaxonFieldAndName(
 
   // If the rank is not a standard taxonomic rank, use otherTaxa
   return {
+    ...taxIdsInfo,
     taxonName: mapping.name,
     taxonNameField: "otherTaxa",
   };
@@ -74,7 +102,9 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
 
   try {
     taxonomyMappings = await readValuesFile<TaxonomyMapping>(
-      OUTBREAK_TAXONOMY_MAPPING_PATH
+      OUTBREAK_TAXONOMY_MAPPING_PATH,
+      undefined,
+      TAXONOMY_MAPPING_KEYS
     );
     console.log(`Read ${taxonomyMappings.length} taxonomy mappings`);
   } catch (error) {
@@ -96,7 +126,7 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
     );
 
     // Create the base outbreak object
-    const outbreak: Outbreak = {
+    let outbreak: Outbreak = {
       description: await readMdxFile(descriptionPath),
       highlight_descendant_taxonomy_ids:
         sourceOutbreak.highlight_descendant_taxonomy_ids ?? null,
@@ -106,11 +136,12 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
       taxonomy_id: sourceOutbreak.taxonomy_id,
     };
 
-    // Determine the taxon field and name for filtering
-    const taxonInfo = determineTaxonFieldAndName(outbreak, taxonomyMappings);
+    // Find the resolved taxonomy IDs, and determine the taxon field and name for filtering
+    // If the relevant mapping entry doesn't exist, the taxonomy IDs are left as they are in the source,
+    // and the taxon field info is omitted
+    const taxonInfo = getTaxonomyInfo(sourceOutbreak, taxonomyMappings);
     if (taxonInfo) {
-      outbreak.taxonNameField = taxonInfo.taxonNameField;
-      outbreak.taxonName = taxonInfo.taxonName;
+      outbreak = { ...outbreak, ...taxonInfo };
     }
 
     outbreaks.push(outbreak);

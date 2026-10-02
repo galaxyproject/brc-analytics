@@ -1201,33 +1201,37 @@ def get_outbreak_taxonomy_ids(
     )
 
 
-def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_path):
+def save_taxonomy_mapping(
+    source_outbreaks_df: pd.DataFrame | None,
+    taxon_name_map: dict[str, str],
+    taxon_rank_map: dict[str, str],
+    output_path: str,
+):
     """
     Create and save a TSV file with taxonomy ID to name and rank mapping.
 
     Args:
-        taxonomy_ids: List of taxonomy IDs to include in the mapping
+        source_outbreaks_df: Outbreak definitions containing resolved taxonomy IDs
         output_path: Path to save the TSV file
     """
-    if not taxonomy_ids:
+    if source_outbreaks_df is None:
         return
 
-    # Create DataFrame with taxonomy ID, name, and rank
-    rows = []
-    for tax_id in taxonomy_ids:
-        if str(tax_id) in taxon_name_map:
-            rows.append(
-                {
-                    "taxonomy_id": tax_id,
-                    "name": taxon_name_map.get(str(tax_id), ""),
-                    "rank": taxon_rank_map.get(str(tax_id), ""),
-                }
-            )
+    taxonomy_mapping_df = source_outbreaks_df[
+        ["source_taxonomy_id", "taxonomy_id", "highlight_descendant_taxonomy_ids"]
+    ]
+    taxonomy_id_strings = taxonomy_mapping_df["taxonomy_id"].astype("string")
+    taxonomy_mapping_df = taxonomy_mapping_df.assign(
+        highlight_descendant_taxonomy_ids=taxonomy_mapping_df[
+            "highlight_descendant_taxonomy_ids"
+        ].map(lambda ids: ",".join([str(id) for id in ids]), na_action="ignore"),
+        name=taxonomy_id_strings.map(taxon_name_map, na_action="ignore"),
+        rank=taxonomy_id_strings.map(taxon_rank_map, na_action="ignore"),
+    )
 
     # Save to TSV file
-    if rows:
-        pd.DataFrame(rows).to_csv(output_path, index=False, sep="\t")
-        print(f"Wrote taxonomy mapping to {output_path}")
+    taxonomy_mapping_df.to_csv(output_path, index=False, sep="\t")
+    print(f"Wrote taxonomy mapping to {output_path}")
 
 
 def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
@@ -1803,7 +1807,7 @@ def build_files(
     if outbreak_taxonomy_mapping_path is not None and outbreak_taxonomy_ids:
         print(f"Saving taxonomy mapping to {outbreak_taxonomy_mapping_path}")
         save_taxonomy_mapping(
-            outbreak_taxonomy_ids,
+            source_outbreaks_df,
             outbreak_taxon_name_map,
             outbreak_taxon_rank_map,
             outbreak_taxonomy_mapping_path,
