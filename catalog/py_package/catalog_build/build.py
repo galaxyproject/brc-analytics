@@ -1642,10 +1642,10 @@ def build_files(
     )
 
     genomes_df = genomes_df.merge(
-        source_organisms_df[["taxonomy_id", "ploidy"]],
+        source_organisms_df[["taxonomy_id", "ploidy"]].set_index("taxonomy_id"),
         how="left",
         left_on="taxonomicLevelSpeciesId",
-        right_on="taxonomy_id",
+        right_index=True,
     )
     qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
         genomes_df
