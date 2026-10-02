@@ -5,7 +5,9 @@ import hashlib
 import json
 import logging
 import random
+import tempfile
 import time
+import zipfile
 from collections import Counter, defaultdict
 from typing import List, Optional, Tuple
 
@@ -110,6 +112,10 @@ KMINDEX_RETRY_SWEEP_DELAY = 20.0
 # can return far more than anyone will page through, and the whole list is
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
+
+# A collection archive is one request for every shard, so it gets fewer, longer
+# tries than a single shard does before falling back to per-shard downloads.
+KMINDEX_COLLECTION_ATTEMPTS = 3
 
 # Statuses worth backing off and asking again for, rather than dropping the shard.
 RETRYABLE_SHARD_STATUSES = frozenset({429, 502, 503, 504})
@@ -228,6 +234,16 @@ _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 # on the cold path at once. Keyed by cache key, so two Galaxy instances (tests,
 # a re-pointed dev) do not queue behind each other.
 _INDEX_LOCKS = defaultdict(asyncio.Lock)
+
+
+def _output_collection_id(job_data: dict) -> Optional[str]:
+    """The job's one output collection, or None if it has none or several."""
+    collections = [
+        c.get("id")
+        for c in (job_data.get("output_collections") or {}).values()
+        if isinstance(c, dict) and c.get("src") == "hdca"
+    ]
+    return collections[0] if len(collections) == 1 else None
 
 
 def _tie_break(accession: str) -> str:
@@ -1026,6 +1042,137 @@ class GalaxyService:
             return None, True
         return record, False
 
+    async def _download_collection(
+        self, job_id: str, status: GalaxyJobStatus
+    ) -> Optional[List[Optional[dict]]]:
+        """
+        Every shard in one request, from the job's output collection as a zip.
+
+        One GET per shard is thousands of requests for an all-index search, and
+        Galaxy rate-limits us well before that. Galaxy streams the archive, so a
+        big one does not trip the read timeout.
+
+        @param job_id: the job, for logging.
+        @param status: the job's status, carrying its outputs and collection.
+        @returns: the parsed shards, or None to fall back to per-shard
+            downloads -- no collection, a download that kept failing, or an
+            archive whose member count does not match the job's outputs.
+        """
+        if not status.output_collection_id:
+            return None
+        delay = KMINDEX_BACKOFF_SECONDS
+        for attempt in range(KMINDEX_COLLECTION_ATTEMPTS):
+            try:
+                shards = await asyncio.to_thread(
+                    self._fetch_collection, status.output_collection_id
+                )
+            except Exception as e:
+                retryable = isinstance(e, requests.exceptions.Timeout) or (
+                    isinstance(e, ShardFetchError)
+                    and e.status in RETRYABLE_SHARD_STATUSES
+                )
+                if not retryable or attempt == KMINDEX_COLLECTION_ATTEMPTS - 1:
+                    logger.warning(
+                        f"kmindex job {job_id}: collection download failed, "
+                        f"falling back to per-shard downloads: {e}"
+                    )
+                    return None
+                await asyncio.sleep(
+                    delay * (1 + random.random() * KMINDEX_BACKOFF_JITTER)
+                )
+                delay *= 2
+                continue
+            if len(shards) != len(status.outputs):
+                # Not knowing which outputs are missing, a short archive can't be
+                # patched shard by shard -- and merging it anyway would report
+                # the gap as "no hits" rather than as failed shards.
+                logger.warning(
+                    f"kmindex job {job_id}: collection held {len(shards)} shards "
+                    f"but the job has {len(status.outputs)} outputs; falling back "
+                    "to per-shard downloads"
+                )
+                return None
+            return shards
+        return None
+
+    def _fetch_collection(self, collection_id: str) -> List[Optional[dict]]:
+        """
+        Download a collection's zip to a temp file and parse each member.
+
+        @param collection_id: the HDCA.
+        @returns: one parsed shard per member, None for a member that isn't
+            valid JSON (counted as a failed shard, as a failed download is).
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/dataset_collections/{collection_id}/download",
+            stream=True,
+        )
+        try:
+            if r.status_code != 200:
+                raise ShardFetchError(
+                    r.status_code, f"collection {collection_id}: {r.text[:200]}"
+                )
+            with tempfile.TemporaryFile() as archive:
+                for chunk in r.iter_content(chunk_size=1 << 20):
+                    archive.write(chunk)
+                archive.seek(0)
+                shards: List[Optional[dict]] = []
+                with zipfile.ZipFile(archive) as z:
+                    for member in z.infolist():
+                        if member.is_dir():
+                            continue
+                        try:
+                            shards.append(json.loads(z.read(member)))
+                        except ValueError:
+                            logger.warning(
+                                f"collection {collection_id}: {member.filename} "
+                                "is not valid JSON"
+                            )
+                            shards.append(None)
+                return shards
+        finally:
+            r.close()
+
+    async def _download_each_shard(
+        self, job_id: str, status: GalaxyJobStatus
+    ) -> List[Optional[dict]]:
+        """
+        One GET per shard, then a slower sweep for the ones that failed.
+
+        @param job_id: the job, for logging.
+        @param status: the job's status, carrying its outputs.
+        @returns: one parsed shard per output, None where the download failed.
+        """
+        semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
+        shards = list(
+            await asyncio.gather(
+                *(self._download_shard(o.dataset.id, semaphore) for o in status.outputs)
+            )
+        )
+
+        # Second pass for stragglers. The rate limiter is bursty, so a handful
+        # of shards can exhaust their budget while the rest sail through --
+        # letting the pressure drop and retrying just those one at a time
+        # recovers them without making every shard wait on a longer budget.
+        stragglers = [i for i, shard in enumerate(shards) if shard is None]
+        if stragglers:
+            logger.info(
+                f"kmindex job {job_id}: retrying {len(stragglers)} shards after "
+                f"a {KMINDEX_RETRY_SWEEP_DELAY}s cooldown"
+            )
+            await asyncio.sleep(KMINDEX_RETRY_SWEEP_DELAY)
+            single = asyncio.Semaphore(1)
+            recovered = await asyncio.gather(
+                *(
+                    self._download_shard(status.outputs[i].dataset.id, single)
+                    for i in stragglers
+                )
+            )
+            for index, shard in zip(stragglers, recovered):
+                shards[index] = shard
+
+        return shards
+
     async def _aggregate_shards(self, job_id: str) -> dict:
         """Download and merge every shard for a completed kmindex job."""
         cache_key = self._agg_cache_key(job_id)
@@ -1057,33 +1204,9 @@ class GalaxyService:
         submitted_indexes = _submitted_index_names(params)
         threshold = _submitted_threshold(params)
 
-        semaphore = asyncio.Semaphore(KMINDEX_MAX_CONCURRENT_DOWNLOADS)
-        shards = list(
-            await asyncio.gather(
-                *(self._download_shard(o.dataset.id, semaphore) for o in status.outputs)
-            )
-        )
-
-        # Second pass for stragglers. The rate limiter is bursty, so a handful
-        # of shards can exhaust their budget while the rest sail through --
-        # letting the pressure drop and retrying just those one at a time
-        # recovers them without making every shard wait on a longer budget.
-        stragglers = [i for i, shard in enumerate(shards) if shard is None]
-        if stragglers:
-            logger.info(
-                f"kmindex job {job_id}: retrying {len(stragglers)} shards after "
-                f"a {KMINDEX_RETRY_SWEEP_DELAY}s cooldown"
-            )
-            await asyncio.sleep(KMINDEX_RETRY_SWEEP_DELAY)
-            single = asyncio.Semaphore(1)
-            recovered = await asyncio.gather(
-                *(
-                    self._download_shard(status.outputs[i].dataset.id, single)
-                    for i in stragglers
-                )
-            )
-            for index, shard in zip(stragglers, recovered):
-                shards[index] = shard
+        shards = await self._download_collection(job_id, status)
+        if shards is None:
+            shards = await self._download_each_shard(job_id, status)
 
         hits: List[dict] = []
         query_name = None
@@ -1480,6 +1603,7 @@ class GalaxyService:
             # re-fetch it.
             if status.is_successful:
                 status.outputs = await self._get_job_outputs(job_id, job_data)
+                status.output_collection_id = _output_collection_id(job_data)
             if state in SETTLED_JOB_STATES:
                 await self.cache.set(cache_key, status.model_dump(), CacheTTL.ONE_HOUR)
 

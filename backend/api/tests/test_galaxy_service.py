@@ -3121,3 +3121,140 @@ class TestGalaxyServiceTimeouts:
 
         assert await service._download_shard("ds1", asyncio.Semaphore(1)) is None
         assert service.gi.make_get_request.call_count == 1
+
+
+def _zip_of(shards: dict) -> bytes:
+    """A collection archive as Galaxy serves it: one JSON file per shard."""
+    import io
+    import zipfile
+
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as z:
+        z.writestr("kmindex query results (json)/", "")
+        for name, body in shards.items():
+            z.writestr(f"kmindex query results (json)/{name}.json", body)
+    return buffer.getvalue()
+
+
+def _archive_response(payload: bytes, status_code: int = 200):
+    response = MagicMock(status_code=status_code, text="")
+    response.iter_content = MagicMock(return_value=iter([payload]))
+    return response
+
+
+class TestCollectionDownload:
+    """
+    A kmindex job's shards come down as one collection archive.
+
+    One GET per shard is thousands of requests for an all-index search, which
+    Galaxy rate-limits long before the merge finishes. The per-shard path is
+    kept as the fallback for when the archive can't be had or can't be trusted.
+    """
+
+    @staticmethod
+    def _status(shard_count, collection_id="hdca1"):
+        outputs = [
+            MagicMock(name=f"out{i}", dataset=MagicMock(id=f"ds{i}"))
+            for i in range(shard_count)
+        ]
+        return MagicMock(outputs=outputs, output_collection_id=collection_id)
+
+    @staticmethod
+    def _shards(n):
+        return {
+            f"IDX_{i}": json.dumps({f"IDX_{i}": {"q": {f"SRR{i}": 0.9}}})
+            for i in range(n)
+        }
+
+    def test_the_collection_id_comes_off_the_job(self):
+        job = {"output_collections": {"output": {"src": "hdca", "id": "c1"}}}
+
+        assert galaxy_service._output_collection_id(job) == "c1"
+        assert galaxy_service._output_collection_id({}) is None
+        # Two collections leave it ambiguous which holds the shards.
+        job["output_collections"]["other"] = {"src": "hdca", "id": "c2"}
+        assert galaxy_service._output_collection_id(job) is None
+
+    @pytest.mark.asyncio
+    async def test_every_shard_comes_from_one_request(self, service):
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            return_value=_archive_response(_zip_of(self._shards(3)))
+        )
+        service._download_shard = AsyncMock()
+
+        shards = await service._download_collection("job1", self._status(3))
+
+        assert sorted(next(iter(s)) for s in shards) == ["IDX_0", "IDX_1", "IDX_2"]
+        assert service.gi.make_get_request.call_count == 1
+        assert service.gi.make_get_request.call_args.args == (
+            "https://galaxy.example/api/dataset_collections/hdca1/download",
+        )
+        service._download_shard.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_rate_limited_archive_is_retried(self, service, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(b"", status_code=429),
+                _archive_response(_zip_of(self._shards(2))),
+            ]
+        )
+
+        shards = await service._download_collection("job1", self._status(2))
+
+        assert len(shards) == 2
+
+    @pytest.mark.asyncio
+    async def test_a_short_archive_falls_back_rather_than_reading_as_no_hits(
+        self, service
+    ):
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            return_value=_archive_response(_zip_of(self._shards(2)))
+        )
+
+        assert await service._download_collection("job1", self._status(3)) is None
+
+    @pytest.mark.asyncio
+    async def test_a_bad_member_counts_as_a_failed_shard(self, service):
+        shards = self._shards(2)
+        shards["IDX_1"] = "{not json"
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.make_get_request = MagicMock(
+            return_value=_archive_response(_zip_of(shards))
+        )
+
+        result = await service._download_collection("job1", self._status(2))
+
+        assert result.count(None) == 1
+
+    @pytest.mark.asyncio
+    async def test_no_collection_means_per_shard_downloads(self, service):
+        service.gi.make_get_request = MagicMock()
+
+        assert await service._download_collection("job1", self._status(2, None)) is None
+        service.gi.make_get_request.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_the_merge_falls_back_when_the_archive_fails(self, service):
+        service.sra_mirror = None
+        service.get_job_status = AsyncMock(return_value=self._status(2))
+        service._job_params = AsyncMock(return_value=None)
+        service._download_collection = AsyncMock(return_value=None)
+        service._download_shard = AsyncMock(
+            side_effect=lambda ds_id, sem: {
+                f"IDX_{ds_id[2:]}": {"q": {f"SRR{ds_id[2:]}": 0.9}}
+            }
+        )
+        service.get_job_status.return_value.is_complete = True
+        service.get_job_status.return_value.is_successful = True
+        service.get_job_status.return_value.params = None
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["shards_searched"] == 2
+        assert aggregate["shards_failed"] == 0
+        assert service._download_shard.await_count == 2

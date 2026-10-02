@@ -550,6 +550,10 @@ class GalaxyJobStatus(BaseModel):
         default=False, description="Whether the job completed successfully"
     )
     outputs: List[GalaxyJobOutput] = []
+    # The collection the outputs belong to, when the tool writes one: kmindex
+    # does, and downloading it as one archive is one request instead of one per
+    # shard.
+    output_collection_id: Optional[str] = None
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
