@@ -48,7 +48,7 @@ const CASES: { breakpoint: BreakpointKey; labels: string[] }[] = [
  * @returns Centre group links.
  */
 function centreLinks(): NavLinkItem[] | undefined {
-  return headerNavigation(true, true)[1];
+  return headerNavigation(true)[1];
 }
 
 /**
@@ -59,7 +59,7 @@ function centreLinks(): NavLinkItem[] | undefined {
  * @returns Drawer labels, in display order.
  */
 function drawerLabels(breakpoint: BreakpointKey): string[] {
-  const [navL, navC, navR] = headerNavigation(true, true);
+  const [navL, navC, navR] = headerNavigation(true);
   const navigation: Navigation = [
     getNavigationLinks(navL, breakpoint),
     getNavigationLinks(navC, breakpoint),

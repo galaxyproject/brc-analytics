@@ -22,16 +22,14 @@ const VISIBLE_AT_SM_MD = visibleOnly("sm", "md");
 /**
  * Header navigation links.
  * @param loganSearchEnabled - Whether to show the Logan Search entry.
- * @param genePagesEnabled - Whether to show the Genes entry.
  * @remarks
  * Kept out of `config.ts` so tests can reach it: `config.ts` transitively
  * imports `next-mdx-remote`, which Jest cannot parse.
+ * The Genes entry is always included here; it is gated at runtime by the
+ * gene pages feature flag (see the site's `useAppConfig` hook).
  * @returns header navigation.
  */
-export function headerNavigation(
-  loganSearchEnabled: boolean,
-  genePagesEnabled: boolean
-): Navigation {
+export function headerNavigation(loganSearchEnabled: boolean): Navigation {
   return [
     undefined,
     [
@@ -39,7 +37,7 @@ export function headerNavigation(
       { label: "Learn", url: SITE_ROUTES.LEARN, visible: HIDDEN_AT_SM },
       { label: "Organisms", url: ROUTES.ORGANISMS },
       { label: "Assemblies", url: ROUTES.GENOMES },
-      ...getGenePagesLinks(genePagesEnabled, HIDDEN_AT_SM),
+      getGenesLink(HIDDEN_AT_SM),
       { label: "Workflows", url: ROUTES.WORKFLOWS, visible: HIDDEN_AT_SM },
       ...getLoganSearchLinks(loganSearchEnabled, HIDDEN_AT_SM),
       {
@@ -53,7 +51,7 @@ export function headerNavigation(
         menuItems: [
           { label: "About", url: SITE_ROUTES.ABOUT },
           { label: "Learn", url: SITE_ROUTES.LEARN },
-          ...getGenePagesLinks(genePagesEnabled),
+          getGenesLink(),
           { label: "Workflows", url: ROUTES.WORKFLOWS },
           ...getLoganSearchLinks(loganSearchEnabled),
           {
@@ -76,24 +74,18 @@ export function headerNavigation(
 }
 
 /**
- * Returns the Genes navigation link, when gene pages are enabled.
- * @param genePagesEnabled - Whether gene pages are enabled.
+ * Returns the Genes navigation link, selected on the genes list and any gene
+ * page beneath it.
  * @param visible - Breakpoints the link is visible at.
- * @returns Genes link, or an empty list when disabled.
+ * @returns Genes link.
  */
-function getGenePagesLinks(
-  genePagesEnabled: boolean,
-  visible?: NavLinkItem["visible"]
-): NavLinkItem[] {
-  if (!genePagesEnabled) return [];
-  return [
-    {
-      label: "Genes",
-      selectedPatterns: [`${ROUTES.GENES}.*`],
-      url: ROUTES.GENES,
-      visible,
-    },
-  ];
+function getGenesLink(visible?: NavLinkItem["visible"]): NavLinkItem {
+  return {
+    label: "Genes",
+    selectedPatterns: [`^${ROUTES.GENES}(/.*)?$`],
+    url: ROUTES.GENES,
+    visible,
+  };
 }
 
 /**

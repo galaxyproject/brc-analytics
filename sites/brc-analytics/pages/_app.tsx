@@ -1,4 +1,4 @@
-import { config } from "@brc/config/config";
+import { useAppConfig } from "@brc/hooks/UseAppConfig/hook";
 import { BRC_DEFAULT_DESCRIPTION } from "@brc/meta/constants";
 import { ensureEntitiesLoaded } from "@brc/services/workflows/hooks/UseEntities/utils";
 import { createBrcTheme } from "@brc/theme/theme";
@@ -17,7 +17,7 @@ setFeatureFlags([
 ]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
-  const appConfig = config();
+  const appConfig = useAppConfig();
   return (
     <AppProviders
       appConfig={appConfig}
