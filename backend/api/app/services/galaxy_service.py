@@ -152,8 +152,9 @@ KMINDEX_RETRY_SWEEP_DELAY = 20.0
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
 
-# A collection archive is one request for every shard, so it gets fewer, longer
-# tries than a single shard does before falling back to per-shard downloads.
+# A collection archive is a single request covering all the shards, so it gets
+# fewer, longer tries than one shard does before falling back to per-shard
+# downloads.
 KMINDEX_COLLECTION_ATTEMPTS = 3
 
 # Statuses worth backing off and asking again for, rather than dropping the shard.
