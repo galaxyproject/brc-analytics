@@ -1799,8 +1799,9 @@ class GalaxyService:
             await self.cache.set(cache_key, result.model_dump(), CacheTTL.ONE_DAY)
             return result
 
-        except (GalaxyJobNotComplete, GalaxyJobFailed):
-            # What the job did, not a failure to ask; the wrapper below would
+        except (GalaxyJobNotComplete, GalaxyJobFailed, GalaxyJobNotFound):
+            # What the job did (or that there is no such job), not a failure
+            # to ask; the wrapper below would
             # flatten both back into the "Failed to ..." message the API layer
             # used to have to guess at.
             raise

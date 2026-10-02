@@ -472,6 +472,8 @@ async def get_job_results(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except GalaxyJobNotComplete as e:
         raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobFailed as e:
@@ -519,6 +521,8 @@ async def get_job_details(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get job details for {job_id}: {str(e)}")
         raise HTTPException(
