@@ -1,4 +1,4 @@
-{{ config(materialized="table") }}
+{{ config(materialized="table", enabled=var("has_workflows", false)) }}
 
 select
   w.* exclude (taxonomy_id),
