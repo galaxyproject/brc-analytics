@@ -65,6 +65,10 @@ RESULTS_RETRY_AFTER = "15"
 # job. A submit normally fills it in within seconds; one that never does died
 # somewhere around run_tool, which is as ambiguous as a submit that failed
 # there, and letting the claim lapse would let a retry start a second search.
+#
+# These records sit in the cache Redis (allkeys-lru), so the guarantee holds
+# only while Redis isn't evicting. That's a deliberate tradeoff for a temporary
+# API; docs/partner-api.md says to watch evicted_keys.
 IDEMPOTENCY_TTL = CacheTTL.ONE_DAY
 STDERR_TAIL = 2000
 

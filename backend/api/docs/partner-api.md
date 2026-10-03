@@ -192,3 +192,13 @@ Configure it with these backend env vars:
   budget holds about 90 MB. Even so, raise `maxmemory` above the 256 MB
   default before enabling this, or partner traffic will evict users' cached
   results and the rate-limit counters.
+- **Idempotency and budgets live in the cache Redis.** Idempotency records
+  and the partner rate-limit counters share the `allkeys-lru` Redis with the
+  cached results, so they hold only while Redis isn't evicting. If Redis
+  evicts an idempotency record, a retry can start a second search. If it
+  evicts a counter, that window's budget resets. This is a deliberate
+  tradeoff for a temporary API: Redis should never get full at the
+  `maxmemory` above. Before enabling on a host, and while the API is live,
+  check that `redis-cli INFO stats` shows `evicted_keys:0`. If evictions start,
+  raise `maxmemory` or pause submits. Don't rely on these guarantees past
+  that point.
