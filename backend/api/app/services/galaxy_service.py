@@ -9,7 +9,7 @@ import tempfile
 import time
 import zipfile
 from collections import Counter, defaultdict
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import requests
 from bioblend import ConnectionError as BioblendConnectionError
@@ -72,6 +72,45 @@ class GalaxyJobAggregating(Exception):
     """The job finished, and its shards are being merged by another request."""
 
 
+class GalaxyJobNotFound(Exception):
+    """Galaxy has no job under this id (or could not decode it as one)."""
+
+
+class GalaxySubmitNotStarted(Exception):
+    """A submission failed before the tool was asked to run.
+
+    So no job can exist for it, and the caller is free to try again. Anything
+    that fails from the run_tool call on is ambiguous -- Galaxy may have queued
+    the job and lost the reply -- and is raised as a plain Exception instead.
+    """
+
+
+# Galaxy answers 404 for an id that decodes to nothing, and 400 with its
+# MalformedId error (err_code 400009) for one it cannot decode. Both mean the
+# caller has the wrong id. Any other 400 is Galaxy refusing something else, and
+# must not read as "no such job".
+MALFORMED_ID_MARKERS = ("400009", "malformed id", "invalid id")
+
+
+def is_missing_job_error(e: BioblendConnectionError) -> bool:
+    """Whether Galaxy is saying this job id names no job."""
+    status = getattr(e, "status_code", None)
+    if status == 404:
+        return True
+    if status != 400:
+        return False
+    body = getattr(e, "body", None) or ""
+    if isinstance(body, bytes):
+        body = body.decode("utf-8", errors="replace")
+    lowered = str(body).lower()
+    return any(marker in lowered for marker in MALFORMED_ID_MARKERS)
+
+
+# A running job's status is cached only this long. Every open search polls, and
+# Galaxy already 429s us, but a completion should still show up promptly.
+LIVE_JOB_STATUS_TTL = 10
+
+
 # Galaxy answers 401 for two very different things: a token it decoded but
 # has no linked account for ("Cannot locate user by access token. The user
 # should log into Galaxy at least once with this OIDC provider.") and a token
@@ -113,8 +152,9 @@ KMINDEX_RETRY_SWEEP_DELAY = 20.0
 # cached as one Redis value.
 KMINDEX_MAX_HITS = 50000
 
-# A collection archive is one request for every shard, so it gets fewer, longer
-# tries than a single shard does before falling back to per-shard downloads.
+# A collection archive is a single request covering all the shards, so it gets
+# fewer, longer tries than one shard does before falling back to per-shard
+# downloads.
 KMINDEX_COLLECTION_ATTEMPTS = 3
 
 # Statuses worth backing off and asking again for, rather than dropping the shard.
@@ -213,10 +253,23 @@ KMINDEX_INDEX_READ_TIMEOUT = 30.0
 # call site, both short RPCs and long dataset downloads.
 GALAXY_REQUEST_TIMEOUT = 30.0
 
-# Aggregation is process-wide serialized: it is I/O bound against a service that
+# Aggregation is serialized per lane: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
-# with a different partial view of the same job.
-_AGGREGATION_LOCK = asyncio.Lock()
+# with a different partial view of the same job. There are two lanes rather than
+# one lock so that partner traffic, which searches every index and so merges
+# thousands of shards a job, never parks a BRC user's results behind it.
+AggregationLane = Literal["native", "partner"]
+_AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
+    "native": asyncio.Lock(),
+    "partner": asyncio.Lock(),
+}
+
+# How long a merged aggregate and its sort orders sit in Redis, for every job.
+# An all-index aggregate is several MB, and a day of them at the partner submit
+# budget alone would be ~2 GB, well past what the VM can give Redis. Two hours
+# covers someone paging through a result; after that the next read re-merges
+# from the job's outputs, which Galaxy keeps, in one collection download.
+KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 
 # Finding or creating the history jobs land in is a read-then-write against
 # Galaxy, and the router builds a GalaxyService per request, so the per-instance
@@ -428,8 +481,15 @@ class GalaxyService:
         cache: CacheService,
         sra_mirror: Optional[SRAMirrorService] = None,
         credential: Optional[GalaxyCredential] = None,
+        history_name: Optional[str] = None,
     ):
+        """
+        @param history_name: where service-account jobs land, in place of the
+            shared "BRC ANALYTICS JOBS". Ignored for a user credential, whose
+            jobs always go to their own account's history.
+        """
         self.cache = cache
+        self.history_name = history_name
         self.sra_mirror = sra_mirror
         self.settings = get_settings()
 
@@ -620,11 +680,13 @@ class GalaxyService:
             f"index(es) ({len(submission.sequence)} chars)"
         )
 
+        tool_requested = False
         try:
             history_id = await self._get_or_create_shared_history()
             upload_dataset_id = await self._upload_fasta(
                 submission.sequence, submission.filename, history_id
             )
+            tool_requested = True
             job_id = await self._run_kmindex_query(
                 upload_dataset_id, submission, history_id
             )
@@ -656,6 +718,10 @@ class GalaxyService:
                 if is_unlinked_account_error(e):
                     raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
+            if not tool_requested:
+                raise GalaxySubmitNotStarted(
+                    f"kmindex query submission failed: {str(e)}"
+                ) from e
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
 
     def _fetch_shard(self, dataset_id: str) -> bytes:
@@ -712,8 +778,16 @@ class GalaxyService:
         offset: int = 0,
         sort: KmindexSort = "score",
         order: Optional[KmindexOrder] = None,
+        lane: AggregationLane = "native",
     ) -> KmindexResults:
-        """Merge a kmindex job's per-shard outputs into one ranked hit list."""
+        """Merge a kmindex job's per-shard outputs into one ranked hit list.
+
+        @param lane: whose aggregation lock a cold merge takes. The native lane
+            waits its turn, as it always has; the partner lane answers
+            GalaxyJobAggregating instead of waiting, because its callers poll
+            and a connection parked behind another partner merge is one the
+            proxy will cut anyway.
+        """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
@@ -731,16 +805,30 @@ class GalaxyService:
                     f"Results for job {job_id} are still being merged"
                 )
 
-            # Serialize aggregation across the whole process. Without this,
-            # several callers landing on a cold cache each pull every shard at
-            # once, which multiplies the load Galaxy is already rate-limiting
-            # and leaves them racing to overwrite the same cache entry with
-            # partial results.
-            async with _AGGREGATION_LOCK:
+            # Serialize aggregation within the lane. Without this, several
+            # callers landing on a cold cache each pull every shard at once,
+            # which multiplies the load Galaxy is already rate-limiting and
+            # leaves them racing to overwrite the same cache entry with partial
+            # results.
+            lock = _AGGREGATION_LOCKS[lane]
+            # No await between this check and the acquire below, so on one event
+            # loop a free lock is still free when async-with takes it.
+            if lane == "partner" and lock.locked():
+                raise GalaxyJobAggregating(
+                    f"Results for job {job_id} are queued behind another merge"
+                )
+            async with lock:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
-                    await self.cache.set(marker_key, "1", CacheTTL.ONE_HOUR)
+                    # The lane lock only serializes its own lane, and the check
+                    # above races, so the job itself is claimed atomically: one
+                    # merge per job across both lanes, and whoever loses is told
+                    # to come back rather than merging it a second time.
+                    if not await self.cache.claim(marker_key, CacheTTL.ONE_HOUR):
+                        raise GalaxyJobAggregating(
+                            f"Results for job {job_id} are still being merged"
+                        )
                     try:
                         aggregate = await self._aggregate_shards(job_id)
                     finally:
@@ -791,13 +879,13 @@ class GalaxyService:
 
         The mirror's capability set is part of the key, not just of the value.
         A capability the mirror cannot serve is skipped rather than attempted,
-        and the result is a steady state worth caching for a day -- correct
+        and the result is a steady state worth caching for the full TTL -- correct
         while the process runs, because a file cannot grow a column underneath
         it. But the whole point of the per-capability check is the window
         where the backend is deployed ahead of a mirror rebuild, and that
         window ends with a restart onto a wider file. Keyed on job id alone,
         every aggregate computed during the window would keep serving without
-        geography for up to a day after the mirror that has it is live.
+        geography for the rest of its TTL after the mirror that has it is live.
 
         Folding the fingerprint in makes that restart a clean miss instead: one
         re-aggregation per job at the moment the capability set actually
@@ -826,7 +914,11 @@ class GalaxyService:
         return self.cache.make_key(KMINDEX_AGGREGATING_PREFIX, {"job_id": job_id})
 
     async def _ordering_for(
-        self, aggregate: dict, job_id: str, sort: KmindexSort, order: KmindexOrder
+        self,
+        aggregate: dict,
+        job_id: str,
+        sort: KmindexSort,
+        order: KmindexOrder,
     ) -> Tuple[Optional[List[int]], KmindexSort, KmindexOrder]:
         """
         How to walk the listed hits for a sort, and which sort that turned out
@@ -861,7 +953,7 @@ class GalaxyService:
             return None, "score", "desc"
 
         # A permutation only fits the listing it was built over, and the listing
-        # under one job id can change while a day-long permutation is still
+        # under one job id can change while a two-hour permutation is still
         # cached: a partial aggregate lives an hour, and the one that replaces
         # it can hold different accessions at the same length -- both capped at
         # KMINDEX_MAX_HITS, say. A length check can't see that, and the stale
@@ -903,7 +995,7 @@ class GalaxyService:
             # still come back.
             logger.warning(f"kmindex job {job_id}: could not order by {sort}: {e}")
             return None, "score", "desc"
-        await self.cache.set(key, ordering, CacheTTL.ONE_DAY)
+        await self.cache.set(key, ordering, KMINDEX_AGG_TTL)
         return ordering, sort, order
 
     def _mirror_can(self, capability: str) -> bool:
@@ -1041,7 +1133,8 @@ class GalaxyService:
         Additive, so it cannot cost anyone their search: a write that fails
         leaves the results correct and simply without a download. Returns
         (record, failed) for the same reason _cohort_for does -- an unconfigured
-        export is a steady state worth caching for a day, a broken write is not.
+        export is a steady state worth caching for the full TTL, a broken write
+        is not.
 
         @param job_id: the job being aggregated; names the file.
         @param hits: every hit, before the cap, in ranked order.
@@ -1364,7 +1457,7 @@ class GalaxyService:
         # one re-aggregation per hour rather than one per request, a transient
         # failure still heals on its own, and the results page says how many
         # shards are missing while it stands. An unreadable index list is a
-        # different case and still refuses the cache: a day of "(unattributed)"
+        # different case and still refuses the cache: hours of "(unattributed)"
         # parked beside a perfectly good hit list has no way to refresh itself.
         if shards_failed:
             ttl = CacheTTL.ONE_HOUR
@@ -1409,8 +1502,8 @@ class GalaxyService:
             # request, and a transient failure still heals on its own. The
             # export is treated identically and for the same reason: it can
             # only be written while the full hit list is alive, so caching a
-            # failed one for a day means no download for a day.
-            ttl = CacheTTL.ONE_DAY
+            # failed one for the full TTL means no download for that long.
+            ttl = KMINDEX_AGG_TTL
             degraded = [
                 name
                 for name, failed in (
@@ -1474,7 +1567,7 @@ class GalaxyService:
         """
         What the response may say about downloading this job's full match set.
 
-        The aggregate is cached for a day; the file it describes is not.
+        The aggregate is cached for KMINDEX_AGG_TTL; the file it describes is not.
         Retention sweeps it and a redeployed volume loses every export at once,
         so the cached record is a claim and the filesystem is the authority --
         an "available" with no file behind it is downgraded here rather than
@@ -1583,7 +1676,9 @@ class GalaxyService:
         cache_key = self.cache.make_key("galaxy:job_status", {"job_id": job_id})
         cached_status = await self.cache.get(cache_key)
 
-        if cached_status and cached_status.get("state") in SETTLED_JOB_STATES:
+        # A settled entry lives an hour; anything else was written with the
+        # short live TTL, so finding it at all means it is fresh enough.
+        if cached_status:
             return GalaxyJobStatus(**cached_status)
 
         try:
@@ -1627,9 +1722,18 @@ class GalaxyService:
                 status.output_collection_id = _output_collection_id(job_data)
             if state in SETTLED_JOB_STATES:
                 await self.cache.set(cache_key, status.model_dump(), CacheTTL.ONE_HOUR)
+            else:
+                await self.cache.set(
+                    cache_key, status.model_dump(), LIVE_JOB_STATUS_TTL
+                )
 
             return status
 
+        except BioblendConnectionError as e:
+            if is_missing_job_error(e):
+                raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
+            logger.error(f"BioBLEND error getting job status: {e}")
+            raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
         except Exception as e:
             logger.error(f"BioBLEND error getting job status: {e}")
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
@@ -1683,8 +1787,9 @@ class GalaxyService:
             await self.cache.set(cache_key, result.model_dump(), CacheTTL.ONE_DAY)
             return result
 
-        except (GalaxyJobNotComplete, GalaxyJobFailed):
-            # What the job did, not a failure to ask; the wrapper below would
+        except (GalaxyJobNotComplete, GalaxyJobFailed, GalaxyJobNotFound):
+            # What the job did (or that there is no such job), not a failure
+            # to ask; the wrapper below would
             # flatten both back into the "Failed to ..." message the API layer
             # used to have to guess at.
             raise
@@ -1878,16 +1983,19 @@ class GalaxyService:
     async def _get_or_create_shared_history(self) -> str:
         """Find or create the history jobs land in.
 
-        Service-account jobs share one "BRC ANALYTICS JOBS" history; a signed-in
-        user's jobs go to a "BRC Logan Search" history in their own account --
-        the bearer token scopes get_histories()/create_history to that user.
+        Service-account jobs share one "BRC ANALYTICS JOBS" history, unless the
+        service was built with a history_name; a signed-in user's jobs go to a
+        "BRC Logan Search" history in their own account -- the bearer token
+        scopes get_histories()/create_history to that user.
         """
         if self.credential is not None and self.credential.kind == "user":
             shared_history_name = "BRC Logan Search"
             account = self.credential.user_sub
         else:
-            shared_history_name = "BRC ANALYTICS JOBS"
-            account = None
+            shared_history_name = self.history_name or "BRC ANALYTICS JOBS"
+            # Keyed by name too: two service histories on one account are
+            # separate find-or-creates, and must not wait on each other.
+            account = ("service", shared_history_name)
 
         if self._shared_history_id:
             return self._shared_history_id

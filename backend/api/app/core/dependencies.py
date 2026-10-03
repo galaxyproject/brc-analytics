@@ -1,13 +1,15 @@
 import logging
+from datetime import datetime, timezone
 from functools import lru_cache
 from typing import Optional
 
-from fastapi import Cookie, Depends, HTTPException, Request
+from fastapi import Cookie, Depends, Header, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheService
 from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
+from app.core.partner_keys import Partner, match_partner_key
 from app.core.rate_limit import RateLimiter
 from app.db.crud import get_user_by_keycloak_sub
 from app.db.models import User
@@ -215,6 +217,57 @@ async def check_submit_rate_limit(
     return await get_submit_rate_limiter().check(request)
 
 
+@lru_cache(maxsize=1)
+def get_partner_rate_limiter() -> RateLimiter:
+    settings = get_settings()
+    return RateLimiter(
+        cache=get_cache_service(),
+        requests=settings.PARTNER_RATE_LIMIT_REQUESTS,
+        window=settings.RATE_LIMIT_WINDOW,
+        namespace="ratelimit:partner",
+    )
+
+
+@lru_cache(maxsize=1)
+def get_partner_submit_rate_limiter() -> RateLimiter:
+    settings = get_settings()
+    return RateLimiter(
+        cache=get_cache_service(),
+        requests=settings.PARTNER_SUBMIT_RATE_LIMIT_REQUESTS,
+        window=settings.SUBMIT_RATE_LIMIT_WINDOW,
+        namespace="ratelimit:partner-submit",
+    )
+
+
+async def get_partner(
+    request: Request,
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+) -> Partner:
+    """Authenticate a partner API call and charge it to the partner's budget.
+
+    Past the sunset date every call is 410, key or not -- that is what keeps a
+    temporary API temporary.
+    """
+    settings = get_settings()
+    sunset = settings.PARTNER_API_SUNSET
+    if sunset is not None and datetime.now(timezone.utc) >= sunset:
+        raise HTTPException(status_code=410, detail="The partner API has been retired")
+    partner = match_partner_key(x_api_key, settings.PARTNER_API_KEYS)
+    if partner is None:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+    await get_partner_rate_limiter().check(request, principal=partner.partner_id)
+    return partner
+
+
+async def check_partner_submit_rate_limit(
+    request: Request, partner: Partner = Depends(get_partner)
+) -> dict:
+    """The partner's submit budget, on top of its general one."""
+    return await get_partner_submit_rate_limiter().check(
+        request, principal=partner.partner_id
+    )
+
+
 async def get_current_user(
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
 ) -> UserMeResponse:
@@ -259,3 +312,5 @@ def reset_all_services() -> None:
     get_rate_limiter.cache_clear()
     get_submit_rate_limiter.cache_clear()
     get_user_submit_rate_limiter.cache_clear()
+    get_partner_rate_limiter.cache_clear()
+    get_partner_submit_rate_limiter.cache_clear()

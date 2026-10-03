@@ -69,6 +69,31 @@ def migrated_db(tmp_path, monkeypatch):
     get_settings.cache_clear()
 
 
+KMINDEX_SUBMISSIONS_COLUMNS = {
+    "created_at",
+    "galaxy_job_id",
+    "id",
+    "identity",
+    "indexes",
+    "partner_id",
+    "query_bases",
+    "source",
+    "threshold",
+    "user_id",
+    "zvalue",
+}
+
+
+def test_upgrade_head_creates_kmindex_submissions(migrated_db):
+    engine = create_engine(migrated_db)
+    try:
+        inspector = inspect(engine)
+        columns = {c["name"] for c in inspector.get_columns("kmindex_submissions")}
+        assert columns == KMINDEX_SUBMISSIONS_COLUMNS
+    finally:
+        engine.dispose()
+
+
 def test_upgrade_head_creates_galaxy_jobs(migrated_db):
     engine = create_engine(migrated_db)
     try:
@@ -134,9 +159,9 @@ def test_orm_json_columns_match_what_the_migrations_create():
         for column in table.c
         if "JSON" in column.type.compile(postgresql.dialect()).upper()
     ]
-    # Nine today. The assertion is the shape, not the number, but a count of
+    # Ten today. The assertion is the shape, not the number, but a count of
     # zero would pass every check below while testing nothing.
-    assert len(json_columns) == 9
+    assert len(json_columns) == 10
 
     for name, column in json_columns:
         where = f"{name}.{column.name}"

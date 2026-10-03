@@ -36,9 +36,11 @@ from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
+    GalaxyJobNotFound,
     GalaxyService,
     is_unlinked_account_error,
 )
+from app.services.kmindex_submissions import record_submission
 from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
@@ -246,6 +248,13 @@ async def submit_kmindex_query(
                     "Failed to record ownership for job %s", response.job_id
                 )
 
+        await record_submission(
+            credential=credential,
+            galaxy_job_id=response.job_id,
+            source="native",
+            submission=submission,
+        )
+
         return response
 
     except HTTPException:
@@ -318,6 +327,8 @@ async def get_kmindex_results(
         raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobFailed as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get kmindex results for {job_id}: {str(e)}")
         raise HTTPException(
@@ -348,6 +359,19 @@ async def export_kmindex_results(
     @param job_id: the completed kmindex job.
     @param format: parquet or tsv.
     @returns: the export as an attachment, named for the job and its row count.
+    """
+    return await serve_kmindex_export(job_id, format)
+
+
+async def serve_kmindex_export(job_id: str, format: str) -> Response:
+    """
+    The export as an attachment, or a 404 if there is no current one.
+
+    Shared with the partner API, which serves the same files.
+
+    @param job_id: the completed kmindex job.
+    @param format: parquet or tsv.
+    @returns: the file response.
     """
     path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
     if path is None or not path.is_file():
@@ -419,6 +443,8 @@ async def get_job_status(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get job status for {job_id}: {str(e)}")
         raise HTTPException(
@@ -446,6 +472,8 @@ async def get_job_results(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except GalaxyJobNotComplete as e:
         raise HTTPException(status_code=202, detail=str(e)) from e
     except GalaxyJobFailed as e:
@@ -493,6 +521,8 @@ async def get_job_details(
 
     except HTTPException:
         raise
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to get job details for {job_id}: {str(e)}")
         raise HTTPException(
