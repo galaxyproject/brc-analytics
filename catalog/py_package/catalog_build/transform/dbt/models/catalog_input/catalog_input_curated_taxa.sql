@@ -1,4 +1,4 @@
-{{ config(materialized="table") }}
+{{ config(materialized="table", enabled=var("has_curated_taxa", false)) }}
 
 select
   t.* exclude (taxonomy_id),

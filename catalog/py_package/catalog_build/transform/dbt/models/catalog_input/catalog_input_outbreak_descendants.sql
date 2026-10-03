@@ -1,4 +1,4 @@
-{{ config(materialized="table") }}
+{{ config(materialized="table", enabled=var("has_outbreaks", false)) }}
 
 with source_descendants as (
   select
