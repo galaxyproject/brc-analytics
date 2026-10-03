@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Mint a partner API key.
 
     python -m scripts.generate_partner_key example-partner 2026-09
