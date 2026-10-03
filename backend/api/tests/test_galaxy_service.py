@@ -1232,7 +1232,7 @@ class TestCohortOverTheFullHitSet:
         assert service._page_kmindex(aggregate, "job1", 5, 0).cohort is None
         mirror.cohort_for_accessions.assert_not_called()
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_failed_cohort_read_still_caches_the_correct_hit_list(self, service):
@@ -1400,7 +1400,7 @@ class TestGeographyInTheAggregationWindow:
         mirror.cohort_for_accessions.assert_called_once()
         # A steady state, so it is cached for a day rather than retried hourly.
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_a_broken_geography_read_shortens_the_ttl_like_the_cohort(
@@ -1464,7 +1464,7 @@ class TestGeographyInTheAggregationWindow:
         # Cached for a day, because nothing about it is going to change while
         # this process is up.
         (_key, _value, ttl) = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
         # The mirror is rebuilt and the backend restarts onto it.
         wide = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
@@ -1897,7 +1897,7 @@ class TestExportOfTheFullMatchSet:
         assert results.export_status == "too_large"
         assert results.export_rows is None
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_a_swept_file_is_not_advertised_by_the_cached_aggregate(
@@ -2658,7 +2658,7 @@ class TestHitOrdering:
         args = service.sra_mirror.order_hits.call_args.args
         assert args[1:] == ("organism", False)
         service.cache.set.assert_awaited_once_with(
-            "order-key", [2, 0, 1], CacheTTL.ONE_DAY
+            "order-key", [2, 0, 1], galaxy_service.KMINDEX_AGG_TTL
         )
         # The key is scoped to the job, the listing, the mirror and the sort, so
         # a re-aggregated listing, a rebuilt mirror or another column cannot
@@ -3061,37 +3061,25 @@ class TestAggregationLanes:
         assert (await reader).total_hits == 1
 
 
-class TestPartnerAggregateTTL:
+class TestAggregateTTL:
     """
-    A partner job's aggregate is cached for an hour, not a day.
+    Every job's aggregate is cached for the same two hours, whichever lane merged it.
 
-    A partner reads a job's results once and takes the export off disk, and an
-    all-index aggregate is several MB. A day of them at the partner's submit
-    budget would crowd BRC users' cached results out of Redis.
+    A day of all-index aggregates at the partner submit budget would be ~2 GB of
+    Redis; past the TTL a read just re-merges from the job's outputs.
     """
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        "lane, cap",
-        [("native", None), ("partner", galaxy_service.PARTNER_AGGREGATE_TTL)],
-    )
-    async def test_each_lane_passes_its_cap_to_the_merge(self, service, lane, cap):
-        service.sra_mirror = None
-        service._aggregate_shards = AsyncMock(return_value=_listing(1))
-
-        await service.get_kmindex_results("job1", lane=lane)
-
-        assert service._aggregate_shards.await_args.kwargs["ttl_cap"] == cap
-
-    @pytest.mark.asyncio
-    @pytest.mark.parametrize("cap, ttl", [(None, CacheTTL.ONE_DAY), (3600, 3600)])
-    async def test_the_merge_caches_for_at_most_the_cap(self, service, cap, ttl):
+    @pytest.mark.parametrize("lane", ["native", "partner"])
+    async def test_both_lanes_cache_for_the_same_ttl(self, service, lane):
         service.sra_mirror = None
         TestCohortOverTheFullHitSet._wire(TestCohortOverTheFullHitSet(), service)
 
-        await service._aggregate_shards("job1", ttl_cap=cap)
+        await service.get_kmindex_results("job1", lane=lane)
 
-        assert service.cache.set.await_args.args[2] == ttl
+        ttls = {c.args[2] for c in service.cache.set.call_args_list if c.args[0] == "k"}
+        assert ttls == {galaxy_service.KMINDEX_AGG_TTL}
+        assert galaxy_service.KMINDEX_AGG_TTL == 2 * CacheTTL.ONE_HOUR
 
 
 class TestResultsEndpoint:

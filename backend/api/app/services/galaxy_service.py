@@ -264,12 +264,12 @@ _AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
     "partner": asyncio.Lock(),
 }
 
-# How long a partner job's aggregate and sort orders may sit in Redis. A partner
-# pulls a job's results once and takes the export, which lives on disk rather
-# than in Redis, so a day of cache buys nothing. At several MB per all-index
-# aggregate and 20 submits an hour, a day's worth would crowd BRC users' cached
-# results out of a 256-768 MB Redis.
-PARTNER_AGGREGATE_TTL = CacheTTL.ONE_HOUR
+# How long a merged aggregate and its sort orders sit in Redis, for every job.
+# An all-index aggregate is several MB, and a day of them at the partner submit
+# budget alone would be ~2 GB, well past what the VM can give Redis. Two hours
+# covers someone paging through a result; after that the next read re-merges
+# from the job's outputs, which Galaxy keeps, in one collection download.
+KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 
 # Finding or creating the history jobs land in is a read-then-write against
 # Galaxy, and the router builds a GalaxyService per request, so the per-instance
@@ -317,10 +317,6 @@ def _output_collection_id(job_data: dict) -> Optional[str]:
         if isinstance(c, dict) and c.get("src") == "hdca"
     ]
     return collections[0] if len(collections) == 1 else None
-
-
-def _capped(ttl: int, cap: Optional[int]) -> int:
-    return ttl if cap is None else min(ttl, cap)
 
 
 def _tie_break(accession: str) -> str:
@@ -797,7 +793,6 @@ class GalaxyService:
 
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
-        ttl_cap = PARTNER_AGGREGATE_TTL if lane == "partner" else None
 
         if aggregate is None:
             # Someone else is already merging this job. Say so rather than
@@ -835,14 +830,12 @@ class GalaxyService:
                             f"Results for job {job_id} are still being merged"
                         )
                     try:
-                        aggregate = await self._aggregate_shards(
-                            job_id, ttl_cap=ttl_cap
-                        )
+                        aggregate = await self._aggregate_shards(job_id)
                     finally:
                         await self.cache.delete(marker_key)
 
         ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort), ttl_cap=ttl_cap
+            aggregate, job_id, sort, order or _default_order(sort)
         )
         # Single exit, so a cache hit can't skip annotation -- an earlier
         # version returned straight from the pre-lock hit and silently served
@@ -886,13 +879,13 @@ class GalaxyService:
 
         The mirror's capability set is part of the key, not just of the value.
         A capability the mirror cannot serve is skipped rather than attempted,
-        and the result is a steady state worth caching for a day -- correct
+        and the result is a steady state worth caching for the full TTL -- correct
         while the process runs, because a file cannot grow a column underneath
         it. But the whole point of the per-capability check is the window
         where the backend is deployed ahead of a mirror rebuild, and that
         window ends with a restart onto a wider file. Keyed on job id alone,
         every aggregate computed during the window would keep serving without
-        geography for up to a day after the mirror that has it is live.
+        geography for the rest of its TTL after the mirror that has it is live.
 
         Folding the fingerprint in makes that restart a clean miss instead: one
         re-aggregation per job at the moment the capability set actually
@@ -926,7 +919,6 @@ class GalaxyService:
         job_id: str,
         sort: KmindexSort,
         order: KmindexOrder,
-        ttl_cap: Optional[int] = None,
     ) -> Tuple[Optional[List[int]], KmindexSort, KmindexOrder]:
         """
         How to walk the listed hits for a sort, and which sort that turned out
@@ -961,7 +953,7 @@ class GalaxyService:
             return None, "score", "desc"
 
         # A permutation only fits the listing it was built over, and the listing
-        # under one job id can change while a day-long permutation is still
+        # under one job id can change while a two-hour permutation is still
         # cached: a partial aggregate lives an hour, and the one that replaces
         # it can hold different accessions at the same length -- both capped at
         # KMINDEX_MAX_HITS, say. A length check can't see that, and the stale
@@ -1003,7 +995,7 @@ class GalaxyService:
             # still come back.
             logger.warning(f"kmindex job {job_id}: could not order by {sort}: {e}")
             return None, "score", "desc"
-        await self.cache.set(key, ordering, _capped(CacheTTL.ONE_DAY, ttl_cap))
+        await self.cache.set(key, ordering, KMINDEX_AGG_TTL)
         return ordering, sort, order
 
     def _mirror_can(self, capability: str) -> bool:
@@ -1141,7 +1133,8 @@ class GalaxyService:
         Additive, so it cannot cost anyone their search: a write that fails
         leaves the results correct and simply without a download. Returns
         (record, failed) for the same reason _cohort_for does -- an unconfigured
-        export is a steady state worth caching for a day, a broken write is not.
+        export is a steady state worth caching for the full TTL, a broken write
+        is not.
 
         @param job_id: the job being aggregated; names the file.
         @param hits: every hit, before the cap, in ranked order.
@@ -1294,13 +1287,8 @@ class GalaxyService:
 
         return shards
 
-    async def _aggregate_shards(
-        self, job_id: str, ttl_cap: Optional[int] = None
-    ) -> dict:
-        """Download and merge every shard for a completed kmindex job.
-
-        @param ttl_cap: an upper bound on how long the aggregate is cached.
-        """
+    async def _aggregate_shards(self, job_id: str) -> dict:
+        """Download and merge every shard for a completed kmindex job."""
         cache_key = self._agg_cache_key(job_id)
 
         status = await self.get_job_status(job_id)
@@ -1469,7 +1457,7 @@ class GalaxyService:
         # one re-aggregation per hour rather than one per request, a transient
         # failure still heals on its own, and the results page says how many
         # shards are missing while it stands. An unreadable index list is a
-        # different case and still refuses the cache: a day of "(unattributed)"
+        # different case and still refuses the cache: hours of "(unattributed)"
         # parked beside a perfectly good hit list has no way to refresh itself.
         if shards_failed:
             ttl = CacheTTL.ONE_HOUR
@@ -1477,7 +1465,7 @@ class GalaxyService:
                 f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
                 f"failed to download; returning a partial result cached for {ttl}s"
             )
-            await self.cache.set(cache_key, aggregate, _capped(ttl, ttl_cap))
+            await self.cache.set(cache_key, aggregate, ttl)
         elif submitted_indexes is None:
             logger.error(
                 f"kmindex job {job_id}: submitted index list unreadable; "
@@ -1514,8 +1502,8 @@ class GalaxyService:
             # request, and a transient failure still heals on its own. The
             # export is treated identically and for the same reason: it can
             # only be written while the full hit list is alive, so caching a
-            # failed one for a day means no download for a day.
-            ttl = CacheTTL.ONE_DAY
+            # failed one for the full TTL means no download for that long.
+            ttl = KMINDEX_AGG_TTL
             degraded = [
                 name
                 for name, failed in (
@@ -1532,7 +1520,7 @@ class GalaxyService:
                     f"returning the hit list without, cached for {ttl}s so the "
                     "work is retried rather than repeated on every request"
                 )
-            await self.cache.set(cache_key, aggregate, _capped(ttl, ttl_cap))
+            await self.cache.set(cache_key, aggregate, ttl)
 
         return aggregate
 
@@ -1579,7 +1567,7 @@ class GalaxyService:
         """
         What the response may say about downloading this job's full match set.
 
-        The aggregate is cached for a day; the file it describes is not.
+        The aggregate is cached for KMINDEX_AGG_TTL; the file it describes is not.
         Retention sweeps it and a redeployed volume loses every export at once,
         so the cached record is a claim and the filesystem is the authority --
         an "available" with no file behind it is downgraded here rather than

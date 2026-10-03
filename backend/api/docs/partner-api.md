@@ -145,10 +145,10 @@ Hits whose ratio fell under the threshold after correction are not included.
 We don't compute p-values or e-values: on Logan's own data they are
 effectively zero for every hit.
 
-Merged results are kept for an hour. Reading `/results` after that works,
+Merged results are kept for two hours. Reading `/results` after that works,
 but it merges the job all over again, which can take minutes for a search
 across every index. So page through what you need, and take the export,
-within the hour.
+within that window.
 
 **Download exports promptly.** They are kept for about a day at most, and
 sooner when disk is tight. After that `/export` returns `404` until a
@@ -187,9 +187,9 @@ Configure it with these backend env vars:
   `kmindex_submissions` with `source` and `partner_id`.
 - **Rotating a key.** Add the new entry alongside the old, hand over the new
   key, then remove the old entry.
-- **Redis.** One all-index aggregate is about 4.5 MB. Partner aggregates are
-  cached for an hour rather than a day, so a partner at its full submit
-  budget holds about 90 MB. Even so, raise `maxmemory` above the 256 MB
+- **Redis.** One all-index aggregate is about 4.5 MB. Every aggregate, native
+  or partner, is cached for two hours (`KMINDEX_AGG_TTL`), so a partner at its
+  full submit budget holds about 180 MB. Even so, raise `maxmemory` above the 256 MB
   default before enabling this, or partner traffic will evict users' cached
   results and the rate-limit counters.
 - **Idempotency and budgets live in the cache Redis.** Idempotency records
