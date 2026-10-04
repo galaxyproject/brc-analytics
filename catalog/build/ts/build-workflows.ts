@@ -239,6 +239,7 @@ function buildWorkflow(
     resolvedMax = assemblyCountMax ?? null;
   }
 
+  // Get the up-to-date taxonomy ID from the taxonomy mapping, defaulting to the ID from the YAML
   const resolvedStringTaxonomyId =
     taxonomyId === null
       ? null
