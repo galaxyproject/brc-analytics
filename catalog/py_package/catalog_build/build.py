@@ -1211,6 +1211,8 @@ def save_taxonomy_mapping(
 
     Args:
         source_outbreaks_df: Outbreak definitions containing resolved taxonomy IDs
+        taxon_name_map: Mapping of taxonomy ID (as string) to name
+        taxon_rank_map: Mapping of taxonomy ID (as string) to rank
         output_path: Path to save the TSV file
     """
     if source_outbreaks_df is None:
