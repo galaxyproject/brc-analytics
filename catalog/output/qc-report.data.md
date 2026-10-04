@@ -559,15 +559,6 @@ Got 2 results, configured to warn if != 0
 | 3703201 |
 | 3703354 |
 
-### `catalog_organisms_unique_tax_ids` — status `warn`, 2 failing rows
-
-Got 2 results, configured to warn if != 0
-
-| unique_field | n_records |
-| --- | --- |
-| 5207 | 2 |
-| 29176 | 2 |
-
 ### `catalog_taxa_in_taxonomy_lineages` — status `warn`, 2 failing rows
 
 Got 2 results, configured to warn if != 0
@@ -576,12 +567,3 @@ Got 2 results, configured to warn if != 0
 | --- |
 | 3703201 |
 | 3703354 |
-
-### `organism_tax_ids_are_latest` — status `warn`, 2 failing rows
-
-Got 2 results, configured to warn if != 0
-
-| taxonomy_id | source_taxonomy_id |
-| --- | --- |
-| 5207 | 178876 |
-| 29176 | 572307 |
