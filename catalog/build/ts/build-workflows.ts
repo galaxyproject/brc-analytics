@@ -6,21 +6,33 @@ import type {
 import {
   Workflow as SourceWorkflow,
   WorkflowCategories as SourceWorkflowCategories,
+  Workflows as SourceWorkflows,
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
-import { readJsonFile, readYamlFile } from "./utils";
+import { parseNumberOrNull, readValuesFile, readYamlFile } from "./utils";
 
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
-const SOURCE_PATH_WORKFLOWS =
-  "catalog/build/intermediate/normalized-workflows.json";
+const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
+const SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING =
+  "catalog/build/intermediate/workflow-taxonomy-mapping.tsv";
+
+const WORKFLOW_TAXONOMY_MAPPING_KEYS = [
+  "source_taxonomy_id",
+  "taxonomy_id",
+] as const;
+
+type WorkflowTaxonomyMappingRow = Record<
+  (typeof WORKFLOW_TAXONOMY_MAPPING_KEYS)[number],
+  string
+>;
 
 export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
     SOURCE_PATH_WORKFLOW_CATEGORIES
   );
-  const sourceWorkflowList = await readJsonFile<SourceWorkflow[]>(
+  const sourceWorkflows = await readYamlFile<SourceWorkflows>(
     SOURCE_PATH_WORKFLOWS
   );
 
@@ -35,9 +47,27 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
       })
     );
 
-  for (const sourceWorkflow of sourceWorkflowList) {
+  const taxonomyMapping = new Map<number, number>();
+  for (const row of await readValuesFile<WorkflowTaxonomyMappingRow>(
+    SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING,
+    undefined,
+    WORKFLOW_TAXONOMY_MAPPING_KEYS
+  )) {
+    const sourceTaxonomyId = parseNumberOrNull(row.source_taxonomy_id);
+    const taxonomyId = parseNumberOrNull(row.taxonomy_id);
+    if (sourceTaxonomyId === null) continue;
+    if (taxonomyId === null) {
+      console.warn(
+        `Resolved taxonomy ID missing for source workflow taxonomy ID ${sourceTaxonomyId}`
+      );
+      continue;
+    }
+    taxonomyMapping.set(sourceTaxonomyId, taxonomyId);
+  }
+
+  for (const sourceWorkflow of sourceWorkflows.workflows) {
     if (sourceWorkflow.active) {
-      buildWorkflow(workflowCategories, sourceWorkflow);
+      buildWorkflow(workflowCategories, sourceWorkflow, taxonomyMapping);
     }
   }
 
@@ -92,7 +122,8 @@ function validateUrl(url: string, context: string): void {
 /* eslint-disable-next-line sonarjs/cognitive-complexity -- function handles multiple optional fields */
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
-  sourceWorkflow: SourceWorkflow
+  sourceWorkflow: SourceWorkflow,
+  taxonomyMapping: Map<number, number>
 ): void {
   const {
     assembly_count_max: assemblyCountMax,
@@ -102,7 +133,7 @@ function buildWorkflow(
     parameters: sourceParameters,
     ploidy,
     scope,
-    taxonomy_id: taxonomyId,
+    taxonomy_id: taxonomyId = null,
     trs_id: trsId,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
@@ -213,6 +244,11 @@ function buildWorkflow(
     resolvedMax = assemblyCountMax ?? null;
   }
 
+  const resolvedStringTaxonomyId =
+    taxonomyId === null
+      ? null
+      : String(taxonomyMapping.get(taxonomyId) ?? taxonomyId);
+
   const workflow: Workflow = {
     assemblyCountMax: resolvedMax,
     assemblyCountMin: resolvedMin,
@@ -220,7 +256,7 @@ function buildWorkflow(
     parameters,
     ploidy,
     scope: resolvedScope,
-    taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
+    taxonomyId: resolvedStringTaxonomyId,
     trsId,
     workflowDescription,
     workflowName,

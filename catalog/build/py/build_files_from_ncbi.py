@@ -9,7 +9,9 @@ OUTBREAKS_PATH = "catalog/source/outbreaks.yml"
 UCSC_ASSEMBLIES_URL = "https://hgdownload.soe.ucsc.edu/hubs/BRC/assemblyList.json"
 
 GENOMES_OUTPUT_PATH = "catalog/build/intermediate/genomes-from-ncbi.tsv"
-WORKFLOWS_OUTPUT_PATH = "catalog/build/intermediate/normalized-workflows.json"
+WORKFLOW_TAXONOMY_MAPPING_PATH = (
+    "catalog/build/intermediate/workflow-taxonomy-mapping.tsv"
+)
 OUTBREAK_TAXONOMY_MAPPING_PATH = (
     "catalog/build/intermediate/outbreak-taxonomy-mapping.tsv"
 )
@@ -69,7 +71,7 @@ if __name__ == "__main__":
         temp_folder_path=TEMP_FOLDER_PATH,
         dlt_pipeline_prefix="brc_catalog_",
         workflows_path=WORKFLOWS_PATH,
-        workflows_output_path=WORKFLOWS_OUTPUT_PATH,
+        workflow_taxonomy_mapping_path=WORKFLOW_TAXONOMY_MAPPING_PATH,
         taxonomic_group_sets={"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,

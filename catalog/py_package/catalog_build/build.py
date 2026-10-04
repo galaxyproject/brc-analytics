@@ -1233,35 +1233,18 @@ def save_taxonomy_mapping(
     print(f"Wrote taxonomy mapping to {output_path}")
 
 
-def save_normalized_workflows(source_workflows_df: pd.DataFrame, output_path: str):
+def save_workflow_taxonomy_mapping(source_workflows_df: pd.DataFrame, output_path: str):
     """
-    Create and save a JSON file of workflows with resolved taxonomy IDs, for the TS
-    build to read.
+    Save a TSV file of workflows' resolved taxonomy IDs, for the TS build to read.
 
     Args:
         source_workflows_df: Workflow definitions containing resolved taxonomy IDs
-        output_path: Path to save the JSON file
+        output_path: Path to save the TSV file
     """
-    # `categories` and `parameters` are nested values, stored as JSON strings in DuckDB
-    workflow_records = (
-        source_workflows_df[Workflow.model_fields.keys()]
-        .assign(
-            categories=source_workflows_df["categories"].map(
-                json.loads, na_action="ignore"
-            ),
-            parameters=source_workflows_df["parameters"].map(
-                json.loads, na_action="ignore"
-            ),
-        )
-        .sort_values(by="trs_id")
-        .to_dict(orient="records")
+    source_workflows_df[["source_taxonomy_id", "taxonomy_id"]].to_csv(
+        output_path, index=False, sep="\t"
     )
-    save_json_file(
-        output_path,
-        [Workflow(**workflow).model_dump(mode="json") for workflow in workflow_records],
-        indent=2,
-    )
-    print(f"Wrote normalized workflows to {output_path}")
+    print(f"Wrote workflow taxonomy mapping to {output_path}")
 
 
 def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
@@ -1460,7 +1443,7 @@ def build_files(
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
     workflows_path=None,
-    workflows_output_path=None,
+    workflow_taxonomy_mapping_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
     datacache_base_url=None,
@@ -1483,6 +1466,8 @@ def build_files(
       taxa_path: Path of input curated taxa YAML
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      workflows_path: Path of input workflows YAML
+      workflow_taxonomy_mapping_path: Path to save taxonomic information for workflows at
       organism_image_path: path to folder containing organism images
       organism_image_source_information_path: path to json file with information about the image source
     """
@@ -1519,8 +1504,10 @@ def build_files(
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
-    if workflows_output_path is not None and source_workflows_df is not None:
-        save_normalized_workflows(source_workflows_df, workflows_output_path)
+    if workflow_taxonomy_mapping_path is not None and source_workflows_df is not None:
+        save_workflow_taxonomy_mapping(
+            source_workflows_df, workflow_taxonomy_mapping_path
+        )
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
         load_and_transform_result.ncbi_genomes
