@@ -19,7 +19,11 @@ const customJestConfig = {
   setupFiles: ["<rootDir>/tests/setup/environment.ts"],
   testEnvironment: "jest-environment-jsdom",
   // Excludes Playwright e2e tests which Jest cannot parse
-  testPathIgnorePatterns: ["/node_modules/", "/catalog/", "/tests/e2e/"],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/catalog/",
+    "/tests/e2e/",
+  ],
 };
 
 module.exports = createJestConfig(customJestConfig);
