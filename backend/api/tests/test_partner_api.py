@@ -218,6 +218,51 @@ def test_a_paused_api_takes_no_new_searches(partner_env, monkeypatch):
 
 
 class TestIdempotency:
+    def test_a_replay_still_answers_once_submits_are_paused(
+        self, partner_env, monkeypatch
+    ):
+        client, galaxy, _ = partner_env
+        headers = {**HEADERS, "Idempotency-Key": "abc"}
+        first = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+        monkeypatch.setenv("PARTNER_SUBMIT_PAUSED", "true")
+        get_settings.cache_clear()
+
+        retried = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+
+        assert retried.status_code == 202
+        assert retried.json()["job_id"] == first.json()["job_id"]
+        galaxy.submit_kmindex_query.assert_awaited_once()
+
+    def test_a_replay_still_answers_once_the_submit_budget_is_spent(
+        self, partner_env, monkeypatch
+    ):
+        # The submit that spent the last of the budget made a job and lost its
+        # reply; the retry has to get that job back, not a 429.
+        from fastapi import HTTPException
+
+        client, galaxy, _ = partner_env
+        spent = MagicMock()
+        spent.check = AsyncMock(
+            side_effect=[{}, HTTPException(status_code=429, detail="over")]
+        )
+        monkeypatch.setattr(
+            dependencies,
+            "get_partner_submit_rate_limiter",
+            MagicMock(return_value=spent),
+        )
+        headers = {**HEADERS, "Idempotency-Key": "abc"}
+        first = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+
+        retried = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+        fresh = client.post(
+            f"{BASE}/jobs", json=PAYLOAD, headers={**HEADERS, "Idempotency-Key": "new"}
+        )
+
+        assert retried.status_code == 202
+        assert retried.json()["job_id"] == first.json()["job_id"]
+        assert fresh.status_code == 429
+        assert spent.check.await_count == 2
+
     def test_a_retried_submit_gets_the_first_job_back(self, partner_env):
         client, galaxy, _ = partner_env
         headers = {**HEADERS, "Idempotency-Key": "abc"}

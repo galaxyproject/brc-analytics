@@ -174,11 +174,11 @@ async def list_indexes(galaxy: GalaxyService = Depends(get_partner_galaxy_servic
 
 @router.post("/jobs", response_model=PartnerJobCreated, status_code=202)
 async def submit_job(
+    request: Request,
     submission: KmindexQuerySubmission,
     partner: Partner = Depends(get_partner),
     galaxy: GalaxyService = Depends(get_partner_galaxy_service),
     cache: CacheService = Depends(get_cache_service),
-    _submit_limit=Depends(check_partner_submit_rate_limit),
     idempotency_key: Optional[str] = Header(
         default=None, alias="Idempotency-Key", max_length=255
     ),
@@ -190,25 +190,33 @@ async def submit_job(
     under the same key within a day answers with the job the first one made,
     instead of starting another search across every index.
     """
-    if get_settings().PARTNER_SUBMIT_PAUSED:
-        raise HTTPException(
-            status_code=503,
-            detail="New partner submissions are paused; existing jobs still answer",
-        )
-    _require_galaxy(galaxy)
     if not submission.sequence.strip():
         raise HTTPException(status_code=400, detail="Query sequence cannot be empty")
-
     if idempotency_key is not None and not idempotency_key.strip():
         # A blank key would otherwise read as no key at all, and the caller
         # would believe its retries were protected when they aren't.
         raise HTTPException(status_code=400, detail="Idempotency-Key is empty")
     idem_key = _idempotency_key(partner, idempotency_key) if idempotency_key else None
     fingerprint = _fingerprint(submission)
+
+    # A replay hands back a job that already exists, so it comes before the
+    # controls on starting new ones: a caller whose 20th submit lost its reply
+    # must still get that job id back, not a 429, and pausing submits mustn't
+    # strand jobs already made.
     if idem_key is not None:
         existing = await cache.get(idem_key)
         if existing:
             return _created(_replay(existing, fingerprint))
+
+    if get_settings().PARTNER_SUBMIT_PAUSED:
+        raise HTTPException(
+            status_code=503,
+            detail="New partner submissions are paused; existing jobs still answer",
+        )
+    _require_galaxy(galaxy)
+    await check_partner_submit_rate_limit(request, partner)
+
+    if idem_key is not None:
         try:
             claimed = await cache.set_if_absent(
                 idem_key, {"fingerprint": fingerprint}, IDEMPOTENCY_TTL
