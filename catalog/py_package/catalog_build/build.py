@@ -1241,7 +1241,7 @@ def save_workflow_taxonomy_mapping(source_workflows_df: pd.DataFrame, output_pat
         source_workflows_df: Workflow definitions containing resolved taxonomy IDs
         output_path: Path to save the TSV file
     """
-    source_workflows_df[["source_taxonomy_id", "taxonomy_id"]].to_csv(
+    source_workflows_df[["source_taxonomy_id", "taxonomy_id"]].dropna().to_csv(
         output_path, index=False, sep="\t"
     )
     print(f"Wrote workflow taxonomy mapping to {output_path}")

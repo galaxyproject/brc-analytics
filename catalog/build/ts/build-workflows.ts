@@ -10,7 +10,7 @@ import {
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
-import { parseNumberOrNull, readValuesFile, readYamlFile } from "./utils";
+import { parseNumber, readValuesFile, readYamlFile } from "./utils";
 
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
@@ -47,23 +47,18 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
       })
     );
 
-  const taxonomyMapping = new Map<number, number>();
-  for (const row of await readValuesFile<WorkflowTaxonomyMappingRow>(
-    SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING,
-    undefined,
-    WORKFLOW_TAXONOMY_MAPPING_KEYS
-  )) {
-    const sourceTaxonomyId = parseNumberOrNull(row.source_taxonomy_id);
-    const taxonomyId = parseNumberOrNull(row.taxonomy_id);
-    if (sourceTaxonomyId === null) continue;
-    if (taxonomyId === null) {
-      console.warn(
-        `Resolved taxonomy ID missing for source workflow taxonomy ID ${sourceTaxonomyId}`
-      );
-      continue;
-    }
-    taxonomyMapping.set(sourceTaxonomyId, taxonomyId);
-  }
+  const taxonomyMapping = new Map(
+    (
+      await readValuesFile<WorkflowTaxonomyMappingRow>(
+        SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING,
+        undefined,
+        WORKFLOW_TAXONOMY_MAPPING_KEYS
+      )
+    ).map((row) => [
+      parseNumber(row.source_taxonomy_id),
+      parseNumber(row.taxonomy_id),
+    ])
+  );
 
   for (const sourceWorkflow of sourceWorkflows.workflows) {
     if (sourceWorkflow.active) {
