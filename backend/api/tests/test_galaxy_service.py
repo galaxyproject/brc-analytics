@@ -3001,6 +3001,22 @@ class TestAggregationLanes:
         await partner
 
     @pytest.mark.asyncio
+    async def test_a_result_cached_before_the_claim_is_not_merged_again(self, service):
+        # The other lane finished, cached and released the marker between this
+        # request's miss and its claim; the claim succeeds, but merging again
+        # would repeat every download.
+        service.sra_mirror = None
+        landed = _listing(1)
+        reads = iter([None, None, None, landed])
+        service.cache.get = AsyncMock(side_effect=lambda _key: next(reads, None))
+        service._aggregate_shards = AsyncMock()
+
+        results = await service.get_kmindex_results("job1", lane="partner")
+
+        service._aggregate_shards.assert_not_awaited()
+        assert results.total_hits == 1
+
+    @pytest.mark.asyncio
     async def test_one_job_is_merged_once_across_both_lanes(self, service):
         # A native reader and a partner reader both miss the aggregate and the
         # marker, then take their own lane locks. Only one may merge.

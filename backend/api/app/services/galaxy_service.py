@@ -830,7 +830,15 @@ class GalaxyService:
                             f"Results for job {job_id} are still being merged"
                         )
                     try:
-                        aggregate = await self._aggregate_shards(job_id)
+                        # Re-check once more under the claim: the other lane can
+                        # finish, cache its result and drop the marker between
+                        # our miss above and this claim, and merging again then
+                        # repeats the downloads -- and a second pass that loses
+                        # shards would overwrite a complete result with a
+                        # partial one.
+                        aggregate = await self.cache.get(cache_key)
+                        if aggregate is None:
+                            aggregate = await self._aggregate_shards(job_id)
                     finally:
                         await self.cache.delete(marker_key)
 
