@@ -41,10 +41,10 @@ const STANDARD_TAXONOMIC_RANKS = [
 ];
 
 /**
- * Determine the best field to use for filtering assemblies/organisms based on an outbreak's taxonomy
- * @param outbreak - The outbreak object containing the taxonomy ID
- * @param taxonomyMappings - Array of taxonomy mappings to look up the taxonomy name and rank
- * @returns An object containing the field name and value to use for filtering, or null if no mapping is found
+ * Get an outbreak's resolved taxonomy IDs, along with the best field to use for filtering assemblies/organisms based on its taxonomy
+ * @param sourceOutbreak - The source outbreak containing the taxonomy ID to look up
+ * @param taxonomyMappings - Array of taxonomy mappings to look up the resolved taxonomy IDs, name and rank
+ * @returns An object containing the resolved taxonomy IDs and the field name and value to use for filtering, or null if no mapping is found
  */
 function getTaxonomyInfo(
   sourceOutbreak: SourceOutbreak,
@@ -67,32 +67,18 @@ function getTaxonomyInfo(
     return null;
   }
 
-  const taxIdsInfo: Pick<
-    Outbreak,
-    "taxonomy_id" | "highlight_descendant_taxonomy_ids"
-  > = {
-    taxonomy_id: Number(mapping.taxonomy_id),
+  // Use the corresponding taxonomic level field for a standard taxonomic rank, and otherTaxa for anything else
+  const rank = mapping.rank.toLowerCase();
+  return {
     highlight_descendant_taxonomy_ids:
       parseListOrNull(mapping.highlight_descendant_taxonomy_ids)?.map((id) =>
         Number(id)
       ) ?? null,
-  };
-
-  // If the rank is a standard taxonomic rank, use the corresponding taxonomic level field
-  const rank = mapping.rank.toLowerCase();
-  if (STANDARD_TAXONOMIC_RANKS.includes(rank)) {
-    return {
-      ...taxIdsInfo,
-      taxonName: mapping.name,
-      taxonNameField: `taxonomicLevel${rank.charAt(0).toUpperCase()}${rank.slice(1)}`,
-    };
-  }
-
-  // If the rank is not a standard taxonomic rank, use otherTaxa
-  return {
-    ...taxIdsInfo,
     taxonName: mapping.name,
-    taxonNameField: "otherTaxa",
+    taxonNameField: STANDARD_TAXONOMIC_RANKS.includes(rank)
+      ? `taxonomicLevel${rank.charAt(0).toUpperCase()}${rank.slice(1)}`
+      : "otherTaxa",
+    taxonomy_id: Number(mapping.taxonomy_id),
   };
 }
 
@@ -125,8 +111,10 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
       sourceOutbreak.description.path
     );
 
-    // Create the base outbreak object
-    let outbreak: Outbreak = {
+    // Create the outbreak object, overlaying the resolved taxonomy IDs and the taxon field and name for filtering.
+    // If the relevant mapping entry doesn't exist, the taxonomy IDs are left as they are in the source,
+    // and the taxon field info is omitted
+    const outbreak: Outbreak = {
       description: await readMdxFile(descriptionPath),
       highlight_descendant_taxonomy_ids:
         sourceOutbreak.highlight_descendant_taxonomy_ids ?? null,
@@ -134,15 +122,8 @@ export async function buildOutbreaks(): Promise<Outbreak[]> {
       priority: sourceOutbreak.priority,
       resources: sourceOutbreak.resources,
       taxonomy_id: sourceOutbreak.taxonomy_id,
+      ...getTaxonomyInfo(sourceOutbreak, taxonomyMappings),
     };
-
-    // Find the resolved taxonomy IDs, and determine the taxon field and name for filtering
-    // If the relevant mapping entry doesn't exist, the taxonomy IDs are left as they are in the source,
-    // and the taxon field info is omitted
-    const taxonInfo = getTaxonomyInfo(sourceOutbreak, taxonomyMappings);
-    if (taxonInfo) {
-      outbreak = { ...outbreak, ...taxonInfo };
-    }
 
     outbreaks.push(outbreak);
   }

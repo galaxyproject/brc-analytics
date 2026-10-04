@@ -7,6 +7,10 @@ version: 2
 # `store_failures` audit tables hard to read and correlate. Keep these unique
 # across the project and comfortably under 63 bytes (for compatibility with
 # Postgres).
+#
+# Tests below don't need their own `enabled` config, even for the optional
+# entity types: a test on a model that's disabled via `enabled` in its
+# `config()` is disabled along with it.
 models:
   - name: catalog_input_curated_taxa
     # Only tested when the catalog curates information for individual taxa
@@ -15,25 +19,17 @@ models:
         data_tests:
           - not_null:
               name: catalog_curated_taxa_have_tax_ids
-              config:
-                enabled: "{{ var('has_curated_taxa', false) }}"
           - unique:
               name: catalog_curated_taxa_unique_ids
-              config:
-                enabled: "{{ var('has_curated_taxa', false) }}"
           - columns_equal:
               name: curated_taxa_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
-              config:
-                enabled: "{{ var('has_curated_taxa', false) }}"
           - relationships:
               name: catalog_curated_taxa_in_lineages
               arguments:
                 to: ref('taxonomy_lineages')
                 field: tax_id
-              config:
-                enabled: "{{ var('has_curated_taxa', false) }}"
   - name: catalog_input_organisms
     columns:
       - name: taxonomy_id
@@ -58,25 +54,17 @@ models:
         data_tests:
           - unique:
               name: catalog_outbreaks_unique_tax_ids
-              config:
-                enabled: "{{ var('has_outbreaks', false) }}"
           - not_null:
               name: catalog_outbreaks_have_tax_ids
-              config:
-                enabled: "{{ var('has_outbreaks', false) }}"
           - columns_equal:
               name: outbreak_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
-              config:
-                enabled: "{{ var('has_outbreaks', false) }}"
           - relationships:
               name: catalog_outbreak_taxa_in_outbreak_taxonomy
               arguments:
                 to: ref('taxonomy_outbreaks')
                 field: taxonomy_id
-              config:
-                enabled: "{{ var('has_outbreaks', false) }}"
   - name: catalog_input_outbreak_descendants
     # Only tested when the catalog has outbreaks
     columns:
@@ -89,11 +77,15 @@ models:
   - name: catalog_input_workflows
     # Only tested when the catalog has workflows
     columns:
+      - name: trs_id
+        data_tests:
+          - unique:
+              name: catalog_workflows_unique_trs_ids
+          - not_null:
+              name: catalog_workflows_have_trs_ids
       - name: taxonomy_id
         data_tests:
           - columns_equal:
               name: workflow_tax_ids_are_latest
               arguments:
                 other_column: source_taxonomy_id
-              config:
-                enabled: "{{ var('has_workflows', false) }}"

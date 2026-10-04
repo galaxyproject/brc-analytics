@@ -14,7 +14,6 @@ import duckdb
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from pydantic_core import to_jsonable_python
 
 from .generated_schema.schema import Workflow
 from .load import do_dlt_load
@@ -1234,6 +1233,37 @@ def save_taxonomy_mapping(
     print(f"Wrote taxonomy mapping to {output_path}")
 
 
+def save_normalized_workflows(source_workflows_df: pd.DataFrame, output_path: str):
+    """
+    Create and save a JSON file of workflows with resolved taxonomy IDs, for the TS
+    build to read.
+
+    Args:
+        source_workflows_df: Workflow definitions containing resolved taxonomy IDs
+        output_path: Path to save the JSON file
+    """
+    # `categories` and `parameters` are nested values, stored as JSON strings in DuckDB
+    workflow_records = (
+        source_workflows_df[Workflow.model_fields.keys()]
+        .assign(
+            categories=source_workflows_df["categories"].map(
+                json.loads, na_action="ignore"
+            ),
+            parameters=source_workflows_df["parameters"].map(
+                json.loads, na_action="ignore"
+            ),
+        )
+        .sort_values(by="trs_id")
+        .to_dict(orient="records")
+    )
+    save_json_file(
+        output_path,
+        [Workflow(**workflow).model_dump(mode="json") for workflow in workflow_records],
+        indent=2,
+    )
+    print(f"Wrote normalized workflows to {output_path}")
+
+
 def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
@@ -1490,22 +1520,7 @@ def build_files(
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
     if workflows_output_path is not None and source_workflows_df is not None:
-        # Output normalized input workflows
-        parsed_workflows = (
-            source_workflows_df[Workflow.model_fields.keys()]
-            .assign(
-                **source_workflows_df[["categories", "parameters"]].map(
-                    json.loads, na_action="ignore"
-                )
-            )
-            .sort_values(by="trs_id")
-            .to_dict(orient="records")
-        )
-        save_json_file(
-            workflows_output_path,
-            to_jsonable_python([Workflow(**w) for w in parsed_workflows]),
-            indent=2,
-        )
+        save_normalized_workflows(source_workflows_df, workflows_output_path)
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
         load_and_transform_result.ncbi_genomes

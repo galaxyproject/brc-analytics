@@ -5,7 +5,6 @@ import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
 import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
-import { OrganismPloidy } from "../../schema/generated/schema";
 
 const ORGANISM_PLOIDIES = Object.values(ORGANISM_PLOIDY);
 
@@ -18,7 +17,7 @@ export function parsePloidyForAssembly(assemblyRow: {
   accession: string;
   ploidy: string;
   speciesTaxonomyId: string;
-}): OrganismPloidy[] | null {
+}): ORGANISM_PLOIDY[] | null {
   const unverifiedPloidies = parseJsonListOrNull(assemblyRow.ploidy);
   if (unverifiedPloidies === null) {
     console.log(

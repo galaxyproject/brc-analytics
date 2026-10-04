@@ -21,6 +21,7 @@ import {
   parseNumberOrNull,
   parsePloidyForAssembly,
   parseStringOrNull,
+  readJsonFile,
   readValuesFile,
   saveJson,
   verifyUniqueIds,
@@ -80,12 +81,8 @@ async function buildCatalog(): Promise<void> {
   // NOTE: This creates a build ordering dependency - BRC catalog must be built
   // before GA2 catalog since GA2 reads catalog/output/workflows.json (a BRC artifact).
   // Do not rearrange build steps without ensuring workflows.json exists first.
-  const workflowCategoriesJson = await fsp.readFile(
-    "catalog/output/workflows.json",
-    "utf8"
-  );
-  const workflowCategories: WorkflowCategory[] = JSON.parse(
-    workflowCategoriesJson
+  const workflowCategories = await readJsonFile<WorkflowCategory[]>(
+    "catalog/output/workflows.json"
   );
 
   // Compute and save workflow-assembly mappings (using shared utility)
