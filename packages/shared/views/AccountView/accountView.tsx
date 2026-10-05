@@ -1,3 +1,4 @@
+import { useConfig } from "@databiosphere/findable-ui/lib/hooks/useConfig";
 import {
   Alert,
   Button,
@@ -5,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { type AppSiteConfig } from "@repo/shared/config/types";
 import { useUserResource } from "@repo/shared/hooks/UseUserResource/hook";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
@@ -46,16 +48,20 @@ export function AccountView(): JSX.Element {
   } = useFavorites();
   const analyses = useUserResource<SavedAnalysisSummary>(fetchAnalyses);
   const launches = useUserResource<WorkflowRunResponse>(fetchLaunches);
+  const { config } = useConfig();
+  const { loganSearchEnabled = false } = config as AppSiteConfig;
   const [loganTotal, setLoganTotal] = useState(0);
   // Stable because setLoganTotal is; it only needs to carry the total out
-  // alongside the first page.
+  // alongside the first page. A site without Logan search (GA2) has no page
+  // for the section to link to, so it never asks.
   const fetchLoganSearches = useCallback(async (): Promise<
     LoganSearchRecord[]
   > => {
+    if (!loganSearchEnabled) return [];
     const page = await apiClient.getLoganSearches();
     setLoganTotal(page.total);
     return page.searches;
-  }, []);
+  }, [loganSearchEnabled]);
   const loganSearches = useUserResource<LoganSearchRecord>(fetchLoganSearches);
 
   const isLoading =

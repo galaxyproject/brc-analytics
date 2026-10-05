@@ -38,6 +38,12 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 jest.mock("@repo/shared/services/workflows/query", () => ({
   findEntity: jest.fn(),
 }));
+let mockLoganSearchEnabled = true;
+jest.mock("@databiosphere/findable-ui/lib/hooks/useConfig", () => ({
+  useConfig: (): { config: { loganSearchEnabled: boolean } } => ({
+    config: { loganSearchEnabled: mockLoganSearchEnabled },
+  }),
+}));
 jest.mock("next/router", () => ({
   __esModule: true,
   default: { push: jest.fn() },
@@ -109,6 +115,7 @@ function loganPage(
 describe("AccountView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLoganSearchEnabled = true;
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isConfigured: true,
@@ -424,6 +431,21 @@ describe("AccountView", () => {
     expect(mockClient.getLoganSearches).toHaveBeenLastCalledWith(2);
     expect(
       screen.queryByRole("button", { name: "Show more" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("never asks for Logan searches on a site without Logan search", async () => {
+    mockLoganSearchEnabled = false;
+    mockClient.getLoganSearches.mockResolvedValue(loganPage(["job-1"], 1));
+
+    renderAccountView();
+
+    await waitFor(() =>
+      expect(screen.getByText(/Browse assemblies/i)).toBeInTheDocument()
+    );
+    expect(mockClient.getLoganSearches).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("region", { name: "Logan searches" })
     ).not.toBeInTheDocument();
   });
 
