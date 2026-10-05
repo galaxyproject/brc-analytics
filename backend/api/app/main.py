@@ -34,6 +34,7 @@ from app.core.dependencies import (
 )
 from app.db.session import close_db, init_db
 from app.services import turn_log
+from app.services.galaxy_service import cancel_kmindex_index_refreshes
 from app.services.mcp_server import create_mcp_server
 
 logger = logging.getLogger(__name__)
@@ -44,17 +45,20 @@ MCP_MOUNT_PATH = "/api/v1/mcp"
 async def warm_kmindex_indexes() -> None:
     """Fill the index-list cache before a reader needs it.
 
-    The list is the one Galaxy call the search page makes on arrival, so the
-    first visitor after a restart is the one who pays for it -- and if Galaxy is
-    rate-limiting us just then, they are the one who sees it fail. Warming it
-    here moves that to boot, where a failure costs nothing: the entry is
-    long-lived and survives the restart, so there is usually one there already.
+    Readers never wait on Galaxy for the list -- a miss serves the last good
+    copy and refreshes behind it -- so this is what keeps that copy current
+    across a restart, and the first visitor off the shipped fallback names on a
+    brand-new deploy. It awaits the refresh itself rather than the read, which
+    would only hand back the cached copy. A failure here costs nothing.
     """
     galaxy = get_service_galaxy()
     if not galaxy.is_available():
         return
     try:
-        indexes = await galaxy.list_kmindex_indexes()
+        indexes = await galaxy.refresh_kmindex_indexes()
+        if not indexes:
+            logger.warning("Could not warm the kmindex index list: no answer")
+            return
         logger.info("Warmed the kmindex index list: %d indexes", len(indexes))
     except Exception as e:
         # Never a reason to fail a boot. The search page still has the last
@@ -135,6 +139,7 @@ def create_app() -> FastAPI:
             warm_task.cancel()
             with suppress(asyncio.CancelledError):
                 await warm_task
+            await cancel_kmindex_index_refreshes()
 
             auth_service = get_auth_service()
             await auth_service.close()

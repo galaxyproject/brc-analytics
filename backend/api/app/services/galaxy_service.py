@@ -9,7 +9,7 @@ import tempfile
 import time
 import zipfile
 from collections import Counter, defaultdict
-from typing import List, Literal, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Tuple
 
 import requests
 from bioblend import ConnectionError as BioblendConnectionError
@@ -221,8 +221,17 @@ KMINDEX_ORDER_CACHE_PREFIX = "galaxy:kmindex_order:v1"
 # reading it per page view is what gets us rate-limited: tools.build renders the
 # whole form, including the 109-option select, and every visitor's search page
 # asks for it. The second entry is the same list kept far longer, as something
-# to serve when Galaxy will not answer at all; it is never read while the first
-# one is live, so a stale copy cannot mask a fresh answer.
+# to serve while the first one is being refilled or when Galaxy will not answer
+# at all; it is never read while the first one is live, so a stale copy cannot
+# mask a fresh answer.
+#
+# No request ever waits on Galaxy for this. It is the one call the search page
+# makes on arrival and the form shows a spinner until it lands, so a request
+# that waited out a slow or 429ing Galaxy -- with everyone else queued behind it
+# -- was a search page that hung for half a minute. A miss is answered from the
+# long-lived copy, or the names shipped with the build, and the refill happens
+# behind it in a background task. The list almost never changes, so the copy is
+# nearly always exactly right.
 #
 # Deliberately outside CACHE_KEY_PATTERNS: a restart is exactly when having
 # yesterday's answer is worth most, and the boot-time warm refreshes it anyway.
@@ -230,20 +239,18 @@ KMINDEX_INDEX_CACHE_PREFIX = "galaxy:kmindex_indexes:v1"
 KMINDEX_INDEX_LAST_GOOD_PREFIX = "galaxy:kmindex_indexes_last_good:v1"
 
 # A read that just failed is a read that is about to fail again: the burst which
-# trips the rate limit arrives while it is tripped, and taking turns on the lock
-# to ask once per request is what keeps it that way -- and, on the service
-# account, leaves a timestamped stray history behind each time, since that is
-# what _get_or_create_shared_history does when the lookup it needs first fails.
-# So a failure is remembered briefly, and the requests behind it are answered
-# from the last good list without touching Galaxy at all.
+# trips the rate limit arrives while it is tripped. So a failure is remembered
+# briefly, and the misses behind it are answered without starting another
+# refresh -- which, on the service account, would also leave a timestamped
+# stray history behind each time, since that is what
+# _get_or_create_shared_history does when the lookup it needs first fails.
 KMINDEX_INDEX_COOLDOWN_PREFIX = "galaxy:kmindex_indexes_cooldown:v1"
 KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 
-# bioblend sets no request timeout, and this call is made holding the lock every
-# other cold reader is waiting on, so a Galaxy that accepts the connection and
-# then says nothing would park the index list for everyone rather than for one
-# request. The list is small and the form is rendered server-side in about half
-# a second, so half a minute is already far past "slow".
+# bioblend sets no request timeout, and a refresh that never ends is one that
+# holds the single-flight slot forever, so no later miss could start another.
+# The list is small and the form is rendered server-side in about half a
+# second, so half a minute is already far past "slow".
 KMINDEX_INDEX_READ_TIMEOUT = 30.0
 
 # bioblend sets no socket timeout by default. We set a global request timeout
@@ -280,13 +287,30 @@ KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 # account's submissions.
 _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 
-# One Galaxy call per cold cache rather than one per waiting request. The list
-# is the same for everyone, so the requests that arrive while it is being read
-# are waiting for that answer, not for a turn to ask again -- which is the shape
-# that trips the rate limit, since a deploy or a TTL expiry lands every visitor
-# on the cold path at once. Keyed by cache key, so two Galaxy instances (tests,
-# a re-pointed dev) do not queue behind each other.
-_INDEX_LOCKS = defaultdict(asyncio.Lock)
+# One Galaxy read per cold cache, process-wide, rather than one per miss. The
+# router builds a service per request, so the in-flight refresh has to live out
+# here, and a deploy or a TTL expiry lands every open search page on the miss
+# path at once -- a burst of reads is exactly what Galaxy answers with 429.
+# Keyed by cache key, so two Galaxy instances (tests, a re-pointed dev) do not
+# share a slot. Holding the task here is also what keeps it from being garbage
+# collected mid-read, since the request that started it does not wait for it.
+_INDEX_REFRESHES: Dict[str, asyncio.Task] = {}
+
+
+def _forget_index_refresh(key: str, task: asyncio.Task) -> None:
+    """Free the slot once a refresh ends, and surface anything it did not log."""
+    if _INDEX_REFRESHES.get(key) is task:
+        del _INDEX_REFRESHES[key]
+    if not task.cancelled() and task.exception() is not None:
+        logger.error("kmindex index refresh failed: %s", task.exception())
+
+
+async def cancel_kmindex_index_refreshes() -> None:
+    """Stop any refresh still reading, before the cache it writes to closes."""
+    tasks = list(_INDEX_REFRESHES.values())
+    for task in tasks:
+        task.cancel()
+    await asyncio.gather(*tasks, return_exceptions=True)
 
 
 # Transport failures worth another try. A dropped connection is the likeliest
@@ -592,7 +616,11 @@ class GalaxyService:
         )
 
     async def list_kmindex_indexes(self) -> List[str]:
-        """List the Logan/kmindex indexes registered on the Galaxy instance."""
+        """List the Logan/kmindex indexes registered on the Galaxy instance.
+
+        Never waits on Galaxy: a miss is answered from the last good list (or
+        the shipped names) while a background refresh refills the cache.
+        """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
@@ -601,39 +629,70 @@ class GalaxyService:
         if cached:
             return cached
 
-        async with _INDEX_LOCKS[key]:
-            cached = await self.cache.get(key)
-            if cached:
-                return cached
-
+        if key not in _INDEX_REFRESHES:
             cooldown_key = self._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX)
-            if await self.cache.get(cooldown_key):
-                return await self._last_known_indexes()
+            if not await self.cache.get(cooldown_key):
+                self._start_index_refresh(key)
+        return await self._last_known_indexes()
 
-            try:
-                indexes = await asyncio.wait_for(
-                    self._build_kmindex_index_list(), KMINDEX_INDEX_READ_TIMEOUT
-                )
-            except Exception as e:
-                # Not fatal any more: the picker can be drawn from the last
-                # answer. Galaxy rate-limiting one page view is not a reason to
-                # give the reader a broken search page.
-                logger.error(f"Failed to list kmindex indexes: {e}")
-                indexes = []
+    async def refresh_kmindex_indexes(self) -> List[str]:
+        """Read the list from Galaxy now and cache it; [] if Galaxy would not.
 
-            if not indexes:
-                # An empty list reads as a search with nothing to search, so it
-                # is treated as a failed read rather than cached as an answer.
-                await self.cache.set(cooldown_key, True, KMINDEX_INDEX_COOLDOWN_SECONDS)
-                return await self._last_known_indexes()
+        For the boot-time warm, which can afford to wait. Joins a refresh that
+        is already running rather than starting a second one, and ignores the
+        cooldown: a boot is not part of a burst.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        key = self._index_cache_key(KMINDEX_INDEX_CACHE_PREFIX)
+        # Shielded so a cancelled caller does not cancel a refresh other misses
+        # are counting on; shutdown cancels it through
+        # cancel_kmindex_index_refreshes instead.
+        return await asyncio.shield(self._start_index_refresh(key))
 
-            await self.cache.set(key, indexes, CacheTTL.ONE_DAY)
-            await self.cache.set(
-                self._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX),
-                indexes,
-                CacheTTL.THIRTY_DAYS,
+    def _start_index_refresh(self, key: str) -> asyncio.Task:
+        """The in-flight refresh for this key, started if there is none.
+
+        No await between the check and the insert, so concurrent misses cannot
+        both start one. The task keeps this service alive past the request that
+        made it, which is safe: it holds the process-wide cache and a bioblend
+        client, and nothing closes either when the request ends.
+        """
+        task = _INDEX_REFRESHES.get(key)
+        if task is None or task.done():
+            task = asyncio.create_task(self._refresh_index_list(key))
+            _INDEX_REFRESHES[key] = task
+            task.add_done_callback(lambda t: _forget_index_refresh(key, t))
+        return task
+
+    async def _refresh_index_list(self, key: str) -> List[str]:
+        """Read the index list from Galaxy and write both cache entries."""
+        try:
+            indexes = await asyncio.wait_for(
+                self._build_kmindex_index_list(), KMINDEX_INDEX_READ_TIMEOUT
             )
-            return indexes
+        except Exception as e:
+            logger.error(f"Failed to list kmindex indexes: {e}")
+            indexes = []
+
+        if not indexes:
+            # An empty list reads as a search with nothing to search, so it is
+            # treated as a failed read rather than cached as an answer.
+            await self.cache.set(
+                self._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX),
+                True,
+                KMINDEX_INDEX_COOLDOWN_SECONDS,
+            )
+            return []
+
+        await self.cache.set(key, indexes, CacheTTL.ONE_DAY)
+        await self.cache.set(
+            self._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX),
+            indexes,
+            CacheTTL.THIRTY_DAYS,
+        )
+        logger.info("Refreshed the kmindex index list: %d indexes", len(indexes))
+        return indexes
 
     async def _build_kmindex_index_list(self) -> List[str]:
         """Read the index names off the pinned tool's form, uncached."""
@@ -651,15 +710,14 @@ class GalaxyService:
             self._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX)
         )
         if cached:
-            logger.warning(
-                "Galaxy would not list kmindex indexes; serving %d from the last "
-                "good answer",
+            logger.info(
+                "No fresh kmindex index list; serving %d from the last good answer",
                 len(cached),
             )
             return cached
         logger.warning(
-            "Galaxy would not list kmindex indexes and none are cached; serving "
-            "the %d shipped with this build",
+            "No kmindex index list cached at all; serving the %d shipped with "
+            "this build",
             len(FALLBACK_INDEX_NAMES),
         )
         return list(FALLBACK_INDEX_NAMES)
