@@ -40,7 +40,7 @@ export function findWorkflow(trsId: string): Workflow | undefined {
  * Finds the workflow categories, returning undefined when they are not loaded.
  * @returns Workflow categories, or undefined when not loaded.
  */
-export function findWorkflows(): WorkflowCategory[] | undefined {
+export function findWorkflowCategories(): WorkflowCategory[] | undefined {
   return findEntities<WorkflowCategory>("workflows");
 }
 

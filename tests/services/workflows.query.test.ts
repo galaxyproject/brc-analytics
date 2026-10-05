@@ -1,7 +1,7 @@
 import {
   findAssembly,
   findWorkflow,
-  findWorkflows,
+  findWorkflowCategories,
 } from "@repo/shared/services/workflows/entities";
 import { getEntities, getEntity } from "@repo/shared/services/workflows/query";
 import {
@@ -69,15 +69,15 @@ describe("workflows query", () => {
     expect(findWorkflow("stale-workflow-id")).toBeUndefined();
   });
 
-  test("findWorkflows returns the workflow categories", () => {
+  test("findWorkflowCategories returns the workflow categories", () => {
     const categories = [{ category: "OTHER", workflows: [] }];
     setEntitiesByType("workflows", categories);
 
-    expect(findWorkflows()).toEqual(categories);
+    expect(findWorkflowCategories()).toEqual(categories);
   });
 
-  test("findWorkflows returns undefined when no workflows are loaded", () => {
-    expect(findWorkflows()).toBeUndefined();
+  test("findWorkflowCategories returns undefined when no workflows are loaded", () => {
+    expect(findWorkflowCategories()).toBeUndefined();
   });
 
   test("findAssembly returns an assembly by entity id", () => {

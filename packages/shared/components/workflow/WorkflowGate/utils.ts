@@ -2,7 +2,7 @@ import {
   findAssembly,
   findOrganism,
   findWorkflow,
-  findWorkflows,
+  findWorkflowCategories,
 } from "@repo/shared/services/workflows/entities";
 import { isWorkflowListedForAssembly } from "@repo/shared/workflow/assemblyWorkflows";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
@@ -25,7 +25,7 @@ export function isAssemblyWorkflowAvailable(
 ): boolean {
   const workflow = findWorkflow(trsId);
   const assembly = findAssembly(entityId);
-  const workflowCategories = findWorkflows();
+  const workflowCategories = findWorkflowCategories();
   if (!workflow || !assembly || !workflowCategories) return false;
   return isWorkflowListedForAssembly(
     workflow,
@@ -52,7 +52,7 @@ export function isOrganismWorkflowAvailable(
 ): boolean {
   const workflow = findWorkflow(trsId);
   const organism = findOrganism(entityId);
-  const workflowCategories = findWorkflows();
+  const workflowCategories = findWorkflowCategories();
   if (!workflow || !organism || !workflowCategories) return false;
   return isWorkflowListedForOrganism(
     workflow,
