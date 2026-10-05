@@ -1,12 +1,14 @@
 import type {
   AnalysisSchema,
+  ChatMessageRole,
+  ClearableField,
   LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
 
 export interface ChatMessageDisplay {
   content: string;
-  role: "user" | "assistant";
+  role: ChatMessageRole;
 }
 
 /**
@@ -26,6 +28,7 @@ export interface UseAssistantChatOptions {
 }
 
 export interface UseAssistantChatReturn {
+  clearField: (field: ClearableField) => Promise<void>;
   error: string | null;
   handoffUrl: string | null;
   isComplete: boolean;
