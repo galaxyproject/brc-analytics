@@ -20,11 +20,36 @@ const VISIBLE_AT_SM = visibleOnly("sm");
 const VISIBLE_AT_SM_MD = visibleOnly("sm", "md");
 
 /**
+ * Returns the Genes navigation link.
+ * @param visible - Breakpoints the link is visible at.
+ * @returns Genes link.
+ */
+function getGenesLink(visible?: NavLinkItem["visible"]): NavLinkItem {
+  return { label: "Genes", url: ROUTES.GENES, visible };
+}
+
+/**
+ * Returns the Logan Search navigation link, when the feature is enabled.
+ * @param loganSearchEnabled - Whether Logan Search is enabled.
+ * @param visible - Breakpoints the link is visible at.
+ * @returns Logan Search link, or an empty list when disabled.
+ */
+function getLoganSearchLinks(
+  loganSearchEnabled: boolean,
+  visible?: NavLinkItem["visible"]
+): NavLinkItem[] {
+  if (!loganSearchEnabled) return [];
+  return [{ label: "Logan Search", url: SITE_ROUTES.LOGAN_SEARCH, visible }];
+}
+
+/**
  * Header navigation links.
  * @param loganSearchEnabled - Whether to show the Logan Search entry.
  * @remarks
  * Kept out of `config.ts` so tests can reach it: `config.ts` transitively
  * imports `next-mdx-remote`, which Jest cannot parse.
+ * The Genes entry is always included here; it is gated at runtime by the
+ * gene pages feature flag (see the site's `useAppConfig` hook).
  * @returns header navigation.
  */
 export function headerNavigation(loganSearchEnabled: boolean): Navigation {
@@ -35,6 +60,7 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
       { label: "Learn", url: SITE_ROUTES.LEARN, visible: HIDDEN_AT_SM },
       { label: "Organisms", url: ROUTES.ORGANISMS },
       { label: "Assemblies", url: ROUTES.GENOMES },
+      getGenesLink(HIDDEN_AT_SM),
       { label: "Workflows", url: ROUTES.WORKFLOWS, visible: HIDDEN_AT_SM },
       ...getLoganSearchLinks(loganSearchEnabled, HIDDEN_AT_SM),
       {
@@ -48,6 +74,7 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
         menuItems: [
           { label: "About", url: SITE_ROUTES.ABOUT },
           { label: "Learn", url: SITE_ROUTES.LEARN },
+          getGenesLink(),
           { label: "Workflows", url: ROUTES.WORKFLOWS },
           ...getLoganSearchLinks(loganSearchEnabled),
           {
@@ -67,20 +94,6 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
     ],
     undefined,
   ];
-}
-
-/**
- * Returns the Logan Search navigation link, when the feature is enabled.
- * @param loganSearchEnabled - Whether Logan Search is enabled.
- * @param visible - Breakpoints the link is visible at.
- * @returns Logan Search link, or an empty list when disabled.
- */
-function getLoganSearchLinks(
-  loganSearchEnabled: boolean,
-  visible?: NavLinkItem["visible"]
-): NavLinkItem[] {
-  if (!loganSearchEnabled) return [];
-  return [{ label: "Logan Search", url: SITE_ROUTES.LOGAN_SEARCH, visible }];
 }
 
 /**

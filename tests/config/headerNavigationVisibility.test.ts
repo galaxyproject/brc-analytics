@@ -14,6 +14,7 @@ const PERSISTENT_LABELS = ["Organisms", "Assemblies", "Assistant"];
 const COLLAPSED_LABELS = [
   "About",
   "Learn",
+  "Genes",
   "Workflows",
   "Logan Search",
   "Priority Pathogens",
@@ -25,6 +26,7 @@ const PRIMARY_LABELS = [
   "Learn",
   "Organisms",
   "Assemblies",
+  "Genes",
   "Workflows",
   "Logan Search",
   "Priority Pathogens",
