@@ -1,6 +1,7 @@
 """Galaxy API integration endpoints."""
 
 import asyncio
+import json
 import logging
 from typing import Any, Dict, Optional
 
@@ -61,17 +62,43 @@ MAX_ERROR_DETAIL_CHARS = 300
 _HTML_MARKERS = ("<!doctype", "<html", "<head", "<body", "<title")
 
 
-def _upstream_status(e: BaseException) -> Optional[int]:
-    """The HTTP status Galaxy answered with, from anywhere in the cause chain."""
+def _upstream_error(e: BaseException) -> tuple[Optional[int], str]:
+    """The HTTP status Galaxy answered with, and its body, from the cause chain.
+
+    Only `__cause__` is followed: every wrapping site re-raises with `from e`,
+    and `__context__` would also pick up an earlier, already-handled Galaxy
+    error that has nothing to do with this one.
+    """
     seen: set[int] = set()
     current: Optional[BaseException] = e
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         if isinstance(current, BioblendConnectionError) and current.status_code:
-            return current.status_code
+            return current.status_code, str(current.body or "")
         if isinstance(current, ShardFetchError):
-            return current.status
-        current = current.__cause__ or current.__context__
+            return current.status, ""
+        current = current.__cause__
+    return None, ""
+
+
+def _short_text(text: str) -> Optional[str]:
+    """Collapse whitespace and cap the length; None for empty or HTML text."""
+    text = " ".join(text.split())
+    if not text or any(marker in text.lower() for marker in _HTML_MARKERS):
+        return None
+    if len(text) > MAX_ERROR_DETAIL_CHARS:
+        text = text[:MAX_ERROR_DETAIL_CHARS].rstrip() + "..."
+    return text
+
+
+def _galaxy_message(body: str) -> Optional[str]:
+    """Galaxy's own error text from a 4xx body: its JSON err_msg, or plain text."""
+    try:
+        parsed = json.loads(body)
+    except ValueError:
+        return _short_text(body)
+    if isinstance(parsed, dict) and isinstance(parsed.get("err_msg"), str):
+        return _short_text(parsed["err_msg"])
     return None
 
 
@@ -82,26 +109,26 @@ def error_detail(prefix: str, e: BaseException) -> str:
     bioblend's ConnectionError stringifies with the whole response body, so a
     Galaxy behind a proxy that answers 502 with an HTML error page turned into
     a detail that was that page, and the results page printed it verbatim. The
-    status is what the reader can act on; the body stays in the log.
+    status is what the reader can act on; the body stays in the log. A 4xx
+    keeps Galaxy's own short message, which usually says what was wrong.
 
     @param prefix: what failed, e.g. "Failed to get job status".
     @param e: the exception caught.
     @returns: the detail to send.
     """
-    status = _upstream_status(e)
+    status, body = _upstream_error(e)
     if status is not None:
         if status >= 500:
             return (
                 f"{prefix}: Galaxy answered HTTP {status}. It may be busy or "
                 "restarting -- try again in a few minutes."
             )
+        message = _galaxy_message(body)
+        if message:
+            return f"{prefix}: Galaxy answered HTTP {status}: {message}"
         return f"{prefix}: Galaxy answered HTTP {status}."
-    text = " ".join(str(e).split())
-    if not text or any(marker in text.lower() for marker in _HTML_MARKERS):
-        return f"{prefix}."
-    if len(text) > MAX_ERROR_DETAIL_CHARS:
-        text = text[:MAX_ERROR_DETAIL_CHARS].rstrip() + "..."
-    return f"{prefix}: {text}"
+    text = _short_text(str(e))
+    return f"{prefix}: {text}" if text else f"{prefix}."
 
 
 async def get_galaxy_service(
