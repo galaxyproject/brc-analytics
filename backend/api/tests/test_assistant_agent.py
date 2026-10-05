@@ -3137,6 +3137,8 @@ class TestPanelClears:
             (MessageRole.ASSISTANT, "Which organism would you like instead?"),
         ]
         assert resp.reply == "Which organism would you like instead?"
+        # The client has no transcript to re-read, so the note comes back too.
+        assert resp.note == "Organism cleared, along with assembly and workflow."
         # No fake user line.
         assert [m.role for m in state.messages].count(MessageRole.USER) == 1
 
@@ -3181,9 +3183,10 @@ class TestPanelClears:
     async def test_clearing_an_empty_field_leaves_no_note(self, agent):
         state = _filled_session(agent)
         state.schema_state.data_source = SchemaField()
-        await agent.chat(None, session_id="s1", clear_fields=["data_source"])
+        resp = await agent.chat(None, session_id="s1", clear_fields=["data_source"])
 
         assert MessageRole.SYSTEM not in [m.role for m in state.messages]
+        assert resp.note is None
         prompt = agent._run_agent_with_retry.await_args.args[0]
         assert "just cleared" not in prompt
 
