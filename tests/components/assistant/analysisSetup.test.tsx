@@ -201,6 +201,34 @@ describe("FieldValueSelector", () => {
     );
     expect(screen.getByText("Not set")).toBeTruthy();
   });
+
+  test("shows a field needing attention with no reason or value as not set", () => {
+    render(
+      <FieldValueSelector
+        field={{ detail: null, status: "needs_attention", value: null }}
+        fieldKey="organism"
+        loading={false}
+        onSend={jest.fn()}
+      />
+    );
+    expect(screen.getByText("Not set")).toBeTruthy();
+  });
+
+  test("shows the reason a field needs attention", () => {
+    render(
+      <FieldValueSelector
+        field={{
+          detail: "Assembly not found",
+          status: "needs_attention",
+          value: "GCF_000002765.6",
+        }}
+        fieldKey="assembly"
+        loading={false}
+        onSend={jest.fn()}
+      />
+    );
+    expect(screen.getByText("Assembly not found")).toBeTruthy();
+  });
 });
 
 describe("Action", () => {
