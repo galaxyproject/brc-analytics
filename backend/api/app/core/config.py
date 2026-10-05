@@ -174,7 +174,7 @@ class Settings:
         # everything else shares RATE_LIMIT_WINDOW (a minute), and is roomier
         # than the per-IP default because partners poll from one server.
         self.PARTNER_SUBMIT_RATE_LIMIT_REQUESTS: int = int(
-            os.getenv("PARTNER_SUBMIT_RATE_LIMIT_REQUESTS", "20")
+            os.getenv("PARTNER_SUBMIT_RATE_LIMIT_REQUESTS", "60")
         )
         self.PARTNER_RATE_LIMIT_REQUESTS: int = int(
             os.getenv("PARTNER_RATE_LIMIT_REQUESTS", "300")

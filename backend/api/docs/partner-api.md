@@ -22,7 +22,7 @@ meant to be called server-to-server, not from a browser.
 
 ## Limits
 
-- 20 submissions per hour.
+- 60 submissions per hour.
 - 300 requests per minute across all other calls.
 
 Going over either returns `429` with `Retry-After`. The rules for what you can
@@ -178,7 +178,7 @@ Configure it with these backend env vars:
 | `PARTNER_API_KEYS`                   | --      | `partner_id:key_id:sha256hex,...`; mint with `python -m scripts.generate_partner_key <partner_id> <key_id>` |
 | `PARTNER_API_SUNSET`                 | --      | ISO date; required when enabled; 410 from then on                                                           |
 | `PARTNER_SUBMIT_PAUSED`              | `false` | 503 on submit, everything else keeps answering                                                              |
-| `PARTNER_SUBMIT_RATE_LIMIT_REQUESTS` | `20`    | Per partner per `SUBMIT_RATE_LIMIT_WINDOW`                                                                  |
+| `PARTNER_SUBMIT_RATE_LIMIT_REQUESTS` | `60`    | Per partner per `SUBMIT_RATE_LIMIT_WINDOW`                                                                  |
 | `PARTNER_RATE_LIMIT_REQUESTS`        | `300`   | Per partner per `RATE_LIMIT_WINDOW`                                                                         |
 
 - **Galaxy.** Jobs run on the BRC service account, in a history called
@@ -189,9 +189,9 @@ Configure it with these backend env vars:
   key, then remove the old entry.
 - **Redis.** One all-index aggregate is about 4.5 MB. Every aggregate, native
   or partner, is cached for two hours (`KMINDEX_AGG_TTL`), so a partner at its
-  full submit budget holds about 180 MB. Even so, raise `maxmemory` above the 256 MB
-  default before enabling this, or partner traffic will evict users' cached
-  results and the rate-limit counters.
+  full submit budget holds about 540 MB. Give Redis at least 1 GB of `maxmemory`
+  before enabling this, or partner traffic will evict users' cached results
+  and the rate-limit counters.
 - **Idempotency and budgets live in the cache Redis.** Idempotency records
   and the partner rate-limit counters share the `allkeys-lru` Redis with the
   cached results, so they hold only while Redis isn't evicting. If Redis
