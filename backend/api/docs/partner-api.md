@@ -59,12 +59,12 @@ curl -X POST -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
      $BASE/jobs
 ```
 
-| Field       | Default | Meaning                                                   |
-| ----------- | ------- | --------------------------------------------------------- |
-| `sequence`  | --      | One FASTA record, up to 2,500 bases                       |
-| `indexes`   | --      | Index names from `/indexes`                               |
-| `threshold` | 0.0     | Minimum share of k-mers a run must contain (kmindex `-r`) |
-| `zvalue`    | 6       | z for findere, kmindex's false-positive filter (`-z`)     |
+| Field       | Default | Meaning                                                              |
+| ----------- | ------- | -------------------------------------------------------------------- |
+| `sequence`  | --      | One FASTA record, up to 2,500 bases                                  |
+| `indexes`   | --      | Index names from `/indexes`                                          |
+| `threshold` | 0.5     | Minimum share of k-mers a run must contain (kmindex `-r`), 0.25 to 1 |
+| `zvalue`    | 6       | z for findere, kmindex's false-positive filter (`-z`)                |
 
 **Send an `Idempotency-Key`.** A submission can time out after the job has
 already started. If you retry with the same key and the same body within 24

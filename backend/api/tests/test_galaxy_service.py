@@ -404,6 +404,25 @@ class TestQueryLengthCap:
             KmindexQuerySubmission(sequence="A" * 100_000, indexes=["GENOMIC_BCT"])
 
 
+class TestThreshold:
+    """Range and default follow logan-search.org."""
+
+    def test_default_is_half(self):
+        submission = KmindexQuerySubmission(sequence="ACGT", indexes=["GENOMIC_BCT"])
+        assert submission.threshold == 0.5
+
+    def test_floor_accepted(self):
+        assert KmindexQuerySubmission(
+            sequence="ACGT", indexes=["GENOMIC_BCT"], threshold=0.25
+        )
+
+    def test_below_floor_rejected(self):
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(
+                sequence="ACGT", indexes=["GENOMIC_BCT"], threshold=0.2
+            )
+
+
 class TestIndexSelection:
     """kmindex_query's select is multiple="true"; any combination is a job."""
 

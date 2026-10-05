@@ -104,8 +104,9 @@ class KmindexQuerySubmission(BaseModel):
     # kmindex indexes s-mers and queries (s+z)-mers; z=6 is the tool default and
     # matches a standard k-mer query.
     zvalue: int = Field(default=6, ge=0, le=16, description="Z-value")
+    # Range and default follow logan-search.org, which is authoritative for Logan.
     threshold: float = Field(
-        default=0.0, ge=0.0, le=1.0, description="Minimum proportion of shared k-mers"
+        default=0.5, ge=0.25, le=1.0, description="Minimum proportion of shared k-mers"
     )
     filename: Optional[str] = Field(
         default="query", description="Name for the uploaded query file"
