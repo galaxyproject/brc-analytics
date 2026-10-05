@@ -8,6 +8,10 @@ import {
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import {
+  LOGAN_EXAMPLES,
+  type LoganExample,
+} from "@brc/components/LoganSearch/LoganSearchForm/examples";
+import {
   queryNameOf,
   type RecentSearch,
 } from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
@@ -78,22 +82,14 @@ const CHIP_SX = {
   height: 32,
 };
 
-// A 500 bp window of the P. falciparum 18S rRNA (GenBank M19172.1). Measured
-// against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages at
-// 25 a page, where the bacterial 16S fragment that used to sit here returned
-// 31,405 against METAGENOMIC_ENV. Neither truncates; the old pair was a worse
-// first run, not a truncated one. What the swap really buys is a coherent pair:
-// a Plasmodium query against the division Plasmodium sits in, rather than
-// against environmental metagenomes.
-const SAMPLE_QUERY = `>Plasmodium_falciparum_18S
-GCGTATATTAAAATTGTTGCAGTTAAAACGCTCGTAGTTGAATTTCAAAGAATCGATATTTTATTGTAAC
-TATTCTAGGGGAACTATTTTAGCTTTTGGCTTTAATACGCTTCCTCTATTATTATGTTCTTTAAATAACA
-AAGATTCTTTTTAAAATCCCCACTTTTGCTTTTGCTTTTTTGGGGATTTTGTTACTTTGAGTAAATTAGA
-GTGTTCAAAGCAAACAGTTAAAGCATTTACTGTGTTTGAATACTATAGCATGGAATAACAAAATTGAACA
-AGCTAAAATTTTTTGTTCTTTTTTCTTATTTTGGCTTAGTTACGATTAATAGGAGTAGCTTGGGGACATT
-CGTATTCAGATGTCAGAGGTGAAATTCTTAGATTTTCTGGAGACGAACAACTGCGAAAGCATTTGTCTAA
-AATACTTCCATTAATCAAGAACGAAAGTTAAGGGAGTGAAGACGATCAGATACCGTCGTAATCTTAACCA
-TAAACTATGC`;
+// The first example: a 500 bp window of the P. falciparum 18S rRNA. Measured
+// against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages
+// at 25 a page, where the bacterial 16S fragment that used to sit here
+// returned 31,405 against METAGENOMIC_ENV. Neither truncates; the old pair was
+// a worse first run, not a truncated one. What the swap really buys is a
+// coherent pair: a Plasmodium query against the division Plasmodium sits in,
+// rather than against environmental metagenomes.
+const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 
 interface AxisChipModel extends IndexAxisOption {
   // Settled with the other row's selection in hand, so the chip itself never
@@ -334,6 +330,17 @@ export const LoganSearchForm = ({
     }
   };
 
+  /**
+   * Put an example in the textarea and pick the indexes it is meant for.
+   * @param example - The example clicked.
+   */
+  const loadExample = (example: LoganExample): void => {
+    setSequence(example.sequence);
+    setFileError(null);
+    setOrganismsPicked(example.divisions);
+    setLibrariesPicked(example.strategies);
+  };
+
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
 
   const defaultIndexes = options.includes(DEFAULT_INDEX)
@@ -434,6 +441,24 @@ export const LoganSearchForm = ({
                 {fileError ??
                   "Replaces the text above. One record, read in your browser."}
               </Typography>
+            </ControlRow>
+            <ControlRow aria-labelledby="logan-examples" role="group">
+              <Typography component="span" id="logan-examples" variant="body2">
+                Examples
+              </Typography>
+              <IndexChips>
+                {LOGAN_EXAMPLES.map((example) => (
+                  <Tooltip describeChild key={example.key} title={example.note}>
+                    <Chip
+                      clickable
+                      label={example.label}
+                      onClick={(): void => loadExample(example)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Tooltip>
+                ))}
+              </IndexChips>
             </ControlRow>
           </FormColumn>
 

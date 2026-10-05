@@ -1,3 +1,4 @@
+import { LOGAN_EXAMPLES } from "@brc/components/LoganSearch/LoganSearchForm/examples";
 import { LoganSearchForm } from "@brc/components/LoganSearch/LoganSearchForm/loganSearchForm";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import {
@@ -340,7 +341,8 @@ describe("LoganSearchForm index picker", () => {
     expect(
       screen.getByText("No indexes are available right now.")
     ).toBeTruthy();
-    expect(screen.queryByRole("group")).toBeNull();
+    expect(screen.queryByRole("group", { name: "Organism" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Library type" })).toBeNull();
   });
 
   test("will not submit an empty query", () => {
@@ -349,6 +351,40 @@ describe("LoganSearchForm index picker", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "" } });
 
     expect(searchButton().disabled).toBe(true);
+  });
+});
+
+describe("LoganSearchForm examples", () => {
+  test("loads an example's sequence and the index it is meant for", () => {
+    renderForm();
+
+    fireEvent.click(chip("Examples", "M. tuberculosis rpoB"));
+
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toMatch(
+      /^>Mycobacterium_tuberculosis_rpoB NC_000962\.3:760822-761421\n/
+    );
+    expect(
+      screen.getByText("600 bases. FASTA; headers are ignored.")
+    ).toBeTruthy();
+    expect(
+      screen.getByText("Searching 1 of 109 indexes: GENOMIC_BCT.")
+    ).toBeTruthy();
+  });
+
+  test("every example fits the query cap and names its source range", () => {
+    for (const example of LOGAN_EXAMPLES) {
+      const [header, ...lines] = example.sequence.split("\n");
+      const bases = lines.join("").length;
+      const range = header.match(/ ([A-Z_]+\d+\.\d+):(\d+)-(\d+)$/);
+      expect(range).not.toBeNull();
+      const [, , start, stop] = range as RegExpMatchArray;
+      expect(bases).toBe(Number(stop) - Number(start) + 1);
+      expect(bases).toBeLessThanOrEqual(2500);
+      expect(lines.join("")).toMatch(/^[ACGT]+$/);
+      expect(INDEXES).toContain(
+        `${example.strategies[0]}_${example.divisions[0]}`
+      );
+    }
   });
 });
 
