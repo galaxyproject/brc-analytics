@@ -1,9 +1,12 @@
-import type { AnalysisSchema } from "@repo/shared/services/api-client/types";
+import type {
+  AnalysisSchema,
+  ClearableField,
+} from "@repo/shared/services/api-client/types";
 
 export interface AnalysisSetupProps {
   handoffUrl: string | null;
   loading: boolean;
-  onSend: (message: string) => Promise<void>;
+  onClearField: (field: ClearableField) => Promise<void>;
   schema: AnalysisSchema | null;
 }
 

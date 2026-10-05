@@ -25,6 +25,7 @@ export const AssistantView = ({
   sessionKey,
 }: Props): JSX.Element => {
   const {
+    clearField,
     error,
     handoffUrl,
     isRestoring,
@@ -131,7 +132,7 @@ export const AssistantView = ({
             <AnalysisSetup
               handoffUrl={handoffUrl}
               loading={loading}
-              onSend={sendMessage}
+              onClearField={clearField}
               schema={schema}
             />
           ) : (

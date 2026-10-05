@@ -2,7 +2,6 @@ import type {
   AnalysisSchema,
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
-import { getClearFieldMessage } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/hooks/UseClearField/utils";
 import { getFieldLabel } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/utils";
 import { PLACEHOLDER_FIELD } from "@repo/shared/views/AssistantView/components/AnalysisSetup/constants";
 import {
@@ -109,15 +108,5 @@ describe("getFieldLabel", () => {
 
   test("returns an empty label for a missing value", () => {
     expect(getFieldLabel("organism", EMPTY)).toBe("");
-  });
-});
-
-describe("getClearFieldMessage", () => {
-  // The wording is load-bearing: the assistant declines a bare "Clear the X."
-  // (it treats the analysis state as system-managed), leaving the field set.
-  test("words the clear as the user changing their mind", () => {
-    expect(getClearFieldMessage("Data source")).toBe(
-      "Let's not use that data source; I'll choose a different one."
-    );
   });
 });

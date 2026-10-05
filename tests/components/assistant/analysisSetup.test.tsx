@@ -47,13 +47,13 @@ function getDeleteIcon(chip: HTMLElement): Element {
 
 describe("FilledValue", () => {
   test("clears a user-chosen field from its ×", () => {
-    const onSend = jest.fn().mockResolvedValue(undefined);
+    const onClearField = jest.fn().mockResolvedValue(undefined);
     render(
       <FilledValue
         field={ORGANISM}
         fieldKey="organism"
         loading={false}
-        onSend={onSend}
+        onClearField={onClearField}
       />
     );
     fireEvent.click(
@@ -63,48 +63,47 @@ describe("FilledValue", () => {
         })
       )
     );
-    expect(onSend).toHaveBeenCalledTimes(1);
-    expect(onSend).toHaveBeenCalledWith(
-      "Let's not use that organism; I'll choose a different one."
-    );
+    expect(onClearField).toHaveBeenCalledTimes(1);
+    // The field itself, not a chat message the assistant has to interpret.
+    expect(onClearField).toHaveBeenCalledWith("organism");
   });
 
   test("clears from the keyboard, as the remove control it is named", () => {
-    const onSend = jest.fn().mockResolvedValue(undefined);
+    const onClearField = jest.fn().mockResolvedValue(undefined);
     render(
       <FilledValue
         field={ORGANISM}
         fieldKey="organism"
         loading={false}
-        onSend={onSend}
+        onClearField={onClearField}
       />
     );
     fireEvent.keyDown(screen.getByRole("button"), { key: "Enter" });
-    expect(onSend).toHaveBeenCalledTimes(1);
+    expect(onClearField).toHaveBeenCalledTimes(1);
   });
 
   test("does not clear when the chip itself is clicked", () => {
-    const onSend = jest.fn().mockResolvedValue(undefined);
+    const onClearField = jest.fn().mockResolvedValue(undefined);
     render(
       <FilledValue
         field={ORGANISM}
         fieldKey="organism"
         loading={false}
-        onSend={onSend}
+        onClearField={onClearField}
       />
     );
     fireEvent.click(screen.getByText("Plasmodium falciparum"));
-    expect(onSend).not.toHaveBeenCalled();
+    expect(onClearField).not.toHaveBeenCalled();
   });
 
   test("does not clear while a reply is in flight", () => {
-    const onSend = jest.fn().mockResolvedValue(undefined);
+    const onClearField = jest.fn().mockResolvedValue(undefined);
     render(
       <FilledValue
         field={ORGANISM}
         fieldKey="organism"
         loading={true}
-        onSend={onSend}
+        onClearField={onClearField}
       />
     );
     const chip = screen.getByRole("button");
@@ -114,7 +113,7 @@ describe("FilledValue", () => {
     fireEvent.click(getDeleteIcon(chip));
     fireEvent.keyUp(chip, { key: "Backspace" });
     fireEvent.keyDown(chip, { key: "Enter" });
-    expect(onSend).not.toHaveBeenCalled();
+    expect(onClearField).not.toHaveBeenCalled();
   });
 
   test("offers no × for a derived field", () => {
@@ -127,7 +126,7 @@ describe("FilledValue", () => {
         }}
         fieldKey="data_characteristics"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(screen.getByText("Paired-end WGS reads")).toBeTruthy();
@@ -153,7 +152,7 @@ describe("FilledValue tooltip focus", () => {
         field={DERIVED}
         fieldKey="data_characteristics"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(getWrapper(container)?.getAttribute("tabindex")).toBe("0");
@@ -165,7 +164,7 @@ describe("FilledValue tooltip focus", () => {
         field={DERIVED}
         fieldKey="data_characteristics"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
@@ -178,7 +177,7 @@ describe("FilledValue tooltip focus", () => {
         field={ORGANISM}
         fieldKey="organism"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
@@ -196,7 +195,7 @@ describe("FieldValueSelector", () => {
         }}
         fieldKey="organism"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
@@ -208,7 +207,7 @@ describe("FieldValueSelector", () => {
         field={{ detail: null, status: "needs_attention", value: null }}
         fieldKey="organism"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
@@ -224,7 +223,7 @@ describe("FieldValueSelector", () => {
         }}
         fieldKey="assembly"
         loading={false}
-        onSend={jest.fn()}
+        onClearField={jest.fn()}
       />
     );
     expect(screen.getByText("Assembly not found")).toBeTruthy();

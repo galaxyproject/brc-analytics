@@ -2,6 +2,8 @@ import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
+  ChatMessage,
+  ClearableField,
   LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
@@ -40,12 +42,8 @@ function isRetryableSaveFailure(error: unknown): boolean {
   return status === undefined || !PERMANENT_SAVE_FAILURES.has(status);
 }
 
-interface ChatMessageDisplay {
-  content: string;
-  role: "user" | "assistant";
-}
-
 interface UseAssistantChatReturn {
+  clearField: (field: ClearableField) => Promise<void>;
   error: string | null;
   handoffUrl: string | null;
   isComplete: boolean;
@@ -53,7 +51,7 @@ interface UseAssistantChatReturn {
   isSaved: boolean;
   loading: boolean;
   logan: LoganContext | null;
-  messages: ChatMessageDisplay[];
+  messages: ChatMessage[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
   schema: AnalysisSchema | null;
@@ -81,7 +79,7 @@ interface UseAssistantChatOptions {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, sendMessage, and reset/retry functions.
+ * @returns Chat state, sendMessage, clearField, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -89,7 +87,7 @@ export const useAssistantChat = ({
   initialSessionId,
   sessionKey,
 }: UseAssistantChatOptions): UseAssistantChatReturn => {
-  const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
   const [isComplete, setIsComplete] = useState(false);
@@ -386,6 +384,45 @@ export const useAssistantChat = ({
     [sessionKey]
   );
 
+  // Clearing a setup field is a direct call, not a chat turn, so it can't hinge
+  // on how the model reads a message. It shares the send latch: a clear landing
+  // mid-turn would be overwritten when that turn saves its state.
+  const clearField = useCallback(
+    async (field: ClearableField): Promise<void> => {
+      const sessionId = sessionIdRef.current;
+      if (!sessionId || sendingRef.current) return;
+      sendingRef.current = true;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const session = await assistantAPIClient.assistantClearField(
+          sessionId,
+          { field }
+        );
+        // A retry pops the last transcript line, which is now this clear's
+        // note rather than the message that failed.
+        setLastFailedMessage(null);
+        // The server's transcript, not an appended copy: it holds the note the
+        // clear left, and the schema may have lost dependent fields with it.
+        setMessages(session.messages);
+        setSchema(session.schema_state);
+        setSuggestions(session.suggestions);
+        setIsComplete(session.is_complete);
+        setHandoffUrl(session.handoff_url);
+        setLogan(session.logan ?? null);
+        if (session.saved) setIsSaved(true);
+      } catch {
+        setError("Couldn't clear that field. Please try again.");
+      } finally {
+        setLoading(false);
+        sendingRef.current = false;
+      }
+    },
+    []
+  );
+
   // Ask the handed-over question once, then drop it from the URL: it outlives
   // the send otherwise, and a reload would open a second conversation asking
   // the same thing.
@@ -448,6 +485,7 @@ export const useAssistantChat = ({
   }, [router, sessionKey]);
 
   return {
+    clearField,
     error,
     handoffUrl,
     isComplete,

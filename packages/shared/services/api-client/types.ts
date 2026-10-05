@@ -57,6 +57,32 @@ export interface TokenUsage {
   total_tokens: number;
 }
 
+/**
+ * Who a transcript line is from. A "system" line is the app's own note, such as
+ * a field cleared from the setup panel.
+ */
+export type ChatMessageRole = "assistant" | "system" | "user";
+
+export interface ChatMessage {
+  content: string;
+  role: ChatMessageRole;
+}
+
+/**
+ * Fields the user chooses in conversation, and so can clear from the setup
+ * panel. The rest are derived from the workflow and assembly.
+ */
+export type ClearableField =
+  | "analysis_type"
+  | "assembly"
+  | "data_source"
+  | "organism"
+  | "workflow";
+
+export interface AssistantClearFieldRequest {
+  field: ClearableField;
+}
+
 export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
@@ -78,7 +104,7 @@ export interface SessionRestoreResponse {
   handoff_url: string | null;
   is_complete: boolean;
   logan?: LoganContext | null;
-  messages: { content: string; role: "user" | "assistant" }[];
+  messages: ChatMessage[];
   saved: boolean;
   schema_state: AnalysisSchema;
   session_id: string;
@@ -123,10 +149,7 @@ export interface SavedAnalysisSummary {
 }
 
 export interface SavedAnalysisDetail extends SavedAnalysisSummary {
-  messages: Array<{
-    content: string;
-    role: "user" | "assistant";
-  }>;
+  messages: ChatMessage[];
   schema: AnalysisSchema;
 }
 

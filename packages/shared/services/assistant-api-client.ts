@@ -2,6 +2,7 @@ import { API_BASE_URL } from "@repo/shared/config/api";
 import type {
   AssistantChatRequest,
   AssistantChatResponse,
+  AssistantClearFieldRequest,
   AssistantInfoResponse,
   LoganSessionRequest,
   SessionRestoreResponse,
@@ -51,6 +52,26 @@ export const assistantAPIClient = {
         json: request,
         retry: { limit: 0 },
         timeout: 120000,
+      })
+      .json();
+  },
+
+  /**
+   * Clear one setup field directly, without a chat turn.
+   * @param sessionId - Session to clear the field on.
+   * @param request - The field to clear.
+   * @returns Promise resolving to the whole session, transcript note included.
+   */
+  assistantClearField: async (
+    sessionId: string,
+    request: AssistantClearFieldRequest
+  ): Promise<SessionRestoreResponse> => {
+    // One attempt: the person is waiting on the chip, and a clear that failed
+    // is better reported than silently retried behind a disabled panel.
+    return httpClient
+      .post(`assistant/session/${sessionId}/clear-field`, {
+        json: request,
+        retry: { limit: 0 },
       })
       .json();
   },
