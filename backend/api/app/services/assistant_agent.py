@@ -947,7 +947,8 @@ class AssistantAgent:
         return (
             "[The user just cleared these from the analysis setup panel: "
             f"{', '.join(names)}. They are undecided now; do not carry the "
-            "earlier choices forward.]"
+            "earlier choices forward. Everything else in the setup still "
+            f"stands. Acknowledge briefly and help them choose a new {names[0]}.]"
         )
 
     @staticmethod

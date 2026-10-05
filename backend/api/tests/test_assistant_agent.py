@@ -3238,6 +3238,13 @@ class TestPanelClears:
 
 
 class TestBuildClearsNote:
+    def test_asks_for_a_replacement_and_keeps_the_rest(self, agent):
+        # Without this a live model (MiniMax-M2.7) read the note as "the setup
+        # was reset" and offered to start over, though the rest still stood.
+        note = agent._build_clears_note(["organism", "assembly", "workflow"])
+        assert "Everything else in the setup still stands" in note
+        assert "help them choose a new organism" in note
+
     def test_none_without_clears(self, agent):
         assert agent._build_clears_note(None) is None
         assert agent._build_clears_note([]) is None
