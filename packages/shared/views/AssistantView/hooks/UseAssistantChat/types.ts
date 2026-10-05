@@ -20,6 +20,14 @@ export interface LastSave {
   savedAnalysisId: string;
 }
 
+/**
+ * One chat turn: a message, setup-panel fields to clear, or both.
+ */
+export interface TurnRequest {
+  clearFields?: ClearableField[];
+  message?: string;
+}
+
 export interface UseAssistantChatOptions {
   initialLoganJobId?: string;
   initialMessage?: string;
