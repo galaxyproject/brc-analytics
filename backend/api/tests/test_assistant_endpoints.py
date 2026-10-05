@@ -442,8 +442,10 @@ class TestChatClearFields:
 
     def test_passes_clears_through(self, client, app_with_stubbed_agent):
         agent = self._agent(app_with_stubbed_agent)
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
         resp = client.post(
-            "/api/v1/assistant/chat", json={"clear_fields": ["organism"]}
+            "/api/v1/assistant/chat",
+            json={"clear_fields": ["organism"], "session_id": "sess-abc"},
         )
         assert resp.status_code == 200, resp.text
         args = agent.chat_with_telemetry.await_args
@@ -459,7 +461,8 @@ class TestChatClearFields:
     def test_rejects_a_derived_field(self, client, app_with_stubbed_agent):
         agent = self._agent(app_with_stubbed_agent)
         resp = client.post(
-            "/api/v1/assistant/chat", json={"clear_fields": ["gene_annotation"]}
+            "/api/v1/assistant/chat",
+            json={"clear_fields": ["gene_annotation"], "session_id": "sess-abc"},
         )
         assert resp.status_code == 422
         agent.chat_with_telemetry.assert_not_awaited()
@@ -473,3 +476,12 @@ class TestChatClearFields:
     def test_rejects_an_empty_message(self, client, app_with_stubbed_agent):
         resp = client.post("/api/v1/assistant/chat", json={"message": ""})
         assert resp.status_code == 422
+
+    def test_rejects_a_clear_without_a_session(self, client, app_with_stubbed_agent):
+        # A new session has nothing to clear; don't spend a turn finding out.
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post(
+            "/api/v1/assistant/chat", json={"clear_fields": ["organism"]}
+        )
+        assert resp.status_code == 422
+        agent.chat_with_telemetry.assert_not_awaited()

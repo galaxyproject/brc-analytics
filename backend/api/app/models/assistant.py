@@ -160,6 +160,9 @@ class ChatRequest(BaseModel):
     def _message_or_clear(self) -> "ChatRequest":
         if not self.message and not self.clear_fields:
             raise ValueError("Send a message, a field to clear, or both")
+        if not self.message and not self.session_id:
+            # A new session has nothing to clear.
+            raise ValueError("A clear on its own needs an existing session")
         return self
 
 

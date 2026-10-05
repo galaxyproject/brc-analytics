@@ -3120,9 +3120,17 @@ class TestPanelClears:
         # cleared state simply carries forward.
         _filled_session(agent)
         resp = await agent.chat(None, session_id="s1", clear_fields=["organism"])
+        # A clear on its own skips the extractor outright: there's no user
+        # text to commit from, and nothing can refill the field.
+        agent._extract_state.assert_not_awaited()
+        assert resp.schema_state.organism == SchemaField()
+
+    @pytest.mark.asyncio
+    async def test_extractor_works_from_the_cleared_prior(self, agent):
+        _filled_session(agent)
+        await agent.chat("let's try yeast", session_id="s1", clear_fields=["organism"])
         prior = agent._extract_state.await_args.args[0]
         assert prior.organism == SchemaField()
-        assert resp.schema_state.organism == SchemaField()
 
     @pytest.mark.asyncio
     async def test_transcript_gets_a_note_then_the_reply(self, agent):
@@ -3159,11 +3167,6 @@ class TestPanelClears:
         assert "organism, assembly, workflow" in prompt
         # A clear on its own has no user text, so nothing to fence.
         assert "<user_input>" not in prompt
-        assert agent._extract_state.await_args.kwargs["cleared"] == [
-            "organism",
-            "assembly",
-            "workflow",
-        ]
 
     @pytest.mark.asyncio
     async def test_clear_with_a_message(self, agent):
@@ -3173,6 +3176,11 @@ class TestPanelClears:
         prompt = agent._run_agent_with_retry.await_args.args[0]
         assert "just cleared these" in prompt
         assert "<user_input>\nlet's try yeast\n</user_input>" in prompt
+        assert agent._extract_state.await_args.kwargs["cleared"] == [
+            "organism",
+            "assembly",
+            "workflow",
+        ]
         assert [m.role for m in state.messages[1:]] == [
             MessageRole.SYSTEM,
             MessageRole.USER,
