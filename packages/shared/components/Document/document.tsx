@@ -6,6 +6,7 @@ import {
   DocumentHeadTags,
   type DocumentHeadTagsProps,
 } from "@mui/material-nextjs/v16-pagesRouter";
+import { ENVIRONMENT, getEnvironment } from "@repo/shared/config/environment";
 import Document, {
   type DocumentContext,
   type DocumentInitialProps,
@@ -16,19 +17,19 @@ import Document, {
 } from "next/document";
 import { type JSX } from "react";
 
-const siteConfig = process.env.NEXT_PUBLIC_SITE_CONFIG;
+const environment = getEnvironment();
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
-const isProd = Boolean(siteConfig && siteConfig.endsWith("-prod"));
+const isProd = environment === ENVIRONMENT.PROD;
 
 if (isProd && !plausibleDomain) {
   throw new Error(
-    `NEXT_PUBLIC_PLAUSIBLE_DOMAIN is not defined in production environment for ${siteConfig}`
+    "NEXT_PUBLIC_PLAUSIBLE_DOMAIN is not defined in production environment"
   );
 }
 
 if (!isProd && plausibleDomain) {
   console.warn(
-    `Plausible is enabled (domain='${plausibleDomain}') while NEXT_PUBLIC_SITE_CONFIG='${siteConfig}'.`
+    `Plausible is enabled (domain='${plausibleDomain}') while NEXT_PUBLIC_ENVIRONMENT='${environment}'.`
   );
 }
 

@@ -1,12 +1,44 @@
-import { apiClient } from "@repo/shared/services/api-client/api-client";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
+  LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
+import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
+import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+// A save that failed for one of these will fail the same way next time: the
+// deployment cannot save at all, there is nothing to save, the session is not
+// ours, or it is gone. Anything else -- a network drop, a 500 -- is worth
+// another attempt when the effect next runs.
+const PERMANENT_SAVE_FAILURES = new Set([403, 404, 409, 501]);
+
+// Backoff for a save that failed in a way a retry could fix. Bounded per
+// session: past the last one the latch holds, so a failure that only looks
+// transient (an unprovisioned user answers 503 every time) costs a handful of
+// requests rather than one per turn for the life of the conversation.
+const SAVE_RETRY_DELAYS_MS = [5_000, 30_000, 120_000];
+
+/**
+ * Whether a failed save is worth attempting again.
+ * @param error - Rejection from the save request.
+ * @returns true when a later attempt could succeed.
+ */
+function isRetryableSaveFailure(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } })?.response
+    ?.status;
+  return status === undefined || !PERMANENT_SAVE_FAILURES.has(status);
+}
 
 interface ChatMessageDisplay {
   content: string;
@@ -18,19 +50,20 @@ interface UseAssistantChatReturn {
   handoffUrl: string | null;
   isComplete: boolean;
   isRestoring: boolean;
+  isSaved: boolean;
   loading: boolean;
+  logan: LoganContext | null;
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
-  saveAnalysis: () => Promise<void>;
-  saveLoading: boolean;
-  saveMessage: string | null;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   suggestions: SuggestionChip[];
 }
 
 interface UseAssistantChatOptions {
+  initialLoganJobId?: string;
+  initialMessage?: string;
   initialSessionId?: string;
   sessionKey: string;
 }
@@ -39,12 +72,20 @@ interface UseAssistantChatOptions {
  * Manages assistant chat state: messages, session, schema, and suggestions.
  * Persists session_id to localStorage and restores on mount; explicit
  * `initialSessionId` from URL params takes precedence over the stored value.
+ * An `initialMessage` opens a new conversation with that question instead, and
+ * `initialLoganJobId` outranks both -- it opens a new conversation bound to
+ * that search, which is the more specific intent when a person has just
+ * clicked through from a cohort.
  * @param root0 - Hook options.
+ * @param root0.initialLoganJobId - Logan job to open a new session from.
+ * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, sendMessage, save/reset/retry functions.
+ * @returns Chat state, sendMessage, and reset/retry functions.
  */
 export const useAssistantChat = ({
+  initialLoganJobId,
+  initialMessage,
   initialSessionId,
   sessionKey,
 }: UseAssistantChatOptions): UseAssistantChatReturn => {
@@ -52,32 +93,70 @@ export const useAssistantChat = ({
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
+  const [logan, setLogan] = useState<LoganContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
     null
   );
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
+  const initialMessageSentRef = useRef(false);
+  // Set once this mount has opened a Logan-bound session. Dropping the
+  // ?loganJob= param re-renders the page without it, which would otherwise
+  // re-arm the restore effect against the id we just wrote.
+  const loganOpenedRef = useRef(false);
+  const saveAttemptRef = useRef<string | null>(null);
+  const saveRetriesRef = useRef<{ count: number; sessionId: string | null }>({
+    count: 0,
+    sessionId: null,
+  });
+  const saveRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Bumped by the retry timer: clearing the latch alone re-runs nothing, so
+  // without it a failed save waited for the user's next turn -- which the
+  // person who signed in only to keep this conversation may never send.
+  const [saveRetryTick, setSaveRetryTick] = useState(0);
+  const retrySave = useCallback((): void => {
+    saveRetryTimerRef.current = null;
+    setSaveRetryTick((tick) => tick + 1);
+  }, []);
   const router = useRouter();
+  const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
+  // A question of whitespace is no question: it would neither be asked nor
+  // leave the conversation it displaced restorable.
+  const question = initialMessage?.trim();
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
   // Either way we call the restore endpoint so we get computed handoff state
   // (handoff_url, is_complete, suggestions), not just messages + schema.
   useEffect(() => {
-    const sourceId = initialSessionId ?? localStorage.getItem(sessionKey);
+    // Until the query settles a handed-over question is invisible, and
+    // restoring on that first pass would race the question to the message list.
+    if (!router.isReady) return;
+    // A Logan job opens its own session below and outranks both sources.
+    if (initialLoganJobId || loganOpenedRef.current) return;
+    // A question handed over from elsewhere on the site opens a conversation of
+    // its own; restoring here would graft it onto whatever came before.
+    if (question) return;
+
+    // Once that question has been asked, the stored pointer is the conversation
+    // it just opened -- restoring it would only re-fetch what is already on
+    // screen. A session the URL names is a different matter: it is somewhere the
+    // user has navigated to, and it still restores.
+    const storedId = initialMessageSentRef.current
+      ? null
+      : localStorage.getItem(sessionKey);
+    const sourceId = initialSessionId ?? storedId;
     if (!sourceId) return;
 
     let cancelled = false;
     // Adopt before the round trip: an unset ref sends session_id: undefined, so
     // a failed restore would open a new session and overwrite the kept pointer.
     sessionIdRef.current = sourceId;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
     setIsRestoring(true);
 
     assistantAPIClient
@@ -91,6 +170,11 @@ export const useAssistantChat = ({
         setSuggestions(restored.suggestions);
         setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
+        setLogan(restored.logan ?? null);
+        // Whether this is already on disk is the server's to answer. Inferring
+        // it from auth state instead would re-save every signed-in session on
+        // every mount just to find out.
+        setIsSaved(restored.saved);
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -129,7 +213,129 @@ export const useAssistantChat = ({
     return (): void => {
       cancelled = true;
     };
-  }, [initialSessionId, sessionKey]);
+  }, [
+    initialLoganJobId,
+    initialSessionId,
+    question,
+    router.isReady,
+    sessionKey,
+  ]);
+
+  // Opening from a Logan search wins over a URL session id and localStorage:
+  // the person just clicked "ask the assistant about this cohort", so a new
+  // conversation bound to that job is what they meant. The prior session is
+  // not deleted -- it lives out its TTL and a saved analysis is unaffected.
+  useEffect(() => {
+    if (!initialLoganJobId) return;
+    let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setIsRestoring(true);
+    setError(null);
+
+    assistantAPIClient
+      .assistantCreateSession({ logan_job_id: initialLoganJobId })
+      .then((created) => {
+        if (cancelled) return;
+        sessionIdRef.current = created.session_id;
+        loganOpenedRef.current = true;
+        localStorage.setItem(sessionKey, created.session_id);
+        setMessages(created.messages);
+        setSchema(created.schema_state);
+        setSuggestions(created.suggestions);
+        setIsComplete(created.is_complete);
+        setHandoffUrl(created.handoff_url);
+        setLogan(created.logan ?? null);
+        stripQueryParam(router, [ASSISTANT_QUERY_PARAM.LOGAN_JOB]);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        sessionIdRef.current = null;
+        setError(loganSessionErrorMessage(error, initialLoganJobId));
+      })
+      .finally(() => {
+        if (!cancelled) setIsRestoring(false);
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- router is stable for the life of the page; listing it would re-run this effect on every shallow replace, including the one it performs itself
+  }, [initialLoganJobId, sessionKey]);
+
+  // Auto-save rides on chat turns, which leaves the sign-in case uncovered:
+  // someone who signed in *because* we offered to keep this conversation has
+  // not sent a turn since, so nothing has been written and the session dies
+  // with its two-hour TTL. Claim and persist it as soon as we know who they
+  // are -- and only let the UI call it saved once that has come back.
+  useEffect(() => {
+    if (!isConfigured || isAuthLoading || !isAuthenticated) return;
+    // A turn in flight is about to save this itself, and mid-send the
+    // messages already include the user's line with no reply yet.
+    if (isSaved || isRestoring || loading) return;
+    const sessionId = sessionIdRef.current;
+    if (!sessionId || messages.length === 0) return;
+    // Once per session. Without this, a deployment that cannot save at all
+    // (no database configured) would fire a doomed request every turn.
+    if (saveAttemptRef.current === sessionId) return;
+    saveAttemptRef.current = sessionId;
+
+    let cancelled = false;
+    assistantAPIClient
+      .assistantSaveSession(sessionId)
+      .then(() => {
+        if (!cancelled) setIsSaved(true);
+      })
+      .catch((error: unknown) => {
+        // The label stays off, which is the honest reading. But the latch was
+        // set before the request went out, so leaving it set after a failure
+        // that a retry could fix means this session is never saved again --
+        // and this effect exists for the user who signs in to keep what is on
+        // screen and then sends nothing more.
+        if (!isRetryableSaveFailure(error)) return;
+        const retries = saveRetriesRef.current;
+        if (retries.sessionId !== sessionId) {
+          retries.sessionId = sessionId;
+          retries.count = 0;
+        }
+        if (retries.count >= SAVE_RETRY_DELAYS_MS.length) return;
+        const delay = SAVE_RETRY_DELAYS_MS[retries.count];
+        retries.count += 1;
+        saveAttemptRef.current = null;
+        clearSaveRetry(saveRetryTimerRef);
+        saveRetryTimerRef.current = setTimeout(retrySave, delay);
+      });
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [
+    isAuthLoading,
+    isAuthenticated,
+    isConfigured,
+    isRestoring,
+    isSaved,
+    loading,
+    messages.length,
+    retrySave,
+    saveRetryTick,
+  ]);
+
+  useEffect(() => (): void => clearSaveRetry(saveRetryTimerRef), []);
+
+  // Signing out doesn't unsave anything server-side, but it ends this
+  // browser's claim to the conversation: AuthProvider.logout only clears the
+  // user, with no reload, so the panel was left rendering "Saved to your
+  // account" and "Sign in to keep this conversation" side by side. The latch
+  // goes too, or signing back in would find the session already attempted and
+  // never re-save it.
+  useEffect(() => {
+    if (isAuthLoading || !isConfigured || isAuthenticated) return;
+    saveAttemptRef.current = null;
+    saveRetriesRef.current = { count: 0, sessionId: null };
+    clearSaveRetry(saveRetryTimerRef);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    setIsSaved(false);
+  }, [isAuthLoading, isAuthenticated, isConfigured]);
 
   const sendMessage = useCallback(
     async (message: string): Promise<void> => {
@@ -139,7 +345,6 @@ export const useAssistantChat = ({
       setLoading(true);
       setError(null);
       setLastFailedMessage(null);
-      setSaveMessage(null);
 
       // Add user message immediately for responsiveness
       setMessages((prev) => [...prev, { content: message, role: "user" }]);
@@ -164,6 +369,11 @@ export const useAssistantChat = ({
         setSuggestions(response.suggestions);
         setIsComplete(response.is_complete);
         setHandoffUrl(response.handoff_url);
+        setLogan(response.logan ?? null);
+        // Latched, not mirrored: a later turn whose write fails does not
+        // un-save the turns already on disk, and flickering the label would
+        // say something worse than either state on its own.
+        if (response.saved) setIsSaved(true);
       } catch (err) {
         const errorMessage = handleChatError(err);
         setError(errorMessage);
@@ -175,6 +385,33 @@ export const useAssistantChat = ({
     },
     [sessionKey]
   );
+
+  // Ask the handed-over question once, then drop it from the URL: it outlives
+  // the send otherwise, and a reload would open a second conversation asking
+  // the same thing.
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (!question || initialMessageSentRef.current) return;
+    initialMessageSentRef.current = true;
+
+    // The conversation this question opens is its own: a session named in the
+    // URL alongside the question is left behind rather than continued, matching
+    // the restore this effect's counterpart skips. The stored pointer goes with
+    // the ref: a send that fails leaves it as the only trace of the displaced
+    // conversation, and the question -- stripped from the URL below -- would not
+    // be there to displace it again on a reload.
+    sessionIdRef.current = null;
+    localStorage.removeItem(sessionKey);
+    void sendMessage(question);
+    // Both parameters go: ?sessionId= outranks the stored pointer on mount, so
+    // leaving it behind means a reload restores the very conversation the
+    // question displaced and orphans the one it opened.
+    stripQueryParam(router, [
+      ASSISTANT_QUERY_PARAM.QUESTION,
+      ASSISTANT_QUERY_PARAM.SESSION_ID,
+    ]);
+  }, [question, router, sendMessage, sessionKey]);
 
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
@@ -191,68 +428,91 @@ export const useAssistantChat = ({
       assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
     sessionIdRef.current = null;
+    loganOpenedRef.current = false;
     localStorage.removeItem(sessionKey);
     // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
     // means a reload restores the conversation we just walked away from and
     // orphans whatever replaced it.
-    if (router.query.sessionId) {
-      const query = { ...router.query };
-      delete query.sessionId;
-      router
-        .replace({ pathname: router.pathname, query }, undefined, {
-          shallow: true,
-        })
-        .catch(() => {
-          // Cosmetic: the session is already reset either way.
-        });
+    if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
+      stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
     setMessages([]);
     setSchema(null);
     setSuggestions([]);
     setIsComplete(false);
+    setIsSaved(false);
     setHandoffUrl(null);
+    setLogan(null);
     setError(null);
     setLastFailedMessage(null);
-    setSaveMessage(null);
   }, [router, sessionKey]);
-
-  const saveAnalysis = useCallback(async (): Promise<void> => {
-    if (!sessionIdRef.current) {
-      setSaveMessage("There is no active assistant session to save.");
-      return;
-    }
-
-    setSaveLoading(true);
-    setSaveMessage(null);
-    try {
-      const savedAnalysis = await apiClient.saveAnalysis(sessionIdRef.current);
-      setSaveMessage(
-        savedAnalysis.title ? `Saved: ${savedAnalysis.title}` : "Saved."
-      );
-    } catch {
-      setSaveMessage("Failed to save this analysis.");
-    } finally {
-      setSaveLoading(false);
-    }
-  }, []);
 
   return {
     error,
     handoffUrl,
     isComplete,
     isRestoring,
+    isSaved,
     loading,
+    logan,
     messages,
     onRetry: lastFailedMessage ? retry : undefined,
     resetSession,
-    saveAnalysis,
-    saveLoading,
-    saveMessage,
     schema,
     sendMessage,
     suggestions,
   };
 };
+
+/**
+ * Drops query parameters from the current URL, leaving the rest of the route
+ * untouched.
+ * @param router - Next router.
+ * @param names - Query parameters to drop.
+ */
+function stripQueryParam(router: NextRouter, names: string[]): void {
+  const query = { ...router.query };
+  for (const name of names) delete query[name];
+  router
+    .replace({ pathname: router.pathname, query }, undefined, { shallow: true })
+    .catch(() => {
+      // Cosmetic: whatever the parameter carried has already been consumed.
+    });
+}
+
+/**
+ * Copy for a failed Logan session open. The error is a string today, so the
+ * results path is spelled out rather than linked.
+ * @param error - The thrown value.
+ * @param jobId - The Logan job that failed to open.
+ * @returns A user-facing error string.
+ */
+function loganSessionErrorMessage(error: unknown, jobId: string): string {
+  const status = httpStatus(error);
+  const resultsPath = `/logan-search?job=${jobId}`;
+  if (status === 404) {
+    return `That search's results have expired. Re-run it at ${resultsPath} to bring them back.`;
+  }
+  if (status === 409) {
+    return `That search is still running. Wait for it at ${resultsPath}, then try again.`;
+  }
+  if (status === 422) {
+    return `That search failed in Galaxy. Check it at ${resultsPath}.`;
+  }
+  return handleChatError(error);
+}
+
+/**
+ * Cancel a pending save retry, if one is scheduled.
+ * @param timerRef - Ref holding the retry timer.
+ */
+function clearSaveRetry(
+  timerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>
+): void {
+  if (timerRef.current === null) return;
+  clearTimeout(timerRef.current);
+  timerRef.current = null;
+}
 
 /**
  * Pull the HTTP status off a thrown request error, if it carries one.

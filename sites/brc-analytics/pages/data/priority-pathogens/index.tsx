@@ -3,9 +3,9 @@ import { config } from "@brc/config/config";
 import { BRC_PAGE_META } from "@brc/meta/constants";
 import { PriorityPathogensView } from "@brc/views/PriorityPathogensView/priorityPathogensView";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
-import { getEntityService } from "@databiosphere/findable-ui/lib/hooks/useEntityService";
+import { seedDatabase } from "@databiosphere/findable-ui/lib/utils/seedDatabase";
 import type { EntitiesResponse } from "@repo/shared/services/staticGeneration/entities/types";
-import { seedDatabase } from "@repo/shared/utils/seedDatabase/utils";
+import { getEntities } from "@repo/shared/services/staticGeneration/entities/utils";
 import type { Props as EntitiesPageProps } from "@repo/shared/views/EntitiesView/types";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
@@ -40,12 +40,8 @@ export const getStaticProps: GetStaticProps<
   // The route may be absent from a site's entity config; return notFound when it is.
   if (!entityConfig) return { notFound: true };
 
-  const { fetchAllEntities } = getEntityService(entityConfig, undefined);
   await seedDatabase(ENTITY_LIST_TYPE, entityConfig);
-  const data = (await fetchAllEntities(
-    ENTITY_LIST_TYPE,
-    undefined
-  )) as EntitiesResponse<Outbreak>;
+  const data = await getEntities<Outbreak>(entityConfig);
 
   return {
     props: {

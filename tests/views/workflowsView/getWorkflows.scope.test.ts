@@ -8,6 +8,7 @@ import type {
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
 import { getWorkflows } from "@repo/shared/views/WorkflowsView/utils";
+import { buildWorkflowGates } from "../../workflow/gates";
 
 jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
   DIFFERENTIAL_EXPRESSION_ANALYSIS: {
@@ -69,7 +70,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result).toHaveLength(2); // 1 workflow + DEA
     expect(result[0].scope).toBeDefined();
@@ -100,7 +106,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result[0].scope).toBe("ASSEMBLY");
     expect(typeof result[0].scope).toBe("string");
@@ -130,7 +141,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result[0].scope).toBe("ORGANISM");
   });
@@ -159,7 +175,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result[0].scope).toBe("SEQUENCE");
   });
@@ -188,7 +209,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result[0].scope).toBe("ASSEMBLY");
   });
@@ -241,7 +267,12 @@ describe("getWorkflows - scope handling", () => {
       },
     ];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     expect(result).toHaveLength(4); // 3 workflows + DEA
     expect(result.map((w) => w.scope)).toContain("ASSEMBLY");
@@ -252,7 +283,12 @@ describe("getWorkflows - scope handling", () => {
   test("DIFFERENTIAL_EXPRESSION_ANALYSIS has ASSEMBLY scope", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     const dea = result.find(
       (w) => w.trsId === "differential-expression-analysis"
@@ -287,7 +323,12 @@ describe("getWorkflows - scope handling", () => {
 
     const mappingsWithoutWorkflow: WorkflowAssemblyMapping[] = [];
 
-    const result = getWorkflows(categories, mappingsWithoutWorkflow, ORGANISMS);
+    const result = getWorkflows(
+      categories,
+      mappingsWithoutWorkflow,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     // Should only include DEA
     expect(result).toHaveLength(1);
@@ -297,7 +338,12 @@ describe("getWorkflows - scope handling", () => {
   test("does not include LMLS workflows when feature flag is disabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates()
+    );
 
     // Should only include DEA
     expect(result).toHaveLength(1);
@@ -306,10 +352,15 @@ describe("getWorkflows - scope handling", () => {
     expect(result.find((w) => w.trsId === "lexicmap")).toBeUndefined();
   });
 
-  test("includes LMLS workflows when feature flag is enabled", () => {
+  test("includes LMLS workflows when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates(true)
+    );
 
     // Should include DEA + Logan Search + Lexicmap
     expect(result).toHaveLength(3);
@@ -320,10 +371,15 @@ describe("getWorkflows - scope handling", () => {
     expect(result.find((w) => w.trsId === "lexicmap")).toBeDefined();
   });
 
-  test("LMLS workflows have SEQUENCE scope when feature flag is enabled", () => {
+  test("LMLS workflows have SEQUENCE scope when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates(true)
+    );
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");
     const lexicmap = result.find((w) => w.trsId === "lexicmap");
@@ -332,10 +388,15 @@ describe("getWorkflows - scope handling", () => {
     expect(lexicmap?.scope).toBe("SEQUENCE");
   });
 
-  test("LMLS workflows have correct category when feature flag is enabled", () => {
+  test("LMLS workflows have correct category when demo flag is enabled", () => {
     const categories: WorkflowCategory[] = [];
 
-    const result = getWorkflows(categories, MAPPINGS, ORGANISMS, false, true);
+    const result = getWorkflows(
+      categories,
+      MAPPINGS,
+      ORGANISMS,
+      buildWorkflowGates(true)
+    );
 
     const loganSearch = result.find((w) => w.trsId === "logan-search");
     const lexicmap = result.find((w) => w.trsId === "lexicmap");

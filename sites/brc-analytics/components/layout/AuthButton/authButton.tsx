@@ -107,17 +107,8 @@ export function AuthButton(): JSX.Element | null {
           )}
         </UserMenuHeader>
         <Divider component="li" />
-        <MenuItem onClick={() => navigateTo("/data/favorites")}>
-          Favorites
-        </MenuItem>
-        <MenuItem onClick={() => navigateTo("/assistant/saved")}>
-          Saved Analyses
-        </MenuItem>
-        <MenuItem onClick={() => navigateTo("/account/workflow-runs")}>
-          Workflow Runs
-        </MenuItem>
-        <MenuItem onClick={() => navigateTo("/account/preferences")}>
-          Preferences
+        <MenuItem onClick={() => navigateTo("/account")}>
+          Your workspace
         </MenuItem>
         <Divider component="li" />
         <MenuItem onClick={handleLogout}>

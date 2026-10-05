@@ -35,3 +35,9 @@ export const ORGANISM_SCOPED_TAG_LABELS: readonly string[] = [
   SPECIES_TAG_LABEL.GROUP,
   SPECIES_TAG_LABEL.PRIORITY,
 ];
+
+/**
+ * Sentinel taxonomy value meaning a workflow applies to any taxon at that
+ * level; rendered roman (it is not a scientific name).
+ */
+export const TAXON_ANY = "Any";

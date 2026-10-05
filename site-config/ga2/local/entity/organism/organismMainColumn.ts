@@ -6,6 +6,7 @@ import {
 import { type GA2OrganismEntity } from "@ga2/apis/organism";
 import * as V from "@ga2/viewModelBuilders/viewModelBuilders";
 import { Main as OrganismViewMain } from "@ga2/views/OrganismView/components/Main/main";
+import { type WithWorkflowCategories } from "@repo/shared/services/staticGeneration/workflows/types";
 
 export const organismMainColumn: ComponentsConfig = [
   {
@@ -16,5 +17,8 @@ export const organismMainColumn: ComponentsConfig = [
       },
     ],
     component: BackPageContentSingleColumn,
-  } as ComponentConfig<typeof BackPageContentSingleColumn, GA2OrganismEntity>,
+  } as ComponentConfig<
+    typeof BackPageContentSingleColumn,
+    WithWorkflowCategories<GA2OrganismEntity>
+  >,
 ];

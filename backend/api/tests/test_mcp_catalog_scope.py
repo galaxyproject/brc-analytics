@@ -6,19 +6,15 @@ implementation from the assistant's app.services.tools.catalog_data.CatalogData
 the guided single-organism/single-assembly flow can't drive.
 """
 
-import json
-
 import pytest
 
 from app.services.catalog_data import CatalogData
-from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
+from tests.test_catalog_data import SAMPLE_WORKFLOWS
 
 
 @pytest.fixture
-def mcp_catalog(tmp_path):
-    (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
-    (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
-    return CatalogData(str(tmp_path))
+def mcp_catalog(catalog_dir):
+    return CatalogData(catalog_dir(SAMPLE_WORKFLOWS))
 
 
 class TestMcpScopeFiltering:
@@ -49,3 +45,69 @@ class TestMcpScopeFiltering:
         # IWC id (#1321). Scope check fires before the assembly lookup.
         with pytest.raises(ValueError):
             mcp_catalog.resolve_workflow_inputs("assembly-with-flye", "GCF_000000000.0")
+
+
+class TestMcpWorkflowCategory:
+    """Condensed workflows carry their category. Only get_workflow_details used
+    to fill it in; the category listing and compatibility search returned ""."""
+
+    def test_workflows_in_category_have_category(self, mcp_catalog):
+        wfs = mcp_catalog.get_workflows_in_category("VARIANT_CALLING")
+        assert wfs
+        assert {w["category"] for w in wfs} == {"Variant Calling"}
+
+    def test_compatible_workflows_have_category(self, mcp_catalog):
+        wfs = mcp_catalog.get_compatible_workflows(["HAPLOID"])
+        by_id = {w["iwcId"]: w["category"] for w in wfs}
+        assert by_id == {
+            "rnaseq-pe": "Transcriptomics",
+            "varcall-haploid": "Variant Calling",
+        }
+
+    def test_workflow_details_has_category(self, mcp_catalog):
+        details = mcp_catalog.get_workflow_details("rnaseq-pe")
+        assert details["category"] == "Transcriptomics"
+        assert details["categories"] == ["Transcriptomics"]
+
+
+class TestMcpSharedWorkflow:
+    @pytest.fixture
+    def shared_catalog(self, catalog_dir, shared_workflows):
+        return CatalogData(catalog_dir(shared_workflows))
+
+    def test_listed_under_each_category(self, shared_catalog):
+        for key, name in [
+            ("TRANSCRIPTOMICS", "Transcriptomics"),
+            ("VARIANT_CALLING", "Variant Calling"),
+        ]:
+            wfs = shared_catalog.get_workflows_in_category(key)
+            by_id = {w["iwcId"]: w["category"] for w in wfs}
+            assert by_id["varcall-haploid"] == name
+
+    def test_listed_once_in_compatible_with_every_category(self, shared_catalog):
+        compatible = shared_catalog.get_compatible_workflows(["HAPLOID"])
+        matches = [w for w in compatible if w["iwcId"] == "varcall-haploid"]
+        assert len(matches) == 1
+        assert matches[0]["category"] == "Transcriptomics"
+        assert matches[0]["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_details_carries_every_category(self, shared_catalog):
+        details = shared_catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Transcriptomics"
+        assert details["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_organism_scope_first_copy_is_skipped(
+        self, catalog_dir, scope_split_workflows
+    ):
+        # The index must keep the servable ASSEMBLY copy, not the first copy,
+        # or details/compatibility would report the workflow as not found.
+        catalog = CatalogData(catalog_dir(scope_split_workflows))
+        details = catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Variant Calling"
+        assert details["categories"] == ["Variant Calling"]
+        compat = catalog.check_workflow_assembly_compatibility(
+            "varcall-haploid", "GCF_000002765.6"
+        )
+        # No assemblies fixture here, so the lookup gets past the workflow and
+        # stops at the assembly.
+        assert compat["reason"].startswith("Assembly")

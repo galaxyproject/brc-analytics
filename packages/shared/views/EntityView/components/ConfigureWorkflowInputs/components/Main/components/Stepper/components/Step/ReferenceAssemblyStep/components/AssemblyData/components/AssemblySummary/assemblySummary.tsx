@@ -11,6 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { Fragment, type JSX } from "react";
 import { StyledRoundedPaper, StyledStack } from "./assemblySummary.styles";
 import { type Props } from "./types";
@@ -54,7 +55,13 @@ export const AssemblySummary = ({
               {getSelectedRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{row.original.accession}</TableCell>
-                  <TableCell>{row.original.taxonomicLevelSpecies}</TableCell>
+                  <TableCell>
+                    {row.original.taxonomicLevelSpecies && (
+                      <ScientificName>
+                        {row.original.taxonomicLevelSpecies}
+                      </ScientificName>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

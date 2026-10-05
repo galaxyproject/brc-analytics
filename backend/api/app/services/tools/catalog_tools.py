@@ -11,6 +11,7 @@ from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_query import CatalogQuery, execute
 
 if TYPE_CHECKING:
+    from app.services.galaxy_service import GalaxyService
     from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -21,13 +22,22 @@ class AssistantDeps:
     catalog: CatalogData
     sra_mirror: Optional["SRAMirrorService"] = None
     con: Any = None  # in-process DuckDB connection for query_catalog (optional)
+    galaxy: Optional["GalaxyService"] = None
+    # The session's Logan snapshot (LoganSnapshot as a dict), when the
+    # conversation was opened from a search. Rendered into instructions.
+    logan: Optional[dict] = None
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:
-    """Search the BRC Analytics catalog for organisms by name, common name, or taxonomy ID.
+    """Search the BRC Analytics catalog for organisms by name, other name, or taxonomy ID.
+
+    An organism's other names cover every non-scientific name NCBI knows for it
+    -- common names, acronyms, and prior or alternate scientific names (e.g.
+    "Candida auris" for Candidozyma auris) -- so a reclassified organism still
+    resolves under the name a user knows it by.
 
     Args:
-        query: organism name, common name, genus, or NCBI taxonomy ID to search for
+        query: organism name, other name, genus, or NCBI taxonomy ID to search for
     """
     results = deps.catalog.search_organisms(query, limit=10)
     if not results:
@@ -132,8 +142,15 @@ def query_catalog(deps: AssistantDeps, query: CatalogQuery) -> str:
     (list); a range = two predicates (gte + lte).
 
     Filter by scientific name via taxonomicLevelSpecies, a clade via the matching
-    rank column (e.g. taxonomicLevelGenus). When a list comes back truncated,
-    state the total and offer to narrow rather than paging.
+    rank column (e.g. taxonomicLevelGenus). otherNames is a list field of
+    non-scientific names, including prior scientific names, so
+    contains/contains_any on it finds an organism under a superseded name. On an
+    organism row, these are aggregated from the organism's assemblies, and may include
+    infraspecific names, depending on the assemblies present; on an assembly row they
+    include the assembly taxon's own names, as well as names inherited from ancestors
+    up to and including species, so don't report an assembly's otherNames entry as a
+    name of its strain — it may belong to the species. When a list comes back
+    truncated, state the total and offer to narrow rather than paging.
 
     Args:
         query: the structured catalog query

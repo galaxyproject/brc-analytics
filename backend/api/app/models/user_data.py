@@ -30,11 +30,6 @@ class FavoriteResponse(FavoritePayload):
     created_at: datetime
 
 
-class SaveAnalysisRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=255)
-    title: str | None = Field(default=None, max_length=255)
-
-
 class SavedAnalysisSummary(BaseModel):
     created_at: datetime
     id: str
@@ -49,6 +44,8 @@ class SavedAnalysisSummary(BaseModel):
 
 
 class SavedAnalysisDetail(SavedAnalysisSummary):
+    # No agent_message_history: the raw pydantic-ai transcript (tool calls and
+    # their returns) is only ever read server-side by the open endpoint.
     messages: list[ChatMessage]
     schema_state: AnalysisSchema = Field(alias="schema")
 

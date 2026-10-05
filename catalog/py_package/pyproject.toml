@@ -8,7 +8,9 @@ dependencies = [
     "lxml==6.0.0",
     "dlt[parquet] (>=1.28.1,<2.0.0)",
     "duckdb (>=1.5.4,<2.0.0)",
-    "dbt-duckdb (>=1.10.1,<2.0.0)"
+    "dbt-duckdb (>=1.10.1,<2.0.0)",
+    "linkml (>=1.11.1,<2.0.0)",
+    "linkml-runtime (>=1.11.1,<2.0.0)"
 ]
 description = "The package provides modules that can be used to run scripts to manage the catalog and schema; it may be desirable to set up shortcuts for running these."
 license = "MIT"

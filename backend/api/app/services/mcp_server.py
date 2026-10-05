@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import List, Optional
 
@@ -5,7 +6,10 @@ from fastmcp import FastMCP
 
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.galaxy_service import GalaxyService
 from app.services.sra_mirror import SRAMirrorService
+from app.services.tools import logan_tools
+from app.services.tools.catalog_tools import AssistantDeps
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +20,18 @@ def create_mcp_server(
     catalog_data: CatalogData,
     ena_service: ENAService,
     sra_mirror: Optional[SRAMirrorService] = None,
+    galaxy: Optional[GalaxyService] = None,
 ) -> FastMCP:
     # Opt-in: the SRA mirror tools only exist when a mirror file is configured
     # and openable. A default deploy (no SRA_MIRROR_PATH) advertises exactly
     # the tools it does today -- same discipline as the assistant prompt.
     sra_enabled = sra_mirror is not None and sra_mirror.is_available()
+    logan_enabled = galaxy is not None and galaxy.is_available()
 
-    wf_count = sum(
-        len(c.get("workflows", [])) for c in catalog_data.workflow_categories
-    )
+    # Count only what the tools will actually return (assembly-scoped, each
+    # workflow once even when it's in several categories), so this matches
+    # brc://catalog/summary.
+    wf_count = len(catalog_data.get_all_workflows())
     instructions = (
         "BRC Analytics provides curated genomic data for infectious disease and "
         "eukaryotic pathogen research. This server exposes the full catalog "
@@ -40,12 +47,21 @@ def create_mcp_server(
             "\n\nThis server also exposes a local SRA metadata mirror "
             "(search_sra, sra_data_summary, get_sra_study_runs): fast, "
             "structured multi-facet search (platform / assay type / country / "
-            "release date) over SRA runs scoped to BRC-relevant organisms, "
-            "refreshed weekly and resilient to ENA/EBI outages. Prefer the SRA "
-            "tools for broad or filtered 'what data exists' queries on BRC "
-            "pathogens; prefer the ENA tools (search_ena, search_ena_keywords) "
-            "for the very latest submissions, non-BRC organisms, or free-text "
-            "keyword search."
+            "release date) over every public SRA run as of the mirror's "
+            "build, resilient to ENA/EBI outages. Prefer the SRA tools for "
+            "broad or filtered 'what data exists' queries; prefer the ENA "
+            "tools (search_ena, search_ena_keywords) for submissions newer "
+            "than the mirror or free-text keyword search."
+        )
+    if logan_enabled:
+        instructions += (
+            "\n\nThis server also exposes read-only access to Logan sequence "
+            "searches (kmindex jobs run through BRC Analytics at "
+            "/logan-search): logan_job_status, logan_cohort (whole-match-set "
+            "counts and facets -- the only honest numbers for a search) and "
+            "logan_hits (a page of score-ranked hits with SRA metadata). "
+            "Results are cached for a day after the results page assembles "
+            "them; a tool that reports 'expired' means open that page first."
         )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
@@ -107,7 +123,7 @@ def create_mcp_server(
     @mcp.tool()
     def get_compatible_workflows(ploidies: List[str], taxonomy_id: str = "") -> dict:
         """Find workflows compatible with given ploidy values and optional taxonomy ID.
-        Ploidy values are e.g. 'haploid', 'diploid'."""
+        Ploidy values are e.g. 'HAPLOID', 'DIPLOID' (case-insensitive)."""
         results = catalog_data.get_compatible_workflows(ploidies, taxonomy_id)
         return {"count": len(results), "workflows": results}
 
@@ -190,9 +206,9 @@ def create_mcp_server(
             limit: int = 50,
         ) -> dict:
             """Search the local SRA mirror for sequencing runs matching an
-            organism plus optional facet filters. Fast, structured, scoped to
-            BRC-relevant organisms, refreshed weekly. Prefer over search_ena for
-            filtered "what data exists" queries on BRC pathogens.
+            organism plus optional facet filters. Fast, structured, covering
+            every public SRA run as of the mirror's build. Prefer over
+            search_ena for filtered "what data exists" queries.
 
             Args:
                 organism: scientific name or NCBI taxonomy ID (e.g. "Plasmodium
@@ -239,6 +255,124 @@ def create_mcp_server(
             return sra_mirror.get_study_runs(accession, limit=limit)
 
         logger.info("SRA mirror tools registered on MCP server")
+
+    if logan_enabled:
+        # The assistant-side tools return JSON strings; MCP returns dicts.
+        # Same functions, one decode -- the tool bodies stay in one place.
+        _deps = AssistantDeps(catalog=None, galaxy=galaxy)  # type: ignore[arg-type]
+
+        @mcp.tool()
+        async def logan_job_status(job_id: str) -> dict:
+            """Check whether a Logan sequence search (kmindex job) has finished.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results
+                    URL (/logan-search?job=<id>).
+            """
+            return json.loads(await logan_tools.logan_job_status(_deps, job_id))
+
+        @mcp.tool()
+        async def logan_cohort(job_id: str) -> dict:
+            """Whole-match-set summary of a finished Logan search: matched-run
+            count, organism/BioProject/study/country counts, the ten most
+            frequent organisms, and six metadata facets with 'other' and 'not
+            recorded' rows. These are the only numbers to describe a search
+            with; the pageable hit list is capped and not representative.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results URL.
+            """
+            return json.loads(await logan_tools.logan_cohort(_deps, job_id))
+
+        @mcp.tool()
+        async def logan_hits(job_id: str, offset: int = 0, limit: int = 25) -> dict:
+            """A page of score-ranked hits from a finished Logan search with SRA
+            run metadata where known. Never compute shares from a page; use
+            logan_cohort.
+
+            Args:
+                job_id: the 16-character Galaxy job id from a Logan results URL.
+                offset: first hit to return (0-based).
+                limit: hits per page (default 25, capped at 100).
+            """
+            return json.loads(
+                await logan_tools.logan_hits(_deps, job_id, offset=offset, limit=limit)
+            )
+
+        logger.info("Logan search tools registered on MCP server")
+
+    # -- Catalog resources (read-only context documents) --
+
+    @mcp.resource("brc://catalog/summary", mime_type="application/json")
+    def get_catalog_summary() -> str:
+        """High-level summary of the BRC Analytics catalog including counts and
+        available categories."""
+        categories = catalog_data.get_workflow_categories()
+        summary = {
+            "name": "BRC Analytics Catalog",
+            "organisms_count": len(catalog_data.organisms),
+            "assemblies_count": len(catalog_data.assemblies),
+            "workflows_count": wf_count,
+            "categories": [
+                {
+                    "name": c.get("name"),
+                    "key": c.get("category"),
+                    "workflow_count": c.get("workflowCount"),
+                }
+                for c in categories
+            ],
+            "sra_mirror_available": sra_enabled,
+        }
+        return json.dumps(summary, indent=2)
+
+    @mcp.resource("brc://catalog/categories", mime_type="application/json")
+    def get_workflow_categories() -> str:
+        """List all workflow categories in the BRC Analytics catalog."""
+        return json.dumps(catalog_data.get_workflow_categories(), indent=2)
+
+    @mcp.resource("brc://catalog/workflows", mime_type="application/json")
+    def get_workflows() -> str:
+        """List all assembly-scoped workflows in the BRC Analytics catalog."""
+        return json.dumps(catalog_data.get_all_workflows(), indent=2)
+
+    @mcp.resource("brc://catalog/organisms/{taxonomy_id}", mime_type="application/json")
+    def get_organism_resource(taxonomy_id: str) -> str:
+        """Get details for a specific organism by NCBI taxonomy ID."""
+        org = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
+        if not org:
+            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+        return json.dumps(org, indent=2)
+
+    # -- Guided prompts --
+
+    @mcp.prompt()
+    def plan_pathogen_analysis(
+        organism: str,
+        analysis_type: str = "VARIANT_CALLING",
+    ) -> str:
+        """Guided workflow prompt for planning a genomic analysis on a
+        pathogen organism. analysis_type is a workflow category key (see
+        list_workflow_categories), e.g. VARIANT_CALLING or TRANSCRIPTOMICS."""
+        return (
+            f"I want to plan a {analysis_type} analysis for the organism "
+            f"'{organism}' using BRC Analytics.\n\n"
+            "Please follow these steps using the available MCP tools:\n"
+            f"1. Search for '{organism}' using search_organisms (or get_organism) "
+            "to resolve its NCBI taxonomy ID.\n"
+            "2. Retrieve the genome assemblies for that taxonomy ID using "
+            "get_assemblies.\n"
+            f"3. List the workflows in the '{analysis_type}' category with "
+            "get_workflows_in_category (use list_workflow_categories if that "
+            "category isn't found), then keep only those that suit the chosen "
+            "assembly, confirming each with check_compatibility. Don't pick a "
+            "workflow from another category.\n"
+            "4. Resolve workflow inputs with resolve_workflow_inputs to see what "
+            "reference files are provided and what sequencing datasets are needed.\n"
+            "5. Search for relevant sequencing runs using "
+            f"{'search_sra or ' if sra_enabled else ''}search_ena.\n"
+            "6. Provide a concise summary of the plan, selected assembly, "
+            "workflow, and candidate runs."
+        )
 
     logger.info("MCP server created")
     return mcp

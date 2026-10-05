@@ -3,7 +3,9 @@ import type {
   AssistantChatRequest,
   AssistantChatResponse,
   AssistantInfoResponse,
+  LoganSessionRequest,
   SessionRestoreResponse,
+  SessionSaveResponse,
 } from "@repo/shared/services/api-client/types";
 import ky, { type HTTPError } from "ky";
 
@@ -54,6 +56,21 @@ export const assistantAPIClient = {
   },
 
   /**
+   * Open a new assistant session bound to a finished Logan search.
+   * @param request - The Logan job id.
+   * @returns Promise resolving to the new session (intro, schema, suggestions).
+   */
+  assistantCreateSession: async (
+    request: LoganSessionRequest
+  ): Promise<SessionRestoreResponse> => {
+    // One attempt: a 404/409 is an answer, not a blip, and the caller links
+    // the user back to the results page either way.
+    return httpClient
+      .post("assistant/session", { json: request, retry: { limit: 0 } })
+      .json();
+  },
+
+  /**
    * Delete an assistant session
    * @param sessionId - Session to delete
    */
@@ -83,6 +100,26 @@ export const assistantAPIClient = {
     // Failing fast is fine here: the pointer is kept and a reload retries.
     return httpClient
       .get(`assistant/session/${sessionId}`, { retry: { limit: 0 } })
+      .json();
+  },
+
+  /**
+   * Save a session to the signed-in user's account without waiting for a turn.
+   *
+   * Auto-save rides on chat turns, which leaves the sign-in case uncovered:
+   * someone who signs in to keep a conversation has not sent a turn since.
+   * @param sessionId - Session to claim and persist
+   * @returns Promise resolving to the saved analysis id
+   */
+  assistantSaveSession: async (
+    sessionId: string
+  ): Promise<SessionSaveResponse> => {
+    // No retries here: useAssistantChat decides what a failed save means --
+    // it re-arms on anything a later attempt could fix and stands down on
+    // anything it can't. Two retry policies stacked would turn one refusal
+    // into three requests and three server-side log lines.
+    return httpClient
+      .post(`assistant/session/${sessionId}/save`, { retry: { limit: 0 } })
       .json();
   },
 };

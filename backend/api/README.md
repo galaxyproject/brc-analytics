@@ -74,20 +74,38 @@ Services:
 
 ## MCP Server
 
-The API embeds a Model Context Protocol server at `/api/v1/mcp`, giving AI
-clients (Claude Desktop, the Galaxy MCP integration) direct access to the BRC
-catalog and sequencing-data search.
+The API embeds a Model Context Protocol server at `/api/v1/mcp/`, giving AI
+clients (Claude Desktop, Claude Code, Cursor, Galaxy MCP) direct access to the
+BRC catalog, sequencing-data search, context resources, and guided prompts.
 
-**Catalog tools** -- organisms, assemblies, workflows, and compatibility checks
-(in-memory, always available).
+**Catalog tools** (`search_organisms`, `get_organism`, `get_assemblies`,
+`get_assembly_details`, `list_workflow_categories`, `get_workflows_in_category`,
+`get_compatible_workflows`, `get_workflow_details`, `check_compatibility`,
+`resolve_workflow_inputs`) -- organisms, assemblies, workflows, and
+compatibility checks (in-memory, always available).
 
 **ENA tools** (`search_ena`, `search_ena_keywords`) -- live sequencing-run
 search against the European Nucleotide Archive.
 
 **SRA mirror tools** (`search_sra`, `sra_data_summary`, `get_sra_study_runs`) --
-fast structured search over a local SRA metadata mirror scoped to BRC-relevant
-organisms. Opt-in: registered only when `SRA_MIRROR_PATH` points at a built
-mirror file; a default deploy exposes only the catalog and ENA tools.
+fast structured search over a local mirror of SRA run metadata covering every
+public run as of its build. Opt-in: registered only when `SRA_MIRROR_PATH`
+points at a built mirror file; a default deploy exposes only the catalog and
+ENA tools.
+
+**Logan search tools** (`logan_job_status`, `logan_cohort`, `logan_hits`) --
+read-only access to Logan/kmindex sequence searches run through
+`/logan-search`: whether a job finished, its whole-match-set counts and facets,
+and pages of score-ranked hits with SRA metadata. Opt-in: registered only when
+`GALAXY_API_KEY` is set. Cache-only -- they read the merged result the results
+page assembled (cached for a day) and never rebuild it, so a tool that reports
+`expired` means opening that page first.
+
+**Catalog resources** (`brc://catalog/summary`, `brc://catalog/categories`,
+`brc://catalog/workflows`, `brc://catalog/organisms/{taxonomy_id}`) -- read-only
+structured context documents for models.
+
+**Prompts** (`plan_pathogen_analysis`) -- guided workflow templates.
 
 ## Configuration
 

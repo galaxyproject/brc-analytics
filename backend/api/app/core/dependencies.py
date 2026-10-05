@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheService
 from app.core.config import get_settings
+from app.core.galaxy_credential import GalaxyCredential
 from app.core.rate_limit import RateLimiter
 from app.db.crud import get_user_by_keycloak_sub
 from app.db.models import User
@@ -16,6 +17,7 @@ from app.services.assistant_agent import AssistantAgent
 from app.services.auth_service import COOKIE_NAME, AuthService
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
+from app.services.galaxy_service import GalaxyService
 from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -63,10 +65,31 @@ def get_sra_mirror_service() -> Optional[SRAMirrorService]:
 
 
 @lru_cache(maxsize=1)
+def get_service_galaxy() -> GalaxyService:
+    """The assistant's and MCP server's Galaxy service, on the service
+    credential, one per process.
+
+    Not the router's: /api/v1/galaxy/* builds a GalaxyService per request
+    with the signed-in user's credential so searches run as them. The
+    assistant only reads -- the job-id-keyed aggregate in Redis, and job
+    status -- and neither needs a user's token. Keep this out of any
+    Depends() on a galaxy route.
+    """
+    service = GalaxyService(
+        get_cache_service(), sra_mirror=get_sra_mirror_service(), credential=None
+    )
+    logger.info(
+        "Service Galaxy client initialized (singleton), available: "
+        f"{service.is_available()}"
+    )
+    return service
+
+
+@lru_cache(maxsize=1)
 def get_assistant_agent() -> AssistantAgent:
     cache = get_cache_service()
     sra_mirror = get_sra_mirror_service()
-    agent = AssistantAgent(cache, sra_mirror=sra_mirror)
+    agent = AssistantAgent(cache, sra_mirror=sra_mirror, galaxy=get_service_galaxy())
     logger.info(
         f"Assistant agent initialized (singleton), available: {agent.is_available()}"
     )
@@ -89,6 +112,35 @@ def get_rate_limiter() -> RateLimiter:
     return limiter
 
 
+@lru_cache(maxsize=1)
+def get_submit_rate_limiter() -> RateLimiter:
+    cache = get_cache_service()
+    settings = get_settings()
+    limiter = RateLimiter(
+        cache=cache,
+        requests=settings.SUBMIT_RATE_LIMIT_REQUESTS,
+        window=settings.SUBMIT_RATE_LIMIT_WINDOW,
+        namespace="ratelimit:submit",
+    )
+    logger.info(
+        f"Submit rate limiter initialized: {settings.SUBMIT_RATE_LIMIT_REQUESTS} "
+        f"submissions per {settings.SUBMIT_RATE_LIMIT_WINDOW}s"
+    )
+    return limiter
+
+
+@lru_cache(maxsize=1)
+def get_user_submit_rate_limiter() -> RateLimiter:
+    cache = get_cache_service()
+    settings = get_settings()
+    return RateLimiter(
+        cache=cache,
+        requests=settings.SUBMIT_RATE_LIMIT_USER_REQUESTS,
+        window=settings.SUBMIT_RATE_LIMIT_WINDOW,
+        namespace="ratelimit:submit-user",
+    )
+
+
 async def check_rate_limit(request: Request) -> dict:
     rate_limiter = get_rate_limiter()
     return await rate_limiter.check(request)
@@ -106,6 +158,61 @@ async def get_optional_current_user(
         return None
 
     return UserMeResponse.model_validate(user_info)
+
+
+async def get_galaxy_credential(
+    brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
+    auth: AuthService = Depends(get_auth_service),
+) -> GalaxyCredential | None:
+    """Resolve which credential Galaxy calls should use for this request.
+
+    A logged-in user's own bearer token wins; the shared service-account key
+    is the anonymous fallback; None means Galaxy endpoints are disabled.
+    """
+    if brc_session:
+        try:
+            token = await auth.get_valid_access_token(brc_session)
+        except Exception as e:
+            # A session-store or IdP blip must not take down an
+            # anonymous-capable route -- degrade to the service key. The
+            # exception type is the only clue that this happened at all,
+            # since the request then succeeds as an anonymous one.
+            logger.warning(
+                "Session token lookup failed (%s); using service credential",
+                type(e).__name__,
+            )
+            token = None
+        if token:
+            claims = auth.decode_token_claims(token)
+            if claims.get("sub"):
+                return GalaxyCredential(
+                    kind="user",
+                    secret=token,
+                    preferred_username=claims.get("preferred_username"),
+                    user_sub=claims["sub"],
+                )
+    settings = get_settings()
+    if settings.GALAXY_API_KEY:
+        return GalaxyCredential(kind="service", secret=settings.GALAXY_API_KEY)
+    return None
+
+
+async def check_submit_rate_limit(
+    request: Request,
+    credential: GalaxyCredential | None = Depends(get_galaxy_credential),
+) -> dict:
+    """Rate limit for endpoints that launch Galaxy jobs.
+
+    Applied on top of check_rate_limit, not instead of it -- the general
+    budget still bounds request volume, this one bounds compute. Signed-in
+    users get their own per-user budget; anonymous traffic shares the
+    per-IP pool exactly as before.
+    """
+    if credential is not None and credential.kind == "user":
+        return await get_user_submit_rate_limiter().check(
+            request, principal=credential.user_sub
+        )
+    return await get_submit_rate_limiter().check(request)
 
 
 async def get_current_user(
@@ -147,5 +254,8 @@ def reset_all_services() -> None:
     get_catalog_data.cache_clear()
     get_ena_service.cache_clear()
     get_sra_mirror_service.cache_clear()
+    get_service_galaxy.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()
+    get_submit_rate_limiter.cache_clear()
+    get_user_submit_rate_limiter.cache_clear()

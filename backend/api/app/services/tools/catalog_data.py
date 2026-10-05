@@ -41,12 +41,29 @@ class CatalogData:
         # workflow annotated with an ancestor taxon (e.g. Bacteria=2) matches
         # every organism below it (e.g. E. coli=562). Built from genome lineages.
         self._lineage_by_tax_id: Dict[str, Set[str]] = {}
+        # Each ASSEMBLY-scope workflow once, in catalog order, with every
+        # category that lists it.
+        self._workflows_by_iwc_id: Dict[str, Dict[str, Any]] = {}
+        self._categories_by_iwc_id: Dict[str, List[str]] = {}
         self._load()
 
     def _load(self) -> None:
         self._load_organisms()
         self._load_workflows()
         self._build_lineage_index()
+        self._build_workflow_index()
+
+    def _build_workflow_index(self) -> None:
+        for cat in self.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                iwc_id = wf.get("iwcId")
+                if not iwc_id or not _is_assembly_scope(wf):
+                    continue
+                self._workflows_by_iwc_id.setdefault(iwc_id, wf)
+                categories = self._categories_by_iwc_id.setdefault(iwc_id, [])
+                name = cat.get("name", "")
+                if name not in categories:
+                    categories.append(name)
 
     def _build_lineage_index(self) -> None:
         """Index each taxonomy ID to its own ancestor lineage (root..tid).
@@ -124,25 +141,32 @@ class CatalogData:
     # ------------------------------------------------------------------
 
     def search_organisms(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Search organisms by species name, common name, or taxonomy ID."""
+        """Search organisms by species name, other name, or taxonomy ID.
+
+        Matches on a name the organism currently holds -- species, genus or
+        taxonomy id -- rank ahead of matches on `otherNames`, which carries
+        prior scientific names: one organism's superseded name can be another's
+        current one, and the assistant reads the first result.
+        """
         q = query.lower().strip()
-        results = []
+        current_name_matches = []
+        other_name_matches = []
         for org in self.organisms:
             species = (org.get("taxonomicLevelSpecies") or "").lower()
-            commons = [(name or "").lower() for name in org.get("commonNames") or []]
+            others = [(name or "").lower() for name in org.get("otherNames") or []]
             tax_id = str(org.get("ncbiTaxonomyId") or "")
             genus = (org.get("taxonomicLevelGenus") or "").lower()
 
-            if (
-                q in species
-                or any(q in common for common in commons)
-                or q == tax_id
-                or q in genus
-            ):
-                results.append(self._summarize_organism(org))
-                if len(results) >= limit:
-                    break
-        return results
+            if q in species or q == tax_id or q in genus:
+                current_name_matches.append(self._summarize_organism(org))
+                # A full page of current-name matches can no longer be displaced,
+                # so stop scanning.
+                if len(current_name_matches) >= limit:
+                    return current_name_matches
+            elif any(q in other for other in others):
+                if len(other_name_matches) < limit:
+                    other_name_matches.append(self._summarize_organism(org))
+        return (current_name_matches + other_name_matches)[:limit]
 
     def get_organism_by_taxonomy_id(self, taxonomy_id: str) -> Optional[Dict[str, Any]]:
         for org in self.organisms:
@@ -153,11 +177,17 @@ class CatalogData:
     def find_organism_exact(self, name: Any) -> Optional[Dict[str, Any]]:
         """Find an organism by its NCBI taxonomy id -- the stable, canonical key
         suggestion chips tag organisms with (#1297). An exact (case-insensitive)
-        species or common name is also accepted as a fail-soft fallback so a chip
+        species or other name is also accepted as a fail-soft fallback so a chip
         the model mis-tags by name isn't needlessly dropped.
 
         Accepts any input (e.g. a numeric taxid or None); the value is coerced
         to a string before matching.
+
+        A taxonomy id or current scientific name wins over an other-name match,
+        whichever organism comes first in the catalog: `otherNames` carries prior
+        scientific names, so one organism's superseded name can be another's
+        current one (e.g. "Candida auris" is a synonym of Candidozyma auris),
+        and the organism that still holds the name is the right answer.
 
         Unlike search_organisms, this does NOT match on genus or substrings, so
         a genus ("Candida") or a partial string ("almonella") will not resolve.
@@ -167,15 +197,19 @@ class CatalogData:
         q = str(name).strip().lower()
         if not q:
             return None
+        other_name_match = None
         for org in self.organisms:
-            candidates = {
+            if q in {
                 (org.get("taxonomicLevelSpecies") or "").lower(),
                 str(org.get("ncbiTaxonomyId") or "").lower(),
-                *((common or "").lower() for common in org.get("commonNames") or []),
-            }
-            candidates.discard("")
-            if q in candidates:
+            }:
                 return self._summarize_organism(org)
+            if other_name_match is None and q in {
+                (other or "").lower() for other in org.get("otherNames") or []
+            }:
+                other_name_match = org
+        if other_name_match is not None:
+            return self._summarize_organism(other_name_match)
         return None
 
     def _summarize_organism(self, org: Dict[str, Any]) -> Dict[str, Any]:
@@ -190,7 +224,7 @@ class CatalogData:
 
         return {
             "species": org.get("taxonomicLevelSpecies"),
-            "common_names": org.get("commonNames"),
+            "other_names": org.get("otherNames"),
             "taxonomy_id": str(org.get("ncbiTaxonomyId")),
             "assembly_count": org.get("assemblyCount", len(genomes)),
             "reference_assembly_count": len(ref_genomes),
@@ -272,37 +306,30 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Return workflows compatible with the given organism ploidies and taxonomy."""
         results = []
-        for cat in self.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
-                    continue
-                wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
-                wf_tax = wf.get("taxonomyId")
+        for wf in self._workflows_by_iwc_id.values():
+            wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
+            wf_tax = wf.get("taxonomyId")
 
-                ploidy_ok = wf_ploidy == _PLOIDY_ANY or wf_ploidy in organism_ploidies
-                tax_ok = wf_tax is None or self._workflow_taxon_matches(
-                    wf_tax, taxonomy_id
-                )
+            ploidy_ok = wf_ploidy == _PLOIDY_ANY or wf_ploidy in organism_ploidies
+            tax_ok = wf_tax is None or self._workflow_taxon_matches(wf_tax, taxonomy_id)
 
-                if ploidy_ok and tax_ok:
-                    results.append(self._summarize_workflow(wf, cat.get("name", "")))
+            if ploidy_ok and tax_ok:
+                results.append(self._summarize_workflow(wf))
         return results
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
-        for cat in self.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if wf.get("iwcId") == iwc_id and _is_assembly_scope(wf):
-                    return self._summarize_workflow(
-                        wf, cat.get("name", ""), include_params=True
-                    )
-        return None
+        wf = self._workflows_by_iwc_id.get(iwc_id)
+        if wf is None:
+            return None
+        return self._summarize_workflow(wf, include_params=True)
 
     def _summarize_workflow(
         self,
         wf: Dict[str, Any],
-        category_name: str,
+        category_name: Optional[str] = None,
         include_params: bool = False,
     ) -> Dict[str, Any]:
+        categories = self._categories_by_iwc_id.get(wf.get("iwcId") or "", [])
         params = wf.get("parameters", [])
         needs_paired = any(
             p.get("data_requirements", {}).get("library_layout") == "PAIRED"
@@ -317,7 +344,9 @@ class CatalogData:
             "iwc_id": wf.get("iwcId"),
             "name": wf.get("workflowName"),
             "description": wf.get("workflowDescription"),
-            "category": category_name,
+            # The category it was looked up under, else the first that lists it.
+            "category": category_name or (categories[0] if categories else ""),
+            "categories": list(categories),
             "ploidy": wf.get("ploidy"),
             "taxonomy_id": wf.get("taxonomyId"),
             "trs_id": wf.get("trsId"),

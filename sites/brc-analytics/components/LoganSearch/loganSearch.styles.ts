@@ -1,0 +1,311 @@
+import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import styled from "@emotion/styled";
+
+export const SearchContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;
+
+/* The query and the threshold share the first row: the query box wants width,
+   and the slider wants exactly the narrower column -- given the whole page a
+   0.05 step is a couple of pixels of travel. The picker goes below them, across
+   both columns, through FormSpan. Collapses to one column before the two halves
+   get too cramped. */
+export const FormGrid = styled.div`
+  display: grid;
+  gap: 24px 32px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+export const FormColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+`;
+
+/* A row that spans both form columns: the index picker wants the full
+   width so its two chip rows wrap once or twice rather than five times. */
+export const FormSpan = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  grid-column: 1 / -1;
+`;
+
+/* Axis label on the left, chips wrapping beside it; stacked when the
+   label column would take a third of a phone. */
+export const IndexAxisRow = styled.div`
+  align-items: baseline;
+  display: grid;
+  gap: 8px 16px;
+  grid-template-columns: 112px minmax(0, 1fr);
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+export const IndexChips = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+export const ControlRow = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+/* The window sentence on the left, the top pager on the right. Aligned to the
+   top because the sentence can run to two lines and the pager should not
+   drift down the toolbar with it. */
+export const ResultsToolbar = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+`;
+
+/* Digits that sit in a column: coverage, ANI, the pagination caption. Inter
+   has tabular figures; without them 0.8915 and 1.0000 are different widths
+   and the column shimmers as the page changes. */
+export const Numeric = styled.span`
+  font-variant-numeric: tabular-nums;
+`;
+
+/* The coverage cell: a short rail proportional to the score, then the number.
+   A fixed rail width rather than a share of the cell, so the bar means the
+   same thing at every column width. */
+export const CoverageCell = styled.span`
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: flex-end;
+`;
+
+export const CoverageRail = styled.span`
+  background: ${PALETTE.SMOKE_MAIN};
+  border-radius: 3px;
+  display: inline-block;
+  height: 6px;
+  overflow: hidden;
+  width: 48px;
+
+  > span {
+    background: ${PALETTE.PRIMARY_MAIN};
+    display: block;
+    height: 100%;
+  }
+
+  /* Below 720px the coverage column is one of the two the table can still
+     fit, and 48px of rail is a third of what it has to say the number in. */
+  @media (max-width: 720px) {
+    display: none;
+  }
+`;
+
+/* Platform, country and release date leave the table below 720px and reappear
+   as one line under the organism, so a phone gets a readable list rather than
+   a seven-column scroll. Both are always in the DOM; CSS picks one. The ANI
+   estimate leaves too and does not come back: it is monotone in the coverage
+   beside it, so on the two columns a phone fits it is the one that says
+   nothing the other does not. */
+export const MetaCellStyles = `
+  @media (max-width: 720px) {
+    display: none;
+  }
+`;
+
+export const OrganismMeta = styled.span`
+  display: none;
+
+  @media (max-width: 720px) {
+    display: block;
+  }
+`;
+
+/* The match count and its figures on the left, the export and the assistant
+   on the right. Aligned to the top because the figures wrap to two rows on a
+   narrow card and the buttons should not drift down with them. */
+export const SummaryHeader = styled.div`
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  justify-content: space-between;
+`;
+
+export const SummaryFigures = styled.div`
+  flex: 1 1 320px;
+  min-width: 0;
+`;
+
+/* A right-hand column with left-aligned contents: the buttons and their
+   captions read as one block, and the advice caption wraps inside the
+   column instead of setting the width of the whole header. */
+export const SummaryActions = styled.div`
+  align-items: flex-start;
+  display: flex;
+  flex: 0 1 400px;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 400px;
+`;
+
+/* Provenance under the headline: which job, which query, which indexes, and
+   the way to hand any of it to someone else. */
+export const SummaryMeta = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 12px;
+`;
+
+/* Headline counts for the match set. Laid out as a row of labelled figures
+   rather than a sentence so organisms/BioProjects/studies/countries read as
+   four separate measurements of one set, not a list of trivia. */
+export const CohortStats = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 40px;
+  margin-top: 4px;
+`;
+
+export const CohortStat = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 88px;
+`;
+
+export const CohortFacetGrid = styled.div`
+  display: grid;
+  gap: 24px 40px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+export const CohortBarRows = styled.div`
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+`;
+
+/* label | bar | count | share. The bar and the share carry the proportion; the
+   count is there because the proportion of a million is not a number anyone
+   can reconstruct in their head. */
+export const CohortBarRow = styled.div`
+  align-items: center;
+  display: grid;
+  gap: 2px 12px;
+  grid-template-columns: minmax(0, 1fr) 72px 80px 52px;
+
+  /* Organism names run long; wrap rather than push the numbers off the row. */
+  > :first-of-type {
+    overflow-wrap: anywhere;
+  }
+
+  /* Too narrow for four columns: the share alone still carries the proportion,
+     so the bar is what goes. */
+  @media (max-width: 560px) {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+
+    > :nth-of-type(2) {
+      display: none;
+    }
+  }
+`;
+
+/* The choropleth's box. A fixed height rather than an aspect ratio because
+   the projection is fitted to the width and a world map at 1200px would
+   otherwise be tall enough to push the counts beside it off screen. */
+export const CohortMapContainer = styled.div`
+  min-height: 320px;
+  width: 100%;
+
+  /* vega-embed renders into a child div and adds its own action menu, which
+     we turn off; this keeps the drawing from overflowing a narrow column.
+     Both element types are named because the renderer depends on the data --
+     canvas once there are sampling points to draw, SVG when there are not. */
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+`;
+
+/* Map left, the country bars right. Full width above the facet grid rather
+   than inside it: at repeat(2, 1fr) on a 1200px page a cell is ~560px, which
+   is too narrow for a world map to be worth drawing. */
+export const CohortGeographyLayout = styled.div`
+  display: grid;
+  gap: 24px 40px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+/* One column per year: a 68px band of bars over 20px of labels.
+   Chronological rather than ranked, because a year is an axis and sorting it
+   by count throws away the only thing it was going to show. Kept shallow --
+   at 1,200px a taller band is a wall of navy across the whole card. */
+export const YearRow = styled.div`
+  align-items: flex-end;
+  display: flex;
+  gap: 3px;
+  height: 88px;
+  margin-top: 8px;
+`;
+
+export const YearColumn = styled.div`
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-end;
+  min-width: 0;
+`;
+
+/* The band the bars stand in, and the line they stand on. The baseline is
+   what makes an empty year read as a gap in a row of columns rather than as
+   a column that failed to draw. */
+export const YearBand = styled.div`
+  border-bottom: 1px solid ${PALETTE.SMOKE_MAIN};
+  display: flex;
+  flex-direction: column;
+  height: 68px;
+  justify-content: flex-end;
+`;
+
+export const YearBar = styled.div`
+  background: ${PALETTE.PRIMARY_MAIN};
+  border-radius: 2px 2px 0 0;
+`;
+
+/* Every fifth column carries a label and the four beside it are empty, so a
+   label is let out of its own column rather than clipped: left-aligned from
+   the column it belongs to, running into the space beside it. */
+export const YearLabel = styled.span`
+  color: ${PALETTE.INK_LIGHT};
+  font-size: 11px;
+  height: 20px;
+  line-height: 20px;
+  overflow: visible;
+  text-align: left;
+  white-space: nowrap;
+`;

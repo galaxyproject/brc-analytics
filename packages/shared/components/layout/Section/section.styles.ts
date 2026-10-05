@@ -1,4 +1,5 @@
 import { css } from "@emotion/react";
+import { SECTION_MAX_WIDTH } from "./constants";
 
 export const section = css`
   width: 100%;
@@ -13,5 +14,5 @@ export const sectionGrid = css`
 export const sectionLayout = css`
   box-sizing: content-box;
   margin: 0 auto;
-  max-width: 1136px;
+  max-width: ${SECTION_MAX_WIDTH}px;
 `;

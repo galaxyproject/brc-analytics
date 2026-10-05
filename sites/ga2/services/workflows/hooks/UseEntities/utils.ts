@@ -6,8 +6,7 @@ import {
 } from "@repo/shared/services/workflows/loader";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 
 /**
  * Ensures that the entities and workflows are loaded.
@@ -20,8 +19,7 @@ export const ensureEntitiesLoaded = createEntitiesLoader(
       loadWorkflows([
         CUSTOM_WORKFLOW,
         DIFFERENTIAL_EXPRESSION_ANALYSIS,
-        LOGAN_SEARCH,
-        LEXICMAP,
+        ...LMLS_WORKFLOWS,
       ]),
       loadEntities(config),
     ]);

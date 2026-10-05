@@ -11,8 +11,10 @@ import {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { Chip } from "@mui/material";
+import { FavoriteCell } from "@repo/shared/components/Favorites/components/FavoriteCell/favoriteCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { type AppEntityConfig } from "@repo/shared/config/types";
+import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import {
   buildAssemblyCount,
   buildOrganismAssemblyTaxonomyIds,
@@ -31,8 +33,23 @@ import {
 } from "@site-config/brc-analytics/category";
 import { organismMainColumn } from "@site-config/brc-analytics/local/entity/organism/organismMainColumn";
 import { organismTop } from "@site-config/brc-analytics/local/entity/organism/organismTop";
+import { type ComponentProps } from "react";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
+
+/**
+ * Builds props for the organism save cell.
+ * @param organism - Organism.
+ * @returns props for FavoriteCell.
+ */
+function buildOrganismFavoriteCell(
+  organism: BRCDataCatalogOrganism
+): ComponentProps<typeof FavoriteCell> {
+  return {
+    entityId: organism.ncbiTaxonomyId,
+    entityType: ENTITY_TYPE.ORGANISM,
+  };
+}
 
 /**
  * Entity config object responsible to config anything related to the /genomes route.
@@ -47,8 +64,8 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_SPECIES,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.ASSEMBLY_TAXONOMY_IDS,
@@ -114,6 +131,17 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
   label: "Organisms",
   list: {
     columns: [
+      {
+        componentConfig: {
+          component: FavoriteCell,
+          viewBuilder: buildOrganismFavoriteCell,
+        } as ComponentConfig<typeof FavoriteCell, BRCDataCatalogOrganism>,
+        enableSorting: false,
+        enableTableDownload: false,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SAVED,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.SAVED,
+        width: "48px",
+      },
       {
         componentConfig: {
           component: BasicCell,
@@ -226,10 +254,10 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildCommonNames,
+          viewBuilder: V.buildOtherNames,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogOrganism>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
         width: { max: "0.65fr", min: "auto" },
       },
       {
@@ -293,7 +321,7 @@ export const organismEntityConfig: AppEntityConfig<BRCDataCatalogOrganism> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_ISOLATE]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES]: false,
         },
         sorting: [
           {

@@ -326,6 +326,26 @@ export interface Pangenome {
 
 
 /**
+ * Root object containing a collection of curated taxon entries for the BRC Analytics platform.
+ */
+export interface Taxa {
+    /** Collection of taxon entries supplying curated information that supplements NCBI's taxonomic data. */
+    taxa: Taxon[],
+}
+
+
+/**
+ * Curated information about a taxon, identified by NCBI Taxonomy ID. Curated values apply to the identified taxon alone; they reach an assembly when the taxon is the assembly's own taxon or one of its ancestors up to rank 'species', and reach an organism when they reach any of that organism's assemblies. A taxon above species rank therefore has no effect on assemblies.
+ */
+export interface Taxon {
+    /** An NCBI Taxonomy ID at any rank. In particular, this may be an infraspecific taxon, which `Organism.taxonomy_id` cannot express; SARS-CoV-2 (2697049) is the motivating case, sitting below its species in NCBI's taxonomy while the catalog's organism is the species. */
+    taxonomy_id: number,
+    /** Curated alternative names for the taxon, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the taxon's NCBI-derived other names in the built catalog. Should be given as display forms; consumers are responsible for normalizing case and punctuation as appropriate. */
+    other_names: string[],
+}
+
+
+/**
  * Root object containing a collection of workflow category definitions used to organize workflows in the BRC Analytics platform.
  */
 export interface WorkflowCategories {

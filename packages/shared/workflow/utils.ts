@@ -3,8 +3,24 @@ import {
   WORKFLOW_PARAMETER_VARIABLE,
   WORKFLOW_PLOIDY,
 } from "@repo/shared/apis/schema-types";
-import type { Workflow } from "@repo/shared/apis/workflow";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { type ParsedUrlQuery } from "querystring";
+
+/**
+ * Determines whether any of the given workflow categories lists the workflow.
+ * Matches on the raw TRS ID, as the catalog records it.
+ * @param workflowCategories - Workflow categories.
+ * @param workflow - Workflow.
+ * @returns True when a category lists the workflow.
+ */
+export function categoriesIncludeWorkflow(
+  workflowCategories: WorkflowCategory[],
+  workflow: Workflow
+): boolean {
+  return workflowCategories.some(({ workflows }) =>
+    workflows.some(({ trsId }) => trsId === workflow.trsId)
+  );
+}
 
 /**
  * Formats a trsId for use in URLs by removing the hash character if it begins with one

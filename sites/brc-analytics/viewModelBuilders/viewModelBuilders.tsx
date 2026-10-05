@@ -5,6 +5,7 @@ import type { OUTBREAK_PRIORITY } from "@brc/apis/schema-types";
 import { getGenomeOrganismId, getOrganismId } from "@brc/apis/utils";
 import { SLUGIFY_OPTIONS } from "@brc/constants/slugify";
 import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
+import { type BRCOrganismDetail } from "@brc/services/staticGeneration/organism/types";
 import { type Main as OrganismViewMain } from "@brc/views/OrganismView/components/Main/main";
 import { Tabs } from "@brc/views/OrganismView/components/Tabs/tabs";
 import { type ResourcesSection } from "@brc/views/PriorityPathogenView/components/ResourcesSection/resourcesSection";
@@ -25,12 +26,15 @@ import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chi
 import { Chip } from "@mui/material";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { AppLink } from "@repo/shared/components/AppLink/appLink";
+import { FavoriteButton } from "@repo/shared/components/Favorites/components/FavoriteButton/favoriteButton";
+import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { TagList } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/components/TagList/tagList";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import type { SpeciesTag } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/types";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
+import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
   ORGANISM_SCOPED_TAG_LABELS,
@@ -77,16 +81,26 @@ import slugify from "slugify";
 import { getPriorityColor, getPriorityLabel } from "./priority";
 
 /**
- * Build props for the common names cell.
+ * Priority-pathogen taxonName ranks (per its taxonNameField discriminator)
+ * that are italicized as scientific names — genus and species only;
+ * family/order names, strains and free-form descriptors stay roman.
+ */
+const ITALIC_TAXON_NAME_FIELDS = new Set([
+  "taxonomicLevelGenus",
+  "taxonomicLevelSpecies",
+]);
+
+/**
+ * Build props for the other names cell.
  * @param entity - Organism or genome entity.
  * @returns Props for the NTagCell component.
  */
-export const buildCommonNames = (
+export const buildOtherNames = (
   entity: BRCDataCatalogOrganism | BRCDataCatalogGenome
 ): ComponentProps<typeof NTagCell> => {
   return {
-    label: "common names",
-    values: entity.commonNames,
+    label: "other names",
+    values: entity.otherNames,
   };
 };
 
@@ -120,7 +134,7 @@ export const buildGenomeSpecies = (
   return {
     ncbiTaxonomyId: genome.ncbiTaxonomyId,
     species: {
-      label: genome.taxonomicLevelSpecies,
+      label: <ScientificName>{genome.taxonomicLevelSpecies}</ScientificName>,
       url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getGenomeOrganismId(genome))}`,
     },
     tags,
@@ -225,7 +239,7 @@ export const buildOrganismTaxonomicLevelSpecies = (
   organism: BRCDataCatalogOrganism
 ): ComponentProps<typeof Link> => {
   return {
-    label: organism.taxonomicLevelSpecies,
+    label: <ScientificName>{organism.taxonomicLevelSpecies}</ScientificName>,
     url: `${ROUTES.ORGANISMS}/${encodeURIComponent(getOrganismId(organism))}`,
   };
 };
@@ -388,6 +402,16 @@ export const buildPriorityPathogenDetails = (
       variant={CHIP_PROPS.VARIANT.STATUS}
     />
   );
+  // Italics apply to genus- and species-rank taxon names only; taxonNameField
+  // carries the name's rank, so family/order names and descriptors stay roman.
+  // An absent name passes through unwrapped rather than as an empty element.
+  const { taxonName, taxonNameField } = priorityPathogen;
+  const taxonLabel =
+    taxonName && ITALIC_TAXON_NAME_FIELDS.has(taxonNameField ?? "") ? (
+      <ScientificName>{taxonName}</ScientificName>
+    ) : (
+      taxonName
+    );
   [
     ["Organisms", ROUTES.ORGANISMS],
     ["Assemblies", ROUTES.GENOMES],
@@ -400,7 +424,7 @@ export const buildPriorityPathogenDetails = (
           pathname
         )}
       >
-        {priorityPathogen.taxonName}
+        {taxonLabel}
       </AppLink>
     );
   });
@@ -444,7 +468,7 @@ export const buildTaxonomicLevelRealm = (entity: {
  * @returns Props to be used for the BackPageHero component.
  */
 export const buildOrganismHero = (
-  organism: BRCDataCatalogOrganism
+  organism: BRCOrganismDetail
 ): ComponentProps<typeof BackPageHero> => {
   // The species/group/priority are constant across the organism's assemblies,
   // so surface group + priority as header chips rather than repeating them on
@@ -458,9 +482,17 @@ export const buildOrganismHero = (
   );
   if (priorityTag) tags.push(priorityTag);
   return {
+    actions: (
+      <FavoriteButton
+        entityId={organism.ncbiTaxonomyId}
+        entityType={ENTITY_TYPE.ORGANISM}
+      />
+    ),
     breadcrumbs: getOrganismEntityBreadcrumbs(organism),
-    children: <Tabs ncbiTaxonomyId={organism.ncbiTaxonomyId} />,
+    children: <Tabs pangenome={organism.pangenome} />,
     subTitle: tags.length > 0 ? <TagList tags={tags} /> : undefined,
+    // Deliberately not italicized: at hero scale the scientific-name italic
+    // reads as styling rather than nomenclature (body-scale renders keep it).
     title: organism.taxonomicLevelSpecies,
   };
 };
@@ -471,7 +503,7 @@ export const buildOrganismHero = (
  * @returns Props for the OrganismViewMain component.
  */
 export const buildOrganismViewMain = (
-  organism: BRCDataCatalogOrganism
+  organism: BRCOrganismDetail
 ): ComponentProps<typeof OrganismViewMain> => {
   return {
     assembly: {
@@ -479,7 +511,8 @@ export const buildOrganismViewMain = (
       tableOptions: buildOrganismGenomesTable(organism),
     },
     entityId: getOrganismId(organism),
-    organism,
+    pangenome: organism.pangenome,
+    workflowCategories: organism.workflowCategories,
   };
 };
 

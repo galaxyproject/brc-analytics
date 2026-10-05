@@ -151,7 +151,11 @@ def get_test_results(
 
 
 def do_dbt_transformations(
-    temp_folder_path: Path, *, taxonomic_levels: list[str], has_outbreaks: bool
+    temp_folder_path: Path,
+    *,
+    taxonomic_levels: list[str],
+    has_curated_taxa: bool,
+    has_outbreaks: bool,
 ) -> TransformResult:
     """
     Run the dbt transformations against the loaded DuckDB database.
@@ -159,6 +163,9 @@ def do_dbt_transformations(
     Args:
       temp_folder_path: Path of the temporary folder holding the DuckDB database
       taxonomic_levels: Taxonomic levels to build columns for, passed to dbt as a var
+      has_curated_taxa: Whether the catalog curates information for individual taxa,
+        passed to dbt as a var so the shared models can skip the curated_taxa source
+        when absent
       has_outbreaks: Whether the catalog includes outbreaks, passed to dbt as a var so
         the shared models can skip outbreak-specific logic when absent
 
@@ -176,6 +183,7 @@ def do_dbt_transformations(
             package_additional_vars={
                 "duckdb_path": get_db_path_string(temp_folder_path),
                 "taxonomic_levels": taxonomic_levels,
+                "has_curated_taxa": has_curated_taxa,
                 "has_outbreaks": has_outbreaks,
             },
         ),

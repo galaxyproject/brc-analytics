@@ -11,23 +11,20 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
 }));
 const mockReplace = jest.fn().mockResolvedValue(true);
 let mockQuery: Record<string, string> = {};
+let mockIsReady = true;
 jest.mock("next/router", () => ({
   useRouter: (): {
+    isReady: boolean;
     pathname: string;
     query: Record<string, string>;
     replace: jest.Mock;
   } => ({
+    isReady: mockIsReady,
     pathname: "/assistant",
     query: mockQuery,
     replace: mockReplace,
   }),
 }));
-// Keeps ESM-only ky out of the jest module graph, which it enters through the
-// shared client the hook imports for saved analyses.
-jest.mock("@repo/shared/services/api-client/api-client", () => ({
-  apiClient: { saveAnalysis: jest.fn() },
-}));
-
 const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -47,6 +44,7 @@ describe("useAssistantChat restore", () => {
     jest.clearAllMocks();
     localStorage.clear();
     mockQuery = {};
+    mockIsReady = true;
   });
 
   test("a 404 on a stored session clears the pointer without alarming the user", async () => {

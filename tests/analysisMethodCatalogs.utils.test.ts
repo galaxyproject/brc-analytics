@@ -4,10 +4,11 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
+import { buildAssemblyWorkflows } from "@repo/shared/workflow/assemblyWorkflows";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../catalog/schema/generated/schema";
 import type { BRCDataCatalogGenome } from "../sites/brc-analytics/apis/assembly";
+import { buildWorkflowGates } from "./workflow/gates";
 
 describe("buildAssemblyWorkflows", () => {
   const WORKFLOW_CATEGORIES: WorkflowCategory[] = [
@@ -109,7 +110,6 @@ describe("buildAssemblyWorkflows", () => {
     accession: "AC",
     annotationStatus: null,
     chromosomes: null,
-    commonNames: [],
     coverage: null,
     galaxyDatacacheUrl: null,
     gcPercent: null,
@@ -119,6 +119,7 @@ describe("buildAssemblyWorkflows", () => {
     level: "scaffold",
     lineageTaxonomyIds: ["999"],
     ncbiTaxonomyId: "123",
+    otherNames: [],
     otherTaxa: null,
     ploidy: [ORGANISM_PLOIDY.DIPLOID],
     priority: null,
@@ -148,7 +149,8 @@ describe("buildAssemblyWorkflows", () => {
   test("filters and sorts workflow categories", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES
+      WORKFLOW_CATEGORIES,
+      buildWorkflowGates()
     );
 
     expect(result.map((c) => c.category)).toEqual([
@@ -165,7 +167,8 @@ describe("buildAssemblyWorkflows", () => {
   test("includes differential expression workflow as first in transcriptomics", () => {
     const result = buildAssemblyWorkflows(
       DIPLOID_ASSEMBLY,
-      WORKFLOW_CATEGORIES
+      WORKFLOW_CATEGORIES,
+      buildWorkflowGates()
     );
 
     const transcriptomics = result.find(

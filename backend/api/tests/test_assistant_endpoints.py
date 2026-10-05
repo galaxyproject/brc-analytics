@@ -295,3 +295,138 @@ class TestAnonymousSessionClaim:
 
         assert resp.status_code == 200, resp.text
         agent.session_service.claim_session.assert_not_awaited()
+
+
+LOGAN_JOB = "fe6f66a714dcbec8"
+
+
+def _logan_agent(app):
+    from app.core.dependencies import get_assistant_agent
+
+    return app.dependency_overrides[get_assistant_agent]()
+
+
+class TestCreateLoganSession:
+    def test_creates_and_sets_cookie(self, client, app_with_stubbed_agent):
+        from app.models.assistant import ChatMessage, MessageRole, SuggestionChip
+
+        agent = _logan_agent(app_with_stubbed_agent)
+        state = SessionState(
+            session_id="sess-logan",
+            messages=[
+                ChatMessage(role=MessageRole.ASSISTANT, content="This Logan search ...")
+            ],
+            suggestions=[
+                SuggestionChip(
+                    label="What is this cohort?", message="What is this cohort?"
+                )
+            ],
+            metadata={"logan": {"job_id": LOGAN_JOB}},
+        )
+        agent.create_logan_session = AsyncMock(return_value=state)
+        agent.reconcile_schema = lambda s: s
+        agent._derive_suggestions = lambda s, logan=None: state.suggestions
+
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert body["session_id"] == "sess-logan"
+        assert body["messages"][0]["role"] == "assistant"
+        assert body["suggestions"][0]["label"] == "What is this cohort?"
+        assert "brc_assistant_session" in r.headers.get("set-cookie", "")
+        agent.create_logan_session.assert_awaited_once_with(LOGAN_JOB, None)
+
+    def test_invalid_job_id_is_422(self, client):
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": "nope"})
+        assert r.status_code == 422
+
+    def test_not_found(self, client, app_with_stubbed_agent):
+        from app.services.assistant_agent import LoganJobNotFoundError
+
+        agent = _logan_agent(app_with_stubbed_agent)
+        agent.create_logan_session = AsyncMock(
+            side_effect=LoganJobNotFoundError(LOGAN_JOB, "gone")
+        )
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+        assert r.status_code == 404
+        assert r.json()["detail"]["code"] == "logan_job_not_found"
+        assert r.json()["detail"]["results_url"] == f"/logan-search?job={LOGAN_JOB}"
+
+    def test_not_ready(self, client, app_with_stubbed_agent):
+        from app.services.assistant_agent import LoganJobNotReadyError
+
+        agent = _logan_agent(app_with_stubbed_agent)
+        agent.create_logan_session = AsyncMock(
+            side_effect=LoganJobNotReadyError(LOGAN_JOB, "running")
+        )
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+        assert r.status_code == 409
+        assert r.json()["detail"]["code"] == "logan_job_not_ready"
+
+    def test_failed_job(self, client, app_with_stubbed_agent):
+        from app.services.assistant_agent import LoganJobFailedError
+
+        agent = _logan_agent(app_with_stubbed_agent)
+        agent.create_logan_session = AsyncMock(
+            side_effect=LoganJobFailedError(LOGAN_JOB, "error")
+        )
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+        assert r.status_code == 422
+        assert r.json()["detail"]["code"] == "logan_job_failed"
+
+    def test_unconfigured(self, client, app_with_stubbed_agent):
+        from app.services.assistant_agent import AssistantUnavailableError
+
+        agent = _logan_agent(app_with_stubbed_agent)
+        agent.create_logan_session = AsyncMock(
+            side_effect=AssistantUnavailableError("no")
+        )
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+        assert r.status_code == 503
+
+    def test_galaxy_outage_is_503_with_results_url(
+        self, client, app_with_stubbed_agent
+    ):
+        agent = _logan_agent(app_with_stubbed_agent)
+        agent.create_logan_session = AsyncMock(
+            side_effect=RuntimeError("bioblend boom")
+        )
+        r = client.post("/api/v1/assistant/session", json={"logan_job_id": LOGAN_JOB})
+        assert r.status_code == 503
+        assert r.json()["detail"]["code"] == "logan_unavailable"
+
+
+class TestSaveWithoutADatabase:
+    """A deployment can have OIDC on and no DATABASE_URL: /chat authenticates
+    on the JWT alone. The save endpoint has to answer that plainly rather than
+    raising into a 503 the client will retry."""
+
+    def test_save_is_not_implemented_without_a_database(
+        self, app_with_stubbed_agent, client, caplog, monkeypatch
+    ):
+        from app.core.config import get_settings
+        from app.core.dependencies import get_assistant_agent, get_current_user
+
+        # Say so rather than inheriting it: CI runs this suite alongside a
+        # Postgres container with DATABASE_URL exported, so a test that only
+        # passes on a laptop without one is a test that passes by accident.
+        monkeypatch.delenv("DATABASE_URL", raising=False)
+        get_settings.cache_clear()
+
+        agent = app_with_stubbed_agent.dependency_overrides[get_assistant_agent]()
+        agent.session_service.claim_session = AsyncMock()
+
+        async def _current_user():
+            return UserMeResponse(sub="user-a")
+
+        app_with_stubbed_agent.dependency_overrides[get_current_user] = _current_user
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+
+        resp = client.post("/api/v1/assistant/session/sess-abc/save")
+
+        assert resp.status_code == 501
+        # Nothing was claimed for a save that could never happen, and the
+        # refusal is not an exception -- both of those were the spam.
+        agent.session_service.claim_session.assert_not_awaited()
+        assert not [record for record in caplog.records if record.exc_info]

@@ -5,11 +5,11 @@ import { GalaxyIcon } from "@repo/shared/components/CustomIcon/components/Galaxy
 import { LiveHelpIcon } from "@repo/shared/components/CustomIcon/components/LiveHelpIcon/liveHelpIcon";
 import { RocketLaunchIcon } from "@repo/shared/components/CustomIcon/components/RocketLaunchIcon/rocketLaunchIcon";
 import { SmartToyIcon } from "@repo/shared/components/CustomIcon/components/SmartToyIcon/smartToyIcon";
+import { SparkleIcon } from "@repo/shared/components/CustomIcon/components/SparkleIcon/sparkleIcon";
 import { YouTubeIcon } from "@repo/shared/components/CustomIcon/components/YouTubeIcon/youTubeIcon";
-import { type SectionContentCard } from "@repo/shared/views/docs/components/SectionContentCard/sectionContentCard";
-import type { ComponentProps } from "react";
+import type { LearnCard } from "./types";
 
-export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
+export const CARDS: LearnCard[] = [
   {
     StartIcon: RocketLaunchIcon,
     href: "/learn/getting-started",
@@ -62,6 +62,7 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
   {
     StartIcon: SearchIcon,
     href: "/learn/sequence-search-workflows",
+    isDemoGated: true,
     secondaryText:
       "Search SRA by genetic content using kmindex and LexicMap workflows.",
     title: "Sequence Search Workflows",
@@ -72,5 +73,12 @@ export const CARDS: ComponentProps<typeof SectionContentCard>[] = [
     secondaryText:
       "Connect AI assistants like Claude to the BRC catalog and ENA search via the Model Context Protocol.",
     title: "MCP Server",
+  },
+  {
+    StartIcon: SparkleIcon,
+    href: "/learn/primaeon",
+    secondaryText:
+      "Run selection analysis in your browser with PrimAeon, and learn when to use HyphAeon, ChronAeon, or HyPhy.",
+    title: "PrimAeon",
   },
 ];

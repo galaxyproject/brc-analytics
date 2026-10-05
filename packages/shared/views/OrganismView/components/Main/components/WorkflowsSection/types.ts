@@ -1,6 +1,6 @@
-import { type OrganismContract } from "@repo/shared/apis/types";
+import { type WorkflowCategory } from "@repo/shared/apis/workflow";
 
 export interface Props {
   entityId: string;
-  organism: OrganismContract;
+  workflowCategories: WorkflowCategory[];
 }

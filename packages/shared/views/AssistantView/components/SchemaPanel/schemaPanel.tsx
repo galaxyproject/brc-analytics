@@ -1,6 +1,10 @@
 import { Box, Button, Chip, Divider, Typography } from "@mui/material";
 import { normalizePagePath } from "@repo/shared/hooks/UseCurrentPath/utils";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
+import {
+  extractAccessions,
+  resolveSequencingSource,
+} from "@repo/shared/providers/workflowHandoff/dataSource";
 import { useHandoffDispatch } from "@repo/shared/providers/workflowHandoff/hooks/UseHandoffDispatch/hook";
 import type {
   AnalysisSchema,
@@ -15,7 +19,6 @@ import {
   PanelContainer,
   PanelHeader,
 } from "./schemaPanel.styles";
-import { extractAccessions, resolveSequencingSource } from "./utils";
 
 interface SchemaPanelProps {
   handoffUrl: string | null;
@@ -119,7 +122,7 @@ export const SchemaPanel = ({
       entity: ENTITY_KEYS.ASSEMBLIES,
       inputs: {
         accessions: extractAccessions(schema.data_source),
-        sequencingSource: resolveSequencingSource(schema.data_source.value),
+        sequencingSource: resolveSequencingSource(schema.data_source),
       },
       // Normalise so the dispatch key matches the read site (useCurrentPath)
       // regardless of trailing slash / query / fragment from the backend.

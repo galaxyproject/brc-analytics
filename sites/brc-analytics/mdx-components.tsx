@@ -1,4 +1,3 @@
-import { CardActions } from "@brc/views/HomeView/components/SectionHero/components/Carousel/components/Cards/cards.styles";
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
@@ -13,7 +12,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ...sharedMDXComponents,
     Alert,
     AlertTitle,
-    CardActions,
     Figure,
     Link,
     RoundedPaper,

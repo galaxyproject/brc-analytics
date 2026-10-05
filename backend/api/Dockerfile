@@ -43,6 +43,12 @@ COPY . .
 
 # Change ownership
 RUN chown -R app:app /app
+
+# Where a search's materialized hit export lands. Created here, owned by the
+# runtime user, because Docker seeds a fresh named volume with the ownership of
+# the image directory it covers -- mount one over a path that does not exist
+# and it arrives root-owned, which this process cannot write to.
+RUN mkdir -p /data/exports && chown -R app:app /data
 USER app
 
 EXPOSE 8000

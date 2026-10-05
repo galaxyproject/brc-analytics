@@ -88,14 +88,25 @@ class CatalogData:
                     else:
                         existing.update(lineage_strs)
 
+        # A workflow can be listed under several categories. Index it once,
+        # preferring an ASSEMBLY-scope copy (the only kind the tools serve),
+        # and remember every category that lists an ASSEMBLY-scope copy --
+        # the same ones get_workflows_in_category returns it under.
         for cat in self.workflow_categories:
             for wf in cat.get("workflows", []):
-                iwc_id = wf.get("iwcId", "")
-                if iwc_id:
-                    self._workflows_by_iwc_id[iwc_id] = {
-                        **wf,
-                        "_category": cat.get("name", ""),
-                    }
+                iwc_id = wf.get("iwcId")
+                if not iwc_id:
+                    continue
+                existing = self._workflows_by_iwc_id.get(iwc_id)
+                if existing is None or (
+                    not _is_assembly_scope(existing) and _is_assembly_scope(wf)
+                ):
+                    categories = existing["_categories"] if existing else []
+                    existing = {**wf, "_categories": categories}
+                    self._workflows_by_iwc_id[iwc_id] = existing
+                name = cat.get("name", "")
+                if _is_assembly_scope(wf) and name not in existing["_categories"]:
+                    existing["_categories"].append(name)
 
     # -- Organism methods --
 
@@ -103,28 +114,38 @@ class CatalogData:
         """
         Search organisms by name, taxonomy ID, or taxonomic group.
         Returns condensed records suitable for MCP responses.
+
+        Matches on a name the organism currently holds rank ahead of matches on
+        `otherNames`, which carries prior scientific names: one organism's
+        superseded name can be another's current one, so a caller reading only
+        the first result would otherwise get the wrong organism.
         """
         if not query.strip():
             return []
         q = query.lower()
-        results = []
+        current_name_matches = []
+        other_name_matches = []
         for org in self.organisms:
             if any(
                 q in str(org.get(field, "")).lower()
                 for field in (
                     "taxonomicLevelSpecies",
                     "taxonomicLevelGenus",
-                    "commonNames",
                     "ncbiTaxonomyId",
                     "taxonomicGroup",
                     "taxonomicLevelStrain",
                     "taxonomicLevelIsolate",
                 )
             ):
-                results.append(self._condense_organism(org))
-                if len(results) >= limit:
-                    break
-        return results
+                current_name_matches.append(self._condense_organism(org))
+                # A full page of current-name matches can no longer be displaced,
+                # so stop scanning.
+                if len(current_name_matches) >= limit:
+                    return current_name_matches
+            elif any(q in (name or "").lower() for name in org.get("otherNames") or []):
+                if len(other_name_matches) < limit:
+                    other_name_matches.append(self._condense_organism(org))
+        return (current_name_matches + other_name_matches)[:limit]
 
     def get_organism_by_taxonomy_id(self, taxonomy_id: str) -> Optional[Dict[str, Any]]:
         org = self._organisms_by_tax_id.get(str(taxonomy_id))
@@ -137,7 +158,7 @@ class CatalogData:
             "ncbiTaxonomyId": org.get("ncbiTaxonomyId"),
             "species": org.get("taxonomicLevelSpecies"),
             "genus": org.get("taxonomicLevelGenus"),
-            "commonNames": org.get("commonNames"),
+            "otherNames": org.get("otherNames"),
             "assemblyCount": org.get("assemblyCount"),
             "taxonomicGroup": org.get("taxonomicGroup"),
             "strain": org.get("taxonomicLevelStrain"),
@@ -198,7 +219,7 @@ class CatalogData:
                 or cat.get("name", "").lower() == cat_lower
             ):
                 return [
-                    self._condense_workflow(wf)
+                    self._condense_workflow(wf, cat.get("name", ""))
                     for wf in cat.get("workflows", [])
                     if _is_assembly_scope(wf)
                 ]
@@ -208,29 +229,38 @@ class CatalogData:
         self, ploidies: List[str], taxonomy_id: str = ""
     ) -> List[Dict[str, Any]]:
         """Find workflows compatible with given ploidies and optional taxonomy ID."""
+        # The catalog stores ploidy upper-case; accept 'haploid' too.
+        ploidies = [p.upper() for p in ploidies]
         results = []
-        for cat in self.workflow_categories:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
+        for wf in self._assembly_workflows():
+            wf_ploidy = wf.get("ploidy")
+            wf_tax = wf.get("taxonomyId")
+            # Ploidy must match (None/ANY = universal)
+            if (
+                wf_ploidy is not None
+                and wf_ploidy != "ANY"
+                and wf_ploidy not in ploidies
+            ):
+                continue
+            # Taxonomy must match if specified on both sides;
+            # check against the full lineage so a workflow targeting
+            # e.g. Bacteria (2) matches E. coli (562)
+            if taxonomy_id and wf_tax is not None:
+                lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
+                if str(wf_tax) not in lineage:
                     continue
-                wf_ploidy = wf.get("ploidy")
-                wf_tax = wf.get("taxonomyId")
-                # Ploidy must match (None/ANY = universal)
-                if (
-                    wf_ploidy is not None
-                    and wf_ploidy != "ANY"
-                    and wf_ploidy not in ploidies
-                ):
-                    continue
-                # Taxonomy must match if specified on both sides;
-                # check against the full lineage so a workflow targeting
-                # e.g. Bacteria (2) matches E. coli (562)
-                if taxonomy_id and wf_tax is not None:
-                    lineage = self._lineage_by_tax_id.get(str(taxonomy_id), set())
-                    if str(wf_tax) not in lineage:
-                        continue
-                results.append(self._condense_workflow(wf))
+            results.append(self._condense_workflow(wf))
         return results
+
+    def get_all_workflows(self) -> List[Dict[str, Any]]:
+        """Every ASSEMBLY-scope workflow once, with all its categories."""
+        return [self._condense_workflow(wf) for wf in self._assembly_workflows()]
+
+    def _assembly_workflows(self) -> List[Dict[str, Any]]:
+        """Each ASSEMBLY-scope workflow once, in catalog order."""
+        return [
+            wf for wf in self._workflows_by_iwc_id.values() if _is_assembly_scope(wf)
+        ]
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         wf = self._workflows_by_iwc_id.get(iwc_id)
@@ -376,12 +406,18 @@ class CatalogData:
             f"{accession}/{accession}.fa.gz"
         )
 
-    def _condense_workflow(self, wf: Dict[str, Any]) -> Dict[str, Any]:
+    def _condense_workflow(
+        self, wf: Dict[str, Any], category_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        indexed = self._workflows_by_iwc_id.get(wf.get("iwcId") or "", {})
+        categories = indexed.get("_categories", [])
         return {
             "iwcId": wf.get("iwcId"),
             "name": wf.get("workflowName"),
             "description": wf.get("workflowDescription"),
-            "category": wf.get("_category", ""),
+            # The category it was looked up under, else the first that lists it.
+            "category": category_name or (categories[0] if categories else ""),
+            "categories": list(categories),
             "ploidy": wf.get("ploidy"),
             "taxonomyId": wf.get("taxonomyId"),
             "trsId": wf.get("trsId"),

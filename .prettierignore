@@ -30,3 +30,6 @@ venv
 
 # playwright mcp debug output
 .playwright-mcp
+
+# vendored boundary geometry -- must stay byte-identical to world-atlas 2.0.2
+/sites/brc-analytics/public/geo/countries-110m.json

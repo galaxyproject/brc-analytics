@@ -42,6 +42,9 @@ export const SectionSubHero = ({
                   expanded={activeIndex === key}
                   onClick={() => onSelectIndex(key)}
                 >
+                  {/* MUI's Accordion re-renders its children as an array inside
+                      MuiAccordionRegion, so these static siblings need keys to
+                      avoid React's list-key warning. */}
                   <AccordionSummary key="summary">{title}</AccordionSummary>
                   {details && (
                     <AccordionDetails key="details">{details}</AccordionDetails>
@@ -56,7 +59,7 @@ export const SectionSubHero = ({
             {images.map((src, index) => (
               <Slide
                 {...SLIDE_PROPS}
-                key={src}
+                key={String(index)}
                 in={activeIndex === String(index)}
               >
                 <StyledBox sx={{ background: `url(${src})` }} />

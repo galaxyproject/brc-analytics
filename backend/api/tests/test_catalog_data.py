@@ -1,5 +1,6 @@
 """Tests for CatalogData search and lookup methods."""
 
+import copy
 import json
 import os
 import tempfile
@@ -14,7 +15,7 @@ SAMPLE_ORGANISMS = [
         "taxonomicLevelSpecies": "Plasmodium falciparum",
         "taxonomicLevelGenus": "Plasmodium",
         "taxonomicLevelFamily": "Plasmodiidae",
-        "commonNames": ["malaria parasite"],
+        "otherNames": ["malaria parasite"],
         "assemblyCount": 2,
         "taxonomicGroup": ["Apicomplexa"],
         "genomes": [
@@ -53,7 +54,7 @@ SAMPLE_ORGANISMS = [
         "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
         "taxonomicLevelGenus": "Saccharomyces",
         "taxonomicLevelFamily": "Saccharomycetaceae",
-        "commonNames": ["yeast", "brewer's yeast"],
+        "otherNames": ["yeast", "brewer's yeast", "Candida robusta"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Fungi"],
         "genomes": [
@@ -155,16 +156,45 @@ class TestSearchOrganisms:
         assert len(results) == 1
         assert results[0]["species"] == "Plasmodium falciparum"
 
-    def test_search_by_common_name(self, catalog):
+    def test_search_by_other_name(self, catalog):
         results = catalog.search_organisms("yeast")
         assert len(results) == 1
         assert results[0]["taxonomy_id"] == "559292"
 
-    def test_search_by_secondary_common_name(self, catalog):
-        # Matches on a non-primary common name from the full list.
+    def test_search_by_secondary_other_name(self, catalog):
+        # Matches on a non-primary name from the full list.
         results = catalog.search_organisms("brewer")
         assert len(results) == 1
         assert results[0]["taxonomy_id"] == "559292"
+
+    def test_search_by_prior_scientific_name(self, catalog):
+        # otherNames carries NCBI synonyms and equivalent names, so an organism
+        # resolves under a superseded scientific name too.
+        results = catalog.search_organisms("Candida robusta")
+        assert len(results) == 1
+        assert results[0]["species"] == "Saccharomyces cerevisiae"
+
+    def test_current_name_ranks_above_other_name(self, tmp_path):
+        # A name one organism has moved on from can still be another's current
+        # name; the assistant reads the first result, so that one must lead.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["Genusvetus specimen"],
+                "genomes": [],
+            },
+            {
+                "ncbiTaxonomyId": 2,
+                "taxonomicLevelSpecies": "Genusvetus specimen",
+                "otherNames": [],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        results = CatalogData(str(tmp_path)).search_organisms("Genusvetus specimen")
+        assert [r["taxonomy_id"] for r in results] == ["2", "1"]
 
     def test_search_by_taxonomy_id(self, catalog):
         results = catalog.search_organisms("5833")
@@ -208,8 +238,34 @@ class TestFindOrganismExact:
     def test_case_insensitive(self, catalog):
         assert catalog.find_organism_exact("plasmodium falciparum") is not None
 
-    def test_common_name_match(self, catalog):
+    def test_other_name_match(self, catalog):
         assert catalog.find_organism_exact("malaria parasite") is not None
+
+    def test_scientific_name_beats_earlier_other_name_match(self, tmp_path):
+        # otherNames carries prior scientific names, so a name one organism has
+        # moved on from can still be another organism's current name -- the
+        # mechanism behind Candidozyma auris keeping "Candida auris". The
+        # organism that currently holds the name must win even when the
+        # other-name match comes first in the catalog.
+        organisms = [
+            {
+                "ncbiTaxonomyId": 1,
+                "taxonomicLevelSpecies": "Genusnovus specimen",
+                "otherNames": ["Genusvetus specimen"],
+                "genomes": [],
+            },
+            {
+                "ncbiTaxonomyId": 2,
+                "taxonomicLevelSpecies": "Genusvetus specimen",
+                "otherNames": [],
+                "genomes": [],
+            },
+        ]
+        (tmp_path / "organisms.json").write_text(json.dumps(organisms))
+        (tmp_path / "workflows.json").write_text(json.dumps([]))
+        org = CatalogData(str(tmp_path)).find_organism_exact("Genusvetus specimen")
+        assert org is not None
+        assert org["taxonomy_id"] == "2"
 
     def test_taxonomy_id_match(self, catalog):
         assert catalog.find_organism_exact("5833") is not None
@@ -423,7 +479,7 @@ LINEAGE_ORGANISMS = [
         "ncbiTaxonomyId": 562,
         "taxonomicLevelSpecies": "Escherichia coli",
         "taxonomicLevelGenus": "Escherichia",
-        "commonNames": ["E. coli"],
+        "otherNames": ["E. coli"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Bacteria"],
         "genomes": [
@@ -445,7 +501,7 @@ LINEAGE_ORGANISMS = [
         "ncbiTaxonomyId": 559292,
         "taxonomicLevelSpecies": "Saccharomyces cerevisiae",
         "taxonomicLevelGenus": "Saccharomyces",
-        "commonNames": ["yeast"],
+        "otherNames": ["yeast"],
         "assemblyCount": 1,
         "taxonomicGroup": ["Fungi"],
         "genomes": [
@@ -540,3 +596,54 @@ class TestLineageTaxonomyMatching:
         assert lineage_catalog._workflow_taxon_matches(562, "2") is False
         # ...but a Bacteria (2) workflow still applies to E. coli (562).
         assert lineage_catalog._workflow_taxon_matches(2, "562") is True
+
+
+# ---------- Workflows listed under more than one category ----------
+
+
+class TestSharedWorkflow:
+    @pytest.fixture
+    def shared_catalog(self, catalog_dir, shared_workflows):
+        return CatalogData(catalog_dir(shared_workflows))
+
+    def test_listed_once_in_compatible(self, shared_catalog):
+        wfs = shared_catalog.get_compatible_workflows(["HAPLOID"])
+        matches = [w for w in wfs if w["iwc_id"] == "varcall-haploid"]
+        assert len(matches) == 1
+        assert matches[0]["category"] == "Transcriptomics"
+        assert matches[0]["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_details_carries_every_category(self, shared_catalog):
+        details = shared_catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Transcriptomics"
+        assert details["categories"] == ["Transcriptomics", "Variant Calling"]
+
+    def test_listed_under_each_category(self, shared_catalog):
+        for key, name in [
+            ("TRANSCRIPTOMICS", "Transcriptomics"),
+            ("VARIANT_CALLING", "Variant Calling"),
+        ]:
+            wfs = shared_catalog.get_workflows_in_category(key)
+            by_id = {w["iwc_id"]: w["category"] for w in wfs}
+            assert by_id["varcall-haploid"] == name
+
+    def test_organism_scope_first_copy_is_skipped(
+        self, catalog_dir, scope_split_workflows
+    ):
+        catalog = CatalogData(catalog_dir(scope_split_workflows))
+        details = catalog.get_workflow_details("varcall-haploid")
+        assert details["category"] == "Variant Calling"
+        assert details["categories"] == ["Variant Calling"]
+        compatible = catalog.get_compatible_workflows(["HAPLOID"])
+        assert [
+            w["categories"] for w in compatible if w["iwc_id"] == "varcall-haploid"
+        ] == [["Variant Calling"]]
+
+    def test_workflows_without_iwc_id_are_not_collapsed(self, catalog_dir):
+        workflows = copy.deepcopy(SAMPLE_WORKFLOWS)
+        for wf in workflows[0]["workflows"] + workflows[1]["workflows"]:
+            wf.pop("iwcId", None)
+        catalog = CatalogData(catalog_dir(workflows))
+        # No id means it can't be de-duplicated or looked up, so it isn't indexed
+        # -- but one missing id must not swallow the others.
+        assert catalog.get_compatible_workflows(["HAPLOID"]) == []

@@ -12,9 +12,6 @@ export interface AssemblyContract {
   accession: string;
   annotationStatus: string | null;
   chromosomes: number | null;
-  // Optional fields are absent on some catalogs' assemblies; consumers must
-  // default when absent.
-  commonNames?: string[];
   coverage: string | null;
   galaxyDatacacheUrl: string | null;
   gcPercent: number | null;
@@ -23,6 +20,9 @@ export interface AssemblyContract {
   level: string;
   lineageTaxonomyIds: string[];
   ncbiTaxonomyId: string;
+  // Optional fields are absent on some catalogs' assemblies; consumers must
+  // default when absent.
+  otherNames?: string[];
   ploidy: ORGANISM_PLOIDY[];
   priority?: OUTBREAK_PRIORITY | null;
   priorityPathogenName?: string | null;

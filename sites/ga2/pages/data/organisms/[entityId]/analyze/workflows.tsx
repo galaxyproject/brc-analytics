@@ -2,6 +2,7 @@ import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceP
 import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
+import { isOrganismWorkflowAvailable } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
 import { ROUTES } from "@repo/shared/routes/constants";
@@ -25,12 +26,14 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   return (
     <EntityDataGate>
       <WorkflowGate
+        entityId={entityId}
         fallback={
           <WorkflowNotFound
             entityContext="organism"
             href={replaceParameters(ROUTES.ORGANISM, { entityId })}
           />
         }
+        isWorkflowAvailable={isOrganismWorkflowAvailable}
         trsId={trsId}
       >
         <OrganismWorkflowInputsView entityId={entityId} trsId={trsId} />

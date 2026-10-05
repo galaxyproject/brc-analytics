@@ -52,6 +52,7 @@ linkml_meta = LinkMLMeta(
             "./organisms",
             "./outbreaks",
             "./pangenomes",
+            "./taxa",
             "./workflow_categories",
             "./workflows",
         ],
@@ -374,7 +375,7 @@ class Organism(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
-                "domain_of": ["Organism", "Outbreak", "Workflow"],
+                "domain_of": ["Organism", "Outbreak", "Taxon", "Workflow"],
             }
         },
     )
@@ -435,7 +436,7 @@ class Outbreak(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
-                "domain_of": ["Organism", "Outbreak", "Workflow"],
+                "domain_of": ["Organism", "Outbreak", "Taxon", "Workflow"],
             }
         },
     )
@@ -591,6 +592,55 @@ class Pangenome(ConfiguredBaseModel):
         default=...,
         description="""The unique identifier for the pangenome.""",
         json_schema_extra={"linkml_meta": {"alias": "id", "domain_of": ["Pangenome"]}},
+    )
+
+
+class Taxa(ConfiguredBaseModel):
+    """
+    Root object containing a collection of curated taxon entries for the BRC Analytics platform.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/taxa.yaml#",
+            "tree_root": True,
+        }
+    )
+
+    taxa: List[Taxon] = Field(
+        default=...,
+        description="""Collection of taxon entries supplying curated information that supplements NCBI's taxonomic data.""",
+        json_schema_extra={"linkml_meta": {"alias": "taxa", "domain_of": ["Taxa"]}},
+    )
+
+
+class Taxon(ConfiguredBaseModel):
+    """
+    Curated information about a taxon, identified by NCBI Taxonomy ID. Curated values apply to the identified taxon alone; they reach an assembly when the taxon is the assembly's own taxon or one of its ancestors up to rank 'species', and reach an organism when they reach any of that organism's assemblies. A taxon above species rank therefore has no effect on assemblies.
+    """
+
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta(
+        {
+            "from_schema": "https://github.com/galaxyproject/brc-analytics/blob/main/catalog/py_package/catalog_build/schema/taxa.yaml#"
+        }
+    )
+
+    taxonomy_id: int = Field(
+        default=...,
+        description="""An NCBI Taxonomy ID at any rank. In particular, this may be an infraspecific taxon, which `Organism.taxonomy_id` cannot express; SARS-CoV-2 (2697049) is the motivating case, sitting below its species in NCBI's taxonomy while the catalog's organism is the species.""",
+        json_schema_extra={
+            "linkml_meta": {
+                "alias": "taxonomy_id",
+                "domain_of": ["Organism", "Outbreak", "Taxon", "Workflow"],
+            }
+        },
+    )
+    other_names: List[str] = Field(
+        default=...,
+        description="""Curated alternative names for the taxon, such as abbreviations and colloquial names that NCBI doesn't supply. Merged into the taxon's NCBI-derived other names in the built catalog. Should be given as display forms; consumers are responsible for normalizing case and punctuation as appropriate.""",
+        json_schema_extra={
+            "linkml_meta": {"alias": "other_names", "domain_of": ["Taxon"]}
+        },
     )
 
 
@@ -766,7 +816,7 @@ class Workflow(ConfiguredBaseModel):
         json_schema_extra={
             "linkml_meta": {
                 "alias": "taxonomy_id",
-                "domain_of": ["Organism", "Outbreak", "Workflow"],
+                "domain_of": ["Organism", "Outbreak", "Taxon", "Workflow"],
             }
         },
     )
@@ -1034,6 +1084,8 @@ OutbreakResource.model_rebuild()
 MarkdownFileReference.model_rebuild()
 Pangenomes.model_rebuild()
 Pangenome.model_rebuild()
+Taxa.model_rebuild()
+Taxon.model_rebuild()
 WorkflowCategories.model_rebuild()
 WorkflowCategory.model_rebuild()
 Workflows.model_rebuild()

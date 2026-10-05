@@ -3,7 +3,18 @@ import type {
   OrganismContract,
 } from "@repo/shared/apis/types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { findEntity, getEntities, getEntity } from "./query";
+import { findEntities, findEntity, getEntities, getEntity } from "./query";
+
+/**
+ * Finds an assembly by entity id, returning undefined when there is no match.
+ * @param entityId - Entity id.
+ * @returns Assembly, or undefined when not found.
+ */
+export function findAssembly<T extends AssemblyContract>(
+  entityId: string
+): T | undefined {
+  return findEntity<T>("assemblies", entityId);
+}
 
 /**
  * Finds an organism by entity id, returning undefined when there is no match.
@@ -23,6 +34,14 @@ export function findOrganism<T extends OrganismContract>(
  */
 export function findWorkflow(trsId: string): Workflow | undefined {
   return findEntity<Workflow>("workflows", trsId);
+}
+
+/**
+ * Finds the workflow categories, returning undefined when they are not loaded.
+ * @returns Workflow categories, or undefined when not loaded.
+ */
+export function findWorkflowCategories(): WorkflowCategory[] | undefined {
+  return findEntities<WorkflowCategory>("workflows");
 }
 
 /**

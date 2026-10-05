@@ -1,3 +1,4 @@
+import { renderWorkflowSpecies } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type ColumnDef } from "@tanstack/react-table";
 import { CATEGORY_CONFIG } from "./categoryGroupConfig";
 import { type WorkflowEntity } from "./types";
@@ -9,11 +10,11 @@ const CATEGORY: ColumnDef<WorkflowEntity> = {
   id: CATEGORY_CONFIG.CATEGORY.key,
 };
 
-const COMMON_NAME: ColumnDef<WorkflowEntity> = {
-  accessorKey: CATEGORY_CONFIG.COMMON_NAME.key,
+const OTHER_NAMES: ColumnDef<WorkflowEntity> = {
+  accessorKey: CATEGORY_CONFIG.OTHER_NAMES.key,
   filterFn: "arrIncludesSome",
-  header: CATEGORY_CONFIG.COMMON_NAME.label,
-  id: CATEGORY_CONFIG.COMMON_NAME.key,
+  header: CATEGORY_CONFIG.OTHER_NAMES.label,
+  id: CATEGORY_CONFIG.OTHER_NAMES.key,
 };
 
 const PLOIDY: ColumnDef<WorkflowEntity> = {
@@ -88,6 +89,7 @@ const TAXONOMIC_LEVEL_REALM: ColumnDef<WorkflowEntity> = {
 
 const TAXONOMIC_LEVEL_SPECIES: ColumnDef<WorkflowEntity> = {
   accessorKey: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.key,
+  cell: renderWorkflowSpecies,
   filterFn: "arrIncludesSome",
   header: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.label,
   id: CATEGORY_CONFIG.TAXONOMIC_LEVEL_SPECIES.key,
@@ -111,7 +113,7 @@ const WORKFLOW_NAME: ColumnDef<WorkflowEntity> = {
 export const COLUMNS: ColumnDef<WorkflowEntity>[] = [
   WORKFLOW_NAME,
   CATEGORY,
-  COMMON_NAME,
+  OTHER_NAMES,
   PLOIDY,
   SCOPE,
   TAXONOMIC_LEVEL_CLASS,

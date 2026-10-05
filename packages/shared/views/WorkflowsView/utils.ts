@@ -1,4 +1,3 @@
-import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
 import type {
   AssemblyContract,
   OrganismContract,
@@ -7,9 +6,16 @@ import type {
   WorkflowAssemblyMapping,
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
-import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
+import {
+  DIFFERENTIAL_EXPRESSION_ANALYSIS,
+  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+} from "@repo/shared/workflow/differentialExpressionAnalysis";
+import type { WorkflowGates } from "@repo/shared/workflow/gates";
+import {
+  LMLS_WORKFLOW_CATEGORY,
+  LMLS_WORKFLOWS,
+} from "@repo/shared/workflow/lmls";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
@@ -28,18 +34,18 @@ function findAssemblyByTaxonomyId(
 }
 
 /**
- * Returns the common names of the assembly, or ["Any"] if the assembly is undefined.
- * `commonNames` is only present on some assemblies; those without it return ["Any"].
- * Returns ["None"] when the assembly exists but has no common names.
+ * Returns the other names of the assembly, or ["Any"] if the assembly is undefined.
+ * `otherNames` is only present on some assemblies; those without it return ["Any"].
+ * Returns ["None"] when the assembly exists but has no other names.
  * Each name becomes its own filter facet bucket.
  * @param assembly - Assembly.
- * @returns The list of common names, ["None"], or ["Any"].
+ * @returns The list of other names, ["None"], or ["Any"].
  */
-function getCommonNames(assembly: AssemblyContract | undefined): string[] {
-  // A missing commonNames field reads as ["Any"]; a present-but-empty
-  // commonNames reads as ["None"].
-  if (!assembly || assembly.commonNames === undefined) return ["Any"];
-  return assembly.commonNames.length ? assembly.commonNames : ["None"];
+function getOtherNames(assembly: AssemblyContract | undefined): string[] {
+  // A missing otherNames field reads as ["Any"]; a present-but-empty
+  // otherNames reads as ["None"].
+  if (!assembly || assembly.otherNames === undefined) return [TAXON_ANY];
+  return assembly.otherNames.length ? assembly.otherNames : ["None"];
 }
 
 /**
@@ -51,50 +57,28 @@ function getCommonNames(assembly: AssemblyContract | undefined): string[] {
 function getTaxonomicLevelRealm(
   assembly: AssemblyContract | undefined
 ): string {
-  return assembly?.taxonomicLevelRealm ?? "Any";
-}
-
-/**
- * Checks if a workflow should be included based on feature flags.
- * @param workflow - Workflow to check.
- * @param workflow.trsId - TRS ID of the workflow.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
- * @returns True if the workflow should be included, false otherwise.
- */
-function shouldIncludeWorkflow(
-  workflow: { trsId: string },
-  isHyphyEnabled: boolean
-): boolean {
-  const isHyphyWorkflow = workflow.trsId.startsWith(
-    "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/"
-  );
-
-  return !isHyphyWorkflow || isHyphyEnabled;
+  return assembly?.taxonomicLevelRealm ?? TAXON_ANY;
 }
 
 /**
  * Utility function to transform workflow categories into a flat list of workflows.
  * Filters out workflows that have no compatible assemblies for the current site.
- * Differential Expression Analysis is always included as an interim measure.
- * LMLS workflows (Logan Search and Lexicmap) are included when the 'lmls' feature flag is enabled.
- * Hyphy workflow is conditionally included based on the 'hyphy' feature flag.
- * Assembly workflows are conditionally included based on the 'assembly-workflows' feature flag.
+ * Differential Expression Analysis is included as an interim measure, and
+ * Sequence Analysis workflows (Logan Search and Lexicmap) are appended; neither
+ * is sourced from the catalog, and both gate through the same rules as the
+ * rest, as members of the category they are listed under.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
  * @param organisms - Organisms.
- * @param isAssemblyWorkflowsEnabled - Whether the 'assembly-workflows' feature flag is enabled.
- * @param isLmlsEnabled - Whether the 'lmls' feature flag is enabled.
- * @param isHyphyEnabled - Whether the 'hyphy' feature flag is enabled.
+ * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
  * @returns An array of workflows, where each workflow is a combination of a workflow and its category name.
  */
 export function getWorkflows(
   workflowCategories: WorkflowCategory[],
   mappings: WorkflowAssemblyMapping[],
   organisms: OrganismContract[],
-  isAssemblyWorkflowsEnabled = false,
-  isLmlsEnabled = false,
-  isHyphyEnabled = false
+  workflowGates: WorkflowGates
 ): WorkflowEntity[] {
   const workflows: WorkflowEntity[] = [];
 
@@ -105,19 +89,8 @@ export function getWorkflows(
     mappings.map((m) => [m.workflowTrsId, m.compatibleAssemblyCount])
   );
 
-  for (const category of workflowCategories) {
-    if (!category.workflows) continue;
-    if (
-      category.category === WORKFLOW_CATEGORY_ID.ASSEMBLY &&
-      !isAssemblyWorkflowsEnabled
-    )
-      continue;
+  for (const category of workflowGates.filterCategories(workflowCategories)) {
     for (const workflow of category.workflows) {
-      // Skip workflows based on feature flags.
-      if (!shouldIncludeWorkflow(workflow, isHyphyEnabled)) {
-        continue;
-      }
-
       // Skip workflows whose minimum assembly requirement cannot be met.
       const count = compatibleCountByTrsId.get(workflow.trsId) ?? 0;
       if (!workflowMeetsAssemblyMinimum(workflow.assemblyCountMin, count)) {
@@ -131,36 +104,38 @@ export function getWorkflows(
         ),
         category: category.name,
         scope: String(workflow.scope),
-        taxonomyId: workflow.taxonomyId ?? "Any",
+        taxonomyId: workflow.taxonomyId ?? TAXON_ANY,
       } as WorkflowEntity);
     }
   }
 
-  // Add Differential Expression Analysis workflow (interim measure).
-  workflows.push({
-    ...DIFFERENTIAL_EXPRESSION_ANALYSIS,
-    assembly: mapAssembly(undefined),
-    category: "Transcriptomics",
-    scope: String(DIFFERENTIAL_EXPRESSION_ANALYSIS.scope),
-    taxonomyId: "Any",
-  } as WorkflowEntity);
-
-  // Add LMLS workflows if feature flag is enabled.
-  if (isLmlsEnabled) {
+  // Add Differential Expression Analysis workflow (interim measure), gated as
+  // a member of the category it is listed under.
+  for (const workflow of workflowGates.filterWorkflows(
+    DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
+    [DIFFERENTIAL_EXPRESSION_ANALYSIS]
+  )) {
     workflows.push({
-      ...LOGAN_SEARCH,
+      ...workflow,
       assembly: mapAssembly(undefined),
-      category: "Sequence Analysis",
-      scope: String(LOGAN_SEARCH.scope),
-      taxonomyId: "Any",
+      category: "Transcriptomics",
+      scope: String(workflow.scope),
+      taxonomyId: TAXON_ANY,
     } as WorkflowEntity);
+  }
 
+  // Sequence Analysis workflows aren't in the catalog, so they're appended
+  // here — through the same gate as every catalog workflow above.
+  for (const workflow of workflowGates.filterWorkflows(
+    LMLS_WORKFLOW_CATEGORY,
+    LMLS_WORKFLOWS
+  )) {
     workflows.push({
-      ...LEXICMAP,
+      ...workflow,
       assembly: mapAssembly(undefined),
       category: "Sequence Analysis",
-      scope: String(LEXICMAP.scope),
-      taxonomyId: "Any",
+      scope: String(workflow.scope),
+      taxonomyId: TAXON_ANY,
     } as WorkflowEntity);
   }
 
@@ -191,7 +166,7 @@ function indexAssemblyByTaxonomyId(
 
 /**
  * Maps an Assembly to the workflow assembly fields.
- * Includes all taxonomy fields plus site-specific fields (commonNames, taxonomicLevelRealm)
+ * Includes all taxonomy fields plus site-specific fields (otherNames, taxonomicLevelRealm)
  * which are present at runtime for all sites but only typed on site-specific WorkflowEntity extensions.
  * If the assembly is undefined, returns default values for the properties.
  * @param assembly - The assembly to map.
@@ -199,15 +174,15 @@ function indexAssemblyByTaxonomyId(
  */
 function mapAssembly(assembly: AssemblyContract | undefined): WorkflowAssembly {
   return {
-    commonNames: getCommonNames(assembly),
-    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? "Any",
-    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? "Any",
-    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? "Any",
-    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? "Any",
-    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? "Any",
-    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? "Any",
-    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? "Any",
+    otherNames: getOtherNames(assembly),
+    taxonomicLevelClass: assembly?.taxonomicLevelClass ?? TAXON_ANY,
+    taxonomicLevelDomain: assembly?.taxonomicLevelDomain ?? TAXON_ANY,
+    taxonomicLevelFamily: assembly?.taxonomicLevelFamily ?? TAXON_ANY,
+    taxonomicLevelGenus: assembly?.taxonomicLevelGenus ?? TAXON_ANY,
+    taxonomicLevelKingdom: assembly?.taxonomicLevelKingdom ?? TAXON_ANY,
+    taxonomicLevelOrder: assembly?.taxonomicLevelOrder ?? TAXON_ANY,
+    taxonomicLevelPhylum: assembly?.taxonomicLevelPhylum ?? TAXON_ANY,
     taxonomicLevelRealm: getTaxonomicLevelRealm(assembly),
-    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? "Any",
+    taxonomicLevelSpecies: assembly?.taxonomicLevelSpecies ?? TAXON_ANY,
   };
 }

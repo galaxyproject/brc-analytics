@@ -70,3 +70,11 @@ __pycache__
 
 # Claude
 .claude/rules*
+
+# SRA mirror build artifacts (backend/api/scripts/build_sra_mirror.py).
+# The taxdump is ~535MB of .dmp files and the mirror itself is ~10GB; both
+# land next to wherever the script is run from.
+taxdump/
+*.dmp
+*.duckdb
+*.duckdb.new

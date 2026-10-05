@@ -11,11 +11,13 @@ import {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import { EXPLORE_MODE } from "@databiosphere/findable-ui/lib/hooks/useExploreMode/types";
 import { Chip } from "@mui/material";
+import { FavoriteCell } from "@repo/shared/components/Favorites/components/FavoriteCell/favoriteCell";
 import { AnalyzeGenome } from "@repo/shared/components/Table/components/TableCell/components/AnalyzeGenome/analyzeGenome";
 import { LevelCell } from "@repo/shared/components/Table/components/TableCell/components/LevelCell/levelCell";
 import { SpeciesCell } from "@repo/shared/components/Table/components/TableCell/components/SpeciesCell/speciesCell";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import { type AppEntityConfig } from "@repo/shared/config/types";
+import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import {
   buildAccession,
   buildAnalyzeGenome,
@@ -46,8 +48,20 @@ import {
   BRC_DATA_CATALOG_CATEGORY_KEY,
   BRC_DATA_CATALOG_CATEGORY_LABEL,
 } from "@site-config/brc-analytics/category";
+import { type ComponentProps } from "react";
 import { CATEGORY_GROUPS } from "./common/category/categories";
 import { COLUMN_REGISTRY } from "./common/column/columnRegistry";
+
+/**
+ * Builds props for the assembly save cell.
+ * @param genome - Assembly.
+ * @returns props for FavoriteCell.
+ */
+function buildAssemblyFavoriteCell(
+  genome: BRCDataCatalogGenome
+): ComponentProps<typeof FavoriteCell> {
+  return { entityId: genome.accession, entityType: ENTITY_TYPE.ASSEMBLY };
+}
 
 /**
  * Entity config object responsible to config anything related to the /assemblies route.
@@ -74,8 +88,8 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
             label: BRC_DATA_CATALOG_CATEGORY_LABEL.TAXONOMIC_LEVEL_ISOLATE,
           },
           {
-            key: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
-            label: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
+            key: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
+            label: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
           },
           {
             key: BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMY_ID,
@@ -161,6 +175,17 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
   label: "Assemblies",
   list: {
     columns: [
+      {
+        componentConfig: {
+          component: FavoriteCell,
+          viewBuilder: buildAssemblyFavoriteCell,
+        } as ComponentConfig<typeof FavoriteCell, BRCDataCatalogGenome>,
+        enableSorting: false,
+        enableTableDownload: false,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.SAVED,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.SAVED,
+        width: "48px",
+      },
       {
         componentConfig: {
           component: AnalyzeGenome,
@@ -316,10 +341,10 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
       {
         componentConfig: {
           component: NTagCell,
-          viewBuilder: V.buildCommonNames,
+          viewBuilder: V.buildOtherNames,
         } as ComponentConfig<typeof NTagCell, BRCDataCatalogGenome>,
-        header: BRC_DATA_CATALOG_CATEGORY_LABEL.COMMON_NAME,
-        id: BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME,
+        header: BRC_DATA_CATALOG_CATEGORY_LABEL.OTHER_NAMES,
+        id: BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES,
         width: { max: "1fr", min: "160px" },
       },
       {
@@ -469,7 +494,7 @@ export const genomeEntityConfig: AppEntityConfig<BRCDataCatalogGenome> = {
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_PHYLUM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_REALM]: false,
           [BRC_DATA_CATALOG_CATEGORY_KEY.TAXONOMIC_LEVEL_DOMAIN]: false,
-          [BRC_DATA_CATALOG_CATEGORY_KEY.COMMON_NAME]: false,
+          [BRC_DATA_CATALOG_CATEGORY_KEY.OTHER_NAMES]: false,
         },
         sorting: [
           {

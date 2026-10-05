@@ -1,5 +1,5 @@
-import { type OrganismContract } from "@repo/shared/apis/types";
+import { type Pangenome } from "@brc/apis/pangenome";
 
 export interface Props {
-  organism: OrganismContract;
+  pangenome?: Pangenome;
 }
