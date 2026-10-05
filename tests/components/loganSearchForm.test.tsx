@@ -313,3 +313,79 @@ describe("LoganSearchForm index picker", () => {
     expect(searchButton().disabled).toBe(true);
   });
 });
+
+describe("LoganSearchForm query file", () => {
+  // jsdom's Blob predates text(), which every browser the site supports has;
+  // FileReader is the jsdom route to the same string.
+  beforeAll(() => {
+    const proto = Blob.prototype as Partial<Pick<Blob, "text">>;
+    if (proto.text) return;
+    proto.text = function text(this: Blob): Promise<string> {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (): void => resolve(String(reader.result));
+        reader.onerror = (): void => reject(reader.error);
+        reader.readAsText(this);
+      });
+    };
+  });
+
+  /**
+   * The hidden file input behind the Load FASTA file button.
+   * @returns The input.
+   */
+  function fileInput(): HTMLInputElement {
+    const input =
+      document.querySelector<HTMLInputElement>("input[type='file']");
+    if (!input) throw new Error("no file input");
+    return input;
+  }
+
+  /**
+   * Pick a file in the hidden input.
+   * @param file - The file the reader picked.
+   */
+  function pick(file: File): void {
+    fireEvent.change(fileInput(), { target: { files: [file] } });
+  }
+
+  test("accepts the FASTA extensions and plain text", () => {
+    renderForm();
+
+    expect(screen.getByText("Load FASTA file").closest("label")).toBeTruthy();
+    expect(fileInput().accept).toBe(".fa,.fasta,.fna,.txt");
+  });
+
+  test("reads the file into the query box", async () => {
+    renderForm();
+    pick(new File([">spike\nACGTACGTAC\nGTAC\n"], "spike.fa"));
+
+    const box = screen.getByRole("textbox") as HTMLTextAreaElement;
+    await screen.findByText("14 bases. FASTA; headers are ignored.");
+    expect(box.value).toBe(">spike\nACGTACGTAC\nGTAC\n");
+  });
+
+  test("holds a loaded file to the same base cap as a pasted query", async () => {
+    const { submit } = renderForm();
+    pick(new File([`>long\n${"A".repeat(2501)}\n`], "long.fasta"));
+
+    await screen.findByText(/2501 bases -- queries are capped at 2500/);
+    expect(searchButton().disabled).toBe(true);
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  test("refuses a file far too large to be one query, leaving the box alone", async () => {
+    renderForm();
+    const before = (screen.getByRole("textbox") as HTMLTextAreaElement).value;
+    const genome = new File(["A"], "genome.fna");
+    Object.defineProperty(genome, "size", { value: 50 * 1024 * 1024 });
+    pick(genome);
+
+    expect((await screen.findByRole("alert")).textContent).toMatch(
+      /genome\.fna is too large/
+    );
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
+      before
+    );
+  });
+});

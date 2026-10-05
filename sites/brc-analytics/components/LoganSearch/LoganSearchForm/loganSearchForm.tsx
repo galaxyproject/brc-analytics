@@ -18,7 +18,7 @@ import {
   selectIndexes,
   sortIndexes,
 } from "@brc/components/LoganSearch/utils";
-import { Search } from "@mui/icons-material";
+import { Search, UploadFile } from "@mui/icons-material";
 import {
   Button,
   Card,
@@ -31,7 +31,7 @@ import {
   Typography,
 } from "@mui/material";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
-import { type JSX, useMemo, useState } from "react";
+import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 
 interface LoganSearchFormProps {
   search: ReturnType<typeof useKmindexSearch>;
@@ -40,6 +40,13 @@ interface LoganSearchFormProps {
 // The index is built for gene-sized queries, not whole genomes. Keep in step
 // with the backend's MAX_QUERY_BASES.
 const MAX_QUERY_BASES = 5000;
+
+// A query file is read into the textarea and validated there, so the only
+// reason to refuse one up front is the browser: a genome picked by mistake
+// would be hundreds of megabytes of text in a textarea. A megabyte is still
+// far past anything the 2,500-base cap would let through.
+const MAX_QUERY_FILE_BYTES = 1024 * 1024;
+const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.txt";
 
 // Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
 // and it carries all but a handful of that query's hits. Fall back to whatever
@@ -288,6 +295,35 @@ export const LoganSearchForm = ({
   const [organismsPicked, setOrganismsPicked] = useState<string[] | null>(null);
   const [librariesPicked, setLibrariesPicked] = useState<string[] | null>(null);
   const [threshold, setThreshold] = useState(0.5);
+  const [fileError, setFileError] = useState<string | null>(null);
+
+  /**
+   * Load a picked FASTA file into the textarea, where the same base count and
+   * cap apply as to a pasted query.
+   * @param event - The file input's change event.
+   */
+  const onQueryFile = async (
+    event: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
+    const input = event.target;
+    const file = input.files?.[0];
+    // Cleared so picking the same file again, after editing the textarea,
+    // still fires a change.
+    input.value = "";
+    if (!file) return;
+    if (file.size > MAX_QUERY_FILE_BYTES) {
+      setFileError(
+        `${file.name} is too large to be a single query of up to ${MAX_QUERY_BASES.toLocaleString()} bases.`
+      );
+      return;
+    }
+    try {
+      setSequence(await file.text());
+      setFileError(null);
+    } catch {
+      setFileError(`${file.name} could not be read.`);
+    }
+  };
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
 
@@ -341,10 +377,37 @@ export const LoganSearchForm = ({
               maxRows={20}
               minRows={6}
               multiline
-              onChange={(e): void => setSequence(e.target.value)}
+              onChange={(e): void => {
+                setSequence(e.target.value);
+                setFileError(null);
+              }}
               slotProps={{ input: { sx: { fontFamily: "monospace" } } }}
               value={sequence}
             />
+            <ControlRow>
+              <Button
+                component="label"
+                size="small"
+                startIcon={<UploadFile />}
+                variant="outlined"
+              >
+                Load FASTA file
+                <input
+                  accept={QUERY_FILE_TYPES}
+                  hidden
+                  onChange={onQueryFile}
+                  type="file"
+                />
+              </Button>
+              <Typography
+                color={fileError ? "error" : "textSecondary"}
+                role={fileError ? "alert" : undefined}
+                variant="caption"
+              >
+                {fileError ??
+                  "Replaces the text above. One record, read in your browser."}
+              </Typography>
+            </ControlRow>
           </FormColumn>
 
           <FormColumn>
