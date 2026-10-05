@@ -110,10 +110,10 @@ describe("generateWorkflowMappingsQC - assembly count aware", () => {
 });
 
 describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
-  const noMappings: {
+  const mappings: {
     compatibleAssemblyCount: number;
     workflowTrsId: string;
-  }[] = [];
+  }[] = [{ compatibleAssemblyCount: 1, workflowTrsId: "#trs-taxon" }];
 
   const makeWorkflow = (
     name: string,
@@ -164,19 +164,14 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
 
   test("shows N/A when no assemblies are passed", () => {
     const report = stripCoverageSection(
-      generateWorkflowMappingsQC(noMappings, categories(null), "Test")
+      generateWorkflowMappingsQC(mappings, categories(null), "Test")
     );
     expect(report).toContain("N/A");
   });
 
   test("does not flag workflow with null taxonomyId", () => {
     const report = stripCoverageSection(
-      generateWorkflowMappingsQC(
-        noMappings,
-        categories(null),
-        "Test",
-        assemblies
-      )
+      generateWorkflowMappingsQC(mappings, categories(null), "Test", assemblies)
     );
     expect(report).toContain("None");
     expect(report).not.toContain("Taxon Wf");
@@ -185,7 +180,7 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
   test("flags workflow whose taxonomyId is not in any assembly lineage", () => {
     const report = stripCoverageSection(
       generateWorkflowMappingsQC(
-        noMappings,
+        mappings,
         categories("9999"),
         "Test",
         assemblies
@@ -198,7 +193,7 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
   test("does not flag workflow whose taxonomyId is a speciesTaxonomyId", () => {
     const report = stripCoverageSection(
       generateWorkflowMappingsQC(
-        noMappings,
+        mappings,
         categories("999"),
         "Test",
         assemblies
@@ -211,7 +206,7 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
   test("flags workflow whose taxonomyId is only a sub-species ncbiTaxonomyId", () => {
     const report = stripCoverageSection(
       generateWorkflowMappingsQC(
-        noMappings,
+        mappings,
         categories("1000"),
         "Test",
         assemblies
@@ -223,12 +218,7 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
 
   test("does not flag workflow whose taxonomyId is a genus/family ancestor (in lineage, not a direct assembly taxon)", () => {
     const report = stripCoverageSection(
-      generateWorkflowMappingsQC(
-        noMappings,
-        categories("10"),
-        "Test",
-        assemblies
-      )
+      generateWorkflowMappingsQC(mappings, categories("10"), "Test", assemblies)
     );
     expect(report).toContain("None");
     expect(report).not.toContain("Taxon Wf");
