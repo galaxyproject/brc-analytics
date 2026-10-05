@@ -523,3 +523,19 @@ class TestClearField:
         agent.clear_field.assert_awaited_once_with("sess-abc", "workflow", "user-a")
         # A saved analysis is kept in step with the clear.
         record.assert_awaited_once()
+
+    def test_is_rate_limited(self, client, app_with_stubbed_agent):
+        from fastapi import HTTPException
+
+        from app.core.dependencies import check_rate_limit
+
+        agent = self._agent(app_with_stubbed_agent)
+
+        async def _limited():
+            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+
+        app_with_stubbed_agent.dependency_overrides[check_rate_limit] = _limited
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(self.URL, json={"field": "organism"})
+        assert resp.status_code == 429
+        agent.clear_field.assert_not_awaited()

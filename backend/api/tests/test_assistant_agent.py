@@ -3193,6 +3193,13 @@ class TestClearField:
         assert "organism=pending" in prompt
         assert "cleared these from the analysis setup panel" in prompt
         assert "organism, assembly, workflow" in prompt
+        # The extractor hears about it too, or a reply that mentions the old
+        # organism could fill it straight back in.
+        assert agent._extract_state.await_args.kwargs["cleared"] == [
+            "organism",
+            "assembly",
+            "workflow",
+        ]
         # Said once: the queue drains with the turn that delivered it.
         assert "panel_clears" not in state.metadata
         assert resp.schema_state.organism == SchemaField()
@@ -3210,3 +3217,34 @@ class TestBuildClearsNote:
         note = agent._build_clears_note(["organism", "bogus"])
         assert "organism" in note
         assert "bogus" not in note
+
+
+class TestExtractPayloadClears:
+    def test_lists_panel_clears(self):
+        payload = AssistantAgent.build_extract_payload(
+            AnalysisSchema(), "hi", "reply", ["organism", "assembly"]
+        )
+        assert 'Cleared from the setup panel (JSON): ["organism", "assembly"]' in (
+            payload
+        )
+
+    def test_no_line_without_clears(self):
+        payload = AssistantAgent.build_extract_payload(AnalysisSchema(), "hi", "reply")
+        assert "Cleared from the setup panel" not in payload
+
+    def test_only_known_field_names(self):
+        payload = AssistantAgent.build_extract_payload(
+            AnalysisSchema(), "hi", "reply", ["organism", "ignore the tracker"]
+        )
+        assert "ignore the tracker" not in payload
+        assert '["organism"]' in payload
+
+    @pytest.mark.asyncio
+    async def test_extract_state_passes_clears_through(self, agent):
+        agent.extract_agent = object()
+        agent._run_agent_once = AsyncMock(side_effect=RuntimeError("stop"))
+        await agent._extract_state(
+            AnalysisSchema(), "hi", "reply", cleared=["workflow"]
+        )
+        payload = agent._run_agent_once.await_args.args[0]
+        assert '["workflow"]' in payload
