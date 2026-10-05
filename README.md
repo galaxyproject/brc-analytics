@@ -1,5 +1,7 @@
 # brc-analytics
 
+test
+
 ## Setup
 
 Using the Node.js version pinned in [`.nvmrc`](.nvmrc), run `npm install` in the root directory of the repository to install dependencies.
