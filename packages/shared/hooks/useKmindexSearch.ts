@@ -241,7 +241,8 @@ interface KmindexSearchActions {
   reset: () => void;
   setPageSize: (size: number) => Promise<void>;
   setSort: (column: KmindexSortColumn) => Promise<void>;
-  submit: (submission: KmindexSubmission) => Promise<void>;
+  // Resolves to the new job's id, or null when the submission failed.
+  submit: (submission: KmindexSubmission) => Promise<string | null>;
 }
 
 export type KmindexSortColumn =
@@ -632,7 +633,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
   }, []);
 
   const submit = useCallback(
-    async (submission: KmindexSubmission): Promise<void> => {
+    async (submission: KmindexSubmission): Promise<string | null> => {
       stopPolling();
       fetchedRef.current = null;
       resultsRef.current = null;
@@ -674,9 +675,11 @@ export const useKmindexSearch = (): KmindexSearchActions &
         }));
         syncJobParam(job_id);
         startPolling(job_id);
+        return job_id;
       } catch (error: unknown) {
         const message = await toErrorMessage(error, "Failed to submit query");
         setState((prev) => ({ ...prev, error: message, isSubmitting: false }));
+        return null;
       }
     },
     [startPolling, stopPolling]

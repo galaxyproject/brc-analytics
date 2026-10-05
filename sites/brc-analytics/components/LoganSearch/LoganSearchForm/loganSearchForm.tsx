@@ -8,6 +8,10 @@ import {
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import {
+  queryNameOf,
+  type RecentSearch,
+} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
+import {
   axisOptions,
   countBases,
   describeIndexSelection,
@@ -35,6 +39,9 @@ import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 
 interface LoganSearchFormProps {
+  // Called once Galaxy has accepted a search, with what the history list
+  // keeps of it.
+  onSubmitted?: (search: RecentSearch) => void;
   search: ReturnType<typeof useKmindexSearch>;
 }
 
@@ -284,6 +291,7 @@ function toggleCode(picked: string[], code: string): string[] {
 }
 
 export const LoganSearchForm = ({
+  onSubmitted,
   search,
 }: LoganSearchFormProps): JSX.Element => {
   const [sequence, setSequence] = useState(SAMPLE_QUERY);
@@ -542,12 +550,21 @@ export const LoganSearchForm = ({
               <Button
                 disabled={!canSubmit}
                 onClick={async (): Promise<void> => {
-                  await search.submit({
+                  const jobId = await search.submit({
                     indexes,
                     sequence,
                     threshold,
                     zvalue: 6,
                   });
+                  if (jobId) {
+                    onSubmitted?.({
+                      indexes,
+                      jobId,
+                      queryName: queryNameOf(sequence),
+                      submittedAt: new Date().toISOString(),
+                      threshold,
+                    });
+                  }
                 }}
                 startIcon={
                   isRunning ? <CircularProgress size={18} /> : <Search />

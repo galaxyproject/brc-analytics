@@ -1,6 +1,12 @@
 import { LoganSearchForm } from "@brc/components/LoganSearch/LoganSearchForm/loganSearchForm";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 // The form renders the Galaxy link prompt, which reaches for the network on
 // mount through ky -- ESM only, which Jest cannot parse. Mocking the module
@@ -268,6 +274,38 @@ describe("LoganSearchForm index picker", () => {
       threshold: 0.5,
       zvalue: 6,
     });
+  });
+
+  test("hands an accepted search to the history list", async () => {
+    const onSubmitted = jest.fn();
+    const submit = jest.fn().mockResolvedValue("job123");
+    render(
+      <LoganSearchForm onSubmitted={onSubmitted} search={search({ submit })} />
+    );
+
+    fireEvent.click(searchButton());
+
+    await waitFor(() => expect(onSubmitted).toHaveBeenCalledTimes(1));
+    expect(onSubmitted).toHaveBeenCalledWith({
+      indexes: ["GENOMIC_INV"],
+      jobId: "job123",
+      queryName: "Plasmodium_falciparum_18S",
+      submittedAt: expect.any(String),
+      threshold: 0.5,
+    });
+  });
+
+  test("records nothing when the submission fails", async () => {
+    const onSubmitted = jest.fn();
+    const submit = jest.fn().mockResolvedValue(null);
+    render(
+      <LoganSearchForm onSubmitted={onSubmitted} search={search({ submit })} />
+    );
+
+    fireEvent.click(searchButton());
+
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
+    expect(onSubmitted).not.toHaveBeenCalled();
   });
 
   test("Reset puts both rows back to the derived default", () => {
