@@ -294,13 +294,13 @@ test.describe("Organism workflow route", () => {
 });
 
 test.describe("Stale workflow URL", () => {
-  test("should render the workflow not-found state for an unknown assembly trsId", async ({
+  test("should render the workflow unavailable state for an unknown assembly trsId", async ({
     page,
   }) => {
     await page.goto(buildAssemblyConfigureWorkflowUrl("not-a-real-workflow"));
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Workflow not found" })
+      page.getByRole("heading", { level: 1, name: "Workflow not available" })
     ).toBeVisible();
     // The back-link target is the one thing each page configures — pin it.
     await expect(
@@ -313,7 +313,7 @@ test.describe("Stale workflow URL", () => {
     );
   });
 
-  test("should render the workflow not-found state for an unknown organism trsId", async ({
+  test("should render the workflow unavailable state for an unknown organism trsId", async ({
     page,
   }) => {
     await page.goto(
@@ -325,7 +325,7 @@ test.describe("Stale workflow URL", () => {
     );
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Workflow not found" })
+      page.getByRole("heading", { level: 1, name: "Workflow not available" })
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Available Workflows" })

@@ -38,6 +38,29 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
 }
 
 /**
+ * Indexes workflows by the id they are looked up under: catalog workflows by
+ * their URL-formatted TRS id, extra workflows by their TRS id as given.
+ * @param workflowCategories - Catalog workflow categories.
+ * @param extraWorkflows - Additional workflows outside the catalog.
+ * @returns Map of id to workflow.
+ */
+export function indexWorkflowsById(
+  workflowCategories: WorkflowCategory[],
+  extraWorkflows: Workflow[] = []
+): Map<string, Workflow> {
+  const workflowById = new Map<string, Workflow>();
+  for (const { workflows } of workflowCategories) {
+    for (const workflow of workflows) {
+      workflowById.set(formatTrsId(workflow.trsId), workflow);
+    }
+  }
+  for (const workflow of extraWorkflows) {
+    workflowById.set(workflow.trsId, workflow);
+  }
+  return workflowById;
+}
+
+/**
  * Checks if the route is an entity route.
  * @param route - Route.
  * @returns True if the route is an entity route; false otherwise.
@@ -89,18 +112,9 @@ export async function loadWorkflows(
     API.workflows
   )) as WorkflowCategory[];
 
-  const workflows = workflowCategories.flatMap((w) => w.workflows);
-
-  const workflowById = new Map<string, Workflow>();
-
-  for (const workflow of workflows) {
-    workflowById.set(formatTrsId(workflow.trsId), workflow);
-  }
-
-  for (const workflow of extraWorkflows) {
-    workflowById.set(workflow.trsId, workflow);
-  }
-
-  setEntitiesById("workflows", workflowById);
+  setEntitiesById(
+    "workflows",
+    indexWorkflowsById(workflowCategories, extraWorkflows)
+  );
   setEntitiesByType("workflows", workflowCategories);
 }

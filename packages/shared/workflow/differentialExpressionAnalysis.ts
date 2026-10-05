@@ -1,8 +1,17 @@
 import {
+  WORKFLOW_CATEGORY_ID,
   WORKFLOW_PLOIDY,
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+
+/**
+ * The catalog category Differential Expression Analysis is listed under. The
+ * workflow is not in the catalog, so the listings add it to this category and
+ * gate it as a member of it, the same as the category's own workflows.
+ */
+export const DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY =
+  WORKFLOW_CATEGORY_ID.TRANSCRIPTOMICS;
 
 export const DIFFERENTIAL_EXPRESSION_ANALYSIS: Workflow = {
   assemblyCountMax: 1,

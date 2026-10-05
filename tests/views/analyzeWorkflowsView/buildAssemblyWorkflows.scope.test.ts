@@ -5,7 +5,7 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
-import { buildAssemblyWorkflows } from "@repo/shared/views/AnalyzeWorkflowsView/components/Main/utils";
+import { buildAssemblyWorkflows } from "@repo/shared/workflow/assemblyWorkflows";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { WorkflowCategoryId } from "../../../catalog/schema/generated/schema";
 import { buildWorkflowGates } from "../../workflow/gates";

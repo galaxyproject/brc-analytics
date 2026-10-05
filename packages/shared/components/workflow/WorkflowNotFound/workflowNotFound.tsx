@@ -19,13 +19,15 @@ import { type JSX } from "react";
 import { type Props } from "./types";
 
 /**
- * Friendly not-found state for a stale or unknown workflow URL. Rendered in
- * place of the configure-inputs view when the `trsId` query param doesn't
- * match a catalog workflow, instead of surfacing the generic error page.
+ * Friendly unavailable state for a workflow URL. Rendered in place of the
+ * configure-inputs view when the `trsId` query param names a workflow the
+ * entity's listing doesn't offer: one that isn't in the catalog, is hidden by a
+ * feature flag, or isn't compatible with the entity. Shown instead of the
+ * generic error page.
  * @param props - Component props.
  * @param props.entityContext - Noun for the entity the workflow was requested for (e.g. "assembly").
  * @param props.href - URL of the entity's available-workflows listing.
- * @returns Workflow not-found element.
+ * @returns Workflow unavailable element.
  */
 export const WorkflowNotFound = ({
   entityContext,
@@ -42,12 +44,12 @@ export const WorkflowNotFound = ({
               component="h1"
               variant={TYPOGRAPHY_PROPS.VARIANT.HEADING_XLARGE}
             >
-              Workflow not found
+              Workflow not available
             </Typography>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_400}>
               The requested workflow isn&apos;t available for this{" "}
-              {entityContext}. It may have been removed, or the link may be out
-              of date.
+              {entityContext}. It may not be compatible with this{" "}
+              {entityContext}, or the link may be out of date.
             </Typography>
           </SectionContent>
           <SectionActions>

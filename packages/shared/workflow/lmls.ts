@@ -3,6 +3,13 @@ import { LEXICMAP } from "@repo/shared/workflow/lexicmap";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
 
 /**
+ * The category the LMLS workflows are listed and gated under. Not a catalog
+ * category, so no category-level rule gates it; only the workflows' own rules
+ * apply.
+ */
+export const LMLS_WORKFLOW_CATEGORY = "SEQUENCE_ANALYSIS";
+
+/**
  * The LMLS workflows, which aren't in the catalog — they're declared here and
  * appended to the catalog's own. The single membership list, so gating,
  * listing and Galaxy landing can't drift from each other.
