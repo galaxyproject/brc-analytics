@@ -45,7 +45,9 @@ export interface DataSourceDetail {
 }
 
 export interface AssistantChatRequest {
-  message: string;
+  /** Setup-panel fields to clear before the turn, applied without the model. */
+  clear_fields?: ClearableField[];
+  message?: string;
   session_id?: string;
 }
 
@@ -79,14 +81,12 @@ export type ClearableField =
   | "organism"
   | "workflow";
 
-export interface AssistantClearFieldRequest {
-  field: ClearableField;
-}
-
 export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
   logan?: LoganContext | null;
+  /** The app's own line for this turn, e.g. "Organism cleared.", if any. */
+  note?: string | null;
   reply: string;
   /** True when the backend persisted this turn to the user's saved analyses. */
   saved: boolean;
