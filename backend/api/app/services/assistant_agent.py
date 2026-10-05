@@ -1440,6 +1440,7 @@ class AssistantAgent:
         response = ChatResponse(
             session_id=state.session_id,
             reply=reply_text,
+            note=self._clear_note(cleared) if cleared else None,
             schema_state=schema_state,
             suggestions=suggestions,
             is_complete=is_complete,

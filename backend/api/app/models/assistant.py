@@ -178,6 +178,13 @@ class ChatResponse(BaseModel):
 
     session_id: str
     reply: str
+    note: Optional[str] = Field(
+        None,
+        description=(
+            "The app's own transcript line for this turn, placed before the "
+            "user's message, e.g. 'Organism cleared.' after a setup-panel clear"
+        ),
+    )
     schema_state: AnalysisSchema
     suggestions: List[SuggestionChip] = Field(default_factory=list)
     is_complete: bool = Field(
