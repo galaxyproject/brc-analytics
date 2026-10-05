@@ -1,3 +1,4 @@
+#!/bin/bash
 set -o pipefail
 
 if [ "$#" -ne 1 ]; then
