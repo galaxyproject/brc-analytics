@@ -281,7 +281,7 @@ function renderMetaValue(
     case "bioproject":
       return (
         <MetaLink
-          href={`${BIOPROJECT_URL}${sra?.bioproject}`}
+          href={`${BIOPROJECT_URL}${encodeURIComponent(sra?.bioproject ?? "")}`}
           value={sra?.bioproject}
         />
       );
@@ -289,7 +289,10 @@ function renderMetaValue(
       // NCBI has no study landing page of its own; an SRA search on the
       // accession lists the study's runs, which is what the reader is after.
       return (
-        <MetaLink href={`${SRA_RUN_URL}${sra?.study}`} value={sra?.study} />
+        <MetaLink
+          href={`${SRA_RUN_URL}${encodeURIComponent(sra?.study ?? "")}`}
+          value={sra?.study}
+        />
       );
     case "mbases":
       return <Meta numeric value={sra?.mbases?.toLocaleString() ?? null} />;
@@ -491,10 +494,17 @@ export const LoganSearchResults = ({
   const metaColumns = META_COLUMNS.filter(({ key }) =>
     visibleColumns.includes(key)
   );
-  const toggleColumn = (key: MetaColumnKey): void =>
+  const toggleColumn = (key: MetaColumnKey): void => {
+    const hiding = visibleColumns.includes(key);
+    // A table ordered by a column nobody can see has no lit header to explain
+    // it, so hiding the sorted column goes back to score order.
+    const column = META_COLUMNS.find((c) => c.key === key);
+    if (hiding && column?.sort && column.sort === appliedSort(results).column)
+      void setSort("score");
     setVisibleColumns((shown) =>
       shown.includes(key) ? shown.filter((k) => k !== key) : [...shown, key]
     );
+  };
 
   // A backend predating the breakdown sends neither total_matches nor
   // per_index, so both need the same guard: an unguarded read of

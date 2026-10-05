@@ -457,6 +457,21 @@ describe("LoganSearchForm query file", () => {
     expect(submit).not.toHaveBeenCalled();
   });
 
+  test("refuses a file that isn't plain text, leaving the box alone", async () => {
+    renderForm();
+    const before = (screen.getByRole("textbox") as HTMLTextAreaElement).value;
+    pick(
+      new File([new Uint8Array([0x3e, 0x71, 0x0a, 0xff, 0xfe, 0x41])], "q.fa")
+    );
+
+    expect((await screen.findByRole("alert")).textContent).toMatch(
+      /q\.fa isn't a plain-text FASTA file/
+    );
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
+      before
+    );
+  });
+
   test("refuses a file far too large to be one query, leaving the box alone", async () => {
     renderForm();
     const before = (screen.getByRole("textbox") as HTMLTextAreaElement).value;

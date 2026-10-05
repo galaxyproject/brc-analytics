@@ -957,6 +957,24 @@ describe("the column chooser", () => {
     expect(screen.queryByRole("cell", { name: "Malawi" })).toBeNull();
   });
 
+  test("hiding the sorted column goes back to score order", () => {
+    const { actions } = renderResults({
+      ...annotated,
+      order: "asc",
+      sort: "country",
+    });
+    toggle("Country");
+
+    expect(actions.setSort).toHaveBeenCalledWith("score");
+  });
+
+  test("hiding a column the table isn't sorted by leaves the sort alone", () => {
+    const { actions } = renderResults(annotated);
+    toggle("Country");
+
+    expect(actions.setSort).not.toHaveBeenCalled();
+  });
+
   test("links the BioProject and the study out to NCBI", () => {
     renderResults(annotated);
     toggle("BioProject");

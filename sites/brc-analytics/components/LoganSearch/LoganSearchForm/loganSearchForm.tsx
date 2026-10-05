@@ -324,7 +324,14 @@ export const LoganSearchForm = ({
       return;
     }
     try {
-      setSequence(await file.text());
+      const text = await file.text();
+      // A binary or non-UTF-8 file decodes to U+FFFD, which countBases would
+      // count as bases and Galaxy would then reject.
+      if (text.includes("\uFFFD")) {
+        setFileError(`${file.name} isn't a plain-text FASTA file.`);
+        return;
+      }
+      setSequence(text);
       setFileError(null);
     } catch {
       setFileError(`${file.name} could not be read.`);
@@ -541,7 +548,7 @@ export const LoganSearchForm = ({
                   logan-search.org&apos;s Fast groups aren&apos;t here because
                   they drop the small sub-indexes inside each division, which
                   these indexes can&apos;t express, and GenBank_RefSeq
-                  isn&apos;t deployed on this instance.
+                  isn&apos;t deployed on Galaxy Test, where these searches run.
                 </Typography>
                 <AxisRow
                   allTooltip="Every organism group registered."
