@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 from app.core.session_signing import sign_session_id
-from app.models.assistant import SessionState
+from app.models.assistant import ChatMessage, MessageRole, SessionState
 from app.models.user_data import UserMeResponse
 from tests.conftest import SECRET
 
@@ -430,3 +430,96 @@ class TestSaveWithoutADatabase:
         # refusal is not an exception -- both of those were the spam.
         agent.session_service.claim_session.assert_not_awaited()
         assert not [record for record in caplog.records if record.exc_info]
+
+
+class TestClearField:
+    """The setup panel's x clears a field with a direct call (#1796), behind
+    the same cookie binding as restore and delete."""
+
+    URL = "/api/v1/assistant/session/sess-abc/clear-field"
+
+    def _agent(self, app):
+        from app.core.dependencies import get_assistant_agent
+
+        agent = app.dependency_overrides[get_assistant_agent]()
+        cleared = SessionState(
+            session_id="sess-abc",
+            messages=[
+                ChatMessage(role=MessageRole.USER, content="hi"),
+                ChatMessage(role=MessageRole.SYSTEM, content="Organism cleared."),
+            ],
+        )
+        agent.clear_field = AsyncMock(return_value=cleared)
+        return agent
+
+    def test_requires_the_session_cookie(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post(self.URL, json={"field": "organism"})
+        assert resp.status_code == 403
+        agent.clear_field.assert_not_awaited()
+
+    def test_clears_and_returns_the_session(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+
+        resp = client.post(self.URL, json={"field": "organism"})
+
+        assert resp.status_code == 200, resp.text
+        agent.clear_field.assert_awaited_once_with("sess-abc", "organism", None)
+        body = resp.json()
+        assert body["session_id"] == "sess-abc"
+        assert body["messages"][-1] == {
+            "content": "Organism cleared.",
+            "role": "system",
+        }
+        assert body["saved"] is False
+
+    def test_rejects_a_derived_field(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(self.URL, json={"field": "gene_annotation"})
+        assert resp.status_code == 422
+        agent.clear_field.assert_not_awaited()
+
+    def test_expired_session_is_404(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        agent.clear_field = AsyncMock(side_effect=KeyError("sess-abc"))
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(self.URL, json={"field": "organism"})
+        assert resp.status_code == 404
+
+    def test_someone_elses_session_is_403(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        agent.clear_field = AsyncMock(side_effect=PermissionError("sess-abc"))
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(self.URL, json={"field": "organism"})
+        assert resp.status_code == 403
+
+    def test_signed_in_user_claims_then_clears_as_owner(
+        self, client, app_with_stubbed_agent, monkeypatch
+    ):
+        from app.api.v1 import assistant as assistant_module
+        from app.core.dependencies import get_optional_current_user
+
+        agent = self._agent(app_with_stubbed_agent)
+        agent.session_service.claim_session = AsyncMock()
+        record = AsyncMock(return_value=None)
+        monkeypatch.setattr(assistant_module.analysis_store, "record", record)
+
+        async def _current_user():
+            return UserMeResponse(sub="user-a")
+
+        app_with_stubbed_agent.dependency_overrides[get_optional_current_user] = (
+            _current_user
+        )
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+
+        resp = client.post(self.URL, json={"field": "workflow"})
+
+        assert resp.status_code == 200, resp.text
+        agent.session_service.claim_session.assert_awaited_once_with(
+            "sess-abc", "user-a"
+        )
+        agent.clear_field.assert_awaited_once_with("sess-abc", "workflow", "user-a")
+        # A saved analysis is kept in step with the clear.
+        record.assert_awaited_once()
