@@ -20,6 +20,7 @@ venv
 /CHANGELOG.md
 
 #catalog
+/catalog/build/intermediate
 /catalog/output
 /catalog/ga2/output
 /catalog/schema/generated

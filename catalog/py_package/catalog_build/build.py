@@ -15,6 +15,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from .generated_schema.schema import Workflow
 from .load import do_dlt_load
 from .qc_utils import (
     format_list_section,
@@ -28,6 +29,11 @@ from .utils import get_db_path
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
 log = logging.getLogger(__name__)
+
+
+def save_json_file(path: str | Path, obj, **json_opts):
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(obj, file, **json_opts)
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -718,30 +724,18 @@ def fetch_sra_metadata(srs_ids, batch_size=20):
     return data
 
 
-def report_missing_ploidy_info(genomes_df, organisms_df):
+def report_missing_ploidy_info(genomes_df: pd.DataFrame):
     """
     Reports assemblies that are missing ploidy information.
 
     Args:
-        genomes_df: DataFrame containing genome information
-        organisms_df: DataFrame containing organism information, including ploidy information
+        genomes_df: DataFrame containing genome information and ploidy information
 
     Returns:
         A list of tuples containing (accession, speciesTaxonomyId) for assemblies without ploidy information
     """
-    # Create a mapping from taxonomy_id to ploidy
-    ploidy_map = organisms_df.set_index("taxonomy_id")["ploidy"].to_dict()
-
-    # Create a DataFrame with just the relevant columns for the check
-    check_df = genomes_df[["accession", "speciesTaxonomyId", "species"]].copy()
-
-    # Check which species tax IDs we have ploidy information for
-    check_df["has_ploidy"] = check_df["speciesTaxonomyId"].apply(
-        lambda tax_id: tax_id in ploidy_map
-    )
-
     # Find assemblies where we have no ploidy information
-    missing_ploidy = check_df[~check_df["has_ploidy"]]
+    missing_ploidy = genomes_df[genomes_df["ploidy"].isna()]
     missing_count = len(missing_ploidy)
 
     if missing_count > 0:
@@ -1194,7 +1188,6 @@ def get_outbreak_taxonomy_ids(
             # optional per outbreak, so the column may be absent entirely.
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
-                .map(json.loads, na_action="ignore")
                 .explode()
                 .dropna()
                 .astype("string")
@@ -1207,33 +1200,53 @@ def get_outbreak_taxonomy_ids(
     )
 
 
-def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_path):
+def save_taxonomy_mapping(
+    source_outbreaks_df: pd.DataFrame | None,
+    taxon_name_map: dict[str, str],
+    taxon_rank_map: dict[str, str],
+    output_path: str,
+):
     """
     Create and save a TSV file with taxonomy ID to name and rank mapping.
 
     Args:
-        taxonomy_ids: List of taxonomy IDs to include in the mapping
+        source_outbreaks_df: Outbreak definitions containing resolved taxonomy IDs
+        taxon_name_map: Mapping of taxonomy ID (as string) to name
+        taxon_rank_map: Mapping of taxonomy ID (as string) to rank
         output_path: Path to save the TSV file
     """
-    if not taxonomy_ids:
+    if source_outbreaks_df is None:
         return
 
-    # Create DataFrame with taxonomy ID, name, and rank
-    rows = []
-    for tax_id in taxonomy_ids:
-        if str(tax_id) in taxon_name_map:
-            rows.append(
-                {
-                    "taxonomy_id": tax_id,
-                    "name": taxon_name_map.get(str(tax_id), ""),
-                    "rank": taxon_rank_map.get(str(tax_id), ""),
-                }
-            )
+    taxonomy_mapping_df = source_outbreaks_df[
+        ["source_taxonomy_id", "taxonomy_id", "highlight_descendant_taxonomy_ids"]
+    ]
+    taxonomy_id_strings = taxonomy_mapping_df["taxonomy_id"].astype("string")
+    taxonomy_mapping_df = taxonomy_mapping_df.assign(
+        highlight_descendant_taxonomy_ids=taxonomy_mapping_df[
+            "highlight_descendant_taxonomy_ids"
+        ].map(lambda ids: ",".join([str(id) for id in ids]), na_action="ignore"),
+        name=taxonomy_id_strings.map(taxon_name_map, na_action="ignore"),
+        rank=taxonomy_id_strings.map(taxon_rank_map, na_action="ignore"),
+    )
 
     # Save to TSV file
-    if rows:
-        pd.DataFrame(rows).to_csv(output_path, index=False, sep="\t")
-        print(f"Wrote taxonomy mapping to {output_path}")
+    taxonomy_mapping_df.to_csv(output_path, index=False, sep="\t")
+    print(f"Wrote taxonomy mapping to {output_path}")
+
+
+def save_workflow_taxonomy_mapping(source_workflows_df: pd.DataFrame, output_path: str):
+    """
+    Save a TSV file of workflows' resolved taxonomy IDs, for the TS build to read.
+
+    Args:
+        source_workflows_df: Workflow definitions containing resolved taxonomy IDs
+        output_path: Path to save the TSV file
+    """
+    source_workflows_df[["source_taxonomy_id", "taxonomy_id"]].dropna().to_csv(
+        output_path, index=False, sep="\t"
+    )
+    print(f"Wrote workflow taxonomy mapping to {output_path}")
 
 
 def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
@@ -1306,20 +1319,19 @@ class BuildMetadata:
 
 
 def save_build_metadata(path: str, meta: BuildMetadata):
-    meta_dict = asdict(meta)
-    with open(path, mode="w", encoding="utf-8") as fh:
-        json.dump(meta_dict, fh, indent=2)
+    save_json_file(path, asdict(meta), indent=2)
 
 
 @dataclass
 class LoadAndTransformResult:
     assemblies_source: pd.DataFrame
     organisms_source: pd.DataFrame
+    workflows_source: pd.DataFrame | None
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
-    taxonomy_outbreaks: pd.DataFrame
+    taxonomy_outbreaks: pd.DataFrame | None
     ncbi_taxdump_md5: str
     dbt_test_results: list[DBTTestResult]
 
@@ -1331,6 +1343,7 @@ def load_and_transform(
     taxonomic_levels: list[str],
     assemblies_path: Path,
     organisms_path: Path,
+    workflows_path: Path | None,
     taxa_path: Path | None,
     outbreaks_path: Path | None,
 ):
@@ -1346,6 +1359,7 @@ def load_and_transform(
       taxonomic_levels: Taxonomic levels to build columns for during transformation
       assemblies_path: Path to source assemblies YAML
       organisms_path: Path to source organisms YAML
+      workflows_path: Path to source workflows YAML, or None for catalogs that don't build workflows
       taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
       outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
 
@@ -1369,6 +1383,7 @@ def load_and_transform(
         dlt_pipeline_prefix=dlt_pipeline_prefix,
         assemblies_path=assemblies_path,
         organisms_path=organisms_path,
+        workflows_path=workflows_path,
         taxa_path=taxa_path,
         outbreaks_path=outbreaks_path,
     )
@@ -1379,22 +1394,32 @@ def load_and_transform(
         taxonomic_levels=taxonomic_levels,
         has_curated_taxa=taxa_path is not None,
         has_outbreaks=outbreaks_path is not None,
+        has_workflows=workflows_path is not None,
     )
 
     # Get transformed data and return along with metadata
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
         return LoadAndTransformResult(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
-            organisms_source=con.query("select * from catalog_source.organisms").df(),
+            organisms_source=con.query("select * from catalog_input_organisms").df(),
+            workflows_source=(
+                None
+                if workflows_path is None
+                else con.query("select * from catalog_input_workflows").df()
+            ),
             outbreaks_source=(
                 None
                 if outbreaks_path is None
-                else con.query("select * from catalog_source.outbreaks").df()
+                else con.query("select * from catalog_input_outbreaks").df()
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
-            taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
+            taxonomy_outbreaks=(
+                None
+                if outbreaks_path is None
+                else con.query("select * from taxonomy_outbreaks").df()
+            ),
             ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
             dbt_test_results=transform_result.dbt_test_results,
         )
@@ -1419,6 +1444,8 @@ def build_files(
     taxa_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    workflows_path=None,
+    workflow_taxonomy_mapping_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
     datacache_base_url=None,
@@ -1441,6 +1468,8 @@ def build_files(
       taxa_path: Path of input curated taxa YAML
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      workflows_path: Path of input workflows YAML
+      workflow_taxonomy_mapping_path: Path to save taxonomic information for workflows at
       organism_image_path: path to folder containing organism images
       organism_image_source_information_path: path to json file with information about the image source
     """
@@ -1459,19 +1488,28 @@ def build_files(
         taxonomic_levels=taxonomic_levels_for_tree,
         assemblies_path=Path(assemblies_path),
         organisms_path=Path(organisms_path),
+        workflows_path=None if workflows_path is None else Path(workflows_path),
         taxa_path=None if taxa_path is None else Path(taxa_path),
         outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
     )
     source_list_df = load_and_transform_result.assemblies_source
-    source_organisms_df = load_and_transform_result.organisms_source.astype(
-        {"taxonomy_id": "string"}
-    )
-    # Outbreaks are optional (only some catalogs use them), so source_outbreaks_df is None when no path is given
+    source_organisms_df = load_and_transform_result.organisms_source.sort_values(
+        by="taxonomy_id"
+    ).astype({"taxonomy_id": "string"})
+    # Outbreaks and workflows are optional (only some catalogs use them), so the corresponding dataframes below are None when no path is given
     source_outbreaks_df = load_and_transform_result.outbreaks_source
+    if source_outbreaks_df is not None:
+        source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
+    source_workflows_df = load_and_transform_result.workflows_source
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
+
+    if workflow_taxonomy_mapping_path is not None and source_workflows_df is not None:
+        save_workflow_taxonomy_mapping(
+            source_workflows_df, workflow_taxonomy_mapping_path
+        )
 
     base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
         load_and_transform_result.ncbi_genomes
@@ -1618,6 +1656,17 @@ def build_files(
         assemblies_df["refSeq"],
     )
 
+    genomes_df = genomes_df.merge(
+        source_organisms_df[["taxonomy_id", "ploidy"]].set_index("taxonomy_id"),
+        how="left",
+        left_on="taxonomicLevelSpeciesId",
+        right_index=True,
+    )
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
+        genomes_df
+    )
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
+
     if do_gene_model_urls:
         genomes_df = add_gene_model_url(genomes_df)
         qc_report_params["missing_gene_model_urls"] = report_missing_values(
@@ -1740,18 +1789,12 @@ def build_files(
     if len(taxonomic_levels_for_tree) > 0:
         # Use the assemblies info from genomes_df to build the species tree
         species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
-        with open(tree_output_path, "w") as outfile:
-            # Dump with sorted keys and consistent indentation
-            json.dump(species_tree, outfile, indent=4, sort_keys=True)
+        # Dump with sorted keys and consistent indentation
+        save_json_file(tree_output_path, species_tree, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
         qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
-
-    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
-        genomes_df, source_organisms_df
-    )
-    print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
     organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
         organism_taxonomy_df
@@ -1779,7 +1822,7 @@ def build_files(
     if outbreak_taxonomy_mapping_path is not None and outbreak_taxonomy_ids:
         print(f"Saving taxonomy mapping to {outbreak_taxonomy_mapping_path}")
         save_taxonomy_mapping(
-            outbreak_taxonomy_ids,
+            source_outbreaks_df,
             outbreak_taxon_name_map,
             outbreak_taxon_rank_map,
             outbreak_taxonomy_mapping_path,

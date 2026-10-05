@@ -2,7 +2,7 @@
 
 ## Assemblies not found on NCBI
 
-None
+- GCF_965196655.1
 
 ## Assemblies not found in UCSC list
 
@@ -282,7 +282,6 @@ None
 - 126728: Bonamia ostreae
 - 138297: Plasmodium vinckei lentum
 - 138298: Plasmodium vinckei petteri
-- 178876: Cryptococcus neoformans
 - 180454: Anopheles gambiae str. PEST
 - 185431: Trypanosoma brucei brucei TREU927
 - 194440: Primate T-lymphotropic virus 1
@@ -321,7 +320,6 @@ None
 - 508771: Toxoplasma gondii ME49
 - 544711: Histoplasma capsulatum var. duboisii H88
 - 544712: Histoplasma capsulatum H143
-- 572307: Neospora caninum
 - 578460: Vairimorpha ceranae BRL01
 - 598745: Giardia duodenalis ATCC 50581
 - 658858: Giardia lamblia P15
@@ -388,6 +386,7 @@ None
 - 2956251: Orthopicobirnavirus equi
 - 2971765: Langya virus
 - 3048399: Betatorquevirus homini32
+- 3066268: Rickettsia endosymbiont of Nabis limbatus
 - 3429217: Hepatovirus fejalco
 - 3703201: 3703201
 - 3703354: 3703354
@@ -399,6 +398,7 @@ None
 - GCA_022627015.2 (current: GCA_022627015.3)
 - GCA_029168785.1 (current: GCA_029168785.2)
 - GCA_029168835.1 (current: GCA_029168835.2)
+- GCA_051549955.1 (current: GCA_051549955.2)
 - GCA_051943415.1 (current: GCA_051943415.2)
 - GCA_051943445.1 (current: GCA_051943445.2)
 - GCA_051943485.1 (current: GCA_051943485.2)

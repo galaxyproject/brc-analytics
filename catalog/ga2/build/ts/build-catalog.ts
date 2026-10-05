@@ -13,23 +13,21 @@ import {
 import {
   defaultStringToNone,
   getMaxDefined,
-  getPloidyForAssembly,
-  getSourceOrganismsByTaxonomyId,
   getSpeciesStrainName,
   incrementValue,
   parseBoolean,
   parseList,
   parseNumber,
   parseNumberOrNull,
+  parsePloidyForAssembly,
   parseStringOrNull,
+  readJsonFile,
   readValuesFile,
   saveJson,
   verifyUniqueIds,
 } from "../../../build/ts/utils";
 import { SOURCE_GENOME_KEYS } from "./constants";
 import { SourceGenome } from "./entities";
-
-const SOURCE_PATH_ORGANISMS = "catalog/ga2/source/organisms.yml";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";
@@ -83,12 +81,8 @@ async function buildCatalog(): Promise<void> {
   // NOTE: This creates a build ordering dependency - BRC catalog must be built
   // before GA2 catalog since GA2 reads catalog/output/workflows.json (a BRC artifact).
   // Do not rearrange build steps without ensuring workflows.json exists first.
-  const workflowCategoriesJson = await fsp.readFile(
-    "catalog/output/workflows.json",
-    "utf8"
-  );
-  const workflowCategories: WorkflowCategory[] = JSON.parse(
-    workflowCategoriesJson
+  const workflowCategories = await readJsonFile<WorkflowCategory[]>(
+    "catalog/output/workflows.json"
   );
 
   // Compute and save workflow-assembly mappings (using shared utility)
@@ -120,18 +114,10 @@ async function buildAssemblies(): Promise<GA2AssemblyEntity[]> {
     undefined,
     SOURCE_GENOME_KEYS
   );
-  const sourceOrganismsByTaxonomyId = await getSourceOrganismsByTaxonomyId(
-    SOURCE_PATH_ORGANISMS
-  );
 
   const mappedRows: GA2AssemblyEntity[] = [];
   for (const row of sourceRows) {
-    const ploidy = getPloidyForAssembly(
-      sourceOrganismsByTaxonomyId,
-      row.speciesTaxonomyId,
-      true,
-      row.accession
-    );
+    const ploidy = parsePloidyForAssembly(row);
     if (ploidy === null) continue;
     const tolIds = parseList(row.tolId);
     if (tolIds.length > 1)

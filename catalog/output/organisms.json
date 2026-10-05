@@ -3748,7 +3748,7 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
-      "502779"
+      "1048829"
     ],
     "genomes": [
       {
@@ -3778,10 +3778,9 @@
           "33183",
           "299071",
           "38946",
-          "1048829",
-          "502779"
+          "1048829"
         ],
-        "ncbiTaxonomyId": "502779",
+        "ncbiTaxonomyId": "1048829",
         "otherNames": [
           "Paracoccidioides brasiliensis Pb01",
           "Paracoccidioides sp. MT-2011"
@@ -3812,7 +3811,7 @@
         "taxonomicLevelRealm": "None",
         "taxonomicLevelSerotype": "None",
         "taxonomicLevelSpecies": "Paracoccidioides lutzii",
-        "taxonomicLevelStrain": "Paracoccidioides lutzii Pb01",
+        "taxonomicLevelStrain": "Paracoccidioides lutzii strain Pb01",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150705.2"
       }
     ],
@@ -3843,7 +3842,7 @@
     ],
     "taxonomicLevelSpecies": "Paracoccidioides lutzii",
     "taxonomicLevelStrain": [
-      "Paracoccidioides lutzii Pb01"
+      "Paracoccidioides lutzii strain Pb01"
     ]
   },
   {
@@ -18132,8 +18131,7 @@
   {
     "assemblyCount": 2,
     "assemblyTaxonomyIds": [
-      "482561",
-      "502780"
+      "121759"
     ],
     "genomes": [
       {
@@ -18163,12 +18161,12 @@
           "33183",
           "299071",
           "38946",
-          "121759",
-          "482561"
+          "121759"
         ],
-        "ncbiTaxonomyId": "482561",
+        "ncbiTaxonomyId": "121759",
         "otherNames": [
           "Loboa loboi",
+          "Paracoccidioides loboi",
           "Zymonema brasiliensis"
         ],
         "otherTaxa": null,
@@ -18197,7 +18195,7 @@
         "taxonomicLevelRealm": "None",
         "taxonomicLevelSerotype": "None",
         "taxonomicLevelSpecies": "Paracoccidioides brasiliensis",
-        "taxonomicLevelStrain": "Paracoccidioides brasiliensis Pb03",
+        "taxonomicLevelStrain": "Paracoccidioides brasiliensis strain Pb03",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCA_000150475.2"
       },
       {
@@ -18227,12 +18225,12 @@
           "33183",
           "299071",
           "38946",
-          "121759",
-          "502780"
+          "121759"
         ],
-        "ncbiTaxonomyId": "502780",
+        "ncbiTaxonomyId": "121759",
         "otherNames": [
           "Loboa loboi",
+          "Paracoccidioides loboi",
           "Zymonema brasiliensis"
         ],
         "otherTaxa": null,
@@ -18261,13 +18259,14 @@
         "taxonomicLevelRealm": "None",
         "taxonomicLevelSerotype": "None",
         "taxonomicLevelSpecies": "Paracoccidioides brasiliensis",
-        "taxonomicLevelStrain": "Paracoccidioides brasiliensis Pb18",
+        "taxonomicLevelStrain": "Paracoccidioides brasiliensis strain Pb18",
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000150735.1"
       }
     ],
     "ncbiTaxonomyId": "121759",
     "otherNames": [
       "Loboa loboi",
+      "Paracoccidioides loboi",
       "Zymonema brasiliensis"
     ],
     "otherTaxa": null,
@@ -18292,8 +18291,8 @@
     ],
     "taxonomicLevelSpecies": "Paracoccidioides brasiliensis",
     "taxonomicLevelStrain": [
-      "Paracoccidioides brasiliensis Pb03",
-      "Paracoccidioides brasiliensis Pb18"
+      "Paracoccidioides brasiliensis strain Pb03",
+      "Paracoccidioides brasiliensis strain Pb18"
     ]
   },
   {
@@ -136655,96 +136654,6 @@
   {
     "assemblyCount": 1,
     "assemblyTaxonomyIds": [
-      "3066268"
-    ],
-    "genomes": [
-      {
-        "accession": "GCF_965196655.1",
-        "annotationStatus": null,
-        "chromosomes": 1,
-        "coverage": "43",
-        "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCF_965196655.1/",
-        "gcPercent": 32,
-        "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCF/965/196/655/GCF_965196655.1/genes/GCF_965196655.1_ihNabLimb1.Rickettsia_sp_1.1.ncbiGene.gtf.gz",
-        "isRef": "Yes",
-        "length": 1883110,
-        "level": "Complete Genome",
-        "lineageTaxonomyIds": [
-          "1",
-          "131567",
-          "2",
-          "3379134",
-          "1224",
-          "28211",
-          "766",
-          "775",
-          "33988",
-          "780",
-          "114295",
-          "3066268"
-        ],
-        "ncbiTaxonomyId": "3066268",
-        "otherNames": [],
-        "otherTaxa": null,
-        "ploidy": [
-          "HAPLOID"
-        ],
-        "priority": null,
-        "priorityPathogenName": null,
-        "releaseDate": "2025-03-05",
-        "scaffoldCount": 1,
-        "scaffoldL50": 1,
-        "scaffoldN50": 1883110,
-        "speciesTaxonomyId": "3066268",
-        "strainName": null,
-        "taxonomicGroup": [
-          "Bacteria"
-        ],
-        "taxonomicLevelClass": "Alphaproteobacteria",
-        "taxonomicLevelDomain": "Bacteria",
-        "taxonomicLevelFamily": "Rickettsiaceae",
-        "taxonomicLevelGenus": "Rickettsia",
-        "taxonomicLevelIsolate": "None",
-        "taxonomicLevelKingdom": "Pseudomonadati",
-        "taxonomicLevelOrder": "Rickettsiales",
-        "taxonomicLevelPhylum": "Pseudomonadota",
-        "taxonomicLevelRealm": "None",
-        "taxonomicLevelSerotype": "None",
-        "taxonomicLevelSpecies": "Rickettsia endosymbiont of Nabis limbatus",
-        "taxonomicLevelStrain": "None",
-        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_965196655.1"
-      }
-    ],
-    "ncbiTaxonomyId": "3066268",
-    "otherNames": [],
-    "otherTaxa": null,
-    "priority": null,
-    "priorityPathogenName": null,
-    "taxonomicGroup": [
-      "Bacteria"
-    ],
-    "taxonomicLevelClass": "Alphaproteobacteria",
-    "taxonomicLevelDomain": "Bacteria",
-    "taxonomicLevelFamily": "Rickettsiaceae",
-    "taxonomicLevelGenus": "Rickettsia",
-    "taxonomicLevelIsolate": [
-      "None"
-    ],
-    "taxonomicLevelKingdom": "Pseudomonadati",
-    "taxonomicLevelOrder": "Rickettsiales",
-    "taxonomicLevelPhylum": "Pseudomonadota",
-    "taxonomicLevelRealm": "None",
-    "taxonomicLevelSerotype": [
-      "None"
-    ],
-    "taxonomicLevelSpecies": "Rickettsia endosymbiont of Nabis limbatus",
-    "taxonomicLevelStrain": [
-      "None"
-    ]
-  },
-  {
-    "assemblyCount": 1,
-    "assemblyTaxonomyIds": [
       "3066269"
     ],
     "genomes": [
@@ -178768,7 +178677,7 @@
         "galaxyDatacacheUrl": "http://datacache.galaxyproject.org/brc/data/genomes/GCA_900624965.1/",
         "gcPercent": 38,
         "geneModelUrl": "https://hgdownload.soe.ucsc.edu/hubs/GCA/900/624/965/GCA_900624965.1/genes/GCA_900624965.1_S_vulgaris_Kentucky_0011_upd.ncbiGene.gtf.gz",
-        "isRef": "Yes",
+        "isRef": "No",
         "length": 291096078,
         "level": "Scaffold",
         "lineageTaxonomyIds": [

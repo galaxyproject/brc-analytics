@@ -6,8 +6,6 @@ import { SourceGenome } from "./entities";
 import {
   defaultStringToNone,
   getOutbreakMatchingLineage,
-  getPloidyForAssembly,
-  getSourceOrganismsByTaxonomyId,
   getSpeciesStrainName,
   parseBoolean,
   parseJsonList,
@@ -15,13 +13,13 @@ import {
   parseListOrNull,
   parseNumber,
   parseNumberOrNull,
+  parsePloidyForAssembly,
   parseStringOrNull,
   readValuesFile,
   verifyUniqueIds,
 } from "./utils";
 
 const SOURCE_PATH_GENOMES = "catalog/build/intermediate/genomes-from-ncbi.tsv";
-const SOURCE_PATH_ORGANISMS = "catalog/source/organisms.yml";
 
 export async function buildAssemblies(
   outbreaksByTaxonomyId: Map<number, Outbreak>
@@ -31,17 +29,9 @@ export async function buildAssemblies(
     undefined,
     SOURCE_GENOME_KEYS
   );
-  const sourceOrganismsByTaxonomyId = await getSourceOrganismsByTaxonomyId(
-    SOURCE_PATH_ORGANISMS
-  );
   const mappedRows: BRCDataCatalogGenome[] = [];
   for (const row of sourceRows) {
-    const ploidy = getPloidyForAssembly(
-      sourceOrganismsByTaxonomyId,
-      row.speciesTaxonomyId,
-      true,
-      row.accession
-    );
+    const ploidy = parsePloidyForAssembly(row);
     if (ploidy === null) continue;
     const lineageTaxonomyIds = parseList(row.lineageTaxonomyIds);
     const outbreak = getOutbreakMatchingLineage(

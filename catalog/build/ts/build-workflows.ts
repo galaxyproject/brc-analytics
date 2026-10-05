@@ -10,11 +10,23 @@ import {
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
-import { readYamlFile } from "./utils";
+import { parseNumber, readValuesFile, readYamlFile } from "./utils";
 
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
 const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
+const SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING =
+  "catalog/build/intermediate/workflow-taxonomy-mapping.tsv";
+
+const WORKFLOW_TAXONOMY_MAPPING_KEYS = [
+  "source_taxonomy_id",
+  "taxonomy_id",
+] as const;
+
+type WorkflowTaxonomyMappingRow = Record<
+  (typeof WORKFLOW_TAXONOMY_MAPPING_KEYS)[number],
+  string
+>;
 
 export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
@@ -35,9 +47,22 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
       })
     );
 
+  const taxonomyMapping = new Map(
+    (
+      await readValuesFile<WorkflowTaxonomyMappingRow>(
+        SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING,
+        undefined,
+        WORKFLOW_TAXONOMY_MAPPING_KEYS
+      )
+    ).map((row) => [
+      parseNumber(row.source_taxonomy_id),
+      parseNumber(row.taxonomy_id),
+    ])
+  );
+
   for (const sourceWorkflow of sourceWorkflows.workflows) {
     if (sourceWorkflow.active) {
-      buildWorkflow(workflowCategories, sourceWorkflow);
+      buildWorkflow(workflowCategories, sourceWorkflow, taxonomyMapping);
     }
   }
 
@@ -92,7 +117,8 @@ function validateUrl(url: string, context: string): void {
 /* eslint-disable-next-line sonarjs/cognitive-complexity -- function handles multiple optional fields */
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
-  sourceWorkflow: SourceWorkflow
+  sourceWorkflow: SourceWorkflow,
+  taxonomyMapping: Map<number, number>
 ): void {
   const {
     assembly_count_max: assemblyCountMax,
@@ -102,7 +128,7 @@ function buildWorkflow(
     parameters: sourceParameters,
     ploidy,
     scope,
-    taxonomy_id: taxonomyId,
+    taxonomy_id: taxonomyId = null,
     trs_id: trsId,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
@@ -213,6 +239,12 @@ function buildWorkflow(
     resolvedMax = assemblyCountMax ?? null;
   }
 
+  // Get the up-to-date taxonomy ID from the taxonomy mapping, defaulting to the ID from the YAML
+  const resolvedStringTaxonomyId =
+    taxonomyId === null
+      ? null
+      : String(taxonomyMapping.get(taxonomyId) ?? taxonomyId);
+
   const workflow: Workflow = {
     assemblyCountMax: resolvedMax,
     assemblyCountMin: resolvedMin,
@@ -220,7 +252,7 @@ function buildWorkflow(
     parameters,
     ploidy,
     scope: resolvedScope,
-    taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
+    taxonomyId: resolvedStringTaxonomyId,
     trsId,
     workflowDescription,
     workflowName,
