@@ -980,3 +980,60 @@ describe("a merge that outlives the request", () => {
     expect(resultsCalls()).toBe(1);
   });
 });
+
+describe("submit errors", () => {
+  const SUBMISSION = {
+    indexes: ["GENOMIC_BCT"],
+    sequence: ">q\nACGT",
+    threshold: 0.5,
+    zvalue: 6,
+  };
+
+  it("resolves to the new job id", async () => {
+    const { result } = await renderSettled();
+
+    let jobId: string | null = null;
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBe(JOB_ID);
+  });
+
+  it("shows the status, not an upstream HTML error page, as the message", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(
+            502,
+            "<!DOCTYPE html><html><head><title>502 Bad Gateway</title></head><body>nginx</body></html>"
+          )
+        ),
+    });
+    const { result } = await renderSettled();
+
+    let jobId: string | null = "unset";
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBeNull();
+    expect(result.current.error).toBe("HTTP 502");
+  });
+
+  it("keeps a plain-text detail", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(400, "Query sequence cannot be empty")
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("Query sequence cannot be empty");
+  });
+});

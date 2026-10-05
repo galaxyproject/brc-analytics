@@ -331,7 +331,15 @@ async function toErrorMessage(
     };
     try {
       const body = await response.json();
-      return body.detail || `HTTP ${response.status}`;
+      const { detail } = body;
+      // A backend that relays an upstream error page as its detail would
+      // otherwise put a whole HTML document in the banner.
+      if (
+        typeof detail === "string" &&
+        /<(!doctype|html|head|body)\b/i.test(detail)
+      )
+        return `HTTP ${response.status}`;
+      return detail || `HTTP ${response.status}`;
     } catch {
       return `HTTP ${response.status}`;
     }

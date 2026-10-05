@@ -39,6 +39,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotFound,
     GalaxyService,
     KmindexUnknownIndex,
+    ShardFetchError,
     is_unlinked_account_error,
 )
 from app.services.kmindex_submissions import record_submission
@@ -53,6 +54,54 @@ from app.services.sra_mirror import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Long enough for any message we write ourselves; anything past it is someone
+# else's response body.
+MAX_ERROR_DETAIL_CHARS = 300
+_HTML_MARKERS = ("<!doctype", "<html", "<head", "<body", "<title")
+
+
+def _upstream_status(e: BaseException) -> Optional[int]:
+    """The HTTP status Galaxy answered with, from anywhere in the cause chain."""
+    seen: set[int] = set()
+    current: Optional[BaseException] = e
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        if isinstance(current, BioblendConnectionError) and current.status_code:
+            return current.status_code
+        if isinstance(current, ShardFetchError):
+            return current.status
+        current = current.__cause__ or current.__context__
+    return None
+
+
+def error_detail(prefix: str, e: BaseException) -> str:
+    """
+    A short, readable error detail for a failure that may have come from Galaxy.
+
+    bioblend's ConnectionError stringifies with the whole response body, so a
+    Galaxy behind a proxy that answers 502 with an HTML error page turned into
+    a detail that was that page, and the results page printed it verbatim. The
+    status is what the reader can act on; the body stays in the log.
+
+    @param prefix: what failed, e.g. "Failed to get job status".
+    @param e: the exception caught.
+    @returns: the detail to send.
+    """
+    status = _upstream_status(e)
+    if status is not None:
+        if status >= 500:
+            return (
+                f"{prefix}: Galaxy answered HTTP {status}. It may be busy or "
+                "restarting -- try again in a few minutes."
+            )
+        return f"{prefix}: Galaxy answered HTTP {status}."
+    text = " ".join(str(e).split())
+    if not text or any(marker in text.lower() for marker in _HTML_MARKERS):
+        return f"{prefix}."
+    if len(text) > MAX_ERROR_DETAIL_CHARS:
+        text = text[:MAX_ERROR_DETAIL_CHARS].rstrip() + "..."
+    return f"{prefix}: {text}"
 
 
 async def get_galaxy_service(
@@ -172,7 +221,7 @@ async def submit_galaxy_job(
     except Exception as e:
         logger.error(f"Failed to submit Galaxy job: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to submit job to Galaxy: {str(e)}"
+            status_code=500, detail=error_detail("Failed to submit job to Galaxy", e)
         ) from e
 
 
@@ -335,7 +384,7 @@ async def get_kmindex_results(
     except Exception as e:
         logger.error(f"Failed to get kmindex results for {job_id}: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to get kmindex results: {str(e)}"
+            status_code=500, detail=error_detail("Failed to get kmindex results", e)
         ) from e
 
 
@@ -451,7 +500,7 @@ async def get_job_status(
     except Exception as e:
         logger.error(f"Failed to get job status for {job_id}: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to get job status: {str(e)}"
+            status_code=500, detail=error_detail("Failed to get job status", e)
         ) from e
 
 
@@ -484,7 +533,7 @@ async def get_job_results(
     except Exception as e:
         logger.error(f"Failed to get job results for {job_id}: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to get job results: {str(e)}"
+            status_code=500, detail=error_detail("Failed to get job results", e)
         ) from e
 
 
@@ -518,7 +567,7 @@ async def get_job_details(
                 response["results"] = results.model_dump()
             except Exception as e:
                 logger.warning(f"Failed to get results for completed job {job_id}: {e}")
-                response["results_error"] = str(e)
+                response["results_error"] = error_detail("Failed to get results", e)
 
         return response
 
@@ -529,7 +578,7 @@ async def get_job_details(
     except Exception as e:
         logger.error(f"Failed to get job details for {job_id}: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to get job details: {str(e)}"
+            status_code=500, detail=error_detail("Failed to get job details", e)
         ) from e
 
 
