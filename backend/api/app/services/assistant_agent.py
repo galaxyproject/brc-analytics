@@ -1381,7 +1381,12 @@ class AssistantAgent:
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
         remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
-        if remaining < EXTRACT_MIN_BUDGET_SECONDS:
+        if not message:
+            # A clear on its own: the user said nothing they could have
+            # committed to, so there is nothing to extract -- and skipping it
+            # means a reply that recalls the old choice can't refill it.
+            schema_updates, extract_usage = {}, None
+        elif remaining < EXTRACT_MIN_BUDGET_SECONDS:
             logger.warning(
                 "Reply used the turn budget (%.1fs left); skipping extraction, "
                 "copying the tracker forward",
