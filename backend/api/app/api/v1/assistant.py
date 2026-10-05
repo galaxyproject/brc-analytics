@@ -345,6 +345,7 @@ async def clear_session_field(
     session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
     agent=Depends(get_assistant_agent),
+    _rate_limit=Depends(check_rate_limit),
 ):
     """Clear one setup field directly, without asking the model (#1796).
 

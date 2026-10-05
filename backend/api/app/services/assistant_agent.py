@@ -378,6 +378,10 @@ Rules:
   organism clears a stale assembly and workflow; a new analysis type clears a \
   stale workflow. analysis_type does not depend on organism, and data_source \
   is always independent.
+- Fields listed as cleared from the setup panel were removed by the user \
+  directly before this message; the prior tracker already has them null. Leave \
+  them null unless the user picks a value again in THIS message -- the \
+  assistant restating or recalling the old choice is not a new commitment.
 - If unsure, keep the prior value. When in doubt, do not change state.
 """
 
@@ -1074,7 +1078,10 @@ class AssistantAgent:
 
     @staticmethod
     def build_extract_payload(
-        prior: AnalysisSchema, user_message: str, reply: str
+        prior: AnalysisSchema,
+        user_message: str,
+        reply: str,
+        cleared: Optional[List[str]] = None,
     ) -> str:
         """The extractor's input: prior tracker + the exchange, all JSON-encoded.
 
@@ -1085,9 +1092,16 @@ class AssistantAgent:
         interpolation had.
         """
         prior_state = {name: getattr(prior, name).value for name in _STATE_FIELDS}
+        payload = f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
+        # Without this the extractor only sees a null where a value was, and a
+        # reply that mentions the old choice in passing can fill it right back.
+        panel_clears = [name for name in cleared or [] if name in _FIELD_LABELS]
+        if panel_clears:
+            payload += (
+                f"Cleared from the setup panel (JSON): {json.dumps(panel_clears)}\n"
+            )
         return (
-            f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
-            f"User message (JSON string): {json.dumps(user_message)}\n"
+            payload + f"User message (JSON string): {json.dumps(user_message)}\n"
             f"Assistant reply (JSON string): {json.dumps(reply)}"
         )
 
@@ -1097,6 +1111,7 @@ class AssistantAgent:
         user_message: str,
         reply: str,
         timeout: float = EXTRACT_RUN_TIMEOUT_SECONDS,
+        cleared: Optional[List[str]] = None,
     ) -> tuple[Dict[str, Optional[str]], Any]:
         """Extract the tracker snapshot via the focused second call.
 
@@ -1109,7 +1124,7 @@ class AssistantAgent:
         non-critical -- the user already has their reply -- so on ANY failure we
         carry the prior tracker forward (empty updates) rather than fail the turn.
         """
-        payload = self.build_extract_payload(prior, user_message, reply)
+        payload = self.build_extract_payload(prior, user_message, reply, cleared)
         try:
             # No retry: the extractor is the optional last call in the turn, so a
             # transient failure should fail fast and copy forward rather than
@@ -1314,9 +1329,12 @@ class AssistantAgent:
         # Wrap user message in a clearly-delimited fence so the model treats
         # its contents as untrusted data, not instructions.
         # Popped here but only persisted with the rest of the turn, so a turn
-        # that fails leaves the clears queued for the next one.
+        # that fails leaves the clears queued for the next one. Both calls get
+        # them: the reply should not reuse a cleared choice, and the extractor
+        # should not refill one from a reply that mentions it.
+        panel_clears = state.metadata.pop(_PANEL_CLEARS_KEY, None)
         augmented_message = self._wrap_user_message(
-            state.schema_state, message, state.metadata.pop(_PANEL_CLEARS_KEY, None)
+            state.schema_state, message, panel_clears
         )
 
         # 1) Conversational reply -- plain text, so it can't fail on structured
@@ -1361,6 +1379,7 @@ class AssistantAgent:
                 message,
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
+                cleared=panel_clears,
             )
         schema_state = self._apply_schema_updates(
             state.schema_state,
