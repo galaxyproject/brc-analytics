@@ -432,110 +432,44 @@ class TestSaveWithoutADatabase:
         assert not [record for record in caplog.records if record.exc_info]
 
 
-class TestClearField:
-    """The setup panel's x clears a field with a direct call (#1796), behind
-    the same cookie binding as restore and delete."""
-
-    URL = "/api/v1/assistant/session/sess-abc/clear-field"
+class TestChatClearFields:
+    """The setup panel's x clears a field on a /chat turn (#1796)."""
 
     def _agent(self, app):
         from app.core.dependencies import get_assistant_agent
 
-        agent = app.dependency_overrides[get_assistant_agent]()
-        cleared = SessionState(
-            session_id="sess-abc",
-            messages=[
-                ChatMessage(role=MessageRole.USER, content="hi"),
-                ChatMessage(role=MessageRole.SYSTEM, content="Organism cleared."),
-            ],
+        return app.dependency_overrides[get_assistant_agent]()
+
+    def test_passes_clears_through(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post(
+            "/api/v1/assistant/chat", json={"clear_fields": ["organism"]}
         )
-        agent.clear_field = AsyncMock(return_value=cleared)
-        return agent
-
-    def test_requires_the_session_cookie(self, client, app_with_stubbed_agent):
-        agent = self._agent(app_with_stubbed_agent)
-        resp = client.post(self.URL, json={"field": "organism"})
-        assert resp.status_code == 403
-        agent.clear_field.assert_not_awaited()
-
-    def test_clears_and_returns_the_session(self, client, app_with_stubbed_agent):
-        agent = self._agent(app_with_stubbed_agent)
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-
-        resp = client.post(self.URL, json={"field": "organism"})
-
         assert resp.status_code == 200, resp.text
-        agent.clear_field.assert_awaited_once_with("sess-abc", "organism", None)
-        body = resp.json()
-        assert body["session_id"] == "sess-abc"
-        assert body["messages"][-1] == {
-            "content": "Organism cleared.",
-            "role": "system",
-        }
-        assert body["saved"] is False
+        args = agent.chat_with_telemetry.await_args
+        assert args.args[0] is None
+        assert args.kwargs["clear_fields"] == ["organism"]
+
+    def test_message_alone_still_works(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+        assert resp.status_code == 200, resp.text
+        assert agent.chat_with_telemetry.await_args.kwargs["clear_fields"] == []
 
     def test_rejects_a_derived_field(self, client, app_with_stubbed_agent):
         agent = self._agent(app_with_stubbed_agent)
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-        resp = client.post(self.URL, json={"field": "gene_annotation"})
+        resp = client.post(
+            "/api/v1/assistant/chat", json={"clear_fields": ["gene_annotation"]}
+        )
         assert resp.status_code == 422
-        agent.clear_field.assert_not_awaited()
+        agent.chat_with_telemetry.assert_not_awaited()
 
-    def test_expired_session_is_404(self, client, app_with_stubbed_agent):
+    def test_rejects_an_empty_turn(self, client, app_with_stubbed_agent):
         agent = self._agent(app_with_stubbed_agent)
-        agent.clear_field = AsyncMock(side_effect=KeyError("sess-abc"))
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-        resp = client.post(self.URL, json={"field": "organism"})
-        assert resp.status_code == 404
+        resp = client.post("/api/v1/assistant/chat", json={})
+        assert resp.status_code == 422
+        agent.chat_with_telemetry.assert_not_awaited()
 
-    def test_someone_elses_session_is_403(self, client, app_with_stubbed_agent):
-        agent = self._agent(app_with_stubbed_agent)
-        agent.clear_field = AsyncMock(side_effect=PermissionError("sess-abc"))
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-        resp = client.post(self.URL, json={"field": "organism"})
-        assert resp.status_code == 403
-
-    def test_signed_in_user_claims_then_clears_as_owner(
-        self, client, app_with_stubbed_agent, monkeypatch
-    ):
-        from app.api.v1 import assistant as assistant_module
-        from app.core.dependencies import get_optional_current_user
-
-        agent = self._agent(app_with_stubbed_agent)
-        agent.session_service.claim_session = AsyncMock()
-        record = AsyncMock(return_value=None)
-        monkeypatch.setattr(assistant_module.analysis_store, "record", record)
-
-        async def _current_user():
-            return UserMeResponse(sub="user-a")
-
-        app_with_stubbed_agent.dependency_overrides[get_optional_current_user] = (
-            _current_user
-        )
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-
-        resp = client.post(self.URL, json={"field": "workflow"})
-
-        assert resp.status_code == 200, resp.text
-        agent.session_service.claim_session.assert_awaited_once_with(
-            "sess-abc", "user-a"
-        )
-        agent.clear_field.assert_awaited_once_with("sess-abc", "workflow", "user-a")
-        # A saved analysis is kept in step with the clear.
-        record.assert_awaited_once()
-
-    def test_is_rate_limited(self, client, app_with_stubbed_agent):
-        from fastapi import HTTPException
-
-        from app.core.dependencies import check_rate_limit
-
-        agent = self._agent(app_with_stubbed_agent)
-
-        async def _limited():
-            raise HTTPException(status_code=429, detail="Rate limit exceeded")
-
-        app_with_stubbed_agent.dependency_overrides[check_rate_limit] = _limited
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
-        resp = client.post(self.URL, json={"field": "organism"})
-        assert resp.status_code == 429
-        agent.clear_field.assert_not_awaited()
+    def test_rejects_an_empty_message(self, client, app_with_stubbed_agent):
+        resp = client.post("/api/v1/assistant/chat", json={"message": ""})
+        assert resp.status_code == 422
