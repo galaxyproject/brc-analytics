@@ -121,7 +121,7 @@ jobs:
       - name: Build catalog data
         run: |
           npm ci
-          env -i PATH="$PATH" npm run build-brc-db
+          npm run build-brc-db
 
       - name: Start backend services
         run: |
