@@ -3009,7 +3009,7 @@ class TestFetchLoganSnapshotIsCacheFirst:
             await self._agent(galaxy).fetch_logan_snapshot(LOGAN_JOB)
 
 
-# ---------- clear_field (setup panel x, #1796) ----------
+# ---------- setup-panel clears on a chat turn (#1796) ----------
 
 _CLEAR_WORKFLOWS = [
     {
@@ -3025,8 +3025,9 @@ _CLEAR_WORKFLOWS = [
 ]
 
 
-def _filled_session(agent, **metadata):
-    """A session with every user-chosen field set, wired to a stub store."""
+def _filled_session(agent, extracted=None):
+    """A session with every user-chosen field set, wired to a stub store and
+    stub model calls. `extracted` is what the stub extractor returns."""
     agent.catalog.workflows_by_category = _CLEAR_WORKFLOWS
     schema = agent._apply_schema_updates(
         AnalysisSchema(),
@@ -3044,26 +3045,42 @@ def _filled_session(agent, **metadata):
         session_id="s1",
         schema_state=schema,
         messages=[ChatMessage(role=MessageRole.USER, content="hi")],
-        metadata=dict(metadata),
     )
     agent.session_service = SimpleNamespace(
         create_session=AsyncMock(return_value=state),
         require_session=AsyncMock(return_value=state),
         save_session=AsyncMock(),
     )
+    agent.agent = object()
+    agent._run_agent_with_retry = AsyncMock(
+        return_value=SimpleNamespace(
+            output="Which organism would you like instead?",
+            usage=lambda: SimpleNamespace(
+                input_tokens=1,
+                output_tokens=1,
+                requests=1,
+                tool_calls=0,
+                total_tokens=2,
+            ),
+            all_messages=lambda: [],
+            new_messages=lambda: [],
+        )
+    )
+    agent._extract_state = AsyncMock(return_value=(extracted or {}, None))
     return state
 
 
-class TestClearField:
-    """The setup panel's x clears a field without going through the model, so
-    it can't silently stop working when the prompt or model changes."""
+class TestPanelClears:
+    """The setup panel's x clears a field on a chat turn, applied directly
+    before the model runs, so it can't silently stop working when the prompt
+    or model changes -- and the assistant still answers it."""
 
     @pytest.mark.asyncio
     async def test_clearing_organism_takes_assembly_and_workflow(self, agent):
         _filled_session(agent)
-        state = await agent.clear_field("s1", "organism", None)
+        resp = await agent.chat(None, session_id="s1", clear_fields=["organism"])
 
-        schema = state.schema_state
+        schema = resp.schema_state
         assert schema.organism == SchemaField()
         assert schema.assembly == SchemaField()
         assert schema.workflow == SchemaField()
@@ -3072,14 +3089,13 @@ class TestClearField:
         # Not tied to the organism.
         assert schema.analysis_type.value == "Variant calling"
         assert schema.data_source.value == "My own data"
-        agent.session_service.save_session.assert_awaited_once_with(state)
 
     @pytest.mark.asyncio
     async def test_clearing_analysis_type_takes_workflow(self, agent):
         _filled_session(agent)
-        state = await agent.clear_field("s1", "analysis_type", None)
+        resp = await agent.chat(None, session_id="s1", clear_fields=["analysis_type"])
 
-        schema = state.schema_state
+        schema = resp.schema_state
         assert schema.analysis_type == SchemaField()
         assert schema.workflow == SchemaField()
         assert schema.organism.status == FieldStatus.FILLED
@@ -3088,122 +3104,126 @@ class TestClearField:
     @pytest.mark.asyncio
     async def test_clearing_data_source_leaves_the_rest(self, agent):
         _filled_session(agent)
-        state = await agent.clear_field("s1", "data_source", None)
+        resp = await agent.chat(None, session_id="s1", clear_fields=["data_source"])
 
-        schema = state.schema_state
+        schema = resp.schema_state
         assert schema.data_source == SchemaField()
         for name in ("organism", "assembly", "analysis_type", "workflow"):
             assert getattr(schema, name).status == FieldStatus.FILLED, name
 
     @pytest.mark.asyncio
-    async def test_leaves_a_system_note_not_a_user_message(self, agent):
+    async def test_the_clear_does_not_depend_on_the_extractor(self, agent):
+        # A weak extractor restating the old tracker must not undo the clear:
+        # the clear is the prior it works from, and an organism it "carries
+        # forward" from the reply would be a fresh fill, which the reply-side
+        # note and extractor rule exist to prevent. With an empty snapshot the
+        # cleared state simply carries forward.
         _filled_session(agent)
-        state = await agent.clear_field("s1", "organism", None)
+        resp = await agent.chat(None, session_id="s1", clear_fields=["organism"])
+        prior = agent._extract_state.await_args.args[0]
+        assert prior.organism == SchemaField()
+        assert resp.schema_state.organism == SchemaField()
 
-        note = state.messages[-1]
-        assert note.role == MessageRole.SYSTEM
-        assert note.content == "Organism cleared, along with assembly and workflow."
+    @pytest.mark.asyncio
+    async def test_transcript_gets_a_note_then_the_reply(self, agent):
+        state = _filled_session(agent)
+        resp = await agent.chat(None, session_id="s1", clear_fields=["organism"])
+
+        assert [(m.role, m.content) for m in state.messages[1:]] == [
+            (
+                MessageRole.SYSTEM,
+                "Organism cleared, along with assembly and workflow.",
+            ),
+            (MessageRole.ASSISTANT, "Which organism would you like instead?"),
+        ]
+        assert resp.reply == "Which organism would you like instead?"
+        # No fake user line.
         assert [m.role for m in state.messages].count(MessageRole.USER) == 1
 
     @pytest.mark.asyncio
     async def test_single_field_note(self, agent):
-        _filled_session(agent)
-        state = await agent.clear_field("s1", "data_source", None)
-        assert state.messages[-1].content == "Data source cleared."
-
-    @pytest.mark.asyncio
-    async def test_suggestions_follow_the_cleared_state(self, agent):
-        _filled_session(agent)
-        agent._derive_suggestions = MagicMock(return_value=[])
-        state = await agent.clear_field("s1", "organism", None)
-        agent._derive_suggestions.assert_called_once_with(
-            state.schema_state, logan=None
-        )
-
-    @pytest.mark.asyncio
-    async def test_clearing_an_empty_field_changes_nothing(self, agent):
         state = _filled_session(agent)
-        state.schema_state.data_source = SchemaField()
-        before = state.model_copy(deep=True)
-
-        after = await agent.clear_field("s1", "data_source", None)
-
-        assert after == before
-        agent.session_service.save_session.assert_not_awaited()
+        await agent.chat(None, session_id="s1", clear_fields=["data_source"])
+        assert state.messages[1].content == "Data source cleared."
 
     @pytest.mark.asyncio
-    async def test_rejects_a_derived_field(self, agent):
+    async def test_both_models_hear_about_the_clear(self, agent):
         _filled_session(agent)
-        with pytest.raises(ValueError):
-            await agent.clear_field("s1", "data_characteristics", None)
-        agent.session_service.save_session.assert_not_awaited()
-
-    @pytest.mark.asyncio
-    async def test_missing_session_propagates(self, agent):
-        agent.session_service = SimpleNamespace(
-            require_session=AsyncMock(side_effect=KeyError("s1")),
-            save_session=AsyncMock(),
-        )
-        with pytest.raises(KeyError):
-            await agent.clear_field("s1", "organism", None)
-
-    @pytest.mark.asyncio
-    async def test_checks_ownership(self, agent):
-        _filled_session(agent)
-        await agent.clear_field("s1", "organism", "user-sub")
-        agent.session_service.require_session.assert_awaited_once_with("s1", "user-sub")
-
-    @pytest.mark.asyncio
-    async def test_queues_clears_for_the_next_turn(self, agent):
-        _filled_session(agent)
-        await agent.clear_field("s1", "data_source", None)
-        state = await agent.clear_field("s1", "organism", None)
-        assert state.metadata["panel_clears"] == [
-            "data_source",
-            "organism",
-            "assembly",
-            "workflow",
-        ]
-
-    @pytest.mark.asyncio
-    async def test_next_turn_tells_the_model_and_keeps_the_field_cleared(self, agent):
-        state = _filled_session(agent)
-        await agent.clear_field("s1", "organism", None)
-
-        agent.agent = object()
-        agent._run_agent_with_retry = AsyncMock(
-            return_value=SimpleNamespace(
-                output="Which organism would you like instead?",
-                usage=lambda: SimpleNamespace(
-                    input_tokens=1,
-                    output_tokens=1,
-                    requests=1,
-                    tool_calls=0,
-                    total_tokens=2,
-                ),
-                all_messages=lambda: [],
-                new_messages=lambda: [],
-            )
-        )
-        agent._extract_state = AsyncMock(return_value=({}, None))
-
-        resp = await agent.chat("let's keep going", session_id="s1")
+        await agent.chat(None, session_id="s1", clear_fields=["organism"])
 
         prompt = agent._run_agent_with_retry.await_args.args[0]
         assert "organism=pending" in prompt
-        assert "cleared these from the analysis setup panel" in prompt
+        assert "just cleared these from the analysis setup panel" in prompt
         assert "organism, assembly, workflow" in prompt
-        # The extractor hears about it too, or a reply that mentions the old
-        # organism could fill it straight back in.
+        # A clear on its own has no user text, so nothing to fence.
+        assert "<user_input>" not in prompt
         assert agent._extract_state.await_args.kwargs["cleared"] == [
             "organism",
             "assembly",
             "workflow",
         ]
-        # Said once: the queue drains with the turn that delivered it.
-        assert "panel_clears" not in state.metadata
-        assert resp.schema_state.organism == SchemaField()
-        assert resp.schema_state.assembly == SchemaField()
+
+    @pytest.mark.asyncio
+    async def test_clear_with_a_message(self, agent):
+        state = _filled_session(agent)
+        await agent.chat("let's try yeast", session_id="s1", clear_fields=["organism"])
+
+        prompt = agent._run_agent_with_retry.await_args.args[0]
+        assert "just cleared these" in prompt
+        assert "<user_input>\nlet's try yeast\n</user_input>" in prompt
+        assert [m.role for m in state.messages[1:]] == [
+            MessageRole.SYSTEM,
+            MessageRole.USER,
+            MessageRole.ASSISTANT,
+        ]
+
+    @pytest.mark.asyncio
+    async def test_clearing_an_empty_field_leaves_no_note(self, agent):
+        state = _filled_session(agent)
+        state.schema_state.data_source = SchemaField()
+        await agent.chat(None, session_id="s1", clear_fields=["data_source"])
+
+        assert MessageRole.SYSTEM not in [m.role for m in state.messages]
+        prompt = agent._run_agent_with_retry.await_args.args[0]
+        assert "just cleared" not in prompt
+
+    @pytest.mark.asyncio
+    async def test_rejects_a_derived_field(self, agent):
+        _filled_session(agent)
+        with pytest.raises(ValueError):
+            await agent.chat(
+                None, session_id="s1", clear_fields=["data_characteristics"]
+            )
+        agent._run_agent_with_retry.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_rejects_an_empty_turn(self, agent):
+        _filled_session(agent)
+        with pytest.raises(ValueError):
+            await agent.chat(None, session_id="s1")
+
+    @pytest.mark.asyncio
+    async def test_failed_turn_saves_nothing(self, agent):
+        # The clear rides the turn: if the reply fails, the session is left as
+        # it was rather than half-cleared with no answer.
+        _filled_session(agent)
+        agent._run_agent_with_retry = AsyncMock(side_effect=RuntimeError("boom"))
+        with pytest.raises(RuntimeError):
+            await agent.chat(None, session_id="s1", clear_fields=["organism"])
+        agent.session_service.save_session.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_turn_log_names_the_clear(self, agent):
+        _filled_session(agent)
+        records = []
+
+        async def _record(t):
+            records.append(t)
+
+        await agent.chat_with_telemetry(
+            None, "s1", None, on_turn=_record, clear_fields=["organism"]
+        )
+        assert records[0].user_message == "[cleared from setup panel: organism]"
 
 
 class TestBuildClearsNote:

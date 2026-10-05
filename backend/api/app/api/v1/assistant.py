@@ -23,7 +23,6 @@ from app.models.assistant import (
     AssistantInfoResponse,
     ChatRequest,
     ChatResponse,
-    ClearFieldRequest,
     SessionRestoreResponse,
     SessionSaveResponse,
     SessionState,
@@ -119,6 +118,7 @@ async def assistant_chat(
             request.session_id,
             current_user.sub if current_user else None,
             turn_id=turn_id,
+            clear_fields=request.clear_fields,
             # The agent records the turn itself, success or failure -- it is
             # the only layer that knows the session it created before a
             # failure. Awaited inline: the insert is milliseconds against a
@@ -330,70 +330,6 @@ async def restore_session(
         # The cookie proves this browser holds the conversation, not whose
         # account it is saved to. Signed out, or signed in as someone else,
         # "saved to your account" is not true of the caller.
-        saved=(
-            state.saved_analysis_id is not None
-            and current_user is not None
-            and state.owner_keycloak_sub == current_user.sub
-        ),
-    )
-
-
-@router.post("/session/{session_id}/clear-field", response_model=SessionRestoreResponse)
-async def clear_session_field(
-    session_id: str,
-    request: ClearFieldRequest,
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
-    current_user: UserMeResponse | None = Depends(get_optional_current_user),
-    agent=Depends(get_assistant_agent),
-    _rate_limit=Depends(check_rate_limit),
-):
-    """Clear one setup field directly, without asking the model (#1796).
-
-    Answers with the whole session, as restore does: the clear adds a note to
-    the transcript and can take dependent fields with it, so the client takes
-    the server's word for all of it rather than patching its own copy.
-    """
-    require_session_cookie(session_id, session_cookie)
-
-    owner = current_user.sub if current_user else None
-    try:
-        if current_user:
-            # Same as a chat turn: a signed-in user touching a session started
-            # anonymously claims it before acting on it.
-            await agent.session_service.claim_session(session_id, current_user.sub)
-        state = await agent.clear_field(session_id, request.field, owner)
-    except KeyError as e:
-        raise HTTPException(
-            status_code=404, detail="Session not found or expired"
-        ) from e
-    except PermissionError as e:
-        raise HTTPException(
-            status_code=403, detail="Assistant session belongs to another user"
-        ) from e
-    except Exception as e:
-        logger.exception("Failed to clear %s on session %s", request.field, session_id)
-        raise HTTPException(status_code=500, detail="Failed to clear field") from e
-
-    # Keep a saved analysis in step: otherwise reopening it would bring the
-    # cleared field back until the next turn saved over it.
-    if current_user:
-        try:
-            saved_analysis_id = await analysis_store.record(state)
-            await _stamp_analysis_id(agent, state, saved_analysis_id)
-        except Exception:
-            logger.exception("Failed to auto-save session %s", session_id)
-
-    is_complete, handoff_url = agent.compute_handoff(
-        state.schema_state, session_id=state.session_id
-    )
-    return SessionRestoreResponse(
-        session_id=state.session_id,
-        messages=state.messages,
-        schema_state=state.schema_state,
-        suggestions=state.suggestions,
-        is_complete=is_complete,
-        handoff_url=handoff_url,
-        logan=logan_context_from(state.metadata),
         saved=(
             state.saved_analysis_id is not None
             and current_user is not None

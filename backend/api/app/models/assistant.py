@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.models.logan import LoganContext
 
@@ -132,22 +132,35 @@ class AnalysisStateUpdate(BaseModel):
     )
 
 
+# The fields a user chooses in conversation, and so can clear from the setup
+# panel. The rest are derived from the workflow and assembly and recomputed on
+# every apply, so a clear of one would not stick.
+ClearableField = Literal[
+    "organism", "assembly", "analysis_type", "workflow", "data_source"
+]
+
+
 class ChatRequest(BaseModel):
     """Request body for POST /api/v1/assistant/chat."""
 
-    message: str = Field(..., min_length=1, max_length=4000)
+    message: Optional[str] = Field(None, min_length=1, max_length=4000)
     session_id: Optional[str] = Field(
         None, description="Existing session to continue; omit to start fresh"
     )
+    clear_fields: List[ClearableField] = Field(
+        default_factory=list,
+        max_length=5,
+        description=(
+            "Setup-panel fields to clear before this turn, applied directly "
+            "rather than through the model. A turn may be a clear on its own."
+        ),
+    )
 
-
-class ClearFieldRequest(BaseModel):
-    """Request body for POST /api/v1/assistant/session/{id}/clear-field."""
-
-    # The fields a user chooses in conversation. The rest are derived from the
-    # workflow and assembly and recomputed on every apply, so a clear of one
-    # would not stick.
-    field: Literal["organism", "assembly", "analysis_type", "workflow", "data_source"]
+    @model_validator(mode="after")
+    def _message_or_clear(self) -> "ChatRequest":
+        if not self.message and not self.clear_fields:
+            raise ValueError("Send a message, a field to clear, or both")
+        return self
 
 
 class TokenUsage(BaseModel):
