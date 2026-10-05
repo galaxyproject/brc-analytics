@@ -10,7 +10,7 @@ import ky, { HTTPError, TimeoutError } from "ky";
 jest.mock("ky", () => {
   class StubHTTPError extends Error {
     response: { json: () => Promise<unknown>; status: number };
-    constructor(status: number, detail: string) {
+    constructor(status: number, detail: unknown) {
       super(`HTTP ${status}`);
       this.response = {
         json: (): Promise<unknown> => Promise.resolve({ detail }),
@@ -36,7 +36,7 @@ const mockKy = ky as unknown as {
 // a test actually cares about.
 const MockHTTPError = HTTPError as unknown as new (
   status: number,
-  detail: string
+  detail: unknown
 ) => Error;
 const MockTimeoutError = TimeoutError as unknown as new () => Error;
 
@@ -1035,5 +1035,44 @@ describe("submit errors", () => {
     });
 
     expect(result.current.error).toBe("Query sequence cannot be empty");
+  });
+
+  it("reads the messages out of a FastAPI validation list", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(422, [
+            {
+              input: ">a\nACGT\n>b\nACGT",
+              loc: ["body", "sequence"],
+              msg: "Value error, Submit one sequence per query; multi-record FASTA is not supported",
+              type: "value_error",
+            },
+          ])
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe(
+      "Value error, Submit one sequence per query; multi-record FASTA is not supported"
+    );
+  });
+
+  it("falls back to the status for a detail that is neither text nor messages", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(new MockHTTPError(422, [{ loc: ["body"] }])),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("HTTP 422");
   });
 });

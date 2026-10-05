@@ -327,19 +327,32 @@ async function toErrorMessage(
 ): Promise<string> {
   if (error && typeof error === "object" && "response" in error) {
     const { response } = error as {
-      response: { json: () => Promise<{ detail?: string }>; status: number };
+      response: { json: () => Promise<{ detail?: unknown }>; status: number };
     };
     try {
       const body = await response.json();
       const { detail } = body;
+      // FastAPI's validation 422 carries a list of objects; React can't
+      // render those, so pull out their messages.
+      if (Array.isArray(detail)) {
+        const messages = detail
+          .map((item) =>
+            item && typeof item === "object" && "msg" in item
+              ? (item as { msg: unknown }).msg
+              : null
+          )
+          .filter((msg): msg is string => typeof msg === "string" && !!msg);
+        return messages.length
+          ? messages.join("; ")
+          : `HTTP ${response.status}`;
+      }
+      if (typeof detail !== "string" || !detail)
+        return `HTTP ${response.status}`;
       // A backend that relays an upstream error page as its detail would
       // otherwise put a whole HTML document in the banner.
-      if (
-        typeof detail === "string" &&
-        /<(!doctype|html|head|body)\b/i.test(detail)
-      )
+      if (/<(!doctype|html|head|body)\b/i.test(detail))
         return `HTTP ${response.status}`;
-      return detail || `HTTP ${response.status}`;
+      return detail;
     } catch {
       return `HTTP ${response.status}`;
     }

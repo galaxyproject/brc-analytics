@@ -448,6 +448,15 @@ describe("LoganSearchForm query file", () => {
     expect(submit).not.toHaveBeenCalled();
   });
 
+  test("holds back a file with more than one record and says why", async () => {
+    const { submit } = renderForm();
+    pick(new File([">a\r\nACGTACGT\r\n>b\r\nACGT\r\n"], "primers.fa"));
+
+    await screen.findByText("2 records -- a query is one sequence");
+    expect(searchButton().disabled).toBe(true);
+    expect(submit).not.toHaveBeenCalled();
+  });
+
   test("refuses a file far too large to be one query, leaving the box alone", async () => {
     renderForm();
     const before = (screen.getByRole("textbox") as HTMLTextAreaElement).value;

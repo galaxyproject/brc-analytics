@@ -313,6 +313,15 @@ export function countBases(fasta: string): number {
 }
 
 /**
+ * Count FASTA records by their header lines.
+ * @param fasta - Raw textarea contents.
+ * @returns Number of lines that open a record.
+ */
+export function countRecords(fasta: string): number {
+  return fasta.split("\n").filter((line) => line.trim().startsWith(">")).length;
+}
+
+/**
  * A count as a share of its denominator.
  *
  * Both ends of the scale round into a claim the count contradicts. "0.0%"

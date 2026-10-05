@@ -18,6 +18,7 @@ import {
 import {
   axisOptions,
   countBases,
+  countRecords,
   describeIndexSelection,
   type IndexAxis,
   type IndexAxisOption,
@@ -380,6 +381,14 @@ export const LoganSearchForm = ({
 
   const bases = countBases(sequence);
   const tooLong = bases > MAX_QUERY_BASES;
+  // The backend refuses multi-record FASTA with a 422; say so here instead.
+  const records = countRecords(sequence);
+  const tooManyRecords = records > 1;
+  let queryHelp = `${bases} bases. FASTA; headers are ignored.`;
+  if (tooLong)
+    queryHelp = `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`;
+  if (tooManyRecords)
+    queryHelp = `${records} records -- a query is one sequence`;
   // An errored job keeps its jobId with no results forever, so leaving the
   // error out of this leaves the form stuck "running" with no way back.
   const isRunning =
@@ -390,6 +399,7 @@ export const LoganSearchForm = ({
     indexes.length > 0 &&
     bases > 0 &&
     !tooLong &&
+    !tooManyRecords &&
     !isRunning &&
     !search.isLoadingIndexes;
 
@@ -401,13 +411,9 @@ export const LoganSearchForm = ({
           <FormColumn>
             <Typography variant="h6">Query sequence</Typography>
             <TextField
-              error={tooLong}
+              error={tooLong || tooManyRecords}
               fullWidth
-              helperText={
-                tooLong
-                  ? `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`
-                  : `${bases} bases. FASTA; headers are ignored.`
-              }
+              helperText={queryHelp}
               maxRows={20}
               minRows={6}
               multiline
