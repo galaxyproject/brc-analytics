@@ -194,4 +194,56 @@ describe("useAssistantChat clearField", () => {
       await turn;
     });
   });
+
+  test("keeps a message that failed to send, and its retry", async () => {
+    const { result } = await renderRestored();
+    mockClient.assistantChat.mockRejectedValueOnce(new Error("network"));
+    await act(async () => {
+      await result.current.sendMessage("try the other assembly");
+    });
+    expect(result.current.onRetry).toBeDefined();
+
+    mockClient.assistantClearField.mockResolvedValue(
+      session({
+        messages: [
+          ...session().messages,
+          { content: "Data source cleared.", role: "system" },
+        ],
+      })
+    );
+    await act(async () => {
+      await result.current.clearField("data_source");
+    });
+
+    expect(result.current.messages.at(-1)).toEqual({
+      content: "try the other assembly",
+      role: "user",
+    });
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.onRetry).toBeDefined();
+
+    mockClient.assistantChat.mockResolvedValue({
+      handoff_url: null,
+      is_complete: false,
+      reply: "ok",
+      saved: false,
+      schema_state: SCHEMA,
+      session_id: SESSION_ID,
+      suggestions: [],
+    });
+    await act(async () => {
+      await result.current.onRetry?.();
+    });
+    // Retry resent the failed message and left the clear's note alone.
+    expect(mockClient.assistantChat).toHaveBeenLastCalledWith(
+      expect.objectContaining({ message: "try the other assembly" })
+    );
+    expect(result.current.messages.map((m) => m.content)).toEqual([
+      "Variant calling in P. falciparum",
+      "Sounds good.",
+      "Data source cleared.",
+      "try the other assembly",
+      "ok",
+    ]);
+  });
 });

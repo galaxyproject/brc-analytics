@@ -394,19 +394,26 @@ export const useAssistantChat = ({
       sendingRef.current = true;
 
       setLoading(true);
-      setError(null);
+      // A failed message keeps its error, which is where its Retry lives.
+      if (!lastFailedMessage) setError(null);
 
       try {
         const session = await assistantAPIClient.assistantClearField(
           sessionId,
           { field }
         );
-        // A retry pops the last transcript line, which is now this clear's
-        // note rather than the message that failed.
-        setLastFailedMessage(null);
         // The server's transcript, not an appended copy: it holds the note the
         // clear left, and the schema may have lost dependent fields with it.
-        setMessages(session.messages);
+        // A message that failed to send never reached the server, so it goes
+        // back on the end, where Retry expects to find it.
+        setMessages(
+          lastFailedMessage
+            ? [
+                ...session.messages,
+                { content: lastFailedMessage, role: "user" },
+              ]
+            : session.messages
+        );
         setSchema(session.schema_state);
         setSuggestions(session.suggestions);
         setIsComplete(session.is_complete);
@@ -420,7 +427,7 @@ export const useAssistantChat = ({
         sendingRef.current = false;
       }
     },
-    []
+    [lastFailedMessage]
   );
 
   // Ask the handed-over question once, then drop it from the URL: it outlives
