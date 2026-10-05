@@ -1,3 +1,5 @@
+set -o pipefail
+
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <filename>" >&2
   exit 1
