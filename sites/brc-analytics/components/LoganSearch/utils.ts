@@ -160,6 +160,90 @@ export function selectIndexes(
   );
 }
 
+export interface IndexPreset {
+  divisions: string[];
+  label: string;
+  // The group's name on logan-search.org, so a reader coming from there can
+  // find the one they know.
+  loganName: string;
+  // What the preset searches, for its tooltip.
+  note: string;
+  strategies: string[];
+}
+
+interface IndexPresetRule {
+  // Codes the preset keeps on each axis; omitted means the whole axis.
+  division?: (code: string) => boolean;
+  label: string;
+  loganName: string;
+  note: string;
+  strategy?: (code: string) => boolean;
+}
+
+const VIRAL_AND_HUMAN = new Set(["HUMAN", "PHG", "VRL"]);
+
+/* logan-search.org's groups that come out as a product of our two axes, and
+   so as a chip selection. Its Fast groups are left out because they drop the
+   small sub-indexes inside each division, which a STRATEGY_DIVISION index
+   cannot express, and GenBank_RefSeq because nothing like it is deployed. */
+const PRESET_RULES: IndexPresetRule[] = [
+  { label: "All", loganName: "All", note: "Every registered index." },
+  {
+    division: (code) => !VIRAL_AND_HUMAN.has(code),
+    label: "All but viral and human",
+    loganName: "All_No_viral_human",
+    note: "Every index except viruses, phage and human.",
+  },
+  {
+    label: "Transcriptomic",
+    loganName: "Transcriptomic",
+    note: "Bulk and single-cell transcriptomic libraries.",
+    strategy: (code) =>
+      code === "TRANSCRIPTOMIC" || code === "TRANSCRIPTOMICSINGLECELL",
+  },
+  {
+    label: "Metatranscriptomic",
+    loganName: "Metatranscriptomic",
+    note: "Metatranscriptomic libraries.",
+    strategy: (code) => code === "METATRANSCRIPTOMIC",
+  },
+  {
+    label: "Metagenomic",
+    loganName: "Metagenomic",
+    note: "Metagenomic libraries.",
+    strategy: (code) => code === "METAGENOMIC",
+  },
+];
+
+/**
+ * The logan-search.org groups this instance can offer, as axis selections.
+ *
+ * Read off the registered list rather than written out as index names, so a
+ * division added upstream lands in All_No_viral_human without anyone editing
+ * this, and a preset with nothing registered under it is not offered at all.
+ * An axis left whole is an empty selection, the same All the chip rows use.
+ * @param indexes - Index names from the API.
+ * @returns The presets that select at least one index, in display order.
+ */
+export function indexPresets(indexes: string[]): IndexPreset[] {
+  const allDivisions = axisOptions(indexes, "division").map(({ code }) => code);
+  const allStrategies = axisOptions(indexes, "strategy").map(
+    ({ code }) => code
+  );
+  const presets: IndexPreset[] = [];
+  for (const { division, label, loganName, note, strategy } of PRESET_RULES) {
+    const divisions = division ? allDivisions.filter(division) : [];
+    const strategies = strategy ? allStrategies.filter(strategy) : [];
+    // A rule that kept nothing would read as an empty selection, which is no
+    // constraint at all, and select everything under the wrong name.
+    if (division && divisions.length === 0) continue;
+    if (strategy && strategies.length === 0) continue;
+    if (selectIndexes(indexes, divisions, strategies).length === 0) continue;
+    presets.push({ divisions, label, loganName, note, strategies });
+  }
+  return presets;
+}
+
 /**
  * Lowercase a label's first character so it can sit inside a sentence.
  * @param label - Display label as it appears on a chip.

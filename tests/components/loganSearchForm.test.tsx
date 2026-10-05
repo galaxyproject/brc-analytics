@@ -389,3 +389,79 @@ describe("LoganSearchForm query file", () => {
     );
   });
 });
+
+describe("LoganSearchForm presets", () => {
+  test("offers Logan's groups and says why the others are missing", () => {
+    renderForm();
+
+    expect(
+      within(row("Presets"))
+        .getAllByRole("button")
+        .map((button) => button.textContent)
+    ).toEqual([
+      "All",
+      "All but viral and human",
+      "Transcriptomic",
+      "Metatranscriptomic",
+      "Metagenomic",
+    ]);
+    expect(screen.getByText(/Fast groups aren't here/)).toBeTruthy();
+    expect(screen.getByText(/GenBank_RefSeq/)).toBeTruthy();
+  });
+
+  test("a preset sets the chip rows, which stay editable", () => {
+    renderForm();
+
+    fireEvent.click(chip("Presets", "Metagenomic"));
+    expect(
+      chip("Library type", "Metagenomic").getAttribute("aria-pressed")
+    ).toBe("true");
+    expect(chip("Organism", "All").getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen.getByText(
+        "Searching 13 of 109 indexes: every organism; metagenomic."
+      )
+    ).toBeTruthy();
+
+    fireEvent.click(chip("Organism", "Bacteria"));
+    expect(
+      screen.getByText("Searching 1 of 109 indexes: METAGENOMIC_BCT.")
+    ).toBeTruthy();
+    // The rows no longer come to the preset, so it is no longer lit.
+    expect(chip("Presets", "Metagenomic").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
+  });
+
+  test("submits what All but viral and human comes to", () => {
+    const { submit } = renderForm();
+
+    fireEvent.click(chip("Presets", "All but viral and human"));
+    fireEvent.click(searchButton());
+
+    const sent: string[] = submit.mock.calls[0][0].indexes;
+    expect(sent).toHaveLength(82);
+    expect(sent.some((index) => /_(VRL|PHG|HUMAN)$/.test(index))).toBe(false);
+  });
+
+  test("lights a preset reached by hand", () => {
+    renderForm();
+
+    fireEvent.click(chip("Organism", "All"));
+    fireEvent.click(chip("Library type", "All"));
+
+    expect(chip("Presets", "All").getAttribute("aria-pressed")).toBe("true");
+    expect(chip("Presets", "Transcriptomic").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
+  });
+
+  test("names the logan-search.org group and its size on hover", async () => {
+    renderForm();
+
+    expect(await tooltipOf("Presets", "Transcriptomic")).toBe(
+      "Transcriptomic on logan-search.org -- Bulk and single-cell " +
+        "transcriptomic libraries. 24 indexes."
+    );
+  });
+});

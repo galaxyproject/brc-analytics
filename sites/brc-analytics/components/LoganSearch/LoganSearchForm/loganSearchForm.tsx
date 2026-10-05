@@ -14,6 +14,7 @@ import {
   type IndexAxis,
   type IndexAxisOption,
   indexDivision,
+  indexPresets,
   indexStrategy,
   selectIndexes,
   sortIndexes,
@@ -337,6 +338,24 @@ export const LoganSearchForm = ({
   const organismChips = axisChips(options, organisms, libraries, "division");
   const libraryChips = axisChips(options, libraries, organisms, "strategy");
 
+  // Lit by what the chips come to rather than by which preset was clicked
+  // last, so picking the same set by hand lights it too and a tweak after a
+  // click turns it off.
+  const selectedKey = indexes.join(",");
+  const presets = indexPresets(options).map((preset) => {
+    const presetIndexes = selectIndexes(
+      options,
+      preset.divisions,
+      preset.strategies
+    );
+    const noun = presetIndexes.length === 1 ? "index" : "indexes";
+    return {
+      ...preset,
+      selected: presetIndexes.join(",") === selectedKey,
+      tooltip: `${preset.loganName} on logan-search.org -- ${preset.note} ${presetIndexes.length} ${noun}.`,
+    };
+  });
+
   const sentence = describeIndexSelection({
     libraries: pickedLabels(libraryChips, libraries),
     organisms: pickedLabels(organismChips, organisms),
@@ -456,6 +475,35 @@ export const LoganSearchForm = ({
             )}
             {!search.isLoadingIndexes && options.length > 0 && (
               <>
+                <IndexAxisRow aria-labelledby="logan-presets" role="group">
+                  <Typography
+                    component="span"
+                    id="logan-presets"
+                    variant="body2"
+                  >
+                    Presets
+                  </Typography>
+                  <IndexChips>
+                    {presets.map((preset) => (
+                      <AxisChip
+                        key={preset.loganName}
+                        label={preset.label}
+                        onClick={(): void => {
+                          setOrganismsPicked(preset.divisions);
+                          setLibrariesPicked(preset.strategies);
+                        }}
+                        selected={preset.selected}
+                        tooltip={preset.tooltip}
+                      />
+                    ))}
+                  </IndexChips>
+                </IndexAxisRow>
+                <Typography color="textSecondary" variant="caption">
+                  logan-search.org&apos;s Fast groups aren&apos;t here because
+                  they drop the small sub-indexes inside each division, which
+                  these indexes can&apos;t express, and GenBank_RefSeq
+                  isn&apos;t deployed on this instance.
+                </Typography>
                 <AxisRow
                   allTooltip="Every organism group registered."
                   label="Organism"
