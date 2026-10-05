@@ -494,6 +494,22 @@ _STATE_FIELDS = (
     "data_source",
 )
 
+# Row labels from the setup panel, so the transcript note a clear leaves behind
+# names what the user actually clicked.
+_FIELD_LABELS = {
+    "organism": "Organism",
+    "assembly": "Assembly",
+    "analysis_type": "Analysis type",
+    "workflow": "Workflow",
+    "data_source": "Data source",
+}
+
+# Session metadata key for fields cleared from the setup panel since the last
+# turn. The model's history still has the old choices in it, so the next turn
+# names the clears explicitly rather than leaving the model to spot a "pending"
+# in the progress prefix.
+_PANEL_CLEARS_KEY = "panel_clears"
+
 
 async def _safe_record(
     sink: Callable[[TurnTelemetry], Awaitable[None]], telemetry: TurnTelemetry
@@ -915,7 +931,29 @@ class AssistantAgent:
         return f"[Analysis progress: {', '.join(parts)}]"
 
     @staticmethod
-    def _wrap_user_message(schema: AnalysisSchema, message: str) -> str:
+    def _build_clears_note(cleared: Optional[List[str]]) -> Optional[str]:
+        """Tell the model which fields the user cleared from the setup panel.
+
+        Only field names from _FIELD_LABELS get through, so nothing
+        user-controlled lands outside the <user_input> fence.
+        """
+        names = [
+            _FIELD_LABELS[name].lower()
+            for name in cleared or []
+            if name in _FIELD_LABELS
+        ]
+        if not names:
+            return None
+        return (
+            "[The user cleared these from the analysis setup panel since the "
+            f"last message: {', '.join(names)}. They are undecided now; do not "
+            "carry the earlier choices forward.]"
+        )
+
+    @staticmethod
+    def _wrap_user_message(
+        schema: AnalysisSchema, message: str, cleared: Optional[List[str]] = None
+    ) -> str:
         """Combine the schema-state prefix with a fenced user message.
 
         The user body is wrapped in <user_input>...</user_input>; any literal
@@ -924,6 +962,9 @@ class AssistantAgent:
         treat the fenced content as untrusted data, not instructions.
         """
         prefix = AssistantAgent._build_context_prefix(schema)
+        clears_note = AssistantAgent._build_clears_note(cleared)
+        if clears_note:
+            prefix = f"{prefix}\n{clears_note}"
         # Insert U+200B (zero-width space) inside any closing-tag variant in
         # the body so the fence stays unambiguous. The model still reads the
         # user's text but cannot terminate the fence early. The regex catches
@@ -1272,7 +1313,11 @@ class AssistantAgent:
 
         # Wrap user message in a clearly-delimited fence so the model treats
         # its contents as untrusted data, not instructions.
-        augmented_message = self._wrap_user_message(state.schema_state, message)
+        # Popped here but only persisted with the rest of the turn, so a turn
+        # that fails leaves the clears queued for the next one.
+        augmented_message = self._wrap_user_message(
+            state.schema_state, message, state.metadata.pop(_PANEL_CLEARS_KEY, None)
+        )
 
         # 1) Conversational reply -- plain text, so it can't fail on structured
         # grounds. This is the only thing the user waits on for their answer.
@@ -1398,6 +1443,70 @@ class AssistantAgent:
         # still DB-agnostic -- what keeps this layer out of the database is
         # that it doesn't write to one, not that it withholds what it has.
         return response, telemetry, state
+
+    async def clear_field(
+        self, session_id: str, field: str, owner_keycloak_sub: Optional[str]
+    ) -> SessionState:
+        """Clear one user-chosen setup field directly, with no model call.
+
+        The setup panel used to clear by sending a chat message worded so the
+        model would drop the field, which a prompt or model change could break
+        silently (#1796). This goes through the same apply + reflector path a
+        turn does, so the dependent clears hold: an organism takes its assembly
+        and workflow with it, an analysis type its workflow, a workflow its
+        derived data characteristics.
+
+        The transcript gets a system note rather than a fake user message, and
+        the cleared fields are queued so the next turn tells the model about
+        them. Clearing a field that is already empty changes nothing.
+
+        Raises KeyError for a missing session and PermissionError for one owned
+        by someone else, like require_session.
+        """
+        if field not in _FIELD_LABELS:
+            raise ValueError(f"{field!r} is not a clearable field")
+        state = await self.session_service.require_session(
+            session_id, owner_keycloak_sub
+        )
+        prior = state.schema_state
+        if getattr(prior, field) == SchemaField():
+            return state
+
+        logan = state.metadata.get("logan")
+        schema = self._apply_schema_updates(prior, {field: None}, logan=logan)
+        # The requested field first, then whatever went with it.
+        cleared = [field] + [
+            name
+            for name in _STATE_FIELDS
+            if name != field
+            and getattr(prior, name).status != FieldStatus.EMPTY
+            and getattr(schema, name).status == FieldStatus.EMPTY
+        ]
+
+        state.schema_state = schema
+        state.suggestions = self._derive_suggestions(schema, logan=logan)
+        state.messages.append(
+            ChatMessage(role=MessageRole.SYSTEM, content=self._clear_note(cleared))
+        )
+        queued = state.metadata.get(_PANEL_CLEARS_KEY) or []
+        state.metadata[_PANEL_CLEARS_KEY] = queued + [
+            name for name in cleared if name not in queued
+        ]
+        self._cap_state_messages(state)
+        await self.session_service.save_session(state)
+        return state
+
+    @staticmethod
+    def _clear_note(cleared: List[str]) -> str:
+        """The transcript line for a setup-panel clear, e.g. "Organism cleared,
+        along with assembly and workflow." """
+        first, *rest = (_FIELD_LABELS[name] for name in cleared)
+        if not rest:
+            return f"{first} cleared."
+        others = [label.lower() for label in rest]
+        if len(others) > 1:
+            others = [", ".join(others[:-1]), others[-1]]
+        return f"{first} cleared, along with {' and '.join(others)}."
 
     def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:
         """Take this turn's messages off the already-serialized history.

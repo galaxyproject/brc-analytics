@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -67,6 +67,9 @@ class AnalysisSchema(BaseModel):
 class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
+    # A note from the app itself, e.g. a field cleared from the setup panel.
+    # Transcript only: the model's history is kept separately.
+    SYSTEM = "system"
 
 
 class ChatMessage(BaseModel):
@@ -136,6 +139,15 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = Field(
         None, description="Existing session to continue; omit to start fresh"
     )
+
+
+class ClearFieldRequest(BaseModel):
+    """Request body for POST /api/v1/assistant/session/{id}/clear-field."""
+
+    # The fields a user chooses in conversation. The rest are derived from the
+    # workflow and assembly and recomputed on every apply, so a clear of one
+    # would not stick.
+    field: Literal["organism", "assembly", "analysis_type", "workflow", "data_source"]
 
 
 class TokenUsage(BaseModel):
