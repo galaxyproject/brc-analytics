@@ -5,6 +5,7 @@ deliberately small: the whole-match-set cohort (the only honest numbers), the
 top hits by score, and the totals. Never the 50,000-row pageable list.
 """
 
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -67,3 +68,26 @@ class LoganSessionRequest(BaseModel):
     """Body for POST /api/v1/assistant/session."""
 
     logan_job_id: str = Field(..., pattern=JOB_ID_PATTERN)
+
+
+class LoganSearchRecord(BaseModel):
+    """One search a signed-in user submitted, as their workspace lists it.
+
+    No query name or sequence: kmindex_submissions keeps the query's size, not
+    its content, and the results page names the query once reopened.
+    """
+
+    job_id: str
+    indexes: List[str]
+    query_bases: int
+    threshold: float
+    created_at: datetime
+
+
+class LoganSearchPage(BaseModel):
+    """GET /api/v1/user/logan_searches: one page, newest first."""
+
+    searches: List[LoganSearchRecord]
+    total: int
+    limit: int
+    offset: int

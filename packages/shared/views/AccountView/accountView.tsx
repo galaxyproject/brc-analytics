@@ -11,14 +11,16 @@ import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import { useFavorites } from "@repo/shared/providers/favorites/provider";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type {
+  LoganSearchRecord,
   SavedAnalysisSummary,
   WorkflowRunResponse,
 } from "@repo/shared/services/api-client/types";
-import { type JSX, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useState } from "react";
 import { AnalysesSection } from "./components/AnalysesSection/analysesSection";
 import { EmptyWorkspace } from "./components/EmptyWorkspace/emptyWorkspace";
 import { FavoritesSection } from "./components/FavoritesSection/favoritesSection";
 import { LaunchesSection } from "./components/LaunchesSection/launchesSection";
+import { LoganSearchesSection } from "./components/LoganSearchesSection/loganSearchesSection";
 import { SignInGate } from "./components/SignInGate/signInGate";
 
 // Module-level so their identity is stable: useUserResource refetches whenever
@@ -30,7 +32,7 @@ const fetchLaunches = (): Promise<WorkflowRunResponse[]> =>
 
 /**
  * The signed-in user's workspace: analyses, saved assemblies and organisms,
- * and workflow launches.
+ * workflow launches, and Logan searches.
  * @returns the workspace element.
  */
 export function AccountView(): JSX.Element {
@@ -44,18 +46,36 @@ export function AccountView(): JSX.Element {
   } = useFavorites();
   const analyses = useUserResource<SavedAnalysisSummary>(fetchAnalyses);
   const launches = useUserResource<WorkflowRunResponse>(fetchLaunches);
+  const [loganTotal, setLoganTotal] = useState(0);
+  // Stable because setLoganTotal is; it only needs to carry the total out
+  // alongside the first page.
+  const fetchLoganSearches = useCallback(async (): Promise<
+    LoganSearchRecord[]
+  > => {
+    const page = await apiClient.getLoganSearches();
+    setLoganTotal(page.total);
+    return page.searches;
+  }, []);
+  const loganSearches = useUserResource<LoganSearchRecord>(fetchLoganSearches);
 
   const isLoading =
-    isFavoritesLoading || analyses.isLoading || launches.isLoading;
+    isFavoritesLoading ||
+    analyses.isLoading ||
+    launches.isLoading ||
+    loganSearches.isLoading;
   // A load that failed leaves its list empty, which is not evidence the user
   // has nothing saved -- fall through to the sections so the one that failed
   // shows its own error instead of the workspace claiming emptiness.
   const hasError = Boolean(favoritesError || analyses.error || launches.error);
+  // Logan searches stay out of hasError on purpose: the section only exists
+  // for someone who has run one, so a failed load (or a backend without the
+  // endpoint) reads as no section rather than as a workspace-level error.
   const isEmpty =
     !hasError &&
     favorites.length === 0 &&
     analyses.items.length === 0 &&
-    launches.items.length === 0;
+    launches.items.length === 0 &&
+    loganSearches.items.length === 0;
 
   // Sticky once true: whether to show sections or EmptyWorkspace can't be
   // decided until the first load resolves, and re-checking on every later
@@ -134,6 +154,9 @@ export function AccountView(): JSX.Element {
           </>
         )}
         <LaunchesSection resource={launches} />
+        {loganSearches.items.length > 0 && (
+          <LoganSearchesSection resource={loganSearches} total={loganTotal} />
+        )}
       </>
     );
   }
