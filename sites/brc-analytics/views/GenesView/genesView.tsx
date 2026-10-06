@@ -115,7 +115,9 @@ function Results({
         {results.map(({ gene, matchedAlias }) => (
           <tr key={gene.geneUid}>
             <td>
-              <Link href={`/data/genes/${gene.geneUid}`}>{gene.geneId}</Link>
+              <Link href={`/data/genes/detail?uid=${gene.geneUid}`}>
+                {gene.geneId}
+              </Link>
               {matchedAlias && (
                 <>
                   {" "}
