@@ -122,7 +122,7 @@ export const AssistantView = ({
             children: (
               <AnalysisSetup
                 handoffUrl={handoffUrl}
-                loading={loading}
+                loading={loading || isRestoring || isOpening}
                 onSend={sendMessage}
                 schema={schema}
               />
