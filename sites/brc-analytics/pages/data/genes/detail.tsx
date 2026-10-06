@@ -6,6 +6,7 @@ import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { findGeneByUid } from "@repo/shared/services/genes/fixture";
 import { type GetStaticProps } from "next";
 import Error from "next/error";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { type JSX } from "react";
 
@@ -24,7 +25,14 @@ const Page = (): JSX.Element => {
   const gene = findGeneByUid(geneUid);
   if (!gene) return <Error statusCode={404} />;
   const title = gene.symbol ? `${gene.geneId} (${gene.symbol})` : gene.geneId;
-  return <GeneDetailView gene={gene} title={title} />;
+  return (
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <GeneDetailView gene={gene} title={title} />
+    </>
+  );
 };
 
 export const getStaticProps: GetStaticProps<GeneDetailProps> = () => {
