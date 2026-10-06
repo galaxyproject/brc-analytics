@@ -13,21 +13,21 @@ import type { AnalysisSetupProps } from "./types";
  * @param props - Component props.
  * @param props.handoffUrl - Workflow setup URL, or null until the schema is complete.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
  * @param props.schema - Current analysis schema, or null before the assistant has returned one.
  * @returns The analysis setup panel element.
  */
 export const AnalysisSetup = ({
   handoffUrl,
   loading,
-  onSend,
+  onClearField,
   schema,
 }: AnalysisSetupProps): JSX.Element => {
   return (
     <Stack>
       <Header schema={schema} />
       <Progress schema={schema} />
-      <Fields loading={loading} onSend={onSend} schema={schema} />
+      <Fields loading={loading} onClearField={onClearField} schema={schema} />
       <Action handoffUrl={handoffUrl} loading={loading} schema={schema} />
     </Stack>
   );

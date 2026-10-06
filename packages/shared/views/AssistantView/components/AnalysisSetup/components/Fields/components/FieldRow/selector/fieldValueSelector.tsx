@@ -19,14 +19,14 @@ import type { FieldValueSelectorProps } from "./types";
  * @param props.field - Field state.
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
  * @returns The selected field value component.
  */
 export const FieldValueSelector = ({
   field,
   fieldKey,
   loading,
-  onSend,
+  onClearField,
 }: FieldValueSelectorProps): JSX.Element => {
   switch (field.status) {
     case FIELD_STATUS.FILLED:
@@ -35,7 +35,7 @@ export const FieldValueSelector = ({
           field={field}
           fieldKey={fieldKey}
           loading={loading}
-          onSend={onSend}
+          onClearField={onClearField}
         />
       );
     case FIELD_STATUS.NEEDS_ATTENTION:

@@ -11,14 +11,14 @@ import type { FieldGroupProps } from "./types";
  * @param props - Component props.
  * @param props.group - Field group.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
  * @param props.schema - Current analysis schema, or null.
  * @returns The field group element.
  */
 export const FieldGroup = ({
   group,
   loading,
-  onSend,
+  onClearField,
   schema,
 }: FieldGroupProps): JSX.Element => {
   return (
@@ -36,7 +36,7 @@ export const FieldGroup = ({
           field={getField(schema, fieldKey)}
           fieldKey={fieldKey}
           loading={loading}
-          onSend={onSend}
+          onClearField={onClearField}
         />
       ))}
     </Stack>

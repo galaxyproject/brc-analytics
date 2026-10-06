@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 from app.core.session_signing import sign_session_id
-from app.models.assistant import SessionState
+from app.models.assistant import ChatMessage, MessageRole, SessionState
 from app.models.user_data import UserMeResponse
 from tests.conftest import SECRET
 
@@ -430,3 +430,58 @@ class TestSaveWithoutADatabase:
         # refusal is not an exception -- both of those were the spam.
         agent.session_service.claim_session.assert_not_awaited()
         assert not [record for record in caplog.records if record.exc_info]
+
+
+class TestChatClearFields:
+    """The setup panel's x clears a field on a /chat turn (#1796)."""
+
+    def _agent(self, app):
+        from app.core.dependencies import get_assistant_agent
+
+        return app.dependency_overrides[get_assistant_agent]()
+
+    def test_passes_clears_through(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        resp = client.post(
+            "/api/v1/assistant/chat",
+            json={"clear_fields": ["organism"], "session_id": "sess-abc"},
+        )
+        assert resp.status_code == 200, resp.text
+        args = agent.chat_with_telemetry.await_args
+        assert args.args[0] is None
+        assert args.kwargs["clear_fields"] == ["organism"]
+
+    def test_message_alone_still_works(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+        assert resp.status_code == 200, resp.text
+        assert agent.chat_with_telemetry.await_args.kwargs["clear_fields"] == []
+
+    def test_rejects_a_derived_field(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post(
+            "/api/v1/assistant/chat",
+            json={"clear_fields": ["gene_annotation"], "session_id": "sess-abc"},
+        )
+        assert resp.status_code == 422
+        agent.chat_with_telemetry.assert_not_awaited()
+
+    def test_rejects_an_empty_turn(self, client, app_with_stubbed_agent):
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post("/api/v1/assistant/chat", json={})
+        assert resp.status_code == 422
+        agent.chat_with_telemetry.assert_not_awaited()
+
+    def test_rejects_an_empty_message(self, client, app_with_stubbed_agent):
+        resp = client.post("/api/v1/assistant/chat", json={"message": ""})
+        assert resp.status_code == 422
+
+    def test_rejects_a_clear_without_a_session(self, client, app_with_stubbed_agent):
+        # A new session has nothing to clear; don't spend a turn finding out.
+        agent = self._agent(app_with_stubbed_agent)
+        resp = client.post(
+            "/api/v1/assistant/chat", json={"clear_fields": ["organism"]}
+        )
+        assert resp.status_code == 422
+        agent.chat_with_telemetry.assert_not_awaited()

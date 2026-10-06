@@ -1,12 +1,12 @@
 import type { TooltipProps } from "@mui/material";
-import type { SchemaFieldKey } from "@repo/shared/views/AssistantView/components/AnalysisSetup/types";
+import type { ClearableField } from "@repo/shared/services/api-client/types";
 
 /**
  * Fields the user chose in conversation, and so can clear from the panel. The
  * rest are derived from the workflow and assembly and recomputed every turn,
  * so clearing one would not stick.
  */
-export const CLEARABLE_FIELDS: ReadonlySet<SchemaFieldKey> = new Set([
+export const CLEARABLE_FIELDS: ReadonlySet<string> = new Set<ClearableField>([
   "analysis_type",
   "assembly",
   "data_source",

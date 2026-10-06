@@ -1,24 +1,40 @@
 import { Box, Typography } from "@mui/material";
+import type { ChatMessageRole } from "@repo/shared/services/api-client/types";
 import { type JSX } from "react";
 import { AssistantBubble, MessageRow, UserBubble } from "./chatMessage.styles";
 import { MarkdownContent } from "./markdownContent";
 
 interface ChatMessageProps {
   content: string;
-  role: "user" | "assistant";
+  role: ChatMessageRole;
 }
 
 /**
- * Renders a single chat message bubble.
+ * Renders a single chat message bubble, or the app's own note (such as a field
+ * cleared from the setup panel) as a plain centred line, so it doesn't read as
+ * something either side said.
  * @param props - Component props
  * @param props.content - Message text content
- * @param props.role - Whether the message is from user or assistant
+ * @param props.role - Whether the message is from user, assistant, or the app
  * @returns Chat message element
  */
 export const ChatMessage = ({
   content,
   role,
 }: ChatMessageProps): JSX.Element => {
+  if (role === "system") {
+    return (
+      <Typography
+        color="text.secondary"
+        component="div"
+        sx={{ textAlign: "center" }}
+        variant="body2"
+      >
+        {content}
+      </Typography>
+    );
+  }
+
   const isUser = role === "user";
   const Bubble = isUser ? UserBubble : AssistantBubble;
 

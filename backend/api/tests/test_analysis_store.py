@@ -71,6 +71,42 @@ async def test_skips_sessions_with_no_user_turn():
 
 
 @pytest.mark.asyncio
+async def test_skips_a_conversation_the_user_has_not_touched():
+    # A Logan session opens with the assistant's intro and nothing from the
+    # user; that's not worth a row yet.
+    intro_only = [
+        ChatMessage(content="Here's your cohort.", role=MessageRole.ASSISTANT)
+    ]
+    with patch.object(analysis_store, "db_session") as db:
+        await analysis_store.record(_state(messages=intro_only))
+    db.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_a_setup_panel_clear_is_worth_saving():
+    # A clear leaves a system note rather than a user line, but it's still the
+    # user changing their analysis -- the old chat-message clear was saved.
+    captured = {}
+
+    async def fake_upsert(session, user, **kwargs):
+        captured.update(kwargs)
+
+    messages = [
+        ChatMessage(content="Here's your cohort.", role=MessageRole.ASSISTANT),
+        ChatMessage(content="Organism cleared.", role=MessageRole.SYSTEM),
+        ChatMessage(content="Which organism instead?", role=MessageRole.ASSISTANT),
+    ]
+    with (
+        patch.object(analysis_store, "upsert_saved_analysis", fake_upsert),
+        patch.object(analysis_store, "get_user_id_by_keycloak_sub", AsyncMock()),
+        patch.object(analysis_store, "db_session"),
+    ):
+        await analysis_store.record(_state(messages=messages))
+
+    assert captured["title"] == "Saved analysis"
+
+
+@pytest.mark.asyncio
 async def test_a_missing_user_row_is_reported_rather_than_shrugged_off(caplog):
     """A valid session whose users row is gone -- a DB restore, a manual
     cleanup -- used to return None from the same branch as an empty

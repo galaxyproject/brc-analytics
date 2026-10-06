@@ -2,5 +2,5 @@ import type { AnalysisSetupProps } from "@repo/shared/views/AssistantView/compon
 
 export type FieldsProps = Pick<
   AnalysisSetupProps,
-  "loading" | "onSend" | "schema"
+  "loading" | "onClearField" | "schema"
 >;

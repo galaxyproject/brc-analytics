@@ -93,12 +93,13 @@ class FakeAssistantAgent:
 
     async def chat_with_telemetry(
         self,
-        message: str,
+        message: str | None,
         session_id: str | None,
         owner_keycloak_sub: str | None,
         *,
         turn_id=None,
         on_turn=None,
+        clear_fields=None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         """Stub a turn, handing back the state auto-save writes from."""
         state = self.session_service.sessions.get(session_id or "")
