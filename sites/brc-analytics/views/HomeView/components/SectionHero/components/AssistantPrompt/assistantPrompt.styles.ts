@@ -23,6 +23,12 @@ export const StyledForm = styled.form`
         inset 0 0 0 1px ${PALETTE.SMOKE_DARK},
         ${SHADOWS["02"]};
       flex-direction: row;
+
+      &:has(.MuiInputBase-root.Mui-focused) {
+        box-shadow:
+          inset 0 0 0 1px ${PALETTE.INK_MAIN},
+          ${SHADOWS["02"]};
+      }
     }
 
     .MuiInputBase-root {
