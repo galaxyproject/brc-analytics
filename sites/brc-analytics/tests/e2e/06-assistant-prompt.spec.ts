@@ -1,7 +1,10 @@
+import { EXAMPLE_CATEGORIES } from "@brc/views/HomeView/components/SectionHero/components/AssistantPrompt/components/ExampleQueries/constants";
 import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { expect, test } from "./utils/fixtures";
 
 const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
+const [EXAMPLE_CATEGORY] = EXAMPLE_CATEGORIES;
+const [EXAMPLE_QUESTION] = EXAMPLE_CATEGORY.queries;
 
 test.describe("BRC Analytics - Home Assistant Prompt", () => {
   test("the send button waits for a question to send", async ({ page }) => {
@@ -33,6 +36,19 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     // Sent as the first message of the conversation. The reply needs a backend
     // this suite doesn't run, so only the question itself is asserted.
     await expect(page.getByText(QUESTION).first()).toBeVisible();
+  });
+
+  test("an example question opens the assistant with it", async ({ page }) => {
+    await page.goto("/");
+
+    await page
+      .locator("form")
+      .getByRole("button", { name: EXAMPLE_CATEGORY.label })
+      .click();
+    await page.getByRole("menuitem", { name: EXAMPLE_QUESTION }).click();
+
+    await page.waitForURL(/\/assistant/);
+    await expect(page.getByText(EXAMPLE_QUESTION).first()).toBeVisible();
   });
 
   test("the question doesn't linger in the URL to be asked twice", async ({
