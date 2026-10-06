@@ -345,9 +345,14 @@ export const useAssistantChat = ({
       .then(() => {
         // On disk whether or not this run is still current.
         setLastSave({ sessionId: currentSessionId });
-        if (cancelled) return;
-        setIsSaved(true);
-        isPersistedRef.current = true;
+        // Saved whatever cut this run short -- often just the same
+        // conversation starting a turn -- so long as it is still the one open.
+        if (sessionIdRef.current === currentSessionId) {
+          isPersistedRef.current = true;
+        }
+        // The account label is another matter: a run cut short by signing out
+        // must not claim the conversation for the account.
+        if (!cancelled) setIsSaved(true);
       })
       .catch((error: unknown) => {
         // The label stays off, which is the honest reading. But the latch was
