@@ -24,6 +24,7 @@ const config = [
       "**/.venv/**",
       "**/.pytest_cache/**",
       "**/.ruff_cache/**",
+      "**/.mypy_cache/**",
       "**/__pycache__/**",
       "**/generated/**",
       "**/playwright-report/**",
