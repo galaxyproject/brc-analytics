@@ -514,8 +514,11 @@ export const useAssistantChat = ({
     // Only a conversation that isn't saved is being discarded. A saved one
     // stays in the user's history, and reopening it rebuilds a live session if
     // the old one is gone -- so deleting it frees nothing worth having, and
-    // races a reopen that lands before the delete does.
-    if (oldId && !isPersistedRef.current) {
+    // races a reopen that lands before the delete does. Signed out, a restore
+    // can't say whether it was saved (its answer is about this account), so
+    // the session is left to expire rather than risk discarding a saved one.
+    const isSavedUnknown = isConfigured && (isAuthLoading || !isAuthenticated);
+    if (oldId && !isPersistedRef.current && !isSavedUnknown) {
       assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
     // Also drops a restore or turn still in flight, whose result would
@@ -530,7 +533,14 @@ export const useAssistantChat = ({
     if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
       stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
-  }, [router, sessionKey, startConversation]);
+  }, [
+    isAuthLoading,
+    isAuthenticated,
+    isConfigured,
+    router,
+    sessionKey,
+    startConversation,
+  ]);
 
   // A failed message retries that message; a failed restore, the restore.
   let onRetry: (() => Promise<void>) | undefined;

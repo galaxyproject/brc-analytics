@@ -193,6 +193,22 @@ describe("useAssistantChat auto-save", () => {
     expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
   });
 
+  test("signed out, new analysis leaves a restored conversation's session alone", async () => {
+    // Signed out, restore reports saved: false even for a saved conversation --
+    // its answer is about this account -- so there is no telling whether it is
+    // saved, and its live session is left to expire rather than deleted.
+    auth(false);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.messages).toHaveLength(2));
+
+    act(() => result.current.resetSession());
+
+    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
+  });
+
   test("a signed-out conversation is never sent to the account", async () => {
     auth(false);
 

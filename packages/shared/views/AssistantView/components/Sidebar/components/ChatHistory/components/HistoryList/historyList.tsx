@@ -1,5 +1,10 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { CircularProgress, ListItemButton, Typography } from "@mui/material";
+import {
+  CircularProgress,
+  ListItem,
+  ListItemButton,
+  Typography,
+} from "@mui/material";
 import type { ChatHistoryProps } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/types";
 import { Fragment, type JSX } from "react";
 import { StyledList } from "./historyList.styles";
@@ -41,21 +46,22 @@ export const HistoryList = (props: ChatHistoryProps): JSX.Element | null => {
       {items.length > 0 && (
         <StyledList disablePadding>
           {items.map(({ id, onOpen, selected, title }) => (
-            <ListItemButton
-              aria-current={selected ? "true" : undefined}
-              disabled={disabled}
-              key={id}
-              onClick={onOpen}
-              selected={selected}
-            >
-              <Typography
-                color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
-                noWrap
-                variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}
+            <ListItem disablePadding key={id}>
+              <ListItemButton
+                aria-current={selected ? "true" : undefined}
+                disabled={disabled}
+                onClick={onOpen}
+                selected={selected}
               >
-                {title}
-              </Typography>
-            </ListItemButton>
+                <Typography
+                  color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
+                  noWrap
+                  variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}
+                >
+                  {title}
+                </Typography>
+              </ListItemButton>
+            </ListItem>
           ))}
         </StyledList>
       )}
