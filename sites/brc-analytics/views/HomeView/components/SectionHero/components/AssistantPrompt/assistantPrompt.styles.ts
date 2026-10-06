@@ -35,14 +35,20 @@ export const StyledForm = styled.form`
       }
     }
 
+    /* Input renders a secondary icon button: replace its grey inset outline. */
     .MuiIconButton-root {
       background-color: ${PALETTE.PRIMARY_MAIN};
       border-radius: 4px;
+      box-shadow: 0 1px 0 0 ${PALETTE.PRIMARY_DARK};
       color: ${PALETTE.COMMON_WHITE};
       padding: 6px;
 
       &:hover {
         background-color: ${PALETTE.PRIMARY_DARK};
+      }
+
+      &:active {
+        box-shadow: none;
       }
 
       &.Mui-disabled {
