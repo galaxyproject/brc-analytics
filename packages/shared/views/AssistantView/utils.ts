@@ -46,12 +46,13 @@ export function formatRetentionNotice(
  * one. For opening from the assistant page itself: the session cookie vouches
  * for one conversation at a time, so an entry for the one being left could not
  * be restored by Back.
- * @returns The live session the conversation was restored into.
+ * @returns The live session the conversation was restored into, or null when
+ * a later navigation cancelled this one -- the page never reached it.
  */
 export async function openSavedAnalysis(
   id: string,
   { replace = false }: OpenSavedAnalysisOptions = {}
-): Promise<string> {
+): Promise<string | null> {
   const { session_id } = await apiClient.openSavedAnalysis(id);
   const url = {
     pathname: ROUTES.ASSISTANT,
@@ -60,8 +61,8 @@ export async function openSavedAnalysis(
   // Singleton Router (not useRouter): callers need not thread one through.
   // A replace stays on the assistant page, where only the query changes, so
   // it is shallow; a push arrives from another page and loads this one.
-  await (replace
+  const navigated = await (replace
     ? Router.replace(url, undefined, { shallow: true })
     : Router.push(url));
-  return session_id;
+  return navigated ? session_id : null;
 }

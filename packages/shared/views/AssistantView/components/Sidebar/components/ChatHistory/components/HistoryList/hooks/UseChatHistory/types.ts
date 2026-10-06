@@ -16,6 +16,7 @@ export interface HistoryItem {
  */
 export interface OpenAnalysisHandlers {
   onOpeningChange: (isOpening: boolean) => void;
+  onRetryRestore: () => void;
   setItems: Dispatch<SetStateAction<SavedAnalysisSummary[]>>;
   setOpenError: Dispatch<SetStateAction<OpenError | null>>;
 }

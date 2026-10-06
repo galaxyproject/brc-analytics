@@ -80,7 +80,16 @@ export const useAssistantChat = ({
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
     null
   );
+  // A restore that failed for a reason a retry could fix, and the count of
+  // retries asked for: bumping it re-runs the restore, which a URL already
+  // naming the session would not do on its own.
+  const [isRestoreFailed, setIsRestoreFailed] = useState(false);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
+  // Whether the server has confirmed the conversation on screen is saved.
+  // Unlike isSaved -- "saved to your account", which signing out clears -- it
+  // outlives the account state, so New analysis never discards a saved one.
+  const isPersistedRef = useRef(false);
   const sendingRef = useRef(false);
   // Bumped each time a different conversation takes the screen. A request
   // started under an older value answers for a conversation no longer shown,
@@ -150,6 +159,8 @@ export const useAssistantChat = ({
     setIsRestoring(false);
     setError(null);
     setLastFailedMessage(null);
+    setIsRestoreFailed(false);
+    isPersistedRef.current = false;
     return conversationRef.current;
   }, []);
 
@@ -211,6 +222,7 @@ export const useAssistantChat = ({
         // it from auth state instead would re-save every signed-in session on
         // every mount just to find out.
         setIsSaved(restored.saved);
+        isPersistedRef.current = restored.saved;
       })
       .catch((error: unknown) => {
         if (isStale()) return;
@@ -225,6 +237,7 @@ export const useAssistantChat = ({
           status === 429
         ) {
           setError("Couldn't load that conversation.");
+          setIsRestoreFailed(true);
           return;
         }
         // Any other 4xx and this browser is never getting that session back --
@@ -256,6 +269,7 @@ export const useAssistantChat = ({
     initialLoganJobId,
     initialSessionId,
     question,
+    restoreAttempt,
     router.isReady,
     sessionKey,
     showSession,
@@ -331,7 +345,9 @@ export const useAssistantChat = ({
       .then(() => {
         // On disk whether or not this run is still current.
         setLastSave({ sessionId: currentSessionId });
-        if (!cancelled) setIsSaved(true);
+        if (cancelled) return;
+        setIsSaved(true);
+        isPersistedRef.current = true;
       })
       .catch((error: unknown) => {
         // The label stays off, which is the honest reading. But the latch was
@@ -427,7 +443,10 @@ export const useAssistantChat = ({
         // Latched, not mirrored: a later turn whose write fails does not
         // un-save the turns already on disk, and flickering the label would
         // say something worse than either state on its own.
-        if (response.saved) setIsSaved(true);
+        if (response.saved) {
+          setIsSaved(true);
+          isPersistedRef.current = true;
+        }
       } catch (err) {
         if (!isCurrent()) return;
         const errorMessage = handleChatError(err);
@@ -480,13 +499,18 @@ export const useAssistantChat = ({
     await sendMessage(msg);
   }, [lastFailedMessage, sendMessage]);
 
+  const retryRestore = useCallback((): Promise<void> => {
+    setRestoreAttempt((attempt) => attempt + 1);
+    return Promise.resolve();
+  }, []);
+
   const resetSession = useCallback((): void => {
     const oldId = sessionIdRef.current;
     // Only a conversation that isn't saved is being discarded. A saved one
     // stays in the user's history, and reopening it rebuilds a live session if
     // the old one is gone -- so deleting it frees nothing worth having, and
     // races a reopen that lands before the delete does.
-    if (oldId && !isSaved) {
+    if (oldId && !isPersistedRef.current) {
       assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
     // Also drops a restore or turn still in flight, whose result would
@@ -501,7 +525,12 @@ export const useAssistantChat = ({
     if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
       stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
-  }, [isSaved, router, sessionKey, startConversation]);
+  }, [router, sessionKey, startConversation]);
+
+  // A failed message retries that message; a failed restore, the restore.
+  let onRetry: (() => Promise<void>) | undefined;
+  if (lastFailedMessage) onRetry = retry;
+  else if (isRestoreFailed) onRetry = retryRestore;
 
   return {
     error,
@@ -513,8 +542,9 @@ export const useAssistantChat = ({
     loading,
     logan,
     messages,
-    onRetry: lastFailedMessage ? retry : undefined,
+    onRetry,
     resetSession,
+    retryRestore,
     schema,
     sendMessage,
     shownSessionId,

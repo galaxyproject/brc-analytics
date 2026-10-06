@@ -15,6 +15,7 @@ import { useChatHistory } from "./hooks/UseChatHistory/hook";
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the session saved.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns The chat history list element, or null when there is nothing to show.
  */
@@ -41,6 +42,7 @@ export const HistoryList = (props: ChatHistoryProps): JSX.Element | null => {
         <StyledList disablePadding>
           {items.map(({ id, onOpen, selected, title }) => (
             <ListItemButton
+              aria-current={selected ? "true" : undefined}
               disabled={disabled}
               key={id}
               onClick={onOpen}

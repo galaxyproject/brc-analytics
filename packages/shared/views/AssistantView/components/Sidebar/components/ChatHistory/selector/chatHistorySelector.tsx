@@ -16,6 +16,7 @@ import { type JSX } from "react";
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the session saved.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns The selected chat history content, or null while auth resolves.
  */
@@ -23,6 +24,7 @@ export const ChatHistorySelector = ({
   disabled,
   lastSave,
   onOpeningChange,
+  onRetryRestore,
   sessionId,
 }: ChatHistoryProps): JSX.Element | null => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -33,6 +35,7 @@ export const ChatHistorySelector = ({
       disabled={disabled}
       lastSave={lastSave}
       onOpeningChange={onOpeningChange}
+      onRetryRestore={onRetryRestore}
       sessionId={sessionId}
     />
   );

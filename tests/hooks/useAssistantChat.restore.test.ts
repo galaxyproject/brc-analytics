@@ -320,6 +320,28 @@ describe("useAssistantChat switching conversations on the page", () => {
     expect(result.current.shownSessionId).toBeNull();
   });
 
+  test("a conversation that failed to load can be restored again on request", async () => {
+    // The URL already names the session, so nothing changes to re-run the
+    // restore on its own: Retry (and picking it again in the history) asks.
+    const { rerender, result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() => expect(result.current.onRetry).toBeDefined());
+
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(OPENED_ID, "opened reply")
+    );
+    await act(async () => {
+      await result.current.onRetry?.();
+    });
+
+    await waitFor(() =>
+      expect(result.current.messages[1]?.content).toBe("opened reply")
+    );
+    expect(result.current.shownSessionId).toBe(OPENED_ID);
+    expect(result.current.error).toBeNull();
+  });
+
   test("a save that lands for the conversation left behind is reported against it", async () => {
     // The chat history checks the session saved, not the one showing, so a
     // first save that lands after the user moved on still joins the list.

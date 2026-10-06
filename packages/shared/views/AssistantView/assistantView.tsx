@@ -36,6 +36,7 @@ export const AssistantView = ({
     messages,
     onRetry,
     resetSession,
+    retryRestore,
     schema,
     sendMessage,
     shownSessionId,
@@ -110,6 +111,7 @@ export const AssistantView = ({
                 lastSave={lastSave}
                 onNewAnalysis={resetSession}
                 onOpeningChange={setIsOpening}
+                onRetryRestore={retryRestore}
                 sessionId={shownSessionId}
                 supportUrl={supportUrl}
               />

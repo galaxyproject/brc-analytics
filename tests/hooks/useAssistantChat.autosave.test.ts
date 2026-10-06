@@ -169,6 +169,30 @@ describe("useAssistantChat auto-save", () => {
     );
   });
 
+  test("signing out does not make new analysis discard a saved conversation", async () => {
+    // Signing out clears "saved to your account", but the conversation is
+    // still saved: its live session must survive New analysis, as for any
+    // saved conversation.
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.isSaved).toBe(true));
+
+    auth(false);
+    rerender();
+    await waitFor(() => expect(result.current.isSaved).toBe(false));
+
+    act(() => result.current.resetSession());
+
+    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
+  });
+
   test("a signed-out conversation is never sent to the account", async () => {
     auth(false);
 

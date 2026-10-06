@@ -15,6 +15,7 @@ import type { SidebarProps } from "./types";
  * @param props.lastSave - Most recent confirmed save, naming the session saved.
  * @param props.onNewAnalysis - Starts a new conversation.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @param props.supportUrl - Feedback form URL; the feedback button is hidden without one.
  * @returns The sidebar element.
@@ -25,6 +26,7 @@ export const Sidebar = ({
   lastSave,
   onNewAnalysis,
   onOpeningChange,
+  onRetryRestore,
   sessionId,
   supportUrl,
 }: SidebarProps): JSX.Element => {
@@ -36,6 +38,7 @@ export const Sidebar = ({
         disabled={disabled}
         lastSave={lastSave}
         onOpeningChange={onOpeningChange}
+        onRetryRestore={onRetryRestore}
         sessionId={sessionId}
       />
       <Footer disclaimer={disclaimer} supportUrl={supportUrl} />

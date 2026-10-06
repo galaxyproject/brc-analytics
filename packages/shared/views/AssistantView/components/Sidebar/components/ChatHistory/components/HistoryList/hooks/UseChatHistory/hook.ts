@@ -20,6 +20,7 @@ import {
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the session saved.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns Chat history state and list items.
  */
@@ -27,6 +28,7 @@ export const useChatHistory = ({
   disabled,
   lastSave,
   onOpeningChange,
+  onRetryRestore,
   sessionId,
 }: ChatHistoryProps): UseChatHistory => {
   const {
@@ -66,11 +68,12 @@ export const useChatHistory = ({
       if (disabled) return;
       void openAnalysis(analysis.id, sessionId, {
         onOpeningChange,
+        onRetryRestore,
         setItems,
         setOpenError,
       });
     },
-    [disabled, onOpeningChange, sessionId, setItems]
+    [disabled, onOpeningChange, onRetryRestore, sessionId, setItems]
   );
 
   const historyItems = useMemo(

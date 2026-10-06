@@ -36,6 +36,7 @@ export interface UseAssistantChatReturn {
   messages: ChatMessageDisplay[];
   onRetry?: () => Promise<void>;
   resetSession: () => void;
+  retryRestore: () => Promise<void>;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   shownSessionId: string | null;

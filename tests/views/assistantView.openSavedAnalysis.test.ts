@@ -59,6 +59,13 @@ describe("openSavedAnalysis", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
+  test("a navigation cancelled by a later one is not reported as opened", async () => {
+    // Next resolves a cancelled navigation to false rather than rejecting.
+    push.mockResolvedValue(false);
+
+    await expect(openSavedAnalysis("analysis-1")).resolves.toBeNull();
+  });
+
   test("a navigation failure is passed on", async () => {
     const error = new Error("boom");
     push.mockRejectedValue(error);

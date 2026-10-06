@@ -1,7 +1,11 @@
 import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
 import { ERROR_MESSAGE } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/components/HistoryList/constants";
-import { UNTITLED_ANALYSIS } from "@repo/shared/views/AssistantView/constants";
+import {
+  ASSISTANT_QUERY_PARAM,
+  UNTITLED_ANALYSIS,
+} from "@repo/shared/views/AssistantView/constants";
 import { openSavedAnalysis } from "@repo/shared/views/AssistantView/utils";
+import Router from "next/router";
 import type { HistoryItem, OpenAnalysisHandlers } from "./types";
 
 /**
@@ -92,24 +96,37 @@ export function isActiveAnalysis(
  * Opens a saved conversation in the chat, in place of the one showing, and
  * mirrors the backend re-pointing its record at the live session it opened --
  * which selects it without reloading the list. Reports the open as in flight
- * until it settles, and a failure against the session that was showing.
+ * until it settles, and a failure against the session that was showing. When
+ * the URL already names the session opened -- one that failed to load -- the
+ * navigation changes nothing, so the restore is asked to run again.
  * @param id - Saved conversation id.
  * @param sessionId - Session of the conversation on screen, or null while none is.
  * @param handlers - Where the open reports its progress.
  * @param handlers.onOpeningChange - Reports whether the open is in flight.
+ * @param handlers.onRetryRestore - Restores the conversation the URL names again.
  * @param handlers.setItems - Sets the saved conversations.
  * @param handlers.setOpenError - Sets the failed open, if any.
  */
 export async function openAnalysis(
   id: string,
   sessionId: string | null,
-  { onOpeningChange, setItems, setOpenError }: OpenAnalysisHandlers
+  {
+    onOpeningChange,
+    onRetryRestore,
+    setItems,
+    setOpenError,
+  }: OpenAnalysisHandlers
 ): Promise<void> {
   onOpeningChange(true);
   setOpenError(null);
   try {
+    // Singleton Router (not useRouter): read once, before the navigation.
+    const requestedSessionId = Router.query[ASSISTANT_QUERY_PARAM.SESSION_ID];
     const liveSessionId = await openSavedAnalysis(id, { replace: true });
+    // A later navigation won: the page never reached this conversation.
+    if (liveSessionId === null) return;
     setItems((analyses) => repointAnalysis(analyses, id, liveSessionId));
+    if (liveSessionId === requestedSessionId) onRetryRestore();
   } catch {
     setOpenError({ sessionId });
   } finally {
