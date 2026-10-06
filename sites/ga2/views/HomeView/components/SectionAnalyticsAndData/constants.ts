@@ -112,7 +112,7 @@ export const ANALYTICS_TOOLS: AnalyticsCard[] = [
     media: {
       alt: "UCSC Genome Browser",
       height: 40,
-      src: "/portals/ucsc.png",
+      src: "/portals/ucsc.webp",
     },
     text: CARD_TEXT.ABOUT_UCSC,
     title: "UCSC Genome Browser",
