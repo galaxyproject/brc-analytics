@@ -30,6 +30,7 @@ export const AssistantView = ({
     handoffUrl,
     isRestoring,
     isSaved,
+    lastSave,
     loading,
     logan,
     messages,
@@ -37,7 +38,7 @@ export const AssistantView = ({
     resetSession,
     schema,
     sendMessage,
-    sessionId,
+    shownSessionId,
     suggestions,
   } = useAssistantChat({
     initialLoganJobId,
@@ -46,6 +47,9 @@ export const AssistantView = ({
     sessionKey,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
+  // A conversation opening from the history: until its restore takes over,
+  // nothing else may start or send, or the open would wipe it.
+  const [isOpening, setIsOpening] = useState(false);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -67,9 +71,6 @@ export const AssistantView = ({
     };
   }, []);
 
-  // On error there are no messages and no schema, which would hide Reset
-  // exactly when it's the only way to clear a bad session id.
-  const showReset = messages.length > 0 || schema !== null || error !== null;
   const modelLabel = formatModelLabel(info);
   const retentionNotice = formatRetentionNotice(info);
   const chat = {
@@ -77,7 +78,7 @@ export const AssistantView = ({
       <ChatPanel
         error={error}
         introText={introText}
-        isRestoring={isRestoring}
+        isRestoring={isRestoring || isOpening}
         isSaved={isSaved}
         loading={loading}
         messages={messages}
@@ -104,10 +105,12 @@ export const AssistantView = ({
           history: {
             children: (
               <Sidebar
+                disabled={loading || isRestoring || isOpening}
                 disclaimer={disclaimer}
-                isSaved={isSaved}
+                lastSave={lastSave}
                 onNewAnalysis={resetSession}
-                sessionId={sessionId}
+                onOpeningChange={setIsOpening}
+                sessionId={shownSessionId}
                 supportUrl={supportUrl}
               />
             ),
@@ -127,6 +130,10 @@ export const AssistantView = ({
       />
     );
   }
+
+  // On error there are no messages and no schema, which would hide Reset
+  // exactly when it's the only way to clear a bad session id.
+  const showReset = messages.length > 0 || schema !== null || error !== null;
 
   return (
     <LegacyLayout

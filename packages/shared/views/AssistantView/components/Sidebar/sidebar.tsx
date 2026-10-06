@@ -10,25 +10,34 @@ import type { SidebarProps } from "./types";
  * Assistant sidebar: title, a new analysis action and the user's chat history,
  * with the AI disclaimer and feedback pinned to the bottom.
  * @param props - Component props.
+ * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.disclaimer - AI disclaimer text.
- * @param props.isSaved - Whether the current conversation is saved to the user's account.
+ * @param props.lastSave - Most recent confirmed save, naming the session saved.
  * @param props.onNewAnalysis - Starts a new conversation.
- * @param props.sessionId - Current assistant session id, or null before one is open.
+ * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @param props.supportUrl - Feedback form URL; the feedback button is hidden without one.
  * @returns The sidebar element.
  */
 export const Sidebar = ({
+  disabled,
   disclaimer,
-  isSaved,
+  lastSave,
   onNewAnalysis,
+  onOpeningChange,
   sessionId,
   supportUrl,
 }: SidebarProps): JSX.Element => {
   return (
     <StyledStack>
       <Header />
-      <NewAnalysis onNewAnalysis={onNewAnalysis} />
-      <ChatHistory isSaved={isSaved} sessionId={sessionId} />
+      <NewAnalysis disabled={disabled} onNewAnalysis={onNewAnalysis} />
+      <ChatHistory
+        disabled={disabled}
+        lastSave={lastSave}
+        onOpeningChange={onOpeningChange}
+        sessionId={sessionId}
+      />
       <Footer disclaimer={disclaimer} supportUrl={supportUrl} />
     </StyledStack>
   );

@@ -27,8 +27,29 @@ jest.mock("next/router", () => ({
 }));
 const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
 
+type ChatResponse = Awaited<ReturnType<typeof mockClient.assistantChat>>;
+type RestoreResponse = Awaited<ReturnType<typeof mockClient.assistantRestore>>;
+
 const SESSION_KEY = "brc-assistant-session-id";
 const STORED_ID = "stored1111222233334444555566667777";
+
+/**
+ * A chat response for one turn.
+ * @param sessionId - Session the turn ran in
+ * @param reply - The assistant's reply
+ * @returns The payload assistantChat resolves with
+ */
+function chatResponse(sessionId: string, reply: string): ChatResponse {
+  return {
+    handoff_url: null,
+    is_complete: false,
+    reply,
+    saved: false,
+    schema_state: null,
+    session_id: sessionId,
+    suggestions: [],
+  } as unknown as ChatResponse;
+}
 
 /**
  * Shaped like the ky HTTPError the client throws -- the hook reads `.response.status`.
@@ -115,14 +136,7 @@ describe("useAssistantChat restore", () => {
     // and success overwrites the very pointer we kept.
     localStorage.setItem(SESSION_KEY, STORED_ID);
     mockClient.assistantRestore.mockRejectedValue(httpError(503));
-    mockClient.assistantChat.mockResolvedValue({
-      handoff_url: null,
-      is_complete: false,
-      reply: "ok",
-      schema_state: null,
-      session_id: STORED_ID,
-      suggestions: [],
-    } as unknown as Awaited<ReturnType<typeof mockClient.assistantChat>>);
+    mockClient.assistantChat.mockResolvedValue(chatResponse(STORED_ID, "ok"));
 
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
@@ -157,5 +171,243 @@ describe("useAssistantChat restore", () => {
       undefined,
       { shallow: true }
     );
+  });
+});
+
+const OPENED_ID = "opened111122223333444455556666777";
+
+/**
+ * A promise whose settling the test controls, to hold a request in flight.
+ * @returns The promise and its resolve/reject handles
+ */
+function deferred<T>(): {
+  promise: Promise<T>;
+  reject: (error: unknown) => void;
+  resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, reject, resolve };
+}
+
+/**
+ * A restore response for a conversation with one completed turn.
+ * @param sessionId - Live session the conversation was restored into
+ * @param reply - The assistant's reply, to tell conversations apart
+ * @returns The payload assistantRestore resolves with
+ */
+function restoredConversation(
+  sessionId: string,
+  reply: string
+): RestoreResponse {
+  return {
+    handoff_url: null,
+    is_complete: false,
+    messages: [
+      { content: "hi", role: "user" },
+      { content: reply, role: "assistant" },
+    ],
+    saved: true,
+    schema_state: null,
+    session_id: sessionId,
+    suggestions: [],
+  } as unknown as RestoreResponse;
+}
+
+/**
+ * Renders the hook on the stored conversation and waits for it to restore,
+ * with initialSessionId as a prop so a test can navigate to another one.
+ * @returns The renderHook result
+ */
+async function renderRestored(): Promise<
+  ReturnType<
+    typeof renderHook<
+      ReturnType<typeof useAssistantChat>,
+      { initialSessionId?: string }
+    >
+  >
+> {
+  localStorage.setItem(SESSION_KEY, STORED_ID);
+  mockClient.assistantRestore.mockResolvedValueOnce(
+    restoredConversation(STORED_ID, "stored reply")
+  );
+  const rendered = renderHook(
+    ({ initialSessionId }: { initialSessionId?: string }) =>
+      useAssistantChat({ initialSessionId, sessionKey: SESSION_KEY }),
+    { initialProps: {} }
+  );
+  await waitFor(() => expect(rendered.result.current.messages).toHaveLength(2));
+  return rendered;
+}
+
+describe("useAssistantChat switching conversations on the page", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+    mockQuery = {};
+    mockIsReady = true;
+  });
+
+  test("starting a new analysis mid-restore leaves the input usable", async () => {
+    // The reset drops ?sessionId=, which cancels the restore's effect run and
+    // re-runs it with nothing to restore. Nothing else clears the flag, so the
+    // chat input stayed disabled until a reload.
+    const { rerender, result } = await renderRestored();
+    const opening = deferred<RestoreResponse>();
+    mockClient.assistantRestore.mockReturnValueOnce(opening.promise);
+
+    mockQuery = { sessionId: OPENED_ID };
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() => expect(result.current.isRestoring).toBe(true));
+
+    act(() => result.current.resetSession());
+    mockQuery = {};
+    rerender({});
+    await act(async () => {
+      opening.resolve(restoredConversation(OPENED_ID, "opened reply"));
+    });
+
+    expect(result.current.isRestoring).toBe(false);
+    expect(result.current.messages).toEqual([]);
+  });
+
+  test("a reply for the conversation left behind does not land in the one opened", async () => {
+    const { rerender, result } = await renderRestored();
+    const turn = deferred<ChatResponse>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.sendMessage("still there?");
+    });
+
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(OPENED_ID, "opened reply")
+    );
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() =>
+      expect(result.current.messages[1]?.content).toBe("opened reply")
+    );
+
+    await act(async () => {
+      turn.resolve(chatResponse(STORED_ID, "late reply"));
+      await sending;
+    });
+
+    expect(result.current.messages.map(({ content }) => content)).toEqual([
+      "hi",
+      "opened reply",
+    ]);
+    expect(result.current.shownSessionId).toBe(OPENED_ID);
+    expect(localStorage.getItem(SESSION_KEY)).toBe(OPENED_ID);
+    expect(result.current.loading).toBe(false);
+  });
+
+  test("a conversation that fails to load for a transient reason is not shown as open", async () => {
+    // The request keeps its session id so a retry can reach it, but nothing is
+    // on screen -- so the history must not highlight it as the open one, or
+    // picking it again to retry would do nothing.
+    const { rerender, result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
+
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+
+    expect(result.current.error).not.toBeNull();
+    expect(result.current.shownSessionId).toBeNull();
+  });
+
+  test("a save that lands for the conversation left behind is reported against it", async () => {
+    // The chat history checks the session saved, not the one showing, so a
+    // first save that lands after the user moved on still joins the list.
+    const { rerender, result } = await renderRestored();
+    const turn = deferred<ChatResponse>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.sendMessage("still there?");
+    });
+
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(OPENED_ID, "opened reply")
+    );
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() => expect(result.current.shownSessionId).toBe(OPENED_ID));
+
+    await act(async () => {
+      turn.resolve({ ...chatResponse(STORED_ID, "late reply"), saved: true });
+      await sending;
+    });
+
+    expect(result.current.lastSave).toEqual({ sessionId: STORED_ID });
+  });
+
+  test("a new analysis leaves a saved conversation's live session alone", async () => {
+    // Deleting it frees nothing -- the conversation stays in the history and
+    // reopening rebuilds a session -- and a reopen could land before the delete.
+    const { result } = await renderRestored();
+
+    act(() => result.current.resetSession());
+
+    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
+  });
+
+  test("a new analysis discards a conversation that isn't saved", async () => {
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockResolvedValueOnce({
+      ...restoredConversation(STORED_ID, "stored reply"),
+      saved: false,
+    });
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.messages).toHaveLength(2));
+
+    act(() => result.current.resetSession());
+
+    expect(mockClient.assistantDeleteSession).toHaveBeenCalledWith(STORED_ID);
+  });
+
+  test("a conversation that fails to open does not leave the previous one on screen", async () => {
+    // Left behind, the previous conversation looked live but was cut off from
+    // its session: the next message would start a new one with no context.
+    const { rerender, result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(404));
+
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+
+    expect(result.current.messages).toEqual([]);
+    expect(result.current.schema).toBeNull();
+    expect(result.current.isSaved).toBe(false);
+    expect(result.current.error).toMatch(/no longer available/i);
+    // Nothing is shown, so the history highlights nothing and the conversation
+    // can be picked again to retry.
+    expect(result.current.shownSessionId).toBeNull();
+  });
+
+  test("starting a new analysis mid-restore does not bring the old conversation back", async () => {
+    // A restore from localStorage has no URL parameter for the reset to strip,
+    // so its effect never re-ran to cancel it and the response restored the
+    // conversation just walked away from.
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    const restoring = deferred<RestoreResponse>();
+    mockClient.assistantRestore.mockReturnValueOnce(restoring.promise);
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.isRestoring).toBe(true));
+
+    act(() => result.current.resetSession());
+    await act(async () => {
+      restoring.resolve(restoredConversation(STORED_ID, "stored reply"));
+    });
+
+    expect(result.current.messages).toEqual([]);
+    expect(result.current.shownSessionId).toBeNull();
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
 });

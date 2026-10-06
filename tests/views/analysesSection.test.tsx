@@ -17,7 +17,8 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 
 const push = jest.fn().mockResolvedValue(undefined);
 jest.mock("next/router", () => ({
-  useRouter: (): { push: jest.Mock } => ({ push }),
+  __esModule: true,
+  default: { push: (...args: unknown[]): unknown => push(...args) },
 }));
 
 const mockClient = apiClient as jest.Mocked<typeof apiClient>;

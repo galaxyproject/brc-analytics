@@ -1,59 +1,57 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { CircularProgress, ListItemButton, Typography } from "@mui/material";
-import { type JSX, Fragment } from "react";
-import { UNTITLED } from "./constants";
+import type { ChatHistoryProps } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/types";
+import { Fragment, type JSX } from "react";
 import { StyledList } from "./historyList.styles";
 import { useChatHistory } from "./hooks/UseChatHistory/hook";
-import { isActiveAnalysis } from "./hooks/UseChatHistory/utils";
-import type { HistoryListProps } from "./types";
 
 /**
- * Renders the signed-in user's saved conversations, most recent first, with
+ * Renders the signed-in user's saved conversations, newest first, with
  * the one open in the chat highlighted. Selecting another opens it in the chat.
- * Renders nothing until the user has a saved conversation.
+ * A failed load or open is reported above the list rather than in place of it,
+ * so the list stays usable to try again. Renders nothing until the user has a
+ * saved conversation.
  * @param props - Component props.
- * @param props.isSaved - Whether the current conversation is saved to the user's account.
- * @param props.sessionId - Current assistant session id, or null before one is open.
- * @returns The chat history list element.
+ * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
+ * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.sessionId - Session of the conversation on screen, or null while none is.
+ * @returns The chat history list element, or null when there is nothing to show.
  */
-export const HistoryList = ({
-  isSaved,
-  sessionId,
-}: HistoryListProps): JSX.Element => {
-  const { error, isInitialLoading, items, onOpen } = useChatHistory(
-    isSaved,
-    sessionId
-  );
+export const HistoryList = (props: ChatHistoryProps): JSX.Element | null => {
+  const { disabled } = props;
+  const { error, isInitialLoading, items } = useChatHistory(props);
 
   if (isInitialLoading)
     return <CircularProgress aria-label="Loading chat history" size={16} />;
 
-  if (error)
-    return (
-      <Typography
-        color={TYPOGRAPHY_PROPS.COLOR.ERROR}
-        variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
-      >
-        {error}
-      </Typography>
-    );
+  if (!error && items.length === 0) return null;
 
   return (
     <Fragment>
+      {error && (
+        <Typography
+          color={TYPOGRAPHY_PROPS.COLOR.ERROR}
+          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
+        >
+          {error}
+        </Typography>
+      )}
       {items.length > 0 && (
         <StyledList disablePadding>
-          {items.map((analysis) => (
+          {items.map(({ id, onOpen, selected, title }) => (
             <ListItemButton
-              key={analysis.id}
-              onClick={() => onOpen(analysis)}
-              selected={isActiveAnalysis(analysis, sessionId)}
+              disabled={disabled}
+              key={id}
+              onClick={onOpen}
+              selected={selected}
             >
               <Typography
                 color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
                 noWrap
                 variant={TYPOGRAPHY_PROPS.VARIANT.BODY_500}
               >
-                {analysis.title ?? UNTITLED}
+                {title}
               </Typography>
             </ListItemButton>
           ))}

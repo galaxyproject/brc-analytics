@@ -68,7 +68,7 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
         url: SITE_ROUTES.PRIORITY_PATHOGENS,
         visible: HIDDEN_AT_SM,
       },
-      { label: "Assistant", url: SITE_ROUTES.ASSISTANT },
+      { label: "Assistant", url: ROUTES.ASSISTANT },
       {
         label: "More",
         menuItems: [

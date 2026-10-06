@@ -1,8 +1,8 @@
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { HistoryList } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/components/HistoryList/historyList";
 import { SignInPrompt } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/components/SignInPrompt/signInPrompt";
+import type { ChatHistoryProps } from "@repo/shared/views/AssistantView/components/Sidebar/components/ChatHistory/types";
 import { type JSX } from "react";
-import type { ChatHistorySelectorProps } from "./types";
 
 /**
  * Selects and renders the chat history content based on auth state.
@@ -13,16 +13,27 @@ import type { ChatHistorySelectorProps } from "./types";
  * - Signed in: Displays the user's saved conversations.
  *
  * @param props - Component props.
- * @param props.isSaved - Whether the current conversation is saved to the user's account.
- * @param props.sessionId - Current assistant session id, or null before one is open.
+ * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
+ * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns The selected chat history content, or null while auth resolves.
  */
 export const ChatHistorySelector = ({
-  isSaved,
+  disabled,
+  lastSave,
+  onOpeningChange,
   sessionId,
-}: ChatHistorySelectorProps): JSX.Element | null => {
+}: ChatHistoryProps): JSX.Element | null => {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return null;
   if (!isAuthenticated) return <SignInPrompt />;
-  return <HistoryList isSaved={isSaved} sessionId={sessionId} />;
+  return (
+    <HistoryList
+      disabled={disabled}
+      lastSave={lastSave}
+      onOpeningChange={onOpeningChange}
+      sessionId={sessionId}
+    />
+  );
 };

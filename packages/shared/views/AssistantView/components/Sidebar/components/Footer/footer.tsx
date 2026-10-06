@@ -1,7 +1,7 @@
 import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
-} from "@databiosphere/findable-ui/lib/components/Links/common/entities.js";
+} from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { AddCommentRounded } from "@mui/icons-material";

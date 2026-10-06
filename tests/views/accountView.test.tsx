@@ -38,7 +38,8 @@ jest.mock("@repo/shared/services/workflows/query", () => ({
   findEntity: jest.fn(),
 }));
 jest.mock("next/router", () => ({
-  useRouter: (): { push: jest.Mock } => ({ push: jest.fn() }),
+  __esModule: true,
+  default: { push: jest.fn() },
 }));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;

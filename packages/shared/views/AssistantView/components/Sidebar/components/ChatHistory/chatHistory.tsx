@@ -11,12 +11,16 @@ import type { ChatHistoryProps } from "./types";
  * signed in, or a prompt to sign in. Hidden where login is not enabled, since
  * conversations are only saved to an account.
  * @param props - Component props.
- * @param props.isSaved - Whether the current conversation is saved to the user's account.
- * @param props.sessionId - Current assistant session id, or null before one is open.
+ * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
+ * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
+ * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns The chat history section element, or null when login is not enabled.
  */
 export const ChatHistory = ({
-  isSaved,
+  disabled,
+  lastSave,
+  onOpeningChange,
   sessionId,
 }: ChatHistoryProps): JSX.Element | null => {
   const { isConfigured } = useAuth();
@@ -32,7 +36,12 @@ export const ChatHistory = ({
         >
           Chat history
         </StyledTypography>
-        <ChatHistorySelector isSaved={isSaved} sessionId={sessionId} />
+        <ChatHistorySelector
+          disabled={disabled}
+          lastSave={lastSave}
+          onOpeningChange={onOpeningChange}
+          sessionId={sessionId}
+        />
       </div>
     </Fragment>
   );

@@ -16,6 +16,12 @@ import {
   useRef,
   useState,
 } from "react";
+import type {
+  ChatMessageDisplay,
+  LastSave,
+  UseAssistantChatOptions,
+  UseAssistantChatReturn,
+} from "./types";
 
 // A save that failed for one of these will fail the same way next time: the
 // deployment cannot save at all, there is nothing to save, the session is not
@@ -40,35 +46,6 @@ function isRetryableSaveFailure(error: unknown): boolean {
   return status === undefined || !PERMANENT_SAVE_FAILURES.has(status);
 }
 
-interface ChatMessageDisplay {
-  content: string;
-  role: "user" | "assistant";
-}
-
-interface UseAssistantChatReturn {
-  error: string | null;
-  handoffUrl: string | null;
-  isComplete: boolean;
-  isRestoring: boolean;
-  isSaved: boolean;
-  loading: boolean;
-  logan: LoganContext | null;
-  messages: ChatMessageDisplay[];
-  onRetry?: () => Promise<void>;
-  resetSession: () => void;
-  schema: AnalysisSchema | null;
-  sendMessage: (message: string) => Promise<void>;
-  sessionId: string | null;
-  suggestions: SuggestionChip[];
-}
-
-interface UseAssistantChatOptions {
-  initialLoganJobId?: string;
-  initialMessage?: string;
-  initialSessionId?: string;
-  sessionKey: string;
-}
-
 /**
  * Manages assistant chat state: messages, session, schema, and suggestions.
  * Persists session_id to localStorage and restores on mount; explicit
@@ -82,7 +59,7 @@ interface UseAssistantChatOptions {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, the current session id, sendMessage, and reset/retry functions.
+ * @returns Chat state, the session on screen and last save, sendMessage, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -104,16 +81,32 @@ export const useAssistantChat = ({
     null
   );
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
-  // Mirrors the ref for rendering: the ref is what requests read, since it
-  // updates synchronously, but a ref change alone re-renders nothing.
-  const [sessionId, setSessionId] = useState<string | null>(
-    initialSessionId ?? null
-  );
-  const adoptSessionId = useCallback((id: string | null): void => {
-    sessionIdRef.current = id;
-    setSessionId(id);
-  }, []);
   const sendingRef = useRef(false);
+  // Bumped each time a different conversation takes the screen. A request
+  // started under an older value answers for a conversation no longer shown,
+  // and its result is dropped rather than landing in the one that replaced it.
+  const conversationRef = useRef(0);
+  // The session whose conversation is on screen, once a restore or turn has
+  // put it there -- not merely the one requested, which a failed restore
+  // leaves behind. Restoring it again would wipe the screen and drop a reply
+  // still in flight for it. Mirrored to state for rendering, since a ref
+  // change re-renders nothing.
+  const shownSessionRef = useRef<string | null>(null);
+  const [shownSessionId, setShownSessionId] = useState<string | null>(null);
+  // Makes a session the conversation on screen, and the one a reload restores.
+  const showSession = useCallback(
+    (id: string): void => {
+      sessionIdRef.current = id;
+      shownSessionRef.current = id;
+      setShownSessionId(id);
+      localStorage.setItem(sessionKey, id);
+    },
+    [sessionKey]
+  );
+  // Set each time the server confirms a conversation was written -- naming
+  // which, since a reply can land for one no longer on screen -- so a
+  // saved-conversation list can refresh without guessing.
+  const [lastSave, setLastSave] = useState<LastSave | null>(null);
   const initialMessageSentRef = useRef(false);
   // Set once this mount has opened a Logan-bound session. Dropping the
   // ?loganJob= param re-renders the page without it, which would otherwise
@@ -138,6 +131,27 @@ export const useAssistantChat = ({
   // A question of whitespace is no question: it would neither be asked nor
   // leave the conversation it displaced restorable.
   const question = initialMessage?.trim();
+
+  // Clears what the conversation on screen left behind, including a turn still
+  // in flight for it, and returns the generation the next one runs under.
+  const startConversation = useCallback((): number => {
+    conversationRef.current += 1;
+    shownSessionRef.current = null;
+    setShownSessionId(null);
+    sendingRef.current = false;
+    setMessages([]);
+    setSchema(null);
+    setSuggestions([]);
+    setIsComplete(false);
+    setIsSaved(false);
+    setHandoffUrl(null);
+    setLogan(null);
+    setLoading(false);
+    setIsRestoring(false);
+    setError(null);
+    setLastFailedMessage(null);
+    return conversationRef.current;
+  }, []);
 
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
@@ -165,19 +179,28 @@ export const useAssistantChat = ({
       : localStorage.getItem(sessionKey);
     const sourceId = initialSessionId ?? storedId;
     if (!sourceId) return;
+    // Already on screen -- e.g. back to the bare page, whose stored pointer is
+    // the conversation showing.
+    if (sourceId === shownSessionRef.current) return;
 
     let cancelled = false;
+    // Opening a conversation from the history list restores it on this page,
+    // over whatever was on screen -- which must not outlive a failed restore,
+    // nor be answered by a turn still in flight for it.
+    const conversation = startConversation();
+    // A reset or another restore since this one started has moved on from it.
+    const isCurrent = (): boolean => conversationRef.current === conversation;
+    const isStale = (): boolean => cancelled || !isCurrent();
     // Adopt before the round trip: an unset ref sends session_id: undefined, so
     // a failed restore would open a new session and overwrite the kept pointer.
-    adoptSessionId(sourceId);
+    sessionIdRef.current = sourceId;
     setIsRestoring(true);
 
     assistantAPIClient
       .assistantRestore(sourceId)
       .then((restored) => {
-        if (cancelled) return;
-        adoptSessionId(restored.session_id);
-        localStorage.setItem(sessionKey, restored.session_id);
+        if (isStale()) return;
+        showSession(restored.session_id);
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
@@ -190,7 +213,7 @@ export const useAssistantChat = ({
         setIsSaved(restored.saved);
       })
       .catch((error: unknown) => {
-        if (cancelled) return;
+        if (isStale()) return;
         const status = httpStatus(error);
         // No response, a server error, or a throttle: the session is probably
         // still there, so keep the pointer and let a reload pick it up. Dropping
@@ -201,13 +224,13 @@ export const useAssistantChat = ({
           status === 408 ||
           status === 429
         ) {
-          setError("Failed to restore the previous conversation.");
+          setError("Couldn't load that conversation.");
           return;
         }
         // Any other 4xx and this browser is never getting that session back --
         // 404 it's gone, 403 the signing cookie no longer matches it. Drop the
         // id so the next message opens a fresh session instead of re-failing.
-        adoptSessionId(null);
+        sessionIdRef.current = null;
         // Only clear the pointer if it's still the one that failed -- a newer
         // session may have replaced it while this request was in flight.
         if (localStorage.getItem(sessionKey) === sourceId) {
@@ -220,19 +243,23 @@ export const useAssistantChat = ({
         }
       })
       .finally(() => {
-        if (!cancelled) setIsRestoring(false);
+        // Settled by the conversation, not the effect run: one cancelled by a
+        // URL change that starts nothing new (a reset dropping ?sessionId=) is
+        // still the restore on screen, and left set it would hold the input.
+        if (isCurrent()) setIsRestoring(false);
       });
 
     return (): void => {
       cancelled = true;
     };
   }, [
-    adoptSessionId,
     initialLoganJobId,
     initialSessionId,
     question,
     router.isReady,
     sessionKey,
+    showSession,
+    startConversation,
   ]);
 
   // Opening from a Logan search wins over a URL session id and localStorage:
@@ -250,7 +277,7 @@ export const useAssistantChat = ({
       .assistantCreateSession({ logan_job_id: initialLoganJobId })
       .then((created) => {
         if (cancelled) return;
-        adoptSessionId(created.session_id);
+        sessionIdRef.current = created.session_id;
         loganOpenedRef.current = true;
         localStorage.setItem(sessionKey, created.session_id);
         setMessages(created.messages);
@@ -268,7 +295,7 @@ export const useAssistantChat = ({
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        adoptSessionId(null);
+        sessionIdRef.current = null;
         setError(loganSessionErrorMessage(error, initialLoganJobId));
       })
       .finally(() => {
@@ -279,7 +306,7 @@ export const useAssistantChat = ({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- router is stable for the life of the page; listing it would re-run this effect on every shallow replace, including the one it performs itself
-  }, [adoptSessionId, initialLoganJobId, sessionKey]);
+  }, [initialLoganJobId, sessionKey]);
 
   // Auto-save rides on chat turns, which leaves the sign-in case uncovered:
   // someone who signed in *because* we offered to keep this conversation has
@@ -302,6 +329,8 @@ export const useAssistantChat = ({
     assistantAPIClient
       .assistantSaveSession(currentSessionId)
       .then(() => {
+        // On disk whether or not this run is still current.
+        setLastSave({ sessionId: currentSessionId });
         if (!cancelled) setIsSaved(true);
       })
       .catch((error: unknown) => {
@@ -360,6 +389,8 @@ export const useAssistantChat = ({
     async (message: string): Promise<void> => {
       if (!message.trim() || sendingRef.current) return;
       sendingRef.current = true;
+      const conversation = conversationRef.current;
+      const isCurrent = (): boolean => conversationRef.current === conversation;
 
       setLoading(true);
       setError(null);
@@ -374,9 +405,13 @@ export const useAssistantChat = ({
             message,
             session_id: sessionIdRef.current ?? undefined,
           });
+        // On disk even if the conversation has since been replaced on screen.
+        if (response.saved) setLastSave({ sessionId: response.session_id });
+        // The reply belongs to a conversation since replaced on screen, and
+        // adopting its session would send later turns there.
+        if (!isCurrent()) return;
 
-        adoptSessionId(response.session_id);
-        localStorage.setItem(sessionKey, response.session_id);
+        showSession(response.session_id);
 
         // Add assistant reply
         setMessages((prev) => [
@@ -394,15 +429,19 @@ export const useAssistantChat = ({
         // say something worse than either state on its own.
         if (response.saved) setIsSaved(true);
       } catch (err) {
+        if (!isCurrent()) return;
         const errorMessage = handleChatError(err);
         setError(errorMessage);
         setLastFailedMessage(message);
       } finally {
-        setLoading(false);
-        sendingRef.current = false;
+        // Whatever replaced the conversation already let go of the send.
+        if (isCurrent()) {
+          setLoading(false);
+          sendingRef.current = false;
+        }
       }
     },
-    [adoptSessionId, sessionKey]
+    [showSession]
   );
 
   // Ask the handed-over question once, then drop it from the URL: it outlives
@@ -420,7 +459,7 @@ export const useAssistantChat = ({
     // the ref: a send that fails leaves it as the only trace of the displaced
     // conversation, and the question -- stripped from the URL below -- would not
     // be there to displace it again on a reload.
-    adoptSessionId(null);
+    sessionIdRef.current = null;
     localStorage.removeItem(sessionKey);
     void sendMessage(question);
     // Both parameters go: ?sessionId= outranks the stored pointer on mount, so
@@ -430,7 +469,7 @@ export const useAssistantChat = ({
       ASSISTANT_QUERY_PARAM.QUESTION,
       ASSISTANT_QUERY_PARAM.SESSION_ID,
     ]);
-  }, [adoptSessionId, question, router, sendMessage, sessionKey]);
+  }, [question, router, sendMessage, sessionKey]);
 
   const retry = useCallback(async (): Promise<void> => {
     if (!lastFailedMessage) return;
@@ -443,10 +482,17 @@ export const useAssistantChat = ({
 
   const resetSession = useCallback((): void => {
     const oldId = sessionIdRef.current;
-    if (oldId) {
+    // Only a conversation that isn't saved is being discarded. A saved one
+    // stays in the user's history, and reopening it rebuilds a live session if
+    // the old one is gone -- so deleting it frees nothing worth having, and
+    // races a reopen that lands before the delete does.
+    if (oldId && !isSaved) {
       assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
     }
-    adoptSessionId(null);
+    // Also drops a restore or turn still in flight, whose result would
+    // otherwise bring back the conversation just walked away from.
+    startConversation();
+    sessionIdRef.current = null;
     loganOpenedRef.current = false;
     localStorage.removeItem(sessionKey);
     // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
@@ -455,16 +501,7 @@ export const useAssistantChat = ({
     if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
       stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
-    setMessages([]);
-    setSchema(null);
-    setSuggestions([]);
-    setIsComplete(false);
-    setIsSaved(false);
-    setHandoffUrl(null);
-    setLogan(null);
-    setError(null);
-    setLastFailedMessage(null);
-  }, [adoptSessionId, router, sessionKey]);
+  }, [isSaved, router, sessionKey, startConversation]);
 
   return {
     error,
@@ -472,6 +509,7 @@ export const useAssistantChat = ({
     isComplete,
     isRestoring,
     isSaved,
+    lastSave,
     loading,
     logan,
     messages,
@@ -479,7 +517,7 @@ export const useAssistantChat = ({
     resetSession,
     schema,
     sendMessage,
-    sessionId,
+    shownSessionId,
     suggestions,
   };
 };
