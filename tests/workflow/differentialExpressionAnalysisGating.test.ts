@@ -3,7 +3,10 @@ import {
   WORKFLOW_CATEGORY_ID,
 } from "@repo/shared/apis/schema-types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
-import { isAssemblyWorkflowAvailable } from "@repo/shared/components/workflow/WorkflowGate/utils";
+import {
+  isAssemblyWorkflowAvailable,
+  isListedWorkflowAvailable,
+} from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { setEntitiesById } from "@repo/shared/services/workflows/store";
 import { getWorkflows } from "@repo/shared/views/WorkflowsView/utils";
 import { buildAssemblyWorkflows } from "@repo/shared/workflow/assemblyWorkflows";
@@ -51,7 +54,7 @@ describe("Differential Expression Analysis under a gated category", () => {
     setEntitiesById("assemblies", new Map([[ASSEMBLY_ID, ASSEMBLY]]));
   });
 
-  it("is dropped from the workflows list, the assembly's list and its configure page with the demo flag off", () => {
+  it("is dropped from the workflows list, the assembly's list, its configure page and its detail page with the demo flag off", () => {
     const gates = buildWorkflowGates();
     expect(
       includesDea(getWorkflows(CATEGORIES, [], [], gates).map((w) => w.trsId))
@@ -63,9 +66,10 @@ describe("Differential Expression Analysis under a gated category", () => {
         )
       )
     ).toBe(false);
-    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, ASSEMBLY_ID, gates)).toBe(
+    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, gates, ASSEMBLY_ID)).toBe(
       false
     );
+    expect(isListedWorkflowAvailable(DEA_TRS_ID, gates)).toBe(false);
   });
 
   it("is shown on every path with the demo flag on", () => {
@@ -80,8 +84,9 @@ describe("Differential Expression Analysis under a gated category", () => {
         )
       )
     ).toBe(true);
-    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, ASSEMBLY_ID, gates)).toBe(
+    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, gates, ASSEMBLY_ID)).toBe(
       true
     );
+    expect(isListedWorkflowAvailable(DEA_TRS_ID, gates)).toBe(true);
   });
 });

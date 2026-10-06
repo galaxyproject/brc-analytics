@@ -1,5 +1,4 @@
-import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
-import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
+import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
 import { formatTrsId } from "@repo/shared/workflow/utils";
 import type { GetStaticPaths, GetStaticPathsResult } from "next";
 import type { WorkflowPageParams } from "./types";
@@ -24,10 +23,7 @@ export function makeWorkflowStaticPaths(
     }
 
     // Interim workflows without a catalog category.
-    for (const { trsId } of [
-      DIFFERENTIAL_EXPRESSION_ANALYSIS,
-      ...LMLS_WORKFLOWS,
-    ]) {
+    for (const { trsId } of UNCATALOGED_WORKFLOWS) {
       paths.push({ params: { trsId: formatTrsId(trsId) } });
     }
 

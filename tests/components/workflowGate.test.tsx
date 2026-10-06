@@ -8,9 +8,10 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@repo/shared/apis/types";
-import type { WorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
+import type { EntityWorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
 import {
   isAssemblyWorkflowAvailable,
+  isListedWorkflowAvailable,
   isOrganismWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
@@ -70,6 +71,22 @@ function buildAssembly(galaxyDatacacheUrl: string | null): AssemblyContract {
 }
 
 /**
+ * Renders the gate as the workflow detail page does: with no entity.
+ * @param trsId - Workflow TRS ID, as it appears in the URL.
+ */
+function renderDetailGate(trsId: string): void {
+  render(
+    <WorkflowGate
+      fallback={<div>not found</div>}
+      isWorkflowAvailable={isListedWorkflowAvailable}
+      trsId={trsId}
+    >
+      <div>content</div>
+    </WorkflowGate>
+  );
+}
+
+/**
  * Renders the gate for the given URL TRS ID.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
  * @param isWorkflowAvailable - The page's availability check.
@@ -77,7 +94,7 @@ function buildAssembly(galaxyDatacacheUrl: string | null): AssemblyContract {
  */
 function renderGate(
   trsId: string,
-  isWorkflowAvailable: WorkflowAvailability = isAssemblyWorkflowAvailable,
+  isWorkflowAvailable: EntityWorkflowAvailability = isAssemblyWorkflowAvailable,
   entityId = ASSEMBLY_ID
 ): void {
   render(
@@ -236,14 +253,14 @@ describe("WorkflowGate", () => {
     });
 
     test("renders children for Differential Expression Analysis, listed outside the catalog", () => {
-      renderGate(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId);
+      renderGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
       expectContent();
     });
 
     test("renders the fallback for a workflow outside the catalog that the assembly's list does not offer", () => {
       // Logan Search is configured on its own page, never here.
       mockUseFeatureFlag.mockReturnValue(true);
-      renderGate(LOGAN_SEARCH.trsId);
+      renderGate(formatTrsId(LOGAN_SEARCH.trsId));
       expectFallback();
     });
 
@@ -314,6 +331,56 @@ describe("WorkflowGate", () => {
         "unknown-organism"
       );
       expectFallback();
+    });
+  });
+
+  describe("on the workflow detail page", () => {
+    test("renders children for a workflow the listing offers", () => {
+      renderDetailGate(formatTrsId(UNGATED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders the fallback for an unknown workflow", () => {
+      renderDetailGate("stale-workflow-id");
+      expectFallback();
+    });
+
+    test("renders the fallback for a workflow in a gated category", () => {
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders the fallback for a workflow gated in its own right", () => {
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders children for a workflow also in an ungated category", () => {
+      renderDetailGate(formatTrsId(SHARED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for gated workflows when the demo flag is on", () => {
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectContent();
+      cleanup();
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for a workflow appended outside the catalog", () => {
+      renderDetailGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
+      expectContent();
+    });
+
+    test("gates an appended workflow by its own rule", () => {
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
+      expectFallback();
+      cleanup();
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
+      expectContent();
     });
   });
 });
