@@ -30,12 +30,13 @@ const SUPPORTED_ID_TYPES = [
 
 export const GenesView = (): JSX.Element => {
   const router = useRouter();
-  const query = typeof router.query.q === "string" ? router.query.q : "";
+  const rawQuery = typeof router.query.q === "string" ? router.query.q : "";
+  const query = rawQuery.trim();
   const results = useMemo(() => searchGenes(query), [query]);
 
   const handleExampleClick = (geneId: string): void => {
     router
-      .push({ pathname: ROUTES.GENES, query: { q: geneId } })
+      .push({ pathname: ROUTES.GENES, query: { ...router.query, q: geneId } })
       .catch(() => undefined);
   };
 
@@ -103,11 +104,11 @@ function Results({
     <ResultsTable>
       <thead>
         <tr>
-          <th>Gene ID</th>
-          <th>Symbol</th>
-          <th>Product</th>
-          <th>Organism</th>
-          <th>Assembly</th>
+          <th scope="col">Gene ID</th>
+          <th scope="col">Symbol</th>
+          <th scope="col">Product</th>
+          <th scope="col">Organism</th>
+          <th scope="col">Assembly</th>
         </tr>
       </thead>
       <tbody>
