@@ -4,7 +4,7 @@ import {
 } from "@repo/shared/apis/schema-types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import {
-  AssemblyForTaxonomyCheck,
+  type AssemblyForTaxonomyCheck,
   generateWorkflowMappingsQC,
 } from "../../../../catalog/build/ts/build-workflow-mappings";
 

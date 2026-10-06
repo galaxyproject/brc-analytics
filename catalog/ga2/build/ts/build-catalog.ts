@@ -1,10 +1,10 @@
 import type { WorkflowCategory } from "@repo/shared/apis/workflow";
 import fsp from "fs/promises";
 import {
-  GA2AssemblyEntity,
-  ImageData,
+  type GA2AssemblyEntity,
+  type ImageData,
 } from "../../../../sites/ga2/apis/assembly";
-import { GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
+import { type GA2OrganismEntity } from "../../../../sites/ga2/apis/organism";
 import { getAssemblyId, getOrganismId } from "../../../../sites/ga2/apis/utils";
 import {
   buildWorkflowAssemblyMappings,
@@ -27,7 +27,7 @@ import {
   verifyUniqueIds,
 } from "../../../build/ts/utils";
 import { SOURCE_GENOME_KEYS } from "./constants";
-import { SourceGenome } from "./entities";
+import { type SourceGenome } from "./entities";
 
 const SOURCE_PATH_GENOMES =
   "catalog/ga2/build/intermediate/genomes-from-ncbi.tsv";

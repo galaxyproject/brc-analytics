@@ -1,16 +1,19 @@
 import { ORGANISM_PLOIDY } from "@repo/shared/apis/schema-types";
 import { parse as parseCsv } from "csv-parse/sync";
 import fsp from "fs/promises";
-import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { type MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import YAML from "yaml";
-import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
+import { type Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
 
 const ORGANISM_PLOIDIES = Object.values(ORGANISM_PLOIDY);
 
 /**
  * Get the ploidy for an assembly, logging a message and returning null if the value is invalid and the assembly should be skipped.
  * @param assemblyRow - Source row from the genomes TSV.
+ * @param assemblyRow.accession - Assembly accession.
+ * @param assemblyRow.ploidy - String-encoded assembly ploidies.
+ * @param assemblyRow.speciesTaxonomyId - Assembly's species taxonomy ID.
  * @returns array of ploidy values, or null if the ploidies are missing or include an invalid value.
  */
 export function parsePloidyForAssembly(assemblyRow: {

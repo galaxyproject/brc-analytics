@@ -19,7 +19,6 @@ const config = [
       "**/node_modules/**",
       "**/out/**",
       "**/.next/**",
-      "**/build/**",
       "**/coverage/**",
       "**/venv/**",
       "**/.venv/**",
