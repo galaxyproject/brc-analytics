@@ -158,7 +158,10 @@ export const AssistantView = ({
             </Button>
           ),
           newConversationButton: (
+            // Not mid-reply: the late reply would re-bind the session cookie
+            // to the conversation left behind, locking out the new one.
             <Button
+              disabled={loading}
               onClick={resetSession}
               size="small"
               startIcon={<RestartAltIcon />}

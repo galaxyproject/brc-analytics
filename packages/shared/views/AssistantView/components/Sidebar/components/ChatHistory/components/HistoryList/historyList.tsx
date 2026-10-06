@@ -38,6 +38,7 @@ export const HistoryList = (props: ChatHistoryProps): JSX.Element | null => {
       {error && (
         <Typography
           color={TYPOGRAPHY_PROPS.COLOR.ERROR}
+          role="alert"
           variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
         >
           {error}
