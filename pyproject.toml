@@ -1,5 +1,5 @@
 [tool.ruff]
-target-version = "py38"
+target-version = "py312"
 line-length = 88
 indent-width = 4
 extend-exclude = ["backend/pyproject.toml", "backend/poetry.lock"]
@@ -17,7 +17,7 @@ fixable = ["ALL"]
 unfixable = []
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_ignores = true
 ignore_missing_imports = true
