@@ -55,6 +55,10 @@ export const GENE_FIXTURE: GeneRecord[] = [
   },
 ];
 
+export function findGeneByUid(uid: string): GeneRecord | undefined {
+  return GENE_FIXTURE.find((gene) => gene.geneUid === uid);
+}
+
 export const EXAMPLE_GENE_IDS = [
   "PF3D7_1133400",
   "AMA1",
