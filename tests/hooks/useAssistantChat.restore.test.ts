@@ -367,32 +367,15 @@ describe("useAssistantChat switching conversations on the page", () => {
     expect(result.current.lastSave).toEqual({ sessionId: STORED_ID });
   });
 
-  test("a new analysis leaves a saved conversation's live session alone", async () => {
-    // Deleting it frees nothing -- the conversation stays in the history and
-    // reopening rebuilds a session -- and a reopen could land before the delete.
+  test("a new analysis leaves the conversation's live session to expire", async () => {
+    // The page can't always tell whether a conversation is saved, and deleting
+    // a saved one's session would race reopening it -- so nothing is deleted.
     const { result } = await renderRestored();
 
     act(() => result.current.resetSession());
 
     expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
   });
-
-  test("a new analysis discards a conversation that isn't saved", async () => {
-    localStorage.setItem(SESSION_KEY, STORED_ID);
-    mockClient.assistantRestore.mockResolvedValueOnce({
-      ...restoredConversation(STORED_ID, "stored reply"),
-      saved: false,
-    });
-    const { result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() => expect(result.current.messages).toHaveLength(2));
-
-    act(() => result.current.resetSession());
-
-    expect(mockClient.assistantDeleteSession).toHaveBeenCalledWith(STORED_ID);
-  });
-
   test("a conversation that fails to open does not leave the previous one on screen", async () => {
     // Left behind, the previous conversation looked live but was cut off from
     // its session: the next message would start a new one with no context.

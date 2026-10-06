@@ -169,46 +169,6 @@ describe("useAssistantChat auto-save", () => {
     );
   });
 
-  test("signing out does not make new analysis discard a saved conversation", async () => {
-    // Signing out clears "saved to your account", but the conversation is
-    // still saved: its live session must survive New analysis, as for any
-    // saved conversation.
-    auth(true);
-    mockClient.assistantRestore.mockResolvedValue({
-      ...restored(),
-      saved: true,
-    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
-
-    const { rerender, result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() => expect(result.current.isSaved).toBe(true));
-
-    auth(false);
-    rerender();
-    await waitFor(() => expect(result.current.isSaved).toBe(false));
-
-    act(() => result.current.resetSession());
-
-    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
-  });
-
-  test("signed out, new analysis leaves a restored conversation's session alone", async () => {
-    // Signed out, restore reports saved: false even for a saved conversation --
-    // its answer is about this account -- so there is no telling whether it is
-    // saved, and its live session is left to expire rather than deleted.
-    auth(false);
-
-    const { result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() => expect(result.current.messages).toHaveLength(2));
-
-    act(() => result.current.resetSession());
-
-    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
-  });
-
   test("a signed-out conversation is never sent to the account", async () => {
     auth(false);
 
@@ -340,41 +300,6 @@ describe("useAssistantChat auto-save", () => {
     });
 
     expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1);
-  });
-
-  test("a save that lands after a turn starts still keeps the session from new analysis", async () => {
-    // Starting a turn re-runs the auto-save effect, cancelling the run whose
-    // save is in flight. If that save then succeeds but the turn fails, the
-    // conversation is still saved -- New analysis must not discard it.
-    auth(true);
-    let resolveSave!: (value: { saved_analysis_id: string }) => void;
-    mockClient.assistantSaveSession.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveSave = resolve;
-      })
-    );
-    mockClient.assistantChat.mockRejectedValueOnce(httpError(500));
-
-    const { result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() =>
-      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
-    );
-
-    // The turn's re-render runs the effect's cleanup before the save lands.
-    let sending!: Promise<void>;
-    act(() => {
-      sending = result.current.sendMessage("one more thing");
-    });
-    await act(async () => {
-      resolveSave({ saved_analysis_id: "analysis-1" });
-      await sending;
-    });
-
-    act(() => result.current.resetSession());
-
-    expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
   });
 
   test("a turn is only called saved when the backend says it wrote it", async () => {

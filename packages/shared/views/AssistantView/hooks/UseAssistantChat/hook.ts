@@ -86,10 +86,6 @@ export const useAssistantChat = ({
   const [isRestoreFailed, setIsRestoreFailed] = useState(false);
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
-  // Whether the server has confirmed the conversation on screen is saved.
-  // Unlike isSaved -- "saved to your account", which signing out clears -- it
-  // outlives the account state, so New analysis never discards a saved one.
-  const isPersistedRef = useRef(false);
   const sendingRef = useRef(false);
   // Bumped each time a different conversation takes the screen. A request
   // started under an older value answers for a conversation no longer shown,
@@ -160,7 +156,6 @@ export const useAssistantChat = ({
     setError(null);
     setLastFailedMessage(null);
     setIsRestoreFailed(false);
-    isPersistedRef.current = false;
     return conversationRef.current;
   }, []);
 
@@ -222,7 +217,6 @@ export const useAssistantChat = ({
         // it from auth state instead would re-save every signed-in session on
         // every mount just to find out.
         setIsSaved(restored.saved);
-        isPersistedRef.current = restored.saved;
       })
       .catch((error: unknown) => {
         if (isStale()) return;
@@ -345,13 +339,6 @@ export const useAssistantChat = ({
       .then(() => {
         // On disk whether or not this run is still current.
         setLastSave({ sessionId: currentSessionId });
-        // Saved whatever cut this run short -- often just the same
-        // conversation starting a turn -- so long as it is still the one open.
-        if (sessionIdRef.current === currentSessionId) {
-          isPersistedRef.current = true;
-        }
-        // The account label is another matter: a run cut short by signing out
-        // must not claim the conversation for the account.
         if (!cancelled) setIsSaved(true);
       })
       .catch((error: unknown) => {
@@ -448,10 +435,7 @@ export const useAssistantChat = ({
         // Latched, not mirrored: a later turn whose write fails does not
         // un-save the turns already on disk, and flickering the label would
         // say something worse than either state on its own.
-        if (response.saved) {
-          setIsSaved(true);
-          isPersistedRef.current = true;
-        }
+        if (response.saved) setIsSaved(true);
       } catch (err) {
         if (!isCurrent()) return;
         const errorMessage = handleChatError(err);
@@ -510,19 +494,12 @@ export const useAssistantChat = ({
   }, []);
 
   const resetSession = useCallback((): void => {
-    const oldId = sessionIdRef.current;
-    // Only a conversation that isn't saved is being discarded. A saved one
-    // stays in the user's history, and reopening it rebuilds a live session if
-    // the old one is gone -- so deleting it frees nothing worth having, and
-    // races a reopen that lands before the delete does. Signed out, a restore
-    // can't say whether it was saved (its answer is about this account), so
-    // the session is left to expire rather than risk discarding a saved one.
-    const isSavedUnknown = isConfigured && (isAuthLoading || !isAuthenticated);
-    if (oldId && !isPersistedRef.current && !isSavedUnknown) {
-      assistantAPIClient.assistantDeleteSession(oldId).catch(() => {});
-    }
-    // Also drops a restore or turn still in flight, whose result would
-    // otherwise bring back the conversation just walked away from.
+    // The conversation left behind isn't deleted: it may be saved, which the
+    // page can't always tell, and reopening a saved one would race the delete.
+    // Unsaved, its live session simply expires.
+    //
+    // Starting afresh also drops a restore or turn still in flight, whose
+    // result would otherwise bring back the conversation just walked away from.
     startConversation();
     sessionIdRef.current = null;
     loganOpenedRef.current = false;
@@ -533,14 +510,7 @@ export const useAssistantChat = ({
     if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
       stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
-  }, [
-    isAuthLoading,
-    isAuthenticated,
-    isConfigured,
-    router,
-    sessionKey,
-    startConversation,
-  ]);
+  }, [router, sessionKey, startConversation]);
 
   // A failed message retries that message; a failed restore, the restore.
   let onRetry: (() => Promise<void>) | undefined;
