@@ -12,7 +12,7 @@ import type { Props } from "./types";
  * below EntityDataGate, which loads the workflows and entities the check reads.
  * @param props - Component props.
  * @param props.children - Content to render when the workflow is available.
- * @param props.entityId - ID of the entity the page configures a workflow for, if any.
+ * @param props.entityId - ID of the entity the page configures a workflow for; absent on a page with no entity.
  * @param props.fallback - Content to render for an unavailable TRS ID.
  * @param props.isWorkflowAvailable - The page's availability check.
  * @param props.trsId - Workflow TRS ID.
@@ -27,7 +27,10 @@ export function WorkflowGate({
 }: Props): JSX.Element {
   const workflowGates = useWorkflowGates();
   const isAvailable = useMemo(
-    () => isWorkflowAvailable(trsId, workflowGates, entityId),
+    () =>
+      entityId === undefined
+        ? isWorkflowAvailable(trsId, workflowGates)
+        : isWorkflowAvailable(trsId, workflowGates, entityId),
     [entityId, isWorkflowAvailable, trsId, workflowGates]
   );
   return <>{isAvailable ? children : fallback}</>;

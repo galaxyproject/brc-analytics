@@ -16,15 +16,14 @@ import { isWorkflowListedForOrganism } from "@repo/shared/workflow/organismWorkf
  * unavailable, so the page shows its fallback rather than failing.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
  * @param workflowGates - Gating rules bound to the current flag state.
- * @param entityId - Assembly entity ID; unavailable when omitted.
+ * @param entityId - Assembly entity ID.
  * @returns True when the workflow is available.
  */
 export function isAssemblyWorkflowAvailable(
   trsId: string,
   workflowGates: WorkflowGates,
-  entityId?: string
+  entityId: string
 ): boolean {
-  if (entityId === undefined) return false;
   const workflow = findWorkflow(trsId);
   const assembly = findAssembly(entityId);
   const workflowCategories = findWorkflowCategories();
@@ -64,15 +63,14 @@ export function isListedWorkflowAvailable(
  * unavailable, so the page shows its fallback rather than failing.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
  * @param workflowGates - Gating rules bound to the current flag state.
- * @param entityId - Organism entity ID; unavailable when omitted.
+ * @param entityId - Organism entity ID.
  * @returns True when the workflow is available.
  */
 export function isOrganismWorkflowAvailable(
   trsId: string,
   workflowGates: WorkflowGates,
-  entityId?: string
+  entityId: string
 ): boolean {
-  if (entityId === undefined) return false;
   const workflow = findWorkflow(trsId);
   const organism = findOrganism(entityId);
   const workflowCategories = findWorkflowCategories();

@@ -38,8 +38,9 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
 }
 
 /**
- * Indexes workflows by the id they are looked up under: catalog workflows by
- * their URL-formatted TRS id, extra workflows by their TRS id as given.
+ * Indexes workflows by the id they are looked up under: their URL-formatted
+ * TRS id, for catalog and extra workflows alike, so a workflow page's URL
+ * finds either.
  * @param workflowCategories - Catalog workflow categories.
  * @param extraWorkflows - Additional workflows outside the catalog.
  * @returns Map of id to workflow.
@@ -55,7 +56,7 @@ export function indexWorkflowsById(
     }
   }
   for (const workflow of extraWorkflows) {
-    workflowById.set(workflow.trsId, workflow);
+    workflowById.set(formatTrsId(workflow.trsId), workflow);
   }
   return workflowById;
 }
@@ -101,7 +102,7 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
 /**
  * Loads the workflows store with workflows from the API, plus any additional
  * workflows supplied by the caller.
- * @param extraWorkflows - Additional workflows to add to the store, keyed by their trsId.
+ * @param extraWorkflows - Additional workflows to add to the store, keyed by their URL-formatted trsId.
  */
 export async function loadWorkflows(
   extraWorkflows: Workflow[] = []

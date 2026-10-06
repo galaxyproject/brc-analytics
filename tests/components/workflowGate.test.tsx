@@ -8,7 +8,7 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@repo/shared/apis/types";
-import type { WorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
+import type { EntityWorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
 import {
   isAssemblyWorkflowAvailable,
   isListedWorkflowAvailable,
@@ -94,7 +94,7 @@ function renderDetailGate(trsId: string): void {
  */
 function renderGate(
   trsId: string,
-  isWorkflowAvailable: WorkflowAvailability = isAssemblyWorkflowAvailable,
+  isWorkflowAvailable: EntityWorkflowAvailability = isAssemblyWorkflowAvailable,
   entityId = ASSEMBLY_ID
 ): void {
   render(
@@ -253,14 +253,14 @@ describe("WorkflowGate", () => {
     });
 
     test("renders children for Differential Expression Analysis, listed outside the catalog", () => {
-      renderGate(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId);
+      renderGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
       expectContent();
     });
 
     test("renders the fallback for a workflow outside the catalog that the assembly's list does not offer", () => {
       // Logan Search is configured on its own page, never here.
       mockUseFeatureFlag.mockReturnValue(true);
-      renderGate(LOGAN_SEARCH.trsId);
+      renderGate(formatTrsId(LOGAN_SEARCH.trsId));
       expectFallback();
     });
 
@@ -370,16 +370,16 @@ describe("WorkflowGate", () => {
     });
 
     test("renders children for a workflow appended outside the catalog", () => {
-      renderDetailGate(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId);
+      renderDetailGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
       expectContent();
     });
 
     test("gates an appended workflow by its own rule", () => {
-      renderDetailGate(LOGAN_SEARCH.trsId);
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
       expectFallback();
       cleanup();
       mockUseFeatureFlag.mockReturnValue(true);
-      renderDetailGate(LOGAN_SEARCH.trsId);
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
       expectContent();
     });
   });
