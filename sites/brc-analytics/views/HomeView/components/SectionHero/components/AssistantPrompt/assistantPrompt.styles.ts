@@ -4,12 +4,14 @@ import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/br
 import styled from "@emotion/styled";
 
 export const StyledForm = styled.form`
+  display: grid;
+  gap: 16px;
   max-width: 560px;
   width: 100%;
 
   /* The input ships with padding around its paper, a plain icon button, and the
      field stacked above the button so the row beneath it can hold more actions.
-     The hero has no other actions: it renders the paper flush, the field and
+     The input has no other actions: it renders the paper flush, the field and
      the send action on a single row, and the send action as a primary button. */
   && {
     .MuiBox-root {
