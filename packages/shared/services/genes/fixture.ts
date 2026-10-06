@@ -29,7 +29,7 @@ export const GENE_FIXTURE: GeneRecord[] = [
   },
   {
     aliases: [],
-    assemblyAccession: "GCF_016808945.1",
+    assemblyAccession: "GCF_000002415.2",
     geneId: "PVP01_0000010",
     geneUid: "pvp01-0000010",
     location: "chr1:738-2,461 (+)",
@@ -37,7 +37,7 @@ export const GENE_FIXTURE: GeneRecord[] = [
     predicted: true,
     product: "hypothetical protein",
     publisher: "NCBI RefSeq",
-    release: "GCF_016808945.1-RS_2024_08",
+    release: "GCF_000002415.2-RS_2024_08",
     symbol: "",
   },
   {
