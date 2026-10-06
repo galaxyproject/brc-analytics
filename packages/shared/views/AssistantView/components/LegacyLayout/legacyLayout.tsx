@@ -1,5 +1,4 @@
 import { Headline } from "@repo/shared/views/AssistantView/components/Headline/headline";
-import type { LayoutProps } from "@repo/shared/views/AssistantView/components/Layout/types";
 import { type JSX } from "react";
 import {
   ActionsRow,
@@ -10,6 +9,7 @@ import {
   StyledSection,
   TwoPanelLayout,
 } from "./legacyLayout.styles";
+import type { LegacyLayoutProps } from "./types";
 
 /**
  * Two-panel assistant layout (chat beside analysis setup), rendered while the
@@ -18,7 +18,7 @@ import {
  * @param props.slotProps - Props for each slot.
  * @returns Legacy assistant layout.
  */
-export const LegacyLayout = ({ slotProps }: LayoutProps): JSX.Element => {
+export const LegacyLayout = ({ slotProps }: LegacyLayoutProps): JSX.Element => {
   const { chat, history, setup } = slotProps;
   return (
     <StyledSection>

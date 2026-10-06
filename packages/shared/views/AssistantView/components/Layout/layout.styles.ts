@@ -8,7 +8,7 @@ export const StyledLayout = styled("div", {
   shouldForwardProp: (prop) => prop !== "bottom" && prop !== "top",
 })<LayoutSpacing>`
   display: grid;
-  grid-template-columns: 296px minmax(0, 1fr) 360px;
+  grid-template-columns: 328px minmax(0, 1fr) 360px;
   height: calc(100dvh - ${({ bottom, top }) => top + bottom}px);
   width: 100%;
 
