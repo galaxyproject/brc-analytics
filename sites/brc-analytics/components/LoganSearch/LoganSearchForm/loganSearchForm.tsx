@@ -57,7 +57,7 @@ const MAX_QUERY_BASES = 5000;
 // A query file is read into the textarea and validated there, so the only
 // reason to refuse one up front is the browser: a genome picked by mistake
 // would be hundreds of megabytes of text in a textarea. A megabyte is still
-// far past anything the 2,500-base cap would let through.
+// far past anything the 5,000-base cap would let through.
 const MAX_QUERY_FILE_BYTES = 1024 * 1024;
 const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.txt";
 

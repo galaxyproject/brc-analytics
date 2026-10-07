@@ -379,7 +379,7 @@ describe("LoganSearchForm examples", () => {
       expect(range).not.toBeNull();
       const [, , start, stop] = range as RegExpMatchArray;
       expect(bases).toBe(Number(stop) - Number(start) + 1);
-      expect(bases).toBeLessThanOrEqual(2500);
+      expect(bases).toBeLessThanOrEqual(5000);
       expect(lines.join("")).toMatch(/^[ACGT]+$/);
       expect(INDEXES).toContain(
         `${example.strategies[0]}_${example.divisions[0]}`
@@ -441,9 +441,9 @@ describe("LoganSearchForm query file", () => {
 
   test("holds a loaded file to the same base cap as a pasted query", async () => {
     const { submit } = renderForm();
-    pick(new File([`>long\n${"A".repeat(2501)}\n`], "long.fasta"));
+    pick(new File([`>long\n${"A".repeat(5001)}\n`], "long.fasta"));
 
-    await screen.findByText(/2501 bases -- queries are capped at 2500/);
+    await screen.findByText(/5001 bases -- queries are capped at 5000/);
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
   });
