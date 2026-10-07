@@ -51,52 +51,57 @@ describe("generateWorkflowMappingsQC - assembly count aware", () => {
     },
   ];
 
-  test.failing("does not flag assembly-independent workflows (min 0)", () => {
+  test("does not flag assembly-independent workflows (min 0)", () => {
     const mappings = [
       { compatibleAssemblyCount: 0, workflowTrsId: "#trs-organism" },
     ];
-    const report = generateWorkflowMappingsQC(mappings, categories, "Test");
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories, "Test")
+    );
     expect(report).toContain(
       "Workflows that cannot meet their minimum assembly requirement"
     );
     expect(report).not.toContain("Organism Wf");
   });
 
-  test.failing("flags ASSEMBLY workflow with 0 compatible assemblies", () => {
+  test("flags ASSEMBLY workflow with 0 compatible assemblies", () => {
     const mappings = [
       { compatibleAssemblyCount: 0, workflowTrsId: "#trs-assembly" },
       { compatibleAssemblyCount: 0, workflowTrsId: "#trs-organism" },
       { compatibleAssemblyCount: 5, workflowTrsId: "#trs-hyphy" },
     ];
-    const report = generateWorkflowMappingsQC(mappings, categories, "Test");
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories, "Test")
+    );
     expect(report).toContain("Assembly Wf");
     expect(report).not.toContain("Organism Wf");
     expect(report).not.toContain("Hyphy Wf");
   });
 
-  test.failing(
-    "flags workflow with insufficient assemblies (0 < count < min)",
-    () => {
-      const mappings = [
-        { compatibleAssemblyCount: 5, workflowTrsId: "#trs-assembly" },
-        { compatibleAssemblyCount: 0, workflowTrsId: "#trs-organism" },
-        { compatibleAssemblyCount: 1, workflowTrsId: "#trs-hyphy" },
-      ];
-      const report = generateWorkflowMappingsQC(mappings, categories, "Test");
-      expect(report).toContain("Hyphy Wf");
-      expect(report).toContain("needs >= 2, 1 compatible");
-      expect(report).not.toContain("Assembly Wf");
-      expect(report).not.toContain("Organism Wf");
-    }
-  );
+  test("flags workflow with insufficient assemblies (0 < count < min)", () => {
+    const mappings = [
+      { compatibleAssemblyCount: 5, workflowTrsId: "#trs-assembly" },
+      { compatibleAssemblyCount: 0, workflowTrsId: "#trs-organism" },
+      { compatibleAssemblyCount: 1, workflowTrsId: "#trs-hyphy" },
+    ];
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories, "Test")
+    );
+    expect(report).toContain("Hyphy Wf");
+    expect(report).toContain("needs >= 2, 1 compatible");
+    expect(report).not.toContain("Assembly Wf");
+    expect(report).not.toContain("Organism Wf");
+  });
 
-  test.failing("does not flag workflows that meet their minimum", () => {
+  test("does not flag workflows that meet their minimum", () => {
     const mappings = [
       { compatibleAssemblyCount: 5, workflowTrsId: "#trs-assembly" },
       { compatibleAssemblyCount: 0, workflowTrsId: "#trs-organism" },
       { compatibleAssemblyCount: 5, workflowTrsId: "#trs-hyphy" },
     ];
-    const report = generateWorkflowMappingsQC(mappings, categories, "Test");
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories, "Test")
+    );
     expect(report).toContain("None");
     expect(report).not.toContain("Assembly Wf");
     expect(report).not.toContain("Organism Wf");
@@ -105,10 +110,10 @@ describe("generateWorkflowMappingsQC - assembly count aware", () => {
 });
 
 describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
-  const noMappings: {
+  const mappings: {
     compatibleAssemblyCount: number;
     workflowTrsId: string;
-  }[] = [];
+  }[] = [{ compatibleAssemblyCount: 1, workflowTrsId: "#trs-taxon" }];
 
   const makeWorkflow = (
     name: string,
@@ -158,72 +163,75 @@ describe("generateWorkflowMappingsQC - workflow taxonomy ID issues", () => {
   ];
 
   test("shows N/A when no assemblies are passed", () => {
-    const report = generateWorkflowMappingsQC(
-      noMappings,
-      categories(null),
-      "Test"
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories(null), "Test")
     );
     expect(report).toContain("N/A");
   });
 
-  test.failing("does not flag workflow with null taxonomyId", () => {
-    const report = generateWorkflowMappingsQC(
-      noMappings,
-      categories(null),
-      "Test",
-      assemblies
+  test("does not flag workflow with null taxonomyId", () => {
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories(null), "Test", assemblies)
     );
     expect(report).toContain("None");
     expect(report).not.toContain("Taxon Wf");
   });
 
   test("flags workflow whose taxonomyId is not in any assembly lineage", () => {
-    const report = generateWorkflowMappingsQC(
-      noMappings,
-      categories("9999"),
-      "Test",
-      assemblies
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(
+        mappings,
+        categories("9999"),
+        "Test",
+        assemblies
+      )
     );
     expect(report).toContain("Taxon Wf");
     expect(report).toContain("not found in any assembly's lineage");
   });
 
-  test.failing(
-    "does not flag workflow whose taxonomyId is a speciesTaxonomyId",
-    () => {
-      const report = generateWorkflowMappingsQC(
-        noMappings,
+  test("does not flag workflow whose taxonomyId is a speciesTaxonomyId", () => {
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(
+        mappings,
         categories("999"),
         "Test",
         assemblies
-      );
-      expect(report).toContain("None");
-      expect(report).not.toContain("Taxon Wf");
-    }
-  );
+      )
+    );
+    expect(report).toContain("None");
+    expect(report).not.toContain("Taxon Wf");
+  });
 
   test("flags workflow whose taxonomyId is only a sub-species ncbiTaxonomyId", () => {
-    const report = generateWorkflowMappingsQC(
-      noMappings,
-      categories("1000"),
-      "Test",
-      assemblies
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(
+        mappings,
+        categories("1000"),
+        "Test",
+        assemblies
+      )
     );
     expect(report).toContain("Taxon Wf");
     expect(report).toContain("below species rank");
   });
 
-  test.failing(
-    "does not flag workflow whose taxonomyId is a genus/family ancestor (in lineage, not a direct assembly taxon)",
-    () => {
-      const report = generateWorkflowMappingsQC(
-        noMappings,
-        categories("10"),
-        "Test",
-        assemblies
-      );
-      expect(report).toContain("None");
-      expect(report).not.toContain("Taxon Wf");
-    }
-  );
+  test("does not flag workflow whose taxonomyId is a genus/family ancestor (in lineage, not a direct assembly taxon)", () => {
+    const report = stripCoverageSection(
+      generateWorkflowMappingsQC(mappings, categories("10"), "Test", assemblies)
+    );
+    expect(report).toContain("None");
+    expect(report).not.toContain("Taxon Wf");
+  });
 });
+
+/**
+ * Strip the "Workflow-Assembly Coverage Summary" section from the report text,
+ * so that it can be meaningfully checked for the presence of a workflow that
+ * would otherwise always be found in the coverage section.
+ * @param report - Workflow mappings QC report text.
+ * @returns report text with coverage section stripped.
+ */
+function stripCoverageSection(report: string): string {
+  return report.replace(/\n## Workflow-Assembly Coverage Summary[^#]*/, "\n");
+}
