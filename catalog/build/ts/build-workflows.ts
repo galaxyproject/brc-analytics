@@ -4,9 +4,9 @@ import type {
   WorkflowParameter,
 } from "@repo/shared/apis/workflow";
 import {
-  Workflow as SourceWorkflow,
-  WorkflowCategories as SourceWorkflowCategories,
-  Workflows as SourceWorkflows,
+  type Workflow as SourceWorkflow,
+  type WorkflowCategories as SourceWorkflowCategories,
+  type Workflows as SourceWorkflows,
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";

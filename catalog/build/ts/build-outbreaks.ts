@@ -1,8 +1,8 @@
 import path from "path";
-import { Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
+import { type Outbreak } from "../../../sites/brc-analytics/apis/outbreak";
 import {
-  Outbreak as SourceOutbreak,
-  Outbreaks as SourceOutbreaks,
+  type Outbreak as SourceOutbreak,
+  type Outbreaks as SourceOutbreaks,
 } from "../../schema/generated/schema";
 import {
   parseListOrNull,

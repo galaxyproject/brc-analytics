@@ -23,7 +23,7 @@ export function EmptyWorkspace(): JSX.Element {
         <Button LinkComponent={Link} href={ROUTES.GENOMES} variant="contained">
           Browse assemblies
         </Button>
-        <Button LinkComponent={Link} href="/assistant" variant="outlined">
+        <Button LinkComponent={Link} href={ROUTES.ASSISTANT} variant="outlined">
           Ask the assistant
         </Button>
         <Button LinkComponent={Link} href={ROUTES.WORKFLOWS} variant="outlined">

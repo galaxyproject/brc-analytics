@@ -3,8 +3,7 @@ import type { Props as HistoryProps } from "./components/History/types";
 import type { Props as SetupProps } from "./components/Setup/types";
 
 /**
- * Props for an assistant layout. The view builds each slot once so both
- * layouts render the same panels and differ only in where they place them.
+ * Props for the assistant-ui layout.
  */
 export interface LayoutProps {
   slotProps: LayoutSlotProps;
