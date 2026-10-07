@@ -27,6 +27,7 @@ from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotFound,
     GalaxySubmitNotStarted,
+    KmindexUnknownIndex,
 )
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
@@ -296,6 +297,21 @@ class TestIdempotency:
         retried = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
 
         assert failed.status_code == 502
+        assert retried.json()["job_id"] == JOB_ID
+
+    def test_an_unknown_index_is_a_400_and_frees_the_key(self, partner_env):
+        client, galaxy, _ = partner_env
+        headers = {**HEADERS, "Idempotency-Key": "abc"}
+        galaxy.submit_kmindex_query.side_effect = [
+            KmindexUnknownIndex("Unknown index name(s): NOPE"),
+            GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1"),
+        ]
+
+        refused = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+        retried = client.post(f"{BASE}/jobs", json=PAYLOAD, headers=headers)
+
+        assert refused.status_code == 400
+        assert "NOPE" in refused.json()["detail"]
         assert retried.json()["job_id"] == JOB_ID
 
     def test_an_ambiguous_failure_keeps_the_key_so_a_retry_cannot_duplicate(

@@ -320,6 +320,38 @@ def test_galaxy_login_url_derives_from_api_url(monkeypatch):
     get_settings.cache_clear()
 
 
+@pytest.fixture(autouse=True)
+def _known_indexes():
+    """Submits check index names first; these tests are about what comes after."""
+    from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
+
+    with patch.object(
+        GalaxyService,
+        "list_kmindex_indexes",
+        AsyncMock(return_value=list(FALLBACK_INDEX_NAMES)),
+    ):
+        yield
+
+
+@pytest.mark.asyncio
+async def test_an_unknown_index_is_refused_before_anything_is_uploaded():
+    from app.models.galaxy import KmindexQuerySubmission
+    from app.services.galaxy_service import KmindexUnknownIndex
+
+    svc = _user_service()
+    svc._get_or_create_shared_history = AsyncMock(return_value="h1")
+    svc._upload_fasta = AsyncMock(return_value="d1")
+    submission = KmindexQuerySubmission(
+        sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
+        indexes=["GENOMIC_BCT", "NOT_AN_INDEX"],
+    )
+
+    with pytest.raises(KmindexUnknownIndex, match="NOT_AN_INDEX"):
+        await svc.submit_kmindex_query(submission)
+    svc._get_or_create_shared_history.assert_not_awaited()
+    svc._upload_fasta.assert_not_awaited()
+
+
 def _user_service() -> GalaxyService:
     with patch("app.services.galaxy_service.GalaxyInstance"):
         return GalaxyService(

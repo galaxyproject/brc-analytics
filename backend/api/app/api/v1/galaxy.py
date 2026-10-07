@@ -38,6 +38,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    KmindexUnknownIndex,
     is_unlinked_account_error,
 )
 from app.services.kmindex_submissions import record_submission
@@ -259,6 +260,8 @@ async def submit_kmindex_query(
 
     except HTTPException:
         raise
+    except KmindexUnknownIndex as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except GalaxyAccountNotLinkedError as e:
         raise HTTPException(
             status_code=409,

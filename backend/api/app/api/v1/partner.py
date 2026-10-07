@@ -44,6 +44,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotFound,
     GalaxyService,
     GalaxySubmitNotStarted,
+    KmindexUnknownIndex,
 )
 from app.services.kmindex_submissions import record_submission
 from app.services.sra_mirror import SRAMirrorService
@@ -235,6 +236,12 @@ async def submit_job(
 
     try:
         response = await galaxy.submit_kmindex_query(submission)
+    except KmindexUnknownIndex as e:
+        # A bad request, not a failure: release the key so the caller can fix
+        # the index list and resend under it.
+        if idem_key is not None:
+            await cache.delete(idem_key)
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except GalaxySubmitNotStarted as e:
         # Nothing reached run_tool, so no job exists and a retry is safe.
         if idem_key is not None:

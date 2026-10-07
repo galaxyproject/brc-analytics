@@ -85,6 +85,14 @@ class GalaxySubmitNotStarted(Exception):
     """
 
 
+class KmindexUnknownIndex(GalaxySubmitNotStarted):
+    """The submission names an index the pinned tool doesn't offer.
+
+    Caught before anything is uploaded: Galaxy would only reject it at run_tool,
+    after the query had already landed in the history.
+    """
+
+
 # Galaxy answers 404 for an id that decodes to nothing, and 400 with its
 # MalformedId error (err_code 400009) for one it cannot decode. Both mean the
 # caller has the wrong id. Any other 400 is Galaxy refusing something else, and
@@ -730,6 +738,14 @@ class GalaxyService:
             raise Exception(
                 "Galaxy service not available - check API key configuration"
             )
+
+        # The list read never waits on Galaxy, so this costs nothing on the
+        # happy path and keeps a typo from leaving an upload behind.
+        known = set(await self.list_kmindex_indexes())
+        unknown = [name for name in submission.indexes if name not in known]
+        if unknown:
+            shown = ", ".join(unknown[:5]) + (" ..." if len(unknown) > 5 else "")
+            raise KmindexUnknownIndex(f"Unknown index name(s): {shown}")
 
         # The count, not the names: a search over every index would put ~1.9 KB
         # of index list in the log on every submission.

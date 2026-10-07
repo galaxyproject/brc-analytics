@@ -186,3 +186,20 @@ def test_user_credential_without_database_url_skips_db(app_client, monkeypatch):
     mock_db_session.assert_not_called()
 
     get_settings.cache_clear()
+
+
+def test_an_unknown_index_is_a_400_not_a_500(app_client):
+    """The detail names the index, so the caller can fix the request."""
+    from app.services.galaxy_service import KmindexUnknownIndex
+
+    service = _stub_service(GalaxyCredential(kind="service", secret="k"))
+    service.submit_kmindex_query = AsyncMock(
+        side_effect=KmindexUnknownIndex("Unknown index name(s): NOPE")
+    )
+    app, client = app_client
+    app.dependency_overrides[get_galaxy_service] = lambda: service
+
+    response = client.post("/api/v1/galaxy/kmindex/submit", json=SUBMISSION_PAYLOAD)
+
+    assert response.status_code == 400
+    assert "NOPE" in response.json()["detail"]
