@@ -1,5 +1,5 @@
-import { ROUTES } from "@brc/routes/constants";
 import { getAssistantUrl } from "@brc/views/HomeView/components/SectionHero/components/AssistantPrompt/hooks/UseAssistantPrompt/utils";
+import { ROUTES } from "@repo/shared/routes/constants";
 
 describe("getAssistantUrl", () => {
   test("carries the question to the assistant route", () => {

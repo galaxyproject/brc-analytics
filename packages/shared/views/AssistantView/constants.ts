@@ -11,6 +11,11 @@ export const ASSISTANT_INPUT_PLACEHOLDER =
   "Ask about organisms, analyses, or workflows...";
 
 /**
+ * Title shown for a saved conversation the assistant has not titled.
+ */
+export const UNTITLED_ANALYSIS = "Untitled analysis";
+
+/**
  * Query parameters read by an assistant page.
  * QUESTION carries a question asked elsewhere on the site, sent as the first
  * message of a new conversation; SESSION_ID names a conversation to restore;

@@ -14,6 +14,7 @@ import { Layout as AssistantUILayout } from "./components/Layout/layout";
 import { LegacyLayout } from "./components/LegacyLayout/legacyLayout";
 import { LoganCohortCard } from "./components/LoganCohortCard/loganCohortCard";
 import { SchemaPanel } from "./components/SchemaPanel/schemaPanel";
+import { Sidebar } from "./components/Sidebar/sidebar";
 import type { Props } from "./types";
 import { formatModelLabel, formatRetentionNotice } from "./utils";
 
@@ -29,13 +30,16 @@ export const AssistantView = ({
     handoffUrl,
     isRestoring,
     isSaved,
+    lastSave,
     loading,
     logan,
     messages,
     onRetry,
     resetSession,
+    retryRestore,
     schema,
     sendMessage,
+    shownSessionId,
     suggestions,
   } = useAssistantChat({
     initialLoganJobId,
@@ -44,6 +48,9 @@ export const AssistantView = ({
     sessionKey,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
+  // A conversation opening from the history: until its restore takes over,
+  // nothing else may start or send, or the open would wipe it.
+  const [isOpening, setIsOpening] = useState(false);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -65,40 +72,77 @@ export const AssistantView = ({
     };
   }, []);
 
+  const modelLabel = formatModelLabel(info);
+  const retentionNotice = formatRetentionNotice(info);
+  const chat = {
+    children: (
+      <ChatPanel
+        error={error}
+        introText={introText}
+        isRestoring={isRestoring || isOpening}
+        isSaved={isSaved}
+        loading={loading}
+        messages={messages}
+        onRetry={onRetry}
+        onSend={sendMessage}
+        suggestions={suggestions}
+      />
+    ),
+  };
+  const disclaimer = (
+    <>
+      AI assistant — {modelLabel}. Your messages are sent to the model provider
+      to generate a response, so avoid sharing sensitive or identifying
+      information. Responses can be inaccurate; verify anything important before
+      relying on it.{retentionNotice}
+    </>
+  );
+
+  if (isAssistantUIEnabled) {
+    return (
+      <AssistantUILayout
+        slotProps={{
+          chat,
+          history: {
+            children: (
+              <Sidebar
+                disabled={loading || isRestoring || isOpening}
+                disclaimer={disclaimer}
+                lastSave={lastSave}
+                onNewAnalysis={resetSession}
+                onOpeningChange={setIsOpening}
+                onRetryRestore={retryRestore}
+                sessionId={shownSessionId}
+                supportUrl={supportUrl}
+              />
+            ),
+          },
+          setup: {
+            // The new UI leaves out the Logan cohort card for now.
+            children: (
+              <AnalysisSetup
+                handoffUrl={handoffUrl}
+                loading={loading || isRestoring || isOpening}
+                onSend={sendMessage}
+                schema={schema}
+              />
+            ),
+          },
+        }}
+      />
+    );
+  }
+
   // On error there are no messages and no schema, which would hide Reset
   // exactly when it's the only way to clear a bad session id.
   const showReset = messages.length > 0 || schema !== null || error !== null;
-  const modelLabel = formatModelLabel(info);
-  const retentionNotice = formatRetentionNotice(info);
-  const Layout = isAssistantUIEnabled ? AssistantUILayout : LegacyLayout;
 
   return (
-    <Layout
+    <LegacyLayout
       slotProps={{
-        chat: {
-          children: (
-            <ChatPanel
-              error={error}
-              introText={introText}
-              isRestoring={isRestoring}
-              isSaved={isSaved}
-              loading={loading}
-              messages={messages}
-              onRetry={onRetry}
-              onSend={sendMessage}
-              suggestions={suggestions}
-            />
-          ),
-        },
+        chat,
         history: {
-          disclaimer: (
-            <>
-              AI assistant — {modelLabel}. Your messages are sent to the model
-              provider to generate a response, so avoid sharing sensitive or
-              identifying information. Responses can be inaccurate; verify
-              anything important before relying on it.{retentionNotice}
-            </>
-          ),
+          disclaimer,
           feedbackButton: supportUrl && (
             <Button
               aria-label="Give feedback on the Analysis Assistant (opens in a new tab)"
@@ -114,7 +158,10 @@ export const AssistantView = ({
             </Button>
           ),
           newConversationButton: (
+            // Not mid-reply: the late reply would re-bind the session cookie
+            // to the conversation left behind, locking out the new one.
             <Button
+              disabled={loading}
               onClick={resetSession}
               size="small"
               startIcon={<RestartAltIcon />}
@@ -126,15 +173,7 @@ export const AssistantView = ({
           ),
         },
         setup: {
-          // The new UI leaves out the Logan cohort card for now.
-          children: isAssistantUIEnabled ? (
-            <AnalysisSetup
-              handoffUrl={handoffUrl}
-              loading={loading}
-              onSend={sendMessage}
-              schema={schema}
-            />
-          ) : (
+          children: (
             <>
               {logan && <LoganCohortCard logan={logan} />}
               <SchemaPanel handoffUrl={handoffUrl} schema={schema} />

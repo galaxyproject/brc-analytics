@@ -8,7 +8,6 @@ import {
   SummaryMeta,
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { joinNaturally } from "@brc/components/LoganSearch/utils";
-import { ROUTES } from "@brc/routes/constants";
 import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
 import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
 import { API_BASE_URL } from "@repo/shared/config/api";
@@ -17,6 +16,7 @@ import {
   type KmindexResults,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
+import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { type JSX, useState } from "react";
 

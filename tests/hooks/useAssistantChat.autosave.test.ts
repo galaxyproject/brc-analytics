@@ -343,6 +343,44 @@ describe("useAssistantChat auto-save", () => {
     expect(result.current.isSaved).toBe(true);
   });
 
+  test("a confirmed save is reported with the session it saved", async () => {
+    // The chat history refreshes on this, so a newly saved conversation joins
+    // the list without a page reload.
+    auth(true);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() =>
+      expect(result.current.lastSave).toEqual({ sessionId: STORED_ID })
+    );
+  });
+
+  test("only a turn the backend wrote is reported as a save", async () => {
+    // Signed out, so the explicit save stays out of play and the report can
+    // only be following the chat response's own flag.
+    auth(false);
+    localStorage.clear();
+    mockClient.assistantChat.mockResolvedValue(chatReply());
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await act(async () => {
+      await result.current.sendMessage("hello");
+    });
+
+    expect(result.current.lastSave).toBeNull();
+
+    mockClient.assistantChat.mockResolvedValue({ ...chatReply(), saved: true });
+    await act(async () => {
+      await result.current.sendMessage("again");
+    });
+
+    expect(result.current.lastSave).toEqual({ sessionId: STORED_ID });
+  });
+
   test("the save is attempted once per session, not once per render", async () => {
     auth(true);
     mockClient.assistantSaveSession.mockRejectedValue(httpError(501));

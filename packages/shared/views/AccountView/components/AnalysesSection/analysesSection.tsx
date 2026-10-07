@@ -2,8 +2,8 @@ import { Button, Typography } from "@mui/material";
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { AccountCard } from "@repo/shared/views/AccountView/components/AccountCard/accountCard";
 import { AccountSection } from "@repo/shared/views/AccountView/components/AccountSection/accountSection";
-import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
-import { useRouter } from "next/router";
+import { UNTITLED_ANALYSIS } from "@repo/shared/views/AssistantView/constants";
+import { openSavedAnalysis } from "@repo/shared/views/AssistantView/utils";
 import { type JSX, useCallback, useState } from "react";
 import type { Props } from "./types";
 
@@ -14,7 +14,6 @@ import type { Props } from "./types";
  * @returns the section element.
  */
 export function AnalysesSection({ resource }: Props): JSX.Element {
-  const router = useRouter();
   const { error, isLoading, items, setItems } = resource;
   // Delete/open failures are local to this section -- a rejected request must
   // not be left as an unhandled promise rejection that tells the user nothing.
@@ -37,25 +36,16 @@ export function AnalysesSection({ resource }: Props): JSX.Element {
     [setItems]
   );
 
-  const handleOpen = useCallback(
-    async (id: string): Promise<void> => {
-      setActionError(null);
-      try {
-        const opened = await apiClient.openSavedAnalysis(id);
-        await router.push({
-          pathname: "/assistant",
-          query: { [ASSISTANT_QUERY_PARAM.SESSION_ID]: opened.session_id },
-        });
-      } catch (err) {
-        setActionError(
-          err instanceof Error
-            ? err
-            : new Error("Failed to open saved analysis.")
-        );
-      }
-    },
-    [router]
-  );
+  const handleOpen = useCallback(async (id: string): Promise<void> => {
+    setActionError(null);
+    try {
+      await openSavedAnalysis(id);
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err : new Error("Failed to open saved analysis.")
+      );
+    }
+  }, []);
 
   return (
     <AccountSection
@@ -94,7 +84,7 @@ export function AnalysesSection({ resource }: Props): JSX.Element {
               }
               key={analysis.id}
               subtitle={`Last active ${new Date(analysis.updated_at).toLocaleString()}`}
-              title={analysis.title ?? "Untitled analysis"}
+              title={analysis.title ?? UNTITLED_ANALYSIS}
             />
           ))
         : undefined}
