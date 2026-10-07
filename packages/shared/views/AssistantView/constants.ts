@@ -4,13 +4,8 @@ import type { ChatMessageDisplay } from "@repo/shared/views/AssistantView/hooks/
  * Placeholder for any field that asks the assistant a question, wherever it is
  * rendered: the wording should not change between where a question is typed
  * and where it is answered.
- *
- * Its rendered width is load-bearing: a field sized to hold this on one line is
- * measured against this wording, so changing its length can wrap it. Re-measure
- * the fields that render it before settling on new copy.
  */
-export const ASSISTANT_INPUT_PLACEHOLDER =
-  "Ask about organisms, analyses, or workflows...";
+export const ASSISTANT_INPUT_PLACEHOLDER = "Ask about genomic data...";
 
 /**
  * Who sent a chat message.

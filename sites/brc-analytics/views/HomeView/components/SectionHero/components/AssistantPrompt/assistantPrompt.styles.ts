@@ -54,13 +54,6 @@ export const StyledForm = styled.form`
   }
 
   ${bpDownSm} {
-    /* Deliberately wider than the headline column so the box can hold
-       ASSISTANT_INPUT_PLACEHOLDER on one line, and capped so it stays tied to
-       it. That placeholder renders at 356px and the field padding and send
-       button take another 64px, needing 420px, rounded up to 424px.
-       The cap only decides the width once the viewport can afford it, from
-       around 456px up; below that the viewport is the narrower constraint and
-       the placeholder wraps to two lines. Re-measure if its wording changes. */
     max-width: 424px;
   }
 `;
