@@ -29,7 +29,7 @@ Going over either returns `429` with `Retry-After`. The rules for what you can
 submit are the same as on brc-analytics.org:
 
 - one FASTA record per search
-- up to 2,500 bases
+- up to 5,000 bases
 - one or more indexes per search
 
 ## The flow
@@ -61,7 +61,7 @@ curl -X POST -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
 
 | Field       | Default | Meaning                                                              |
 | ----------- | ------- | -------------------------------------------------------------------- |
-| `sequence`  | --      | One FASTA record, up to 2,500 bases                                  |
+| `sequence`  | --      | One FASTA record, up to 5,000 bases                                  |
 | `indexes`   | --      | Index names from `/indexes`                                          |
 | `threshold` | 0.5     | Minimum share of k-mers a run must contain (kmindex `-r`), 0.25 to 1 |
 | `zvalue`    | 6       | z for findere, kmindex's false-positive filter (`-z`)                |

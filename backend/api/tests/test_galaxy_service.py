@@ -382,7 +382,7 @@ class TestQueryLengthCap:
     """The UI enforces the same ceiling, but the UI is not the only caller."""
 
     def test_over_limit_rejected(self):
-        with pytest.raises(ValidationError, match="the limit is 2500"):
+        with pytest.raises(ValidationError, match="the limit is 5000"):
             KmindexQuerySubmission(
                 sequence=">q\n" + "A" * (MAX_QUERY_BASES + 1), indexes=["GENOMIC_BCT"]
             )

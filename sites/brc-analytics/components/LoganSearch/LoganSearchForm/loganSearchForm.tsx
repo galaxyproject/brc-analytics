@@ -37,9 +37,9 @@ interface LoganSearchFormProps {
   search: ReturnType<typeof useKmindexSearch>;
 }
 
-// Logan-Search caps queries at 2.5 kb; k-mer recall degrades past that and the
-// index is built for gene-sized queries, not whole genomes.
-const MAX_QUERY_BASES = 2500;
+// The index is built for gene-sized queries, not whole genomes. Keep in step
+// with the backend's MAX_QUERY_BASES.
+const MAX_QUERY_BASES = 5000;
 
 // Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
 // and it carries all but a handful of that query's hits. Fall back to whatever

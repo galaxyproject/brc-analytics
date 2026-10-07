@@ -72,7 +72,7 @@ class GalaxyJobSubmission(BaseModel):
     )
 
 
-MAX_QUERY_BASES = 2500
+MAX_QUERY_BASES = 5000
 
 
 def query_bases(sequence: str) -> int:
