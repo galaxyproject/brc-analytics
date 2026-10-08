@@ -68,6 +68,14 @@ def test_validate_catalog_passes_unique_accessions(tmp_path, capsys):
     assert "No issues found" in capsys.readouterr().out
 
 
+def test_validate_catalog_skips_accession_check_for_other_schemas(tmp_path, capsys):
+    (tmp_path / "taxa.yml").write_text(
+        "taxa:\n  - taxonomy_id: 573\n    other_names:\n      - K. pneumoniae\n"
+    )
+    validate_catalog(str(tmp_path), ["taxa"])
+    assert "No issues found" in capsys.readouterr().out
+
+
 @pytest.mark.parametrize(
     ("content", "expected_output"),
     [

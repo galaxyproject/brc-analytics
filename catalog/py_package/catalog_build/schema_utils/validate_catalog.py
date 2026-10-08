@@ -34,8 +34,8 @@ def find_assembly_accession_errors(assemblies_path):
         assemblies_path: Path of the assemblies YAML file.
 
     Returns:
-        A list of error messages, each naming the (1-based) line numbers involved;
-        empty if the file has no errors.
+        A list of error messages, empty if the file has no errors. Messages about a
+        duplicate or a malformed entry name the (1-based) line numbers involved.
     """
     with open(assemblies_path) as f:
         root = yaml.compose(f)
