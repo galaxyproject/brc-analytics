@@ -1414,9 +1414,6 @@ assemblies:
   # organism: Plasmodium falciparum 3D7
   # common_name: malaria parasite P. falciparum (3D7 2016 refseq)
   - accession: GCF_000002765.6
-  # organism: Plasmodium falciparum 3D7
-  # common_name: malaria parasite P. falciparum (3D7 2016)
-  - accession: GCF_000002765.6
   # organism: Trichomonas vaginalis G3
   # common_name: trichomonads (G3; ATCC PRA-98 2007)
   - accession: GCF_000002825.2
@@ -2206,9 +2203,6 @@ assemblies:
   # organism: Coccidioides posadasii str. Silveira
   # common_name: ascomycetes C.posadasii str. (Silveira 2022)
   - accession: GCF_018416015.2
-  # organism: Coccidioides posadasii str. Silveira
-  # common_name: ascomycetes C.posadasii str. (Silveira 2022)
-  - accession: GCF_018416015.2
   # organism: Phytophthora cinnamomi
   # common_name: downy mildews (GKB4 2021)
   - accession: GCF_018691715.1
@@ -2239,7 +2233,6 @@ assemblies:
   # organism: Dermacentor andersoni
   # common_name: mites & ticks D.andersoni (primary hap 2022)
   - accession: GCF_023375885.2
-  - accession: GCF_023375885.2
   # organism: Dermacentor variabilis
   # common_name: mites & ticks D.variabilis (primary hap 2024)
   - accession: GCF_050947875.1
@@ -2255,18 +2248,12 @@ assemblies:
   # organism: Amblyomma americanum
   # common_name: lone star tick (ASM5285725v1 2024)
   - accession: GCF_052857255.1
-  # organism: Amblyomma maculatum
-  # common_name: Gulf Coast tick (ASM2396939v1 2022)
-  - accession: GCA_023969395.1
   # organism: Amblyomma javanense
   # common_name: tick A.javanense (ZWH2_Genome 2024)
   - accession: GCA_965286815.2
   # organism: Amblyomma testudinarium
   # common_name: tick A.testudinarium (GXH_Genome 2024)
   - accession: GCA_965286825.1
-  # organism: Rhipicephalus sanguineus
-  # common_name: brown dog tick (BIME_Rsan_1.4 2020)
-  - accession: GCF_013339695.2
   # organism: Rhipicephalus appendiculatus
   # common_name: brown ear tick (ASM3052246v2 2024)
   - accession: GCA_030522465.2
@@ -2405,12 +2392,6 @@ assemblies:
   # organism: Babesia gibsoni
   # common_name: Babesia gibsoni (strain WH58)
   - accession: GCA_035575875.1
-  # organism: Babesia microti
-  # common_name: Babesia microti (strain RI)
-  - accession: GCF_000691945.2
-  # organism: Babesia bovis
-  # common_name: Babesia bovis (strain T2Bo)
-  - accession: GCF_000165395.2
   # organism: Babesia bigemina
   # common_name: Babesia bigemina (strain Bond)
   - accession: GCF_000981445.1
@@ -2423,21 +2404,9 @@ assemblies:
   # organism: Babesia ovis
   # common_name: Babesia ovis (strain Israeli)
   - accession: GCA_051529585.1
-  # organism: Babesia ovata
-  # common_name: Babesia ovata (strain Miyake)
-  - accession: GCF_002897235.1
-  # organism: Theileria orientalis
-  # common_name: Theileria orientalis (strain Shintoku)
-  - accession: GCF_000740895.1
-  # organism: Theileria parva
-  # common_name: Theileria parva (strain Muguga)
-  - accession: GCF_000165365.1
   # organism: Theileria annulata
   # common_name: Theileria annulata (strain Ankara C9)
   - accession: GCF_000003225.4
-  # organism: Theileria equi
-  # common_name: Theileria equi (strain WA)
-  - accession: GCF_000342415.1
   # organism: Theileria haneyi
   # common_name: Theileria haneyi (strain Ho-208)
   - accession: GCA_050329265.1
@@ -2510,9 +2479,6 @@ assemblies:
   # organism: Trichomonas vaginalis G3
   # common_name: Trichomonas vaginalis (G3 2022)
   - accession: GCF_026262505.1
-  # organism: Babesia duncani
-  # common_name: apicomplexans B.duncani (WA1 2023)
-  - accession: GCF_028658345.1
   # organism: Musca domestica
   # common_name: house fly (aabys 2023)
   - accession: GCF_030504385.1
@@ -2611,8 +2577,6 @@ assemblies:
   - accession: GCF_000865085.1
   - accession: GCF_000864105.1
   - accession: GCF_000851145.1
-  # Alkhurma hemorrhagic fever
-  - accession: GCA_031116565.1
   # Cache valley virus
   - accession: GCF_004789995.1
   # Caliciviridae viruses
@@ -2735,7 +2699,6 @@ assemblies:
   - accession: GCF_000850405.1
   # heartland virus
   - accession: GCF_013086545.1
-  - accession: GCF_000922255.1
   # Hendra virus
   - accession: GCF_000852685.1
   # hepatitis a
@@ -2746,8 +2709,6 @@ assemblies:
   - accession: GCF_000862145.1
   # junin virus
   - accession: GCF_000856545.1
-  # Kyasanur Forest
-  - accession: GCF_002820625.1
   # la crosse virus
   - accession: GCF_004789695.1
   - accession: GCF_000850965.1
@@ -2779,17 +2740,12 @@ assemblies:
   - accession: GCF_000863005.1
   - accession: GCF_002888795.1
   - accession: GCA_002888815.1
-  # Omsk hemorrhagic fever virus
-  - accession: GCF_000855505.1
   # Oropouche virus
   - accession: GCF_000853785.1
   # Poliovirus
   - accession: GCF_008766755.1
   - accession: GCF_008766715.1
   - accession: GCF_003108605.1
-  # Powassan (deer tick) virus
-  - accession: GCF_000860485.1
-  - accession: GCA_004786555.1
   # Punta Toro virus
   - accession: GCF_002815115.1
   - accession: GCF_001021295.1
@@ -2800,10 +2756,7 @@ assemblies:
   - accession: GCF_000847345.1
   # St. Louis encephalitis virus
   - accession: GCF_000866785.1
-  # Severe fever with thrombocytopenia syndrome virus
-  - accession: GCF_003087855.1
   # Tickborne encephalitis virus
-  - accession: GCF_000863125.1
   - accession: GCF_004788235.1
   # variola (smallpox)
   - accession: GCF_000859885.1
@@ -2831,9 +2784,6 @@ assemblies:
   - accession: GCF_001945665.1
   # Borrelia burgdorferi
   - accession: GCF_000181575.2
-  # Hard tick relapsing fever
-  # Borrelia miyamotoi
-  - accession: GCF_019668505.1
   # brucella
   - accession: GCF_000007125.1
   - accession: GCF_000007505.1
@@ -2870,24 +2820,11 @@ assemblies:
   - accession: GCF_000009085.1
   # Chlamydia psittaci (psittacosis)
   - accession: GCF_000204255.1
-  # Coxiella burnetii (Q fever)
-  - accession: GCF_000007765.2
   # Ehrlichia
-  - accession: GCF_000026005.1
-  - accession: GCF_000013145.1
   - accession: GCF_000508225.1
-  - accession: GCF_000632845.1
-  - accession: GCF_000012565.1
-  - accession: GCF_004181775.1
-  # Anaplasma phagocytophilum
-  - accession: GCF_000964685.1
-  # Neorickettsia sennetsu
-  - accession: GCF_000013165.1
   # e. coli
   - accession: GCF_000005845.2
   - accession: GCF_000008865.2
-  # Francisella tularensis (tularemia)
-  - accession: GCF_000833355.1
   # Leptospira
   - accession: GCF_000313175.2
   - accession: GCF_000017685.1
@@ -2965,21 +2902,9 @@ assemblies:
   # Listeria monocytogenes
   - accession: GCF_000196035.1
   # Rickettsia
-  - accession: GCF_000007025.1
-  - accession: GCF_000283595.1
   - accession: GCF_000284075.1
   - accession: GCF_000012385.1
-  - accession: GCF_000166935.1
-  - accession: GCF_000499665.2
-  - accession: GCF_000237845.1
-  - accession: GCF_000008045.1
   - accession: GCF_016743795.2
-  - accession: GCF_000018225.1
-  - accession: GCF_000277165.1
-  - accession: GCF_000284155.1
-  - accession: GCF_000283915.1
-  - accession: GCF_963970025.1
-  - accession: GCF_000018205.1
   - accession: GCF_936269705.1
   - accession: GCF_964026385.1
   - accession: GCF_964026435.1
@@ -3353,7 +3278,6 @@ assemblies:
   - accession: GCF_003032925.1
   - accession: GCF_003032865.1
   - accession: GCF_003032885.1
-  - accession: GCF_000858485.1
   - accession: GCF_003047675.1
   - accession: GCF_003047715.1
   - accession: GCF_003047695.1
@@ -3456,20 +3380,8 @@ assemblies:
   - accession: GCF_000820495.2
   - accession: GCF_002867775.1
   - accession: GCF_000856665.10
-  # Sinu virus
-  - accession: GCF_023157055.1
-  # Upolu virus
-  - accession: GCF_023156825.1
-  # Oz virus
-  - accession: GCF_004117175.1
-  # Jos virus
-  - accession: GCF_023156725.1
-  # Bourbon virus
-  - accession: GCF_023156645.1
   # Thailand tick thogotovirus
   - accession: GCF_023156685.1
-  # Thogotovirus thogotoense
-  - accession: GCF_000854245.1
   # Thogotovirus dhoriense
   - accession: GCF_002116195.1
   # orthobornavirus
@@ -3525,7 +3437,6 @@ assemblies:
   # Orthoflavivirus
   - accession: GCF_000863565.1
   - accession: GCF_000860805.1
-  - accession: GCF_000863165.1
   - accession: GCF_000883915.1
   # pegivirus
   - accession: GCF_002821105.1
@@ -3582,7 +3493,6 @@ assemblies:
   - accession: GCF_018595155.1
   - accession: GCF_000850985.1
   - accession: GCF_001629985.1
-  - accession: GCF_000854165.1
   # Phlebovirus
   - accession: GCF_001019855.1
   - accession: GCA_031497085.1
@@ -4216,8 +4126,6 @@ assemblies:
   - accession: GCF_002302495.1
   # organism: Chromobacterium violaceum
   - accession: GCF_016890085.1
-  # organism: Chryseobacterium indologenes
-  - accession: GCF_002706795.1
   # organism: Citrobacter freundii
   - accession: GCF_904859905.1
   # organism: Clostridium botulinum
@@ -7720,10 +7628,6 @@ assemblies:
   - accession: GCF_000011425.1
   #   assembly_name: ASM1142v1
   #   assembly_level: Chromosome
-  # organism: Babesia bigemina | community: Protists | total: 2 | new: 1
-  - accession: GCF_000981445.1
-  #   assembly_name: Bbig001
-  #   assembly_level: Chromosome
   # organism: Babesia microti | community: Protists | total: 4 | new: 3
   - accession: GCA_026802255.1
   #   assembly_name: ASM2680225v1
@@ -8229,7 +8133,7 @@ assemblies:
   # - accession: GCF_009914755.1  # temporarily disabled: missing from UCSC (2026-03)
   #   assembly_name: T2T-CHM13v2.0
   #   assembly_level: Complete Genome
-  # organism: Leishmania braziliensis | total: 13 | new: 11
+  # organism: Leishmania braziliensis | total: 13 | new: 9
   - accession: GCA_003304975.1
   #   assembly_name: IOC-L_3564
   #   assembly_level: Chromosome
@@ -8251,15 +8155,9 @@ assemblies:
   - accession: GCA_044509545.1
   #   assembly_name: LL0249
   #   assembly_level: Chromosome
-  - accession: GCA_900537975.2
-  #   assembly_name: LBRM_annotationDEFINITIVO
-  #   assembly_level: Chromosome
   - accession: GCA_902369275.1
   #   assembly_name: Lbraz
   #   assembly_level: Chromosome
-  - accession: GCA_964014045.1
-  #   assembly_name: Leishmania_braziliensis_M2904-Dec2022
-  #   assembly_level: Scaffold
   - accession: GCA_964014055.1
   #   assembly_name: Leishmania_braziliensis_M2903-Dec2022
   #   assembly_level: Scaffold
@@ -8570,10 +8468,6 @@ assemblies:
   - accession: GCF_009556855.1
   #   assembly_name: ASM955685v1
   #   assembly_level: Complete Genome
-  # organism: Theileria annulata | community: Protists | total: 1 | new: 1
-  - accession: GCF_000003225.4
-  #   assembly_name: ASM322v1
-  #   assembly_level: Chromosome
   # organism: Toxoplasma gondii | total: 23 | new: 6
   - accession: GCA_009761385.1
   #   assembly_name: ASM976138v1
