@@ -1,8 +1,8 @@
 """The boot-time warm of the kmindex index list.
 
-Without it the first visitor after a restart is the one who waits on Galaxy for
-the index picker, and the one who sees it fail if Galaxy is rate-limiting us
-right then.
+Readers never wait on Galaxy for the index picker -- a miss serves the last good
+copy and refreshes behind it -- so the warm is what keeps that copy current
+across a restart. It is the one caller that waits for the real read.
 """
 
 import asyncio
@@ -19,7 +19,8 @@ from app import main
 def _galaxy(available=True, **kwargs):
     galaxy = MagicMock()
     galaxy.is_available.return_value = available
-    galaxy.list_kmindex_indexes = AsyncMock(**kwargs)
+    galaxy.refresh_kmindex_indexes = AsyncMock(**kwargs)
+    galaxy.list_kmindex_indexes = AsyncMock(side_effect=AssertionError("read"))
     return galaxy
 
 
@@ -31,7 +32,7 @@ async def test_the_warm_fills_the_list_before_a_reader_arrives(monkeypatch, capl
     with caplog.at_level(logging.INFO):
         await main.warm_kmindex_indexes()
 
-    galaxy.list_kmindex_indexes.assert_awaited_once()
+    galaxy.refresh_kmindex_indexes.assert_awaited_once()
     assert "2 indexes" in caplog.text
 
 
@@ -40,6 +41,17 @@ async def test_a_galaxy_that_will_not_answer_does_not_fail_the_boot(
     monkeypatch, caplog
 ):
     galaxy = _galaxy(side_effect=Exception("Unexpected HTTP status code: 429"))
+    monkeypatch.setattr(main, "get_service_galaxy", MagicMock(return_value=galaxy))
+
+    with caplog.at_level(logging.WARNING):
+        await main.warm_kmindex_indexes()
+
+    assert "Could not warm" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_an_empty_answer_is_logged_as_a_failed_warm(monkeypatch, caplog):
+    galaxy = _galaxy(return_value=[])
     monkeypatch.setattr(main, "get_service_galaxy", MagicMock(return_value=galaxy))
 
     with caplog.at_level(logging.WARNING):
