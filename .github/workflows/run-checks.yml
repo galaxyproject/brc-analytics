@@ -93,6 +93,9 @@ jobs:
       - name: Validate GA2 catalog files
         # Validate the GA2 catalog source files.
         run: npm run validate-ga2-catalog
+      - name: Test catalog build package
+        # Run the catalog_build package's unit tests, such as the duplicate-accession check in the catalog validator.
+        run: python -m pytest catalog/py_package/tests
       - name: poetry lint
         # Validate the GA2 catalog source files.
         run: poetry check -P catalog/py_package/
