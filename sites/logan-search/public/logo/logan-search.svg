@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="28" viewBox="0 0 168 28" role="img" aria-label="Logan Search">
+  <!-- Placeholder wordmark until there's a real visual pass. -->
+  <rect x="0" y="2" width="24" height="24" rx="5" fill="#155E5C"/>
+  <path d="M8 7v14h9" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="32" y="20" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="600" fill="#0E3B3A">Logan Search</text>
+</svg>
