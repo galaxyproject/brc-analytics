@@ -1,8 +1,15 @@
 "use client";
 
+import {
+  downloadMapImage,
+  MAP_IMAGE_OPTIONS,
+  type MapImageFormat,
+  type MapImageView,
+} from "@brc/components/LoganSearch/CohortGeography/mapImage";
 import { CohortMapContainer } from "@brc/components/LoganSearch/loganSearch.styles";
 import { formatShare } from "@brc/components/LoganSearch/utils";
-import { Box, Typography } from "@mui/material";
+import { Download } from "@mui/icons-material";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import {
   type KmindexGeography,
   type KmindexGeographyCountry,
@@ -18,6 +25,8 @@ interface CohortGeographyProps {
   // our deployment, not about the cohort, so it renders as nothing rather
   // than as "no geography recorded".
   geography?: KmindexGeography | null;
+  // Names the downloaded image; the map still draws without it.
+  jobId?: string | null;
 }
 
 // Committed under sites/brc-analytics/public, so it is same-origin and there
@@ -40,6 +49,8 @@ const BORDER_STROKE = "#ffffff";
 // Three fits on one line at the width this block gets and is enough to make
 // the point that the omissions are real places.
 const UNPLACEABLE_NAMED = 3;
+
+const DOWNLOAD_MENU_ID = "logan-map-download-menu";
 
 // Sampling points sit on top of the choropleth, so they need to read as a
 // different thing rather than as a darker country. Plasma against blues does
@@ -440,6 +451,79 @@ function buildSpec(
 }
 
 /**
+ * The button and menu that save the map as an image, like kmviz's figure
+ * export.
+ * @param props - Component props.
+ * @param props.jobId - Job the map belongs to, for the filename.
+ * @param props.view - The embedded view, or null until it has drawn.
+ * @returns The download control.
+ */
+function MapDownload({
+  jobId,
+  view,
+}: {
+  jobId: string | null;
+  view: MapImageView | null;
+}): JSX.Element {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  const save = async (format: MapImageFormat): Promise<void> => {
+    setAnchor(null);
+    if (!view) return;
+    try {
+      setFailed(false);
+      await downloadMapImage(view, format, jobId);
+    } catch (error) {
+      console.error("Failed to export the cohort map:", error);
+      setFailed(true);
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        gap: 1,
+        justifyContent: "flex-end",
+      }}
+    >
+      {failed && (
+        <Typography color="textSecondary" variant="caption">
+          The image could not be saved.
+        </Typography>
+      )}
+      {/* Rendered before the view exists, disabled, so the map does not jump
+          down by a button's height when the drawing lands. */}
+      <Button
+        aria-controls={anchor ? DOWNLOAD_MENU_ID : undefined}
+        aria-expanded={Boolean(anchor)}
+        aria-haspopup="menu"
+        disabled={!view}
+        onClick={(event): void => setAnchor(event.currentTarget)}
+        size="small"
+        startIcon={<Download />}
+      >
+        Download map
+      </Button>
+      <Menu
+        anchorEl={anchor}
+        id={DOWNLOAD_MENU_ID}
+        onClose={(): void => setAnchor(null)}
+        open={Boolean(anchor)}
+      >
+        {MAP_IMAGE_OPTIONS.map(({ format, label }) => (
+          <MenuItem dense key={format} onClick={(): void => void save(format)}>
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  );
+}
+
+/**
  * The choropleth itself.
  *
  * Follows the embedding pattern in packages/shared/components/mdx/VegaEmbed:
@@ -458,17 +542,23 @@ function buildSpec(
  * need its first one for this.
  * @param props - Component props.
  * @param props.countries - Drawable countries with their run counts.
+ * @param props.jobId - Job the map belongs to, for the download filename.
  * @param props.points - Aggregated sampling positions, labelled for hover.
  * @returns The map, or a note in place of it if the render failed.
  */
 function GeographyMap({
   countries,
+  jobId,
   points,
 }: {
   countries: KmindexGeographyCountry[];
+  jobId: string | null;
   points: PlottedLocation[];
 }): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Held in state rather than a ref so the download control re-renders
+  // enabled once the drawing exists, and disabled again when it is torn down.
+  const [view, setView] = useState<MapImageView | null>(null);
   // Which attempt failed, rather than whether one did. A boolean cannot clear
   // itself here: the message below replaces the container, so the next run
   // finds a null ref and returns before reaching the reset, and the map stays
@@ -509,6 +599,7 @@ function GeographyMap({
           return;
         }
         result = embedded;
+        setView(embedded.view ?? null);
         setFailedFor(null);
       } catch (error) {
         // A map that fails to draw must say so. A blank box in the space
@@ -523,6 +614,8 @@ function GeographyMap({
 
     return (): void => {
       cancelled = true;
+      // A finalized view cannot render, so exporting it would only throw.
+      setView(null);
       if (result) result.finalize();
     };
   }, [countries, points]);
@@ -534,17 +627,24 @@ function GeographyMap({
       </Typography>
     );
   }
-  return <CohortMapContainer ref={containerRef} />;
+  return (
+    <>
+      <MapDownload jobId={jobId} view={view} />
+      <CohortMapContainer ref={containerRef} />
+    </>
+  );
 }
 
 /**
  * Where a cohort's runs were sampled from.
  * @param props - Component props.
  * @param props.geography - Geography rollup over the whole match set.
+ * @param props.jobId - Job the cohort belongs to, for the image filename.
  * @returns The geography block.
  */
 export const CohortGeography = ({
   geography,
+  jobId = null,
 }: CohortGeographyProps): JSX.Element | null => {
   const locations = geography?.locations ?? null;
   const precision = geography?.locations_precision ?? null;
@@ -584,7 +684,7 @@ export const CohortGeography = ({
         </Typography>
       )}
       {countries.length > 0 || points.length > 0 ? (
-        <GeographyMap countries={countries} points={points} />
+        <GeographyMap countries={countries} jobId={jobId} points={points} />
       ) : (
         // Nothing to draw at all: no country the outline can place, and no
         // sampling position either. One point is enough to earn a map, so

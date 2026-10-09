@@ -256,7 +256,7 @@ export const LoganSearchCohort = ({
     <>
       <Divider sx={{ my: 2 }} />
       <CohortGeographyLayout>
-        <CohortGeography geography={geography} />
+        <CohortGeography geography={geography} jobId={results.job_id} />
         {countryFacet && <CohortFacetBlock facet={countryFacet} />}
       </CohortGeographyLayout>
     </>

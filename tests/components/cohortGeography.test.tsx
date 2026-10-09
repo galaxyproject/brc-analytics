@@ -4,7 +4,13 @@ import {
   type KmindexGeographyCountry,
   type KmindexGeographyLocation,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 
 // The hook module this component takes its types from imports ky, which ships
 // ESM only and Jest cannot parse.
@@ -393,6 +399,115 @@ describe("the map", () => {
       expect(embedMock().mock.calls.length).toBeGreaterThan(attempts)
     );
     expect(screen.queryByText(/The map could not be drawn/)).toBeNull();
+  });
+});
+
+describe("the map download", () => {
+  let click: jest.SpyInstance;
+  let downloads: string[];
+
+  beforeEach(() => {
+    embedMock().mockClear();
+    downloads = [];
+    click = jest
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        downloads.push(this.download);
+      });
+  });
+
+  afterEach(() => {
+    click.mockRestore();
+  });
+
+  /**
+   * An embed result whose view can be exported.
+   * @param toImageURL - What rendering resolves (or rejects) with.
+   * @returns The resolved embed result.
+   */
+  function exportable(toImageURL: jest.Mock): {
+    finalize: jest.Mock;
+    view: object;
+  } {
+    let background = "transparent";
+    return {
+      finalize: jest.fn(),
+      view: {
+        background: (next?: string): string | void => {
+          if (next === undefined) return background;
+          background = next;
+        },
+        runAsync: jest.fn(async () => undefined),
+        toImageURL,
+      },
+    };
+  }
+
+  it("stays disabled until there is a drawing to save", async () => {
+    const toImageURL = jest.fn(async () => "data:image/png;base64,AA");
+    let resolveEmbed: ((value: unknown) => void) | undefined;
+    embedMock().mockImplementationOnce(
+      () => new Promise((resolve) => (resolveEmbed = resolve))
+    );
+    render(
+      <CohortGeography geography={geography()} jobId="fe6f66a714dcbec8" />
+    );
+
+    const button = await screen.findByRole("button", { name: "Download map" });
+    expect(button.hasAttribute("disabled")).toBe(true);
+
+    await waitFor(() => expect(embedMock()).toHaveBeenCalled());
+    await act(async () => resolveEmbed?.(exportable(toImageURL)));
+    expect(button.hasAttribute("disabled")).toBe(false);
+  });
+
+  it("offers PNG and SVG, named after the job", async () => {
+    const toImageURL = jest.fn(async () => "data:image/png;base64,AA");
+    embedMock().mockResolvedValueOnce(exportable(toImageURL));
+    render(
+      <CohortGeography geography={geography()} jobId="fe6f66a714dcbec8" />
+    );
+
+    const button = await screen.findByRole("button", { name: "Download map" });
+    await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
+    fireEvent.click(button);
+    expect(screen.getByRole("menuitem", { name: "SVG vector" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("menuitem", { name: "PNG image" }));
+
+    await waitFor(() =>
+      expect(downloads).toEqual(["logan-fe6f66a714dcbec8-map.png"])
+    );
+    expect(toImageURL).toHaveBeenCalledWith("png", 2);
+  });
+
+  it("says so when the image cannot be made", async () => {
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    const toImageURL = jest.fn(async () => {
+      throw new Error("canvas tainted");
+    });
+    embedMock().mockResolvedValueOnce(exportable(toImageURL));
+    render(<CohortGeography geography={geography()} />);
+
+    const button = await screen.findByRole("button", { name: "Download map" });
+    await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("menuitem", { name: "SVG vector" }));
+
+    expect(
+      await screen.findByText(/The image could not be saved/)
+    ).toBeTruthy();
+    expect(downloads).toEqual([]);
+    // The map itself is untouched by a failed export.
+    expect(screen.queryByText(/The map could not be drawn/)).toBeNull();
+  });
+
+  it("is not offered when the map failed to draw", async () => {
+    embedMock().mockRejectedValueOnce(new Error("no geometry"));
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    render(<CohortGeography geography={geography()} />);
+
+    expect(await screen.findByText(/The map could not be drawn/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Download map" })).toBeNull();
   });
 });
 
