@@ -5,6 +5,7 @@ import { LoganSearch } from "@repo/shared/components/LoganSearch/loganSearch";
 import { type LoganSearchRoutes } from "@repo/shared/components/LoganSearch/types";
 import NextLink from "next/link";
 import { Fragment, type JSX } from "react";
+import { LOGAN_STATS } from "./constants";
 import { SearchContainer, SearchSection } from "./loganSearchSiteView.styles";
 
 // No assistantHref: the assistant lives on BRC Analytics, and whether this site
@@ -23,6 +24,7 @@ export const LoganSearchSiteView = (): JSX.Element => {
     <Fragment>
       <LoganHero
         head="Logan Search"
+        stats={LOGAN_STATS}
         subHead={
           <Fragment>
             Paste a DNA sequence and find the SRA runs it occurs in.{" "}
