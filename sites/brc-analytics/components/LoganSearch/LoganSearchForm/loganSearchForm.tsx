@@ -17,14 +17,13 @@ import {
 } from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
 import {
   axisOptions,
-  countBases,
-  countRecords,
   describeIndexSelection,
   type IndexAxis,
   type IndexAxisOption,
   indexDivision,
   indexPresets,
   indexStrategy,
+  parseQuery,
   selectIndexes,
   sortIndexes,
 } from "@brc/components/LoganSearch/utils";
@@ -59,7 +58,7 @@ const MAX_QUERY_BASES = 5000;
 // would be hundreds of megabytes of text in a textarea. A megabyte is still
 // far past anything the 5,000-base cap would let through.
 const MAX_QUERY_FILE_BYTES = 1024 * 1024;
-const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.txt";
+const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.fq,.fastq,.txt";
 
 // Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
 // and it carries all but a handful of that query's hits. Fall back to whatever
@@ -304,8 +303,8 @@ export const LoganSearchForm = ({
   const [fileError, setFileError] = useState<string | null>(null);
 
   /**
-   * Load a picked FASTA file into the textarea, where the same base count and
-   * cap apply as to a pasted query.
+   * Load a picked FASTA or FASTQ file into the textarea, where the same base
+   * count and cap apply as to a pasted query.
    * @param event - The file input's change event.
    */
   const onQueryFile = async (
@@ -325,10 +324,10 @@ export const LoganSearchForm = ({
     }
     try {
       const text = await file.text();
-      // A binary or non-UTF-8 file decodes to U+FFFD, which countBases would
-      // count as bases and Galaxy would then reject.
+      // A binary or non-UTF-8 file (a gzipped FASTQ, say) decodes to U+FFFD,
+      // which would be counted as bases and Galaxy would then reject.
       if (text.includes("\uFFFD")) {
-        setFileError(`${file.name} isn't a plain-text FASTA file.`);
+        setFileError(`${file.name} isn't a plain-text FASTA or FASTQ file.`);
         return;
       }
       setSequence(text);
@@ -386,16 +385,20 @@ export const LoganSearchForm = ({
     total: options.length,
   });
 
-  const bases = countBases(sequence);
+  const query = parseQuery(sequence);
+  const { bases, records } = query;
   const tooLong = bases > MAX_QUERY_BASES;
   // The backend refuses multi-record FASTA with a 422; say so here instead.
-  const records = countRecords(sequence);
   const tooManyRecords = records > 1;
-  let queryHelp = `${bases} bases. FASTA; headers are ignored.`;
+  let queryHelp =
+    query.format === "fastq"
+      ? `${bases} bases. FASTQ; headers and quality scores are ignored.`
+      : `${bases} bases. FASTA; headers are ignored.`;
   if (tooLong)
     queryHelp = `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`;
   if (tooManyRecords)
     queryHelp = `${records} records -- a query is one sequence`;
+  if (query.error) queryHelp = query.error;
   // An errored job keeps its jobId with no results forever, so leaving the
   // error out of this leaves the form stuck "running" with no way back.
   const isRunning =
@@ -407,6 +410,7 @@ export const LoganSearchForm = ({
     bases > 0 &&
     !tooLong &&
     !tooManyRecords &&
+    !query.error &&
     !isRunning &&
     !search.isLoadingIndexes;
 
@@ -418,7 +422,7 @@ export const LoganSearchForm = ({
           <FormColumn>
             <Typography variant="h6">Query sequence</Typography>
             <TextField
-              error={tooLong || tooManyRecords}
+              error={tooLong || tooManyRecords || Boolean(query.error)}
               fullWidth
               helperText={queryHelp}
               maxRows={20}
@@ -438,7 +442,7 @@ export const LoganSearchForm = ({
                 startIcon={<UploadFile />}
                 variant="outlined"
               >
-                Load FASTA file
+                Load FASTA/FASTQ file
                 <input
                   accept={QUERY_FILE_TYPES}
                   hidden
@@ -588,9 +592,10 @@ export const LoganSearchForm = ({
               <Button
                 disabled={!canSubmit}
                 onClick={async (): Promise<void> => {
+                  // FASTQ goes as its FASTA form; the backend only reads FASTA.
                   const jobId = await search.submit({
                     indexes,
-                    sequence,
+                    sequence: query.fasta,
                     threshold,
                     zvalue: 6,
                   });
@@ -598,7 +603,7 @@ export const LoganSearchForm = ({
                     onSubmitted?.({
                       indexes,
                       jobId,
-                      queryName: queryNameOf(sequence),
+                      queryName: queryNameOf(query.fasta),
                       submittedAt: new Date().toISOString(),
                       threshold,
                     });

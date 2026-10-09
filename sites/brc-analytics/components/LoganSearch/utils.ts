@@ -321,6 +321,71 @@ export function countRecords(fasta: string): number {
   return fasta.split("\n").filter((line) => line.trim().startsWith(">")).length;
 }
 
+export interface ParsedQuery {
+  bases: number;
+  // Why a FASTQ query can't be read, as a sentence; null when it can.
+  error: string | null;
+  // The query as the backend takes it, which is FASTA only.
+  fasta: string;
+  format: "fasta" | "fastq";
+  records: number;
+}
+
+const FASTQ_SHAPE = "four lines: @header, sequence, +, quality";
+
+/**
+ * Read the query box as FASTA or FASTQ.
+ *
+ * FASTQ is told apart by its leading "@", and turned into FASTA here so the
+ * request the backend sees is the same either way. Records are read as
+ * strict four-line groups: wrapped FASTQ is rare, and a quality line can
+ * itself start with "@", so it can't be split reliably on headers.
+ * @param text - Raw textarea contents.
+ * @returns The query's format, its FASTA form, and what the form checks.
+ */
+export function parseQuery(text: string): ParsedQuery {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (!lines[0]?.startsWith("@")) {
+    return {
+      bases: countBases(text),
+      error: null,
+      fasta: text,
+      format: "fasta",
+      records: countRecords(text),
+    };
+  }
+  const records: { header: string; sequence: string }[] = [];
+  let error: string | null = null;
+  for (let start = 0; start < lines.length && !error; start += 4) {
+    const n = start / 4 + 1;
+    const [header, sequence, plus, quality] = lines.slice(start, start + 4);
+    if (!header.startsWith("@")) {
+      error = `Malformed FASTQ: record ${n} doesn't start with an @ header. Each record is ${FASTQ_SHAPE}.`;
+    } else if (quality === undefined) {
+      error = `Malformed FASTQ: record ${n} is incomplete. Each record is ${FASTQ_SHAPE}.`;
+    } else if (!plus.startsWith("+")) {
+      error = `Malformed FASTQ: record ${n} has no + line after its sequence. Each record is ${FASTQ_SHAPE}.`;
+    } else if (quality.length !== sequence.length) {
+      error = `Malformed FASTQ: record ${n} has ${sequence.length} bases but ${quality.length} quality scores.`;
+    } else {
+      records.push({ header: header.slice(1), sequence });
+    }
+  }
+  const fasta = records
+    .map(({ header, sequence }) => `>${header}\n${sequence}\n`)
+    .join("");
+  return {
+    bases: countBases(fasta),
+    error,
+    fasta,
+    format: "fastq",
+    records: records.length,
+  };
+}
+
 /**
  * A count as a share of its denominator.
  *

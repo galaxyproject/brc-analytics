@@ -18,9 +18,9 @@ title: "Logan Search"
 
 ## Your query
 
-- **One sequence**, as FASTA or bare bases. Headers are ignored, and the first word of the header becomes the query's name in the results. A query with more than one record can't be submitted; the form says so under the box.
+- **One sequence**, as FASTA, FASTQ or bare bases. Headers are ignored, and the first word of the header becomes the query's name in the results. A query with more than one record can't be submitted; the form says so under the box. FASTQ is read as plain four-line records (`@header`, sequence, `+`, quality) and its quality scores are dropped.
 - **Up to 5,000 bases.** Logan's index is built for gene-sized queries, not whole genomes. The base count under the text box turns red when you're over.
-- **Load FASTA file** reads a `.fa`, `.fasta`, `.fna` or `.txt` file into the text box in your browser, where the same checks apply. FASTQ isn't supported.
+- **Load FASTA/FASTQ file** reads a `.fa`, `.fasta`, `.fna`, `.fq`, `.fastq` or `.txt` file into the text box in your browser, where the same checks apply. Compressed files such as `.fastq.gz` aren't read; unzip them first.
 - **Examples** fill the text box with a real NCBI sequence range -- the accession and coordinates are in each example's header -- and pick the one index its organism lives in.
 
 ## Threshold
