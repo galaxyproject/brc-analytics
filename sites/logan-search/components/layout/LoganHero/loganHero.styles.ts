@@ -37,6 +37,7 @@ export const HeroLayout = styled("div", {
   flex-direction: column;
   gap: 8px;
   margin: 0 auto;
+  position: relative; /* positions the home page's lens */
 
   ${({ variant }) =>
     variant === "home"
