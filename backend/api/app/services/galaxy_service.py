@@ -8,6 +8,7 @@ import random
 import tempfile
 import zipfile
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
 from typing import Dict, List, Literal, Optional, Tuple
 
 import requests
@@ -325,6 +326,15 @@ HISTORY_ID_CACHE_PREFIX = "galaxy:history_id:v1"
 # A user's history is one long-lived history in their own account; a gone one
 # is caught on use (_is_missing_history_error), so the TTL only bounds staleness.
 HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
+# A service history is only written to on its own UTC day, so a day's grace past
+# that is plenty.
+SERVICE_HISTORY_ID_TTL = 2 * CacheTTL.ONE_DAY
+
+
+def _today() -> str:
+    """Today's UTC date, which names the day's service history."""
+    return datetime.now(timezone.utc).date().isoformat()
+
 
 # One Galaxy read per cold cache, process-wide, rather than one per miss. The
 # router builds a service per request, so the in-flight refresh has to live out
@@ -548,8 +558,9 @@ class GalaxyService:
     ):
         """
         @param history_name: where service-account jobs land, in place of the
-            shared "BRC ANALYTICS JOBS". Ignored for a user credential, whose
-            jobs always go to their own account's history.
+            shared "BRC ANALYTICS JOBS"; either way the UTC date is appended.
+            Ignored for a user credential, whose jobs always go to their own
+            account's history.
         """
         self.cache = cache
         self.history_name = history_name
@@ -2117,17 +2128,22 @@ class GalaxyService:
     def _history_target(self) -> Tuple[str, object, int]:
         """The history jobs land in: its name, its lock's account, its TTL.
 
-        Service-account jobs share one "BRC ANALYTICS JOBS" history, unless the
-        service was built with a history_name; a signed-in user's jobs go to a
-        "BRC Logan Search" history in their own account -- the bearer token
-        scopes the lookup and create_history to that user.
+        Service-account jobs go to a "BRC ANALYTICS JOBS - <UTC date>" history
+        (or history_name's, if the service was built with one); a signed-in
+        user's jobs go to a single "BRC Logan Search" history in their own
+        account -- the bearer token scopes the lookup and create_history to
+        that user.
+
+        Service histories turn over daily because every search adds an upload
+        and a collection of one dataset per index shard -- thousands for an
+        all-index search -- so one history would grow without end.
         """
         if self.credential is not None and self.credential.kind == "user":
             return "BRC Logan Search", self.credential.user_sub, HISTORY_ID_TTL
-        name = self.history_name or "BRC ANALYTICS JOBS"
+        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {_today()}"
         # Keyed by name too: two service histories on one account are separate
         # find-or-creates, and must not wait on each other.
-        return name, ("service", name), HISTORY_ID_TTL
+        return name, ("service", name), SERVICE_HISTORY_ID_TTL
 
     def _history_cache_key(self, account: object, name: str) -> Optional[str]:
         """Where the resolved id is cached, or None when it must not be.

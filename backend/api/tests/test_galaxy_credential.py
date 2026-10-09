@@ -14,6 +14,7 @@ from app.core.dependencies import get_galaxy_credential
 from app.core.galaxy_credential import GalaxyCredential
 from app.services import galaxy_service
 from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
+from app.services.galaxy_service import _today as real_today
 
 # Verbatim from galaxy/lib/galaxy/authnz/managers.py -- the two 401s we have
 # to tell apart.
@@ -210,10 +211,15 @@ class FakeGalaxy:
         return history
 
 
+TODAY = "2026-10-08"
+SERVICE_HISTORY = f"BRC ANALYTICS JOBS - {TODAY}"
+
+
 @pytest.fixture(autouse=True)
 def _fresh_history_state(monkeypatch):
     monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
     monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+    monkeypatch.setattr(galaxy_service, "_today", lambda: TODAY)
 
 
 def _service(galaxy, cache=None, credential=None, history_name=None):
@@ -241,19 +247,17 @@ async def test_user_jobs_use_per_user_history_name():
 async def test_service_jobs_keep_shared_history_name():
     galaxy = FakeGalaxy()
     await _service(galaxy)._get_or_create_shared_history()
-    galaxy.gi.histories.create_history.assert_called_once_with(
-        name="BRC ANALYTICS JOBS"
-    )
+    galaxy.gi.histories.create_history.assert_called_once_with(name=SERVICE_HISTORY)
 
 
 @pytest.mark.asyncio
 async def test_a_named_service_history_replaces_the_shared_one():
-    galaxy = FakeGalaxy([{"id": "shared", "name": "BRC ANALYTICS JOBS"}])
+    galaxy = FakeGalaxy([{"id": "shared", "name": SERVICE_HISTORY}])
     svc = _service(galaxy, history_name="BRC Logan Partner - logan")
 
     assert await svc._get_or_create_shared_history() == "h1"
     galaxy.gi.histories.create_history.assert_called_once_with(
-        name="BRC Logan Partner - logan"
+        name=f"BRC Logan Partner - logan - {TODAY}"
     )
 
 
@@ -266,6 +270,48 @@ async def test_a_history_name_does_not_move_a_users_jobs():
 
 
 @pytest.mark.asyncio
+async def test_service_histories_carry_the_utc_date(monkeypatch):
+    galaxy = FakeGalaxy()
+    first = await _service(galaxy)._get_or_create_shared_history()
+    assert await _service(galaxy)._get_or_create_shared_history() == first
+
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+    second = await _service(galaxy)._get_or_create_shared_history()
+
+    assert second != first
+    assert [h["name"] for h in galaxy.histories] == [
+        SERVICE_HISTORY,
+        "BRC ANALYTICS JOBS - 2026-10-09",
+    ]
+
+
+def test_the_date_is_the_utc_date(monkeypatch):
+    from datetime import datetime, timezone
+
+    class Clock:
+        @staticmethod
+        def now(tz=None):
+            # Late evening in the Americas is already tomorrow in UTC.
+            assert tz is timezone.utc
+            return datetime(2026, 10, 9, 1, 30, tzinfo=timezone.utc)
+
+    monkeypatch.setattr(galaxy_service, "datetime", Clock)
+    assert real_today() == "2026-10-09"
+
+
+@pytest.mark.asyncio
+async def test_user_histories_do_not_rotate(monkeypatch):
+    galaxy = FakeGalaxy()
+    first = await _service(galaxy, credential=USER)._get_or_create_shared_history()
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+    monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+
+    svc = _service(galaxy, credential=USER)
+    assert await svc._get_or_create_shared_history() == first
+    assert [h["name"] for h in galaxy.histories] == ["BRC Logan Search"]
+
+
+@pytest.mark.asyncio
 async def test_lookup_filters_by_name_on_the_server():
     # The 2026-10-08 timeout was an unfiltered list of every history on the
     # account; FakeGalaxy fails get_histories and any lookup without q=name.
@@ -274,7 +320,7 @@ async def test_lookup_filters_by_name_on_the_server():
     params = galaxy.gi.make_get_request.call_args.kwargs["params"]
     assert dict(zip(params["q"], params["qv"])) == {
         "deleted": "False",
-        "name": "BRC ANALYTICS JOBS",
+        "name": SERVICE_HISTORY,
     }
     galaxy.gi.histories.get_histories.assert_not_called()
 
@@ -283,8 +329,8 @@ async def test_lookup_filters_by_name_on_the_server():
 async def test_lookup_takes_the_most_recently_updated_match():
     galaxy = FakeGalaxy(
         [
-            {"id": "old", "name": "BRC ANALYTICS JOBS", "update_time": "2026-01-01"},
-            {"id": "new", "name": "BRC ANALYTICS JOBS", "update_time": "2026-10-01"},
+            {"id": "old", "name": SERVICE_HISTORY, "update_time": "2026-01-01"},
+            {"id": "new", "name": SERVICE_HISTORY, "update_time": "2026-10-01"},
         ]
     )
     assert await _service(galaxy)._get_or_create_shared_history() == "new"
@@ -331,8 +377,8 @@ async def test_named_service_histories_do_not_share_a_lock(monkeypatch):
         await _service(FakeGalaxy(), history_name=name)._get_or_create_shared_history()
 
     assert set(locks) == {
-        ("service", "BRC ANALYTICS JOBS"),
-        ("service", "BRC Logan Partner - logan"),
+        ("service", SERVICE_HISTORY),
+        ("service", f"BRC Logan Partner - logan - {TODAY}"),
     }
 
 
@@ -512,7 +558,7 @@ def _history_gone():
 
 @pytest.mark.asyncio
 async def test_a_gone_history_is_re_resolved_and_the_upload_retried():
-    galaxy = FakeGalaxy([{"id": "stale", "name": "BRC ANALYTICS JOBS"}])
+    galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
     cache = FakeCache()
     svc = _service(galaxy, cache)
     assert await svc._get_or_create_shared_history() == "stale"
@@ -538,7 +584,7 @@ async def test_a_gone_history_is_re_resolved_and_the_upload_retried():
 
 @pytest.mark.asyncio
 async def test_a_gone_history_at_run_tool_clears_the_cache_without_a_retry():
-    galaxy = FakeGalaxy([{"id": "stale", "name": "BRC ANALYTICS JOBS"}])
+    galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
     cache = FakeCache()
     svc = _service(galaxy, cache)
     svc._upload_fasta = AsyncMock(return_value="d1")
@@ -556,7 +602,7 @@ async def test_a_gone_history_at_run_tool_clears_the_cache_without_a_retry():
 async def test_an_unrelated_upload_failure_keeps_the_cached_history():
     from app.services.galaxy_service import GalaxySubmitNotStarted
 
-    galaxy = FakeGalaxy([{"id": "h", "name": "BRC ANALYTICS JOBS"}])
+    galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
     svc = _service(galaxy)
     galaxy.gi.tools.paste_content = MagicMock(side_effect=RuntimeError("timed out"))
 
