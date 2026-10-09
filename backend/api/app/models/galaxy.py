@@ -484,7 +484,7 @@ class KmindexResults(BaseModel):
         description="True when f.* filter parameters were applied. The page is "
         "then served from the export parquet: total_hits is the filtered count "
         "over the whole match set (not the capped listing), truncated is false, "
-        "per_index is empty, and cohort/geography stay the unfiltered ones -- "
+        "per_index is empty, and cohort/geography stay the unfiltered ones; "
         "the filtered pair is GET .../summary",
     )
     hits: List[KmindexHit] = []
