@@ -1,6 +1,7 @@
 import {
   LoganSearchResults,
   MIRROR_SCOPE_NOTE,
+  openViromeUrl,
 } from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
   type KmindexHit,
@@ -794,6 +795,45 @@ describe("the hit table", () => {
   });
 });
 
+describe("OpenVirome links", () => {
+  test("encodes the filter as a whole rather than pasting it in raw", () => {
+    const url = openViromeUrl("runId", "SRR1197259");
+
+    expect(url).toBe(
+      "https://openvirome.com/?filters=%5B%22runId-SRR1197259%22%5D"
+    );
+    // What logan-search.org links to, once the query string is decoded.
+    expect(new URL(url).searchParams.get("filters")).toBe(
+      '["runId-SRR1197259"]'
+    );
+  });
+
+  test("puts an OpenVirome link beside every run's NCBI link", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [hit(), hit({ accession: "SRR000002" })],
+      total_hits: 2,
+      total_matches: 2,
+    });
+
+    const links = screen.getAllByRole("link", { name: /on OpenVirome/ });
+    expect(links.map((link) => link.textContent)).toEqual([
+      "OV (SRR000001 on OpenVirome, opens in a new tab)",
+      "OV (SRR000002 on OpenVirome, opens in a new tab)",
+    ]);
+    expect(links[1].getAttribute("href")).toBe(
+      openViromeUrl("runId", "SRR000002")
+    );
+    expect(links[1].getAttribute("target")).toBe("_blank");
+    // The NCBI link keeps its own name rather than absorbing the second one.
+    expect(
+      screen.getByRole("link", {
+        name: "SRR000002 (opens NCBI SRA in a new tab)",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("sorting and page size", () => {
   test("clicking a header asks the hook to sort by that column", () => {
     const { actions } = renderResults(BASE_RESULTS);
@@ -990,6 +1030,23 @@ describe("the column chooser", () => {
         .getByRole("link", { name: "SRP654321 (opens NCBI in a new tab)" })
         .getAttribute("href")
     ).toBe("https://www.ncbi.nlm.nih.gov/sra/?term=SRP654321");
+  });
+
+  test("links the BioProject to OpenVirome too, but not the study", () => {
+    renderResults(annotated);
+    toggle("BioProject");
+    toggle("Study");
+
+    expect(
+      screen
+        .getByRole("link", { name: /PRJNA123456 on OpenVirome/ })
+        .getAttribute("href")
+    ).toBe(openViromeUrl("bioproject", "PRJNA123456"));
+    // logan-search.org links no study to OpenVirome, so there is no known
+    // filter for one to use.
+    expect(
+      screen.queryByRole("link", { name: /SRP654321 on OpenVirome/ })
+    ).toBeNull();
   });
 
   test("groups the Mbases digits and dims what the mirror lacks", () => {

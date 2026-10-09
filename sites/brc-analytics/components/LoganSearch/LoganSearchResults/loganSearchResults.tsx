@@ -60,6 +60,10 @@ interface LoganSearchResultsProps {
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 const BIOPROJECT_URL = "https://www.ncbi.nlm.nih.gov/bioproject/";
+const OPENVIROME_URL = "https://openvirome.com/";
+
+// The filter prefixes OpenVirome reads, as logan-search.org links them.
+export type OpenViromeField = "bioproject" | "runId";
 
 // The truncation disclosure, named so the toggle can point aria-controls at
 // what it opens. One card per page, so a constant is enough.
@@ -234,18 +238,78 @@ function describeMeta(hit: KmindexHit): string {
 }
 
 /**
- * An NCBI link for a BioProject or study accession, or the dimmed dash when
- * the mirror had none.
+ * An OpenVirome search filtered to one accession.
+ *
+ * The filter is a JSON array in the query string, so it is encoded as a whole
+ * rather than pasted in raw the way logan-search.org does: brackets and quotes
+ * are not safe in a query and an accession is no guarantee of tidy input.
+ * @param field - Which OpenVirome filter the accession goes in.
+ * @param accession - The run or BioProject accession.
+ * @returns e.g. https://openvirome.com/?filters=%5B%22runId-SRR1197259%22%5D.
+ */
+export function openViromeUrl(
+  field: OpenViromeField,
+  accession: string
+): string {
+  const filters = JSON.stringify([`${field}-${accession}`]);
+  return `${OPENVIROME_URL}?filters=${encodeURIComponent(filters)}`;
+}
+
+/**
+ * A compact OpenVirome link to sit after an accession's NCBI link.
+ *
+ * "OV" is what logan-search.org prints, and spelling the name out on every
+ * row would double the width of the accession column. The tooltip names it
+ * for a sighted reader, keyboard included, and the hidden text names it for a
+ * screen reader; describeChild keeps the tooltip from replacing that name.
+ * @param props - Component props.
+ * @param props.accession - The accession to search for.
+ * @param props.field - Which OpenVirome filter the accession goes in.
+ * @returns The link.
+ */
+function OpenViromeLink({
+  accession,
+  field,
+}: {
+  accession: string;
+  field: OpenViromeField;
+}): JSX.Element {
+  return (
+    <Tooltip describeChild title="Find this accession on OpenVirome">
+      <Link
+        href={openViromeUrl(field, accession)}
+        rel="noopener noreferrer"
+        target="_blank"
+        underline="hover"
+        variant="caption"
+      >
+        OV
+        <Box component="span" sx={visuallyHidden}>
+          {" "}
+          ({accession} on OpenVirome, opens in a new tab)
+        </Box>
+      </Link>
+    </Tooltip>
+  );
+}
+
+/**
+ * An NCBI link for a BioProject or study accession, with an OpenVirome link
+ * beside it where asked for, or the dimmed dash when the mirror had none.
  * @param props - Component props.
  * @param props.href - Where the accession resolves at NCBI.
+ * @param props.openVirome - OpenVirome filter for a second link beside the
+ * NCBI one, for the accession kinds OpenVirome can filter on.
  * @param props.value - The accession, or null when not recorded.
  * @returns The link, or the dash.
  */
 function MetaLink({
   href,
+  openVirome,
   value,
 }: {
   href: string;
+  openVirome?: OpenViromeField;
   value?: string | null;
 }): JSX.Element {
   if (!value) return <Meta value={value} />;
@@ -263,6 +327,12 @@ function MetaLink({
           (opens NCBI in a new tab)
         </Box>
       </Link>
+      {openVirome && (
+        <>
+          {" "}
+          <OpenViromeLink accession={value} field={openVirome} />
+        </>
+      )}
     </Typography>
   );
 }
@@ -282,6 +352,7 @@ function renderMetaValue(
       return (
         <MetaLink
           href={`${BIOPROJECT_URL}${encodeURIComponent(sra?.bioproject ?? "")}`}
+          openVirome="bioproject"
           value={sra?.bioproject}
         />
       );
@@ -752,7 +823,8 @@ export const LoganSearchResults = ({
                         {" "}
                         (opens NCBI SRA in a new tab)
                       </Box>
-                    </Link>
+                    </Link>{" "}
+                    <OpenViromeLink accession={hit.accession} field="runId" />
                   </TableCell>
                   <TableCell align="right">
                     <CoverageCell>
