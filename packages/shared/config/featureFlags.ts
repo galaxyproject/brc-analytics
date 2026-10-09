@@ -12,4 +12,5 @@ export const FEATURE_FLAGS = {
   ASSISTANT_UI: "assistant-ui",
   DEMO: "demo",
   GENE_PAGES: "gene-pages",
+  LOGAN_FILTERS: "logan-filters",
 } as const;
