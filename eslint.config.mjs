@@ -30,7 +30,7 @@ const config = [
       "**/test-results/**",
       ".github/**",
       "public/favicons/**",
-      "next-env.d.ts",
+      "**/next-env.d.ts",
       "next.config.mjs",
     ],
   },
