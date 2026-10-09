@@ -538,6 +538,19 @@ export const LoganSearchResults = ({
 
   if (!results) return null;
 
+  // Filtered to nothing is the reader's filter, not the query: blaming the
+  // threshold here would send them to change the wrong thing.
+  if (results.filtered && results.total_hits === 0) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <ShardWarning noun="search" results={results} />
+        <Alert severity="info">
+          No runs match these filters. Remove one above to widen the set.
+        </Alert>
+      </Box>
+    );
+  }
+
   if (results.total_hits === 0) {
     return (
       <Box sx={{ mt: 2 }}>
@@ -602,7 +615,9 @@ export const LoganSearchResults = ({
   // under any sort, because the cap is applied on score before the listing is
   // re-sorted, so the listed rows are the highest-coverage ones however they
   // are ordered on screen.
-  let listWindow = `All ${results.total_hits.toLocaleString()} hits`;
+  let listWindow = results.filtered
+    ? `All ${results.total_hits.toLocaleString()} runs that match these filters`
+    : `All ${results.total_hits.toLocaleString()} hits`;
   let capNote: string | null = null;
   if (results.truncated) {
     listWindow = `Listing the ${cap.toLocaleString()} highest-coverage hits`;
