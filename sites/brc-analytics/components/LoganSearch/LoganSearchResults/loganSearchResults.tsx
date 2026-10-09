@@ -60,10 +60,11 @@ interface LoganSearchResultsProps {
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 const BIOPROJECT_URL = "https://www.ncbi.nlm.nih.gov/bioproject/";
+const BIOSAMPLE_URL = "https://www.ncbi.nlm.nih.gov/biosample/";
 const OPENVIROME_URL = "https://openvirome.com/";
 
 // The filter prefixes OpenVirome reads, as logan-search.org links them.
-export type OpenViromeField = "bioproject" | "runId";
+export type OpenViromeField = "bioproject" | "biosample" | "runId";
 
 // The truncation disclosure, named so the toggle can point aria-controls at
 // what it opens. One card per page, so a constant is enough.
@@ -114,6 +115,7 @@ const META_COLUMNS: MetaColumn[] = [
   { key: "library_layout", label: "Layout" },
   { key: "mbases", label: "Mbases" },
   { key: "bioproject", label: "BioProject" },
+  { key: "biosample", label: "BioSample" },
   { key: "study", label: "Study" },
 ];
 
@@ -294,8 +296,9 @@ function OpenViromeLink({
 }
 
 /**
- * An NCBI link for a BioProject or study accession, with an OpenVirome link
- * beside it where asked for, or the dimmed dash when the mirror had none.
+ * An NCBI link for a BioProject, BioSample or study accession, with an
+ * OpenVirome link beside it where asked for, or the dimmed dash when the
+ * mirror had none.
  * @param props - Component props.
  * @param props.href - Where the accession resolves at NCBI.
  * @param props.openVirome - OpenVirome filter for a second link beside the
@@ -354,6 +357,14 @@ function renderMetaValue(
           href={`${BIOPROJECT_URL}${encodeURIComponent(sra?.bioproject ?? "")}`}
           openVirome="bioproject"
           value={sra?.bioproject}
+        />
+      );
+    case "biosample":
+      return (
+        <MetaLink
+          href={`${BIOSAMPLE_URL}${encodeURIComponent(sra?.biosample ?? "")}`}
+          openVirome="biosample"
+          value={sra?.biosample}
         />
       );
     case "study":

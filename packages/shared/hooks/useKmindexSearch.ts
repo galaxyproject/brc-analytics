@@ -5,6 +5,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export interface SraRunMetadata {
   assay_type: string | null;
   bioproject: string | null;
+  // Optional because a backend predating it omits the key, and null on a
+  // mirror built before the column existed.
+  biosample?: string | null;
   country: string | null;
   instrument: string | null;
   library_layout: string | null;

@@ -899,6 +899,7 @@ describe("the column chooser", () => {
         sra: sraMeta({
           assay_type: "WGS",
           bioproject: "PRJNA123456",
+          biosample: "SAMN07654321",
           instrument: "Illumina NovaSeq 6000",
           library_layout: "PAIRED",
           mbases: 12345,
@@ -960,13 +961,14 @@ describe("the column chooser", () => {
       "Layout",
       "Mbases",
       "BioProject",
+      "BioSample",
       "Study",
     ]);
     expect(items.map((item) => item.getAttribute("aria-checked"))).toEqual([
       "true",
       "true",
       "true",
-      ...Array(6).fill("false"),
+      ...Array(7).fill("false"),
     ]);
   });
 
@@ -1046,6 +1048,40 @@ describe("the column chooser", () => {
     // filter for one to use.
     expect(
       screen.queryByRole("link", { name: /SRP654321 on OpenVirome/ })
+    ).toBeNull();
+  });
+
+  test("links the BioSample out to NCBI and to OpenVirome", () => {
+    renderResults(annotated);
+    toggle("BioSample");
+
+    expect(
+      screen
+        .getByRole("link", { name: "SAMN07654321 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/biosample/SAMN07654321");
+    expect(
+      screen
+        .getByRole("link", { name: /SAMN07654321 on OpenVirome/ })
+        .getAttribute("href")
+    ).toBe(openViromeUrl("biosample", "SAMN07654321"));
+  });
+
+  test("dims the BioSample when a backend predating it sends no key", () => {
+    // Older backends omit the field altogether rather than sending null.
+    const legacy = sraMeta();
+    delete legacy.biosample;
+    renderResults({
+      ...annotated,
+      hits: [hit({ accession: "SRR000002", sra: legacy })],
+    });
+    toggle("BioSample");
+
+    const row = screen.getByText("SRR000002").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("--");
+    expect(
+      within(row as HTMLElement).queryByRole("link", { name: /SAMN/ })
     ).toBeNull();
   });
 
