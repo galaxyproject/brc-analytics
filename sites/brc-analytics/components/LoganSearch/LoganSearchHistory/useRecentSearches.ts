@@ -55,9 +55,13 @@ export function useRecentSearches(): UseRecentSearches {
     const stored = readRecentSearches();
     if (stored.status === "ok") {
       const next = withRecentSearch(stored.searches, search);
-      writeRecentSearches(next);
-      setSearches(next);
-      return;
+      if (writeRecentSearches(next)) {
+        setSearches(next);
+        return;
+      }
+      // Storage that reads but won't take a write (full, or some private
+      // modes) never holds this page's searches, so the next record would
+      // rebuild from it and drop them. Memory is the only list that has them.
     }
     // Unreadable storage might still hold history, so don't write over it;
     // the list lives in memory for the page's lifetime instead.

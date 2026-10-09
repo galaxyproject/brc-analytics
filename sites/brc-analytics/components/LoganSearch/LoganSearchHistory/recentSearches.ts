@@ -90,12 +90,15 @@ export function readRecentSearches(): RecentSearchesRead {
 /**
  * Store the list, quietly giving up if storage refuses it.
  * @param searches - The list to keep.
+ * @returns Whether the list was stored.
  */
-export function writeRecentSearches(searches: RecentSearch[]): void {
+export function writeRecentSearches(searches: RecentSearch[]): boolean {
   try {
     window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+    return true;
   } catch {
     // Full or blocked storage just means the list doesn't outlive the page.
+    return false;
   }
 }
 

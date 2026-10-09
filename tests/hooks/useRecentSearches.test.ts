@@ -125,6 +125,19 @@ describe("useRecentSearches", () => {
     expect(storedIds()).toEqual(["kept"]);
   });
 
+  test("keeps a list in memory when storage reads but refuses writes", () => {
+    const { result } = renderHook(() => useRecentSearches());
+    jest.spyOn(Storage.prototype, "setItem").mockImplementation((): never => {
+      throw new Error("QuotaExceededError");
+    });
+
+    act(() => result.current.record(entry("a")));
+    act(() => result.current.record(entry("b")));
+
+    expect(result.current.searches.map((e) => e.jobId)).toEqual(["b", "a"]);
+    expect(storedIds()).toBeNull();
+  });
+
   test("keeps a list in memory when storage is unavailable throughout", () => {
     jest.spyOn(Storage.prototype, "getItem").mockImplementation((): never => {
       throw new Error("SecurityError");
