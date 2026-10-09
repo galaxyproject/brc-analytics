@@ -9,7 +9,7 @@ import {
   section,
   sectionLayout,
 } from "@repo/shared/components/layout/Section/section.styles";
-import { HERO_IMAGES } from "./constants";
+import { HERO_IMAGES, MOBILE_COLUMN_MAX_WIDTH } from "./constants";
 
 export const StyledSection = styled.section`
   ${section};
@@ -44,7 +44,7 @@ export const Headline = styled.div`
   text-align: center;
 
   ${bpDownSm} {
-    max-width: 328px;
+    max-width: ${MOBILE_COLUMN_MAX_WIDTH}px;
   }
 `;
 
