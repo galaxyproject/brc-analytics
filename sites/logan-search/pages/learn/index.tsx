@@ -3,11 +3,11 @@ import { buildMDXFilePath } from "@databiosphere/findable-ui/lib/utils/mdx/stati
 import { MDX_COMPONENTS } from "@logan/mdx/constants";
 import { LOGAN_PAGE_META } from "@logan/meta/constants";
 import { SMOKE } from "@logan/theme/options/palette";
+import { LearnView } from "@logan/views/LearnView/learnView";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { sanitizeFrontmatter } from "@repo/shared/views/docs/common/frontmatter/utils";
 import type { StaticProps } from "@repo/shared/views/docs/common/staticGeneration/types";
 import { sanitizeStaticProps } from "@repo/shared/views/docs/common/staticGeneration/utils";
-import { ContentView } from "@repo/shared/views/docs/ContentView/contentView";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
@@ -16,7 +16,7 @@ const DOCS_DIRS = ["sites", "logan-search", "docs"];
 const SLUG = ["learn"];
 
 const Page = (props: StaticProps): JSX.Element | null => {
-  return <ContentView {...props} components={MDX_COMPONENTS} />;
+  return <LearnView {...props} components={MDX_COMPONENTS} />;
 };
 
 export const getStaticProps: GetStaticProps<StaticProps> = async () => {
