@@ -1,7 +1,7 @@
 import { LOGAN_PAGE_META } from "@logan/meta/constants";
+import { SMOKE } from "@logan/theme/options/palette";
 import { LoganSearchSiteView } from "@logan/views/LoganSearchSiteView/loganSearchSiteView";
 import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
-import { SMOKE_LIGHTEST } from "@repo/shared/styles/palette";
 import { type GetStaticProps } from "next";
 import { type JSX } from "react";
 
@@ -16,7 +16,7 @@ export const getStaticProps: GetStaticProps = async () => {
       // Logan Search".
       pageDescription: LOGAN_PAGE_META.SEARCH.pageDescription,
       themeOptions: {
-        palette: { background: { default: SMOKE_LIGHTEST } },
+        palette: { background: { default: SMOKE.LIGHTEST } },
       },
     },
   };
