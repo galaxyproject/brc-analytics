@@ -36,6 +36,7 @@ backend/**/.env
 # favicons
 /sites/ga2/public/favicons/*
 /sites/brc-analytics/public/favicons/*
+/sites/logan-search/public/favicons/*
 
 # catalog build
 /catalog/build/temp
