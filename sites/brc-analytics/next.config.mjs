@@ -6,6 +6,7 @@ const withMDX = nextMDX({
 });
 
 const nextConfig = {
+  agentRules: false,
   basePath: "",
   compiler: { emotion: true },
   images: { unoptimized: true },
