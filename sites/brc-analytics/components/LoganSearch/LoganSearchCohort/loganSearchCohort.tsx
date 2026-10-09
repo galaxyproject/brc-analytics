@@ -168,7 +168,7 @@ function describeTopOrganisms(cohort: KmindexCohort): string {
   }
   return (
     `The ${shown} largest of ${cohort.organisms.toLocaleString()} distinct ` +
-    `organisms -- ${listed.toLocaleString()} runs, ` +
+    `organisms: ${listed.toLocaleString()} runs, ` +
     `${formatShare(listed, cohort.in_mirror)} of those with metadata. The ` +
     `remaining ${(cohort.organisms - shown).toLocaleString()} organisms are ` +
     `not listed, so these rows stop well short of the total.`
@@ -482,8 +482,8 @@ export const LoganSearchCohort = ({
           sx={{ mb: 2 }}
           variant="caption"
         >
-          Each breakdown accounts for every run with metadata -- the largest
-          values, everything else, and the runs with nothing recorded -- so its
+          Each breakdown accounts for every run with metadata (the largest
+          values, everything else, and the runs with nothing recorded), so its
           shares add to 100%.
         </Typography>
         {geographyBlock}

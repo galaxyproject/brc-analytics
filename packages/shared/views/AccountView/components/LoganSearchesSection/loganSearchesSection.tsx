@@ -89,7 +89,7 @@ export function LoganSearchesSection({ resource, total }: Props): JSX.Element {
                 </MuiLink>
               }
               key={search.job_id}
-              subtitle={`${search.query_bases.toLocaleString()} bases at threshold ${search.threshold.toFixed(2)} -- ${describeIndexes(search.indexes)}`}
+              subtitle={`${search.query_bases.toLocaleString()} bases at threshold ${search.threshold.toFixed(2)} · ${describeIndexes(search.indexes)}`}
               title={`Searched ${new Date(search.created_at).toLocaleString()}`}
             />
           ))

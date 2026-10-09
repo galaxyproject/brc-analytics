@@ -111,10 +111,10 @@ export const LoganSearchHistory = ({
                   component="div"
                   variant="caption"
                 >
-                  {formatSubmitted(entry.submittedAt)} -- threshold{" "}
-                  {entry.threshold.toFixed(2)} --{" "}
+                  {formatSubmitted(entry.submittedAt)} · threshold{" "}
+                  {entry.threshold.toFixed(2)} ·{" "}
                   {describeSearchIndexes(entry.indexes)}
-                  {entry.queryName ? ` -- job ${entry.jobId}` : ""}
+                  {entry.queryName ? ` · job ${entry.jobId}` : ""}
                 </Typography>
               </li>
             );

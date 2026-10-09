@@ -157,8 +157,8 @@ function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
     matched <= cap
       ? `alone it would return all ${total}`
       : `alone it would still cap at ${cap.toLocaleString()}`;
-  if (kept === 0) return `${total} matched, none listed -- ${alone}`;
-  return `${listed} of ${total} listed -- ${alone}`;
+  if (kept === 0) return `${total} matched, none listed (${alone})`;
+  return `${listed} of ${total} listed (${alone})`;
 }
 
 /**
@@ -190,7 +190,7 @@ function describeCorrection(hit: KmindexHit): string {
   return (
     `kmindex reported ${raw.toFixed(4)}. This run's index is saturated and ` +
     `matches about ${(hit.fp_correction ?? 0).toFixed(4)} of any query's ` +
-    `k-mers, so that baseline is subtracted -- as logan-search.org does.`
+    `k-mers, so that baseline is subtracted, as logan-search.org does.`
   );
 }
 
@@ -721,7 +721,7 @@ export const LoganSearchResults = ({
                     <Typography variant="body2" sx={{ mt: 1 }}>
                       The cap is one score sort across every index, applied
                       after the shards merge, so each index keeps only what
-                      ranked highest overall -- an index with few matches can
+                      ranked highest overall, so an index with few matches can
                       keep none of them.
                     </Typography>
                     {perIndex.slice(0, indexLines).map((summary) => (
@@ -756,14 +756,14 @@ export const LoganSearchResults = ({
                   k-mers, so ties are common and a conserved query can put every
                   row listed here on a single one. Where the cut falls inside a
                   tie, a stable hash of the accession decides which
-                  equally-scoring runs made the list -- arbitrary, but the same
-                  on every reload.
+                  equally-scoring runs made the list: arbitrary, but the same on
+                  every reload.
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   A longer query is not a more specific one: kmindex scores the
                   fraction of your query&apos;s k-mers a run shares, so
                   extending into conserved flanking sequence raises that
-                  fraction in unrelated runs too -- a 4x longer version of the
+                  fraction in unrelated runs too. A 4x longer version of the
                   same 18S query matched more runs here, not fewer. The match
                   set responds to how rare your k-mers are and to the threshold
                   above, not to query length.

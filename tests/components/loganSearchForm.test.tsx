@@ -208,7 +208,7 @@ describe("LoganSearchForm index picker", () => {
       chip("Organism", "Environmental").getAttribute("aria-disabled")
     ).toBe("true");
     expect(await tooltipOf("Organism", "Environmental")).toBe(
-      "ENV -- no index pairs it with the selected library types."
+      "ENV: no index pairs it with the selected library types."
     );
 
     fireEvent.click(chip("Library type", "All"));
@@ -258,7 +258,7 @@ describe("LoganSearchForm index picker", () => {
     renderForm();
 
     expect(await tooltipOf("Organism", "Invertebrates")).toBe(
-      "INV -- 9 indexes. GenBank's invertebrate division, which also holds " +
+      "INV: 9 indexes. GenBank's invertebrate division, which also holds " +
         "protists such as Plasmodium."
     );
   });
@@ -383,7 +383,7 @@ describe("LoganSearchForm index picker", () => {
     });
 
     expect(
-      screen.getByText("2 records -- a query is one sequence")
+      screen.getByText("2 records, but a query is one sequence")
     ).toBeTruthy();
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
@@ -516,7 +516,7 @@ describe("LoganSearchForm query file", () => {
     const { submit } = renderForm();
     pick(new File([`>long\n${"A".repeat(5001)}\n`], "long.fasta"));
 
-    await screen.findByText(/5001 bases -- queries are capped at 5000/);
+    await screen.findByText(/5001 bases, but queries are capped at 5000/);
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
   });
@@ -525,7 +525,7 @@ describe("LoganSearchForm query file", () => {
     const { submit } = renderForm();
     pick(new File([">a\r\nACGTACGT\r\n>b\r\nACGT\r\n"], "primers.fa"));
 
-    await screen.findByText("2 records -- a query is one sequence");
+    await screen.findByText("2 records, but a query is one sequence");
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
   });
@@ -631,7 +631,7 @@ describe("LoganSearchForm presets", () => {
     renderForm();
 
     expect(await tooltipOf("Presets", "Transcriptomic")).toBe(
-      "Transcriptomic on logan-search.org -- Bulk and single-cell " +
+      "Transcriptomic on logan-search.org: Bulk and single-cell " +
         "transcriptomic libraries. 24 indexes."
     );
   });

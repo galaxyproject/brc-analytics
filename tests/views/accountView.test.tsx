@@ -405,7 +405,7 @@ describe("AccountView", () => {
       name: "Logan searches",
     });
     expect(region).toHaveTextContent(
-      "500 bases at threshold 0.50 -- GENOMIC_INV, GENOMIC_BCT, GENOMIC_VRL and 1 more"
+      "500 bases at threshold 0.50 · GENOMIC_INV, GENOMIC_BCT, GENOMIC_VRL and 1 more"
     );
     expect(screen.getByRole("link", { name: "Open results" })).toHaveAttribute(
       "href",

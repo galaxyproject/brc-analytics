@@ -163,7 +163,7 @@ function describeUnplaceable(geography: KmindexGeography): string | null {
       : `${unplaceable.length.toLocaleString()} places`;
   return (
     `${runs.toLocaleString()} of those runs come from ${places} the map ` +
-    `cannot colour -- the world outline has no shape of its own for them at ` +
+    `cannot colour: the world outline has no shape of its own for them at ` +
     `this scale, or the recorded value is not a country. They are counted ` +
     `here but not on the map: ${named}${tail}.`
   );
@@ -257,7 +257,7 @@ function describeLocations(geography: KmindexGeography): string | null {
   if (truncated) {
     const drawn = locations.length;
     parts.push(
-      `Only the ${drawn.toLocaleString()} busiest are drawn -- ` +
+      `Only the ${drawn.toLocaleString()} busiest are drawn, so ` +
         `${truncated.toLocaleString()} runs at the other ` +
         `${(places - drawn).toLocaleString()} are counted here and shown ` +
         `nowhere on the map.`

@@ -161,10 +161,10 @@ function chipTooltip(
   unavailable: boolean,
   reason: string
 ): string {
-  if (unavailable) return `${option.code} -- ${reason}`;
+  if (unavailable) return `${option.code}: ${reason}`;
   const noun = option.count === 1 ? "index" : "indexes";
   const note = option.note ? ` ${option.note}` : "";
-  return `${option.code} -- ${option.count} ${noun}.${note}`;
+  return `${option.code}: ${option.count} ${noun}.${note}`;
 }
 
 /**
@@ -374,7 +374,7 @@ export const LoganSearchForm = ({
     return {
       ...preset,
       selected: presetIndexes.join(",") === selectedKey,
-      tooltip: `${preset.loganName} on logan-search.org -- ${preset.note} ${presetIndexes.length} ${noun}.`,
+      tooltip: `${preset.loganName} on logan-search.org: ${preset.note} ${presetIndexes.length} ${noun}.`,
     };
   });
 
@@ -395,9 +395,9 @@ export const LoganSearchForm = ({
       ? `${bases} bases. FASTQ; headers and quality scores are ignored.`
       : `${bases} bases. FASTA; headers are ignored.`;
   if (tooLong)
-    queryHelp = `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`;
+    queryHelp = `${bases} bases, but queries are capped at ${MAX_QUERY_BASES}`;
   if (tooManyRecords)
-    queryHelp = `${records} records -- a query is one sequence`;
+    queryHelp = `${records} records, but a query is one sequence`;
   if (query.error) queryHelp = query.error;
   // An errored job keeps its jobId with no results forever, so leaving the
   // error out of this leaves the form stuck "running" with no way back.

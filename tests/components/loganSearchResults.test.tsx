@@ -31,7 +31,7 @@ const TIE_BAND_COPY =
   "Scores repeat: the score is a fraction of your query's k-mers, so ties " +
   "are common and a conserved query can put every row listed here on a " +
   "single one. Where the cut falls inside a tie, a stable hash of the " +
-  "accession decides which equally-scoring runs made the list -- arbitrary, " +
+  "accession decides which equally-scoring runs made the list: arbitrary, " +
   "but the same on every reload.";
 
 /**
@@ -305,10 +305,10 @@ describe("LoganSearchResults truncation disclosure", () => {
     openWhy();
 
     expect(container.textContent).toContain(
-      "GENOMIC_BCT: 47,089 of 1,100,404 listed -- alone it would still cap at 50,000"
+      "GENOMIC_BCT: 47,089 of 1,100,404 listed (alone it would still cap at 50,000)"
     );
     expect(container.textContent).toContain(
-      "METATRANSCRIPTOMIC_BCT: 2,911 of 33,112 listed -- alone it would return all 33,112"
+      "METATRANSCRIPTOMIC_BCT: 2,911 of 33,112 listed (alone it would return all 33,112)"
     );
   });
 
@@ -325,7 +325,7 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     // Being outranked by the others is what the disclosure is here to explain.
     expect(container.textContent).toContain(
-      "METAGENOMIC_UNKNOWN: 39 matched, none listed -- alone it would return all 39"
+      "METAGENOMIC_UNKNOWN: 39 matched, none listed (alone it would return all 39)"
     );
     // Matching nothing is not: the cap did not do it, and the rollup counts it.
     expect(container.textContent).not.toContain("METAGENOMIC_PHG:");
@@ -341,7 +341,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     const alert = screen.getByRole("alert");
     expect(within(alert).getAllByText(INDEX_LINE)).toHaveLength(10);
     expect(alert.textContent).toContain(
-      "GENOMIC_MAM: 3 of 1,500 listed -- alone it would return all 1,500"
+      "GENOMIC_MAM: 3 of 1,500 listed (alone it would return all 1,500)"
     );
     // 900 + 39 matched between them, and the cap left them nothing. Twelve
     // lines is already long; 109 of them is why the tail is summed.

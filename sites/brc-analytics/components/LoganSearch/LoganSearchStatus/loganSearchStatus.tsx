@@ -64,8 +64,7 @@ export const LoganSearchStatus = ({
       {ranAsSharedAccount && (
         <Alert severity="info" sx={{ mt: 2 }}>
           This search ran under the shared BRC account because your session
-          couldn&apos;t be verified -- sign in again to run searches as
-          yourself.
+          couldn&apos;t be verified. Sign in again to run searches as yourself.
         </Alert>
       )}
       {/* Only while the search is still running. Once results are in, the job
