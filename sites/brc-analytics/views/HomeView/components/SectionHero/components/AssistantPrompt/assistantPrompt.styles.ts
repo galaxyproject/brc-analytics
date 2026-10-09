@@ -1,3 +1,4 @@
+import { MOBILE_COLUMN_MAX_WIDTH } from "@brc/views/HomeView/components/SectionHero/constants";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
@@ -54,6 +55,6 @@ export const StyledForm = styled.form`
   }
 
   ${bpDownSm} {
-    max-width: 424px;
+    max-width: ${MOBILE_COLUMN_MAX_WIDTH}px;
   }
 `;
