@@ -6,6 +6,8 @@ const withMDX = nextMDX({
 });
 
 const nextConfig = {
+  // Stop `next dev` writing an AGENTS.md into the site when it detects an AI agent.
+  agentRules: false,
   basePath: "",
   compiler: { emotion: true },
   images: { unoptimized: true },
