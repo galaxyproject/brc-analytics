@@ -1,6 +1,6 @@
+import { LoganHero } from "@logan/components/layout/LoganHero/loganHero";
 import { ROUTES } from "@logan/routes/constants";
 import { Link } from "@mui/material";
-import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { LoganSearch } from "@repo/shared/components/LoganSearch/loganSearch";
 import { type LoganSearchRoutes } from "@repo/shared/components/LoganSearch/types";
 import NextLink from "next/link";
@@ -14,24 +14,24 @@ const LOGAN_ROUTES: LoganSearchRoutes = {
 };
 
 /**
- * The site's home page: a short hero around the shared Logan search.
+ * The site's home page: a short hero, with the shared Logan search riding up
+ * over its bottom edge.
  * @returns the search page.
  */
 export const LoganSearchSiteView = (): JSX.Element => {
   return (
     <Fragment>
-      <SectionHero
-        breadcrumbs={[]}
+      <LoganHero
         head="Logan Search"
         subHead={
           <Fragment>
-            Search a DNA sequence against assembled contigs from the entire
-            Sequence Read Archive, and get back the SRA accessions it occurs in.{" "}
+            Paste a DNA sequence and find the SRA runs it occurs in.{" "}
             <Link component={NextLink} href={ROUTES.LEARN}>
               How it works
             </Link>
           </Fragment>
         }
+        variant="home"
       />
       <SearchSection>
         <SearchContainer>
