@@ -195,6 +195,23 @@ const config = [
     },
   },
   {
+    files: ["sites/logan-search/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["..", "../*", "../**"],
+              message:
+                "Reach outside this directory via the @logan/… alias; relative imports are for ./ same-dir and descendants only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ["pages/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-restricted-imports": [

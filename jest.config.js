@@ -11,10 +11,11 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>/"],
   // next/jest derives aliases from the brc-analytics tsconfig (which omits
-  // @ga2 for site isolation); the central test suite spans both sites, so map
-  // @ga2 explicitly here.
+  // the other sites' aliases for site isolation); the central test suite spans
+  // every site, so map those explicitly here.
   moduleNameMapper: {
     "^@ga2/(.*)$": "<rootDir>/sites/ga2/$1",
+    "^@logan/(.*)$": "<rootDir>/sites/logan-search/$1",
   },
   setupFiles: ["<rootDir>/tests/setup/environment.ts"],
   testEnvironment: "jest-environment-jsdom",
