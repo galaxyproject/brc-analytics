@@ -364,7 +364,7 @@ class TestRoutes:
     """The filter params on /results, the new /summary, and the export."""
 
     @staticmethod
-    def _client(monkeypatch, export_dir, aggregate):
+    def _client(monkeypatch, export_dir, aggregate, mirror=None):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
 
@@ -385,7 +385,7 @@ class TestRoutes:
         service = GalaxyService(cache)
         service.gi = MagicMock()
         service._galaxy_available = True
-        service.sra_mirror = None
+        service.sra_mirror = mirror
 
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
@@ -420,6 +420,40 @@ class TestRoutes:
         assert [h["accession"] for h in body["hits"]] == ["SRR01", "SRR03"]
         assert body["hits"][0]["sra"]["country"] == "Kenya"
         assert body["hits"][0]["ani"] is not None
+
+    def test_a_filtered_page_reads_biosample_from_the_mirror(
+        self, tmp_path, monkeypatch
+    ):
+        write_export(tmp_path / "job1.parquet")
+        mirror = MagicMock()
+        mirror.is_available.return_value = True
+        mirror.has_capability.return_value = True
+        mirror.runs_by_accession.return_value = {"SRR01": {"biosample": "SAMN01"}}
+        client = self._client(monkeypatch, tmp_path, _aggregate(), mirror=mirror)
+
+        body = client.get(
+            "/galaxy/kmindex/jobs/job1/results?limit=2&f.country_iso=KEN"
+        ).json()
+
+        assert body["hits"][0]["accession"] == "SRR01"
+        assert body["hits"][0]["sra"]["biosample"] == "SAMN01"
+        # The rest of the row is still the export's, not the mirror's.
+        assert body["hits"][0]["sra"]["country"] == "Kenya"
+
+    def test_a_failed_biosample_lookup_keeps_the_page(self, tmp_path, monkeypatch):
+        write_export(tmp_path / "job1.parquet")
+        mirror = MagicMock()
+        mirror.is_available.return_value = True
+        mirror.has_capability.return_value = True
+        mirror.runs_by_accession.side_effect = RuntimeError("mirror went away")
+        client = self._client(monkeypatch, tmp_path, _aggregate(), mirror=mirror)
+
+        body = client.get(
+            "/galaxy/kmindex/jobs/job1/results?limit=2&f.country_iso=KEN"
+        ).json()
+
+        assert body["filtered"] is True
+        assert body["hits"][0]["sra"]["biosample"] is None
 
     def test_an_unknown_field_is_a_422(self, tmp_path, monkeypatch):
         client = self._client(monkeypatch, tmp_path, _aggregate())

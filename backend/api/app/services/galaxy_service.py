@@ -43,6 +43,7 @@ from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.logan_stats import correct_score
 from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
+    CAPABILITY_BIOSAMPLE,
     CAPABILITY_COHORT,
     CAPABILITY_EXPORT,
     CAPABILITY_GEOGRAPHY,
@@ -1067,7 +1068,8 @@ class GalaxyService:
 
         Pages every row the filter keeps, not the top 50,000, and needs neither
         Redis beyond the aggregate nor the mirror: rows in the file already
-        carry their metadata.
+        carry their metadata. BioSample is the exception, read from the mirror
+        when it can answer, since the export has no such column.
 
         @param job_id: the kmindex job.
         @param filters: a non-empty filter.
@@ -1088,6 +1090,7 @@ class GalaxyService:
         )
         export = self._export_state(aggregate, job_id)
         hits = [KmindexHit(**h) for h in page["hits"]]
+        await self._fill_biosample(hits)
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
@@ -1297,6 +1300,32 @@ class GalaxyService:
             and self.sra_mirror.is_available()
             and self.sra_mirror.has_capability(capability)
         )
+
+    async def _fill_biosample(self, hits: List[KmindexHit]) -> None:
+        """
+        Carry BioSample onto a filtered page from the mirror.
+
+        The export predates the biosample column, so a page read from it has
+        none, and the BioSample column would go blank the moment a filter is
+        applied. Best effort, like annotation: the page is correct without it.
+        """
+        wanted = [hit.accession for hit in hits if hit.sra is not None]
+        if not wanted or not (
+            self._mirror_can(CAPABILITY_ANNOTATION)
+            and self._mirror_can(CAPABILITY_BIOSAMPLE)
+        ):
+            return
+        try:
+            by_accession = await asyncio.to_thread(
+                self.sra_mirror.runs_by_accession, wanted
+            )
+        except Exception as e:
+            logger.warning(f"BioSample lookup for a filtered page failed: {e}")
+            return
+        for hit in hits:
+            metadata = by_accession.get(hit.accession)
+            if hit.sra is not None and metadata:
+                hit.sra.biosample = metadata.get("biosample")
 
     async def _annotate_with_sra(self, results: KmindexResults) -> KmindexResults:
         """
