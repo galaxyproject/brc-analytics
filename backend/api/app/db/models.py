@@ -7,6 +7,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -328,4 +329,51 @@ class AssistantTurnLog(Base):
             "created_at",
             postgresql_where=text("outcome <> 'success'"),
         ),
+    )
+
+
+class KmindexSubmission(Base):
+    """One row per Logan/kmindex search submitted, whoever submitted it.
+
+    Analytics, not ownership -- that is `galaxy_jobs`, which only knows about
+    signed-in users. This counts everything, so native traffic (anonymous or
+    signed in) can be told apart from searches that came through the partner
+    API, and neither side has to be reconstructed from Galaxy afterwards.
+    """
+
+    __tablename__ = "kmindex_submissions"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    galaxy_job_id: Mapped[str] = mapped_column(Text, nullable=False)
+    # "native" (brc-analytics.org itself) or "partner" (the partner API).
+    source: Mapped[str] = mapped_column(String(16), nullable=False)
+    partner_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # The Galaxy identity the job ran as: "service" or "user".
+    identity: Mapped[str] = mapped_column(String(16), nullable=False)
+    # Same rationale as AssistantTurnLog.user_id: deleting a user anonymizes
+    # the row rather than punching a hole in the counts.
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    indexes: Mapped[list[str]] = mapped_column(
+        JSON_COLUMN, default=list, nullable=False
+    )
+    query_bases: Mapped[int] = mapped_column(Integer, nullable=False)
+    threshold: Mapped[float] = mapped_column(Float, nullable=False)
+    zvalue: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        nullable=False,
+    )
+
+    __table_args__ = (
+        UniqueConstraint("galaxy_job_id", name="uq_kmindex_submissions_galaxy_job_id"),
+        Index("ix_kmindex_submissions_created_at", "created_at"),
     )

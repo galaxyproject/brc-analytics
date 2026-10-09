@@ -12,6 +12,7 @@ from app.db.models import (
     AssistantTurnLog,
     Favorite,
     GalaxyJob,
+    KmindexSubmission,
     SavedAnalysis,
     User,
     WorkflowRun,
@@ -380,6 +381,36 @@ async def create_galaxy_job(
     session.add(job)
     await session.flush()
     return job
+
+
+async def create_kmindex_submission(
+    session: AsyncSession,
+    *,
+    galaxy_job_id: str,
+    source: str,
+    identity: str,
+    indexes: list[str],
+    query_bases: int,
+    threshold: float,
+    zvalue: int,
+    partner_id: str | None = None,
+    user_id: uuid.UUID | None = None,
+) -> KmindexSubmission:
+    """Record one kmindex search for analytics. Caller commits."""
+    row = KmindexSubmission(
+        galaxy_job_id=galaxy_job_id,
+        identity=identity,
+        indexes=indexes,
+        partner_id=partner_id,
+        query_bases=query_bases,
+        source=source,
+        threshold=threshold,
+        user_id=user_id,
+        zvalue=zvalue,
+    )
+    session.add(row)
+    await session.flush()
+    return row
 
 
 async def purge_assistant_turn_logs_before(

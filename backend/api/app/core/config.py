@@ -4,6 +4,8 @@ from typing import List
 
 from dotenv import load_dotenv
 
+from app.core.partner_keys import parse_partner_keys, parse_sunset
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -155,6 +157,33 @@ class Settings:
             os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
         )
 
+        # Partner API, for an external service running Logan searches through
+        # us. Off unless enabled, and refuses to start enabled without keys
+        # or a sunset date: the date is what makes it temporary.
+        self.PARTNER_API_ENABLED: bool = os.getenv(
+            "PARTNER_API_ENABLED", "false"
+        ).lower() in ("1", "true", "yes")
+        self.PARTNER_API_KEYS = parse_partner_keys(os.getenv("PARTNER_API_KEYS", ""))
+        self.PARTNER_API_SUNSET = parse_sunset(os.getenv("PARTNER_API_SUNSET", ""))
+        # Stops new submissions while status and results keep answering, so
+        # jobs already running can be collected.
+        self.PARTNER_SUBMIT_PAUSED: bool = os.getenv(
+            "PARTNER_SUBMIT_PAUSED", "false"
+        ).lower() in ("1", "true", "yes")
+        # Per partner. Submits share SUBMIT_RATE_LIMIT_WINDOW (an hour);
+        # everything else shares RATE_LIMIT_WINDOW (a minute), and is roomier
+        # than the per-IP default because partners poll from one server.
+        self.PARTNER_SUBMIT_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_SUBMIT_RATE_LIMIT_REQUESTS", "60")
+        )
+        self.PARTNER_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_RATE_LIMIT_REQUESTS", "300")
+        )
+        if self.PARTNER_API_ENABLED and not self.PARTNER_API_KEYS:
+            raise ValueError("PARTNER_API_ENABLED needs at least one PARTNER_API_KEYS")
+        if self.PARTNER_API_ENABLED and self.PARTNER_API_SUNSET is None:
+            raise ValueError("PARTNER_API_ENABLED needs a PARTNER_API_SUNSET date")
+
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
         # header itself -- otherwise clients can spoof IPs.
@@ -207,6 +236,10 @@ class Settings:
         # would also eat an "/api" in the middle of a hostname or path.
         self.GALAXY_BASE_URL: str = self.GALAXY_API_URL.rstrip("/").removesuffix("/api")
         self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+        # Partner jobs only ever run on the service account, so without its key
+        # every partner call would 503.
+        if self.PARTNER_API_ENABLED and not self.GALAXY_API_KEY:
+            raise ValueError("PARTNER_API_ENABLED needs GALAXY_API_KEY")
 
         # Galaxy tool IDs
         self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")

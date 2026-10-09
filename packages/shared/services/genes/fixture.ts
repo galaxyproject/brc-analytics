@@ -29,16 +29,16 @@ export const GENE_FIXTURE: GeneRecord[] = [
   },
   {
     aliases: [],
-    assemblyAccession: "GCF_016808945.1",
-    geneId: "PVP01_0000010",
-    geneUid: "pvp01-0000010",
-    location: "chr1:738-2,461 (+)",
-    organism: "Plasmodium vivax P01",
-    predicted: true,
-    product: "hypothetical protein",
+    assemblyAccession: "GCF_000002415.2",
+    geneId: "PVX_099980",
+    geneUid: "pvx-099980",
+    location: "chr7:1,157,742-1,163,137 (+)",
+    organism: "Plasmodium vivax Sal-1",
+    predicted: false,
+    product: "merozoite surface protein 1",
     publisher: "NCBI RefSeq",
-    release: "GCF_016808945.1-RS_2024_08",
-    symbol: "",
+    release: "GCF_000002415.2-RS_2024_08",
+    symbol: "MSP1",
   },
   {
     aliases: ["PBANKA_0000011"],
@@ -55,9 +55,13 @@ export const GENE_FIXTURE: GeneRecord[] = [
   },
 ];
 
+export function findGeneByUid(uid: string): GeneRecord | undefined {
+  return GENE_FIXTURE.find((gene) => gene.geneUid === uid);
+}
+
 export const EXAMPLE_GENE_IDS = [
   "PF3D7_1133400",
   "AMA1",
   "PF11_0344",
-  "PVP01_0000010",
+  "PVX_099980",
 ];
