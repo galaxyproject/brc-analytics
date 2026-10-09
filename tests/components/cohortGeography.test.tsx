@@ -480,6 +480,29 @@ describe("the map download", () => {
     expect(toImageURL).toHaveBeenCalledWith("png", 2);
   });
 
+  it("can't start a second export while one is rendering", async () => {
+    let finishRender: ((url: string) => void) | undefined;
+    const toImageURL = jest.fn(
+      () => new Promise<string>((resolve) => (finishRender = resolve))
+    );
+    embedMock().mockResolvedValueOnce(exportable(toImageURL));
+    render(
+      <CohortGeography geography={geography()} jobId="fe6f66a714dcbec8" />
+    );
+
+    const button = await screen.findByRole("button", { name: "Download map" });
+    await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("menuitem", { name: "PNG image" }));
+
+    await waitFor(() => expect(toImageURL).toHaveBeenCalled());
+    expect(button.hasAttribute("disabled")).toBe(true);
+
+    await act(async () => finishRender?.("data:image/png;base64,AA"));
+    await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
+    expect(downloads).toEqual(["logan-fe6f66a714dcbec8-map.png"]);
+  });
+
   it("says so when the image cannot be made", async () => {
     jest.spyOn(console, "error").mockImplementation(() => undefined);
     const toImageURL = jest.fn(async () => {

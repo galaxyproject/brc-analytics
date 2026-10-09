@@ -507,16 +507,23 @@ function MapDownload({
 }): JSX.Element {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [failed, setFailed] = useState(false);
+  // One export at a time: each swaps the live view's background and restores
+  // what it found, so a second started mid-render would read the first's
+  // white and leave the map painted with it.
+  const [saving, setSaving] = useState(false);
 
   const save = async (format: MapImageFormat): Promise<void> => {
     setAnchor(null);
     if (!view) return;
+    setSaving(true);
     try {
       setFailed(false);
       await downloadMapImage(view, format, jobId);
     } catch (error) {
       console.error("Failed to export the cohort map:", error);
       setFailed(true);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -540,7 +547,7 @@ function MapDownload({
         aria-controls={anchor ? DOWNLOAD_MENU_ID : undefined}
         aria-expanded={Boolean(anchor)}
         aria-haspopup="menu"
-        disabled={!view}
+        disabled={!view || saving}
         onClick={(event): void => setAnchor(event.currentTarget)}
         size="small"
         startIcon={<Download />}
