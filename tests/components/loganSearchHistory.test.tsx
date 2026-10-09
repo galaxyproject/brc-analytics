@@ -1,12 +1,13 @@
 import { LoganSearchHistory } from "@brc/components/LoganSearch/LoganSearchHistory/loganSearchHistory";
 import {
-  addRecentSearch,
   clearRecentSearches,
   MAX_RECENT_SEARCHES,
   queryNameOf,
   readRecentSearches,
   RECENT_SEARCHES_KEY,
   type RecentSearch,
+  withRecentSearch,
+  writeRecentSearches,
 } from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -57,28 +58,40 @@ describe("recent searches storage", () => {
   test("puts the newest first, drops a repeated job and caps the list", () => {
     let list: RecentSearch[] = [];
     for (let i = 0; i < MAX_RECENT_SEARCHES + 5; i++) {
-      list = addRecentSearch(list, entry(`job${i}`));
+      list = withRecentSearch(list, entry(`job${i}`));
     }
-    list = addRecentSearch(list, entry("job10"));
+    list = withRecentSearch(list, entry("job10"));
 
     expect(list).toHaveLength(MAX_RECENT_SEARCHES);
     expect(list[0].jobId).toBe("job10");
     expect(list.filter((e) => e.jobId === "job10")).toHaveLength(1);
-    expect(readRecentSearches()).toEqual(list);
+  });
+
+  test("round-trips through storage", () => {
+    const list = [entry("b"), entry("a")];
+    writeRecentSearches(list);
+    expect(readRecentSearches()).toEqual({ searches: list, status: "ok" });
+  });
+
+  test("reads nothing stored as an empty list, not as unavailable", () => {
+    expect(readRecentSearches()).toEqual({ searches: [], status: "ok" });
   });
 
   test("ignores malformed storage rather than throwing", () => {
     window.localStorage.setItem(RECENT_SEARCHES_KEY, "{not json");
-    expect(readRecentSearches()).toEqual([]);
+    expect(readRecentSearches()).toEqual({ searches: [], status: "ok" });
 
     window.localStorage.setItem(
       RECENT_SEARCHES_KEY,
       JSON.stringify([entry("good"), { jobId: 7 }, null, "nope"])
     );
-    expect(readRecentSearches().map((e) => e.jobId)).toEqual(["good"]);
+    const read = readRecentSearches();
+    expect(read.status === "ok" && read.searches.map((e) => e.jobId)).toEqual([
+      "good",
+    ]);
   });
 
-  test("keeps working when storage throws on every access", () => {
+  test("reports unavailable, and keeps working, when storage throws", () => {
     jest.spyOn(Storage.prototype, "getItem").mockImplementation((): never => {
       throw new Error("SecurityError");
     });
@@ -91,15 +104,15 @@ describe("recent searches storage", () => {
         throw new Error("SecurityError");
       });
 
-    expect(readRecentSearches()).toEqual([]);
-    expect(addRecentSearch([], entry("a")).map((e) => e.jobId)).toEqual(["a"]);
+    expect(readRecentSearches()).toEqual({ status: "unavailable" });
+    expect(() => writeRecentSearches([entry("a")])).not.toThrow();
     expect(() => clearRecentSearches()).not.toThrow();
   });
 
   test("clear forgets everything", () => {
-    addRecentSearch([], entry("a"));
+    writeRecentSearches([entry("a")]);
     clearRecentSearches();
-    expect(readRecentSearches()).toEqual([]);
+    expect(readRecentSearches()).toEqual({ searches: [], status: "ok" });
   });
 });
 
