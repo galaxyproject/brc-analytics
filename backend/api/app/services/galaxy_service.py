@@ -1066,9 +1066,11 @@ class GalaxyService:
     ) -> KmindexResults:
         """A page of the filtered match set, served from the export parquet.
 
-        Pages every row the filter keeps, not the top 50,000, and needs neither
-        Redis beyond the aggregate nor the mirror: rows in the file already
-        carry their metadata. BioSample is the exception, read from the mirror
+        Filters every matched row, not the top 50,000, then caps what can be
+        paged at KMINDEX_MAX_HITS the way the listing is, keeping the true
+        count in filtered_matches; the filtered export stays uncapped. Needs
+        neither Redis beyond the aggregate nor the mirror: rows in the file
+        already carry their metadata. BioSample is the exception, read from the mirror
         when it can answer, since the export has no such column.
 
         @param job_id: the kmindex job.
@@ -1086,22 +1088,32 @@ class GalaxyService:
         path = await self._filterable_export(aggregate, job_id)
         order = order or _default_order(sort)
         page = await asyncio.to_thread(
-            kmindex_filters.subset_page, path, filters, limit, offset, sort, order
+            kmindex_filters.subset_page,
+            path,
+            filters,
+            limit,
+            offset,
+            sort,
+            order,
+            KMINDEX_MAX_HITS,
         )
+        matched = page["matched"]
         export = self._export_state(aggregate, job_id)
         hits = [KmindexHit(**h) for h in page["hits"]]
         await self._fill_biosample(hits)
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
-            total_hits=page["matched"],
+            total_hits=min(matched, KMINDEX_MAX_HITS),
             total_matches=aggregate["total_matches"],
+            filtered_matches=matched,
             shards_failed=aggregate.get("shards_failed", 0),
             shards_searched=aggregate.get("shards_searched", 0),
             shards_with_hits=aggregate.get("shards_with_hits", 0),
-            # The filtered page reaches every row the filter keeps, so the cap
-            # does not apply and per-index cap accounting means nothing here.
-            truncated=False,
+            truncated=matched > KMINDEX_MAX_HITS,
+            # The cap here is one rank cut over the filtered rows, not the
+            # merge's cut across indexes, so per-index accounting has nothing
+            # to say about it.
             per_index=[],
             cohort=aggregate.get("cohort"),
             geography=aggregate.get("geography"),

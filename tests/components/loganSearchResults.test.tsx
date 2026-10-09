@@ -477,6 +477,28 @@ describe("LoganSearchResults truncation disclosure", () => {
     expect(container.textContent).not.toContain("remaining 0");
   });
 
+  test("caps a filtered page against what the filter keeps", () => {
+    const { container } = renderResults({
+      ...BASE_RESULTS,
+      filtered: true,
+      filtered_matches: 120000,
+      total_hits: CAP,
+      total_matches: 2000000,
+      truncated: true,
+    });
+
+    expect(
+      screen.getByText(
+        "Listing the 50,000 highest-coverage runs that match these filters"
+      )
+    ).toBeTruthy();
+    // 120,000 kept less the 50,000 listed, not the whole match set's gap.
+    expect(container.textContent).toContain(
+      "The remaining 70,000 cannot be paged to. Download the filtered runs " +
+        "above for the full set."
+    );
+  });
+
   test("renders an untruncated result from that same backend", () => {
     const legacy: Record<string, unknown> = { ...BASE_RESULTS, total_hits: 17 };
     delete legacy.per_index;

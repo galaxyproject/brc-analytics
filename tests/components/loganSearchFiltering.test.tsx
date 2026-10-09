@@ -263,6 +263,56 @@ describe("cohort bars as filters", () => {
   });
 });
 
+describe("a filtered table past the cap", () => {
+  it("warns that the cohort counts more than the table lists", () => {
+    render(
+      <LoganSearchCohort
+        filtering={controlsOf({ platform: ["ILLUMINA"] })}
+        search={searchOf({
+          ...RESULTS,
+          filtered: true,
+          filtered_matches: 60,
+          total_hits: 50,
+          truncated: true,
+        })}
+        summary={{
+          ...IDLE_SUMMARY,
+          summary: summaryOf({ ...COHORT, in_mirror: 60, total: 60 }),
+        }}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        "These counts describe the whole match set, not the table above."
+      )
+    ).toBeTruthy();
+    expect(screen.getByText(/Every run matching these filters/)).toBeTruthy();
+  });
+
+  it("counts what the filter keeps, not what the table lists", () => {
+    render(
+      <LoganSearchFilterBar
+        disabledReason={null}
+        filterError={null}
+        filtering={filteringOf({ platform: ["ILLUMINA"] })}
+        results={{
+          ...RESULTS,
+          filtered: true,
+          filtered_matches: 60,
+          total_hits: 50,
+          truncated: true,
+        }}
+        summary={IDLE_SUMMARY}
+      />
+    );
+
+    expect(
+      screen.getByText("60 of 100 runs match these filters.")
+    ).toBeTruthy();
+  });
+});
+
 describe("years and map as filters", () => {
   it("toggles a year", () => {
     const controls = controlsOf();

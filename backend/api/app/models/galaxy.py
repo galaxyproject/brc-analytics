@@ -482,10 +482,16 @@ class KmindexResults(BaseModel):
     filtered: bool = Field(
         default=False,
         description="True when f.* filter parameters were applied. The page is "
-        "then served from the export parquet: total_hits is the filtered count "
-        "over the whole match set (not the capped listing), truncated is false, "
-        "per_index is empty, and cohort/geography stay the unfiltered ones; "
-        "the filtered pair is GET .../summary",
+        "then served from the export parquet, filtering the whole match set "
+        "(not the capped listing): filtered_matches is how many rows the "
+        "filter keeps, total_hits is that capped as the listing is, truncated "
+        "says whether the cap bit, per_index is empty, and cohort/geography "
+        "stay the unfiltered ones; the filtered pair is GET .../summary",
+    )
+    filtered_matches: Optional[int] = Field(
+        default=None,
+        description="Rows the filter keeps, before the cap; set only when "
+        "filtered. The filtered export carries all of them",
     )
     hits: List[KmindexHit] = []
 

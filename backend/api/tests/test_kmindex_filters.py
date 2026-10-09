@@ -241,6 +241,28 @@ class TestSubsetPage:
         assert page["matched"] == 6
         assert [h["accession"] for h in page["hits"]] == ["SRR04", "SRR06"]
 
+    def test_cap_keeps_the_top_ranked_rows_and_the_true_count(self, export):
+        page = subset_page(export, KmindexFilters(platform=["ILLUMINA"]), 10, 0, cap=3)
+        assert page["matched"] == 6
+        assert [h["accession"] for h in page["hits"]] == ["SRR01", "SRR03", "SRR04"]
+
+    def test_cap_is_cut_on_rank_before_the_page_sort(self, export):
+        # Sorting first and capping second would list SRR10 and SRR08, which
+        # rank below the cap, just because they sort high by accession.
+        got = accessions(
+            export,
+            KmindexFilters(platform=["ILLUMINA"]),
+            sort="accession",
+            order="desc",
+            cap=3,
+        )
+        assert got == ["SRR04", "SRR03", "SRR01"]
+
+    def test_a_page_past_the_cap_is_empty(self, export):
+        page = subset_page(export, KmindexFilters(platform=["ILLUMINA"]), 2, 4, cap=3)
+        assert page["matched"] == 6
+        assert page["hits"] == []
+
     def test_score_ascending_reverses_rank(self, export):
         got = accessions(export, KmindexFilters(), sort="score", order="asc")
         assert got == [r[0] for r in reversed(_ROWS)]
@@ -415,11 +437,35 @@ class TestRoutes:
 
         assert body["filtered"] is True
         assert body["total_hits"] == 3
+        assert body["filtered_matches"] == 3
         assert body["total_matches"] == len(_ROWS)
         assert body["truncated"] is False
         assert [h["accession"] for h in body["hits"]] == ["SRR01", "SRR03"]
         assert body["hits"][0]["sra"]["country"] == "Kenya"
         assert body["hits"][0]["ani"] is not None
+
+    def test_a_filtered_page_is_capped_like_the_listing(self, tmp_path, monkeypatch):
+        from app.services import galaxy_service
+
+        monkeypatch.setattr(galaxy_service, "KMINDEX_MAX_HITS", 2)
+        write_export(tmp_path / "job1.parquet")
+        client = self._client(monkeypatch, tmp_path, _aggregate())
+        url = "/galaxy/kmindex/jobs/job1/results?limit=10&f.platform=ILLUMINA"
+
+        body = client.get(url).json()
+
+        assert body["total_hits"] == 2
+        assert body["filtered_matches"] == 6
+        assert body["truncated"] is True
+        assert [h["accession"] for h in body["hits"]] == ["SRR01", "SRR03"]
+        # Past the cap there is nothing to page to, as in the listing.
+        assert client.get(url + "&offset=2").json()["hits"] == []
+
+        # The download is the way to the rest, so it is not capped.
+        export = client.get(
+            "/galaxy/kmindex/jobs/job1/export?format=tsv&f.platform=ILLUMINA"
+        )
+        assert len(export.text.splitlines()) == 7
 
     def test_a_filtered_page_reads_biosample_from_the_mirror(
         self, tmp_path, monkeypatch

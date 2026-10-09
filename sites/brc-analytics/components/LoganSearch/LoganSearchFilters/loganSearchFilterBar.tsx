@@ -97,7 +97,8 @@ function describeMatched(
 ): string | null {
   const total = results.total_matches ?? results.total_hits;
   let matched: number | null = summary.summary?.matched ?? null;
-  if (matched === null && results.filtered) matched = results.total_hits;
+  if (matched === null && results.filtered)
+    matched = results.filtered_matches ?? results.total_hits;
   if (matched === null) return null;
   return `${matched.toLocaleString()} of ${total.toLocaleString()} runs match these filters.`;
 }

@@ -385,9 +385,8 @@ export const LoganSearchCohort = ({
   // The two cards describe different sets whenever the cap bit. Derived from
   // the counts rather than the truncated flag because it is precisely the gap
   // between these two numbers that the reader has to be told about.
-  // A filtered table pages every row the filter keeps, so the two cards
-  // describe the same set and there is no cap to warn about.
-  const isTruncated = !filtered && cohort.total > listed;
+  // A filtered table is capped the same way, against what the filter keeps.
+  const isTruncated = cohort.total > listed;
   const mirrorNote = describeMirrorCoverage(cohort);
   const scopeNote = filtered
     ? "Counted over every run that matches these filters, the same rows the table above pages through. Each breakdown leaves out its own filter, so the values you did not pick stay visible and can be added."
@@ -430,12 +429,12 @@ export const LoganSearchCohort = ({
               These counts describe the whole match set, not the table above.
             </AlertTitle>
             <Typography variant="body2">
-              Every matched run is counted here. The table above lists{" "}
-              {listed.toLocaleString()} of them: the top of the score range,
-              which over-represents whatever is common at the top. Counting
-              those rows gives different answers, up to and including a
-              different top organism. Where the two disagree, these are the
-              numbers that describe your search.
+              Every {filtered ? "run matching these filters" : "matched run"} is
+              counted here. The table above lists {listed.toLocaleString()} of
+              them: the top of the score range, which over-represents whatever
+              is common at the top. Counting those rows gives different answers,
+              up to and including a different top organism. Where the two
+              disagree, these are the numbers that describe your search.
             </Typography>
           </Alert>
         ) : (

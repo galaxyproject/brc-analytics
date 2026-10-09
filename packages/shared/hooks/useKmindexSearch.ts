@@ -171,10 +171,14 @@ export interface KmindexResults {
   // omits it entirely.
   export_status?: KmindexExportStatus;
   // True when the page was served for a filter (f.* params), from the export
-  // parquet: total_hits is then the filtered count over the whole match set,
-  // truncated is false and per_index is empty. cohort and geography stay the
-  // unfiltered ones; the filtered pair comes from .../summary.
+  // parquet. The filter runs over the whole match set, then what can be paged
+  // is capped as the listing is: total_hits is the capped count, truncated
+  // says whether the cap bit, and per_index is empty. cohort and geography
+  // stay the unfiltered ones; the filtered pair comes from .../summary.
   filtered?: boolean;
+  // Rows the filter keeps, before the cap. Set only when filtered; absent on
+  // a backend predating the cap, which never truncated a filtered page.
+  filtered_matches?: number | null;
   // Absent on a backend predating the map, on a job whose mirror was
   // unavailable, and on one whose mirror predates the columns the geography
   // query needs -- geography closes on its own so the rest of the mirror

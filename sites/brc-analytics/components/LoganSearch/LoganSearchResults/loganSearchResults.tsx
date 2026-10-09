@@ -605,7 +605,11 @@ export const LoganSearchResults = ({
   // per_index, so both need the same guard: an unguarded read of
   // total_matches throws inside render and unmounts the whole card, which is
   // worse than the count it was meant to show being missing.
-  const totalMatches = results.total_matches ?? results.total_hits;
+  // A filtered page is capped against what the filter keeps, not against
+  // the whole match set.
+  const totalMatches = results.filtered
+    ? (results.filtered_matches ?? results.total_hits)
+    : (results.total_matches ?? results.total_hits);
   const notListed = Math.max(totalMatches - results.total_hits, 0);
   // While truncated the listing is exactly the cap, so total_hits names it.
   const cap = results.total_hits;
@@ -620,13 +624,18 @@ export const LoganSearchResults = ({
     : `All ${results.total_hits.toLocaleString()} hits`;
   let capNote: string | null = null;
   if (results.truncated) {
-    listWindow = `Listing the ${cap.toLocaleString()} highest-coverage hits`;
+    listWindow = results.filtered
+      ? `Listing the ${cap.toLocaleString()} highest-coverage runs that match these filters`
+      : `Listing the ${cap.toLocaleString()} highest-coverage hits`;
     // notListed is 0 only when the match count went missing; "the remaining 0"
     // would be a worse answer than naming the cap and leaving it there.
     capNote =
       notListed > 0
         ? `The remaining ${notListed.toLocaleString()} cannot be paged to.`
         : `More accessions matched than can be listed.`;
+    // The filtered download is not capped, so it is the way to the rest.
+    if (results.filtered)
+      capNote += " Download the filtered runs above for the full set.";
   }
 
   // What the response says it did, not what was clicked: a metadata sort the

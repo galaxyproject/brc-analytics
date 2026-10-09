@@ -425,13 +425,17 @@ def subset_page(
     offset: int,
     sort: str = "score",
     order: str = "desc",
+    cap: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     One page of the filtered match set, and how many rows match in all.
 
-    Pages the whole filtered set, not the top 50,000: filtering country =
-    Malawi inside the capped listing would miss every Malawi run below the
-    cap. Rows already carry their metadata, so there is no annotation pass.
+    Filters the whole match set, not the capped listing: filtering country =
+    Malawi inside the top 50,000 would miss every Malawi run below it. What
+    can be paged is then capped the way the listing is, on rank before any
+    re-sort, so a filter that keeps millions of rows does not page through
+    them all; the count stays the true one. Rows already carry their
+    metadata, so there is no annotation pass.
 
     @param path: the job's current export.
     @param filters: the filter.
@@ -439,7 +443,8 @@ def subset_page(
     @param offset: rows to skip.
     @param sort: a KmindexSort column.
     @param order: asc or desc.
-    @returns: {"hits": [...], "matched": int}.
+    @param cap: highest-ranked matching rows that can be paged, or None for all.
+    @returns: {"hits": [...], "matched": int}, matched being uncapped.
     """
     con = _connect()
     try:
@@ -450,15 +455,25 @@ def subset_page(
             f"SELECT count(*) FROM read_parquet($path) WHERE {clause}", params
         ).fetchone()[0]
         columns = ", ".join(_HIT_COLUMNS + _METADATA_COLUMNS)
+        # The file is in rank order, so the first `cap` matching rows by
+        # file_row_number are the ones the cap keeps, whatever the page sort.
+        kept_limit = "LIMIT $cap" if cap is not None else ""
+        cap_params = {"cap": cap} if cap is not None else {}
         cursor = con.execute(
             f"""
+            WITH kept AS (
+                SELECT {columns}, file_row_number
+                FROM read_parquet($path, file_row_number=true)
+                WHERE {clause}
+                ORDER BY file_row_number
+                {kept_limit}
+            )
             SELECT {columns}
-            FROM read_parquet($path, file_row_number=true)
-            WHERE {clause}
+            FROM kept
             ORDER BY {_order_by(sort, order)}
             LIMIT $limit OFFSET $offset
             """,
-            {**params, "limit": limit, "offset": offset},
+            {**params, **cap_params, "limit": limit, "offset": offset},
         )
         names = [d[0] for d in cursor.description]
         hits = [_hit_from_row(names, row) for row in cursor.fetchall()]
