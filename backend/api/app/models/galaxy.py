@@ -172,6 +172,8 @@ class SraRunMetadata(BaseModel):
 
     assay_type: Optional[str] = None
     bioproject: Optional[str] = None
+    # Null on a mirror older than schema_version 5, which has no such column.
+    biosample: Optional[str] = None
     country: Optional[str] = None
     instrument: Optional[str] = None
     library_layout: Optional[str] = None

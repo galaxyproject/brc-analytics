@@ -118,7 +118,8 @@ Each hit carries:
 - `fp_correction`
 - `shard`
 - `sra`: organism, assay, platform, instrument, library layout, release
-  date, country, BioProject, study and Mbases
+  date, country, BioProject, BioSample (null on a mirror built before the
+  column existed), study and Mbases
 
 ### Export
 
