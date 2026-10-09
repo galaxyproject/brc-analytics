@@ -671,13 +671,13 @@ describe("coverage and ANI columns", () => {
     });
 
     // Scoped to the hit's own row: Platform, Country and Released all render
-    // "--" for null metadata, so a page-wide dash search cannot fail.
+    // "–" for null metadata, so a page-wide dash search cannot fail.
     const row = screen.getByText("SRR000002").closest("tr");
     expect(row).not.toBeNull();
     const cells = within(row as HTMLElement).getAllByRole("cell");
 
     // Accession, k-mer coverage, ANI est.
-    expect(cells[2].textContent).toBe("--");
+    expect(cells[2].textContent).toBe("–");
     // The coverage cell also carries the "corrected" chip, since this hit has
     // an fp_correction -- ahead of the rail, so the rail and the digits stay
     // in column against the rows that carry no chip.
@@ -763,7 +763,7 @@ describe("the hit table", () => {
     // Accession, coverage, ANI, organism, platform, country, released. The
     // country is the one the mirror had nothing for.
     expect(cells[4].textContent).toBe("ILLUMINA");
-    expect(cells[5].textContent).toBe("--");
+    expect(cells[5].textContent).toBe("–");
     expect(cells[6].textContent).toBe("2018-07-25");
   });
 
@@ -1101,7 +1101,7 @@ describe("the column chooser", () => {
 
     const row = screen.getByText("SRR000002").closest("tr");
     const cells = within(row as HTMLElement).getAllByRole("cell");
-    expect(cells[7].textContent).toBe("--");
+    expect(cells[7].textContent).toBe("–");
     expect(
       within(row as HTMLElement).queryByRole("link", { name: /SAMN/ })
     ).toBeNull();
@@ -1123,8 +1123,8 @@ describe("the column chooser", () => {
     expect(screen.getByText("12,345")).toBeTruthy();
     const row = screen.getByText("SRR000002").closest("tr");
     const cells = within(row as HTMLElement).getAllByRole("cell");
-    expect(cells[7].textContent).toBe("--");
-    expect(cells[8].textContent).toBe("--");
+    expect(cells[7].textContent).toBe("–");
+    expect(cells[8].textContent).toBe("–");
     expect(
       within(row as HTMLElement).queryByRole("link", { name: /NCBI in/ })
     ).toBeNull();

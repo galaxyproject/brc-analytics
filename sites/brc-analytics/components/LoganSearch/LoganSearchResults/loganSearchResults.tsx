@@ -212,7 +212,7 @@ function Meta({
   if (!value) {
     return (
       <Typography color="text.disabled" variant="caption">
-        --
+        –
       </Typography>
     );
   }
@@ -902,7 +902,7 @@ export const LoganSearchResults = ({
                   </TableCell>
                   <MetaCell align="right">
                     <Numeric>
-                      {hit.ani == null ? "--" : hit.ani.toFixed(4)}
+                      {hit.ani == null ? "–" : hit.ani.toFixed(4)}
                     </Numeric>
                   </MetaCell>
                   <TableCell>

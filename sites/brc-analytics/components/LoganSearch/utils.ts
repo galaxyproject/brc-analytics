@@ -400,7 +400,7 @@ export function parseQuery(text: string): ParsedQuery {
  * @returns Percentage string.
  */
 export function formatShare(count: number, total: number): string {
-  if (total <= 0) return "--";
+  if (total <= 0) return "–";
   if (count === 0) return "0%";
   const share = (count / total) * 100;
   if (share < 0.1) return "<0.1%";
