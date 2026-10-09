@@ -5,7 +5,9 @@ import { Head, HeroBand, HeroLayout, Stats, Subhead } from "./loganHero.styles";
 import type { Props } from "./types";
 
 // Middle dots rather than dashes, which the site's copy keeps out of headings.
-const STATS_SEPARATOR = " · ";
+// The no-break space keeps each dot on the end of its fact when a narrow
+// screen wraps the line, instead of starting the next line with it.
+const STATS_SEPARATOR = " · ";
 
 /**
  * The site's page band: title, optional breadcrumbs, subhead and a line of
