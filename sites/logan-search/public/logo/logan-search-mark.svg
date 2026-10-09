@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Logan Search">
+  <!-- Lens on contigs: a magnifier over three assembled contigs, with the stretch
+       under the lens in amber as the hit. -->
+  <defs><clipPath id="lens-mark"><circle cx="34" cy="31" r="11"/></clipPath></defs>
+  <rect width="64" height="64" rx="15" fill="#5B2BB5"/>
+  <rect x="9" y="15" width="30" height="6" rx="3" fill="#C9B8F0"/>
+  <rect x="9" y="28" width="44" height="6" rx="3" fill="#C9B8F0"/>
+  <rect x="9" y="41" width="22" height="6" rx="3" fill="#C9B8F0"/>
+  <circle cx="34" cy="31" r="11" fill="#3B1782"/>
+  <rect x="9" y="28" width="44" height="6" rx="3" fill="#F0A93B" clip-path="url(#lens-mark)"/>
+  <circle cx="34" cy="31" r="11" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+  <line x1="42.5" y1="39.5" x2="51" y2="48" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+</svg>
