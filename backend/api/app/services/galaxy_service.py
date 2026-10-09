@@ -6,7 +6,6 @@ import json
 import logging
 import random
 import tempfile
-import time
 import zipfile
 from collections import Counter, defaultdict
 from typing import Dict, List, Literal, Optional, Tuple
@@ -83,6 +82,27 @@ class GalaxySubmitNotStarted(Exception):
     that fails from the run_tool call on is ambiguous -- Galaxy may have queued
     the job and lost the reply -- and is raised as a plain Exception instead.
     """
+
+
+def _is_missing_history_error(e: BaseException) -> bool:
+    """Whether Galaxy refused a call because the history it named is gone.
+
+    A cached history id can outlive its history (deleted or purged by hand, or a
+    re-pointed account), and Galaxy says so with a 400/403/404 that names the
+    history. Our own wrappers re-raise with the bioblend error as the cause, so
+    the whole chain is checked.
+    """
+    seen = set()
+    while e is not None and id(e) not in seen:
+        seen.add(id(e))
+        if isinstance(e, BioblendConnectionError) and getattr(
+            e, "status_code", None
+        ) in (400, 403, 404):
+            detail = f"{getattr(e, 'body', '') or ''} {e}".lower()
+            if "history" in detail:
+                return True
+        e = e.__cause__ or e.__context__
+    return False
 
 
 class KmindexUnknownIndex(GalaxySubmitNotStarted):
@@ -249,9 +269,7 @@ KMINDEX_INDEX_LAST_GOOD_PREFIX = "galaxy:kmindex_indexes_last_good:v1"
 # A read that just failed is a read that is about to fail again: the burst which
 # trips the rate limit arrives while it is tripped. So a failure is remembered
 # briefly, and the misses behind it are answered without starting another
-# refresh -- which, on the service account, would also leave a timestamped
-# stray history behind each time, since that is what
-# _get_or_create_shared_history does when the lookup it needs first fails.
+# refresh.
 KMINDEX_INDEX_COOLDOWN_PREFIX = "galaxy:kmindex_indexes_cooldown:v1"
 KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 
@@ -287,13 +305,26 @@ _AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
 KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 
 # Finding or creating the history jobs land in is a read-then-write against
-# Galaxy, and the router builds a GalaxyService per request, so the per-instance
-# memo cannot stop two first submissions each finding nothing and each creating
+# Galaxy, and the id cache below is empty until the first one finishes, so
+# without it two first submissions could each find nothing and each create
 # one. The lock is per Galaxy account -- the user's sub, or None for the service
 # account -- because that's the scope of the race, and bioblend sets no request
 # timeout, so one shared lock would let a single hung get_histories hold up every
 # account's submissions.
 _HISTORY_LOCKS = defaultdict(asyncio.Lock)
+
+# The resolved history id, so a submit doesn't ask Galaxy for it at all. Every
+# kmindex submit needs one and the router builds a service per request, so a
+# per-instance memo never hit: each submit listed every history on the service
+# account, a list that only grows, and on 2026-10-08 that read timed out while
+# Galaxy was slow and took submits down with it. Process-wide first, Redis
+# behind it so a restart or another worker doesn't go back to Galaxy either.
+# Keyed by Galaxy URL, account and history name (see _history_cache_key).
+_HISTORY_IDS: Dict[str, str] = {}
+HISTORY_ID_CACHE_PREFIX = "galaxy:history_id:v1"
+# A user's history is one long-lived history in their own account; a gone one
+# is caught on use (_is_missing_history_error), so the TTL only bounds staleness.
+HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
 
 # One Galaxy read per cold cache, process-wide, rather than one per miss. The
 # router builds a service per request, so the in-flight refresh has to live out
@@ -556,8 +587,9 @@ class GalaxyService:
                 self.settings.GALAXY_API_URL,
             )
 
-        # Memoized per instance, so a history id never leaks across requests/users.
-        self._shared_history_id = None
+        # The cache key the last resolved history id lives under, so a submit
+        # that finds the history gone can drop exactly that entry.
+        self._history_key: Optional[str] = None
 
     def is_available(self) -> bool:
         """Check if Galaxy service is available."""
@@ -757,13 +789,33 @@ class GalaxyService:
         tool_requested = False
         try:
             history_id = await self._get_or_create_shared_history()
-            upload_dataset_id = await self._upload_fasta(
-                submission.sequence, submission.filename, history_id
-            )
+            try:
+                upload_dataset_id = await self._upload_fasta(
+                    submission.sequence, submission.filename, history_id
+                )
+            except Exception as e:
+                if not _is_missing_history_error(e):
+                    raise
+                # Nothing has run yet, so one more go against a freshly
+                # resolved history is safe.
+                logger.warning(
+                    "Cached history %s is gone; resolving it again", history_id
+                )
+                await self._forget_shared_history()
+                history_id = await self._get_or_create_shared_history()
+                upload_dataset_id = await self._upload_fasta(
+                    submission.sequence, submission.filename, history_id
+                )
             tool_requested = True
-            job_id = await self._run_kmindex_query(
-                upload_dataset_id, submission, history_id
-            )
+            try:
+                job_id = await self._run_kmindex_query(
+                    upload_dataset_id, submission, history_id
+                )
+            except Exception as e:
+                # Not retried: the job may exist. Just stop handing out the id.
+                if _is_missing_history_error(e):
+                    await self._forget_shared_history()
+                raise
 
             return GalaxyJobResponse(
                 job_id=job_id,
@@ -2062,65 +2114,127 @@ class GalaxyService:
             logger.error(f"BioBLEND error getting dataset content: {e}")
             return f"Error retrieving dataset content: {str(e)}"
 
-    async def _get_or_create_shared_history(self) -> str:
-        """Find or create the history jobs land in.
+    def _history_target(self) -> Tuple[str, object, int]:
+        """The history jobs land in: its name, its lock's account, its TTL.
 
         Service-account jobs share one "BRC ANALYTICS JOBS" history, unless the
         service was built with a history_name; a signed-in user's jobs go to a
         "BRC Logan Search" history in their own account -- the bearer token
-        scopes get_histories()/create_history to that user.
+        scopes the lookup and create_history to that user.
         """
         if self.credential is not None and self.credential.kind == "user":
-            shared_history_name = "BRC Logan Search"
-            account = self.credential.user_sub
-        else:
-            shared_history_name = self.history_name or "BRC ANALYTICS JOBS"
-            # Keyed by name too: two service histories on one account are
-            # separate find-or-creates, and must not wait on each other.
-            account = ("service", shared_history_name)
+            return "BRC Logan Search", self.credential.user_sub, HISTORY_ID_TTL
+        name = self.history_name or "BRC ANALYTICS JOBS"
+        # Keyed by name too: two service histories on one account are separate
+        # find-or-creates, and must not wait on each other.
+        return name, ("service", name), HISTORY_ID_TTL
 
-        if self._shared_history_id:
-            return self._shared_history_id
+    def _history_cache_key(self, account: object, name: str) -> Optional[str]:
+        """Where the resolved id is cached, or None when it must not be.
+
+        A user credential without a sub can't be told apart from another one,
+        so its history is looked up every time rather than risk handing one
+        user's history id to another.
+        """
+        if account is None:
+            return None
+        return self.cache.make_key(
+            HISTORY_ID_CACHE_PREFIX,
+            {
+                "account": list(account) if isinstance(account, tuple) else account,
+                "name": name,
+                "url": self.settings.GALAXY_API_URL,
+            },
+        )
+
+    async def _get_or_create_shared_history(self) -> str:
+        """Find or create the history jobs land in, from cache when possible.
+
+        Raises rather than inventing a stand-in history: a failure here is
+        before anything ran, so the submit is safe to retry, and a timestamped
+        stray per failure only made the account's history list longer.
+        """
+        name, account, ttl = self._history_target()
+        key = self._history_cache_key(account, name)
+        self._history_key = key
+
+        cached = await self._cached_history_id(key)
+        if cached:
+            return cached
 
         async with _HISTORY_LOCKS[account]:
+            # Whoever held the lock may have just resolved it.
+            cached = await self._cached_history_id(key)
+            if cached:
+                return cached
+
             try:
-                # Get all histories using BioBLEND
-                histories = await asyncio.to_thread(self.gi.histories.get_histories)
-
-                # Look for existing shared history
-                for history in histories:
-                    if history.get("name") == shared_history_name:
-                        history_id = history["id"]
-                        logger.info(
-                            "Using existing shared history: "
-                            f"{history_id} ({shared_history_name})"
-                        )
-                        self._shared_history_id = history_id
-                        return history_id
-
-                # If we get here, the shared history doesn't exist, so create it
-                logger.info(f"Creating new shared history: {shared_history_name}")
-                new_history = await asyncio.to_thread(
-                    self.gi.histories.create_history, name=shared_history_name
-                )
-                history_id = new_history["id"]
-                logger.info(
-                    f"Created shared history: {history_id} ({shared_history_name})"
-                )
-                self._shared_history_id = history_id
-                return history_id
-
+                history_id = await asyncio.to_thread(self._find_history, name)
+                if history_id:
+                    logger.info(f"Using existing shared history: {history_id} ({name})")
+                else:
+                    logger.info(f"Creating new shared history: {name}")
+                    new_history = await asyncio.to_thread(
+                        self.gi.histories.create_history, name=name
+                    )
+                    history_id = new_history["id"]
+                    logger.info(f"Created shared history: {history_id} ({name})")
             except Exception as e:
+                # An unlinked user's 401 has to travel intact to the
+                # connect-prompt mapping, so this re-raises as is.
                 logger.error(f"Error getting or creating shared history: {e}")
-                if self.credential is not None and self.credential.kind == "user":
-                    # Never litter someone's own account with timestamped strays
-                    # over a transient blip, and let an unlinked 401 travel
-                    # intact to the connect-prompt mapping instead of dying here.
-                    raise
-                # Fallback to creating a new history with timestamp
-                fallback_name = f"{shared_history_name} - {int(time.time())}"
-                logger.warning(f"Falling back to creating history: {fallback_name}")
-                fallback_history = await asyncio.to_thread(
-                    self.gi.histories.create_history, name=fallback_name
-                )
-                return fallback_history["id"]
+                raise
+
+            if key:
+                _HISTORY_IDS[key] = history_id
+                await self.cache.set(key, history_id, ttl)
+            return history_id
+
+    async def _cached_history_id(self, key: Optional[str]) -> Optional[str]:
+        """The cached id under key, from this process or else from Redis."""
+        if not key:
+            return None
+        history_id = _HISTORY_IDS.get(key)
+        if history_id:
+            return history_id
+        history_id = await self.cache.get(key)
+        if history_id:
+            _HISTORY_IDS[key] = history_id
+        return history_id
+
+    async def _forget_shared_history(self) -> None:
+        """Drop the cached id, so the next resolve goes back to Galaxy."""
+        key = self._history_key
+        if not key:
+            return
+        _HISTORY_IDS.pop(key, None)
+        await self.cache.delete(key)
+
+    def _find_history(self, name: str) -> Optional[str]:
+        """The id of this account's live history called name, if there is one.
+
+        bioblend's get_histories(name=...) lists every history and filters
+        client-side, which is the read that timed out; Galaxy's q/qv filter
+        does it server-side. The name is re-checked here anyway, so a Galaxy
+        that ignored the filter would be slow rather than wrong.
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/histories",
+            params={
+                "keys": "id,name,update_time",
+                "q": ["name", "deleted"],
+                "qv": [name, "False"],
+            },
+        )
+        if r.status_code != 200:
+            raise BioblendConnectionError(
+                f"History lookup failed with status {r.status_code}",
+                body=r.text,
+                status_code=r.status_code,
+            )
+        matches = [h for h in r.json() if h.get("name") == name]
+        if not matches:
+            return None
+        # Several only if someone made one by hand; the busiest is the one
+        # jobs have been going to.
+        return max(matches, key=lambda h: h.get("update_time") or "")["id"]
