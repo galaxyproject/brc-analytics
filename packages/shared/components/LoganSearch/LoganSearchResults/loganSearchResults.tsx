@@ -1,11 +1,3 @@
-import {
-  CoverageCell,
-  CoverageRail,
-  MetaCellStyles,
-  Numeric,
-  OrganismMeta,
-  ResultsToolbar,
-} from "@brc/components/LoganSearch/loganSearch.styles";
 import { ViewColumn } from "@mui/icons-material";
 import {
   Alert,
@@ -34,6 +26,14 @@ import {
 } from "@mui/material";
 import { styled as muiStyled } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
+import {
+  CoverageCell,
+  CoverageRail,
+  MetaCellStyles,
+  Numeric,
+  OrganismMeta,
+  ResultsToolbar,
+} from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import {
   appliedSort,
   defaultOrder,

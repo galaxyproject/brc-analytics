@@ -1,4 +1,3 @@
-import { ControlRow } from "@brc/components/LoganSearch/loganSearch.styles";
 import {
   Alert,
   Card,
@@ -7,6 +6,7 @@ import {
   LinearProgress,
   Typography,
 } from "@mui/material";
+import { ControlRow } from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { type JSX } from "react";

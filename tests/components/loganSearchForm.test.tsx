@@ -1,5 +1,5 @@
-import { LOGAN_EXAMPLES } from "@brc/components/LoganSearch/LoganSearchForm/examples";
-import { LoganSearchForm } from "@brc/components/LoganSearch/LoganSearchForm/loganSearchForm";
+import { LOGAN_EXAMPLES } from "@repo/shared/components/LoganSearch/LoganSearchForm/examples";
+import { LoganSearchForm } from "@repo/shared/components/LoganSearch/LoganSearchForm/loganSearchForm";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import {
   fireEvent,

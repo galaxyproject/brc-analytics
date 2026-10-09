@@ -1,16 +1,16 @@
 "use client";
 
+import { Download } from "@mui/icons-material";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import {
   downloadMapImage,
   MAP_IMAGE_OPTIONS,
   type MapImageFormat,
   type MapImageView,
-} from "@brc/components/LoganSearch/CohortGeography/mapImage";
-import { type LoganFilterControls } from "@brc/components/LoganSearch/LoganSearchFilters/types";
-import { CohortMapContainer } from "@brc/components/LoganSearch/loganSearch.styles";
-import { formatShare } from "@brc/components/LoganSearch/utils";
-import { Download } from "@mui/icons-material";
-import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
+} from "@repo/shared/components/LoganSearch/CohortGeography/mapImage";
+import { type LoganFilterControls } from "@repo/shared/components/LoganSearch/LoganSearchFilters/types";
+import { CohortMapContainer } from "@repo/shared/components/LoganSearch/loganSearch.styles";
+import { formatShare } from "@repo/shared/components/LoganSearch/utils";
 import {
   type KmindexGeography,
   type KmindexGeographyCountry,

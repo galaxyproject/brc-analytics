@@ -1,4 +1,3 @@
-import { ROUTES } from "@brc/routes/constants";
 import {
   Button,
   Card,
@@ -15,6 +14,8 @@ interface LoganSearchHistoryProps {
   currentJobId: string | null;
   onClear: () => void;
   searches: RecentSearch[];
+  // Where the search is mounted; each entry reopens at `${searchPath}?job=`.
+  searchPath: string;
 }
 
 // Past this the line stops being something you can read at a glance; the
@@ -51,12 +52,14 @@ function formatSubmitted(submittedAt: string): string {
  * @param props.currentJobId - The job on screen.
  * @param props.onClear - Called when the list is cleared.
  * @param props.searches - Stored searches, newest first.
+ * @param props.searchPath - The path the search is mounted at.
  * @returns The list, or null when there is nothing in it.
  */
 export const LoganSearchHistory = ({
   currentJobId,
   onClear,
   searches,
+  searchPath,
 }: LoganSearchHistoryProps): JSX.Element | null => {
   if (searches.length === 0) return null;
 
@@ -99,7 +102,7 @@ export const LoganSearchHistory = ({
                   // A full page load, not a client-side route change: the
                   // search hook picks up ?job= only on mount.
                   <Link
-                    href={`${ROUTES.LOGAN_SEARCH}?job=${encodeURIComponent(entry.jobId)}`}
+                    href={`${searchPath}?job=${encodeURIComponent(entry.jobId)}`}
                     underline="hover"
                     variant="subtitle2"
                   >

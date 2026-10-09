@@ -8,8 +8,8 @@ import {
   toggleValue,
   toggleYear,
   yearSelected,
-} from "@brc/components/LoganSearch/LoganSearchFilters/filters";
-import { useLoganFilters } from "@brc/components/LoganSearch/LoganSearchFilters/useLoganFilters";
+} from "@repo/shared/components/LoganSearch/LoganSearchFilters/filters";
+import { useLoganFilters } from "@repo/shared/components/LoganSearch/LoganSearchFilters/useLoganFilters";
 import { act, renderHook } from "@testing-library/react";
 
 /**

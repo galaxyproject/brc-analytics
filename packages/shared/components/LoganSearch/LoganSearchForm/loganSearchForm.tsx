@@ -1,32 +1,3 @@
-import {
-  ControlRow,
-  FormColumn,
-  FormGrid,
-  FormSpan,
-  IndexAxisRow,
-  IndexChips,
-} from "@brc/components/LoganSearch/loganSearch.styles";
-import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
-import {
-  LOGAN_EXAMPLES,
-  type LoganExample,
-} from "@brc/components/LoganSearch/LoganSearchForm/examples";
-import {
-  queryNameOf,
-  type RecentSearch,
-} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
-import {
-  axisOptions,
-  describeIndexSelection,
-  type IndexAxis,
-  type IndexAxisOption,
-  indexDivision,
-  indexPresets,
-  indexStrategy,
-  parseQuery,
-  selectIndexes,
-  sortIndexes,
-} from "@brc/components/LoganSearch/utils";
 import { Search, UploadFile } from "@mui/icons-material";
 import {
   Button,
@@ -39,6 +10,35 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import {
+  ControlRow,
+  FormColumn,
+  FormGrid,
+  FormSpan,
+  IndexAxisRow,
+  IndexChips,
+} from "@repo/shared/components/LoganSearch/loganSearch.styles";
+import { ConnectGalaxyAccount } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
+import {
+  LOGAN_EXAMPLES,
+  type LoganExample,
+} from "@repo/shared/components/LoganSearch/LoganSearchForm/examples";
+import {
+  queryNameOf,
+  type RecentSearch,
+} from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import {
+  axisOptions,
+  describeIndexSelection,
+  type IndexAxis,
+  type IndexAxisOption,
+  indexDivision,
+  indexPresets,
+  indexStrategy,
+  parseQuery,
+  selectIndexes,
+  sortIndexes,
+} from "@repo/shared/components/LoganSearch/utils";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 

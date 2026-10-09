@@ -5,7 +5,7 @@ import {
   indexPresets,
   joinNaturally,
   selectIndexes,
-} from "@brc/components/LoganSearch/utils";
+} from "@repo/shared/components/LoganSearch/utils";
 
 // The registered list as dev returns it: every strategy across every division
 // except ENV, which exists only as METAGENOMIC_ENV. 9 x 12 + 1 = 109.

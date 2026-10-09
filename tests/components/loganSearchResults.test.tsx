@@ -2,7 +2,7 @@ import {
   LoganSearchResults,
   MIRROR_SCOPE_NOTE,
   openViromeUrl,
-} from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
+} from "@repo/shared/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
   type KmindexHit,
   type KmindexIndexSummary,

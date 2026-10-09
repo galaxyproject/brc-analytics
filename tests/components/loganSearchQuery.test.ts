@@ -1,4 +1,4 @@
-import { parseQuery } from "@brc/components/LoganSearch/utils";
+import { parseQuery } from "@repo/shared/components/LoganSearch/utils";
 
 describe("parseQuery", () => {
   test("passes FASTA through untouched", () => {

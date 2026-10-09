@@ -1,4 +1,3 @@
-import { FilterChips } from "@brc/components/LoganSearch/loganSearch.styles";
 import { Download } from "@mui/icons-material";
 import {
   Alert,
@@ -8,6 +7,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
+import { FilterChips } from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import { type KmindexResults } from "@repo/shared/hooks/useKmindexSearch";
 import { type KmindexSummaryState } from "@repo/shared/hooks/useKmindexSummary";

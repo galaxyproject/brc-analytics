@@ -1,4 +1,4 @@
-import { LoganSearchHistory } from "@brc/components/LoganSearch/LoganSearchHistory/loganSearchHistory";
+import { LoganSearchHistory } from "@repo/shared/components/LoganSearch/LoganSearchHistory/loganSearchHistory";
 import {
   clearRecentSearches,
   MAX_RECENT_SEARCHES,
@@ -8,7 +8,7 @@ import {
   type RecentSearch,
   withRecentSearch,
   writeRecentSearches,
-} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
+} from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -122,6 +122,7 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId={null}
         onClear={jest.fn()}
+        searchPath="/logan-search"
         searches={[]}
       />
     );
@@ -133,6 +134,7 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId="current"
         onClear={jest.fn()}
+        searchPath="/logan-search"
         searches={[
           entry("current"),
           entry("older", {
@@ -159,10 +161,26 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId={null}
         onClear={onClear}
+        searchPath="/logan-search"
         searches={[entry("a")]}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     expect(onClear).toHaveBeenCalledTimes(1);
+  });
+
+  test("links back to wherever the search is mounted", () => {
+    // The Logan Search site mounts the search at its root.
+    render(
+      <LoganSearchHistory
+        currentJobId={null}
+        onClear={jest.fn()}
+        searchPath="/"
+        searches={[entry("older", { queryName: null })]}
+      />
+    );
+
+    const link = screen.getByRole("link", { name: "Job older" });
+    expect(link.getAttribute("href")).toBe("/?job=older");
   });
 });
