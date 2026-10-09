@@ -818,7 +818,7 @@ export const CohortGeography = ({
           Each point is every matched run recorded at that coordinate, not one
           run, so hovering names a place rather than an accession. A handful of
           the busiest are institutional addresses typed into the sample
-          attribute rather than sampling sites -- a point carrying tens of
+          attribute rather than sampling sites; a point carrying tens of
           thousands of runs across many organisms is usually one of those.
         </Typography>
       )}
