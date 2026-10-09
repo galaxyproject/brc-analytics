@@ -74,6 +74,7 @@ export function AuthProvider({
   }, [loginEnabled]);
 
   const login = useCallback(() => {
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- backend oauth route, not a next page
     window.location.href = `${API_BASE_URL}/auth/login`;
   }, []);
 
