@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="168" height="28" viewBox="0 0 168 28" role="img" aria-label="Logan Search">
-  <!-- Placeholder wordmark until there's a real visual pass. -->
-  <rect x="0" y="2" width="24" height="24" rx="5" fill="#155E5C"/>
-  <path d="M8 7v14h9" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="32" y="20" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="600" fill="#0E3B3A">Logan Search</text>
+  <!-- Placeholder mark: a few stacked contig bars, echoing the hero motif, in
+       the site palette. The real mark should come from, or be agreed with, the
+       Logan team. As an <img> this can't load the site's web fonts, so the
+       text falls back to whatever sans the system has. -->
+  <rect x="0" y="1" width="15" height="5" rx="2.5" fill="#5B2BB5"/>
+  <rect x="5" y="8" width="19" height="5" rx="2.5" fill="#5B2BB5"/>
+  <rect x="2" y="15" width="12" height="5" rx="2.5" fill="#F0A93B"/>
+  <rect x="9" y="22" width="15" height="5" rx="2.5" fill="#3B1782"/>
+  <text x="32" y="20" font-family="'Schibsted Grotesk', Inter, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="600" fill="#3B1782">Logan Search</text>
 </svg>
