@@ -32,7 +32,7 @@ import { type EntitiesLoader } from "@repo/shared/services/workflows/hooks/UseEn
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
-import { type JSX } from "react";
+import { Fragment, type JSX, type ReactNode } from "react";
 
 const DEFAULT_ENTITY_LIST_TYPE = "organisms";
 
@@ -53,11 +53,39 @@ export type AppPropsWithComponent = AppProps & {
   pageProps: SitePageProps;
 };
 
+/**
+ * Explore state for the page's entity list, or nothing on a site with no
+ * entity lists: findable-ui's initializer looks the list up by name and throws
+ * when there isn't one. Nothing outside an entity list reads explore state
+ * except the error fallback, whose context default covers it.
+ * @param props - Component props.
+ * @param props.children - The page.
+ * @param props.entityListType - The page's entity list type, or "".
+ * @returns the children, inside explore state when there is an entity list.
+ */
+function ExploreState({
+  children,
+  entityListType,
+}: {
+  children: ReactNode;
+  entityListType: string;
+}): JSX.Element {
+  if (!entityListType) return <Fragment>{children}</Fragment>;
+  return (
+    <ExploreStateProvider entityListType={entityListType}>
+      {children}
+    </ExploreStateProvider>
+  );
+}
+
 export interface AppProvidersProps {
   appConfig: AppSiteConfig;
   appProps: AppPropsWithComponent;
   appTheme: Theme;
   defaultDescription: string;
+  // The entity list a page belongs to when it doesn't say. A site with no
+  // entity lists at all passes "".
+  defaultEntityListType?: string;
   ensureEntitiesLoaded: EntitiesLoader;
 }
 
@@ -71,6 +99,8 @@ export interface AppProvidersProps {
  * @param props.appProps - Next.js app props (Component + pageProps).
  * @param props.appTheme - Resolved MUI/Emotion theme.
  * @param props.defaultDescription - Fallback OG description for the site.
+ * @param props.defaultEntityListType - Entity list type for pages that don't
+ * name one; "" for a site with no entity lists.
  * @param props.ensureEntitiesLoaded - Loader that resolves once the site's
  * entities and workflows are loaded.
  * @returns the application shell.
@@ -80,6 +110,7 @@ export function AppProviders({
   appProps,
   appTheme,
   defaultDescription,
+  defaultEntityListType = DEFAULT_ENTITY_LIST_TYPE,
   ensureEntitiesLoaded,
 }: AppProvidersProps): JSX.Element {
   const entities = useEntities(ensureEntitiesLoaded);
@@ -87,7 +118,7 @@ export function AppProviders({
   const { layout, redirectRootToPath } = appConfig;
   const { floating, footer, header } = layout || {};
   const {
-    entityListType = DEFAULT_ENTITY_LIST_TYPE,
+    entityListType = defaultEntityListType,
     pageDescription,
     pageTitle,
   } = pageProps;
@@ -116,7 +147,7 @@ export function AppProviders({
                       <LayoutDimensionsProvider>
                         <AppLayout>
                           <DXHeader {...header} />
-                          <ExploreStateProvider entityListType={entityListType}>
+                          <ExploreState entityListType={entityListType}>
                             <WorkflowHandoffProvider>
                               <Main>
                                 <ErrorBoundary
@@ -144,7 +175,7 @@ export function AppProviders({
                                 </ErrorBoundary>
                               </Main>
                             </WorkflowHandoffProvider>
-                          </ExploreStateProvider>
+                          </ExploreState>
                           <StyledFooter {...footer} />
                         </AppLayout>
                       </LayoutDimensionsProvider>
