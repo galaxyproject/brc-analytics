@@ -9,6 +9,7 @@ import tempfile
 import zipfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple
 
 import requests
@@ -33,8 +34,11 @@ from app.models.galaxy import (
     KmindexQuerySubmission,
     KmindexResults,
     KmindexSort,
+    KmindexSummary,
     SraRunMetadata,
 )
+from app.services import kmindex_filters
+from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.logan_stats import correct_score
 from app.services.sra_mirror import (
@@ -47,6 +51,7 @@ from app.services.sra_mirror import (
     EXPORT_UNAVAILABLE,
     SRAMirrorService,
     export_file_path,
+    export_is_current,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,6 +79,14 @@ class GalaxyJobAggregating(Exception):
 
 class GalaxyJobNotFound(Exception):
     """Galaxy has no job under this id (or could not decode it as one)."""
+
+
+class KmindexFiltersUnavailable(Exception):
+    """The job has no current export, so there is nothing to filter over.
+
+    Never answered by filtering the capped listing instead: that is the
+    wrong-answer trap the whole-match-set cohort exists to avoid.
+    """
 
 
 class GalaxySubmitNotStarted(Exception):
@@ -928,6 +941,39 @@ class GalaxyService:
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
+        aggregate = await self._load_aggregate(job_id, lane)
+
+        ordering, sort, order = await self._ordering_for(
+            aggregate, job_id, sort, order or _default_order(sort)
+        )
+        # Single exit, so a cache hit can't skip annotation -- an earlier
+        # version returned straight from the pre-lock hit and silently served
+        # every warm request unannotated.
+        return await self._annotate_with_sra(
+            self._page_kmindex(
+                aggregate,
+                job_id,
+                limit,
+                offset,
+                ordering=ordering,
+                sort=sort,
+                order=order,
+            )
+        )
+
+    async def _load_aggregate(
+        self, job_id: str, lane: AggregationLane = "native"
+    ) -> dict:
+        """The job's cached aggregate, merging its shards first on a miss.
+
+        Shared by the listing and the filtered reads, so a filtered link opened
+        after the aggregate expired re-aggregates too -- which rewrites the
+        export the filter runs over.
+
+        @param job_id: the kmindex job.
+        @param lane: whose aggregation lock a cold merge takes.
+        @returns: the aggregate.
+        """
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
 
@@ -978,23 +1024,117 @@ class GalaxyService:
                             aggregate = await self._aggregate_shards(job_id)
                     finally:
                         await self.cache.delete(marker_key)
+        return aggregate
 
-        ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort)
-        )
-        # Single exit, so a cache hit can't skip annotation -- an earlier
-        # version returned straight from the pre-lock hit and silently served
-        # every warm request unannotated.
-        return await self._annotate_with_sra(
-            self._page_kmindex(
-                aggregate,
-                job_id,
-                limit,
-                offset,
-                ordering=ordering,
-                sort=sort,
-                order=order,
+    async def _filterable_export(self, aggregate: dict, job_id: str) -> Path:
+        """The export a filtered read runs over, or why there is none.
+
+        @param aggregate: the job's aggregate.
+        @param job_id: the kmindex job.
+        @returns: the path of a current export.
+        @raises KmindexFiltersUnavailable: with a reason the UI can show.
+        """
+        export = self._export_state(aggregate, job_id)
+        if export["status"] == EXPORT_TOO_LARGE:
+            raise KmindexFiltersUnavailable(
+                "Filtering needs the full match set on disk, and this search "
+                "matched too many runs for one to be prepared."
             )
+        path = export_file_path(self.settings.KMINDEX_EXPORT_DIR, job_id)
+        current = False
+        if export["status"] == EXPORT_AVAILABLE and path is not None:
+            try:
+                current = await asyncio.to_thread(export_is_current, path)
+            except Exception as e:
+                logger.warning(f"kmindex job {job_id}: unreadable export: {e}")
+        if not current:
+            raise KmindexFiltersUnavailable(
+                "Filtering needs the full match set on disk, and it is not "
+                "available for this search right now."
+            )
+        return path
+
+    async def get_filtered_kmindex_results(
+        self,
+        job_id: str,
+        filters: KmindexFilters,
+        limit: int = 100,
+        offset: int = 0,
+        sort: KmindexSort = "score",
+        order: Optional[KmindexOrder] = None,
+    ) -> KmindexResults:
+        """A page of the filtered match set, served from the export parquet.
+
+        Pages every row the filter keeps, not the top 50,000, and needs neither
+        Redis beyond the aggregate nor the mirror: rows in the file already
+        carry their metadata.
+
+        @param job_id: the kmindex job.
+        @param filters: a non-empty filter.
+        @param limit: page size.
+        @param offset: rows to skip.
+        @param sort: column to order by.
+        @param order: direction, defaulting as the listing does.
+        @returns: the page, with filtered=True.
+        @raises KmindexFiltersUnavailable: when there is no current export.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        aggregate = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, job_id)
+        order = order or _default_order(sort)
+        page = await asyncio.to_thread(
+            kmindex_filters.subset_page, path, filters, limit, offset, sort, order
+        )
+        export = self._export_state(aggregate, job_id)
+        hits = [KmindexHit(**h) for h in page["hits"]]
+        return KmindexResults(
+            job_id=job_id,
+            query_name=aggregate.get("query_name"),
+            total_hits=page["matched"],
+            total_matches=aggregate["total_matches"],
+            shards_failed=aggregate.get("shards_failed", 0),
+            shards_searched=aggregate.get("shards_searched", 0),
+            shards_with_hits=aggregate.get("shards_with_hits", 0),
+            # The filtered page reaches every row the filter keeps, so the cap
+            # does not apply and per-index cap accounting means nothing here.
+            truncated=False,
+            per_index=[],
+            cohort=aggregate.get("cohort"),
+            geography=aggregate.get("geography"),
+            export_bytes=export["bytes"],
+            export_rows=export["rows"],
+            export_status=export["status"],
+            limit=limit,
+            offset=offset,
+            sort=sort,
+            order=order,
+            sra_mirror_available=True,
+            sra_annotated=sum(1 for hit in hits if hit.sra is not None),
+            filtered=True,
+            hits=hits,
+        )
+
+    async def get_filtered_kmindex_summary(
+        self, job_id: str, filters: KmindexFilters
+    ) -> KmindexSummary:
+        """The filtered cohort and geography, shaped as the unfiltered ones.
+
+        @param job_id: the kmindex job.
+        @param filters: the filter; an empty one summarizes the whole file.
+        @returns: the summary.
+        @raises KmindexFiltersUnavailable: when there is no current export.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        aggregate = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, job_id)
+        summary = await asyncio.to_thread(kmindex_filters.subset_summary, path, filters)
+        return KmindexSummary(
+            cohort=summary["cohort"],
+            geography=summary["geography"],
+            matched=summary["matched"],
+            total_matches=aggregate["total_matches"],
         )
 
     async def get_cached_kmindex_results(
