@@ -1,4 +1,4 @@
-import { LoganSearchCohort } from "@brc/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
+import { LoganSearchCohort } from "@repo/shared/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
 import {
   type KmindexCohort,
   type KmindexFacet,

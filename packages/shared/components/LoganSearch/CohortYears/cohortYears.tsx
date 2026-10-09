@@ -1,8 +1,10 @@
+import { Box, Typography } from "@mui/material";
+import { visuallyHidden } from "@mui/utils";
 import {
   describeYears,
   yearSelected,
-} from "@brc/components/LoganSearch/LoganSearchFilters/filters";
-import { type LoganFilterControls } from "@brc/components/LoganSearch/LoganSearchFilters/types";
+} from "@repo/shared/components/LoganSearch/LoganSearchFilters/filters";
+import { type LoganFilterControls } from "@repo/shared/components/LoganSearch/LoganSearchFilters/types";
 import {
   YearBand,
   YearBar,
@@ -10,9 +12,7 @@ import {
   YearLabel,
   YearRow,
   YearToggle,
-} from "@brc/components/LoganSearch/loganSearch.styles";
-import { Box, Typography } from "@mui/material";
-import { visuallyHidden } from "@mui/utils";
+} from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import { type KmindexFacet } from "@repo/shared/hooks/useKmindexSearch";
 import { type JSX } from "react";
 

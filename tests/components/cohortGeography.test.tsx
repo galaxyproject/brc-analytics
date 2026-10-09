@@ -1,4 +1,4 @@
-import { CohortGeography } from "@brc/components/LoganSearch/CohortGeography/cohortGeography";
+import { CohortGeography } from "@repo/shared/components/LoganSearch/CohortGeography/cohortGeography";
 import {
   type KmindexGeography,
   type KmindexGeographyCountry,

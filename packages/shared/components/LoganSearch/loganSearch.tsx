@@ -16,6 +16,7 @@ import { useRecentSearches } from "./LoganSearchHistory/useRecentSearches";
 import { LoganSearchResults } from "./LoganSearchResults/loganSearchResults";
 import { LoganSearchStatus } from "./LoganSearchStatus/loganSearchStatus";
 import { LoganSearchSummary } from "./LoganSearchSummary/loganSearchSummary";
+import { type LoganSearchRoutes } from "./types";
 
 /**
  * Why a search's results cannot be filtered, if they cannot.
@@ -33,7 +34,18 @@ function filterDisabledReason(results: KmindexResults): string | null {
   return "Filtering needs the full match set on disk, and it is not available for this search.";
 }
 
-export const LoganSearch = (): JSX.Element => {
+interface LoganSearchProps {
+  routes: LoganSearchRoutes;
+}
+
+/**
+ * The whole Logan search: form, status, summary, filters, results, cohort and
+ * recent searches. Each site mounts it inside its own view.
+ * @param props - Component props.
+ * @param props.routes - Where the search links to on the mounting site.
+ * @returns The search.
+ */
+export const LoganSearch = ({ routes }: LoganSearchProps): JSX.Element => {
   const filtersEnabled = useFeatureFlag(FEATURE_FLAGS.LOGAN_FILTERS);
   const filtering = useLoganFilters(filtersEnabled);
   const search = useKmindexSearch(filtering.query);
@@ -74,7 +86,10 @@ export const LoganSearch = (): JSX.Element => {
     <div>
       <LoganSearchForm onSubmitted={history.record} search={search} />
       <LoganSearchStatus search={search} />
-      <LoganSearchSummary search={search} />
+      <LoganSearchSummary
+        assistantHref={routes.assistantHref}
+        search={search}
+      />
       {controls && results && (
         <LoganSearchFilterBar
           disabledReason={controls.disabledReason}
@@ -93,6 +108,7 @@ export const LoganSearch = (): JSX.Element => {
       <LoganSearchHistory
         currentJobId={search.jobId}
         onClear={history.clear}
+        searchPath={routes.searchPath}
         searches={history.searches}
       />
     </div>

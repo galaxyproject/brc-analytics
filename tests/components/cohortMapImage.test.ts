@@ -5,7 +5,7 @@ import {
   type MapImageView,
   PNG_SCALE,
   renderMapImage,
-} from "@brc/components/LoganSearch/CohortGeography/mapImage";
+} from "@repo/shared/components/LoganSearch/CohortGeography/mapImage";
 
 /**
  * A stand-in for the embedded vega view that records what the export did to

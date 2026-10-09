@@ -1,3 +1,5 @@
+import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
+import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
 import {
   CohortStat,
   CohortStats,
@@ -6,21 +8,20 @@ import {
   SummaryFigures,
   SummaryHeader,
   SummaryMeta,
-} from "@brc/components/LoganSearch/loganSearch.styles";
-import { joinNaturally } from "@brc/components/LoganSearch/utils";
-import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
-import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
+} from "@repo/shared/components/LoganSearch/loganSearch.styles";
+import { type LoganSearchRoutes } from "@repo/shared/components/LoganSearch/types";
+import { joinNaturally } from "@repo/shared/components/LoganSearch/utils";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
   type KmindexResults,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { type JSX, useState } from "react";
 
 interface LoganSearchSummaryProps {
+  assistantHref?: LoganSearchRoutes["assistantHref"];
   search: ReturnType<typeof useKmindexSearch>;
 }
 
@@ -239,10 +240,13 @@ function SummaryExport({
  * shape of the set behind it, the file, the assistant, and the job this all
  * came from.
  * @param props - Component props.
+ * @param props.assistantHref - Builds the assistant handoff link; without it
+ * there is no "Ask the assistant" button.
  * @param props.search - The kmindex search hook.
  * @returns The strip, or null before there is a match to summarise.
  */
 export const LoganSearchSummary = ({
+  assistantHref,
   search,
 }: LoganSearchSummaryProps): JSX.Element | null => {
   const { jobId, results } = search;
@@ -323,22 +327,22 @@ export const LoganSearchSummary = ({
                 string title is handed to the child as its aria-label, and a
                 140-character name with no "Ask the assistant" in it is a
                 link nobody can ask for by the words on it. */}
-            <Tooltip
-              describeChild
-              title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs."
-            >
-              <Button
-                component={Link}
-                href={`${ROUTES.ASSISTANT}?loganJob=${encodeURIComponent(
-                  jobId
-                )}`}
-                size="small"
-                startIcon={<AutoAwesome />}
-                variant="outlined"
+            {assistantHref && (
+              <Tooltip
+                describeChild
+                title="The assistant can explain what this cohort is, say which of its organisms are in BRC, and set up a Galaxy analysis on the top runs."
               >
-                Ask the assistant
-              </Button>
-            </Tooltip>
+                <Button
+                  component={Link}
+                  href={assistantHref(jobId)}
+                  size="small"
+                  startIcon={<AutoAwesome />}
+                  variant="outlined"
+                >
+                  Ask the assistant
+                </Button>
+              </Tooltip>
+            )}
           </SummaryActions>
         </SummaryHeader>
         <SummaryMeta>
