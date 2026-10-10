@@ -68,7 +68,8 @@ function withSavedColumnGated<T>(
  * @param browserUrl - Browser URL.
  * @param gitHubUrl - GitHub URL.
  * @param loginEnabled - Whether to show the login button.
- * @param loganSearchEnabled - Whether to show the Logan Search header entry.
+ * @param loganSearchEnabled - Whether to show the Logan Search header entry
+ * and Learn card.
  * @remarks
  * The `genomeEntityConfig` is typecast to `EntityConfig<BRCDataCatalogGenome>`
  * because the `SiteConfig` interface from the `@databiosphere/findable-ui` package expects
@@ -136,6 +137,7 @@ export function makeConfig(
         socialMedia: socialMedia,
       },
     },
+    loganSearchEnabled,
     loginEnabled,
     maxReadRunsForBrowseAll: 80000,
     redirectRootToPath: "/",

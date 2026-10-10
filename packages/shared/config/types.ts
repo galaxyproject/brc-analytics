@@ -30,6 +30,9 @@ export interface AppEntityConfig<R> extends Omit<
  * the app-level fields each site provides.
  */
 export interface AppSiteConfig extends BaseSiteConfig {
+  // Whether Logan Search is advertised (header entry, Learn card). The pages
+  // themselves are always built and reachable by URL.
+  loganSearchEnabled?: boolean;
   loginEnabled?: boolean;
   maxReadRunsForBrowseAll: number;
   // Where this site's help and feedback go. Resolved per site so shared code can

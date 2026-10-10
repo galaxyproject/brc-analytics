@@ -2,10 +2,11 @@ import type { SectionContentCard } from "@repo/shared/views/docs/components/Sect
 import type { ComponentProps } from "react";
 
 /**
- * A Learn card, plus whether it is one of the cards the demo feature flag
- * gates. Declared on the card itself so gated content is named where the
- * content is, rather than re-identified by URL in the filter.
+ * A Learn card, plus which flag, if any, gates it: the demo feature flag, or
+ * the Logan Search build flag. Declared on the card itself so gated content is
+ * named where the content is, rather than re-identified by URL in the filter.
  */
 export type LearnCard = ComponentProps<typeof SectionContentCard> & {
   isDemoGated?: boolean;
+  isLoganSearchGated?: boolean;
 };

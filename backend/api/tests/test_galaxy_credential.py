@@ -14,6 +14,7 @@ from app.core.dependencies import get_galaxy_credential
 from app.core.galaxy_credential import GalaxyCredential
 from app.services import galaxy_service
 from app.services.galaxy_service import GalaxyAccountNotLinkedError, GalaxyService
+from app.services.galaxy_service import _today as real_today
 
 # Verbatim from galaxy/lib/galaxy/authnz/managers.py -- the two 401s we have
 # to tell apart.
@@ -149,70 +150,222 @@ def test_secret_is_not_in_repr():
     assert "tok" not in repr(cred)
 
 
-@pytest.mark.asyncio
-async def test_user_jobs_use_per_user_history_name():
-    cache = MagicMock()
+class FakeCache:
+    """Just enough of CacheService for the history id to round-trip."""
+
+    def __init__(self):
+        self.store = {}
+
+    def make_key(self, prefix, params):
+        return f"{prefix}:{json.dumps(params, sort_keys=True)}"
+
+    async def get(self, key):
+        return self.store.get(key)
+
+    async def set(self, key, value, ttl=3600):
+        self.store[key] = value
+        return True
+
+    async def delete(self, key):
+        return self.store.pop(key, None) is not None
+
+
+class FakeGalaxy:
+    """A Galaxy account's histories, behind the calls history resolution makes.
+
+    get_histories is wired to fail, since it lists every history on the
+    account before bioblend filters by name.
+    """
+
+    def __init__(self, histories=None, lookup_delay=0.0):
+        self.histories = list(histories or [])
+        self.lookup_delay = lookup_delay
+        self.lookups = []
+        self.gi = MagicMock()
+        self.gi.url = "https://galaxy.example/api"
+        self.gi.make_get_request = MagicMock(side_effect=self._get)
+        self.gi.histories.get_histories = MagicMock(
+            side_effect=AssertionError("listed every history")
+        )
+        self.gi.histories.create_history = MagicMock(side_effect=self._create)
+
+    def _get(self, url, params=None, **kwargs):
+        assert url == "https://galaxy.example/api/histories"
+        filters = dict(zip(params["q"], params["qv"]))
+        assert "name" in filters, "history lookup without a name filter"
+        self.lookups.append(filters["name"])
+        time.sleep(self.lookup_delay)
+        response = MagicMock(status_code=200)
+        response.json.return_value = [
+            h for h in self.histories if h["name"] == filters["name"]
+        ]
+        return response
+
+    def _create(self, name):
+        history = {
+            "id": f"h{len(self.histories)}",
+            "name": name,
+            "update_time": "2026-10-08T00:00:00",
+        }
+        self.histories.append(history)
+        return history
+
+
+TODAY = "2026-10-08"
+SERVICE_HISTORY = f"BRC ANALYTICS JOBS - {TODAY}"
+
+
+@pytest.fixture(autouse=True)
+def _fresh_history_state(monkeypatch):
+    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
+    monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+    monkeypatch.setattr(galaxy_service, "_today", lambda: TODAY)
+
+
+def _service(galaxy, cache=None, credential=None, history_name=None):
     with patch("app.services.galaxy_service.GalaxyInstance"):
         svc = GalaxyService(
-            cache,
-            credential=GalaxyCredential(kind="user", secret="tok", user_sub="u1"),
+            cache or FakeCache(),
+            credential=credential or GalaxyCredential(kind="service", secret="k"),
+            history_name=history_name,
         )
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(return_value=[])
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h1"})
-    await svc._get_or_create_shared_history()
-    svc.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
+    svc.gi = galaxy.gi
+    return svc
+
+
+USER = GalaxyCredential(kind="user", secret="tok", user_sub="u1")
+
+
+@pytest.mark.asyncio
+async def test_user_jobs_use_per_user_history_name():
+    galaxy = FakeGalaxy()
+    await _service(galaxy, credential=USER)._get_or_create_shared_history()
+    galaxy.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
 
 
 @pytest.mark.asyncio
 async def test_service_jobs_keep_shared_history_name():
-    cache = MagicMock()
-    with patch("app.services.galaxy_service.GalaxyInstance"):
-        svc = GalaxyService(
-            cache, credential=GalaxyCredential(kind="service", secret="k")
-        )
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(return_value=[])
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h2"})
-    await svc._get_or_create_shared_history()
-    svc.gi.histories.create_history.assert_called_once_with(name="BRC ANALYTICS JOBS")
+    galaxy = FakeGalaxy()
+    await _service(galaxy)._get_or_create_shared_history()
+    galaxy.gi.histories.create_history.assert_called_once_with(name=SERVICE_HISTORY)
 
 
 @pytest.mark.asyncio
 async def test_a_named_service_history_replaces_the_shared_one():
-    cache = MagicMock()
-    with patch("app.services.galaxy_service.GalaxyInstance"):
-        svc = GalaxyService(
-            cache,
-            credential=GalaxyCredential(kind="service", secret="k"),
-            history_name="BRC Logan Partner - logan",
-        )
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(
-        return_value=[{"id": "shared", "name": "BRC ANALYTICS JOBS"}]
-    )
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h3"})
+    galaxy = FakeGalaxy([{"id": "shared", "name": SERVICE_HISTORY}])
+    svc = _service(galaxy, history_name="BRC Logan Partner - logan")
 
-    assert await svc._get_or_create_shared_history() == "h3"
-    svc.gi.histories.create_history.assert_called_once_with(
-        name="BRC Logan Partner - logan"
+    assert await svc._get_or_create_shared_history() == "h1"
+    galaxy.gi.histories.create_history.assert_called_once_with(
+        name=f"BRC Logan Partner - logan - {TODAY}"
     )
 
 
 @pytest.mark.asyncio
 async def test_a_history_name_does_not_move_a_users_jobs():
-    cache = MagicMock()
-    with patch("app.services.galaxy_service.GalaxyInstance"):
-        svc = GalaxyService(
-            cache,
-            credential=GalaxyCredential(kind="user", secret="tok", user_sub="u1"),
-            history_name="BRC Logan Partner - logan",
-        )
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(return_value=[])
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h4"})
+    galaxy = FakeGalaxy()
+    svc = _service(galaxy, credential=USER, history_name="BRC Logan Partner - logan")
     await svc._get_or_create_shared_history()
-    svc.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
+    galaxy.gi.histories.create_history.assert_called_once_with(name="BRC Logan Search")
+
+
+@pytest.mark.asyncio
+async def test_service_histories_carry_the_utc_date(monkeypatch):
+    galaxy = FakeGalaxy()
+    first = await _service(galaxy)._get_or_create_shared_history()
+    assert await _service(galaxy)._get_or_create_shared_history() == first
+
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+    second = await _service(galaxy)._get_or_create_shared_history()
+
+    assert second != first
+    assert [h["name"] for h in galaxy.histories] == [
+        SERVICE_HISTORY,
+        "BRC ANALYTICS JOBS - 2026-10-09",
+    ]
+
+
+def test_the_date_is_the_utc_date(monkeypatch):
+    from datetime import datetime, timezone
+
+    class Clock:
+        @staticmethod
+        def now(tz=None):
+            # Late evening in the Americas is already tomorrow in UTC.
+            assert tz is timezone.utc
+            return datetime(2026, 10, 9, 1, 30, tzinfo=timezone.utc)
+
+    monkeypatch.setattr(galaxy_service, "datetime", Clock)
+    assert real_today() == "2026-10-09"
+
+
+@pytest.mark.asyncio
+async def test_user_histories_do_not_rotate(monkeypatch):
+    galaxy = FakeGalaxy()
+    first = await _service(galaxy, credential=USER)._get_or_create_shared_history()
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+    monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+
+    svc = _service(galaxy, credential=USER)
+    assert await svc._get_or_create_shared_history() == first
+    assert [h["name"] for h in galaxy.histories] == ["BRC Logan Search"]
+
+
+@pytest.mark.asyncio
+async def test_lookup_filters_by_name_on_the_server():
+    # The 2026-10-08 timeout was an unfiltered list of every history on the
+    # account; FakeGalaxy fails get_histories and any lookup without q=name.
+    galaxy = FakeGalaxy()
+    await _service(galaxy)._get_or_create_shared_history()
+    params = galaxy.gi.make_get_request.call_args.kwargs["params"]
+    assert dict(zip(params["q"], params["qv"])) == {
+        "deleted": "False",
+        "name": SERVICE_HISTORY,
+    }
+    galaxy.gi.histories.get_histories.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_lookup_takes_the_most_recently_updated_match():
+    galaxy = FakeGalaxy(
+        [
+            {"id": "old", "name": SERVICE_HISTORY, "update_time": "2026-01-01"},
+            {"id": "new", "name": SERVICE_HISTORY, "update_time": "2026-10-01"},
+        ]
+    )
+    assert await _service(galaxy)._get_or_create_shared_history() == "new"
+    galaxy.gi.histories.create_history.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_a_second_submit_in_the_process_asks_galaxy_nothing():
+    galaxy = FakeGalaxy()
+    first = await _service(galaxy)._get_or_create_shared_history()
+    # A new service per request, as the router builds them, and a cold Redis.
+    assert await _service(galaxy)._get_or_create_shared_history() == first
+    assert len(galaxy.lookups) == 1
+
+
+@pytest.mark.asyncio
+async def test_a_warm_redis_answers_a_fresh_process(monkeypatch):
+    galaxy = FakeGalaxy()
+    cache = FakeCache()
+    first = await _service(galaxy, cache)._get_or_create_shared_history()
+
+    # A restart, or another worker: nothing in process, Redis still warm.
+    monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+    assert await _service(galaxy, cache)._get_or_create_shared_history() == first
+    assert len(galaxy.lookups) == 1
+
+
+@pytest.mark.asyncio
+async def test_users_do_not_share_a_cached_history():
+    galaxy = FakeGalaxy()
+    cache = FakeCache()
+    other = GalaxyCredential(kind="user", secret="tok2", user_sub="u2")
+    await _service(galaxy, cache, credential=USER)._get_or_create_shared_history()
+    await _service(galaxy, cache, credential=other)._get_or_create_shared_history()
+    assert len(galaxy.lookups) == 2
 
 
 @pytest.mark.asyncio
@@ -221,88 +374,52 @@ async def test_named_service_histories_do_not_share_a_lock(monkeypatch):
     monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", locks)
 
     for name in (None, "BRC Logan Partner - logan"):
-        with patch("app.services.galaxy_service.GalaxyInstance"):
-            svc = GalaxyService(
-                MagicMock(),
-                credential=GalaxyCredential(kind="service", secret="k"),
-                history_name=name,
-            )
-        svc.gi = MagicMock()
-        svc.gi.histories.get_histories = MagicMock(return_value=[])
-        svc.gi.histories.create_history = MagicMock(return_value={"id": "h"})
-        await svc._get_or_create_shared_history()
+        await _service(FakeGalaxy(), history_name=name)._get_or_create_shared_history()
 
     assert set(locks) == {
-        ("service", "BRC ANALYTICS JOBS"),
-        ("service", "BRC Logan Partner - logan"),
+        ("service", SERVICE_HISTORY),
+        ("service", f"BRC Logan Partner - logan - {TODAY}"),
     }
 
 
 @pytest.mark.asyncio
-async def test_concurrent_first_submissions_create_one_shared_history(monkeypatch):
-    # The router builds a GalaxyService per request, so the per-instance memo
-    # can't stop two first submissions each finding nothing and each creating
-    # the history.
-    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
-    histories = []
-
-    def get_histories():
-        snapshot = list(histories)
-        # Widen the gap between the read and the write it decides.
-        time.sleep(0.05)
-        return snapshot
-
-    def create_history(name):
-        history = {"id": f"h{len(histories)}", "name": name}
-        histories.append(history)
-        return history
-
-    services = []
-    for _ in range(2):
-        with patch("app.services.galaxy_service.GalaxyInstance"):
-            svc = GalaxyService(
-                MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
-            )
-        svc.gi = MagicMock()
-        svc.gi.histories.get_histories = MagicMock(side_effect=get_histories)
-        svc.gi.histories.create_history = MagicMock(side_effect=create_history)
-        services.append(svc)
+async def test_concurrent_cold_misses_make_one_lookup_and_one_history():
+    # Neither cache has the id until the first resolve finishes, so without
+    # the lock both would find nothing and both would create the history.
+    galaxy = FakeGalaxy(lookup_delay=0.05)
+    services = [_service(galaxy, FakeCache()) for _ in range(3)]
 
     ids = await asyncio.gather(*(s._get_or_create_shared_history() for s in services))
 
-    assert len(histories) == 1
-    assert ids[0] == ids[1]
+    assert len(set(ids)) == 1
+    assert len(galaxy.lookups) == 1
+    assert len(galaxy.histories) == 1
 
 
 @pytest.mark.asyncio
-async def test_one_account_stuck_on_galaxy_does_not_hold_up_another(monkeypatch):
-    # bioblend sets no request timeout, so a hung get_histories can hold its
-    # lock indefinitely; that has to stay one account's problem.
-    monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
+async def test_one_account_stuck_on_galaxy_does_not_hold_up_another():
+    # A hung lookup can hold its lock for the whole request timeout; that has
+    # to stay one account's problem.
     release = threading.Event()
-
-    def user_service(sub, get_histories):
-        with patch("app.services.galaxy_service.GalaxyInstance"):
-            svc = GalaxyService(
-                MagicMock(),
-                credential=GalaxyCredential(kind="user", secret="tok", user_sub=sub),
-            )
-        svc.gi = MagicMock()
-        svc.gi.histories.get_histories = MagicMock(side_effect=get_histories)
-        svc.gi.histories.create_history = MagicMock(return_value={"id": sub})
-        return svc
-
-    stuck = user_service("u1", lambda: release.wait(5) and [])
-    free = user_service("u2", lambda: [])
+    stuck_galaxy = FakeGalaxy()
+    stuck_galaxy.gi.make_get_request = MagicMock(
+        side_effect=lambda *a, **k: release.wait(5) and None
+    )
+    stuck = _service(stuck_galaxy, credential=USER)
+    free = _service(
+        FakeGalaxy(),
+        credential=GalaxyCredential(kind="user", secret="tok", user_sub="u2"),
+    )
 
     stuck_task = asyncio.create_task(stuck._get_or_create_shared_history())
     # Let the stuck lookup take its lock before the other one asks.
     await asyncio.sleep(0.05)
     try:
-        assert await asyncio.wait_for(free._get_or_create_shared_history(), 1) == "u2"
+        assert await asyncio.wait_for(free._get_or_create_shared_history(), 1) == "h0"
     finally:
         release.set()
-        await stuck_task
+        with pytest.raises(Exception):
+            await stuck_task
 
 
 def test_galaxy_login_url_derives_from_api_url(monkeypatch):
@@ -396,31 +513,103 @@ async def test_invalid_token_401_is_not_a_connect_prompt():
 
 
 @pytest.mark.asyncio
-async def test_user_history_failure_does_not_fall_back_to_a_timestamped_history():
-    svc = _user_service()
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(side_effect=RuntimeError("boom"))
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h9"})
+@pytest.mark.parametrize("credential", [USER, None])
+async def test_a_history_failure_raises_and_creates_nothing(credential):
+    # The service account used to fall back to a "<name> - <timestamp>"
+    # history, which on 2026-10-08 timed out too and would only have added
+    # another history to the list whose length caused the timeout.
+    galaxy = FakeGalaxy()
+    galaxy.gi.make_get_request = MagicMock(side_effect=RuntimeError("timed out"))
+    svc = _service(galaxy, credential=credential)
 
     with pytest.raises(RuntimeError):
         await svc._get_or_create_shared_history()
-    svc.gi.histories.create_history.assert_not_called()
+    galaxy.gi.histories.create_history.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_service_history_failure_still_falls_back():
-    cache = MagicMock()
-    with patch("app.services.galaxy_service.GalaxyInstance"):
-        svc = GalaxyService(
-            cache, credential=GalaxyCredential(kind="service", secret="k")
-        )
-    svc.gi = MagicMock()
-    svc.gi.histories.get_histories = MagicMock(side_effect=RuntimeError("boom"))
-    svc.gi.histories.create_history = MagicMock(return_value={"id": "h9"})
+async def test_a_failed_lookup_status_raises_a_bioblend_error():
+    # A bioblend ConnectionError, so an unlinked user's 401 still reaches the
+    # connect-prompt mapping.
+    from bioblend import ConnectionError as BioblendConnectionError
 
-    assert await svc._get_or_create_shared_history() == "h9"
-    name = svc.gi.histories.create_history.call_args.kwargs["name"]
-    assert name.startswith("BRC ANALYTICS JOBS - ")
+    galaxy = FakeGalaxy()
+    galaxy.gi.make_get_request = MagicMock(
+        return_value=MagicMock(status_code=401, text=UNLINKED_BODY)
+    )
+    svc = _service(galaxy, credential=USER)
+
+    with pytest.raises(GalaxyAccountNotLinkedError):
+        await svc.submit_kmindex_query(_submission())
+    with pytest.raises(BioblendConnectionError):
+        await svc._get_or_create_shared_history()
+    galaxy.gi.histories.create_history.assert_not_called()
+
+
+def _history_gone():
+    from bioblend import ConnectionError as BioblendConnectionError
+
+    return BioblendConnectionError(
+        "404",
+        body=json.dumps({"err_msg": "History not found"}),
+        status_code=404,
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_gone_history_is_re_resolved_and_the_upload_retried():
+    galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
+    cache = FakeCache()
+    svc = _service(galaxy, cache)
+    assert await svc._get_or_create_shared_history() == "stale"
+    # Someone deleted it by hand; the lookup only returns live histories.
+    galaxy.histories.clear()
+
+    def paste_content(history_id, **kwargs):
+        if history_id == "stale":
+            raise _history_gone()
+        return {"outputs": [{"id": "d1"}]}
+
+    galaxy.gi.tools.paste_content = MagicMock(side_effect=paste_content)
+    svc._run_kmindex_query = AsyncMock(return_value="job1")
+
+    response = await svc.submit_kmindex_query(_submission())
+
+    assert response.job_id == "job1"
+    fresh = svc._run_kmindex_query.await_args.args[2]
+    assert fresh != "stale"
+    assert list(galaxy_service._HISTORY_IDS.values()) == [fresh]
+    assert list(cache.store.values()) == [fresh]
+
+
+@pytest.mark.asyncio
+async def test_a_gone_history_at_run_tool_clears_the_cache_without_a_retry():
+    galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
+    cache = FakeCache()
+    svc = _service(galaxy, cache)
+    svc._upload_fasta = AsyncMock(return_value="d1")
+    galaxy.gi.tools.run_tool = MagicMock(side_effect=_history_gone())
+
+    with pytest.raises(Exception):
+        await svc.submit_kmindex_query(_submission())
+
+    assert galaxy.gi.tools.run_tool.call_count == 1
+    assert galaxy_service._HISTORY_IDS == {}
+    assert cache.store == {}
+
+
+@pytest.mark.asyncio
+async def test_an_unrelated_upload_failure_keeps_the_cached_history():
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
+    svc = _service(galaxy)
+    galaxy.gi.tools.paste_content = MagicMock(side_effect=RuntimeError("timed out"))
+
+    with pytest.raises(GalaxySubmitNotStarted):
+        await svc.submit_kmindex_query(_submission())
+    assert galaxy.gi.tools.paste_content.call_count == 1
+    assert list(galaxy_service._HISTORY_IDS.values()) == ["h"]
 
 
 @pytest.mark.asyncio

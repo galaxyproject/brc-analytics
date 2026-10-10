@@ -10,7 +10,7 @@ import ky, { HTTPError, TimeoutError } from "ky";
 jest.mock("ky", () => {
   class StubHTTPError extends Error {
     response: { json: () => Promise<unknown>; status: number };
-    constructor(status: number, detail: string) {
+    constructor(status: number, detail: unknown) {
       super(`HTTP ${status}`);
       this.response = {
         json: (): Promise<unknown> => Promise.resolve({ detail }),
@@ -36,7 +36,7 @@ const mockKy = ky as unknown as {
 // a test actually cares about.
 const MockHTTPError = HTTPError as unknown as new (
   status: number,
-  detail: string
+  detail: unknown
 ) => Error;
 const MockTimeoutError = TimeoutError as unknown as new () => Error;
 
@@ -978,5 +978,101 @@ describe("a merge that outlives the request", () => {
     expect(result.current.error).toBe("Failed to get kmindex results: boom");
     expect(result.current.isLoadingResults).toBe(false);
     expect(resultsCalls()).toBe(1);
+  });
+});
+
+describe("submit errors", () => {
+  const SUBMISSION = {
+    indexes: ["GENOMIC_BCT"],
+    sequence: ">q\nACGT",
+    threshold: 0.5,
+    zvalue: 6,
+  };
+
+  it("resolves to the new job id", async () => {
+    const { result } = await renderSettled();
+
+    let jobId: string | null = null;
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBe(JOB_ID);
+  });
+
+  it("shows the status, not an upstream HTML error page, as the message", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(
+            502,
+            "<!DOCTYPE html><html><head><title>502 Bad Gateway</title></head><body>nginx</body></html>"
+          )
+        ),
+    });
+    const { result } = await renderSettled();
+
+    let jobId: string | null = "unset";
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBeNull();
+    expect(result.current.error).toBe("HTTP 502");
+  });
+
+  it("keeps a plain-text detail", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(400, "Query sequence cannot be empty")
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("Query sequence cannot be empty");
+  });
+
+  it("reads the messages out of a FastAPI validation list", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(422, [
+            {
+              input: ">a\nACGT\n>b\nACGT",
+              loc: ["body", "sequence"],
+              msg: "Value error, Submit one sequence per query; multi-record FASTA is not supported",
+              type: "value_error",
+            },
+          ])
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe(
+      "Value error, Submit one sequence per query; multi-record FASTA is not supported"
+    );
+  });
+
+  it("falls back to the status for a detail that is neither text nor messages", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(new MockHTTPError(422, [{ loc: ["body"] }])),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("HTTP 422");
   });
 });
