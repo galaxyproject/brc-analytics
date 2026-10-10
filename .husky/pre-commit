@@ -20,6 +20,14 @@ npm run lint ||
 echo '🐍 Formatting Python files with Ruff...'
 npm run format:python
 
+# Lint Python
+echo '🐍 Linting Python files...'
+npm run lint:python ||
+(
+	echo 'Python linting failed';
+	false;
+)
+
 # Check TypeScript
 npm run typecheck ||
 (
