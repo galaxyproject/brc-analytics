@@ -59,7 +59,7 @@ def _fetch_failure_sample(
         f"SELECT * FROM {relation_name} ORDER BY ALL LIMIT {sample_size}"
     )
     columns = relation.columns
-    return [dict(zip(columns, row)) for row in relation.fetchall()]
+    return [dict(zip(columns, row, strict=True)) for row in relation.fetchall()]
 
 
 def _test_status_is_success(status: str) -> bool:
