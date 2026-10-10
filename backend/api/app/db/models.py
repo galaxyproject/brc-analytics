@@ -376,4 +376,5 @@ class KmindexSubmission(Base):
     __table_args__ = (
         UniqueConstraint("galaxy_job_id", name="uq_kmindex_submissions_galaxy_job_id"),
         Index("ix_kmindex_submissions_created_at", "created_at"),
+        Index("ix_kmindex_submissions_user_id_created_at", "user_id", "created_at"),
     )

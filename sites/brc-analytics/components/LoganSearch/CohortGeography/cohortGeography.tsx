@@ -1,8 +1,16 @@
 "use client";
 
+import {
+  downloadMapImage,
+  MAP_IMAGE_OPTIONS,
+  type MapImageFormat,
+  type MapImageView,
+} from "@brc/components/LoganSearch/CohortGeography/mapImage";
+import { type LoganFilterControls } from "@brc/components/LoganSearch/LoganSearchFilters/types";
 import { CohortMapContainer } from "@brc/components/LoganSearch/loganSearch.styles";
 import { formatShare } from "@brc/components/LoganSearch/utils";
-import { Box, Typography } from "@mui/material";
+import { Download } from "@mui/icons-material";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import {
   type KmindexGeography,
   type KmindexGeographyCountry,
@@ -12,12 +20,17 @@ import { type JSX, useEffect, useMemo, useRef, useState } from "react";
 import type { TopLevelSpec } from "vega-lite";
 
 interface CohortGeographyProps {
+  // Present only with the logan-filters flag on: clicking a country then
+  // toggles it as a filter.
+  filtering?: LoganFilterControls;
   // Nullable on purpose. Absent means the backend could not answer -- an
   // unconfigured mirror, or one that predates the columns the geography query
   // needs and closed that capability on its own. That is a statement about
   // our deployment, not about the cohort, so it renders as nothing rather
   // than as "no geography recorded".
   geography?: KmindexGeography | null;
+  // Names the downloaded image; the map still draws without it.
+  jobId?: string | null;
 }
 
 // Committed under sites/brc-analytics/public, so it is same-origin and there
@@ -41,12 +54,18 @@ const BORDER_STROKE = "#ffffff";
 // the point that the omissions are real places.
 const UNPLACEABLE_NAMED = 3;
 
+const DOWNLOAD_MENU_ID = "logan-map-download-menu";
+
 // Sampling points sit on top of the choropleth, so they need to read as a
 // different thing rather than as a darker country. Plasma against blues does
 // that, and both ramps stay legible next to each other.
 const POINT_SCHEME = "plasma" as const;
 const POINT_STROKE = "#37474f";
 const POINT_OPACITY = 0.72;
+
+// Outline on a country picked as a filter. Dark rather than coloured so it
+// reads on every step of the blue ramp.
+const SELECTED_STROKE = "#263238";
 
 // Area in px^2, not radius. The distribution is brutally skewed -- a single
 // institutional coordinate can carry tens of thousands of runs against one
@@ -144,10 +163,16 @@ function describeUnplaceable(geography: KmindexGeography): string | null {
       : `${unplaceable.length.toLocaleString()} places`;
   return (
     `${runs.toLocaleString()} of those runs come from ${places} the map ` +
-    `cannot colour -- the world outline has no shape of its own for them at ` +
+    `cannot colour: the world outline has no shape of its own for them at ` +
     `this scale, or the recorded value is not a country. They are counted ` +
     `here but not on the map: ${named}${tail}.`
   );
+}
+
+// A country as the spec sees it while filtering is on: the payload plus
+// whether it is one of the picked ones.
+interface SelectableCountry extends KmindexGeographyCountry {
+  selected: boolean;
 }
 
 // A point as the spec sees it: the payload's numbers plus the one string the
@@ -232,7 +257,7 @@ function describeLocations(geography: KmindexGeography): string | null {
   if (truncated) {
     const drawn = locations.length;
     parts.push(
-      `Only the ${drawn.toLocaleString()} busiest are drawn -- ` +
+      `Only the ${drawn.toLocaleString()} busiest are drawn, so ` +
         `${truncated.toLocaleString()} runs at the other ` +
         `${(places - drawn).toLocaleString()} are counted here and shown ` +
         `nowhere on the map.`
@@ -267,14 +292,32 @@ function describeLocations(geography: KmindexGeography): string | null {
  * colour by mean score -- computed over the whole match set rather than one
  * mark per result row. It is drawn last so a station is never hidden under
  * the country it sits in.
+ *
+ * With `selectable` the matched layer also carries each country's code and
+ * whether it is picked, outlines the picked ones, and shows a pointer. Without
+ * it the spec is exactly what it was before filtering existed.
  * @param countries - Drawable countries with their run counts.
  * @param points - Aggregated sampling positions, already labelled for hover.
+ * @param selectable - Whether countries are filter controls.
  * @returns A Vega-Lite spec.
  */
-function buildSpec(
-  countries: KmindexGeographyCountry[],
-  points: PlottedLocation[]
+export function buildSpec(
+  countries: KmindexGeographyCountry[] | SelectableCountry[],
+  points: PlottedLocation[],
+  selectable = false
 ): TopLevelSpec {
+  const selection = selectable
+    ? {
+        stroke: {
+          condition: { test: "datum.selected", value: SELECTED_STROKE },
+          value: BORDER_STROKE,
+        },
+        strokeWidth: {
+          condition: { test: "datum.selected", value: 1.6 },
+          value: 0.4,
+        },
+      }
+    : {};
   return {
     $schema: "https://vega.github.io/schema/vega-lite/v6.json",
     autosize: { contains: "padding", resize: true, type: "fit-x" },
@@ -334,6 +377,7 @@ function buildSpec(
       },
       {
         encoding: {
+          ...selection,
           color: {
             field: "count",
             legend: { format: ",", title: "Matched runs" },
@@ -350,12 +394,19 @@ function buildSpec(
             },
           ],
         },
-        mark: { stroke: BORDER_STROKE, strokeWidth: 0.4, type: "geoshape" },
+        mark: {
+          stroke: BORDER_STROKE,
+          strokeWidth: 0.4,
+          type: "geoshape",
+          ...(selectable ? { cursor: "pointer" as const } : {}),
+        },
         transform: [
           {
             from: {
               data: { values: countries },
-              fields: ["count", "value"],
+              fields: selectable
+                ? ["count", "value", "iso_a3", "selected"]
+                : ["count", "value"],
               key: "iso_n3",
             },
             lookup: "id",
@@ -440,6 +491,86 @@ function buildSpec(
 }
 
 /**
+ * The button and menu that save the map as an image, like kmviz's figure
+ * export.
+ * @param props - Component props.
+ * @param props.jobId - Job the map belongs to, for the filename.
+ * @param props.view - The embedded view, or null until it has drawn.
+ * @returns The download control.
+ */
+function MapDownload({
+  jobId,
+  view,
+}: {
+  jobId: string | null;
+  view: MapImageView | null;
+}): JSX.Element {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [failed, setFailed] = useState(false);
+  // One export at a time: each swaps the live view's background and restores
+  // what it found, so a second started mid-render would read the first's
+  // white and leave the map painted with it.
+  const [saving, setSaving] = useState(false);
+
+  const save = async (format: MapImageFormat): Promise<void> => {
+    setAnchor(null);
+    if (!view) return;
+    setSaving(true);
+    try {
+      setFailed(false);
+      await downloadMapImage(view, format, jobId);
+    } catch (error) {
+      console.error("Failed to export the cohort map:", error);
+      setFailed(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        gap: 1,
+        justifyContent: "flex-end",
+      }}
+    >
+      {failed && (
+        <Typography color="textSecondary" variant="caption">
+          The image could not be saved.
+        </Typography>
+      )}
+      {/* Rendered before the view exists, disabled, so the map does not jump
+          down by a button's height when the drawing lands. */}
+      <Button
+        aria-controls={anchor ? DOWNLOAD_MENU_ID : undefined}
+        aria-expanded={Boolean(anchor)}
+        aria-haspopup="menu"
+        disabled={!view || saving}
+        onClick={(event): void => setAnchor(event.currentTarget)}
+        size="small"
+        startIcon={<Download />}
+      >
+        Download map
+      </Button>
+      <Menu
+        anchorEl={anchor}
+        id={DOWNLOAD_MENU_ID}
+        onClose={(): void => setAnchor(null)}
+        open={Boolean(anchor)}
+      >
+        {MAP_IMAGE_OPTIONS.map(({ format, label }) => (
+          <MenuItem dense key={format} onClick={(): void => void save(format)}>
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  );
+}
+
+/**
  * The choropleth itself.
  *
  * Follows the embedding pattern in packages/shared/components/mdx/VegaEmbed:
@@ -458,24 +589,44 @@ function buildSpec(
  * need its first one for this.
  * @param props - Component props.
  * @param props.countries - Drawable countries with their run counts.
+ * @param props.jobId - Job the map belongs to, for the download filename.
+ * @param props.onCountryClick - Toggles a country as a filter; absent, the
+ * map is not a control.
  * @param props.points - Aggregated sampling positions, labelled for hover.
  * @returns The map, or a note in place of it if the render failed.
  */
 function GeographyMap({
   countries,
+  jobId,
+  onCountryClick,
   points,
 }: {
-  countries: KmindexGeographyCountry[];
+  countries: KmindexGeographyCountry[] | SelectableCountry[];
+  jobId: string | null;
+  onCountryClick?: (iso: string) => void;
   points: PlottedLocation[];
 }): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Held in state rather than a ref so the download control re-renders
+  // enabled once the drawing exists, and disabled again when it is torn down.
+  const [view, setView] = useState<MapImageView | null>(null);
+  // Read through a ref so a new handler identity does not re-embed the view.
+  const onCountryClickRef = useRef(onCountryClick);
+  useEffect(() => {
+    onCountryClickRef.current = onCountryClick;
+  }, [onCountryClick]);
+  const selectable = Boolean(onCountryClick);
   // Which attempt failed, rather than whether one did. A boolean cannot clear
   // itself here: the message below replaces the container, so the next run
   // finds a null ref and returns before reaching the reset, and the map stays
   // broken for the life of the mount. Keyed on the data it failed to draw, a
   // new cohort is simply not the attempt that failed.
   const [failedFor, setFailedFor] = useState<
-    readonly [KmindexGeographyCountry[], PlottedLocation[]] | null
+    | readonly [
+        KmindexGeographyCountry[] | SelectableCountry[],
+        PlottedLocation[],
+      ]
+    | null
   >(null);
   const failed =
     failedFor !== null && failedFor[0] === countries && failedFor[1] === points;
@@ -491,7 +642,7 @@ function GeographyMap({
         if (cancelled || !containerRef.current) return;
         const embedded = await embed(
           containerRef.current,
-          buildSpec(countries, points),
+          buildSpec(countries, points, selectable),
           {
             actions: false,
             // vega-embed takes one renderer for the whole view, and the point
@@ -509,6 +660,19 @@ function GeographyMap({
           return;
         }
         result = embedded;
+        setView(embedded.view ?? null);
+        if (selectable) {
+          // Only matched countries carry a code; the flat base layer and the
+          // points do not, so a click on those does nothing.
+          embedded.view.addEventListener(
+            "click",
+            (_event: unknown, item?: { datum?: unknown } | null): void => {
+              const iso = (item?.datum as { iso_a3?: unknown } | undefined)
+                ?.iso_a3;
+              if (typeof iso === "string") onCountryClickRef.current?.(iso);
+            }
+          );
+        }
         setFailedFor(null);
       } catch (error) {
         // A map that fails to draw must say so. A blank box in the space
@@ -523,9 +687,11 @@ function GeographyMap({
 
     return (): void => {
       cancelled = true;
+      // A finalized view cannot render, so exporting it would only throw.
+      setView(null);
       if (result) result.finalize();
     };
-  }, [countries, points]);
+  }, [countries, points, selectable]);
 
   if (failed) {
     return (
@@ -534,19 +700,51 @@ function GeographyMap({
       </Typography>
     );
   }
-  return <CohortMapContainer ref={containerRef} />;
+  return (
+    <>
+      <MapDownload jobId={jobId} view={view} />
+      <CohortMapContainer ref={containerRef} />
+    </>
+  );
 }
 
 /**
  * Where a cohort's runs were sampled from.
  * @param props - Component props.
+ * @param props.filtering - Filter controls, when filtering is on.
  * @param props.geography - Geography rollup over the whole match set.
+ * @param props.jobId - Job the cohort belongs to, for the image filename.
  * @returns The geography block.
  */
 export const CohortGeography = ({
+  filtering,
   geography,
+  jobId = null,
 }: CohortGeographyProps): JSX.Element | null => {
   const locations = geography?.locations ?? null;
+  const selectable = Boolean(filtering && !filtering.disabledReason);
+  const picked = filtering?.filters.country_iso;
+  const payloadCountries = geography?.countries;
+  // Memoized for the same reason as the points: it is an effect dependency of
+  // the map. Unselectable, it is the payload's own array, as before.
+  const countries = useMemo(
+    () =>
+      selectable
+        ? (payloadCountries ?? []).map((country) => ({
+            ...country,
+            selected: (picked ?? []).includes(country.iso_a3),
+          }))
+        : (payloadCountries ?? []),
+    [payloadCountries, picked, selectable]
+  );
+  const onToggle = filtering?.onToggle;
+  const onCountryClick = useMemo(
+    () =>
+      selectable && onToggle
+        ? (iso: string): void => onToggle("country_iso", iso)
+        : undefined,
+    [onToggle, selectable]
+  );
   const precision = geography?.locations_precision ?? null;
   // Memoized because it is an effect dependency: a fresh array on every
   // render would tear down and re-embed the whole view each time anything
@@ -566,7 +764,6 @@ export const CohortGeography = ({
   // empty state, it is an assertion that the query matched nowhere.
   if (!geography) return null;
 
-  const countries = geography.countries ?? [];
   const unplaceable = describeUnplaceable(geography);
   const positions = describeLocations(geography);
   return (
@@ -584,7 +781,12 @@ export const CohortGeography = ({
         </Typography>
       )}
       {countries.length > 0 || points.length > 0 ? (
-        <GeographyMap countries={countries} points={points} />
+        <GeographyMap
+          countries={countries}
+          jobId={jobId}
+          onCountryClick={onCountryClick}
+          points={points}
+        />
       ) : (
         // Nothing to draw at all: no country the outline can place, and no
         // sampling position either. One point is enough to earn a map, so
@@ -623,7 +825,7 @@ export const CohortGeography = ({
           Each point is every matched run recorded at that coordinate, not one
           run, so hovering names a place rather than an accession. A handful of
           the busiest are institutional addresses typed into the sample
-          attribute rather than sampling sites -- a point carrying tens of
+          attribute rather than sampling sites; a point carrying tens of
           thousands of runs across many organisms is usually one of those.
         </Typography>
       )}

@@ -6,9 +6,10 @@ import json
 import logging
 import random
 import tempfile
-import time
 import zipfile
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple
 
 import requests
@@ -33,12 +34,16 @@ from app.models.galaxy import (
     KmindexQuerySubmission,
     KmindexResults,
     KmindexSort,
+    KmindexSummary,
     SraRunMetadata,
 )
+from app.services import kmindex_filters
+from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.logan_stats import correct_score
 from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
+    CAPABILITY_BIOSAMPLE,
     CAPABILITY_COHORT,
     CAPABILITY_EXPORT,
     CAPABILITY_GEOGRAPHY,
@@ -47,6 +52,7 @@ from app.services.sra_mirror import (
     EXPORT_UNAVAILABLE,
     SRAMirrorService,
     export_file_path,
+    export_is_current,
 )
 
 logger = logging.getLogger(__name__)
@@ -76,6 +82,14 @@ class GalaxyJobNotFound(Exception):
     """Galaxy has no job under this id (or could not decode it as one)."""
 
 
+class KmindexFiltersUnavailable(Exception):
+    """The job has no current export, so there is nothing to filter over.
+
+    Never answered by filtering the capped listing instead: that is the
+    wrong-answer trap the whole-match-set cohort exists to avoid.
+    """
+
+
 class GalaxySubmitNotStarted(Exception):
     """A submission failed before the tool was asked to run.
 
@@ -83,6 +97,27 @@ class GalaxySubmitNotStarted(Exception):
     that fails from the run_tool call on is ambiguous -- Galaxy may have queued
     the job and lost the reply -- and is raised as a plain Exception instead.
     """
+
+
+def _is_missing_history_error(e: BaseException) -> bool:
+    """Whether Galaxy refused a call because the history it named is gone.
+
+    A cached history id can outlive its history (deleted or purged by hand, or a
+    re-pointed account), and Galaxy says so with a 400/403/404 that names the
+    history. Our own wrappers re-raise with the bioblend error as the cause, so
+    the whole chain is checked.
+    """
+    seen = set()
+    while e is not None and id(e) not in seen:
+        seen.add(id(e))
+        if isinstance(e, BioblendConnectionError) and getattr(
+            e, "status_code", None
+        ) in (400, 403, 404):
+            detail = f"{getattr(e, 'body', '') or ''} {e}".lower()
+            if "history" in detail:
+                return True
+        e = e.__cause__ or e.__context__
+    return False
 
 
 class KmindexUnknownIndex(GalaxySubmitNotStarted):
@@ -249,9 +284,7 @@ KMINDEX_INDEX_LAST_GOOD_PREFIX = "galaxy:kmindex_indexes_last_good:v1"
 # A read that just failed is a read that is about to fail again: the burst which
 # trips the rate limit arrives while it is tripped. So a failure is remembered
 # briefly, and the misses behind it are answered without starting another
-# refresh -- which, on the service account, would also leave a timestamped
-# stray history behind each time, since that is what
-# _get_or_create_shared_history does when the lookup it needs first fails.
+# refresh.
 KMINDEX_INDEX_COOLDOWN_PREFIX = "galaxy:kmindex_indexes_cooldown:v1"
 KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 
@@ -287,13 +320,35 @@ _AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
 KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 
 # Finding or creating the history jobs land in is a read-then-write against
-# Galaxy, and the router builds a GalaxyService per request, so the per-instance
-# memo cannot stop two first submissions each finding nothing and each creating
+# Galaxy, and the id cache below is empty until the first one finishes, so
+# without it two first submissions could each find nothing and each create
 # one. The lock is per Galaxy account -- the user's sub, or None for the service
 # account -- because that's the scope of the race, and bioblend sets no request
 # timeout, so one shared lock would let a single hung get_histories hold up every
 # account's submissions.
 _HISTORY_LOCKS = defaultdict(asyncio.Lock)
+
+# The resolved history id, so a submit doesn't ask Galaxy for it at all. Every
+# kmindex submit needs one and the router builds a service per request, so a
+# per-instance memo never hit: each submit listed every history on the service
+# account, a list that only grows, and on 2026-10-08 that read timed out while
+# Galaxy was slow and took submits down with it. Process-wide first, Redis
+# behind it so a restart or another worker doesn't go back to Galaxy either.
+# Keyed by Galaxy URL, account and history name (see _history_cache_key).
+_HISTORY_IDS: Dict[str, str] = {}
+HISTORY_ID_CACHE_PREFIX = "galaxy:history_id:v1"
+# A user's history is one long-lived history in their own account; a gone one
+# is caught on use (_is_missing_history_error), so the TTL only bounds staleness.
+HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
+# A service history is only written to on its own UTC day, so a day's grace past
+# that is plenty.
+SERVICE_HISTORY_ID_TTL = 2 * CacheTTL.ONE_DAY
+
+
+def _today() -> str:
+    """Today's UTC date, which names the day's service history."""
+    return datetime.now(timezone.utc).date().isoformat()
+
 
 # One Galaxy read per cold cache, process-wide, rather than one per miss. The
 # router builds a service per request, so the in-flight refresh has to live out
@@ -517,8 +572,9 @@ class GalaxyService:
     ):
         """
         @param history_name: where service-account jobs land, in place of the
-            shared "BRC ANALYTICS JOBS". Ignored for a user credential, whose
-            jobs always go to their own account's history.
+            shared "BRC ANALYTICS JOBS"; either way the UTC date is appended.
+            Ignored for a user credential, whose jobs always go to their own
+            account's history.
         """
         self.cache = cache
         self.history_name = history_name
@@ -556,8 +612,9 @@ class GalaxyService:
                 self.settings.GALAXY_API_URL,
             )
 
-        # Memoized per instance, so a history id never leaks across requests/users.
-        self._shared_history_id = None
+        # The cache key the last resolved history id lives under, so a submit
+        # that finds the history gone can drop exactly that entry.
+        self._history_key: Optional[str] = None
 
     def is_available(self) -> bool:
         """Check if Galaxy service is available."""
@@ -757,13 +814,33 @@ class GalaxyService:
         tool_requested = False
         try:
             history_id = await self._get_or_create_shared_history()
-            upload_dataset_id = await self._upload_fasta(
-                submission.sequence, submission.filename, history_id
-            )
+            try:
+                upload_dataset_id = await self._upload_fasta(
+                    submission.sequence, submission.filename, history_id
+                )
+            except Exception as e:
+                if not _is_missing_history_error(e):
+                    raise
+                # Nothing has run yet, so one more go against a freshly
+                # resolved history is safe.
+                logger.warning(
+                    "Cached history %s is gone; resolving it again", history_id
+                )
+                await self._forget_shared_history()
+                history_id = await self._get_or_create_shared_history()
+                upload_dataset_id = await self._upload_fasta(
+                    submission.sequence, submission.filename, history_id
+                )
             tool_requested = True
-            job_id = await self._run_kmindex_query(
-                upload_dataset_id, submission, history_id
-            )
+            try:
+                job_id = await self._run_kmindex_query(
+                    upload_dataset_id, submission, history_id
+                )
+            except Exception as e:
+                # Not retried: the job may exist. Just stop handing out the id.
+                if _is_missing_history_error(e):
+                    await self._forget_shared_history()
+                raise
 
             return GalaxyJobResponse(
                 job_id=job_id,
@@ -865,6 +942,39 @@ class GalaxyService:
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
+        aggregate = await self._load_aggregate(job_id, lane)
+
+        ordering, sort, order = await self._ordering_for(
+            aggregate, job_id, sort, order or _default_order(sort)
+        )
+        # Single exit, so a cache hit can't skip annotation -- an earlier
+        # version returned straight from the pre-lock hit and silently served
+        # every warm request unannotated.
+        return await self._annotate_with_sra(
+            self._page_kmindex(
+                aggregate,
+                job_id,
+                limit,
+                offset,
+                ordering=ordering,
+                sort=sort,
+                order=order,
+            )
+        )
+
+    async def _load_aggregate(
+        self, job_id: str, lane: AggregationLane = "native"
+    ) -> dict:
+        """The job's cached aggregate, merging its shards first on a miss.
+
+        Shared by the listing and the filtered reads, so a filtered link opened
+        after the aggregate expired re-aggregates too -- which rewrites the
+        export the filter runs over.
+
+        @param job_id: the kmindex job.
+        @param lane: whose aggregation lock a cold merge takes.
+        @returns: the aggregate.
+        """
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
 
@@ -915,23 +1025,131 @@ class GalaxyService:
                             aggregate = await self._aggregate_shards(job_id)
                     finally:
                         await self.cache.delete(marker_key)
+        return aggregate
 
-        ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort)
-        )
-        # Single exit, so a cache hit can't skip annotation -- an earlier
-        # version returned straight from the pre-lock hit and silently served
-        # every warm request unannotated.
-        return await self._annotate_with_sra(
-            self._page_kmindex(
-                aggregate,
-                job_id,
-                limit,
-                offset,
-                ordering=ordering,
-                sort=sort,
-                order=order,
+    async def _filterable_export(self, aggregate: dict, job_id: str) -> Path:
+        """The export a filtered read runs over, or why there is none.
+
+        @param aggregate: the job's aggregate.
+        @param job_id: the kmindex job.
+        @returns: the path of a current export.
+        @raises KmindexFiltersUnavailable: with a reason the UI can show.
+        """
+        export = self._export_state(aggregate, job_id)
+        if export["status"] == EXPORT_TOO_LARGE:
+            raise KmindexFiltersUnavailable(
+                "Filtering needs the full match set on disk, and this search "
+                "matched too many runs for one to be prepared."
             )
+        path = export_file_path(self.settings.KMINDEX_EXPORT_DIR, job_id)
+        current = False
+        if export["status"] == EXPORT_AVAILABLE and path is not None:
+            try:
+                current = await asyncio.to_thread(export_is_current, path)
+            except Exception as e:
+                logger.warning(f"kmindex job {job_id}: unreadable export: {e}")
+        if not current:
+            raise KmindexFiltersUnavailable(
+                "Filtering needs the full match set on disk, and it is not "
+                "available for this search right now."
+            )
+        return path
+
+    async def get_filtered_kmindex_results(
+        self,
+        job_id: str,
+        filters: KmindexFilters,
+        limit: int = 100,
+        offset: int = 0,
+        sort: KmindexSort = "score",
+        order: Optional[KmindexOrder] = None,
+    ) -> KmindexResults:
+        """A page of the filtered match set, served from the export parquet.
+
+        Filters every matched row, not the top 50,000, then caps what can be
+        paged at KMINDEX_MAX_HITS the way the listing is, keeping the true
+        count in filtered_matches; the filtered export stays uncapped. Needs
+        neither Redis beyond the aggregate nor the mirror: rows in the file
+        already carry their metadata. BioSample is the exception, read from the mirror
+        when it can answer, since the export has no such column.
+
+        @param job_id: the kmindex job.
+        @param filters: a non-empty filter.
+        @param limit: page size.
+        @param offset: rows to skip.
+        @param sort: column to order by.
+        @param order: direction, defaulting as the listing does.
+        @returns: the page, with filtered=True.
+        @raises KmindexFiltersUnavailable: when there is no current export.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        aggregate = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, job_id)
+        order = order or _default_order(sort)
+        page = await asyncio.to_thread(
+            kmindex_filters.subset_page,
+            path,
+            filters,
+            limit,
+            offset,
+            sort,
+            order,
+            KMINDEX_MAX_HITS,
+        )
+        matched = page["matched"]
+        export = self._export_state(aggregate, job_id)
+        hits = [KmindexHit(**h) for h in page["hits"]]
+        await self._fill_biosample(hits)
+        return KmindexResults(
+            job_id=job_id,
+            query_name=aggregate.get("query_name"),
+            total_hits=min(matched, KMINDEX_MAX_HITS),
+            total_matches=aggregate["total_matches"],
+            filtered_matches=matched,
+            shards_failed=aggregate.get("shards_failed", 0),
+            shards_searched=aggregate.get("shards_searched", 0),
+            shards_with_hits=aggregate.get("shards_with_hits", 0),
+            truncated=matched > KMINDEX_MAX_HITS,
+            # The cap here is one rank cut over the filtered rows, not the
+            # merge's cut across indexes, so per-index accounting has nothing
+            # to say about it.
+            per_index=[],
+            cohort=aggregate.get("cohort"),
+            geography=aggregate.get("geography"),
+            export_bytes=export["bytes"],
+            export_rows=export["rows"],
+            export_status=export["status"],
+            limit=limit,
+            offset=offset,
+            sort=sort,
+            order=order,
+            sra_mirror_available=True,
+            sra_annotated=sum(1 for hit in hits if hit.sra is not None),
+            filtered=True,
+            hits=hits,
+        )
+
+    async def get_filtered_kmindex_summary(
+        self, job_id: str, filters: KmindexFilters
+    ) -> KmindexSummary:
+        """The filtered cohort and geography, shaped as the unfiltered ones.
+
+        @param job_id: the kmindex job.
+        @param filters: the filter; an empty one summarizes the whole file.
+        @returns: the summary.
+        @raises KmindexFiltersUnavailable: when there is no current export.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        aggregate = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, job_id)
+        summary = await asyncio.to_thread(kmindex_filters.subset_summary, path, filters)
+        return KmindexSummary(
+            cohort=summary["cohort"],
+            geography=summary["geography"],
+            matched=summary["matched"],
+            total_matches=aggregate["total_matches"],
         )
 
     async def get_cached_kmindex_results(
@@ -1094,6 +1312,32 @@ class GalaxyService:
             and self.sra_mirror.is_available()
             and self.sra_mirror.has_capability(capability)
         )
+
+    async def _fill_biosample(self, hits: List[KmindexHit]) -> None:
+        """
+        Carry BioSample onto a filtered page from the mirror.
+
+        The export predates the biosample column, so a page read from it has
+        none, and the BioSample column would go blank the moment a filter is
+        applied. Best effort, like annotation: the page is correct without it.
+        """
+        wanted = [hit.accession for hit in hits if hit.sra is not None]
+        if not wanted or not (
+            self._mirror_can(CAPABILITY_ANNOTATION)
+            and self._mirror_can(CAPABILITY_BIOSAMPLE)
+        ):
+            return
+        try:
+            by_accession = await asyncio.to_thread(
+                self.sra_mirror.runs_by_accession, wanted
+            )
+        except Exception as e:
+            logger.warning(f"BioSample lookup for a filtered page failed: {e}")
+            return
+        for hit in hits:
+            metadata = by_accession.get(hit.accession)
+            if hit.sra is not None and metadata:
+                hit.sra.biosample = metadata.get("biosample")
 
     async def _annotate_with_sra(self, results: KmindexResults) -> KmindexResults:
         """
@@ -2062,65 +2306,132 @@ class GalaxyService:
             logger.error(f"BioBLEND error getting dataset content: {e}")
             return f"Error retrieving dataset content: {str(e)}"
 
-    async def _get_or_create_shared_history(self) -> str:
-        """Find or create the history jobs land in.
+    def _history_target(self) -> Tuple[str, object, int]:
+        """The history jobs land in: its name, its lock's account, its TTL.
 
-        Service-account jobs share one "BRC ANALYTICS JOBS" history, unless the
-        service was built with a history_name; a signed-in user's jobs go to a
-        "BRC Logan Search" history in their own account -- the bearer token
-        scopes get_histories()/create_history to that user.
+        Service-account jobs go to a "BRC ANALYTICS JOBS - <UTC date>" history
+        (or history_name's, if the service was built with one); a signed-in
+        user's jobs go to a single "BRC Logan Search" history in their own
+        account -- the bearer token scopes the lookup and create_history to
+        that user.
+
+        Service histories turn over daily because every search adds an upload
+        and a collection of one dataset per index shard -- thousands for an
+        all-index search -- so one history would grow without end.
         """
         if self.credential is not None and self.credential.kind == "user":
-            shared_history_name = "BRC Logan Search"
-            account = self.credential.user_sub
-        else:
-            shared_history_name = self.history_name or "BRC ANALYTICS JOBS"
-            # Keyed by name too: two service histories on one account are
-            # separate find-or-creates, and must not wait on each other.
-            account = ("service", shared_history_name)
+            return "BRC Logan Search", self.credential.user_sub, HISTORY_ID_TTL
+        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {_today()}"
+        # Keyed by name too: two service histories on one account are separate
+        # find-or-creates, and must not wait on each other.
+        return name, ("service", name), SERVICE_HISTORY_ID_TTL
 
-        if self._shared_history_id:
-            return self._shared_history_id
+    def _history_cache_key(self, account: object, name: str) -> Optional[str]:
+        """Where the resolved id is cached, or None when it must not be.
+
+        A user credential without a sub can't be told apart from another one,
+        so its history is looked up every time rather than risk handing one
+        user's history id to another.
+        """
+        if account is None:
+            return None
+        return self.cache.make_key(
+            HISTORY_ID_CACHE_PREFIX,
+            {
+                "account": list(account) if isinstance(account, tuple) else account,
+                "name": name,
+                "url": self.settings.GALAXY_API_URL,
+            },
+        )
+
+    async def _get_or_create_shared_history(self) -> str:
+        """Find or create the history jobs land in, from cache when possible.
+
+        Raises rather than inventing a stand-in history: a failure here is
+        before anything ran, so the submit is safe to retry, and a timestamped
+        stray per failure only made the account's history list longer.
+        """
+        name, account, ttl = self._history_target()
+        key = self._history_cache_key(account, name)
+        self._history_key = key
+
+        cached = await self._cached_history_id(key)
+        if cached:
+            return cached
 
         async with _HISTORY_LOCKS[account]:
+            # Whoever held the lock may have just resolved it.
+            cached = await self._cached_history_id(key)
+            if cached:
+                return cached
+
             try:
-                # Get all histories using BioBLEND
-                histories = await asyncio.to_thread(self.gi.histories.get_histories)
-
-                # Look for existing shared history
-                for history in histories:
-                    if history.get("name") == shared_history_name:
-                        history_id = history["id"]
-                        logger.info(
-                            "Using existing shared history: "
-                            f"{history_id} ({shared_history_name})"
-                        )
-                        self._shared_history_id = history_id
-                        return history_id
-
-                # If we get here, the shared history doesn't exist, so create it
-                logger.info(f"Creating new shared history: {shared_history_name}")
-                new_history = await asyncio.to_thread(
-                    self.gi.histories.create_history, name=shared_history_name
-                )
-                history_id = new_history["id"]
-                logger.info(
-                    f"Created shared history: {history_id} ({shared_history_name})"
-                )
-                self._shared_history_id = history_id
-                return history_id
-
+                history_id = await asyncio.to_thread(self._find_history, name)
+                if history_id:
+                    logger.info(f"Using existing shared history: {history_id} ({name})")
+                else:
+                    logger.info(f"Creating new shared history: {name}")
+                    new_history = await asyncio.to_thread(
+                        self.gi.histories.create_history, name=name
+                    )
+                    history_id = new_history["id"]
+                    logger.info(f"Created shared history: {history_id} ({name})")
             except Exception as e:
+                # An unlinked user's 401 has to travel intact to the
+                # connect-prompt mapping, so this re-raises as is.
                 logger.error(f"Error getting or creating shared history: {e}")
-                if self.credential is not None and self.credential.kind == "user":
-                    # Never litter someone's own account with timestamped strays
-                    # over a transient blip, and let an unlinked 401 travel
-                    # intact to the connect-prompt mapping instead of dying here.
-                    raise
-                # Fallback to creating a new history with timestamp
-                fallback_name = f"{shared_history_name} - {int(time.time())}"
-                logger.warning(f"Falling back to creating history: {fallback_name}")
-                fallback_history = await asyncio.to_thread(
-                    self.gi.histories.create_history, name=fallback_name
-                )
-                return fallback_history["id"]
+                raise
+
+            if key:
+                _HISTORY_IDS[key] = history_id
+                await self.cache.set(key, history_id, ttl)
+            return history_id
+
+    async def _cached_history_id(self, key: Optional[str]) -> Optional[str]:
+        """The cached id under key, from this process or else from Redis."""
+        if not key:
+            return None
+        history_id = _HISTORY_IDS.get(key)
+        if history_id:
+            return history_id
+        history_id = await self.cache.get(key)
+        if history_id:
+            _HISTORY_IDS[key] = history_id
+        return history_id
+
+    async def _forget_shared_history(self) -> None:
+        """Drop the cached id, so the next resolve goes back to Galaxy."""
+        key = self._history_key
+        if not key:
+            return
+        _HISTORY_IDS.pop(key, None)
+        await self.cache.delete(key)
+
+    def _find_history(self, name: str) -> Optional[str]:
+        """The id of this account's live history called name, if there is one.
+
+        bioblend's get_histories(name=...) lists every history and filters
+        client-side, which is the read that timed out; Galaxy's q/qv filter
+        does it server-side. The name is re-checked here anyway, so a Galaxy
+        that ignored the filter would be slow rather than wrong.
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/histories",
+            params={
+                "keys": "id,name,update_time",
+                "q": ["name", "deleted"],
+                "qv": [name, "False"],
+            },
+        )
+        if r.status_code != 200:
+            raise BioblendConnectionError(
+                f"History lookup failed with status {r.status_code}",
+                body=r.text,
+                status_code=r.status_code,
+            )
+        matches = [h for h in r.json() if h.get("name") == name]
+        if not matches:
+            return None
+        # Several only if someone made one by hand; the busiest is the one
+        # jobs have been going to.
+        return max(matches, key=lambda h: h.get("update_time") or "")["id"]

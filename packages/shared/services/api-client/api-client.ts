@@ -2,6 +2,7 @@ import { API_BASE_URL } from "@repo/shared/config/api";
 import ky, { type HTTPError } from "ky";
 import type {
   FavoriteResponse,
+  LoganSearchPage,
   SavedAnalysisDetail,
   SavedAnalysisRestoreResponse,
   SavedAnalysisSummary,
@@ -60,6 +61,15 @@ export const apiClient = {
       .get("favorites", {
         searchParams: entity_type ? { entity_type } : undefined,
       })
+      .json();
+  },
+
+  getLoganSearches: async (
+    offset = 0,
+    limit = 20
+  ): Promise<LoganSearchPage> => {
+    return httpClient
+      .get("user/logan_searches", { searchParams: { limit, offset } })
       .json();
   },
 

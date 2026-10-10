@@ -8,17 +8,26 @@ import {
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@brc/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import {
+  LOGAN_EXAMPLES,
+  type LoganExample,
+} from "@brc/components/LoganSearch/LoganSearchForm/examples";
+import {
+  queryNameOf,
+  type RecentSearch,
+} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
+import {
   axisOptions,
-  countBases,
   describeIndexSelection,
   type IndexAxis,
   type IndexAxisOption,
   indexDivision,
+  indexPresets,
   indexStrategy,
+  parseQuery,
   selectIndexes,
   sortIndexes,
 } from "@brc/components/LoganSearch/utils";
-import { Search } from "@mui/icons-material";
+import { Search, UploadFile } from "@mui/icons-material";
 import {
   Button,
   Card,
@@ -31,15 +40,25 @@ import {
   Typography,
 } from "@mui/material";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
-import { type JSX, useMemo, useState } from "react";
+import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 
 interface LoganSearchFormProps {
+  // Called once Galaxy has accepted a search, with what the history list
+  // keeps of it.
+  onSubmitted?: (search: RecentSearch) => void;
   search: ReturnType<typeof useKmindexSearch>;
 }
 
 // The index is built for gene-sized queries, not whole genomes. Keep in step
 // with the backend's MAX_QUERY_BASES.
 const MAX_QUERY_BASES = 5000;
+
+// A query file is read into the textarea and validated there, so the only
+// reason to refuse one up front is the browser: a genome picked by mistake
+// would be hundreds of megabytes of text in a textarea. A megabyte is still
+// far past anything the 5,000-base cap would let through.
+const MAX_QUERY_FILE_BYTES = 1024 * 1024;
+const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.fq,.fastq,.txt";
 
 // Paired with SAMPLE_QUERY below: this is the division P. falciparum sits in,
 // and it carries all but a handful of that query's hits. Fall back to whatever
@@ -63,22 +82,14 @@ const CHIP_SX = {
   height: 32,
 };
 
-// A 500 bp window of the P. falciparum 18S rRNA (GenBank M19172.1). Measured
-// against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages at
-// 25 a page, where the bacterial 16S fragment that used to sit here returned
-// 31,405 against METAGENOMIC_ENV. Neither truncates; the old pair was a worse
-// first run, not a truncated one. What the swap really buys is a coherent pair:
-// a Plasmodium query against the division Plasmodium sits in, rather than
-// against environmental metagenomes.
-const SAMPLE_QUERY = `>Plasmodium_falciparum_18S
-GCGTATATTAAAATTGTTGCAGTTAAAACGCTCGTAGTTGAATTTCAAAGAATCGATATTTTATTGTAAC
-TATTCTAGGGGAACTATTTTAGCTTTTGGCTTTAATACGCTTCCTCTATTATTATGTTCTTTAAATAACA
-AAGATTCTTTTTAAAATCCCCACTTTTGCTTTTGCTTTTTTGGGGATTTTGTTACTTTGAGTAAATTAGA
-GTGTTCAAAGCAAACAGTTAAAGCATTTACTGTGTTTGAATACTATAGCATGGAATAACAAAATTGAACA
-AGCTAAAATTTTTTGTTCTTTTTTCTTATTTTGGCTTAGTTACGATTAATAGGAGTAGCTTGGGGACATT
-CGTATTCAGATGTCAGAGGTGAAATTCTTAGATTTTCTGGAGACGAACAACTGCGAAAGCATTTGTCTAA
-AATACTTCCATTAATCAAGAACGAAAGTTAAGGGAGTGAAGACGATCAGATACCGTCGTAATCTTAACCA
-TAAACTATGC`;
+// The first example: a 500 bp window of the P. falciparum 18S rRNA. Measured
+// against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages
+// at 25 a page, where the bacterial 16S fragment that used to sit here
+// returned 31,405 against METAGENOMIC_ENV. Neither truncates; the old pair was
+// a worse first run, not a truncated one. What the swap really buys is a
+// coherent pair: a Plasmodium query against the division Plasmodium sits in,
+// rather than against environmental metagenomes.
+const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 
 interface AxisChipModel extends IndexAxisOption {
   // Settled with the other row's selection in hand, so the chip itself never
@@ -150,10 +161,10 @@ function chipTooltip(
   unavailable: boolean,
   reason: string
 ): string {
-  if (unavailable) return `${option.code} -- ${reason}`;
+  if (unavailable) return `${option.code}: ${reason}`;
   const noun = option.count === 1 ? "index" : "indexes";
   const note = option.note ? ` ${option.note}` : "";
-  return `${option.code} -- ${option.count} ${noun}.${note}`;
+  return `${option.code}: ${option.count} ${noun}.${note}`;
 }
 
 /**
@@ -276,6 +287,7 @@ function toggleCode(picked: string[], code: string): string[] {
 }
 
 export const LoganSearchForm = ({
+  onSubmitted,
   search,
 }: LoganSearchFormProps): JSX.Element => {
   const [sequence, setSequence] = useState(SAMPLE_QUERY);
@@ -288,6 +300,53 @@ export const LoganSearchForm = ({
   const [organismsPicked, setOrganismsPicked] = useState<string[] | null>(null);
   const [librariesPicked, setLibrariesPicked] = useState<string[] | null>(null);
   const [threshold, setThreshold] = useState(0.5);
+  const [fileError, setFileError] = useState<string | null>(null);
+
+  /**
+   * Load a picked FASTA or FASTQ file into the textarea, where the same base
+   * count and cap apply as to a pasted query.
+   * @param event - The file input's change event.
+   */
+  const onQueryFile = async (
+    event: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
+    const input = event.target;
+    const file = input.files?.[0];
+    // Cleared so picking the same file again, after editing the textarea,
+    // still fires a change.
+    input.value = "";
+    if (!file) return;
+    if (file.size > MAX_QUERY_FILE_BYTES) {
+      setFileError(
+        `${file.name} is too large to be a single query of up to ${MAX_QUERY_BASES.toLocaleString()} bases.`
+      );
+      return;
+    }
+    try {
+      const text = await file.text();
+      // A binary or non-UTF-8 file (a gzipped FASTQ, say) decodes to U+FFFD,
+      // which would be counted as bases and Galaxy would then reject.
+      if (text.includes("\uFFFD")) {
+        setFileError(`${file.name} isn't a plain-text FASTA or FASTQ file.`);
+        return;
+      }
+      setSequence(text);
+      setFileError(null);
+    } catch {
+      setFileError(`${file.name} could not be read.`);
+    }
+  };
+
+  /**
+   * Put an example in the textarea and pick the indexes it is meant for.
+   * @param example - The example clicked.
+   */
+  const loadExample = (example: LoganExample): void => {
+    setSequence(example.sequence);
+    setFileError(null);
+    setOrganismsPicked(example.divisions);
+    setLibrariesPicked(example.strategies);
+  };
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
 
@@ -301,6 +360,24 @@ export const LoganSearchForm = ({
   const organismChips = axisChips(options, organisms, libraries, "division");
   const libraryChips = axisChips(options, libraries, organisms, "strategy");
 
+  // Lit by what the chips come to rather than by which preset was clicked
+  // last, so picking the same set by hand lights it too and a tweak after a
+  // click turns it off.
+  const selectedKey = indexes.join(",");
+  const presets = indexPresets(options).map((preset) => {
+    const presetIndexes = selectIndexes(
+      options,
+      preset.divisions,
+      preset.strategies
+    );
+    const noun = presetIndexes.length === 1 ? "index" : "indexes";
+    return {
+      ...preset,
+      selected: presetIndexes.join(",") === selectedKey,
+      tooltip: `${preset.loganName} on logan-search.org: ${preset.note} ${presetIndexes.length} ${noun}.`,
+    };
+  });
+
   const sentence = describeIndexSelection({
     libraries: pickedLabels(libraryChips, libraries),
     organisms: pickedLabels(organismChips, organisms),
@@ -308,8 +385,20 @@ export const LoganSearchForm = ({
     total: options.length,
   });
 
-  const bases = countBases(sequence);
+  const query = parseQuery(sequence);
+  const { bases, records } = query;
   const tooLong = bases > MAX_QUERY_BASES;
+  // The backend refuses multi-record FASTA with a 422; say so here instead.
+  const tooManyRecords = records > 1;
+  let queryHelp =
+    query.format === "fastq"
+      ? `${bases} bases. FASTQ; headers and quality scores are ignored.`
+      : `${bases} bases. FASTA; headers are ignored.`;
+  if (tooLong)
+    queryHelp = `${bases} bases, but queries are capped at ${MAX_QUERY_BASES}`;
+  if (tooManyRecords)
+    queryHelp = `${records} records, but a query is one sequence`;
+  if (query.error) queryHelp = query.error;
   // An errored job keeps its jobId with no results forever, so leaving the
   // error out of this leaves the form stuck "running" with no way back.
   const isRunning =
@@ -320,6 +409,8 @@ export const LoganSearchForm = ({
     indexes.length > 0 &&
     bases > 0 &&
     !tooLong &&
+    !tooManyRecords &&
+    !query.error &&
     !isRunning &&
     !search.isLoadingIndexes;
 
@@ -331,20 +422,61 @@ export const LoganSearchForm = ({
           <FormColumn>
             <Typography variant="h6">Query sequence</Typography>
             <TextField
-              error={tooLong}
+              error={tooLong || tooManyRecords || Boolean(query.error)}
               fullWidth
-              helperText={
-                tooLong
-                  ? `${bases} bases -- queries are capped at ${MAX_QUERY_BASES}`
-                  : `${bases} bases. FASTA; headers are ignored.`
-              }
+              helperText={queryHelp}
               maxRows={20}
               minRows={6}
               multiline
-              onChange={(e): void => setSequence(e.target.value)}
+              onChange={(e): void => {
+                setSequence(e.target.value);
+                setFileError(null);
+              }}
               slotProps={{ input: { sx: { fontFamily: "monospace" } } }}
               value={sequence}
             />
+            <ControlRow>
+              <Button
+                component="label"
+                size="small"
+                startIcon={<UploadFile />}
+                variant="outlined"
+              >
+                Load FASTA/FASTQ file
+                <input
+                  accept={QUERY_FILE_TYPES}
+                  hidden
+                  onChange={onQueryFile}
+                  type="file"
+                />
+              </Button>
+              <Typography
+                color={fileError ? "error" : "textSecondary"}
+                role={fileError ? "alert" : undefined}
+                variant="caption"
+              >
+                {fileError ??
+                  "Replaces the text above. One record, read in your browser."}
+              </Typography>
+            </ControlRow>
+            <ControlRow aria-labelledby="logan-examples" role="group">
+              <Typography component="span" id="logan-examples" variant="body2">
+                Examples
+              </Typography>
+              <IndexChips>
+                {LOGAN_EXAMPLES.map((example) => (
+                  <Tooltip describeChild key={example.key} title={example.note}>
+                    <Chip
+                      clickable
+                      label={example.label}
+                      onClick={(): void => loadExample(example)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Tooltip>
+                ))}
+              </IndexChips>
+            </ControlRow>
           </FormColumn>
 
           <FormColumn>
@@ -393,6 +525,35 @@ export const LoganSearchForm = ({
             )}
             {!search.isLoadingIndexes && options.length > 0 && (
               <>
+                <IndexAxisRow aria-labelledby="logan-presets" role="group">
+                  <Typography
+                    component="span"
+                    id="logan-presets"
+                    variant="body2"
+                  >
+                    Presets
+                  </Typography>
+                  <IndexChips>
+                    {presets.map((preset) => (
+                      <AxisChip
+                        key={preset.loganName}
+                        label={preset.label}
+                        onClick={(): void => {
+                          setOrganismsPicked(preset.divisions);
+                          setLibrariesPicked(preset.strategies);
+                        }}
+                        selected={preset.selected}
+                        tooltip={preset.tooltip}
+                      />
+                    ))}
+                  </IndexChips>
+                </IndexAxisRow>
+                <Typography color="textSecondary" variant="caption">
+                  logan-search.org&apos;s Fast groups aren&apos;t here because
+                  they drop the small sub-indexes inside each division, which
+                  these indexes can&apos;t express, and GenBank_RefSeq
+                  isn&apos;t deployed on Galaxy Test, where these searches run.
+                </Typography>
                 <AxisRow
                   allTooltip="Every organism group registered."
                   label="Organism"
@@ -431,12 +592,22 @@ export const LoganSearchForm = ({
               <Button
                 disabled={!canSubmit}
                 onClick={async (): Promise<void> => {
-                  await search.submit({
+                  // FASTQ goes as its FASTA form; the backend only reads FASTA.
+                  const jobId = await search.submit({
                     indexes,
-                    sequence,
+                    sequence: query.fasta,
                     threshold,
                     zvalue: 6,
                   });
+                  if (jobId) {
+                    onSubmitted?.({
+                      indexes,
+                      jobId,
+                      queryName: queryNameOf(query.fasta),
+                      submittedAt: new Date().toISOString(),
+                      threshold,
+                    });
+                  }
                 }}
                 startIcon={
                   isRunning ? <CircularProgress size={18} /> : <Search />

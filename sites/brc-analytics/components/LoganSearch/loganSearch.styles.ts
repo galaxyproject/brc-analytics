@@ -309,3 +309,58 @@ export const YearLabel = styled.span`
   text-align: left;
   white-space: nowrap;
 `;
+
+/* A breakdown row the reader can click to filter by its value. The same grid
+   as a plain row, so turning filtering on does not move anything; only the
+   button's own chrome is reset. */
+export const CohortBarToggle = styled(CohortBarRow.withComponent("button"))`
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  margin: 0 -4px;
+  padding: 1px 4px;
+  text-align: left;
+  width: calc(100% + 8px);
+
+  &:hover {
+    background: ${PALETTE.SMOKE_LIGHT};
+  }
+
+  &[aria-pressed="true"] {
+    background: ${PALETTE.PRIMARY_LIGHTEST};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${PALETTE.PRIMARY_MAIN};
+  }
+`;
+
+/* A year column the reader can click, with the same reset. */
+export const YearToggle = styled(YearColumn.withComponent("button"))`
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+
+  &:hover {
+    background: ${PALETTE.SMOKE_LIGHT};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${PALETTE.PRIMARY_MAIN};
+  }
+`;
+
+/* The active filters: a sentence, then a wrapping row of chips and actions. */
+export const FilterChips = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;

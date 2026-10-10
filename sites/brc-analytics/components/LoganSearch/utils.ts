@@ -160,6 +160,90 @@ export function selectIndexes(
   );
 }
 
+export interface IndexPreset {
+  divisions: string[];
+  label: string;
+  // The group's name on logan-search.org, so a reader coming from there can
+  // find the one they know.
+  loganName: string;
+  // What the preset searches, for its tooltip.
+  note: string;
+  strategies: string[];
+}
+
+interface IndexPresetRule {
+  // Codes the preset keeps on each axis; omitted means the whole axis.
+  division?: (code: string) => boolean;
+  label: string;
+  loganName: string;
+  note: string;
+  strategy?: (code: string) => boolean;
+}
+
+const VIRAL_AND_HUMAN = new Set(["HUMAN", "PHG", "VRL"]);
+
+/* logan-search.org's groups that come out as a product of our two axes, and
+   so as a chip selection. Its Fast groups are left out because they drop the
+   small sub-indexes inside each division, which a STRATEGY_DIVISION index
+   cannot express, and GenBank_RefSeq because nothing like it is deployed. */
+const PRESET_RULES: IndexPresetRule[] = [
+  { label: "All", loganName: "All", note: "Every registered index." },
+  {
+    division: (code) => !VIRAL_AND_HUMAN.has(code),
+    label: "All but viral and human",
+    loganName: "All_No_viral_human",
+    note: "Every index except viruses, phage and human.",
+  },
+  {
+    label: "Transcriptomic",
+    loganName: "Transcriptomic",
+    note: "Bulk and single-cell transcriptomic libraries.",
+    strategy: (code) =>
+      code === "TRANSCRIPTOMIC" || code === "TRANSCRIPTOMICSINGLECELL",
+  },
+  {
+    label: "Metatranscriptomic",
+    loganName: "Metatranscriptomic",
+    note: "Metatranscriptomic libraries.",
+    strategy: (code) => code === "METATRANSCRIPTOMIC",
+  },
+  {
+    label: "Metagenomic",
+    loganName: "Metagenomic",
+    note: "Metagenomic libraries.",
+    strategy: (code) => code === "METAGENOMIC",
+  },
+];
+
+/**
+ * The logan-search.org groups this instance can offer, as axis selections.
+ *
+ * Read off the registered list rather than written out as index names, so a
+ * division added upstream lands in All_No_viral_human without anyone editing
+ * this, and a preset with nothing registered under it is not offered at all.
+ * An axis left whole is an empty selection, the same All the chip rows use.
+ * @param indexes - Index names from the API.
+ * @returns The presets that select at least one index, in display order.
+ */
+export function indexPresets(indexes: string[]): IndexPreset[] {
+  const allDivisions = axisOptions(indexes, "division").map(({ code }) => code);
+  const allStrategies = axisOptions(indexes, "strategy").map(
+    ({ code }) => code
+  );
+  const presets: IndexPreset[] = [];
+  for (const { division, label, loganName, note, strategy } of PRESET_RULES) {
+    const divisions = division ? allDivisions.filter(division) : [];
+    const strategies = strategy ? allStrategies.filter(strategy) : [];
+    // A rule that kept nothing would read as an empty selection, which is no
+    // constraint at all, and select everything under the wrong name.
+    if (division && divisions.length === 0) continue;
+    if (strategy && strategies.length === 0) continue;
+    if (selectIndexes(indexes, divisions, strategies).length === 0) continue;
+    presets.push({ divisions, label, loganName, note, strategies });
+  }
+  return presets;
+}
+
 /**
  * Lowercase a label's first character so it can sit inside a sentence.
  * @param label - Display label as it appears on a chip.
@@ -229,6 +313,80 @@ export function countBases(fasta: string): number {
 }
 
 /**
+ * Count FASTA records by their header lines.
+ * @param fasta - Raw textarea contents.
+ * @returns Number of lines that open a record.
+ */
+export function countRecords(fasta: string): number {
+  return fasta.split("\n").filter((line) => line.trim().startsWith(">")).length;
+}
+
+export interface ParsedQuery {
+  bases: number;
+  // Why a FASTQ query can't be read, as a sentence; null when it can.
+  error: string | null;
+  // The query as the backend takes it, which is FASTA only.
+  fasta: string;
+  format: "fasta" | "fastq";
+  records: number;
+}
+
+const FASTQ_SHAPE = "four lines: @header, sequence, +, quality";
+
+/**
+ * Read the query box as FASTA or FASTQ.
+ *
+ * FASTQ is told apart by its leading "@", and turned into FASTA here so the
+ * request the backend sees is the same either way. Records are read as
+ * strict four-line groups: wrapped FASTQ is rare, and a quality line can
+ * itself start with "@", so it can't be split reliably on headers.
+ * @param text - Raw textarea contents.
+ * @returns The query's format, its FASTA form, and what the form checks.
+ */
+export function parseQuery(text: string): ParsedQuery {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (!lines[0]?.startsWith("@")) {
+    return {
+      bases: countBases(text),
+      error: null,
+      fasta: text,
+      format: "fasta",
+      records: countRecords(text),
+    };
+  }
+  const records: { header: string; sequence: string }[] = [];
+  let error: string | null = null;
+  for (let start = 0; start < lines.length && !error; start += 4) {
+    const n = start / 4 + 1;
+    const [header, sequence, plus, quality] = lines.slice(start, start + 4);
+    if (!header.startsWith("@")) {
+      error = `Malformed FASTQ: record ${n} doesn't start with an @ header. Each record is ${FASTQ_SHAPE}.`;
+    } else if (quality === undefined) {
+      error = `Malformed FASTQ: record ${n} is incomplete. Each record is ${FASTQ_SHAPE}.`;
+    } else if (!plus.startsWith("+")) {
+      error = `Malformed FASTQ: record ${n} has no + line after its sequence. Each record is ${FASTQ_SHAPE}.`;
+    } else if (quality.length !== sequence.length) {
+      error = `Malformed FASTQ: record ${n} has ${sequence.length} bases but ${quality.length} quality scores.`;
+    } else {
+      records.push({ header: header.slice(1), sequence });
+    }
+  }
+  const fasta = records
+    .map(({ header, sequence }) => `>${header}\n${sequence}\n`)
+    .join("");
+  return {
+    bases: countBases(fasta),
+    error,
+    fasta,
+    format: "fastq",
+    records: records.length,
+  };
+}
+
+/**
  * A count as a share of its denominator.
  *
  * Both ends of the scale round into a claim the count contradicts. "0.0%"
@@ -242,7 +400,7 @@ export function countBases(fasta: string): number {
  * @returns Percentage string.
  */
 export function formatShare(count: number, total: number): string {
-  if (total <= 0) return "--";
+  if (total <= 0) return "–";
   if (count === 0) return "0%";
   const share = (count / total) * 100;
   if (share < 0.1) return "<0.1%";
