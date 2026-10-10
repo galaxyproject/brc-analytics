@@ -15,7 +15,6 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from .generated_schema.schema import Workflow
 from .load import do_dlt_load
 from .qc_utils import (
     format_list_section,
@@ -744,7 +743,13 @@ def report_missing_ploidy_info(genomes_df: pd.DataFrame):
         for _, row in missing_ploidy.iterrows():
             print(f"  {row['accession']}: {row['speciesTaxonomyId']}")
 
-    return list(zip(missing_ploidy["accession"], missing_ploidy["speciesTaxonomyId"]))
+    return list(
+        zip(
+            missing_ploidy["accession"],
+            missing_ploidy["speciesTaxonomyId"],
+            strict=True,
+        )
+    )
 
 
 def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
@@ -1155,8 +1160,8 @@ def build_taxon_maps(taxonomy_df):
         Tuple of (name_map, rank_map) dicts keyed by taxonomy ID string
     """
     taxon_id_strings = taxonomy_df["taxonomy_id"].astype("string")
-    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"]))
-    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"]))
+    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"], strict=True))
+    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"], strict=True))
     return name_map, rank_map
 
 
@@ -1299,7 +1304,9 @@ def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
         f"{normalized_base_url}{accession}/" if accession in available else ""
         for accession in accessions
     ]
-    missing_accessions = [a for a, url in zip(accessions, datacache_urls) if not url]
+    missing_accessions = [
+        a for a, url in zip(accessions, datacache_urls, strict=True) if not url
+    ]
 
     print(
         f"Validated {len(accessions)} datacache URLs against {len(available)}-entry listing, "

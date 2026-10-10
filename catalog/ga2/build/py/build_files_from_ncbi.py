@@ -1,7 +1,3 @@
-import json
-
-import pandas as pd
-
 from ....py_package.catalog_build import build_files
 
 ASSEMBLIES_PATH = "catalog/ga2/source/assemblies.yml"
