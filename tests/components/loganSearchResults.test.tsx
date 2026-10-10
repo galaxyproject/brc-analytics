@@ -1,7 +1,8 @@
 import {
   LoganSearchResults,
   MIRROR_SCOPE_NOTE,
-} from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
+  openViromeUrl,
+} from "@repo/shared/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
   type KmindexHit,
   type KmindexIndexSummary,
@@ -30,7 +31,7 @@ const TIE_BAND_COPY =
   "Scores repeat: the score is a fraction of your query's k-mers, so ties " +
   "are common and a conserved query can put every row listed here on a " +
   "single one. Where the cut falls inside a tie, a stable hash of the " +
-  "accession decides which equally-scoring runs made the list -- arbitrary, " +
+  "accession decides which equally-scoring runs made the list: arbitrary, " +
   "but the same on every reload.";
 
 /**
@@ -304,10 +305,10 @@ describe("LoganSearchResults truncation disclosure", () => {
     openWhy();
 
     expect(container.textContent).toContain(
-      "GENOMIC_BCT: 47,089 of 1,100,404 listed -- alone it would still cap at 50,000"
+      "GENOMIC_BCT: 47,089 of 1,100,404 listed (alone it would still cap at 50,000)"
     );
     expect(container.textContent).toContain(
-      "METATRANSCRIPTOMIC_BCT: 2,911 of 33,112 listed -- alone it would return all 33,112"
+      "METATRANSCRIPTOMIC_BCT: 2,911 of 33,112 listed (alone it would return all 33,112)"
     );
   });
 
@@ -324,7 +325,7 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     // Being outranked by the others is what the disclosure is here to explain.
     expect(container.textContent).toContain(
-      "METAGENOMIC_UNKNOWN: 39 matched, none listed -- alone it would return all 39"
+      "METAGENOMIC_UNKNOWN: 39 matched, none listed (alone it would return all 39)"
     );
     // Matching nothing is not: the cap did not do it, and the rollup counts it.
     expect(container.textContent).not.toContain("METAGENOMIC_PHG:");
@@ -340,7 +341,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     const alert = screen.getByRole("alert");
     expect(within(alert).getAllByText(INDEX_LINE)).toHaveLength(10);
     expect(alert.textContent).toContain(
-      "GENOMIC_MAM: 3 of 1,500 listed -- alone it would return all 1,500"
+      "GENOMIC_MAM: 3 of 1,500 listed (alone it would return all 1,500)"
     );
     // 900 + 39 matched between them, and the cap left them nothing. Twelve
     // lines is already long; 109 of them is why the tail is summed.
@@ -474,6 +475,28 @@ describe("LoganSearchResults truncation disclosure", () => {
     expect(container.textContent).not.toContain("NaN");
     expect(container.textContent).not.toContain("undefined");
     expect(container.textContent).not.toContain("remaining 0");
+  });
+
+  test("caps a filtered page against what the filter keeps", () => {
+    const { container } = renderResults({
+      ...BASE_RESULTS,
+      filtered: true,
+      filtered_matches: 120000,
+      total_hits: CAP,
+      total_matches: 2000000,
+      truncated: true,
+    });
+
+    expect(
+      screen.getByText(
+        "Listing the 50,000 highest-coverage runs that match these filters"
+      )
+    ).toBeTruthy();
+    // 120,000 kept less the 50,000 listed, not the whole match set's gap.
+    expect(container.textContent).toContain(
+      "The remaining 70,000 cannot be paged to. Download the filtered runs " +
+        "above for the full set."
+    );
   });
 
   test("renders an untruncated result from that same backend", () => {
@@ -648,13 +671,13 @@ describe("coverage and ANI columns", () => {
     });
 
     // Scoped to the hit's own row: Platform, Country and Released all render
-    // "--" for null metadata, so a page-wide dash search cannot fail.
+    // "–" for null metadata, so a page-wide dash search cannot fail.
     const row = screen.getByText("SRR000002").closest("tr");
     expect(row).not.toBeNull();
     const cells = within(row as HTMLElement).getAllByRole("cell");
 
     // Accession, k-mer coverage, ANI est.
-    expect(cells[2].textContent).toBe("--");
+    expect(cells[2].textContent).toBe("–");
     // The coverage cell also carries the "corrected" chip, since this hit has
     // an fp_correction -- ahead of the rail, so the rail and the digits stay
     // in column against the rows that carry no chip.
@@ -740,7 +763,7 @@ describe("the hit table", () => {
     // Accession, coverage, ANI, organism, platform, country, released. The
     // country is the one the mirror had nothing for.
     expect(cells[4].textContent).toBe("ILLUMINA");
-    expect(cells[5].textContent).toBe("--");
+    expect(cells[5].textContent).toBe("–");
     expect(cells[6].textContent).toBe("2018-07-25");
   });
 
@@ -789,6 +812,45 @@ describe("the hit table", () => {
     expect(
       screen.getByRole("link", {
         name: "SRR000001 (opens NCBI SRA in a new tab)",
+      })
+    ).toBeTruthy();
+  });
+});
+
+describe("OpenVirome links", () => {
+  test("encodes the filter as a whole rather than pasting it in raw", () => {
+    const url = openViromeUrl("runId", "SRR1197259");
+
+    expect(url).toBe(
+      "https://openvirome.com/?filters=%5B%22runId-SRR1197259%22%5D"
+    );
+    // What logan-search.org links to, once the query string is decoded.
+    expect(new URL(url).searchParams.get("filters")).toBe(
+      '["runId-SRR1197259"]'
+    );
+  });
+
+  test("puts an OpenVirome link beside every run's NCBI link", () => {
+    renderResults({
+      ...BASE_RESULTS,
+      hits: [hit(), hit({ accession: "SRR000002" })],
+      total_hits: 2,
+      total_matches: 2,
+    });
+
+    const links = screen.getAllByRole("link", { name: /on OpenVirome/ });
+    expect(links.map((link) => link.textContent)).toEqual([
+      "OV (SRR000001 on OpenVirome, opens in a new tab)",
+      "OV (SRR000002 on OpenVirome, opens in a new tab)",
+    ]);
+    expect(links[1].getAttribute("href")).toBe(
+      openViromeUrl("runId", "SRR000002")
+    );
+    expect(links[1].getAttribute("target")).toBe("_blank");
+    // The NCBI link keeps its own name rather than absorbing the second one.
+    expect(
+      screen.getByRole("link", {
+        name: "SRR000002 (opens NCBI SRA in a new tab)",
       })
     ).toBeTruthy();
   });
@@ -848,5 +910,235 @@ describe("sorting and page size", () => {
     // Offset 100 at 50 a page is the third page. MUI joins the range with an
     // en dash, which the regex sidesteps.
     expect(screen.getAllByText(/101.150 of 400/)[0]).toBeTruthy();
+  });
+});
+
+describe("the column chooser", () => {
+  const annotated = {
+    ...BASE_RESULTS,
+    hits: [
+      hit({
+        sra: sraMeta({
+          assay_type: "WGS",
+          bioproject: "PRJNA123456",
+          biosample: "SAMN07654321",
+          instrument: "Illumina NovaSeq 6000",
+          library_layout: "PAIRED",
+          mbases: 12345,
+          study: "SRP654321",
+        }),
+      }),
+    ],
+    sra_annotated: 1,
+    sra_mirror_available: true,
+  };
+
+  /**
+   * The header labels, in order.
+   * @returns Each column header's text.
+   */
+  function headers(): string[] {
+    return screen
+      .getAllByRole("columnheader")
+      .map((cell) => cell.textContent ?? "");
+  }
+
+  /**
+   * Open the chooser, flip one column and close it again.
+   * @param label - The column's label in the menu.
+   */
+  function toggle(label: string): void {
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: label }));
+    // The menu stays open on a pick and, being modal, hides the table from
+    // role queries until it closes.
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+  }
+
+  test("keeps the table as it was until a column is picked", () => {
+    renderResults(annotated);
+
+    expect(headers()).toEqual([
+      "Accession",
+      "k-mer coverage",
+      "ANI est.",
+      "Organism",
+      "Platform",
+      "Country",
+      "Released",
+    ]);
+  });
+
+  test("offers every mirror field the API returns", () => {
+    renderResults(annotated);
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+
+    const items = screen.getAllByRole("menuitemcheckbox");
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Platform",
+      "Country",
+      "Released",
+      "Instrument",
+      "Assay type",
+      "Layout",
+      "Mbases",
+      "BioProject",
+      "BioSample",
+      "Study",
+    ]);
+    expect(items.map((item) => item.getAttribute("aria-checked"))).toEqual([
+      "true",
+      "true",
+      "true",
+      ...Array(7).fill("false"),
+    ]);
+  });
+
+  test("adds a column in its place rather than at the end", () => {
+    renderResults(annotated);
+    toggle("Study");
+    toggle("Instrument");
+
+    // Config order, not click order, so a column lands in the same place
+    // however it was switched on.
+    expect(headers().slice(4)).toEqual([
+      "Platform",
+      "Country",
+      "Released",
+      "Instrument",
+      "Study",
+    ]);
+    const row = screen.getByText("Plasmodium falciparum").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("Illumina NovaSeq 6000");
+  });
+
+  test("hides a default column", () => {
+    renderResults(annotated);
+    toggle("Country");
+
+    expect(headers()).not.toContain("Country");
+    expect(screen.queryByRole("cell", { name: "Malawi" })).toBeNull();
+  });
+
+  test("hiding the sorted column goes back to score order", () => {
+    const { actions } = renderResults({
+      ...annotated,
+      order: "asc",
+      sort: "country",
+    });
+    toggle("Country");
+
+    expect(actions.setSort).toHaveBeenCalledWith("score");
+  });
+
+  test("hiding a column the table isn't sorted by leaves the sort alone", () => {
+    const { actions } = renderResults(annotated);
+    toggle("Country");
+
+    expect(actions.setSort).not.toHaveBeenCalled();
+  });
+
+  test("links the BioProject and the study out to NCBI", () => {
+    renderResults(annotated);
+    toggle("BioProject");
+    toggle("Study");
+
+    expect(
+      screen
+        .getByRole("link", { name: "PRJNA123456 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/bioproject/PRJNA123456");
+    expect(
+      screen
+        .getByRole("link", { name: "SRP654321 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/sra/?term=SRP654321");
+  });
+
+  test("links the BioProject to OpenVirome too, but not the study", () => {
+    renderResults(annotated);
+    toggle("BioProject");
+    toggle("Study");
+
+    expect(
+      screen
+        .getByRole("link", { name: /PRJNA123456 on OpenVirome/ })
+        .getAttribute("href")
+    ).toBe(openViromeUrl("bioproject", "PRJNA123456"));
+    // logan-search.org links no study to OpenVirome, so there is no known
+    // filter for one to use.
+    expect(
+      screen.queryByRole("link", { name: /SRP654321 on OpenVirome/ })
+    ).toBeNull();
+  });
+
+  test("links the BioSample out to NCBI and to OpenVirome", () => {
+    renderResults(annotated);
+    toggle("BioSample");
+
+    expect(
+      screen
+        .getByRole("link", { name: "SAMN07654321 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/biosample/SAMN07654321");
+    expect(
+      screen
+        .getByRole("link", { name: /SAMN07654321 on OpenVirome/ })
+        .getAttribute("href")
+    ).toBe(openViromeUrl("biosample", "SAMN07654321"));
+  });
+
+  test("dims the BioSample when a backend predating it sends no key", () => {
+    // Older backends omit the field altogether rather than sending null.
+    const legacy = sraMeta();
+    delete legacy.biosample;
+    renderResults({
+      ...annotated,
+      hits: [hit({ accession: "SRR000002", sra: legacy })],
+    });
+    toggle("BioSample");
+
+    const row = screen.getByText("SRR000002").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("–");
+    expect(
+      within(row as HTMLElement).queryByRole("link", { name: /SAMN/ })
+    ).toBeNull();
+  });
+
+  test("groups the Mbases digits and dims what the mirror lacks", () => {
+    renderResults({
+      ...annotated,
+      hits: [
+        ...annotated.hits,
+        hit({ accession: "SRR000002", sra: sraMeta() }),
+      ],
+      total_hits: 2,
+      total_matches: 2,
+    });
+    toggle("Mbases");
+    toggle("BioProject");
+
+    expect(screen.getByText("12,345")).toBeTruthy();
+    const row = screen.getByText("SRR000002").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("–");
+    expect(cells[8].textContent).toBe("–");
+    expect(
+      within(row as HTMLElement).queryByRole("link", { name: /NCBI in/ })
+    ).toBeNull();
+  });
+
+  test("sorts only the columns the API can order by", () => {
+    const { actions } = renderResults(annotated);
+    toggle("Instrument");
+
+    // The three default columns keep their sort; a new one is a plain header,
+    // since the API cannot order by it.
+    const instrument = screen.getByRole("columnheader", { name: "Instrument" });
+    expect(within(instrument).queryByRole("button")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Platform" }));
+    expect(actions.setSort).toHaveBeenCalledWith("platform");
   });
 });

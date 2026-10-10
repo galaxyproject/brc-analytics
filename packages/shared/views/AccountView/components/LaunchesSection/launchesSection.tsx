@@ -46,7 +46,7 @@ export function LaunchesSection({ resource }: Props): JSX.Element {
               key={launch.id}
               subtitle={
                 launch.assembly_accession
-                  ? `${launch.assembly_accession} -- launched ${new Date(launch.created_at).toLocaleString()}`
+                  ? `${launch.assembly_accession} · launched ${new Date(launch.created_at).toLocaleString()}`
                   : `Launched ${new Date(launch.created_at).toLocaleString()}`
               }
               title={launch.workflow_trs_id}

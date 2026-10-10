@@ -1,4 +1,4 @@
-import { LoganSearchSummary } from "@brc/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
+import { LoganSearchSummary } from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
@@ -173,8 +173,20 @@ function renderSummary(
   indexes: string[] = []
 ): ReturnType<typeof render> {
   return render(
-    <LoganSearchSummary search={search({ indexes, jobId: JOB_ID, results })} />
+    <LoganSearchSummary
+      assistantHref={assistantHref}
+      search={search({ indexes, jobId: JOB_ID, results })}
+    />
   );
+}
+
+/**
+ * The assistant link as BRC builds it.
+ * @param jobId - The finished search's job id.
+ * @returns The assistant path carrying the job.
+ */
+function assistantHref(jobId: string): string {
+  return `/assistant?loganJob=${encodeURIComponent(jobId)}`;
 }
 
 describe("LoganSearchSummary", () => {
@@ -286,6 +298,19 @@ describe("LoganSearchSummary", () => {
     const link = screen.getByRole("link", { name: "Ask the assistant" });
     expect(link.getAttribute("href")).toBe(`/assistant?loganJob=${JOB_ID}`);
     expect(link.getAttribute("aria-label")).toBeNull();
+  });
+
+  test("has no assistant button on a site without an assistant", () => {
+    render(
+      <LoganSearchSummary
+        search={search({ jobId: JOB_ID, results: BASE_RESULTS })}
+      />
+    );
+
+    expect(screen.getByText(`Job ${JOB_ID}`)).toBeTruthy();
+    expect(
+      screen.queryByRole("link", { name: "Ask the assistant" })
+    ).toBeNull();
   });
 
   test("keeps the assistant sentence as a description of that link", async () => {

@@ -1,7 +1,7 @@
 import {
   CohortYears,
   yearBars,
-} from "@brc/components/LoganSearch/CohortYears/cohortYears";
+} from "@repo/shared/components/LoganSearch/CohortYears/cohortYears";
 import { type KmindexFacet } from "@repo/shared/hooks/useKmindexSearch";
 import { render, screen } from "@testing-library/react";
 

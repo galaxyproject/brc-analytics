@@ -1,0 +1,70 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "Logan Search"
+contentType: "ARTICLE"
+description: "Search a DNA sequence against Logan's assemblies of the Sequence Read Archive and get back the SRA runs it occurs in: inputs, limits, scores, export and retention."
+enableOutline: true
+title: "Logan Search"
+---
+
+## What it is
+
+[Logan](https://github.com/IndexThePlanet/Logan) is an assembly of nearly every public run in the NCBI Sequence Read Archive (SRA) up to the end of 2023: tens of millions of runs, each reduced to its assembled contigs. Those contigs are indexed with [kmindex](https://github.com/tlemane/kmindex), which can tell you, for a short query sequence, which runs share a large enough fraction of its k-mers.
+
+[Logan Search](/logan-search) runs that lookup for you. Paste a sequence (a gene, a marker, a stretch of a pathogen genome), pick which parts of the archive to search, and you get back the SRA runs it occurs in, ranked by how much of the query each one contains, with each run's SRA metadata alongside. The search runs as a job on a Galaxy server, so it takes anywhere from a minute or two to much longer when the queue is busy; the results page can be left and reopened.
+
+## Your query
+
+- **One sequence**, as FASTA, FASTQ or bare bases. Headers are ignored, and the first word of the header becomes the query's name in the results. A query with more than one record can't be submitted; the form says so under the box. FASTQ is read as plain four-line records (`@header`, sequence, `+`, quality) and its quality scores are dropped.
+- **Up to 5,000 bases.** Logan's index is built for gene-sized queries, not whole genomes. The base count under the text box turns red when you're over.
+- **Load FASTA/FASTQ file** reads a `.fa`, `.fasta`, `.fna`, `.fq`, `.fastq` or `.txt` file into the text box in your browser, where the same checks apply. Compressed files such as `.fastq.gz` aren't read; unzip them first.
+- **Examples** fill the text box with a real NCBI sequence range (the accession and coordinates are in each example's header) and pick the one index its organism lives in.
+
+## Threshold
+
+The threshold is the minimum fraction of the query's k-mers a run must contain to count as a hit. It runs from 0.25 to 1 and defaults to 0.5, the same default as logan-search.org. Lower values return more runs and take longer to merge; below about a quarter the hit list is mostly noise.
+
+## Indexes and presets
+
+The archive is split into 109 indexes, each one organism group crossed with one library type: `GENOMIC_BCT` is genomic runs of bacteria, `METATRANSCRIPTOMIC_ENV` is metatranscriptomes from environmental samples, and so on. The two rows of chips pick from each axis, and the search covers every index that matches both. The sentence under the chips says exactly which indexes that comes to.
+
+The **presets** set the chips to the logan-search.org groups we can reproduce faithfully over these 109 indexes:
+
+- **All**: every index.
+- **All but viral and human**: everything except the viral, phage and human indexes.
+- **Transcriptomic**: bulk and single-cell transcriptomic runs.
+- **Metatranscriptomic** and **Metagenomic**: the indexes of those library types.
+
+A preset only sets the chips; you can adjust from there. logan-search.org's "Fast" groups aren't offered because they leave out small sub-indexes inside each division, which these indexes can't express. Its GenBank/RefSeq group isn't available here either, because that index isn't deployed on Galaxy Test, the Galaxy server these searches run on.
+
+Searching more indexes costs more: the default is the single index that pairs with the first example, and All is the most expensive job on offer.
+
+## Reading the scores
+
+- **k-mer coverage** is the fraction of the query's k-mers found in a run. Logan flags a small set of runs (227 of them) whose indexes are so saturated that they report a share of any query's k-mers whether or not the sequence is there. For those, a baseline is subtracted and the hit is marked **corrected**; hover the chip to see the raw value and the baseline. The threshold is applied again after the correction, so a corrected hit that falls below it is dropped.
+- **ANI est.** is an estimate of average nucleotide identity between the query and what's in the run, computed as coverage^(1/31) (k = 31). A coverage of 0.94 is an ANI of about 0.998. It's an estimate from k-mer sharing, not an alignment.
+
+## Results, cap and export
+
+The table lists up to the **50,000 highest-coverage hits**, which you can sort by score, accession, organism, platform, country or release date and page through. When a search matches more than that, the page says so and explains where the cut fell.
+
+Everything else on the page covers the **whole match set**, not just the 50,000 listed: the summary counts, the cohort breakdown (organisms, assay types, platforms, layouts, instruments, countries, release years) and the map. The download buttons on the summary give you every matched run, joined to its SRA metadata, as TSV or Parquet, up to 5 million rows. A search that matches more than that can't be exported; narrow the indexes or raise the threshold.
+
+From a finished search, **Ask the assistant** opens a conversation that already knows the cohort. See [About the Assistant](/learn/assistant).
+
+## How long results last
+
+- Each search has a link (the page's address with `?job=` on the end) that you can bookmark or share. The **Copy link** button copies it.
+- Merged results are cached for a couple of hours. After that, reopening the link merges them again from the Galaxy job's outputs, which is slower but gives the same answer, for as long as the Galaxy server keeps the job.
+- The download file is kept for up to a day and rewritten whenever the results are merged again.
+- **Recent searches**, at the bottom of the search page, lists the searches your browser has submitted. It lives only in that browser.
+- If you're signed in, your searches run under your own Galaxy account, in a history called "BRC Logan Search", and are listed under **Logan searches** in [your workspace](/account).
+
+## How it relates to logan-search.org
+
+[logan-search.org](https://logan-search.org) is the Logan team's own search site, and it queries the same kind of kmindex indexes. This page is BRC Analytics' version of the same search, built around what BRC users tend to do next: SRA metadata for every hit from a local mirror of the archive, counts and a map over the whole match set rather than the top of the list, a whole-set export, and a handoff to the analysis assistant and Galaxy workflows.
+
+Some things are only on logan-search.org for now: searching GenBank and RefSeq reference genomes, its "Fast" index groups, email notification when a search finishes, and alignment of the query against a run's contigs. If you need one of those, use logan-search.org; the threshold and scores mean the same thing on both.

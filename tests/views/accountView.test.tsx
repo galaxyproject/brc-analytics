@@ -29,6 +29,7 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
     deleteFavorite: jest.fn(),
     deleteSavedAnalysis: jest.fn(),
     getFavorites: jest.fn(),
+    getLoganSearches: jest.fn(),
     getSavedAnalyses: jest.fn(),
     getWorkflowRuns: jest.fn(),
     openSavedAnalysis: jest.fn(),
@@ -36,6 +37,12 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 }));
 jest.mock("@repo/shared/services/workflows/query", () => ({
   findEntity: jest.fn(),
+}));
+let mockLoganSearchEnabled = true;
+jest.mock("@databiosphere/findable-ui/lib/hooks/useConfig", () => ({
+  useConfig: (): { config: { loganSearchEnabled: boolean } } => ({
+    config: { loganSearchEnabled: mockLoganSearchEnabled },
+  }),
 }));
 jest.mock("next/router", () => ({
   __esModule: true,
@@ -79,9 +86,36 @@ function setFavorites(favorites: unknown[] = []): void {
   } as unknown as ReturnType<typeof useFavorites>);
 }
 
+/**
+ * A page of Logan searches as the backend returns it.
+ * @param jobIds - Job ids on the page, newest first.
+ * @param total - Searches the user has in all.
+ * @param offset - Where the page starts.
+ * @returns The page.
+ */
+function loganPage(
+  jobIds: string[],
+  total: number,
+  offset = 0
+): Awaited<ReturnType<typeof apiClient.getLoganSearches>> {
+  return {
+    limit: 20,
+    offset,
+    searches: jobIds.map((job_id) => ({
+      created_at: "2026-10-01T12:00:00Z",
+      indexes: ["GENOMIC_INV", "GENOMIC_BCT", "GENOMIC_VRL", "GENOMIC_PLN"],
+      job_id,
+      query_bases: 500,
+      threshold: 0.5,
+    })),
+    total,
+  };
+}
+
 describe("AccountView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLoganSearchEnabled = true;
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isConfigured: true,
@@ -92,6 +126,7 @@ describe("AccountView", () => {
     setFavorites();
     mockClient.getSavedAnalyses.mockResolvedValue([]);
     mockClient.getWorkflowRuns.mockResolvedValue([]);
+    mockClient.getLoganSearches.mockResolvedValue(loganPage([], 0));
   });
 
   test("shows a single loading state before deciding between sections and the empty panel", async () => {
@@ -357,5 +392,73 @@ describe("AccountView", () => {
       expect(screen.getByText(/trs:\/\/x/)).toBeInTheDocument()
     );
     expect(screen.queryByText(/handoff_created/)).not.toBeInTheDocument();
+  });
+
+  test("lists Logan searches, each linking back to its results", async () => {
+    mockClient.getLoganSearches.mockResolvedValue(
+      loganPage(["aaaa000000000001"], 1)
+    );
+
+    renderAccountView();
+
+    const region = await screen.findByRole("region", {
+      name: "Logan searches",
+    });
+    expect(region).toHaveTextContent(
+      "500 bases at threshold 0.50 · GENOMIC_INV, GENOMIC_BCT, GENOMIC_VRL and 1 more"
+    );
+    expect(screen.getByRole("link", { name: "Open results" })).toHaveAttribute(
+      "href",
+      "/logan-search?job=aaaa000000000001"
+    );
+    expect(screen.queryByText(/Browse assemblies/i)).not.toBeInTheDocument();
+  });
+
+  test("pages further back on Show more, without repeating a job", async () => {
+    mockClient.getLoganSearches
+      .mockResolvedValueOnce(loganPage(["job1", "job2"], 3))
+      .mockResolvedValueOnce(loganPage(["job2", "job3"], 3, 2));
+
+    renderAccountView();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Show more" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole("link", { name: "Open results" })
+      ).toHaveLength(3)
+    );
+    expect(mockClient.getLoganSearches).toHaveBeenLastCalledWith(2);
+    expect(
+      screen.queryByRole("button", { name: "Show more" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("never asks for Logan searches on a site without Logan search", async () => {
+    mockLoganSearchEnabled = false;
+    mockClient.getLoganSearches.mockResolvedValue(loganPage(["job-1"], 1));
+
+    renderAccountView();
+
+    await waitFor(() =>
+      expect(screen.getByText(/Browse assemblies/i)).toBeInTheDocument()
+    );
+    expect(mockClient.getLoganSearches).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("region", { name: "Logan searches" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("leaves the section out when the searches fail to load", async () => {
+    mockClient.getLoganSearches.mockRejectedValue(new Error("503"));
+
+    renderAccountView();
+
+    await waitFor(() =>
+      expect(screen.getByText(/Browse assemblies/i)).toBeInTheDocument()
+    );
+    expect(
+      screen.queryByRole("region", { name: "Logan searches" })
+    ).not.toBeInTheDocument();
   });
 });
