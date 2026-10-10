@@ -33,7 +33,7 @@ class TransformResult:
     dbt_test_results: list[DBTTestResult]
 
 
-def _load_run_results() -> dict:
+def _load_run_results():
     """Read dbt's run_results.json artifact from the most recent dbt invocation."""
     run_results_path = Path(DBT_FOLDER_PATH) / "target" / "run_results.json"
     with open(run_results_path, encoding="utf-8") as file:
@@ -174,9 +174,9 @@ def do_dbt_transformations(
       A TransformResult containing the dbt test results
     """
     runner = create_runner(
-        None,
-        None,
-        None,
+        None,  # type: ignore  # Mistyped in dlt
+        None,  # type: ignore  # Mistyped in dlt
+        None,  # type: ignore  # Mistyped in dlt
         config=DBTRunnerConfiguration(
             package_location=DBT_FOLDER_PATH,
             package_profiles_dir=DBT_FOLDER_PATH,
