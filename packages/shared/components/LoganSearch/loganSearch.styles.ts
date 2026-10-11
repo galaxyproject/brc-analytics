@@ -7,20 +7,12 @@ export const SearchContainer = styled.div`
   gap: 24px;
 `;
 
-/* The query and the threshold share the first row: the query box wants width,
-   and the slider wants exactly the narrower column -- given the whole page a
-   0.05 step is a couple of pixels of travel. The picker goes below them, across
-   both columns, through FormSpan. Collapses to one column before the two halves
-   get too cramped. */
+/* Query, then indexes, then the action bar, each the full width: the matrix
+   needs it, and the threshold lives in the action bar beside Search. */
 export const FormGrid = styled.div`
-  display: grid;
-  gap: 24px 32px;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  align-items: start;
-
-  @media (max-width: 900px) {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 `;
 
 export const FormColumn = styled.div`
@@ -30,13 +22,30 @@ export const FormColumn = styled.div`
   min-width: 0;
 `;
 
-/* A row that spans both form columns: the index picker wants the full
-   width so its two chip rows wrap once or twice rather than five times. */
 export const FormSpan = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  grid-column: 1 / -1;
+  min-width: 0;
+`;
+
+/* Threshold, the index count and the buttons: everything that sets what the
+   search will cost, read where it starts. */
+export const ActionBar = styled.div`
+  align-items: center;
+  border-top: 1px solid ${PALETTE.SMOKE_MAIN};
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  padding-top: 20px;
+`;
+
+/* Wide enough that a 0.05 step is a few pixels of travel, no wider. */
+export const ThresholdControl = styled.div`
+  display: flex;
+  flex: 0 1 320px;
+  flex-direction: column;
+  min-width: 220px;
 `;
 
 /* The Indexes heading and the info icon that explains what's missing. */

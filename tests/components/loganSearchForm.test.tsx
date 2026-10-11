@@ -58,7 +58,11 @@ const INDEXES = STRATEGY_CODES.flatMap((strategy) =>
 
 const VIRAL_ONLY = INDEXES.filter((index) => index.endsWith("_VRL"));
 
-const DEFAULT_SENTENCE = "Searching 1 of 109 indexes: GENOMIC_INV.";
+const DEFAULT_SENTENCE =
+  "Searching 1 of 109 indexes: invertebrate genomic, where the sample query's hits are.";
+
+// The same single index, once someone has picked it rather than inherited it.
+const PICKED_INV = "Searching 1 of 109 indexes: GENOMIC_INV.";
 
 /**
  * A search-hook stub carrying only what the form reads.
@@ -124,20 +128,11 @@ function chip(name: string, label: string): HTMLElement {
  * @returns The card.
  */
 function card(title: string): HTMLElement {
-  return within(group("Index scope")).getByRole("button", {
+  return within(group("Index presets")).getByRole("button", {
     // The title, then the note, which starts with a capital: so "All" doesn't
     // also find "All but viral and human".
     name: new RegExp(`^${title} [A-Z]`),
   });
-}
-
-/**
- * Open the matrix behind the Custom card.
- * @returns The grid.
- */
-function openMatrix(): HTMLElement {
-  fireEvent.click(card("Custom"));
-  return screen.getByRole("grid");
 }
 
 /**
@@ -180,7 +175,7 @@ function searchButton(): HTMLButtonElement {
 }
 
 describe("LoganSearchForm index picker", () => {
-  test("offers a card per Logan group, then Custom", () => {
+  test("offers a card per Logan group", () => {
     renderForm();
 
     const titles = [
@@ -189,9 +184,8 @@ describe("LoganSearchForm index picker", () => {
       "Transcriptomic",
       "Metatranscriptomic",
       "Metagenomic",
-      "Custom",
     ];
-    expect(within(group("Index scope")).getAllByRole("button")).toEqual(
+    expect(within(group("Index presets")).getAllByRole("button")).toEqual(
       titles.map(card)
     );
     expect(card("All but viral and human").textContent).toContain("82 indexes");
@@ -201,8 +195,11 @@ describe("LoganSearchForm index picker", () => {
     renderForm();
 
     expect(sentence()).toBe(DEFAULT_SENTENCE);
-    expect(card("Custom").getAttribute("data-current")).toBe("true");
-    expect(card("All").getAttribute("aria-pressed")).toBe("false");
+    for (const preset of within(group("Index presets")).getAllByRole("button"))
+      expect(preset.getAttribute("aria-pressed")).toBe("false");
+    expect(cell("Genomic", "Invertebrates").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
     expect(screen.getByText("of 109 indexes")).toBeTruthy();
   });
 
@@ -210,11 +207,14 @@ describe("LoganSearchForm index picker", () => {
     renderForm();
     const why = /where the sample query's hits are/;
 
-    expect(card("Custom").textContent).toMatch(why);
+    expect(sentence()).toMatch(why);
     fireEvent.click(card("Metagenomic"));
-    expect(card("Custom").textContent).not.toMatch(why);
+    expect(sentence()).not.toMatch(why);
+    fireEvent.click(cell("Metagenomic", "Bacteria"));
+    fireEvent.click(line("Metagenomic"));
+    expect(sentence()).not.toMatch(why);
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-    expect(card("Custom").textContent).toMatch(why);
+    expect(sentence()).toMatch(why);
   });
 
   test("a card selects its scope and lights up", () => {
@@ -226,7 +226,9 @@ describe("LoganSearchForm index picker", () => {
     expect(card("All but viral and human").getAttribute("aria-pressed")).toBe(
       "true"
     );
-    expect(card("Custom").getAttribute("data-current")).toBe("false");
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
     const sent: string[] = submit.mock.calls[0][0].indexes;
     expect(sent).toHaveLength(82);
     expect(sent.some((index) => /_(VRL|PHG|HUMAN)$/.test(index))).toBe(false);
@@ -238,7 +240,6 @@ describe("LoganSearchForm index picker", () => {
     expect(card("All but viral and human").textContent).toContain(
       "logan-search.org:All_No_viral_human"
     );
-    expect(card("Custom").textContent).not.toContain("logan-search.org");
   });
 
   test("says why some logan-search.org groups are missing", async () => {
@@ -253,22 +254,22 @@ describe("LoganSearchForm index picker", () => {
     expect(tip).toMatch(/GenBank_RefSeq/);
   });
 
-  test("keeps the matrix closed until Custom opens it", () => {
+  test("shows the matrix from the start, with a phone-only toggle", () => {
     renderForm();
 
-    expect(screen.queryByRole("grid")).toBeNull();
-    expect(card("Custom").getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("grid")).toBeTruthy();
+    // Hidden by CSS until the screen is phone-sized, which jsdom never is, so
+    // it has no accessible name here and is found by its text instead.
+    const toggle = screen.getByText("Pick index by index");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
 
-    openMatrix();
-    expect(card("Custom").getAttribute("aria-expanded")).toBe("true");
-
-    fireEvent.click(card("Custom"));
-    expect(screen.queryByRole("grid")).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.textContent).toBe("Hide the matrix");
   });
 
   test("a cell adds or drops its index", () => {
     renderForm();
-    openMatrix();
 
     fireEvent.click(cell("Genomic", "Bacteria"));
     expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
@@ -284,7 +285,6 @@ describe("LoganSearchForm index picker", () => {
 
   test("a row label takes the whole row, then drops it", () => {
     renderForm();
-    openMatrix();
 
     fireEvent.click(line("Bacteria"));
     expect(sentence()).toBe(
@@ -293,23 +293,20 @@ describe("LoganSearchForm index picker", () => {
     expect(line("Bacteria").getAttribute("aria-pressed")).toBe("true");
 
     fireEvent.click(line("Bacteria"));
-    expect(sentence()).toBe(DEFAULT_SENTENCE);
+    expect(sentence()).toBe(PICKED_INV);
   });
 
   test("a column label that matches a card lights the card", () => {
     renderForm();
-    openMatrix();
 
     fireEvent.click(cell("Genomic", "Invertebrates"));
     fireEvent.click(line("Metagenomic"));
 
     expect(card("Metagenomic").getAttribute("aria-pressed")).toBe("true");
-    expect(card("Custom").getAttribute("data-current")).toBe("false");
   });
 
   test("the corner All takes everything, and clearing it closes Search", () => {
     renderForm();
-    openMatrix();
 
     fireEvent.click(within(screen.getByRole("grid")).getByText("All"));
     expect(sentence()).toBe("Searching all 109 indexes.");
@@ -322,7 +319,6 @@ describe("LoganSearchForm index picker", () => {
 
   test("a drag paints every cell it crosses the way the first one went", () => {
     renderForm();
-    openMatrix();
 
     fireEvent.pointerDown(cell("Genomic", "Human"), { button: 0 });
     fireEvent.pointerEnter(cell("Metagenomic", "Human"));
@@ -338,7 +334,6 @@ describe("LoganSearchForm index picker", () => {
 
   test("shows a hole in the grid as a hole, not a cell", () => {
     renderForm();
-    openMatrix();
 
     expect(
       screen.queryByRole("button", { name: "Genomic, Environmental" })
@@ -351,7 +346,7 @@ describe("LoganSearchForm index picker", () => {
 
   test("is one tab stop, moved by the arrow keys past holes", () => {
     renderForm();
-    const grid = openMatrix();
+    const grid = screen.getByRole("grid");
 
     const stops = within(grid)
       .getAllByRole("button")
@@ -421,7 +416,7 @@ describe("LoganSearchForm index picker", () => {
     // Not All: resting on everything would make one click on an untouched
     // form the most expensive job the instance can run.
     expect(sentence()).toBe("Searching 1 of 9 indexes: GENOMIC_VRL.");
-    expect(card("Custom").textContent).not.toMatch(/sample query/);
+    expect(sentence()).not.toMatch(/sample query/);
   });
 
   test("says so when the instance has no indexes at all", () => {
@@ -430,7 +425,7 @@ describe("LoganSearchForm index picker", () => {
     expect(
       screen.getByText("No indexes are available right now.")
     ).toBeTruthy();
-    expect(screen.queryByRole("group", { name: "Index scope" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Index presets" })).toBeNull();
   });
 
   test("submits a pasted FASTQ record as FASTA, named by its header", async () => {

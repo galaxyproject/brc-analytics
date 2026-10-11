@@ -1,37 +1,50 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
-/* Scope cards: five presets plus Custom, so three to a row on a wide form
-   (two full rows), fewer as it narrows, and one column on a phone. */
+/* Presets in a narrow column beside the matrix, so a preset and the cells it
+   lights are read together. Below that width the presets wrap above the
+   matrix, and on a phone the matrix folds behind its toggle. */
+export const PickerLayout = styled.div`
+  align-items: start;
+  display: grid;
+  gap: 16px 24px;
+  grid-template-areas: "presets" "toggle" "matrix";
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 1100px) {
+    grid-template-areas: "presets matrix";
+    grid-template-columns: 264px minmax(0, 1fr);
+  }
+`;
+
 export const ScopeCards = styled.div`
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 8px;
+  grid-area: presets;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+
+  @media (min-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 `;
 
 export const ScopeCard = styled.button`
-  align-items: center;
   background: ${PALETTE.COMMON_WHITE};
   border: 1px solid ${PALETTE.SMOKE_DARK};
-  border-radius: 12px;
+  border-radius: 10px;
   color: inherit;
   cursor: pointer;
-  display: grid;
+  display: block;
   font: inherit;
-  gap: 12px;
-  grid-template-columns: auto minmax(0, 1fr);
   min-width: 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   text-align: left;
 
   &:hover {
     border-color: ${PALETTE.PRIMARY_MAIN};
   }
 
-  /* The card that names the current selection. Custom has no aria-pressed --
-     it opens the matrix -- so it carries data-current instead. */
-  &[aria-pressed="true"],
-  &[data-current="true"] {
+  &[aria-pressed="true"] {
     background: ${PALETTE.PRIMARY_LIGHTEST};
     border-color: ${PALETTE.PRIMARY_MAIN};
     box-shadow: inset 0 0 0 1px ${PALETTE.PRIMARY_MAIN};
@@ -40,6 +53,42 @@ export const ScopeCard = styled.button`
   &:focus-visible {
     outline: 2px solid ${PALETTE.PRIMARY_MAIN};
     outline-offset: 2px;
+  }
+`;
+
+/* Only on a phone, where the matrix starts folded. */
+export const MatrixToggle = styled.button`
+  background: none;
+  border: 1px solid ${PALETTE.PRIMARY_MAIN};
+  border-radius: 8px;
+  color: ${PALETTE.PRIMARY_MAIN};
+  cursor: pointer;
+  display: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  grid-area: toggle;
+  justify-self: start;
+  padding: 6px 14px;
+
+  &:focus-visible {
+    outline: 2px solid ${PALETTE.PRIMARY_MAIN};
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 760px) {
+    display: block;
+  }
+`;
+
+export const MatrixPane = styled.div`
+  grid-area: matrix;
+  min-width: 0;
+
+  @media (max-width: 760px) {
+    &[data-open="false"] {
+      display: none;
+    }
   }
 `;
 
@@ -111,7 +160,7 @@ export const MatrixTable = styled.table`
     line-height: 15px;
     text-align: center;
     vertical-align: bottom;
-    width: 72px;
+    width: 64px;
   }
 
   thead th button {
@@ -203,7 +252,7 @@ export const MatrixCell = styled.button`
   display: block;
   height: 30px;
   padding: 0;
-  width: 72px;
+  width: 64px;
 
   &:hover,
   &[data-crossed="true"] {
@@ -235,7 +284,7 @@ export const MatrixGap = styled.div`
   border: 1px dashed ${PALETTE.SMOKE_MAIN};
   border-radius: 6px;
   height: 30px;
-  width: 72px;
+  width: 64px;
 `;
 
 export const MatrixHint = styled.p`
