@@ -1,10 +1,13 @@
 import {
   axisOptions,
   describeIndexSelection,
+  describeIndexSet,
   indexDivision,
   indexPresets,
   joinNaturally,
   selectIndexes,
+  selectionAxes,
+  sortIndexes,
 } from "@repo/shared/components/LoganSearch/utils";
 
 // The registered list as dev returns it: every strategy across every division
@@ -390,5 +393,76 @@ describe("indexPresets", () => {
     expect(indexPresets(["GENOMIC_VRL"]).map((p) => p.loganName)).toEqual([
       "All",
     ]);
+  });
+});
+
+describe("selectionAxes", () => {
+  test("reads a product back as its rows and columns", () => {
+    const selected = selectIndexes(INDEXES, ["BCT", "INV"], ["GENOMIC"]);
+
+    expect(selectionAxes(INDEXES, selected)).toEqual({
+      divisions: ["BCT", "INV"],
+      isProduct: true,
+      strategies: ["GENOMIC"],
+    });
+  });
+
+  test("lists touched codes in display order, not pick order", () => {
+    const { divisions } = selectionAxes(INDEXES, [
+      "GENOMIC_HUMAN",
+      "GENOMIC_BCT",
+    ]);
+
+    expect(divisions).toEqual(["BCT", "HUMAN"]);
+  });
+
+  test("knows a diagonal isn't a product", () => {
+    expect(
+      selectionAxes(INDEXES, ["GENOMIC_BCT", "METAGENOMIC_INV"]).isProduct
+    ).toBe(false);
+  });
+
+  test("calls the lone environmental index a product of its row", () => {
+    // ENV has only a metagenomic index, so its row is one cell wide.
+    expect(selectionAxes(INDEXES, ["METAGENOMIC_ENV"]).isProduct).toBe(true);
+  });
+});
+
+describe("describeIndexSet", () => {
+  test("asks for a pick when nothing is chosen", () => {
+    expect(describeIndexSet(INDEXES, [])).toBe(
+      "Pick at least one index to search."
+    );
+  });
+
+  test("names a short set outright", () => {
+    expect(describeIndexSet(INDEXES, ["GENOMIC_BCT", "METAGENOMIC_INV"])).toBe(
+      "Searching 2 of 109 indexes: GENOMIC_BCT, METAGENOMIC_INV."
+    );
+  });
+
+  test("reads a product the way the axes would", () => {
+    const selected = selectIndexes(INDEXES, [], ["METAGENOMIC"]);
+
+    expect(describeIndexSet(INDEXES, selected)).toBe(
+      "Searching 13 of 109 indexes: every organism; metagenomic."
+    );
+  });
+
+  test("says how far a larger custom set reaches", () => {
+    const selected = sortIndexes([
+      ...selectIndexes(INDEXES, ["BCT"], []),
+      "GENOMIC_HUMAN",
+    ]);
+
+    expect(describeIndexSet(INDEXES, selected)).toBe(
+      "Searching 10 of 109 indexes: a custom set across 9 library types and 2 organism groups."
+    );
+  });
+
+  test("calls the whole registry all of it", () => {
+    expect(describeIndexSet(INDEXES, INDEXES)).toBe(
+      "Searching all 109 indexes."
+    );
   });
 });

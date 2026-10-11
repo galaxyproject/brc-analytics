@@ -46,6 +46,9 @@ export interface IndexAxisValue {
   label: string;
   // Where the label alone would mislead: what the division actually holds.
   note?: string;
+  // The label for a narrow matrix column header, with soft hyphens where a
+  // long word may break.
+  shortLabel?: string;
 }
 
 export interface IndexAxisOption extends IndexAxisValue {
@@ -86,11 +89,27 @@ const DIVISIONS: IndexAxisValue[] = [
    most of Logan sit at the head of the row. */
 const STRATEGIES: IndexAxisValue[] = [
   { code: "GENOMIC", label: "Genomic" },
-  { code: "METAGENOMIC", label: "Metagenomic" },
-  { code: "TRANSCRIPTOMIC", label: "Transcriptomic" },
-  { code: "METATRANSCRIPTOMIC", label: "Metatranscriptomic" },
+  {
+    code: "METAGENOMIC",
+    label: "Metagenomic",
+    shortLabel: "Meta\u00ADgenomic",
+  },
+  {
+    code: "TRANSCRIPTOMIC",
+    label: "Transcriptomic",
+    shortLabel: "Tran\u00ADscrip\u00ADtomic",
+  },
+  {
+    code: "METATRANSCRIPTOMIC",
+    label: "Metatranscriptomic",
+    shortLabel: "Meta\u00ADtran\u00ADscrip\u00ADtomic",
+  },
   { code: "GENOMICSINGLECELL", label: "Single-cell genomic" },
-  { code: "TRANSCRIPTOMICSINGLECELL", label: "Single-cell transcriptomic" },
+  {
+    code: "TRANSCRIPTOMICSINGLECELL",
+    label: "Single-cell transcriptomic",
+    shortLabel: "Single-cell tran\u00ADscrip\u00ADtomic",
+  },
   { code: "VIRALRNA", label: "Viral RNA" },
   { code: "SYNTHETIC", label: "Synthetic" },
   { code: "OTHER", label: "Other" },
@@ -297,6 +316,70 @@ export function describeIndexSelection(args: {
     ? joinNaturally(libraries.map(lowerFirst))
     : "every library type";
   return `Searching ${share} indexes: ${organismPhrase}; ${libraryPhrase}.`;
+}
+
+/**
+ * The organism groups and library types a set of indexes touches, and whether
+ * the set is all of their product -- the only shape the axes, the presets and
+ * the sentence can name. A set picked cell by cell on the matrix often isn't.
+ * @param indexes - Every registered index name.
+ * @param selected - The chosen index names, each one registered.
+ * @returns Touched codes in each axis's display order, and the product test.
+ */
+export function selectionAxes(
+  indexes: string[],
+  selected: string[]
+): { divisions: string[]; isProduct: boolean; strategies: string[] } {
+  const chosen = new Set(selected);
+  const touched = (axis: IndexAxis): string[] => {
+    const read = axis === "division" ? indexDivision : indexStrategy;
+    const codes = new Set([...chosen].map(read));
+    return axisOptions(indexes, axis)
+      .map(({ code }) => code)
+      .filter((code) => codes.has(code));
+  };
+  const divisions = touched("division");
+  const strategies = touched("strategy");
+  // The product always contains the set, so equal sizes mean equal sets.
+  const isProduct =
+    selectIndexes(indexes, divisions, strategies).length === chosen.size;
+  return { divisions, isProduct, strategies };
+}
+
+/**
+ * What a picked set of indexes searches, as the sentence beside the Search
+ * button. A set the axes can name reads as before; one that isn't a product of
+ * its rows and columns says how far it reaches instead of listing every name.
+ * @param indexes - Every registered index name.
+ * @param selected - The chosen index names.
+ * @returns One sentence.
+ */
+export function describeIndexSet(
+  indexes: string[],
+  selected: string[]
+): string {
+  if (selected.length === 0) return "Pick at least one index to search.";
+  const { divisions, isProduct, strategies } = selectionAxes(indexes, selected);
+  const total = indexes.length;
+  if (isProduct || selected.length <= 4 || selected.length === total) {
+    const labelsOf = (axis: IndexAxis, codes: string[]): string[] => {
+      const options = axisOptions(indexes, axis);
+      // A whole axis reads as "every ...", the same as an empty selection.
+      if (codes.length === options.length) return [];
+      return options
+        .filter((option) => codes.includes(option.code))
+        .map((option) => option.label);
+    };
+    return describeIndexSelection({
+      libraries: labelsOf("strategy", strategies),
+      organisms: labelsOf("division", divisions),
+      selected,
+      total,
+    });
+  }
+  const groups = divisions.length === 1 ? "organism group" : "organism groups";
+  const types = strategies.length === 1 ? "library type" : "library types";
+  return `Searching ${selected.length.toLocaleString()} of ${total.toLocaleString()} indexes: a custom set across ${strategies.length} ${types} and ${divisions.length} ${groups}.`;
 }
 
 /**
