@@ -1,6 +1,8 @@
-import { IndexGlyph } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/IndexPicker/indexGlyph";
 import { IndexMatrix } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/IndexPicker/indexMatrix";
 import {
+  MatrixPane,
+  MatrixToggle,
+  PickerLayout,
   ScopeCard,
   ScopeCards,
   ScopeCount,
@@ -18,7 +20,6 @@ import { type JSX, useMemo, useState } from "react";
 const MATRIX_ID = "logan-index-matrix";
 
 interface IndexPickerProps {
-  defaultNote?: string;
   indexes: string[];
   onChange: (selected: string[]) => void;
   selected: string[];
@@ -35,21 +36,20 @@ function indexCount(count: number): string {
 
 /**
  * Which indexes to search: a card per logan-search.org group this instance
- * can offer, and a Custom card that opens the full matrix.
+ * can offer, beside the full matrix.
  *
  * A card lights up when the selection is exactly what it covers, however the
  * selection got there, so picking the same set by hand lights it too and a
- * tweak on the matrix turns it off. Custom lights up for anything else.
+ * tweak on the matrix turns it off. With no card lit, the matrix is the
+ * selection. On a phone the matrix is too wide to sit open by default, so it
+ * folds behind a toggle there.
  * @param props - Component props.
- * @param props.defaultNote - Why the untouched default is what it is, shown on
- * Custom until someone picks something.
  * @param props.indexes - Every registered index name, sorted.
  * @param props.onChange - Called with the new selection, sorted.
  * @param props.selected - The chosen index names, sorted.
  * @returns The picker.
  */
 export const IndexPicker = ({
-  defaultNote,
   indexes,
   onChange,
   selected,
@@ -68,15 +68,9 @@ export const IndexPicker = ({
     (preset) => preset.indexes.join(",") === selectedKey
   );
 
-  let customCount = indexCount(selected.length);
-  if (current) customCount = matrixOpen ? "Hide the matrix" : "Open the matrix";
-  let customNote = "Pick indexes one by one on the full matrix.";
-  if (defaultNote) customNote = defaultNote;
-  if (matrixOpen) customNote = "Pick indexes on the matrix below.";
-
   return (
-    <>
-      <ScopeCards aria-label="Index scope" role="group">
+    <PickerLayout>
+      <ScopeCards aria-label="Index presets" role="group">
         {presets.map((preset) => (
           <ScopeCard
             aria-pressed={preset === current}
@@ -84,7 +78,6 @@ export const IndexPicker = ({
             onClick={(): void => onChange(preset.indexes)}
             type="button"
           >
-            <IndexGlyph indexes={indexes} selected={preset.indexes} />
             <ScopeText>
               <ScopeTitle>{preset.label}</ScopeTitle>
               <ScopeNote>{preset.note}</ScopeNote>
@@ -96,29 +89,23 @@ export const IndexPicker = ({
             </ScopeText>
           </ScopeCard>
         ))}
-        <ScopeCard
-          aria-controls={MATRIX_ID}
-          aria-expanded={matrixOpen}
-          data-current={!current}
-          onClick={(): void => setMatrixOpen((open) => !open)}
-          type="button"
-        >
-          <IndexGlyph indexes={indexes} selected={selected} />
-          <ScopeText>
-            <ScopeTitle>Custom</ScopeTitle>
-            <ScopeNote>{customNote}</ScopeNote>
-            <ScopeCount>{customCount}</ScopeCount>
-          </ScopeText>
-        </ScopeCard>
       </ScopeCards>
-      {matrixOpen && (
+      <MatrixToggle
+        aria-controls={MATRIX_ID}
+        aria-expanded={matrixOpen}
+        onClick={(): void => setMatrixOpen((open) => !open)}
+        type="button"
+      >
+        {matrixOpen ? "Hide the matrix" : "Pick index by index"}
+      </MatrixToggle>
+      <MatrixPane data-open={matrixOpen}>
         <IndexMatrix
           id={MATRIX_ID}
           indexes={indexes}
           onChange={onChange}
           selected={selected}
         />
-      )}
-    </>
+      </MatrixPane>
+    </PickerLayout>
   );
 };

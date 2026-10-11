@@ -11,12 +11,14 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  ActionBar,
   ControlRow,
   FormColumn,
   FormGrid,
   FormSpan,
   IndexChips,
   IndexHeading,
+  ThresholdControl,
 } from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
 import { IndexPicker } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/IndexPicker/indexPicker";
@@ -70,10 +72,9 @@ const DEFAULT_INDEX = "GENOMIC_INV";
 // rather than against environmental metagenomes.
 const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 
-// Shown on Custom while the default stands, so a lone highlighted index reads
-// as a choice the page made, not one somebody forgot about.
-const DEFAULT_NOTE =
-  "Starts on invertebrate genomic, where the sample query's hits are.";
+// The sentence's ending while the default stands, so a lone index reads as a
+// choice the page made, not one somebody forgot about.
+const DEFAULT_NOTE = "invertebrate genomic, where the sample query's hits are.";
 
 export const LoganSearchForm = ({
   onSubmitted,
@@ -145,7 +146,10 @@ export const LoganSearchForm = ({
   const indexes = picked
     ? options.filter((index) => picked.includes(index))
     : defaultIndexes;
-  const sentence = describeIndexSet(options, indexes);
+  const sentence =
+    !picked && options.includes(DEFAULT_INDEX)
+      ? `Searching 1 of ${options.length.toLocaleString()} indexes: ${DEFAULT_NOTE}`
+      : describeIndexSet(options, indexes);
 
   const query = parseQuery(sequence);
   const { bases, records } = query;
@@ -241,31 +245,6 @@ export const LoganSearchForm = ({
             </ControlRow>
           </FormColumn>
 
-          <FormColumn>
-            <Typography variant="h6">Threshold</Typography>
-            {/* The reading, the slider and the caption are one control, so they
-                sit inside the column's gap rather than spread across it. */}
-            <div>
-              <Typography gutterBottom variant="body2">
-                Minimum shared k-mer fraction: {threshold.toFixed(2)}
-              </Typography>
-              <Slider
-                max={1}
-                // Logan-Search itself clamps here: below a quarter of the query's
-                // k-mers the hit list is mostly noise and very expensive to merge.
-                min={0.25}
-                onChange={(_, value): void => setThreshold(value as number)}
-                step={0.05}
-                value={threshold}
-                valueLabelDisplay="auto"
-              />
-              <Typography color="textSecondary" variant="caption">
-                Lower values return more accessions and take longer to
-                aggregate.
-              </Typography>
-            </div>
-          </FormColumn>
-
           <FormSpan>
             <IndexHeading>
               <Typography variant="h6">Indexes</Typography>
@@ -282,8 +261,8 @@ export const LoganSearchForm = ({
               </Tooltip>
             </IndexHeading>
             <Typography color="textSecondary" variant="body2">
-              Each index is one organism group by one library type. Pick a
-              scope, or open Custom to choose index by index.
+              Each index is one organism group by one library type. Start from a
+              preset, or pick cells on the matrix.
             </Typography>
             {search.isLoadingIndexes && (
               <ControlRow>
@@ -300,11 +279,6 @@ export const LoganSearchForm = ({
             )}
             {!search.isLoadingIndexes && options.length > 0 && (
               <IndexPicker
-                defaultNote={
-                  !picked && options.includes(DEFAULT_INDEX)
-                    ? DEFAULT_NOTE
-                    : undefined
-                }
                 indexes={options}
                 onChange={(next): void => setPicked(sortIndexes(next))}
                 selected={indexes}
@@ -313,52 +287,79 @@ export const LoganSearchForm = ({
           </FormSpan>
 
           <FormSpan>
-            <ControlRow>
-              <Button
-                disabled={!canSubmit}
-                onClick={async (): Promise<void> => {
-                  // FASTQ goes as its FASTA form; the backend only reads FASTA.
-                  const jobId = await search.submit({
-                    indexes,
-                    sequence: query.fasta,
-                    threshold,
-                    zvalue: 6,
-                  });
-                  if (jobId) {
-                    onSubmitted?.({
-                      indexes,
-                      jobId,
-                      queryName: queryNameOf(query.fasta),
-                      submittedAt: new Date().toISOString(),
-                      threshold,
-                    });
-                  }
-                }}
-                startIcon={
-                  isRunning ? <CircularProgress size={18} /> : <Search />
-                }
-                variant="contained"
-              >
-                {isRunning ? "Searching..." : "Search Logan"}
-              </Button>
-              {/* Never disabled -- Reset is the escape hatch when a search is
-                  wedged, which is exactly when it would be disabled otherwise. */}
-              <Button
-                onClick={(): void => {
-                  setPicked(null);
-                  search.reset();
-                }}
-                variant="outlined"
-              >
-                Reset
-              </Button>
+            <ActionBar>
+              {/* Threshold sits with Search: it's how hard to search, set
+                  last, and the reading, slider and caption are one control. */}
+              <ThresholdControl>
+                <Typography id="logan-threshold" variant="body2">
+                  Threshold: minimum shared k-mer fraction{" "}
+                  <strong>{threshold.toFixed(2)}</strong>
+                </Typography>
+                <Slider
+                  aria-labelledby="logan-threshold"
+                  max={1}
+                  // Logan-Search itself clamps here: below a quarter of the
+                  // query's k-mers the hit list is mostly noise and very
+                  // expensive to merge.
+                  min={0.25}
+                  onChange={(_, value): void => setThreshold(value as number)}
+                  size="small"
+                  step={0.05}
+                  value={threshold}
+                  valueLabelDisplay="auto"
+                />
+                <Typography color="textSecondary" variant="caption">
+                  Lower values return more accessions and take longer to
+                  aggregate.
+                </Typography>
+              </ThresholdControl>
               {options.length > 0 && (
                 <IndexSummary
                   selected={indexes.length}
                   total={options.length}
                 />
               )}
-            </ControlRow>
+              <ControlRow>
+                <Button
+                  disabled={!canSubmit}
+                  onClick={async (): Promise<void> => {
+                    // FASTQ goes as its FASTA form; the backend only reads FASTA.
+                    const jobId = await search.submit({
+                      indexes,
+                      sequence: query.fasta,
+                      threshold,
+                      zvalue: 6,
+                    });
+                    if (jobId) {
+                      onSubmitted?.({
+                        indexes,
+                        jobId,
+                        queryName: queryNameOf(query.fasta),
+                        submittedAt: new Date().toISOString(),
+                        threshold,
+                      });
+                    }
+                  }}
+                  startIcon={
+                    isRunning ? <CircularProgress size={18} /> : <Search />
+                  }
+                  variant="contained"
+                >
+                  {isRunning ? "Searching..." : "Search Logan"}
+                </Button>
+                {/* Never disabled -- Reset is the escape hatch when a search is
+                  wedged, which is exactly when it would be disabled otherwise. */}
+                <Button
+                  onClick={(): void => {
+                    setPicked(null);
+                    search.reset();
+                  }}
+                  variant="outlined"
+                >
+                  Reset
+                </Button>
+              </ControlRow>
+            </ActionBar>
             {options.length > 0 && (
               <Typography
                 aria-live="polite"
