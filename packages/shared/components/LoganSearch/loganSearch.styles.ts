@@ -39,17 +39,11 @@ export const FormSpan = styled.div`
   grid-column: 1 / -1;
 `;
 
-/* Axis label on the left, chips wrapping beside it; stacked when the
-   label column would take a third of a phone. */
-export const IndexAxisRow = styled.div`
-  align-items: baseline;
-  display: grid;
-  gap: 8px 16px;
-  grid-template-columns: 112px minmax(0, 1fr);
-
-  @media (max-width: 600px) {
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* The Indexes heading and the info icon that explains what's missing. */
+export const IndexHeading = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 6px;
 `;
 
 export const IndexChips = styled.div`
