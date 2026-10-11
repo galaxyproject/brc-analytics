@@ -206,6 +206,17 @@ describe("LoganSearchForm index picker", () => {
     expect(screen.getByText("of 109 indexes")).toBeTruthy();
   });
 
+  test("says why the default is what it is until something is picked", () => {
+    renderForm();
+    const why = /where the sample query's hits are/;
+
+    expect(card("Custom").textContent).toMatch(why);
+    fireEvent.click(card("Metagenomic"));
+    expect(card("Custom").textContent).not.toMatch(why);
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(card("Custom").textContent).toMatch(why);
+  });
+
   test("a card selects its scope and lights up", () => {
     const { submit } = renderForm();
 
@@ -410,6 +421,7 @@ describe("LoganSearchForm index picker", () => {
     // Not All: resting on everything would make one click on an untouched
     // form the most expensive job the instance can run.
     expect(sentence()).toBe("Searching 1 of 9 indexes: GENOMIC_VRL.");
+    expect(card("Custom").textContent).not.toMatch(/sample query/);
   });
 
   test("says so when the instance has no indexes at all", () => {

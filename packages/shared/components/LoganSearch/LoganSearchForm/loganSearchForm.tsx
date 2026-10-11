@@ -70,6 +70,11 @@ const DEFAULT_INDEX = "GENOMIC_INV";
 // rather than against environmental metagenomes.
 const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 
+// Shown on Custom while the default stands, so a lone highlighted index reads
+// as a choice the page made, not one somebody forgot about.
+const DEFAULT_NOTE =
+  "Starts on invertebrate genomic, where the sample query's hits are.";
+
 export const LoganSearchForm = ({
   onSubmitted,
   search,
@@ -295,6 +300,11 @@ export const LoganSearchForm = ({
             )}
             {!search.isLoadingIndexes && options.length > 0 && (
               <IndexPicker
+                defaultNote={
+                  !picked && options.includes(DEFAULT_INDEX)
+                    ? DEFAULT_NOTE
+                    : undefined
+                }
                 indexes={options}
                 onChange={(next): void => setPicked(sortIndexes(next))}
                 selected={indexes}

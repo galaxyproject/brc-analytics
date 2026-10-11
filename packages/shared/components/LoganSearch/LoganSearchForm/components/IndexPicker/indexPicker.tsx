@@ -18,6 +18,7 @@ import { type JSX, useMemo, useState } from "react";
 const MATRIX_ID = "logan-index-matrix";
 
 interface IndexPickerProps {
+  defaultNote?: string;
   indexes: string[];
   onChange: (selected: string[]) => void;
   selected: string[];
@@ -40,12 +41,15 @@ function indexCount(count: number): string {
  * selection got there, so picking the same set by hand lights it too and a
  * tweak on the matrix turns it off. Custom lights up for anything else.
  * @param props - Component props.
+ * @param props.defaultNote - Why the untouched default is what it is, shown on
+ * Custom until someone picks something.
  * @param props.indexes - Every registered index name, sorted.
  * @param props.onChange - Called with the new selection, sorted.
  * @param props.selected - The chosen index names, sorted.
  * @returns The picker.
  */
 export const IndexPicker = ({
+  defaultNote,
   indexes,
   onChange,
   selected,
@@ -66,6 +70,9 @@ export const IndexPicker = ({
 
   let customCount = indexCount(selected.length);
   if (current) customCount = matrixOpen ? "Hide the matrix" : "Open the matrix";
+  let customNote = "Pick indexes one by one on the full matrix.";
+  if (defaultNote) customNote = defaultNote;
+  if (matrixOpen) customNote = "Pick indexes on the matrix below.";
 
   return (
     <>
@@ -99,11 +106,7 @@ export const IndexPicker = ({
           <IndexGlyph indexes={indexes} selected={selected} />
           <ScopeText>
             <ScopeTitle>Custom</ScopeTitle>
-            <ScopeNote>
-              {matrixOpen
-                ? "Pick indexes on the matrix below."
-                : "Pick indexes one by one on the full matrix."}
-            </ScopeNote>
+            <ScopeNote>{customNote}</ScopeNote>
             <ScopeCount>{customCount}</ScopeCount>
           </ScopeText>
         </ScopeCard>
