@@ -1,4 +1,4 @@
-import { Search, UploadFile } from "@mui/icons-material";
+import { InfoOutlined, Search, UploadFile } from "@mui/icons-material";
 import {
   Button,
   Card,
@@ -15,10 +15,12 @@ import {
   FormColumn,
   FormGrid,
   FormSpan,
-  IndexAxisRow,
   IndexChips,
+  IndexHeading,
 } from "@repo/shared/components/LoganSearch/loganSearch.styles";
 import { ConnectGalaxyAccount } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/ConnectGalaxyAccount/connectGalaxyAccount";
+import { IndexPicker } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/IndexPicker/indexPicker";
+import { IndexSummary } from "@repo/shared/components/LoganSearch/LoganSearchForm/components/IndexPicker/indexSummary";
 import {
   LOGAN_EXAMPLES,
   type LoganExample,
@@ -28,13 +30,7 @@ import {
   type RecentSearch,
 } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
 import {
-  axisOptions,
-  describeIndexSelection,
-  type IndexAxis,
-  type IndexAxisOption,
-  indexDivision,
-  indexPresets,
-  indexStrategy,
+  describeIndexSet,
   parseQuery,
   selectIndexes,
   sortIndexes,
@@ -65,23 +61,6 @@ const QUERY_FILE_TYPES = ".fa,.fasta,.fna,.fq,.fastq,.txt";
 // the instance actually has registered.
 const DEFAULT_INDEX = "GENOMIC_INV";
 
-// The theme's chips are 20/24px tags. These are the form's main control, so
-// they get a size you can hit and read, and a focus ring you can see: the
-// default focus style is a slightly darker grey on a grey chip, which at a
-// glance is no ring at all.
-const CHIP_SX = {
-  "& .MuiChip-label": { fontSize: 14, px: 1.5 },
-  "&.Mui-focusVisible": {
-    outline: "2px solid",
-    outlineColor: "primary.main",
-    outlineOffset: "2px",
-  },
-  // The chip stays clickable so it keeps the tab order and the tooltip, which
-  // leaves MUI's pointer cursor promising a click that does nothing.
-  "&[aria-disabled='true']": { cursor: "default" },
-  height: 32,
-};
-
 // The first example: a 500 bp window of the P. falciparum 18S rRNA. Measured
 // against DEFAULT_INDEX at threshold 0.5 it returns 17,629 hits -- 706 pages
 // at 25 a page, where the bacterial 16S fragment that used to sit here
@@ -91,214 +70,18 @@ const CHIP_SX = {
 // rather than against environmental metagenomes.
 const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 
-interface AxisChipModel extends IndexAxisOption {
-  // Settled with the other row's selection in hand, so the chip itself never
-  // has to work out what it stands for.
-  tooltip: string;
-  // Nothing registered pairs this value with the other row's selection.
-  unavailable: boolean;
-}
-
-/**
- * One toggle chip in an axis row.
- *
- * An unavailable value is marked rather than disabled. MUI's `disabled` drops
- * the chip out of the tab order and turns off its pointer events, which takes
- * the reason it cannot be picked away from the reader most likely to need it
- * read out.
- * @param props - Component props.
- * @param props.label - Chip text.
- * @param props.onClick - Called when a pickable chip is clicked.
- * @param props.selected - Whether this value is part of the axis selection.
- * @param props.tooltip - What the chip stands for, or why it cannot be picked.
- * @param props.unavailable - Set when picking this value would search nothing.
- * @returns The chip.
- */
-function AxisChip({
-  label,
-  onClick,
-  selected,
-  tooltip,
-  unavailable = false,
-}: {
-  label: string;
-  onClick: () => void;
-  selected: boolean;
-  tooltip: string;
-  unavailable?: boolean;
-}): JSX.Element {
-  return (
-    <Tooltip describeChild title={tooltip}>
-      <Chip
-        aria-disabled={unavailable || undefined}
-        aria-pressed={selected}
-        clickable
-        color={selected ? "primary" : "default"}
-        label={label}
-        // The handler stays attached when the value is unavailable: without one
-        // the chip is not a button, and the button is what the tooltip
-        // describes.
-        onClick={(): void => {
-          if (!unavailable) onClick();
-        }}
-        size="medium"
-        sx={unavailable ? { ...CHIP_SX, opacity: 0.5 } : CHIP_SX}
-        variant="filled"
-      />
-    </Tooltip>
-  );
-}
-
-/**
- * What a value chip says on hover: what it stands for, or why it is closed.
- * @param option - The value the chip carries.
- * @param unavailable - Whether anything pairs it with the other row.
- * @param reason - Why nothing pairs with it, for the unavailable case.
- * @returns The tooltip text.
- */
-function chipTooltip(
-  option: IndexAxisOption,
-  unavailable: boolean,
-  reason: string
-): string {
-  if (unavailable) return `${option.code}: ${reason}`;
-  const noun = option.count === 1 ? "index" : "indexes";
-  const note = option.note ? ` ${option.note}` : "";
-  return `${option.code}: ${option.count} ${noun}.${note}`;
-}
-
-/**
- * The chips one row offers: its values in display order, which of them the
- * other row has closed off, and what each of them says on hover.
- *
- * A value is unreachable only against the *other* row's current selection, and
- * a value already picked is part of what the other row was filtered by: closing
- * it would trap the selection in the state that closed it. The two rows are the
- * same rule with the axes swapped, so they are one function called twice.
- * @param indexes - Index names from the API.
- * @param picked - Codes selected on this axis; empty means all.
- * @param other - Codes selected on the other axis; empty means all.
- * @param axis - Which half of STRATEGY_DIVISION this row picks.
- * @returns The row's chips, in display order.
- */
-function axisChips(
-  indexes: string[],
-  picked: string[],
-  other: string[],
-  axis: IndexAxis
-): AxisChipModel[] {
-  const isDivision = axis === "division";
-  const reason = isDivision
-    ? "no index pairs it with the selected library types."
-    : "no index pairs it with the selected organism groups.";
-  return axisOptions(indexes, axis).map((option) => {
-    const paired = isDivision
-      ? selectIndexes(indexes, [option.code], other)
-      : selectIndexes(indexes, other, [option.code]);
-    const unavailable = !picked.includes(option.code) && paired.length === 0;
-    return {
-      ...option,
-      tooltip: chipTooltip(option, unavailable, reason),
-      unavailable,
-    };
-  });
-}
-
-/**
- * One axis of the picker: its label, an All chip, then a chip per value.
- * @param props - Component props.
- * @param props.allTooltip - Tooltip for the All chip.
- * @param props.label - Row label, shown beside the chips.
- * @param props.labelId - Id the row's group is labelled by.
- * @param props.onSelectAll - Called when All is clicked.
- * @param props.onToggle - Called with the code of the clicked value chip.
- * @param props.options - The row's values, in display order.
- * @param props.picked - Codes currently selected; empty means All.
- * @returns The row.
- */
-function AxisRow({
-  allTooltip,
-  label,
-  labelId,
-  onSelectAll,
-  onToggle,
-  options,
-  picked,
-}: {
-  allTooltip: string;
-  label: string;
-  labelId: string;
-  onSelectAll: () => void;
-  onToggle: (code: string) => void;
-  options: AxisChipModel[];
-  picked: string[];
-}): JSX.Element {
-  return (
-    <IndexAxisRow aria-labelledby={labelId} role="group">
-      <Typography component="span" id={labelId} variant="body2">
-        {label}
-      </Typography>
-      <IndexChips>
-        <AxisChip
-          key="all"
-          label="All"
-          onClick={onSelectAll}
-          selected={picked.length === 0}
-          tooltip={allTooltip}
-        />
-        {options.map((option) => (
-          <AxisChip
-            key={option.code}
-            label={option.label}
-            onClick={(): void => onToggle(option.code)}
-            selected={picked.includes(option.code)}
-            tooltip={option.tooltip}
-            unavailable={option.unavailable}
-          />
-        ))}
-      </IndexChips>
-    </IndexAxisRow>
-  );
-}
-
-/**
- * Labels for the codes chosen on one axis, in the row's order rather than the
- * order they were clicked, so the sentence reads the same as the chips do.
- * @param options - The axis's values, in display order.
- * @param picked - Codes currently selected.
- * @returns The chosen labels.
- */
-function pickedLabels(options: IndexAxisOption[], picked: string[]): string[] {
-  return options
-    .filter((option) => picked.includes(option.code))
-    .map((option) => option.label);
-}
-
-/**
- * Add a code to an axis selection, or take it out again.
- * @param picked - Codes currently selected.
- * @param code - The clicked code.
- * @returns The new selection.
- */
-function toggleCode(picked: string[], code: string): string[] {
-  return picked.includes(code)
-    ? picked.filter((value) => value !== code)
-    : [...picked, code];
-}
-
 export const LoganSearchForm = ({
   onSubmitted,
   search,
 }: LoganSearchFormProps): JSX.Element => {
   const [sequence, setSequence] = useState(SAMPLE_QUERY);
-  // Division and strategy codes. null means "not touched": the default is
-  // derived from the loaded list rather than seeded, because the list arrives
-  // asynchronously and a default the instance lacks would select nothing. What
-  // it falls back to when DEFAULT_INDEX is missing is the first index the
-  // instance does have, never All -- a default nobody chose should be the
-  // cheapest coherent job, never the dearest one on offer.
-  const [organismsPicked, setOrganismsPicked] = useState<string[] | null>(null);
-  const [librariesPicked, setLibrariesPicked] = useState<string[] | null>(null);
+  // Index names. null means "not touched": the default is derived from the
+  // loaded list rather than seeded, because the list arrives asynchronously
+  // and a default the instance lacks would select nothing. What it falls back
+  // to when DEFAULT_INDEX is missing is the first index the instance does
+  // have, never All -- a default nobody chose should be the cheapest coherent
+  // job, never the dearest one on offer.
+  const [picked, setPicked] = useState<string[] | null>(null);
   const [threshold, setThreshold] = useState(0.5);
   const [fileError, setFileError] = useState<string | null>(null);
 
@@ -344,8 +127,7 @@ export const LoganSearchForm = ({
   const loadExample = (example: LoganExample): void => {
     setSequence(example.sequence);
     setFileError(null);
-    setOrganismsPicked(example.divisions);
-    setLibrariesPicked(example.strategies);
+    setPicked(selectIndexes(options, example.divisions, example.strategies));
   };
 
   const options = useMemo(() => sortIndexes(search.indexes), [search.indexes]);
@@ -353,37 +135,12 @@ export const LoganSearchForm = ({
   const defaultIndexes = options.includes(DEFAULT_INDEX)
     ? [DEFAULT_INDEX]
     : options.slice(0, 1);
-  const organisms = organismsPicked ?? defaultIndexes.map(indexDivision);
-  const libraries = librariesPicked ?? defaultIndexes.map(indexStrategy);
-
-  const indexes = selectIndexes(options, organisms, libraries);
-  const organismChips = axisChips(options, organisms, libraries, "division");
-  const libraryChips = axisChips(options, libraries, organisms, "strategy");
-
-  // Lit by what the chips come to rather than by which preset was clicked
-  // last, so picking the same set by hand lights it too and a tweak after a
-  // click turns it off.
-  const selectedKey = indexes.join(",");
-  const presets = indexPresets(options).map((preset) => {
-    const presetIndexes = selectIndexes(
-      options,
-      preset.divisions,
-      preset.strategies
-    );
-    const noun = presetIndexes.length === 1 ? "index" : "indexes";
-    return {
-      ...preset,
-      selected: presetIndexes.join(",") === selectedKey,
-      tooltip: `${preset.loganName} on logan-search.org: ${preset.note} ${presetIndexes.length} ${noun}.`,
-    };
-  });
-
-  const sentence = describeIndexSelection({
-    libraries: pickedLabels(libraryChips, libraries),
-    organisms: pickedLabels(organismChips, organisms),
-    selected: indexes,
-    total: options.length,
-  });
+  // Kept to names the instance registers, so a pick made against an older
+  // list can't send an index Galaxy no longer has.
+  const indexes = picked
+    ? options.filter((index) => picked.includes(index))
+    : defaultIndexes;
+  const sentence = describeIndexSet(options, indexes);
 
   const query = parseQuery(sequence);
   const { bases, records } = query;
@@ -505,10 +262,23 @@ export const LoganSearchForm = ({
           </FormColumn>
 
           <FormSpan>
-            <Typography variant="h6">Indexes</Typography>
+            <IndexHeading>
+              <Typography variant="h6">Indexes</Typography>
+              <Tooltip
+                describeChild
+                title="logan-search.org's Fast groups aren't here because they drop the small sub-indexes inside each division, which these indexes can't express, and GenBank_RefSeq isn't deployed on Galaxy Test, where these searches run."
+              >
+                <InfoOutlined
+                  aria-label="Why some logan-search.org groups are missing"
+                  color="action"
+                  fontSize="small"
+                  tabIndex={0}
+                />
+              </Tooltip>
+            </IndexHeading>
             <Typography color="textSecondary" variant="body2">
-              Every index is one organism group by one library type. A job
-              searches each index that matches both rows.
+              Each index is one organism group by one library type. Pick a
+              scope, or open Custom to choose index by index.
             </Typography>
             {search.isLoadingIndexes && (
               <ControlRow>
@@ -524,66 +294,11 @@ export const LoganSearchForm = ({
               </Typography>
             )}
             {!search.isLoadingIndexes && options.length > 0 && (
-              <>
-                <IndexAxisRow aria-labelledby="logan-presets" role="group">
-                  <Typography
-                    component="span"
-                    id="logan-presets"
-                    variant="body2"
-                  >
-                    Presets
-                  </Typography>
-                  <IndexChips>
-                    {presets.map((preset) => (
-                      <AxisChip
-                        key={preset.loganName}
-                        label={preset.label}
-                        onClick={(): void => {
-                          setOrganismsPicked(preset.divisions);
-                          setLibrariesPicked(preset.strategies);
-                        }}
-                        selected={preset.selected}
-                        tooltip={preset.tooltip}
-                      />
-                    ))}
-                  </IndexChips>
-                </IndexAxisRow>
-                <Typography color="textSecondary" variant="caption">
-                  logan-search.org&apos;s Fast groups aren&apos;t here because
-                  they drop the small sub-indexes inside each division, which
-                  these indexes can&apos;t express, and GenBank_RefSeq
-                  isn&apos;t deployed on Galaxy Test, where these searches run.
-                </Typography>
-                <AxisRow
-                  allTooltip="Every organism group registered."
-                  label="Organism"
-                  labelId="logan-axis-organism"
-                  onSelectAll={(): void => setOrganismsPicked([])}
-                  onToggle={(code): void =>
-                    setOrganismsPicked(toggleCode(organisms, code))
-                  }
-                  options={organismChips}
-                  picked={organisms}
-                />
-                <AxisRow
-                  allTooltip="Every library type registered."
-                  label="Library type"
-                  labelId="logan-axis-library"
-                  onSelectAll={(): void => setLibrariesPicked([])}
-                  onToggle={(code): void =>
-                    setLibrariesPicked(toggleCode(libraries, code))
-                  }
-                  options={libraryChips}
-                  picked={libraries}
-                />
-                <Typography
-                  aria-live="polite"
-                  color="textSecondary"
-                  variant="body2"
-                >
-                  {sentence}
-                </Typography>
-              </>
+              <IndexPicker
+                indexes={options}
+                onChange={(next): void => setPicked(sortIndexes(next))}
+                selected={indexes}
+              />
             )}
           </FormSpan>
 
@@ -620,15 +335,29 @@ export const LoganSearchForm = ({
                   wedged, which is exactly when it would be disabled otherwise. */}
               <Button
                 onClick={(): void => {
-                  setOrganismsPicked(null);
-                  setLibrariesPicked(null);
+                  setPicked(null);
                   search.reset();
                 }}
                 variant="outlined"
               >
                 Reset
               </Button>
+              {options.length > 0 && (
+                <IndexSummary
+                  selected={indexes.length}
+                  total={options.length}
+                />
+              )}
             </ControlRow>
+            {options.length > 0 && (
+              <Typography
+                aria-live="polite"
+                color="textSecondary"
+                variant="body2"
+              >
+                {sentence}
+              </Typography>
+            )}
           </FormSpan>
         </FormGrid>
       </CardContent>
