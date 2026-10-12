@@ -2109,14 +2109,20 @@ class SRAMirrorService:
         )
         os.close(fd)
         partial = Path(partial_name)
-        with self._lock:
-            cursor = self._con.cursor()
 
         # The staging file is the join's left-hand side and never outlives the
         # call; it carries the rank because the app's md5 tie-break has no SQL
         # equivalent, and the export ships in the order the app ranked it.
+        #
+        # Everything after mkstemp sits inside the try, the cursor and the
+        # rename included: a failure anywhere past that point must take the
+        # partial with it, or the export directory collects empty files that
+        # only the hourly sweep ever removes.
+        cursor = None
         staging = None
         try:
+            with self._lock:
+                cursor = self._con.cursor()
             staging = tempfile.NamedTemporaryFile(
                 "w", suffix=".tsv", prefix="kmindex-export-", delete=False
             )
@@ -2131,6 +2137,7 @@ class SRAMirrorService:
                 _export_sql(self.has_capability(CAPABILITY_COORDINATES)),
                 [staging.name, str(partial)],
             )
+            partial.replace(destination)
         except Exception:
             try:
                 partial.unlink(missing_ok=True)
@@ -2138,12 +2145,12 @@ class SRAMirrorService:
                 pass
             raise
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
             if staging is not None:
                 staging.close()
                 Path(staging.name).unlink(missing_ok=True)
 
-        partial.replace(destination)
         # Count the file, not the input. They agree only while runs.acc happens
         # to be unique -- there is no constraint on it -- and a LEFT JOIN that
         # fanned out would put a row count in the download's filename that the
