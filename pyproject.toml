@@ -2,7 +2,11 @@
 target-version = "py312"
 line-length = 88
 indent-width = 4
-extend-exclude = ["backend/pyproject.toml", "backend/poetry.lock"]
+extend-exclude = [
+    "backend/pyproject.toml",
+    "backend/poetry.lock",
+    "catalog/py_package/catalog_build/generated_schema/",
+]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -24,6 +28,7 @@ ignore_missing_imports = true
 exclude = [
     "^backend/",  # backend has its own type checking setup
     "venv/",
+    "catalog/py_package/catalog_build/generated_schema/",
 ]
 
 # Gradually enable stricter checks as we fix existing issues
