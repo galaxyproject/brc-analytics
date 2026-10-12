@@ -10,6 +10,7 @@ import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssi
 import { type JSX, useEffect, useState } from "react";
 import { AnalysisSetup } from "./components/AnalysisSetup/analysisSetup";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
+import { Conversation } from "./components/Conversation/conversation";
 import { Layout as AssistantUILayout } from "./components/Layout/layout";
 import { LegacyLayout } from "./components/LegacyLayout/legacyLayout";
 import { LoganCohortCard } from "./components/LoganCohortCard/loganCohortCard";
@@ -74,21 +75,6 @@ export const AssistantView = ({
 
   const modelLabel = formatModelLabel(info);
   const retentionNotice = formatRetentionNotice(info);
-  const chat = {
-    children: (
-      <ChatPanel
-        error={error}
-        introText={introText}
-        isRestoring={isRestoring || isOpening}
-        isSaved={isSaved}
-        loading={loading}
-        messages={messages}
-        onRetry={onRetry}
-        onSend={sendMessage}
-        suggestions={suggestions}
-      />
-    ),
-  };
   const disclaimer = (
     <>
       AI assistant — {modelLabel}. Your messages are sent to the model provider
@@ -102,7 +88,20 @@ export const AssistantView = ({
     return (
       <AssistantUILayout
         slotProps={{
-          chat,
+          chat: {
+            children: (
+              <Conversation
+                error={error}
+                introText={introText}
+                isRestoring={isRestoring || isOpening}
+                loading={loading}
+                messages={messages}
+                onRetry={onRetry}
+                onSend={sendMessage}
+                suggestions={suggestions}
+              />
+            ),
+          },
           history: {
             children: (
               <Sidebar
@@ -140,7 +139,21 @@ export const AssistantView = ({
   return (
     <LegacyLayout
       slotProps={{
-        chat,
+        chat: {
+          children: (
+            <ChatPanel
+              error={error}
+              introText={introText}
+              isRestoring={isRestoring || isOpening}
+              isSaved={isSaved}
+              loading={loading}
+              messages={messages}
+              onRetry={onRetry}
+              onSend={sendMessage}
+              suggestions={suggestions}
+            />
+          ),
+        },
         history: {
           disclaimer,
           feedbackButton: supportUrl && (

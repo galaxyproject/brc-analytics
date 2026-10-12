@@ -1,3 +1,5 @@
+import type { ChatMessageDisplay } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
+
 /**
  * Placeholder for any field that asks the assistant a question, wherever it is
  * rendered: the wording should not change between where a question is typed
@@ -9,6 +11,14 @@
  */
 export const ASSISTANT_INPUT_PLACEHOLDER =
   "Ask about organisms, analyses, or workflows...";
+
+/**
+ * Who sent a chat message.
+ */
+export const MESSAGE_ROLE = {
+  ASSISTANT: "assistant",
+  USER: "user",
+} as const satisfies Record<string, ChatMessageDisplay["role"]>;
 
 /**
  * Title shown for a saved conversation the assistant has not titled.
