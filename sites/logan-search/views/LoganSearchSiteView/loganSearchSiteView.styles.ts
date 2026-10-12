@@ -24,3 +24,13 @@ export const SearchContainer = styled.div`
   gap: 24px;
   width: 100%;
 `;
+
+/* The results page has no hero to ride over: the query strip is its header. */
+export const ResultsSection = styled.section`
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 24px 20px 32px;
+  width: 100%;
+`;

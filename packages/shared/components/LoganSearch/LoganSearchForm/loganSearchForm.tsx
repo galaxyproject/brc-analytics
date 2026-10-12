@@ -40,7 +40,16 @@ import {
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 
+// A search to start from instead of the sample query: the one being edited.
+export interface LoganSearchFormInitial {
+  indexes: string[];
+  sequence: string;
+  threshold: number;
+}
+
 interface LoganSearchFormProps {
+  // Read on mount only; remount the form (with a key) to load another.
+  initial?: LoganSearchFormInitial;
   // Called once Galaxy has accepted a search, with what the history list
   // keeps of it.
   onSubmitted?: (search: RecentSearch) => void;
@@ -77,18 +86,21 @@ const SAMPLE_QUERY = LOGAN_EXAMPLES[0].sequence;
 const DEFAULT_NOTE = "invertebrate genomic, where the sample query's hits are.";
 
 export const LoganSearchForm = ({
+  initial,
   onSubmitted,
   search,
 }: LoganSearchFormProps): JSX.Element => {
-  const [sequence, setSequence] = useState(SAMPLE_QUERY);
+  const [sequence, setSequence] = useState(initial?.sequence ?? SAMPLE_QUERY);
   // Index names. null means "not touched": the default is derived from the
   // loaded list rather than seeded, because the list arrives asynchronously
   // and a default the instance lacks would select nothing. What it falls back
   // to when DEFAULT_INDEX is missing is the first index the instance does
   // have, never All -- a default nobody chose should be the cheapest coherent
   // job, never the dearest one on offer.
-  const [picked, setPicked] = useState<string[] | null>(null);
-  const [threshold, setThreshold] = useState(0.5);
+  const [picked, setPicked] = useState<string[] | null>(
+    initial?.indexes ?? null
+  );
+  const [threshold, setThreshold] = useState(initial?.threshold ?? 0.5);
   const [fileError, setFileError] = useState<string | null>(null);
 
   /**
