@@ -4,6 +4,9 @@ export interface RecentSearch {
   // The FASTA header's first word, which is what kmindex reports the query
   // as. Null for a query pasted without a header.
   queryName: string | null;
+  // The query as submitted, in FASTA form, so the search can be edited and
+  // run again. Absent on entries stored before it was kept.
+  sequence?: string;
   // ISO 8601.
   submittedAt: string;
   threshold: number;
@@ -44,6 +47,7 @@ function isRecentSearch(value: unknown): value is RecentSearch {
     Array.isArray(entry.indexes) &&
     entry.indexes.every((index) => typeof index === "string") &&
     (entry.queryName === null || typeof entry.queryName === "string") &&
+    (entry.sequence === undefined || typeof entry.sequence === "string") &&
     typeof entry.submittedAt === "string" &&
     typeof entry.threshold === "number"
   );

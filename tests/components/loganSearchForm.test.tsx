@@ -382,6 +382,7 @@ describe("LoganSearchForm index picker", () => {
       indexes: ["GENOMIC_INV"],
       jobId: "job123",
       queryName: "Plasmodium_falciparum_18S",
+      sequence: submit.mock.calls[0][0].sequence,
       submittedAt: expect.any(String),
       threshold: 0.5,
     });
