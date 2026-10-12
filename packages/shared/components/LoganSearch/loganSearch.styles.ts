@@ -48,6 +48,12 @@ export const ThresholdControl = styled.div`
   min-width: 220px;
 `;
 
+/* The job card and then the summary that replaces it: where the page scrolls
+   to on Search. The margin keeps it clear of the site header. */
+export const SearchProgress = styled.div`
+  scroll-margin-top: 88px;
+`;
+
 /* The Indexes heading and the info icon that explains what's missing. */
 export const IndexHeading = styled.div`
   align-items: center;
