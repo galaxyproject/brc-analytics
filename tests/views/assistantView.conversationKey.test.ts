@@ -6,9 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 describe("useConversationKey", () => {
   test("starting a new analysis resets the session and moves the key", () => {
     const resetSession = jest.fn();
-    const { result } = renderHook(() =>
-      useConversationKey(resetSession, jest.fn())
-    );
+    const { result } = renderHook(() => useConversationKey(resetSession));
     const before = result.current.conversationKey;
 
     act(() => result.current.onNewAnalysis());
@@ -17,25 +15,18 @@ describe("useConversationKey", () => {
     expect(result.current.conversationKey).not.toBe(before);
   });
 
-  test("opening a conversation from the history moves the key once", () => {
-    const setIsOpening = jest.fn();
-    const { result } = renderHook(() =>
-      useConversationKey(jest.fn(), setIsOpening)
-    );
+  test("opening a different conversation from the history moves the key", () => {
+    const { result } = renderHook(() => useConversationKey(jest.fn()));
     const before = result.current.conversationKey;
 
-    act(() => result.current.onOpeningChange(true));
-    const opened = result.current.conversationKey;
-    act(() => result.current.onOpeningChange(false));
+    act(() => result.current.onOpened());
 
-    expect(setIsOpening.mock.calls).toEqual([[true], [false]]);
-    expect(opened).not.toBe(before);
-    expect(result.current.conversationKey).toBe(opened);
+    expect(result.current.conversationKey).not.toBe(before);
   });
 
   test("keeps the key until the user moves to a different conversation", () => {
     const { rerender, result } = renderHook(() =>
-      useConversationKey(jest.fn(), jest.fn())
+      useConversationKey(jest.fn())
     );
     const before = result.current.conversationKey;
 

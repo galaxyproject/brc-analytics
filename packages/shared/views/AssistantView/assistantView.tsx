@@ -53,8 +53,8 @@ export const AssistantView = ({
   // A conversation opening from the history: until its restore takes over,
   // nothing else may start or send, or the open would wipe it.
   const [isOpening, setIsOpening] = useState(false);
-  const { conversationKey, onNewAnalysis, onOpeningChange } =
-    useConversationKey(resetSession, setIsOpening);
+  const { conversationKey, onNewAnalysis, onOpened } =
+    useConversationKey(resetSession);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -115,7 +115,8 @@ export const AssistantView = ({
                 disclaimer={disclaimer}
                 lastSave={lastSave}
                 onNewAnalysis={onNewAnalysis}
-                onOpeningChange={onOpeningChange}
+                onOpened={onOpened}
+                onOpeningChange={setIsOpening}
                 onRetryRestore={retryRestore}
                 sessionId={shownSessionId}
                 supportUrl={supportUrl}

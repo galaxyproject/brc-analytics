@@ -3,16 +3,15 @@ import type { UseConversationKey } from "./types";
 
 /**
  * Returns a key for the conversation panel that changes when the user moves to
- * a different conversation -- starting a new analysis, or opening one from the
- * history -- so the panel starts afresh, unsent draft included. Retrying a
- * restore, or a conversation's own replies, leave it be.
+ * a different conversation -- starting a new analysis, or opening another from
+ * the history -- so the panel starts afresh, unsent draft included. An open
+ * that fails, loses to a later navigation, or retries the conversation already
+ * named, a retried restore, and a conversation's own replies leave it be.
  * @param resetSession - Starts a new conversation.
- * @param setIsOpening - Records whether a conversation is opening from the history.
- * @returns The key, and the sidebar's new analysis and opening handlers.
+ * @returns The key, and the sidebar's new analysis and opened handlers.
  */
 export const useConversationKey = (
-  resetSession: () => void,
-  setIsOpening: (isOpening: boolean) => void
+  resetSession: () => void
 ): UseConversationKey => {
   const [conversationKey, setConversationKey] = useState(0);
 
@@ -21,13 +20,9 @@ export const useConversationKey = (
     setConversationKey((key) => key + 1);
   }, [resetSession]);
 
-  const onOpeningChange = useCallback(
-    (isOpening: boolean): void => {
-      setIsOpening(isOpening);
-      if (isOpening) setConversationKey((key) => key + 1);
-    },
-    [setIsOpening]
-  );
+  const onOpened = useCallback((): void => {
+    setConversationKey((key) => key + 1);
+  }, []);
 
-  return { conversationKey, onNewAnalysis, onOpeningChange };
+  return { conversationKey, onNewAnalysis, onOpened };
 };

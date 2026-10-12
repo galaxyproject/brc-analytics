@@ -15,6 +15,7 @@ export interface HistoryItem {
  * What opening a saved conversation reports to as it goes.
  */
 export interface OpenAnalysisHandlers {
+  onOpened: () => void;
   onOpeningChange: (isOpening: boolean) => void;
   onRetryRestore: () => void;
   setItems: Dispatch<SetStateAction<SavedAnalysisSummary[]>>;
