@@ -23,6 +23,9 @@ import { type JSX, useState } from "react";
 interface LoganSearchSummaryProps {
   assistantHref?: LoganSearchRoutes["assistantHref"];
   search: ReturnType<typeof useKmindexSearch>;
+  // False where the page already names the job and query and offers the
+  // link, so the card doesn't say it twice.
+  withProvenance?: boolean;
 }
 
 interface SummaryExportProps {
@@ -243,11 +246,14 @@ function SummaryExport({
  * @param props.assistantHref - Builds the assistant handoff link; without it
  * there is no "Ask the assistant" button.
  * @param props.search - The kmindex search hook.
+ * @param props.withProvenance - Whether to name the job and query and offer
+ * the link to them.
  * @returns The strip, or null before there is a match to summarise.
  */
 export const LoganSearchSummary = ({
   assistantHref,
   search,
+  withProvenance = true,
 }: LoganSearchSummaryProps): JSX.Element | null => {
   const { jobId, results } = search;
   const [copied, setCopied] = useState<"copied" | "failed" | "idle">("idle");
@@ -346,12 +352,14 @@ export const LoganSearchSummary = ({
           </SummaryActions>
         </SummaryHeader>
         <SummaryMeta>
-          <Typography color="textSecondary" variant="caption">
-            Job {jobId}
-          </Typography>
+          {withProvenance && (
+            <Typography color="textSecondary" variant="caption">
+              Job {jobId}
+            </Typography>
+          )}
           {/* Its own caption rather than a dot-joined tail on the job: the
               row already spaces what it holds. */}
-          {results.query_name && (
+          {withProvenance && results.query_name && (
             <Typography color="textSecondary" variant="caption">
               Query {results.query_name}
             </Typography>
@@ -361,9 +369,11 @@ export const LoganSearchSummary = ({
               {indexes}
             </Typography>
           )}
-          <Button onClick={copyLink} size="small" startIcon={<LinkIcon />}>
-            {COPY_LABELS[copied]}
-          </Button>
+          {withProvenance && (
+            <Button onClick={copyLink} size="small" startIcon={<LinkIcon />}>
+              {COPY_LABELS[copied]}
+            </Button>
+          )}
         </SummaryMeta>
       </CardContent>
     </Card>
