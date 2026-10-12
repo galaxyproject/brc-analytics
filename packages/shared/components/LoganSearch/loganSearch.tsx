@@ -5,17 +5,19 @@ import {
   useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import { useKmindexSummary } from "@repo/shared/hooks/useKmindexSummary";
-import { type JSX, useEffect, useMemo, useRef } from "react";
+import { type JSX, useCallback, useEffect, useMemo, useRef } from "react";
 import { LoganSearchCohort } from "./LoganSearchCohort/loganSearchCohort";
 import { LoganSearchFilterBar } from "./LoganSearchFilters/loganSearchFilterBar";
 import { type LoganFilterControls } from "./LoganSearchFilters/types";
 import { useLoganFilters } from "./LoganSearchFilters/useLoganFilters";
 import { LoganSearchForm } from "./LoganSearchForm/loganSearchForm";
 import { LoganSearchHistory } from "./LoganSearchHistory/loganSearchHistory";
+import { type RecentSearch } from "./LoganSearchHistory/recentSearches";
 import { useRecentSearches } from "./LoganSearchHistory/useRecentSearches";
 import { LoganSearchResults } from "./LoganSearchResults/loganSearchResults";
 import { LoganSearchStatus } from "./LoganSearchStatus/loganSearchStatus";
 import { LoganSearchSummary } from "./LoganSearchSummary/loganSearchSummary";
+import { SearchProgress } from "./loganSearch.styles";
 import { type LoganSearchRoutes } from "./types";
 
 /**
@@ -32,6 +34,20 @@ function filterDisabledReason(results: KmindexResults): string | null {
   if (results.export_status === "too_large")
     return "Filtering needs the full match set on disk, and this search matched too many runs for one to be prepared.";
   return "Filtering needs the full match set on disk, and it is not available for this search.";
+}
+
+/**
+ * Bring an element to the top of the viewport, without the glide for anyone
+ * who has asked the OS for less motion.
+ * @param element - What to show.
+ */
+function revealElement(element: HTMLElement | null): void {
+  if (!element) return;
+  const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  element.scrollIntoView?.({
+    behavior: still ? "auto" : "smooth",
+    block: "start",
+  });
 }
 
 interface LoganSearchProps {
@@ -65,6 +81,42 @@ export const LoganSearch = ({ routes }: LoganSearchProps): JSX.Element => {
     lastJobRef.current = search.jobId;
   }, [clear, search.jobId]);
 
+  // The form is taller than most screens, so the job card and the results that
+  // replace it land below the fold. Without this, the only sign Search did
+  // anything is the scrollbar changing.
+  const progressRef = useRef<HTMLDivElement>(null);
+  const awaitingRef = useRef(false);
+  const { record } = history;
+  const onSubmitted = useCallback(
+    (entry: RecentSearch): void => {
+      record(entry);
+      awaitingRef.current = true;
+      // After the paint that renders the job card, so there is one to show.
+      requestAnimationFrame(() => revealElement(progressRef.current));
+    },
+    [record]
+  );
+  // A failed submit says why in the same spot, and is just as easy to miss.
+  // Once per error, not again when the results change under it.
+  const { error } = search;
+  const hasResults = Boolean(search.results);
+  const revealedErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (error && error !== revealedErrorRef.current && !hasResults)
+      revealElement(progressRef.current);
+    revealedErrorRef.current = error;
+  }, [error, hasResults]);
+  // The job card sits as low as the page could scroll, so the summary that
+  // replaces it starts low too. Bring it up once, but only for someone still
+  // watching the card, never someone who has scrolled off to read the form.
+  useEffect(() => {
+    if (!hasResults || !awaitingRef.current) return;
+    awaitingRef.current = false;
+    const element = progressRef.current;
+    const top = element?.getBoundingClientRect().top ?? -1;
+    if (top >= 0 && top < window.innerHeight) revealElement(element);
+  }, [hasResults]);
+
   const { results } = search;
   const controls = useMemo((): LoganFilterControls | undefined => {
     if (!filtersEnabled || !results) return undefined;
@@ -84,12 +136,14 @@ export const LoganSearch = ({ routes }: LoganSearchProps): JSX.Element => {
 
   return (
     <div>
-      <LoganSearchForm onSubmitted={history.record} search={search} />
-      <LoganSearchStatus search={search} />
-      <LoganSearchSummary
-        assistantHref={routes.assistantHref}
-        search={search}
-      />
+      <LoganSearchForm onSubmitted={onSubmitted} search={search} />
+      <SearchProgress ref={progressRef}>
+        <LoganSearchStatus search={search} />
+        <LoganSearchSummary
+          assistantHref={routes.assistantHref}
+          search={search}
+        />
+      </SearchProgress>
       {controls && results && (
         <LoganSearchFilterBar
           disabledReason={controls.disabledReason}
