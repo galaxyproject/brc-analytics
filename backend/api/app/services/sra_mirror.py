@@ -77,6 +77,7 @@ _ACCESSION_BATCH_SIZE = 500
 # promising a column the file may not have. If you add a column to a query,
 # add it here in the same change.
 CAPABILITY_ANNOTATION = "annotation"
+CAPABILITY_BIOSAMPLE = "biosample"
 CAPABILITY_COHORT = "cohort"
 CAPABILITY_COORDINATES = "coordinates"
 CAPABILITY_EXPORT = "export"
@@ -101,6 +102,12 @@ _RUN_DETAIL_COLUMNS: Tuple[str, ...] = (
 
 _CAPABILITY_COLUMNS: Dict[str, Tuple[str, ...]] = {
     CAPABILITY_ANNOTATION: _RUN_DETAIL_COLUMNS,
+    # Kept out of _RUN_DETAIL_COLUMNS for the reason coordinates are: the
+    # builder has written `biosample` since schema_version 5, but the
+    # schema_version 3 file predates it, and annotating a page must not go
+    # dark there to add one optional field. runs_by_accession asks this
+    # capability and selects NULL when it is closed.
+    CAPABILITY_BIOSAMPLE: ("acc", "biosample"),
     CAPABILITY_COHORT: (
         "acc",
         "assay_type",
@@ -1729,6 +1736,14 @@ class SRAMirrorService:
         if not wanted:
             return {}
 
+        # A constant rather than an interpolated value: the choice is between
+        # two fixed expressions, never anything a caller sent.
+        biosample = (
+            "nullif(biosample, '')"
+            if self.has_capability(CAPABILITY_BIOSAMPLE)
+            else "NULL"
+        )
+
         cache_key = ("runs_by_accession", tuple(wanted))
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
@@ -1742,13 +1757,13 @@ class SRAMirrorService:
             batch = wanted[start : start + _ACCESSION_BATCH_SIZE]
             rows.extend(
                 self._con.execute(
-                    """
+                    f"""
                     SELECT acc, sra_study, bioproject, organism, assay_type,
                            platform,
                            nullif(instrument, 'unspecified'),
                            librarylayout, releasedate,
                            nullif(geo_loc_name_country_calc, 'uncalculated'),
-                           mbases
+                           mbases, {biosample}
                     FROM runs WHERE acc IN (SELECT UNNEST(?))
                     """,
                     [batch],
@@ -1759,6 +1774,7 @@ class SRAMirrorService:
             r[0]: {
                 "assay_type": r[4],
                 "bioproject": r[2],
+                "biosample": r[11],
                 "country": r[9],
                 "instrument": r[6],
                 "library_layout": r[7],

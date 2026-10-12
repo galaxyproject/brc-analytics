@@ -164,3 +164,20 @@ export interface WorkflowRunResponse {
   workflow_id: string | null;
   workflow_trs_id: string;
 }
+
+// One search the signed-in user submitted. The backend keeps the query's size,
+// not its sequence or name; reopening the job is how to see either.
+export interface LoganSearchRecord {
+  created_at: string;
+  indexes: string[];
+  job_id: string;
+  query_bases: number;
+  threshold: number;
+}
+
+export interface LoganSearchPage {
+  limit: number;
+  offset: number;
+  searches: LoganSearchRecord[];
+  total: number;
+}

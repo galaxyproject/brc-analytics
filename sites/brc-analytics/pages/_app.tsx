@@ -14,6 +14,7 @@ setFeatureFlags([
   FEATURE_FLAGS.ASSISTANT_UI,
   FEATURE_FLAGS.DEMO,
   FEATURE_FLAGS.GENE_PAGES,
+  FEATURE_FLAGS.LOGAN_FILTERS,
 ]);
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
