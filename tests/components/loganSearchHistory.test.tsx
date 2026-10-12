@@ -91,6 +91,22 @@ describe("recent searches storage", () => {
     ]);
   });
 
+  test("keeps a stored query, and still reads entries saved without one", () => {
+    writeRecentSearches([
+      entry("new", { sequence: ">q1\nACGT\n" }),
+      entry("old"),
+      { ...entry("bad"), sequence: 42 } as unknown as RecentSearch,
+    ]);
+    const read = readRecentSearches();
+    expect(read.status === "ok" && read.searches.map((e) => e.jobId)).toEqual([
+      "new",
+      "old",
+    ]);
+    expect(read.status === "ok" && read.searches[0].sequence).toBe(
+      ">q1\nACGT\n"
+    );
+  });
+
   test("reports unavailable, and keeps working, when storage throws", () => {
     jest.spyOn(Storage.prototype, "getItem").mockImplementation((): never => {
       throw new Error("SecurityError");

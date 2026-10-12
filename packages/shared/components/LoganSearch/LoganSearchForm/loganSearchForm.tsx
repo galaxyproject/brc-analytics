@@ -335,6 +335,7 @@ export const LoganSearchForm = ({
                         indexes,
                         jobId,
                         queryName: queryNameOf(query.fasta),
+                        sequence: query.fasta,
                         submittedAt: new Date().toISOString(),
                         threshold,
                       });
