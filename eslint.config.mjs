@@ -94,7 +94,13 @@ const config = [
       "react-hooks/refs": "error",
       "react-hooks/set-state-in-effect": "error",
       "react-hooks/static-components": "error",
+      // Test-style rules new in sonarjs v4 (taken for its minimatch fix); off
+      // until we decide whether to adopt them and update the existing tests.
+      "sonarjs/assertions-in-tests": "off",
       "sonarjs/cognitive-complexity": ["error", 15],
+      "sonarjs/no-fixed-wait-in-tests": "off",
+      "sonarjs/parameterized-tests": "off",
+      "sonarjs/prefer-specific-assertions": "off",
       "sonarjs/todo-tag": "warn",
       "sort-destructure-keys/sort-destructure-keys": [
         "error",

@@ -81,7 +81,7 @@ export async function readValuesFile<T>(
   checkKeys?: readonly string[]
 ): Promise<T[]> {
   const content = await fsp.readFile(filePath, "utf8");
-  const result = parseCsv(content, {
+  const result = parseCsv<T>(content, {
     columns: true,
     delimiter,
     relax_quotes: true,
