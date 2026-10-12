@@ -1,5 +1,6 @@
 export const ROUTES = {
   LEARN: "/learn",
+  MY_SEARCHES: "/my-searches",
   RESULTS: "/results",
   SEARCH: "/",
 };

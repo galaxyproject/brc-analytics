@@ -10,10 +10,16 @@ export interface RecentSearch {
   // ISO 8601.
   submittedAt: string;
   threshold: number;
+  // Runs the search matched, noted when its results were last opened here.
+  // Absent until then, and on entries stored before it was kept.
+  totalMatches?: number;
 }
 
 export const RECENT_SEARCHES_KEY = "brc-logan-recent-searches";
 export const MAX_RECENT_SEARCHES = 20;
+// Fired on window after every write or clear. The storage event only reaches
+// other tabs, and the header's count has to follow a search made in this one.
+export const RECENT_SEARCHES_EVENT = "brc-logan-recent-searches-change";
 
 /**
  * The name kmindex will report a query under: the first word of its FASTA
@@ -48,6 +54,8 @@ function isRecentSearch(value: unknown): value is RecentSearch {
     entry.indexes.every((index) => typeof index === "string") &&
     (entry.queryName === null || typeof entry.queryName === "string") &&
     (entry.sequence === undefined || typeof entry.sequence === "string") &&
+    (entry.totalMatches === undefined ||
+      typeof entry.totalMatches === "number") &&
     typeof entry.submittedAt === "string" &&
     typeof entry.threshold === "number"
   );
@@ -99,6 +107,7 @@ export function readRecentSearches(): RecentSearchesRead {
 export function writeRecentSearches(searches: RecentSearch[]): boolean {
   try {
     window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+    window.dispatchEvent(new Event(RECENT_SEARCHES_EVENT));
     return true;
   } catch {
     // Full or blocked storage just means the list doesn't outlive the page.
@@ -124,6 +133,26 @@ export function withRecentSearch(
 }
 
 /**
+ * Note how many runs a stored search matched.
+ * @param searches - The current list.
+ * @param jobId - The search's job id.
+ * @param totalMatches - Runs it matched.
+ * @returns The new list, or the same one when nothing changed. Nothing is
+ * stored.
+ */
+export function withSearchMatches(
+  searches: RecentSearch[],
+  jobId: string,
+  totalMatches: number
+): RecentSearch[] {
+  const entry = searches.find((search) => search.jobId === jobId);
+  if (!entry || entry.totalMatches === totalMatches) return searches;
+  return searches.map((search) =>
+    search === entry ? { ...search, totalMatches } : search
+  );
+}
+
+/**
  * Forget every stored search.
  */
 export function clearRecentSearches(): void {
@@ -132,4 +161,5 @@ export function clearRecentSearches(): void {
   } catch {
     // Nothing stored that we could reach, so nothing to clear.
   }
+  window.dispatchEvent(new Event(RECENT_SEARCHES_EVENT));
 }

@@ -17,7 +17,7 @@ import { type JSX, useEffect, useState } from "react";
  */
 export const LoganResultsView = (): JSX.Element => {
   const { filtering, filtersEnabled, search } = useLoganSearch();
-  const { searches } = useRecentSearches();
+  const { noteMatches, searches } = useRecentSearches();
   // Set after mount, once the URL is readable: a bare /results has nothing
   // to show and should say so rather than sit empty.
   const [noJob, setNoJob] = useState(false);
@@ -28,8 +28,19 @@ export const LoganResultsView = (): JSX.Element => {
       setNoJob(true);
   }, []);
 
-  const { jobId } = search;
+  const { jobId, results } = search;
   const entry = searches.find((search) => search.jobId === jobId);
+
+  // Kept with the stored search so My searches can say what each one found
+  // without reopening every job. A filtered page counts the filter, not the
+  // search, so only an unfiltered one is noted.
+  const matched =
+    results && !results.filtered
+      ? (results.total_matches ?? results.total_hits)
+      : null;
+  useEffect(() => {
+    if (jobId && matched !== null) noteMatches(jobId, matched);
+  }, [jobId, matched, noteMatches]);
 
   return (
     <ResultsSection>
@@ -58,7 +69,7 @@ export const LoganResultsView = (): JSX.Element => {
               jobId={jobId}
               newHref={ROUTES.SEARCH}
               registered={search.indexes}
-              results={search.results}
+              results={results}
             />
             <LoganSearchJob
               filtering={filtering}
