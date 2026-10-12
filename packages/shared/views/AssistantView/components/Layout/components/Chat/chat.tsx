@@ -1,6 +1,5 @@
-import { Stack } from "@mui/material";
 import { type JSX } from "react";
-import { StyledStack } from "./chat.styles";
+import { StyledChatInner, StyledStack } from "./chat.styles";
 import type { Props } from "./types";
 
 /**
@@ -12,7 +11,7 @@ import type { Props } from "./types";
 export const Chat = ({ children }: Props): JSX.Element => {
   return (
     <StyledStack>
-      <Stack>{children}</Stack>
+      <StyledChatInner>{children}</StyledChatInner>
     </StyledStack>
   );
 };

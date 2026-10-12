@@ -15,6 +15,7 @@ import { type JSX } from "react";
  * @param props - Component props.
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.onOpened - Reports that the history opened a different conversation.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
  * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
@@ -23,6 +24,7 @@ import { type JSX } from "react";
 export const ChatHistorySelector = ({
   disabled,
   lastSave,
+  onOpened,
   onOpeningChange,
   onRetryRestore,
   sessionId,
@@ -34,6 +36,7 @@ export const ChatHistorySelector = ({
     <HistoryList
       disabled={disabled}
       lastSave={lastSave}
+      onOpened={onOpened}
       onOpeningChange={onOpeningChange}
       onRetryRestore={onRetryRestore}
       sessionId={sessionId}

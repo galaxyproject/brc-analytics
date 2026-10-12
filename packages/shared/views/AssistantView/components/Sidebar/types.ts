@@ -6,6 +6,7 @@ export interface SidebarProps {
   disclaimer: ReactNode;
   lastSave: LastSave | null;
   onNewAnalysis: () => void;
+  onOpened: () => void;
   onOpeningChange: (isOpening: boolean) => void;
   onRetryRestore: () => void;
   sessionId: string | null;

@@ -98,10 +98,12 @@ export function isActiveAnalysis(
  * which selects it without reloading the list. Reports the open as in flight
  * until it settles, and a failure against the session that was showing. When
  * the URL already names the session opened -- one that failed to load -- the
- * navigation changes nothing, so the restore is asked to run again.
+ * navigation changes nothing, so the restore is asked to run again. An open
+ * that reaches a conversation other than the one showing is reported as such.
  * @param id - Saved conversation id.
  * @param sessionId - Session of the conversation on screen, or null while none is.
  * @param handlers - Where the open reports its progress.
+ * @param handlers.onOpened - Reports that a different conversation was reached.
  * @param handlers.onOpeningChange - Reports whether the open is in flight.
  * @param handlers.onRetryRestore - Restores the conversation the URL names again.
  * @param handlers.setItems - Sets the saved conversations.
@@ -111,6 +113,7 @@ export async function openAnalysis(
   id: string,
   sessionId: string | null,
   {
+    onOpened,
     onOpeningChange,
     onRetryRestore,
     setItems,
@@ -127,6 +130,7 @@ export async function openAnalysis(
     if (liveSessionId === null) return;
     setItems((analyses) => repointAnalysis(analyses, id, liveSessionId));
     if (liveSessionId === requestedSessionId) onRetryRestore();
+    else if (liveSessionId !== sessionId) onOpened();
   } catch {
     setOpenError({ sessionId });
   } finally {
