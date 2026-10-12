@@ -49,7 +49,11 @@ def dmp_rows(path: Path, cols: list[str | None]):
                 raise Exception(
                     f"Column number mismatch in {path}: expected {n_cols}, found {len(values)} on line {line_num}"
                 )
-            yield {col: value for col, value in zip(cols, values) if col is not None}
+            yield {
+                col: value
+                for col, value in zip(cols, values, strict=True)
+                if col is not None
+            }
             line_num += 1
 
 
