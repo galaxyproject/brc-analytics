@@ -30,7 +30,9 @@ const mockRouter = {
   push: jest.fn(() => Promise.resolve(true)),
   replace: jest.fn(() => Promise.resolve(true)),
 };
-jest.mock("next/router", () => ({ useRouter: () => mockRouter }));
+jest.mock("next/router", () => ({
+  useRouter: (): typeof mockRouter => mockRouter,
+}));
 
 const mockKy = ky as unknown as { get: jest.Mock; post: jest.Mock };
 

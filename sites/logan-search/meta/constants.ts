@@ -12,6 +12,11 @@ export const LOGAN_PAGE_META = {
       "How Logan Search works: inputs, indexes, scores, export and how long results last.",
     pageTitle: "How it works",
   },
+  MY_SEARCHES: {
+    pageDescription:
+      "The Logan searches this browser has run, with their status and how many runs each matched.",
+    pageTitle: "My searches",
+  },
   RESULTS: {
     pageDescription:
       "Logan Search results: the SRA runs a sequence occurs in, where they were sampled, and the full match set to download.",

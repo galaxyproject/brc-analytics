@@ -2,14 +2,17 @@ import { useCallback, useEffect, useState } from "react";
 import {
   clearRecentSearches,
   readRecentSearches,
+  RECENT_SEARCHES_EVENT,
   RECENT_SEARCHES_KEY,
   type RecentSearch,
   withRecentSearch,
+  withSearchMatches,
   writeRecentSearches,
 } from "./recentSearches";
 
 export interface UseRecentSearches {
   clear: () => void;
+  noteMatches: (jobId: string, totalMatches: number) => void;
   record: (search: RecentSearch) => void;
   searches: RecentSearch[];
 }
@@ -17,7 +20,7 @@ export interface UseRecentSearches {
 /**
  * The browser-local list of recent Logan searches, kept in step with other
  * tabs on the same origin.
- * @returns The list, newest first, and the two ways to change it.
+ * @returns The list, newest first, and the ways to change it.
  */
 export function useRecentSearches(): UseRecentSearches {
   const [searches, setSearches] = useState<RecentSearch[]>([]);
@@ -46,7 +49,11 @@ export function useRecentSearches(): UseRecentSearches {
 
     sync();
     window.addEventListener("storage", onStorage);
-    return (): void => window.removeEventListener("storage", onStorage);
+    window.addEventListener(RECENT_SEARCHES_EVENT, sync);
+    return (): void => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(RECENT_SEARCHES_EVENT, sync);
+    };
   }, []);
 
   const record = useCallback((search: RecentSearch): void => {
@@ -68,10 +75,21 @@ export function useRecentSearches(): UseRecentSearches {
     setSearches((prev) => withRecentSearch(prev, search));
   }, []);
 
+  const noteMatches = useCallback(
+    (jobId: string, totalMatches: number): void => {
+      const stored = readRecentSearches();
+      if (stored.status !== "ok") return;
+      const next = withSearchMatches(stored.searches, jobId, totalMatches);
+      // Unchanged, or a job this browser never ran: nothing to write.
+      if (next !== stored.searches) writeRecentSearches(next);
+    },
+    []
+  );
+
   const clear = useCallback((): void => {
     clearRecentSearches();
     setSearches([]);
   }, []);
 
-  return { clear, record, searches };
+  return { clear, noteMatches, record, searches };
 }

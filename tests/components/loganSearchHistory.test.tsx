@@ -9,8 +9,15 @@ import {
   withRecentSearch,
   writeRecentSearches,
 } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react";
 
 /**
  * A stored search.
@@ -198,5 +205,24 @@ describe("LoganSearchHistory", () => {
 
     const link = screen.getByRole("link", { name: "Job older" });
     expect(link.getAttribute("href")).toBe("/?job=older");
+  });
+});
+
+describe("useRecentSearches", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  test("follows a search recorded elsewhere in the same tab", () => {
+    // The header's count and the form each hold their own copy of the list.
+    const header = renderHook(() => useRecentSearches());
+    const form = renderHook(() => useRecentSearches());
+
+    act(() => form.result.current.record(entry("a")));
+    expect(header.result.current.searches.map((e) => e.jobId)).toEqual(["a"]);
+
+    act(() => form.result.current.noteMatches("a", 42));
+    expect(header.result.current.searches[0].totalMatches).toBe(42);
+
+    act(() => form.result.current.clear());
+    expect(header.result.current.searches).toEqual([]);
   });
 });
