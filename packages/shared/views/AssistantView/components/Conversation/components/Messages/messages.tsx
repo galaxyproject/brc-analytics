@@ -11,7 +11,8 @@ import type { MessagesProps } from "./types";
 /**
  * Renders the conversation's messages, delegating each to the message
  * selector, with the welcome text before the first message and the
- * assistant's status after the last. The list is a log, so screen readers
+ * assistant's status -- restoring or replying -- after the last, where the
+ * pinned list keeps it in view. The list is a log, so screen readers
  * announce each new message and status as it arrives, and it keeps itself
  * scrolled to the newest. It takes focus so keyboard users can scroll back.
  * Each message is preceded by its sender, hidden from view but read out by
@@ -40,7 +41,6 @@ export const Messages = ({
       role="log"
       tabIndex={0}
     >
-      {isRestoring && <Status label={STATUS_LABEL.RESTORING} />}
       {!isRestoring && messages.length === 0 && (
         <Typography
           color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
@@ -55,6 +55,7 @@ export const Messages = ({
           <MessageSelector message={message} />
         </Fragment>
       ))}
+      {isRestoring && <Status label={STATUS_LABEL.RESTORING} />}
       {loading && <Status label={STATUS_LABEL.LOADING} />}
     </StyledStack>
   );
