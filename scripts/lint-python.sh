@@ -13,7 +13,7 @@ mypy catalog/py_package/ || failed+=("mypy")
 
 if [ ${#failed[@]} -gt 0 ]; then
   echo ""
-  echo "Python linting failed for:"
+  echo "Errors reported by:"
   for name in "${failed[@]}"; do
     echo "$name"
   done
