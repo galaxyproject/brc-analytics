@@ -1,6 +1,7 @@
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
+import { focusVisibleOutline } from "@repo/shared/styles/mixins/focus";
 
 export const StyledContainer = styled.div`
   border: 1px solid ${PALETTE.SMOKE_MAIN};
@@ -8,10 +9,7 @@ export const StyledContainer = styled.div`
   margin: 24px 0;
   overflow-x: auto;
 
-  &:focus-visible {
-    outline: 2px solid ${PALETTE.PRIMARY_MAIN};
-    outline-offset: 2px;
-  }
+  ${focusVisibleOutline}
 `;
 
 export const StyledTable = styled.table`
