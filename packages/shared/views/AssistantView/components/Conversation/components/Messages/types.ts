@@ -2,5 +2,5 @@ import type { ConversationProps } from "@repo/shared/views/AssistantView/compone
 
 export type MessagesProps = Pick<
   ConversationProps,
-  "error" | "introText" | "isRestoring" | "loading" | "messages" | "onRetry"
+  "error" | "introText" | "isRestoring" | "loading" | "messages"
 >;

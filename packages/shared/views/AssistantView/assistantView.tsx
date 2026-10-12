@@ -7,6 +7,7 @@ import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
+import { useConversationKey } from "@repo/shared/views/AssistantView/hooks/UseConversationKey/hook";
 import { type JSX, useEffect, useState } from "react";
 import { AnalysisSetup } from "./components/AnalysisSetup/analysisSetup";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
@@ -52,6 +53,8 @@ export const AssistantView = ({
   // A conversation opening from the history: until its restore takes over,
   // nothing else may start or send, or the open would wipe it.
   const [isOpening, setIsOpening] = useState(false);
+  const { conversationKey, onNewAnalysis, onOpeningChange } =
+    useConversationKey(resetSession, setIsOpening);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -90,7 +93,10 @@ export const AssistantView = ({
         slotProps={{
           chat: {
             children: (
+              // Keyed by conversation, so an unsent draft doesn't follow the
+              // user into the next one.
               <Conversation
+                key={conversationKey}
                 error={error}
                 introText={introText}
                 isRestoring={isRestoring || isOpening}
@@ -108,8 +114,8 @@ export const AssistantView = ({
                 disabled={loading || isRestoring || isOpening}
                 disclaimer={disclaimer}
                 lastSave={lastSave}
-                onNewAnalysis={resetSession}
-                onOpeningChange={setIsOpening}
+                onNewAnalysis={onNewAnalysis}
+                onOpeningChange={onOpeningChange}
                 onRetryRestore={retryRestore}
                 sessionId={shownSessionId}
                 supportUrl={supportUrl}
