@@ -13,10 +13,7 @@ export const StyledStack = styled(StyledGridItem)`
   padding: 40px 40px 16px;
 
   ${bpDownMd} {
-    box-shadow:
-      inset 0 1px 0 ${PALETTE.SMOKE_MAIN},
-      inset 0 -1px 0 ${PALETTE.SMOKE_MAIN};
-    min-height: 500px;
+    box-shadow: none;
     padding: 16px;
   }
 `;

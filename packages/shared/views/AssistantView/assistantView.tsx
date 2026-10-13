@@ -10,6 +10,7 @@ import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssi
 import { useConversationKey } from "@repo/shared/views/AssistantView/hooks/UseConversationKey/hook";
 import { type JSX, useEffect, useState } from "react";
 import { AnalysisSetup } from "./components/AnalysisSetup/analysisSetup";
+import { TabLabel as SetupTabLabel } from "./components/AnalysisSetup/components/TabLabel/tabLabel";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
 import { Conversation } from "./components/Conversation/conversation";
 import { Layout as AssistantUILayout } from "./components/Layout/layout";
@@ -90,6 +91,7 @@ export const AssistantView = ({
   if (isAssistantUIEnabled) {
     return (
       <AssistantUILayout
+        conversationKey={conversationKey}
         slotProps={{
           chat: {
             children: (
@@ -107,6 +109,7 @@ export const AssistantView = ({
                 suggestions={suggestions}
               />
             ),
+            tabLabel: "Chat",
           },
           history: {
             children: (
@@ -122,6 +125,7 @@ export const AssistantView = ({
                 supportUrl={supportUrl}
               />
             ),
+            tabLabel: "History",
           },
           setup: {
             // The new UI leaves out the Logan cohort card for now.
@@ -133,6 +137,7 @@ export const AssistantView = ({
                 schema={schema}
               />
             ),
+            tabLabel: <SetupTabLabel handoffUrl={handoffUrl} schema={schema} />,
           },
         }}
       />

@@ -1,3 +1,4 @@
+import { bpDownMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import type { CSSObject } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
@@ -18,4 +19,12 @@ export const StyledStack = styled(Stack)`
   position: relative;
 
   ${focusVisibleOutline}
+
+  // On narrow screens the chat tab scrolls as a whole, so the list takes its
+  // full height rather than scrolling on its own, and grows into any spare
+  // room, keeping the composer at the bottom of a short conversation.
+  ${bpDownMd} {
+    flex: 1 0 auto;
+    overflow-y: visible;
+  }
 `;

@@ -7,6 +7,7 @@ import { Messages } from "./components/Messages/messages";
 import { Suggestions } from "./components/Suggestions/suggestions";
 import { StyledStack } from "./conversation.styles";
 import { useComposerFocus } from "./hooks/UseComposerFocus/hook";
+import { useRevealLatest } from "./hooks/UseRevealLatest/hook";
 import type { ConversationProps } from "./types";
 
 /**
@@ -14,7 +15,8 @@ import type { ConversationProps } from "./types";
  * the last request, suggested next steps and the composer. The error sits outside
  * the messages' log, so only its own alert announces it, and it stays in view
  * above the composer. Signing in to keep the conversation is offered by the
- * sidebar, so it isn't repeated here.
+ * sidebar, so it isn't repeated here. On narrow screens the whole chat tab
+ * scrolls, composer included, and keeps the newest message in view.
  * @param props - Component props.
  * @param props.error - Error from the last request, if any.
  * @param props.introText - Welcome text shown before any messages.
@@ -38,8 +40,9 @@ export const Conversation = ({
 }: ConversationProps): JSX.Element => {
   const disabled = loading || isRestoring;
   const { inputRef, onFocusComposer } = useComposerFocus();
+  const ref = useRevealLatest([error, isRestoring, loading, messages]);
   return (
-    <StyledStack>
+    <StyledStack ref={ref}>
       <Messages
         error={error}
         introText={introText}
