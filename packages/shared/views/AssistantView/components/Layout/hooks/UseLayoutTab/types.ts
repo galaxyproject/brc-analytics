@@ -9,6 +9,15 @@ import type { SyntheticEvent } from "react";
  */
 export type ScrollPositions = Partial<Record<LayoutTab, number>>;
 
+/**
+ * The column showing, and whether switching to it should move focus to its
+ * tab regardless of where focus was.
+ */
+export interface ShownTab {
+  moveFocus: boolean;
+  tab: LayoutTab;
+}
+
 export interface UseLayoutTab {
   onSelectTab: SelectTab;
   onTabChange: (event: SyntheticEvent, tab: LayoutTab) => void;

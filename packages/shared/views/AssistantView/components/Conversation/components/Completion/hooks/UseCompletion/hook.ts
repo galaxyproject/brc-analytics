@@ -8,7 +8,7 @@ import type { UseCompletion } from "./types";
 /**
  * Returns the handlers behind the completion block's buttons: continuing to
  * workflow setup, as the setup panel's own button does, and showing the setup
- * tab.
+ * tab, where the layout moves focus too.
  * @param handoffUrl - Workflow setup URL, or null until the setup is complete.
  * @param schema - Current analysis schema.
  * @returns Continue and view-setup handlers.
