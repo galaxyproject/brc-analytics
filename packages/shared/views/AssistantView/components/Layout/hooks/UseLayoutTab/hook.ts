@@ -22,7 +22,8 @@ import { refocusIfLeft, restoreScroll, saveScroll } from "./utils";
  * opening a conversation from the history, moves focus to the tab now showing.
  * @param conversationKey - Key that changes when the user moves to a different conversation.
  * @param baseId - Id unique to the layout, naming its tabs.
- * @returns The column showing, and a handler that switches column.
+ * @returns The column showing, and handlers that switch column: one for the
+ * tabs, and one for content inside a column.
  */
 export const useLayoutTab = (
   conversationKey: number,
@@ -40,12 +41,16 @@ export const useLayoutTab = (
     setTab(LAYOUT_TAB.CHAT);
   }
 
+  // Reads the tab being left from the ref, so the handler, which content
+  // inside a column receives through context, stays the same between switches.
+  const onSelectTab = useCallback((nextTab: LayoutTab): void => {
+    saveScroll(scrollPositions.current, shownTab.current);
+    setTab(nextTab);
+  }, []);
+
   const onTabChange = useCallback(
-    (_event: SyntheticEvent, nextTab: LayoutTab): void => {
-      saveScroll(scrollPositions.current, tab);
-      setTab(nextTab);
-    },
-    [tab]
+    (_event: SyntheticEvent, nextTab: LayoutTab): void => onSelectTab(nextTab),
+    [onSelectTab]
   );
 
   // Declared before the restore below, so it runs first when both change.
@@ -63,5 +68,5 @@ export const useLayoutTab = (
     refocusIfLeft(baseId, leftTab, tab);
   }, [baseId, tab]);
 
-  return { onTabChange, tab };
+  return { onSelectTab, onTabChange, tab };
 };

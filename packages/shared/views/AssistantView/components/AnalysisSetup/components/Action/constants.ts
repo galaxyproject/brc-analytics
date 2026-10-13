@@ -6,3 +6,8 @@ export const ACTION_PLACEMENT = {
   END: "end",
   START: "start",
 } as const;
+
+/**
+ * Label of the handoff to workflow setup, wherever it is offered.
+ */
+export const CONTINUE_LABEL = "Continue to workflow setup";

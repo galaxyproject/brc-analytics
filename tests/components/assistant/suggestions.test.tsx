@@ -1,3 +1,5 @@
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
 import type { SuggestionChip } from "@repo/shared/services/api-client/types";
 import {
   HEADING,
@@ -28,7 +30,8 @@ interface RenderOptions {
 }
 
 /**
- * Renders the suggested next steps.
+ * Renders the suggested next steps, under the app theme its narrow-screen
+ * styles read breakpoints from.
  * @param options - Props to override.
  * @param options.disabled - Whether the assistant is busy.
  * @param options.onFocusComposer - Moves focus to the composer.
@@ -45,10 +48,16 @@ function renderSuggestions({
   const { container } = render(
     <Suggestions
       disabled={disabled}
+      isSetupComplete={false}
       onFocusComposer={onFocusComposer}
       onSend={onSend}
       suggestions={suggestions}
-    />
+    />,
+    {
+      wrapper: ({ children }) => (
+        <ThemeProvider theme={createAppTheme()}>{children}</ThemeProvider>
+      ),
+    }
   );
   return container;
 }

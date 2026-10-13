@@ -21,10 +21,9 @@ export const StyledStack = styled(Stack)`
   ${focusVisibleOutline}
 
   // On narrow screens the chat tab scrolls as a whole, so the list takes its
-  // full height rather than scrolling on its own, and grows into any spare
-  // room, keeping the composer at the bottom of a short conversation.
+  // full height rather than scrolling on its own.
   ${bpDownMd} {
-    flex: 1 0 auto;
+    flex: none;
     overflow-y: visible;
   }
 `;

@@ -1,6 +1,7 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { type JSX } from "react";
 import { StyledButton } from "./action.styles";
+import { CONTINUE_LABEL } from "./constants";
 import { useContinueHandoff } from "./hooks/UseContinueHandoff/hook";
 import type { ActionProps } from "./types";
 
@@ -32,7 +33,7 @@ export const Action = ({
       placement={placement}
       variant={BUTTON_PROPS.VARIANT.CONTAINED}
     >
-      Continue to workflow setup
+      {CONTINUE_LABEL}
     </StyledButton>
   );
 };

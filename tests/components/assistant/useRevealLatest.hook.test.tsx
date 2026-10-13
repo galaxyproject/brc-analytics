@@ -161,6 +161,7 @@ describe("useRevealLatest", () => {
     render(
       <ChatConversation
         error={null}
+        handoffUrl={null}
         introText="Welcome"
         isRestoring={false}
         loading={false}
@@ -170,6 +171,7 @@ describe("useRevealLatest", () => {
         ]}
         onRetry={jest.fn()}
         onSend={jest.fn()}
+        schema={null}
         suggestions={[]}
       />,
       { wrapper }
