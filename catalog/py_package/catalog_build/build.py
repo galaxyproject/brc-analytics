@@ -4,7 +4,6 @@ import io
 import json
 import logging
 import os
-import time
 import urllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -245,24 +244,7 @@ def get_genome_row(genome_info: pd.Series):
     }
 
 
-def get_biosample_data(genome_info: pd.Series):
-    sample_ids = genome_info["assembly_info"]["biosample"]["sample_ids"]
-    if sample_ids is None:
-        sample_ids = []
-    return {
-        "accession": genome_info["accession"],
-        "biosample": genome_info["assembly_info"]["biosample"]["accession"],
-        "sample_ids": ",".join(
-            [
-                f"{sample['db']}:{sample['value']}"
-                for sample in sample_ids
-                if sample["db"] is not None
-            ]
-        ),
-    }
-
-
-def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
+def get_genomes_df(source_ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
     """
     Takes loaded NCBI genomes and creates DataFrames for genomes and biosample data.
 
@@ -282,17 +264,7 @@ def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
         lambda v: None if v is None else json.loads(v)
     )
     ncbi_genomes_df = source_ncbi_genomes_df.assign(**parsed_json_columns)
-    ncbi_genomes_having_biosamples_df = ncbi_genomes_df[
-        ncbi_genomes_df["assembly_info"].map(
-            lambda info: isinstance(info, dict) and info["biosample"] is not None
-        )
-    ]
-    return (
-        ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand"),
-        ncbi_genomes_having_biosamples_df.apply(
-            get_biosample_data, axis="columns", result_type="expand"
-        ),
-    )
+    return ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand")
 
 
 def _get_gene_model_urls_from_genark_list():
@@ -488,239 +460,6 @@ def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
             level for level in taxonomic_levels if level not in present_ranks
         ],
     }
-
-
-def fetch_sra_metadata(srs_ids, batch_size=20):
-    """
-    Fetches metadata for a list of SRS IDs from the SRA database.
-
-    This function retrieves metadata for a given list of SRS (SRA Sample) IDs by querying the NCBI and EBI databases.
-    It fetches the metadata in batches and handles retries and waiting mechanisms for failed requests. The metadata includes
-    information about the experiment, platform, instrument, library, and associated files.
-
-    Args:
-      srs_ids (list): A list of SRS IDs to fetch metadata for.
-      batch_size (int, optional): The number of SRS IDs to process in each batch. Defaults to 20.
-
-    Returns:
-      dict: A dictionary containing the fetched metadata, organized by sample accession and run accession.
-
-    Raises:
-      Exception: If the data could not be fetched after the specified number of retries or if duplicate entries are found.
-    """
-
-    def fetch_url_data(url, counter=0, counter_limit=2, wait_time=2, num_retry=3):
-        """
-        Fetches data from a given URL with retry and wait mechanisms.
-        Args:
-          url (str): The URL to fetch data from.
-          counter (int, optional): The current retry counter. Defaults to 0.
-          counter_limit (int, optional): The maximum number of retries before waiting. Defaults to 3.
-          wait_time (int, optional): The time to wait before retrying in seconds. Defaults to 5.
-          num_retry (int, optional): The number of retry attempts. Defaults to 3.
-        Returns:
-          tuple: A tuple containing the JSON response and the updated counter.
-        Raises:
-          Exception: If the data could not be fetched after the specified number of retries.
-        """
-        if counter > counter_limit:
-            time.sleep(wait_time)
-            counter = 0
-
-        response = requests.get(url)
-        while num_retry > 0 and response.status_code != 200:
-            time.sleep(wait_time)
-            log.debug(
-                f"Failed to fetch, status: {response.status_code}, url: {url}. Retrying..."
-            )
-            response = requests.get(url)
-            num_retry -= 1
-
-        if num_retry <= 0:
-            raise Exception(
-                f"Failed to fetch, status: {response.status_code}, url: {url} "
-            )
-        log.debug(f"Fetching data from {url}")
-        return response, counter + 1
-
-    if srs_ids is None:
-        return None
-
-    data = {}
-    counter = 0
-    samples_processed = 0
-    for i in range(0, len(srs_ids), batch_size):
-        print(
-            f"Processing metadata for samples: {samples_processed} of {len(srs_ids)}",
-            end="\r",
-        )
-        batch_srs_id = srs_ids[i : i + batch_size]
-        samples_processed += len(batch_srs_id)
-        search_data, counter = fetch_url_data(
-            f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={'+OR+'.join(batch_srs_id)}&retmode=json&retmax=1000",
-            counter,
-        )
-        search_data = search_data.json()
-
-        if int(search_data.get("esearchresult", {}).get("count", 0)) == 0:
-            log.debug(f"No SRR IDs found for SRS {batch_srs_id}")
-            return None
-
-        # Extract SRR IDs
-        srr_ids = search_data.get("esearchresult", {}).get("idlist", [])
-        if srr_ids:
-            for i in range(0, len(srr_ids), batch_size):
-                batch_srr_id = srr_ids[i : i + batch_size]
-                summary_data, counter = fetch_url_data(
-                    f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=sra&id={','.join(batch_srr_id)}&retmode=json&retmax=1000",
-                    counter,
-                )
-                summary_data = summary_data.json()
-                if "result" in summary_data:
-                    for result in summary_data["result"]["uids"]:
-                        exp_soup = BeautifulSoup(
-                            f"<Root>{summary_data['result'][result]['expxml']}</Root>",
-                            "xml",
-                        )
-                        run_soup = BeautifulSoup(
-                            f"<Root>{summary_data['result'][result]['runs']}</Root>",
-                            "xml",
-                        )
-
-                        library_layout = exp_soup.find("LIBRARY_LAYOUT").find().name
-                        title = exp_soup.find("Title").text
-                        platform = exp_soup.find("Platform").text
-                        instrument = exp_soup.find("Platform")["instrument_model"]
-                        organism_name = exp_soup.find("Organism").get(
-                            "ScientificName", ""
-                        )
-                        total_spots = exp_soup.find("Statistics")["total_spots"]
-                        total_bases = exp_soup.find("Statistics")["total_bases"]
-
-                        sra_experiment_acc = exp_soup.find("Experiment")["acc"]
-                        sra_sample_acc = exp_soup.find("Sample")["acc"]
-                        sra_study_acc = exp_soup.find("Study")["acc"]
-                        sra_submitter_acc = exp_soup.find("Submitter")["acc"]
-
-                        library_name = (
-                            exp_soup.find("LIBRARY_NAME").text
-                            if exp_soup.find("LIBRARY_NAME")
-                            else ""
-                        )
-                        library_strategy = (
-                            exp_soup.find("LIBRARY_STRATEGY").text
-                            if exp_soup.find("LIBRARY_STRATEGY")
-                            else ""
-                        )
-                        library_source = (
-                            exp_soup.find("LIBRARY_SOURCE").text
-                            if exp_soup.find("LIBRARY_SOURCE")
-                            else ""
-                        )
-                        library_selection = (
-                            exp_soup.find("LIBRARY_SELECTION").text
-                            if exp_soup.find("LIBRARY_SELECTION")
-                            else ""
-                        )
-                        bioproject_elem = exp_soup.find("Bioproject")
-                        bioproject = bioproject_elem.text if bioproject_elem else ""
-
-                        for run in run_soup.find_all("Run"):
-                            sra_run_acc = run["acc"]
-                            run_total_bases = run["total_bases"]
-                            run_total_spots = run["total_spots"]
-
-                            d = {
-                                "title": title,
-                                "platform": platform,
-                                "instrument": instrument,
-                                "total_spots": total_spots,
-                                "total_bases": total_bases,
-                                "bioproject": bioproject,
-                                "organism_name": organism_name,
-                                "library_name": library_name,
-                                "library_layout": library_layout,
-                                "library_strategy": library_strategy,
-                                "library_source": library_source,
-                                "library_selection": library_selection,
-                                "sra_experiment_acc": sra_experiment_acc,
-                                "sra_run_acc": sra_run_acc,
-                                "sra_sample_acc": sra_sample_acc,
-                                "sra_study_acc": sra_study_acc,
-                                "sra_submitter_acc": sra_submitter_acc,
-                                "run_total_bases": run_total_bases,
-                                "run_total_spots": run_total_spots,
-                            }
-
-                            if sra_sample_acc in data:
-                                if sra_run_acc in data[sra_sample_acc]:
-                                    raise Exception(
-                                        f"Duplicate biosample run_acc {sra_run_acc} found {sra_sample_acc}"
-                                    )
-                                else:
-                                    data[sra_sample_acc][sra_run_acc] = d
-                            else:
-                                data[sra_sample_acc] = {sra_run_acc: d}
-    print(
-        f"Processing metadata for samples: {samples_processed} of {len(srs_ids)}",
-        end="\n",
-    )
-    samples_processed = 0
-    for sample_acc in data:
-        print(f"Adding file urls to : {samples_processed} of {len(data)}", end="\r")
-        samples_processed += 1
-        # Fetch url, file size and md5 for raw/primary data files
-        file_list_data, counter = fetch_url_data(
-            f"https://www.ebi.ac.uk/ena/portal/api/filereport?accession={sample_acc}&result=read_run&format=json&retmax=1000",
-            counter,
-        )
-        file_list_data = file_list_data.json()
-        for result in file_list_data:
-            if result["run_accession"] not in data[sample_acc]:
-                raise Exception(
-                    f"Not metadata found for {result['run_accession']} {sample_acc}"
-                )
-            if "fastq_ftp" in data[sample_acc][result["run_accession"]]:
-                raise Exception(
-                    f"Duplicate file list entry for {result['run_accession']}  {sample_acc}"
-                )
-
-            data[sample_acc][result["run_accession"]]["file_urls"] = result["fastq_ftp"]
-            data[sample_acc][result["run_accession"]]["file_size"] = result[
-                "fastq_bytes"
-            ]
-            data[sample_acc][result["run_accession"]]["file_md5"] = result["fastq_md5"]
-
-            data[sample_acc][result["run_accession"]]["file_urls"] = result["fastq_ftp"]
-            data[sample_acc][result["run_accession"]]["file_size"] = result[
-                "fastq_bytes"
-            ]
-            data[sample_acc][result["run_accession"]]["file_md5"] = result["fastq_md5"]
-
-            if not len(data[sample_acc][result["run_accession"]]["file_urls"]):
-                # Some raw or primary data has been uploaded but not properly processed by SRA.
-                # These files will lack https/ftp URLs and statistics, looks like these are
-                # BAM files that are labeled as FASTQ.
-                # For these, we can retrieve S3 links instead.
-                file_list_data, counter = fetch_url_data(
-                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&id=SRR25741043&retmode=xml",
-                    counter,
-                )
-                srafile_soup = BeautifulSoup(file_list_data.text, "xml")
-                for file in srafile_soup.findAll("SRAFile"):
-                    if file["supertype"] == "Original":
-                        alternatives = file.find("Alternatives")
-                        data[sample_acc][result["run_accession"]]["file_urls"] = (
-                            alternatives["url"]
-                        )
-                        data[sample_acc][result["run_accession"]]["file_size"] = file[
-                            "size"
-                        ]
-                        data[sample_acc][result["run_accession"]]["file_md5"] = file[
-                            "md5"
-                        ]
-    print(f"Adding file urls to : {samples_processed} of {len(data)}", end="\n")
-    return data
 
 
 def report_missing_ploidy_info(genomes_df: pd.DataFrame):
@@ -1444,8 +1183,6 @@ def build_files(
     build_meta_output_path,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
-    extract_primary_data=False,
-    primary_output_path=None,
     qc_report_path=None,
     organisms_path,
     taxa_path=None,
@@ -1468,8 +1205,6 @@ def build_files(
       taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level (with order being insignificant for categories that are at the same level as each other)
       taxonomic_group_sets: Dict describing taxa or groups of taxa to be given specified names in the "taxonomic group" field
       do_gene_model_urls: Boolean specifying whether to fetch gene model URLs (if False, the `geneModelUrl` column is filled with empty string)
-      extract_primary_data: Boolean specifying whether to fetch and save metadata from SRA
-      primary_output_path: Path to save SRA metadata at
       qc_report_path: Path to save QC report to (if omitted, no report is generated)
       organisms_path: Path of input organisms YAML, used to perform checks
       taxa_path: Path of input curated taxa YAML
@@ -1518,35 +1253,7 @@ def build_files(
             source_workflows_df, workflow_taxonomy_mapping_path
         )
 
-    base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
-        load_and_transform_result.ncbi_genomes
-    )
-
-    primarydata_df["sra_sample_acc"] = primarydata_df["sample_ids"].str.split(",")
-    primarydata_df = primarydata_df.explode("sra_sample_acc")
-    primarydata_df = primarydata_df[
-        ~primarydata_df["sra_sample_acc"].isnull()
-        & primarydata_df["sra_sample_acc"].str.startswith("SRA")
-    ]
-    primarydata_df["sra_sample_acc"] = primarydata_df["sra_sample_acc"].str.replace(
-        "SRA:", ""
-    )
-    if extract_primary_data:
-        sra_ids_list = primarydata_df["sra_sample_acc"].dropna().unique().tolist()
-        sra_metadata = fetch_sra_metadata(sra_ids_list)
-        sra_metadata_df = pd.DataFrame(
-            [
-                sra_metadata[sra][srr]
-                for sra in sra_metadata
-                for srr in sra_metadata[sra]
-            ]
-        )
-        primarydata_df = primarydata_df.merge(
-            sra_metadata_df,
-            how="left",
-            left_on="sra_sample_acc",
-            right_on="sra_sample_acc",
-        )
+    base_genomes_df = get_genomes_df(load_and_transform_result.ncbi_genomes)
 
     qc_report_params["missing_ncbi_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1758,40 +1465,9 @@ def build_files(
             species_image_source_link
         )
 
-        if extract_primary_data and primarydata_df is not None:
-            if "organism_name" in primarydata_df.columns:
-                # Map the image paths back to the organism_name
-                primarydata_df["organismImageUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_paths)
-                primarydata_df["organismThumbnailUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_thumbnail_paths)
-                primarydata_df["organismImageCredit"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_credit)
-                primarydata_df["organismImageLicense"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_license)
-                primarydata_df["organismImageSourceName"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_source)
-                primarydata_df["organismImageSourceUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_source_link)
-            else:
-                print(
-                    "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
-                )
-
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
     print(f"Wrote to {genomes_output_path}")
-
-    if extract_primary_data:
-        primarydata_df = primarydata_df.sort_values("accession", kind="stable")
-        primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
-        print(f"Wrote to {primary_output_path}")
 
     if len(taxonomic_levels_for_tree) > 0:
         # Use the assemblies info from genomes_df to build the species tree
