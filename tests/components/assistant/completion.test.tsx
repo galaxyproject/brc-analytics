@@ -60,7 +60,7 @@ interface RenderOptions {
  * Renders the completion block inside the layout's tab switching, under the
  * app theme its narrow-screen styles read breakpoints from.
  * @param options - Props to override.
- * @param options.disabled - Whether a reply is in flight.
+ * @param options.disabled - Whether the assistant is busy.
  * @param options.handoffUrl - Workflow setup URL, or null while incomplete.
  * @param options.onSelectTab - Switches the column shown.
  * @returns The render's container.
@@ -117,7 +117,7 @@ describe("Completion", () => {
   });
 
   // The handoff URL may change with the reply.
-  test("holds the handoff while a reply is in flight", () => {
+  test("holds the handoff while the assistant is busy", () => {
     renderCompletion({ disabled: true });
     expect(screen.getByRole("button", { name: CONTINUE_LABEL })).toBeDisabled();
   });

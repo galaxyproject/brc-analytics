@@ -56,22 +56,22 @@ export const Conversation = ({
         loading={loading}
         messages={messages}
       />
-      {error && (
-        <Alert
-          {...ALERT_PROPS.STANDARD_ERROR}
-          action={
-            onRetry && (
-              <Button onClick={onRetry} size={BUTTON_PROPS.SIZE.SMALL}>
-                Retry
-              </Button>
-            )
-          }
-        >
-          {error}
-        </Alert>
-      )}
       <Completion disabled={disabled} handoffUrl={handoffUrl} schema={schema} />
       <StyledFooter>
+        {error && (
+          <Alert
+            {...ALERT_PROPS.STANDARD_ERROR}
+            action={
+              onRetry && (
+                <Button onClick={onRetry} size={BUTTON_PROPS.SIZE.SMALL}>
+                  Retry
+                </Button>
+              )
+            }
+          >
+            {error}
+          </Alert>
+        )}
         <Suggestions
           disabled={disabled}
           isSetupComplete={Boolean(handoffUrl)}
