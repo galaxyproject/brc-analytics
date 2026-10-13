@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { ScrollPositions, UseLayoutTab } from "./types";
-import { restoreScroll, saveScroll } from "./utils";
+import { refocusIfLeft, restoreScroll, saveScroll } from "./utils";
 
 /**
  * Tracks which column shows while the columns are tabbed, starting on the
@@ -18,11 +18,16 @@ import { restoreScroll, saveScroll } from "./utils";
  * keeps the position of the tab left and restores the one returned to, or
  * starts it at the top. Positions belong to the conversation they were left
  * in, so a different conversation starts afresh. The chat brings its newest
- * message into view itself.
+ * message into view itself. A switch that hides the focused control, such as
+ * opening a conversation from the history, moves focus to the tab now showing.
  * @param conversationKey - Key that changes when the user moves to a different conversation.
+ * @param baseId - Id unique to the layout, naming its tabs.
  * @returns The column showing, and a handler that switches column.
  */
-export const useLayoutTab = (conversationKey: number): UseLayoutTab => {
+export const useLayoutTab = (
+  conversationKey: number,
+  baseId: string
+): UseLayoutTab => {
   const [tab, setTab] = useState<LayoutTab>(LAYOUT_TAB.CHAT);
   const [shownKey, setShownKey] = useState(conversationKey);
   const scrollPositions = useRef<ScrollPositions>({});
@@ -51,10 +56,12 @@ export const useLayoutTab = (conversationKey: number): UseLayoutTab => {
   // Before paint, so the new tab never shows at the old one's position. Only
   // on a switch, leaving the page where the browser put it on arrival.
   useLayoutEffect(() => {
-    if (shownTab.current === tab) return;
+    const leftTab = shownTab.current;
+    if (leftTab === tab) return;
     shownTab.current = tab;
     restoreScroll(scrollPositions.current, tab);
-  }, [tab]);
+    refocusIfLeft(baseId, leftTab, tab);
+  }, [baseId, tab]);
 
   return { onTabChange, tab };
 };

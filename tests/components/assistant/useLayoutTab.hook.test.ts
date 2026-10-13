@@ -1,19 +1,37 @@
 import { LAYOUT_TAB } from "@repo/shared/views/AssistantView/components/Layout/constants";
 import { useLayoutTab } from "@repo/shared/views/AssistantView/components/Layout/hooks/UseLayoutTab/hook";
 import type { LayoutTab } from "@repo/shared/views/AssistantView/components/Layout/types";
+import {
+  getTabId,
+  getTabPanelId,
+} from "@repo/shared/views/AssistantView/components/Layout/utils";
 import { act, renderHook } from "@testing-library/react";
 import type { SyntheticEvent } from "react";
+
+const BASE_ID = "layout";
 
 const EVENT = {} as SyntheticEvent;
 
 let scrollTo: jest.SpyInstance;
 
 /**
- * Sets where the page is scrolled, as the browser would.
- * @param y - Vertical scroll position.
+ * Adds a button to the page, inside a column's panel or on its own.
+ * @param id - Button id.
+ * @param panelTab - Column whose panel holds the button, if any.
+ * @returns The button.
  */
-function scrollPageTo(y: number): void {
-  Object.defineProperty(window, "scrollY", { configurable: true, value: y });
+function addButton(id: string, panelTab?: LayoutTab): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.id = id;
+  if (!panelTab) {
+    document.body.append(button);
+    return button;
+  }
+  const panel = document.createElement("div");
+  panel.id = getTabPanelId(BASE_ID, panelTab);
+  panel.append(button);
+  document.body.append(panel);
+  return button;
 }
 
 /**
@@ -24,9 +42,17 @@ function scrollPageTo(y: number): void {
 function renderLayoutTab(
   conversationKey = 0
 ): ReturnType<typeof renderHook<ReturnType<typeof useLayoutTab>, number>> {
-  return renderHook((key: number) => useLayoutTab(key), {
+  return renderHook((key: number) => useLayoutTab(key, BASE_ID), {
     initialProps: conversationKey,
   });
+}
+
+/**
+ * Sets where the page is scrolled, as the browser would.
+ * @param y - Vertical scroll position.
+ */
+function scrollPageTo(y: number): void {
+  Object.defineProperty(window, "scrollY", { configurable: true, value: y });
 }
 
 /**
@@ -49,6 +75,7 @@ beforeEach(() => {
 
 afterEach(() => {
   scrollTo.mockRestore();
+  document.body.replaceChildren();
 });
 
 describe("useLayoutTab", () => {
@@ -109,5 +136,33 @@ describe("useLayoutTab", () => {
     rerender(1);
     switchTo(result, LAYOUT_TAB.SETUP);
     expect(scrollTo).toHaveBeenLastCalledWith({ top: 0 });
+  });
+
+  // Opening a conversation from the history hides the control the user was
+  // on, so focus follows them to the chat rather than being lost.
+  test("moves focus to the chat tab when it was in the tab just left", () => {
+    const chatTab = addButton(getTabId(BASE_ID, LAYOUT_TAB.CHAT));
+    const { rerender, result } = renderLayoutTab(0);
+    switchTo(result, LAYOUT_TAB.HISTORY);
+    addButton("open-conversation", LAYOUT_TAB.HISTORY).focus();
+    rerender(1);
+    expect(document.activeElement).toBe(chatTab);
+  });
+
+  test("leaves focus on the tab just clicked", () => {
+    addButton(getTabId(BASE_ID, LAYOUT_TAB.SETUP));
+    const { result } = renderLayoutTab();
+    const clickedTab = addButton("clicked-tab");
+    clickedTab.focus();
+    switchTo(result, LAYOUT_TAB.SETUP);
+    expect(document.activeElement).toBe(clickedTab);
+  });
+
+  // Safari doesn't focus a button on click, leaving focus on the page.
+  test("doesn't take focus when nothing in the tab just left had it", () => {
+    addButton(getTabId(BASE_ID, LAYOUT_TAB.SETUP));
+    const { result } = renderLayoutTab();
+    switchTo(result, LAYOUT_TAB.SETUP);
+    expect(document.activeElement).toBe(document.body);
   });
 });

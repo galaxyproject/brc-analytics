@@ -33,8 +33,8 @@ export const Layout = ({
 }: LayoutProps): JSX.Element => {
   const { spacing } = useLayoutSpacing();
   const isTabbed = useBreakpointHelper(BREAKPOINT_FN_NAME.DOWN, "md");
-  const { onTabChange, tab } = useLayoutTab(conversationKey);
   const baseId = useId();
+  const { onTabChange, tab } = useLayoutTab(conversationKey, baseId);
   const top = spacing.top || DEFAULT_HEIGHT.TOP;
 
   return (
