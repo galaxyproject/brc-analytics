@@ -4,3 +4,7 @@ export type ActionProps = Pick<
   AnalysisSetupProps,
   "handoffUrl" | "loading" | "schema"
 >;
+
+export interface StyledButtonProps {
+  complete: boolean;
+}

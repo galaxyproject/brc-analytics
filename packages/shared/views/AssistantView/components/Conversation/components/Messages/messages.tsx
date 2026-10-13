@@ -13,8 +13,9 @@ import type { MessagesProps } from "./types";
  * selector, with the welcome text before the first message and the
  * assistant's status -- restoring or replying -- after the last, where the
  * pinned list keeps it in view. The list is a log, so screen readers
- * announce each new message and status as it arrives, and it keeps itself
- * scrolled to the newest. It takes focus so keyboard users can scroll back.
+ * announce each new message and status as it arrives. Where it scrolls on its
+ * own, it keeps itself scrolled to the newest and takes focus so keyboard
+ * users can scroll back; on narrow screens the page scrolls it instead.
  * Each message is preceded by its sender, hidden from view but read out by
  * screen readers, since the sender is otherwise told apart only by styling.
  * @param props - Component props.

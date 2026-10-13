@@ -1,3 +1,5 @@
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
 import { Messages } from "@repo/shared/views/AssistantView/components/Conversation/components/Messages/messages";
 import type { ChatMessageDisplay } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import { render, screen, within } from "@testing-library/react";
@@ -60,7 +62,8 @@ interface RenderOptions {
 }
 
 /**
- * Renders the messages list.
+ * Renders the messages list under the app theme, which its narrow-screen
+ * styles read breakpoints from.
  * @param messages - Messages in the conversation.
  * @param options - Assistant status.
  * @param options.isRestoring - Whether a conversation is being restored or opened.
@@ -72,13 +75,15 @@ function renderMessages(
   { isRestoring = false, loading = false }: RenderOptions = {}
 ): HTMLElement {
   render(
-    <Messages
-      error={null}
-      introText="Welcome"
-      isRestoring={isRestoring}
-      loading={loading}
-      messages={messages}
-    />
+    <ThemeProvider theme={createAppTheme()}>
+      <Messages
+        error={null}
+        introText="Welcome"
+        isRestoring={isRestoring}
+        loading={loading}
+        messages={messages}
+      />
+    </ThemeProvider>
   );
   return screen.getByRole("log", { name: "Conversation" });
 }

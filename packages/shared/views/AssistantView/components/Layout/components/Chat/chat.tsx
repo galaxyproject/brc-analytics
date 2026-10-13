@@ -8,9 +8,9 @@ import type { Props } from "./types";
  * @param props.children - Chat panel.
  * @returns Chat column.
  */
-export const Chat = ({ children }: Props): JSX.Element => {
+export const Chat = ({ children, ...props }: Props): JSX.Element => {
   return (
-    <StyledStack>
+    <StyledStack {...props}>
       <StyledChatInner>{children}</StyledChatInner>
     </StyledStack>
   );

@@ -1,3 +1,5 @@
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
 import type {
   AnalysisSchema,
   SchemaFieldState,
@@ -8,6 +10,7 @@ import { FieldValueSelector } from "@repo/shared/views/AssistantView/components/
 import { Header } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Header/header";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Router from "next/router";
+import type { ComponentProps } from "react";
 
 jest.mock("next/router", () => ({
   __esModule: true,
@@ -307,6 +310,19 @@ describe("Action", () => {
     workflow: ORGANISM,
   };
 
+  /**
+   * Renders the action under the app theme, which its narrow-screen styles
+   * read breakpoints from.
+   * @param props - Action props.
+   */
+  function renderAction(props: ComponentProps<typeof Action>): void {
+    render(
+      <ThemeProvider theme={createAppTheme()}>
+        <Action {...props} />
+      </ThemeProvider>
+    );
+  }
+
   function getButton(): HTMLButtonElement {
     return screen.getByRole("button", {
       name: "Continue to workflow setup",
@@ -314,17 +330,17 @@ describe("Action", () => {
   }
 
   test("is disabled until the assistant produces a handoff", () => {
-    render(<Action handoffUrl={null} loading={false} schema={SCHEMA} />);
+    renderAction({ handoffUrl: null, loading: false, schema: SCHEMA });
     expect(getButton().disabled).toBe(true);
   });
 
   test("is disabled while a reply is in flight", () => {
-    render(<Action handoffUrl={HANDOFF_URL} loading={true} schema={SCHEMA} />);
+    renderAction({ handoffUrl: HANDOFF_URL, loading: true, schema: SCHEMA });
     expect(getButton().disabled).toBe(true);
   });
 
   test("hands off the captured accessions and navigates to setup", () => {
-    render(<Action handoffUrl={HANDOFF_URL} loading={false} schema={SCHEMA} />);
+    renderAction({ handoffUrl: HANDOFF_URL, loading: false, schema: SCHEMA });
     fireEvent.click(getButton());
     expect(onSetHandoff).toHaveBeenCalledWith(
       expect.objectContaining({

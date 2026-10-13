@@ -65,8 +65,13 @@ export const ChatPanel = ({
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages. Not before there are any: on mount
+  // there is nothing to reveal, and scrollIntoView would scroll the page too.
+  // That matters behind the assistant-ui flag, which reads as off on the
+  // hydration pass, so this panel mounts briefly before the new layout
+  // replaces it, and the page would keep scrolling after it has gone.
   useEffect(() => {
+    if (messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 

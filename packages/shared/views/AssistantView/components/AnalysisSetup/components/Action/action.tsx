@@ -7,6 +7,8 @@ import type { ActionProps } from "./types";
 /**
  * Renders the handoff to workflow setup, disabled until the schema is complete
  * and while a reply is in flight, when the handoff URL may be about to change.
+ * On narrow screens it leads the panel instead, shown only once the schema is
+ * complete.
  * @param props - Component props.
  * @param props.handoffUrl - Workflow setup URL, or null until the schema is complete.
  * @param props.loading - Whether a reply to the last message is in flight.
@@ -22,6 +24,7 @@ export const Action = ({
   return (
     <StyledButton
       color={BUTTON_PROPS.COLOR.PRIMARY}
+      complete={Boolean(handoffUrl)}
       disabled={!handoffUrl || loading}
       fullWidth
       onClick={onContinue}

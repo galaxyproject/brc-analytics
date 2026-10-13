@@ -1,3 +1,3 @@
-import { type ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
+import type { ColumnProps } from "@repo/shared/views/AssistantView/components/Layout/types";
 
-export type Props = ChildrenProps;
+export type Props = ColumnProps;
