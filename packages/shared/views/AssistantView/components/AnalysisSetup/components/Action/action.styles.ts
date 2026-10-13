@@ -19,6 +19,6 @@ export const StyledButton = styled(Button, {
   ${bpDownMd} {
     display: ${({ placement }) =>
       placement === ACTION_PLACEMENT.START ? "flex" : "none"};
-    margin: 0 0 16px;
+    margin: 0 0 32px;
   }
 `;
