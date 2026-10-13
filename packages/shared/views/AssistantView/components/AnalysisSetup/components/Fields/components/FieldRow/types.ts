@@ -10,4 +10,5 @@ export interface FieldRowProps extends Pick<
 > {
   field: SchemaFieldState;
   fieldKey: SchemaFieldKey;
+  optional: boolean;
 }

@@ -14,6 +14,7 @@ import type { FieldRowProps } from "./types";
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
  * @param props.onSend - Sends a message to the assistant.
+ * @param props.optional - Whether the field is optional for the chosen workflow.
  * @returns The field row element.
  */
 export const FieldRow = ({
@@ -21,6 +22,7 @@ export const FieldRow = ({
   fieldKey,
   loading,
   onSend,
+  optional,
 }: FieldRowProps): JSX.Element => {
   return (
     <StyledStack direction={STACK_PROPS.DIRECTION.ROW}>
@@ -35,6 +37,7 @@ export const FieldRow = ({
         fieldKey={fieldKey}
         loading={loading}
         onSend={onSend}
+        optional={optional}
       />
     </StyledStack>
   );
