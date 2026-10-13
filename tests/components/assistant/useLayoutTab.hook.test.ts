@@ -96,6 +96,31 @@ describe("useLayoutTab", () => {
     expect(result.current.tab).toBe(LAYOUT_TAB.SETUP);
   });
 
+  test("switches tab from content inside a column", () => {
+    const { result } = renderLayoutTab();
+    act(() => result.current.onSelectTab(LAYOUT_TAB.SETUP));
+    expect(result.current.tab).toBe(LAYOUT_TAB.SETUP);
+  });
+
+  // Content inside a column gets it through context, so a new handler on each
+  // switch would re-render that content for nothing.
+  test("keeps the same handler for content inside a column between switches", () => {
+    const { result } = renderLayoutTab();
+    const { onSelectTab } = result.current;
+    act(() => onSelectTab(LAYOUT_TAB.SETUP));
+    act(() => result.current.onSelectTab(LAYOUT_TAB.HISTORY));
+    expect(result.current.onSelectTab).toBe(onSelectTab);
+  });
+
+  test("keeps the scroll of the tab left when switching from inside a column", () => {
+    const { result } = renderLayoutTab();
+    act(() => result.current.onSelectTab(LAYOUT_TAB.HISTORY));
+    scrollPageTo(320);
+    act(() => result.current.onSelectTab(LAYOUT_TAB.SETUP));
+    act(() => result.current.onSelectTab(LAYOUT_TAB.HISTORY));
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 320 });
+  });
+
   test("starts a tab not yet visited at the top", () => {
     const { result } = renderLayoutTab();
     scrollPageTo(500);
@@ -164,5 +189,31 @@ describe("useLayoutTab", () => {
     const { result } = renderLayoutTab();
     switchTo(result, LAYOUT_TAB.SETUP);
     expect(document.activeElement).toBe(document.body);
+  });
+
+  // Safari doesn't focus a tapped history item, so nothing has focus when the
+  // conversation changes; the chat tab takes it all the same.
+  test("moves focus to the chat tab when the conversation changes from another tab", () => {
+    const chatTab = addButton(getTabId(BASE_ID, LAYOUT_TAB.CHAT));
+    const { rerender, result } = renderLayoutTab(0);
+    switchTo(result, LAYOUT_TAB.HISTORY);
+    rerender(1);
+    expect(document.activeElement).toBe(chatTab);
+  });
+
+  test("leaves focus alone when the conversation changes on the chat", () => {
+    addButton(getTabId(BASE_ID, LAYOUT_TAB.CHAT));
+    const { rerender } = renderLayoutTab(0);
+    rerender(1);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  // The control used is in the column now hidden, and in Safari it never had
+  // focus, so the new tab takes it.
+  test("moves focus to the new tab when switching from inside a column", () => {
+    const setupTab = addButton(getTabId(BASE_ID, LAYOUT_TAB.SETUP));
+    const { result } = renderLayoutTab();
+    act(() => result.current.onSelectTab(LAYOUT_TAB.SETUP));
+    expect(document.activeElement).toBe(setupTab);
   });
 });

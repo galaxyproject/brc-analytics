@@ -1,6 +1,10 @@
 import type { ConversationProps } from "@repo/shared/views/AssistantView/components/Conversation/types";
 import type { MouseEvent } from "react";
 
+export interface StyledStackProps {
+  isSetupComplete: boolean;
+}
+
 /**
  * A suggested next step as the suggestions list renders it.
  */
@@ -16,5 +20,6 @@ export interface SuggestionsProps extends Pick<
   "onSend" | "suggestions"
 > {
   disabled: boolean;
+  isSetupComplete: boolean;
   onFocusComposer: () => void;
 }

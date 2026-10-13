@@ -1,3 +1,5 @@
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
 import type { SuggestionChip } from "@repo/shared/services/api-client/types";
 import {
   HEADING,
@@ -22,15 +24,18 @@ const SUGGESTIONS: SuggestionChip[] = [
 
 interface RenderOptions {
   disabled?: boolean;
+  isSetupComplete?: boolean;
   onFocusComposer?: jest.Mock;
   onSend?: jest.Mock;
   suggestions?: SuggestionChip[];
 }
 
 /**
- * Renders the suggested next steps.
+ * Renders the suggested next steps, under the app theme its narrow-screen
+ * styles read breakpoints from.
  * @param options - Props to override.
  * @param options.disabled - Whether the assistant is busy.
+ * @param options.isSetupComplete - Whether the setup is complete and ready to hand off.
  * @param options.onFocusComposer - Moves focus to the composer.
  * @param options.onSend - Sends a message to the assistant.
  * @param options.suggestions - Suggested next steps.
@@ -38,6 +43,7 @@ interface RenderOptions {
  */
 function renderSuggestions({
   disabled = false,
+  isSetupComplete = false,
   onFocusComposer = jest.fn(),
   onSend = jest.fn(),
   suggestions = SUGGESTIONS,
@@ -45,10 +51,16 @@ function renderSuggestions({
   const { container } = render(
     <Suggestions
       disabled={disabled}
+      isSetupComplete={isSetupComplete}
       onFocusComposer={onFocusComposer}
       onSend={onSend}
       suggestions={suggestions}
-    />
+    />,
+    {
+      wrapper: ({ children }) => (
+        <ThemeProvider theme={createAppTheme()}>{children}</ThemeProvider>
+      ),
+    }
   );
   return container;
 }
@@ -63,6 +75,13 @@ function getRow(text: string): HTMLElement {
 }
 
 describe("Suggestions", () => {
+  // jsdom applies no media queries, so this is the wide-screen layout; hiding
+  // them on narrow screens is covered by the assistant e2e suite.
+  test("keeps the suggestions on wide screens once the setup is complete", () => {
+    renderSuggestions({ isSetupComplete: true });
+    expect(screen.getByRole("list", { name: HEADING })).toBeVisible();
+  });
+
   test("renders nothing when there are no suggestions", () => {
     const container = renderSuggestions({ suggestions: [] });
 

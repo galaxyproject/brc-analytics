@@ -2,7 +2,14 @@ import type { UseAssistantChatReturn } from "@repo/shared/views/AssistantView/ho
 
 export interface ConversationProps extends Pick<
   UseAssistantChatReturn,
-  "error" | "isRestoring" | "loading" | "messages" | "onRetry" | "suggestions"
+  | "error"
+  | "handoffUrl"
+  | "isRestoring"
+  | "loading"
+  | "messages"
+  | "onRetry"
+  | "schema"
+  | "suggestions"
 > {
   introText: string;
   onSend: (message: string) => void;

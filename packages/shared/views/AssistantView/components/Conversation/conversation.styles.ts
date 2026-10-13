@@ -2,6 +2,14 @@ import { bpDownMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/br
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
 
+// Any error, the suggestions and the composer, kept together at the foot of
+// the conversation. On narrow screens a short conversation leaves the spare
+// room above them, under the messages and any handoff.
+export const StyledFooter = styled(Stack)`
+  gap: 16px;
+  margin-top: auto;
+`;
+
 export const StyledStack = styled(Stack)`
   gap: 16px;
   height: 100%;

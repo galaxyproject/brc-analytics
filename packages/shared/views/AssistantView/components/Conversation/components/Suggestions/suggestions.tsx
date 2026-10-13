@@ -11,9 +11,11 @@ import { buildSuggestionItems } from "./utils";
  * when the assistant gives one, a description. Selecting a row sends it as the
  * user's message. A last row, "Type something else...", moves focus to the
  * composer. Every row is disabled while the assistant is busy. Renders nothing
- * when there are no suggestions.
+ * when there are no suggestions, and is hidden on narrow screens once the setup
+ * is complete, where the chat offers the handoff instead.
  * @param props - Component props.
  * @param props.disabled - Whether the assistant is busy, so nothing can be sent.
+ * @param props.isSetupComplete - Whether the setup is complete and ready to hand off.
  * @param props.onFocusComposer - Moves focus to the composer.
  * @param props.onSend - Sends a message to the assistant.
  * @param props.suggestions - Suggested next steps.
@@ -21,6 +23,7 @@ import { buildSuggestionItems } from "./utils";
  */
 export const Suggestions = ({
   disabled,
+  isSetupComplete,
   onFocusComposer,
   onSend,
   suggestions,
@@ -29,7 +32,7 @@ export const Suggestions = ({
   const items = buildSuggestionItems(suggestions, onSend, onFocusComposer);
   if (items.length === 0) return null;
   return (
-    <StyledStack>
+    <StyledStack isSetupComplete={isSetupComplete}>
       <Typography
         color={TYPOGRAPHY_PROPS.COLOR.INK_MAIN}
         component="h2"

@@ -41,6 +41,11 @@ export interface LayoutSlotProps {
 export type LayoutTab = (typeof LAYOUT_TAB)[keyof typeof LAYOUT_TAB];
 
 /**
+ * Switches the column shown while the columns are tabbed.
+ */
+export type SelectTab = (tab: LayoutTab) => void;
+
+/**
  * Attributes that tie a column to its tab while the columns are tabbed.
  */
 export type TabPanelProps = Pick<

@@ -6,6 +6,18 @@ import {
 import type { ScrollPositions } from "./types";
 
 /**
+ * Moves focus to a tab, without scrolling it into view. Does nothing while the
+ * tabs are hidden on wider screens.
+ * @param baseId - Id unique to the layout.
+ * @param tab - Tab to focus.
+ */
+export function focusTab(baseId: string, tab: LayoutTab): void {
+  document
+    .getElementById(getTabId(baseId, tab))
+    ?.focus({ preventScroll: true });
+}
+
+/**
  * Moves focus to a tab when it was inside the tab just left, which is now
  * hidden, as when a conversation opened from the history brings the chat back.
  * Focus anywhere else, such as on the tab just clicked, is left alone.

@@ -100,12 +100,14 @@ export const AssistantView = ({
               <Conversation
                 key={conversationKey}
                 error={error}
+                handoffUrl={handoffUrl}
                 introText={introText}
                 isRestoring={isRestoring || isOpening}
                 loading={loading}
                 messages={messages}
                 onRetry={onRetry}
                 onSend={sendMessage}
+                schema={schema}
                 suggestions={suggestions}
               />
             ),
