@@ -4,7 +4,9 @@ import type {
   AnalysisSchema,
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
+import { AnalysisSetup } from "@repo/shared/views/AssistantView/components/AnalysisSetup/analysisSetup";
 import { Action } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/action";
+import { ACTION_PLACEMENT } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/constants";
 import { FilledValue } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/filledValue";
 import { FieldValueSelector } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/selector/fieldValueSelector";
 import { Header } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Header/header";
@@ -311,14 +313,16 @@ describe("Action", () => {
   };
 
   /**
-   * Renders the action under the app theme, which its narrow-screen styles
-   * read breakpoints from.
-   * @param props - Action props.
+   * Renders the action at the panel's end under the app theme, which its
+   * narrow-screen styles read breakpoints from.
+   * @param props - Action props, less its placement.
    */
-  function renderAction(props: ComponentProps<typeof Action>): void {
+  function renderAction(
+    props: Omit<ComponentProps<typeof Action>, "placement">
+  ): void {
     render(
       <ThemeProvider theme={createAppTheme()}>
-        <Action {...props} />
+        <Action {...props} placement={ACTION_PLACEMENT.END} />
       </ThemeProvider>
     );
   }
@@ -337,6 +341,24 @@ describe("Action", () => {
   test("is disabled while a reply is in flight", () => {
     renderAction({ handoffUrl: HANDOFF_URL, loading: true, schema: SCHEMA });
     expect(getButton().disabled).toBe(true);
+  });
+
+  // The panel renders it at its start too once complete, for narrow screens;
+  // only one copy may be exposed at a time.
+  test("is offered once by the panel, at any screen width", () => {
+    render(
+      <ThemeProvider theme={createAppTheme()}>
+        <AnalysisSetup
+          handoffUrl={HANDOFF_URL}
+          loading={false}
+          onSend={jest.fn()}
+          schema={SCHEMA}
+        />
+      </ThemeProvider>
+    );
+    expect(
+      screen.getAllByRole("button", { name: "Continue to workflow setup" })
+    ).toHaveLength(1);
   });
 
   test("hands off the captured accessions and navigates to setup", () => {

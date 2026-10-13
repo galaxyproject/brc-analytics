@@ -1,3 +1,7 @@
+import {
+  BREAKPOINT_FN_NAME,
+  useBreakpointHelper,
+} from "@databiosphere/findable-ui/lib/hooks/useBreakpointHelper";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { useScroll } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Messages/hooks/UseScroll/hook";
 import { Typography } from "@mui/material";
@@ -15,7 +19,8 @@ import type { MessagesProps } from "./types";
  * pinned list keeps it in view. The list is a log, so screen readers
  * announce each new message and status as it arrives. Where it scrolls on its
  * own, it keeps itself scrolled to the newest and takes focus so keyboard
- * users can scroll back; on narrow screens the page scrolls it instead.
+ * users can scroll back; on narrow screens the page scrolls it instead, so it
+ * isn't a tab stop.
  * Each message is preceded by its sender, hidden from view but read out by
  * screen readers, since the sender is otherwise told apart only by styling.
  * @param props - Component props.
@@ -35,12 +40,13 @@ export const Messages = ({
   messages,
 }: MessagesProps): JSX.Element => {
   const ref = useScroll([error, isRestoring, loading, messages]);
+  const isNarrow = useBreakpointHelper(BREAKPOINT_FN_NAME.DOWN, "md");
   return (
     <StyledStack
       aria-label={ARIA_LABEL.MESSAGES}
       ref={ref}
       role="log"
-      tabIndex={0}
+      tabIndex={isNarrow ? undefined : 0}
     >
       {!isRestoring && messages.length === 0 && (
         <Typography
