@@ -1,12 +1,15 @@
 import type { AnalysisSchema } from "@repo/shared/services/api-client/types";
-import { TOTAL_FIELDS } from "@repo/shared/views/AssistantView/components/AnalysisSetup/constants";
-import { countSetFields } from "@repo/shared/views/AssistantView/components/AnalysisSetup/utils";
+import {
+  countSetFields,
+  countTotalFields,
+} from "@repo/shared/views/AssistantView/components/AnalysisSetup/utils";
 
 /**
- * Text of the setup tab's label: its name and how many fields are set.
+ * Text of the setup tab's label: its name and how many fields are set, out of
+ * those the setup counts, as the panel's header does.
  * @param schema - Current analysis schema, or null before the assistant has returned one.
  * @returns Label text, e.g. "Setup 2/7".
  */
 export function getTabLabel(schema: AnalysisSchema | null): string {
-  return `Setup ${countSetFields(schema)}/${TOTAL_FIELDS}`;
+  return `Setup ${countSetFields(schema)}/${countTotalFields(schema)}`;
 }

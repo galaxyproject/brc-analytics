@@ -13,3 +13,8 @@ export const LAYOUT_TAB = {
   HISTORY: "history",
   SETUP: "setup",
 } as const;
+
+/**
+ * Accessible name of the tabs that switch between the columns.
+ */
+export const TABS_LABEL = "Assistant sections";

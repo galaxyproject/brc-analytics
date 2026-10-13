@@ -1,4 +1,5 @@
 import { Tab } from "@mui/material";
+import { TABS_LABEL } from "@repo/shared/views/AssistantView/components/Layout/constants";
 import {
   getTabId,
   getTabPanelId,
@@ -28,7 +29,12 @@ export const Tabs = ({
 }: TabsProps): JSX.Element => {
   return (
     <StyledTabBar top={top}>
-      <StyledTabs onChange={onTabChange} value={value} variant="fullWidth">
+      <StyledTabs
+        aria-label={TABS_LABEL}
+        onChange={onTabChange}
+        value={value}
+        variant="fullWidth"
+      >
         {tabs.map(({ label, value: tab }) => (
           <Tab
             key={tab}
