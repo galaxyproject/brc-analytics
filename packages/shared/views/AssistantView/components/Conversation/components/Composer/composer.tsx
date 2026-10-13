@@ -22,16 +22,22 @@ import { getPlaceholder } from "./utils";
  * @param props - Component props.
  * @param props.disabled - Whether the assistant is busy, so nothing can be sent.
  * @param props.hasMessages - Whether the conversation has any messages.
+ * @param props.inputRef - Ref to the field, so controls outside the composer
+ * can focus it.
  * @param props.onSend - Sends a message to the assistant.
  * @returns The composer element.
  */
 export const Composer = ({
   disabled,
   hasMessages,
+  inputRef,
   onSend,
 }: ComposerProps): JSX.Element => {
-  const { canSend, inputRef, onChange, onKeyDown, onSubmit, value } =
-    useComposer(onSend, disabled);
+  const { canSend, onChange, onKeyDown, onSubmit, value } = useComposer(
+    onSend,
+    disabled,
+    inputRef
+  );
   return (
     <form onSubmit={onSubmit}>
       <StyledRoundedPaper elevation={0}>

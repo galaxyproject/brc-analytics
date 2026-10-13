@@ -1,16 +1,17 @@
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
 import { Alert, Button } from "@mui/material";
-import { SuggestionChips } from "@repo/shared/views/AssistantView/components/SuggestionChips/suggestionChips";
 import { type JSX } from "react";
 import { Composer } from "./components/Composer/composer";
 import { Messages } from "./components/Messages/messages";
+import { Suggestions } from "./components/Suggestions/suggestions";
 import { StyledStack } from "./conversation.styles";
+import { useComposerFocus } from "./hooks/UseComposerFocus/hook";
 import type { ConversationProps } from "./types";
 
 /**
  * Renders the conversation with the assistant: its messages, any error from
- * the last request, suggested replies and the composer. The error sits outside
+ * the last request, suggested next steps and the composer. The error sits outside
  * the messages' log, so only its own alert announces it, and it stays in view
  * above the composer. Signing in to keep the conversation is offered by the
  * sidebar, so it isn't repeated here.
@@ -22,7 +23,7 @@ import type { ConversationProps } from "./types";
  * @param props.messages - Messages in the conversation.
  * @param props.onRetry - Retries the last failed request.
  * @param props.onSend - Sends a message to the assistant.
- * @param props.suggestions - Suggested replies.
+ * @param props.suggestions - Suggested next steps.
  * @returns The conversation element.
  */
 export const Conversation = ({
@@ -36,6 +37,7 @@ export const Conversation = ({
   suggestions,
 }: ConversationProps): JSX.Element => {
   const disabled = loading || isRestoring;
+  const { inputRef, onFocusComposer } = useComposerFocus();
   return (
     <StyledStack>
       <Messages
@@ -59,14 +61,16 @@ export const Conversation = ({
           {error}
         </Alert>
       )}
-      <SuggestionChips
-        chips={suggestions}
+      <Suggestions
         disabled={disabled}
-        onSelect={onSend}
+        onFocusComposer={onFocusComposer}
+        onSend={onSend}
+        suggestions={suggestions}
       />
       <Composer
         disabled={disabled}
         hasMessages={messages.length > 0}
+        inputRef={inputRef}
         onSend={onSend}
       />
     </StyledStack>

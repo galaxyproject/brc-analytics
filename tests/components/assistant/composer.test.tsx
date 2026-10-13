@@ -1,3 +1,4 @@
+import type { InputElement } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Input/hooks/UseControlledInput/types";
 import { Composer } from "@repo/shared/views/AssistantView/components/Conversation/components/Composer/composer";
 import { ARIA_LABEL } from "@repo/shared/views/AssistantView/components/Conversation/components/Composer/constants";
 import {
@@ -10,6 +11,9 @@ import {
 // jest-dom matchers aren't registered globally in this repo's jest config; opt
 // in locally as the sibling suites do.
 import "@testing-library/jest-dom";
+import { createRef } from "react";
+
+const INPUT_REF = createRef<InputElement>();
 
 const QUESTION = "Which assemblies exist for Plasmodium vivax?";
 
@@ -30,7 +34,12 @@ function renderComposer(
   onSend: jest.Mock = jest.fn()
 ): RenderedComposer {
   const { rerender } = render(
-    <Composer disabled={disabled} hasMessages onSend={onSend} />
+    <Composer
+      disabled={disabled}
+      hasMessages
+      inputRef={INPUT_REF}
+      onSend={onSend}
+    />
   );
   return {
     field: screen.getByRole("textbox", { name: ARIA_LABEL.INPUT }),
@@ -60,7 +69,14 @@ describe("Composer", () => {
     const { field, rerender, send } = renderComposer(true, onSend);
     fireEvent.change(field, { target: { value: QUESTION } });
 
-    rerender(<Composer disabled={false} hasMessages onSend={onSend} />);
+    rerender(
+      <Composer
+        disabled={false}
+        hasMessages
+        inputRef={INPUT_REF}
+        onSend={onSend}
+      />
+    );
 
     expect(field).toHaveValue(QUESTION);
     expect(send).toBeEnabled();
