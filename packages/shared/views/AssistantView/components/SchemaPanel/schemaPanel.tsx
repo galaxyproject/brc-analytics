@@ -11,6 +11,12 @@ import type {
   FieldStatus,
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
+import { OPTIONAL_FIELDS } from "@repo/shared/views/AssistantView/components/AnalysisSetup/constants";
+import {
+  countSetFields,
+  countTotalFields,
+  isOptionalField,
+} from "@repo/shared/views/AssistantView/components/AnalysisSetup/utils";
 import Router from "next/router";
 import { type JSX, useCallback } from "react";
 import {
@@ -44,8 +50,6 @@ const REQUIRED_FIELDS: (keyof AnalysisSchema)[] = [
   "data_characteristics",
 ];
 
-const OPTIONAL_FIELDS: (keyof AnalysisSchema)[] = ["gene_annotation"];
-
 const FIELD_ORDER: (keyof AnalysisSchema)[] = [
   ...REQUIRED_FIELDS,
   ...OPTIONAL_FIELDS,
@@ -72,19 +76,16 @@ const PLACEHOLDER_SCHEMA: AnalysisSchema = {
 /**
  * Get the status indicator for a schema field.
  * @param props - Component props
- * @param props.optional - Whether the field is optional (not required to hand off)
+ * @param props.optional - Whether the field is optional for the chosen workflow
  * @param props.status - Field status
- * @param props.workflowSelected - Whether a workflow has been chosen yet
  * @returns Status chip element
  */
 function StatusIndicator({
   optional,
   status,
-  workflowSelected,
 }: {
   optional: boolean;
   status: FieldStatus;
-  workflowSelected: boolean;
 }): JSX.Element {
   if (status === "filled") {
     return <Chip color="success" label="Done" size="small" />;
@@ -92,11 +93,9 @@ function StatusIndicator({
   if (status === "needs_attention") {
     return <Chip color="warning" label="Attention" size="small" />;
   }
-  // Only call an optional field "Optional" once a workflow is chosen -- until
-  // then we don't yet know whether it (e.g. a GTF) will turn out to be required.
   return (
     <Chip
-      label={optional && workflowSelected ? "Optional" : "Pending"}
+      label={optional ? "Optional" : "Pending"}
       size="small"
       variant="outlined"
     />
@@ -138,16 +137,12 @@ export const SchemaPanel = ({
   const isEmpty = !schema;
   const activeSchema = schema ?? PLACEHOLDER_SCHEMA;
 
-  const filledCount = FIELD_ORDER.filter(
-    (key) => activeSchema[key].status === "filled"
-  ).length;
-
   return (
     <PanelContainer>
       <PanelHeader>
         <Typography variant="subtitle1">Analysis Setup</Typography>
         <Typography color="text.secondary" variant="caption">
-          {filledCount} / {FIELD_ORDER.length} configured
+          {countSetFields(schema)} / {countTotalFields(schema)} configured
         </Typography>
       </PanelHeader>
 
@@ -177,9 +172,8 @@ export const SchemaPanel = ({
               >
                 <Typography variant="body2">{FIELD_LABELS[key]}</Typography>
                 <StatusIndicator
-                  optional={OPTIONAL_FIELDS.includes(key)}
+                  optional={isOptionalField(activeSchema, key)}
                   status={field.status}
-                  workflowSelected={activeSchema.workflow.status === "filled"}
                 />
               </Box>
               {field.value && (

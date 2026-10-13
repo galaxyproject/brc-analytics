@@ -1,7 +1,11 @@
-import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
+import type {
+  AnalysisSchema,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
 import { Action } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/action";
 import { FilledValue } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/filledValue";
 import { FieldValueSelector } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/selector/fieldValueSelector";
+import { Header } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Header/header";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Router from "next/router";
 
@@ -197,6 +201,7 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
@@ -209,9 +214,24 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
+  });
+
+  test("shows an empty field optional for the chosen workflow as optional", () => {
+    render(
+      <FieldValueSelector
+        field={{ detail: null, status: "empty", value: null }}
+        fieldKey="gene_annotation"
+        loading={false}
+        onSend={jest.fn()}
+        optional
+      />
+    );
+    expect(screen.getByText("Optional")).toBeTruthy();
+    expect(screen.queryByText("Not set")).toBeNull();
   });
 
   test("shows the reason a field needs attention", () => {
@@ -225,9 +245,49 @@ describe("FieldValueSelector", () => {
         fieldKey="assembly"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Assembly not found")).toBeTruthy();
+  });
+});
+
+describe("Header", () => {
+  const SET: SchemaFieldState = { detail: null, status: "filled", value: "x" };
+  const SCHEMA: AnalysisSchema = {
+    analysis_type: SET,
+    assembly: SET,
+    data_characteristics: SET,
+    data_source: SET,
+    gene_annotation: { detail: null, status: "empty", value: null },
+    organism: SET,
+    workflow: SET,
+  };
+
+  test("counts every field before the assistant has returned a schema", () => {
+    render(<Header schema={null} />);
+    expect(screen.getByText("0 of 7 set")).toBeTruthy();
+  });
+
+  test("leaves gene annotation out of the count when the workflow doesn't need it", () => {
+    render(<Header schema={SCHEMA} />);
+    expect(screen.getByText("6 of 6 set")).toBeTruthy();
+  });
+
+  test("counts gene annotation when it needs attention", () => {
+    render(
+      <Header
+        schema={{
+          ...SCHEMA,
+          gene_annotation: {
+            detail: "No gene model for the selected assembly",
+            status: "needs_attention",
+            value: "Reference GTF",
+          },
+        }}
+      />
+    );
+    expect(screen.getByText("6 of 7 set")).toBeTruthy();
   });
 });
 
