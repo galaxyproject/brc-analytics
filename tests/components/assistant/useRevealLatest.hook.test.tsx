@@ -1,8 +1,20 @@
 import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
 import { ThemeProvider } from "@mui/material";
+import { Conversation as ChatConversation } from "@repo/shared/views/AssistantView/components/Conversation/conversation";
 import { useRevealLatest } from "@repo/shared/views/AssistantView/components/Conversation/hooks/UseRevealLatest/hook";
 import { act, render } from "@testing-library/react";
 import { type JSX, type ReactNode } from "react";
+
+// findable-ui's MarkdownRenderer runs a unified/rehype pipeline whose packages
+// are ESM-only, which Jest can't parse. A plain renderer stands in for it.
+jest.mock(
+  "@databiosphere/findable-ui/lib/components/MarkdownRenderer/markdownRenderer",
+  () => ({
+    MarkdownRenderer: ({ value }: { value: string }): JSX.Element => (
+      <p>{value}</p>
+    ),
+  })
+);
 
 interface ObserverMock {
   callback: ResizeObserverCallback;
@@ -75,6 +87,8 @@ beforeEach(() => {
   observers.length = 0;
   scrollIntoView = jest.fn();
   Element.prototype.scrollIntoView = scrollIntoView;
+  // The messages' own pinning scrolls them with scrollTo, which jsdom lacks.
+  Element.prototype.scrollTo = jest.fn();
   global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
     const observer = { callback, disconnect: jest.fn(), observe: jest.fn() };
     observers.push(observer);
@@ -138,6 +152,37 @@ describe("useRevealLatest", () => {
     render(<Conversation messages={["Hello"]} />, { wrapper });
     expect(scrollIntoView).not.toHaveBeenCalled();
     expect(observers).toHaveLength(0);
+  });
+
+  // The hook finds the newest message by structure: the last child of the
+  // conversation's first child. This renders the real conversation, so moving
+  // the messages from first place, or wrapping them, fails here.
+  test("watches the newest message in the chat's own conversation", () => {
+    render(
+      <ChatConversation
+        error={null}
+        introText="Welcome"
+        isRestoring={false}
+        loading={false}
+        messages={[
+          { content: "Which assemblies exist?", role: "user" },
+          { content: "And which workflows?", role: "user" },
+        ]}
+        onRetry={jest.fn()}
+        onSend={jest.fn()}
+        suggestions={[]}
+      />,
+      { wrapper }
+    );
+    // The messages pin themselves with an observer of their own; this hook's
+    // is the one that reveals the end.
+    const revealing = observers.find(({ callback }) => {
+      scrollIntoView.mockClear();
+      callback([], {} as unknown as ResizeObserver);
+      return scrollIntoView.mock.calls.length > 0;
+    });
+    const observed: Element = revealing?.observe.mock.calls[0][0];
+    expect(observed.textContent).toBe("And which workflows?");
   });
 
   test("stops watching when the conversation goes", () => {

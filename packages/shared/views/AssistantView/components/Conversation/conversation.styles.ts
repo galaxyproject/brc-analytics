@@ -7,9 +7,12 @@ export const StyledStack = styled(Stack)`
   height: 100%;
   min-height: 0;
 
-  // On narrow screens the page scrolls the chat tab, composer included, and
-  // the composer is kept clear of the bottom edge when brought into view.
+  // On narrow screens the page scrolls the chat tab, composer included. The
+  // conversation fills at least the tab, so a short one still keeps the
+  // composer at the bottom, and the composer is kept clear of the bottom edge
+  // when brought into view.
   ${bpDownMd} {
+    flex: 1 0 auto;
     height: auto;
     scroll-margin-bottom: 16px;
   }

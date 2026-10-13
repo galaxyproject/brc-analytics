@@ -344,8 +344,9 @@ describe("Action", () => {
   });
 
   // The panel renders it at its start too once complete, for narrow screens;
-  // only one copy may be exposed at a time.
-  test("is offered once by the panel, at any screen width", () => {
+  // only one copy may be exposed at a time. jsdom applies no media queries, so
+  // this checks the wide-screen styles; the narrow swap is checked in a browser.
+  test("is offered once by the panel on wide screens", () => {
     render(
       <ThemeProvider theme={createAppTheme()}>
         <AnalysisSetup
