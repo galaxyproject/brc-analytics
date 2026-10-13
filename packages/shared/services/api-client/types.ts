@@ -19,6 +19,7 @@ export interface AnalysisSchema {
 }
 
 export interface SuggestionChip {
+  description?: string;
   label: string;
   message: string;
 }

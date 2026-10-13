@@ -1,12 +1,6 @@
 import type { InputElement } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Input/hooks/UseControlledInput/types";
 import type { ComposerProps } from "@repo/shared/views/AssistantView/components/Conversation/components/Composer/types";
-import {
-  type ChangeEvent,
-  type FormEvent,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { type ChangeEvent, type FormEvent, useCallback, useState } from "react";
 import type { UseComposer } from "./types";
 import { canSendMessage, onComposerKeyDown } from "./utils";
 
@@ -18,13 +12,14 @@ import { canSendMessage, onComposerKeyDown } from "./utils";
  * busy or the composer holds only whitespace.
  * @param onSend - Sends a message to the assistant.
  * @param disabled - Whether the assistant is busy, so nothing can be sent.
+ * @param inputRef - Ref to the composer's field.
  * @returns Composer value, whether it can be sent, and its handlers.
  */
 export const useComposer = (
   onSend: ComposerProps["onSend"],
-  disabled: boolean
+  disabled: boolean,
+  inputRef: ComposerProps["inputRef"]
 ): UseComposer => {
-  const inputRef = useRef<InputElement>(null);
   const [value, setValue] = useState("");
   const canSend = canSendMessage(value, disabled);
 
@@ -40,12 +35,11 @@ export const useComposer = (
       setValue("");
       inputRef.current?.focus();
     },
-    [canSend, onSend, value]
+    [canSend, inputRef, onSend, value]
   );
 
   return {
     canSend,
-    inputRef,
     onChange,
     onKeyDown: onComposerKeyDown,
     onSubmit,
