@@ -598,6 +598,9 @@ class GalaxyJobStatus(BaseModel):
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
+    # Set when Galaxy answered the request from its job cache: this job is a
+    # copy of that one and shares its outputs.
+    copied_from_job_id: Optional[str] = None
     # The job's tool parameters, carried in-process so callers that need them
     # don't have to re-fetch a job dict this status was already built from.
     # excluded, so it reaches neither the HTTP response (this is a public

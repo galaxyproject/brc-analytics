@@ -516,6 +516,7 @@ async def export_kmindex_results(
     job_id: str,
     format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
@@ -524,15 +525,16 @@ async def export_kmindex_results(
     This is the whole match set, not the 50,000 the results endpoint pages and
     not the 25 rows it annotates -- on a real job, 1,133,516 rows against a
     displayed 50,000. It was written once during aggregation, which is the only
-    moment the full list exists, so this only ever serves a finished file and
-    never touches Galaxy.
+    moment the full list exists, so this only ever serves a finished file. The
+    one Galaxy read is the job's status, usually cached, to find a job-cache
+    copy's original, which the file was written under; if Galaxy can't answer,
+    the file is looked up under the job asked for.
 
     parquet is the file as materialized, served byte for byte (16 MB on the
     measured job). tsv is converted on the way out for anything that wants a
     plain text table, and streams rather than being assembled in memory -- the
     same rows are 168 MB as text.
 
-    @param job_id: the completed kmindex job.
     With f.* filter parameters only the rows the filter keeps are sent, as
     TSV. A filtered parquet needs a temporary file and a path that reliably
     removes it, so for now it is refused rather than served unfiltered.
@@ -547,12 +549,17 @@ async def export_kmindex_results(
                 status_code=422,
                 detail="A filtered download is TSV only for now",
             )
-        return await serve_kmindex_export(job_id, format, filters=filters)
-    return await serve_kmindex_export(job_id, format)
+        return await serve_kmindex_export(
+            job_id, format, galaxy_service, filters=filters
+        )
+    return await serve_kmindex_export(job_id, format, galaxy_service)
 
 
 async def serve_kmindex_export(
-    job_id: str, format: str, filters: Optional[KmindexFilters] = None
+    job_id: str,
+    format: str,
+    galaxy_service: Optional[GalaxyService] = None,
+    filters: Optional[KmindexFilters] = None,
 ) -> Response:
     """
     The export as an attachment, or a 404 if there is no current one.
@@ -562,10 +569,15 @@ async def serve_kmindex_export(
 
     @param job_id: the completed kmindex job.
     @param format: parquet or tsv.
+    @param galaxy_service: to find a job-cache copy's original, which the file
+        was written under. Without one, the file is looked up under job_id.
     @param filters: a non-empty filter to narrow a TSV download, or None.
-    @returns: the file response.
+    @returns: the file response, named for job_id either way.
     """
-    path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
+    source_job_id = job_id
+    if galaxy_service is not None and galaxy_service.is_available():
+        source_job_id = await galaxy_service.source_job_id(job_id)
+    path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, source_job_id)
     if path is None or not path.is_file():
         raise HTTPException(
             status_code=404,

@@ -354,6 +354,10 @@ GALAXY_REQUEST_TIMEOUT = 30.0
 KMINDEX_TOOL_REQUEST_TIMEOUT = 60.0
 KMINDEX_TOOL_REQUEST_POLL = 1.0
 
+# A job-cache copy can itself be copied; following a few links is plenty, and
+# the cap keeps a cycle from spinning.
+KMINDEX_COPY_HOPS = 5
+
 # Aggregation is serialized per lane: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
 # with a different partial view of the same job. There are two lanes rather than
@@ -1095,10 +1099,10 @@ class GalaxyService:
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        aggregate = await self._load_aggregate(job_id, lane)
+        aggregate, source_job_id = await self._load_aggregate(job_id, lane)
 
         ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort)
+            aggregate, source_job_id, sort, order or _default_order(sort)
         )
         # Single exit, so a cache hit can't skip annotation -- an earlier
         # version returned straight from the pre-lock hit and silently served
@@ -1112,12 +1116,13 @@ class GalaxyService:
                 ordering=ordering,
                 sort=sort,
                 order=order,
+                export_job_id=source_job_id,
             )
         )
 
     async def _load_aggregate(
         self, job_id: str, lane: AggregationLane = "native"
-    ) -> dict:
+    ) -> Tuple[dict, str]:
         """The job's cached aggregate, merging its shards first on a miss.
 
         Shared by the listing and the filtered reads, so a filtered link opened
@@ -1126,10 +1131,23 @@ class GalaxyService:
 
         @param job_id: the kmindex job.
         @param lane: whose aggregation lock a cold merge takes.
-        @returns: the aggregate.
+        @returns: the aggregate, and the job it lives under: job_id's job-cache
+            original when job_id is a copy, else job_id itself. The export file
+            is written under that job too.
         """
+        requested_job_id = job_id
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
+        source_status: Optional[GalaxyJobStatus] = None
+        if aggregate is None:
+            # A job-cache copy shares its original's outputs, so every copy
+            # reads one aggregate instead of re-merging thousands of shards
+            # each. The status is handed on, so a cold read still makes one
+            # show_job, not two.
+            job_id, source_status = await self._resolve_source(job_id)
+            if job_id != requested_job_id:
+                cache_key = self._agg_cache_key(job_id)
+                aggregate = await self.cache.get(cache_key)
 
         if aggregate is None:
             # Someone else is already merging this job. Say so rather than
@@ -1175,10 +1193,12 @@ class GalaxyService:
                         # partial one.
                         aggregate = await self.cache.get(cache_key)
                         if aggregate is None:
-                            aggregate = await self._aggregate_shards(job_id)
+                            aggregate = await self._aggregate_shards(
+                                job_id, source_status
+                            )
                     finally:
                         await self.cache.delete(marker_key)
-        return aggregate
+        return aggregate, job_id
 
     async def _filterable_export(self, aggregate: dict, job_id: str) -> Path:
         """The export a filtered read runs over, or why there is none.
@@ -1237,8 +1257,8 @@ class GalaxyService:
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
-        aggregate = await self._load_aggregate(job_id)
-        path = await self._filterable_export(aggregate, job_id)
+        aggregate, source_job_id = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, source_job_id)
         order = order or _default_order(sort)
         page = await asyncio.to_thread(
             kmindex_filters.subset_page,
@@ -1251,7 +1271,7 @@ class GalaxyService:
             KMINDEX_MAX_HITS,
         )
         matched = page["matched"]
-        export = self._export_state(aggregate, job_id)
+        export = self._export_state(aggregate, source_job_id)
         hits = [KmindexHit(**h) for h in page["hits"]]
         await self._fill_biosample(hits)
         return KmindexResults(
@@ -1295,8 +1315,8 @@ class GalaxyService:
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
-        aggregate = await self._load_aggregate(job_id)
-        path = await self._filterable_export(aggregate, job_id)
+        aggregate, source_job_id = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, source_job_id)
         summary = await asyncio.to_thread(kmindex_filters.subset_summary, path, filters)
         return KmindexSummary(
             cohort=summary["cohort"],
@@ -1319,13 +1339,75 @@ class GalaxyService:
         Needs no Galaxy connection -- paging a cached aggregate is Redis plus
         the mirror -- so it is deliberately not gated on is_available().
         """
-        cache_key = self._agg_cache_key(job_id)
-        aggregate = await self.cache.get(cache_key)
+        export_job_id = job_id
+        aggregate = await self.cache.get(self._agg_cache_key(job_id))
+        if aggregate is None:
+            # A job-cache copy's aggregate lives under its original. Only the
+            # cached status is consulted, so this still never touches Galaxy.
+            source = await self._cached_copied_from(job_id)
+            if source:
+                aggregate = await self.cache.get(self._agg_cache_key(source))
+                export_job_id = source
         if aggregate is None:
             return None
         return await self._annotate_with_sra(
-            self._page_kmindex(aggregate, job_id, limit, offset)
+            self._page_kmindex(
+                aggregate, job_id, limit, offset, export_job_id=export_job_id
+            )
         )
+
+    async def source_job_id(self, job_id: str) -> str:
+        """
+        The job whose outputs this one shares: its job-cache original, if any.
+
+        Galaxy answers a repeated query with a copy of the finished job, under a
+        new id. The copy's outputs are the original's datasets, so results and
+        the export are built once, under the original, and every copy reads
+        them. Anything that keeps a link from being followed -- Galaxy down, the
+        original purged -- stops at the last job that answered, which still has
+        the outputs to merge.
+
+        @param job_id: the job asked about.
+        @returns: the original job's id, or job_id if it isn't a copy.
+        """
+        return (await self._resolve_source(job_id))[0]
+
+    async def _resolve_source(
+        self, job_id: str
+    ) -> Tuple[str, Optional[GalaxyJobStatus]]:
+        """source_job_id, plus the source's status when it was read.
+
+        @param job_id: the job asked about.
+        @returns: the source job's id, and its status, or None if reading it
+            failed.
+        """
+        answered: Tuple[str, Optional[GalaxyJobStatus]] = (job_id, None)
+        current, seen = job_id, {job_id}
+        for _ in range(KMINDEX_COPY_HOPS):
+            try:
+                status = await self.get_job_status(current)
+            except Exception as e:
+                logger.info(f"Could not read job {current} following copy links: {e}")
+                break
+            answered = (current, status)
+            parent = status.copied_from_job_id
+            if not isinstance(parent, str) or not parent or parent in seen:
+                break
+            seen.add(parent)
+            current = parent
+        return answered
+
+    async def _cached_copied_from(self, job_id: str) -> Optional[str]:
+        """The job-cache original, read from the status cache alone.
+
+        @param job_id: the job asked about.
+        @returns: the original's id, or None when it isn't a copy or its
+            status isn't cached.
+        """
+        cached = await self.cache.get(
+            self.cache.make_key("galaxy:job_status", {"job_id": job_id})
+        )
+        return (cached or {}).get("copied_from_job_id")
 
     def _agg_cache_key(self, job_id: str) -> str:
         """Where a job's aggregate lives, for the mirror we are serving from.
@@ -1766,11 +1848,18 @@ class GalaxyService:
 
         return shards
 
-    async def _aggregate_shards(self, job_id: str) -> dict:
-        """Download and merge every shard for a completed kmindex job."""
+    async def _aggregate_shards(
+        self, job_id: str, status: Optional[GalaxyJobStatus] = None
+    ) -> dict:
+        """Download and merge every shard for a completed kmindex job.
+
+        @param job_id: the job to merge.
+        @param status: its status, when the caller just read it.
+        """
         cache_key = self._agg_cache_key(job_id)
 
-        status = await self.get_job_status(job_id)
+        if status is None:
+            status = await self.get_job_status(job_id)
         if not status.is_complete:
             raise GalaxyJobNotComplete(
                 f"Job {job_id} is not yet complete (state: {status.state})"
@@ -2106,14 +2195,20 @@ class GalaxyService:
         ordering: Optional[List[int]] = None,
         sort: KmindexSort = "score",
         order: KmindexOrder = "desc",
+        export_job_id: Optional[str] = None,
     ) -> KmindexResults:
-        """Slice a cached aggregate into a page of results, in the given order."""
+        """Slice a cached aggregate into a page of results, in the given order.
+
+        @param job_id: the job the caller asked for, which the page names.
+        @param export_job_id: the job the export file was written under, when
+            that's a job-cache original rather than job_id.
+        """
         hits = aggregate["hits"]
         if ordering is None:
             page = hits[offset : offset + limit]
         else:
             page = [hits[i] for i in ordering[offset : offset + limit]]
-        export = self._export_state(aggregate, job_id)
+        export = self._export_state(aggregate, export_job_id or job_id)
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
@@ -2180,6 +2275,7 @@ class GalaxyService:
                 stdout=job_data.get("stdout"),
                 stderr=job_data.get("stderr"),
                 exit_code=job_data.get("exit_code"),
+                copied_from_job_id=job_data.get("copied_from_job_id"),
                 # Carried for in-process callers (see the field's comment);
                 # excluded from both the response and the cached model_dump.
                 params=job_data.get("params"),

@@ -365,6 +365,7 @@ async def job_results(
 async def job_export(
     job_id: str = JobId,
     format: str = Query(default="tsv", pattern="^(parquet|tsv)$"),
+    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
 ) -> Response:
     """
     Every hit the search matched, not just the pages results serves.
@@ -372,7 +373,7 @@ async def job_export(
     Written when the results are first merged, so read results once before
     this. Kept for about a day at most, and sooner under disk pressure.
     """
-    return await serve_kmindex_export(job_id, format)
+    return await serve_kmindex_export(job_id, format, galaxy)
 
 
 async def add_sunset_header(request: Request, call_next):

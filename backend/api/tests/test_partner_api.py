@@ -75,6 +75,7 @@ def _galaxy():
     galaxy.submit_kmindex_query = AsyncMock(
         return_value=GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1")
     )
+    galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
     return galaxy
 
 
