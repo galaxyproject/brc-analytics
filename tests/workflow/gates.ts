@@ -3,7 +3,6 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { indexWorkflowsById } from "@repo/shared/services/workflows/loader";
 import {
   getEntitiesById,
   getEntitiesByType,
@@ -14,6 +13,7 @@ import {
   bindWorkflowGates,
   type WorkflowGates,
 } from "@repo/shared/workflow/gates";
+import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 
 export const HYPHY_TRS_ID =
   "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2";

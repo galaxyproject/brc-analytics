@@ -45,6 +45,38 @@ export function getTrsId(query: ParsedUrlQuery): string | undefined {
 }
 
 /**
+ * Indexes workflows by the id they are looked up under: their URL-formatted
+ * TRS id, for catalog and extra workflows alike, so a workflow page's URL
+ * finds either. A workflow listed more than once under the same TRS id (the
+ * catalog lists a workflow under each category it belongs to) is indexed once,
+ * as its last listing, so an extra workflow overrides a catalog one.
+ * @param workflowCategories - Catalog workflow categories.
+ * @param extraWorkflows - Additional workflows outside the catalog.
+ * @returns Map of id to workflow.
+ * @throws If two workflows with different TRS ids format to the same id, since
+ * the URL could then resolve to either.
+ */
+export function indexWorkflowsById<T extends Pick<Workflow, "trsId">>(
+  workflowCategories: readonly { workflows: readonly T[] }[],
+  extraWorkflows: readonly T[] = []
+): Map<string, T> {
+  const workflowById = new Map<string, T>();
+  for (const workflow of [
+    ...workflowCategories.flatMap(({ workflows }) => workflows),
+    ...extraWorkflows,
+  ]) {
+    const id = formatTrsId(workflow.trsId);
+    const indexed = workflowById.get(id);
+    if (indexed && indexed.trsId !== workflow.trsId)
+      throw new Error(
+        `Workflows "${indexed.trsId}" and "${workflow.trsId}" share the URL id "${id}"`
+      );
+    workflowById.set(id, workflow);
+  }
+  return workflowById;
+}
+
+/**
  * Determines whether a workflow's minimum assembly requirement can be met
  * given the number of compatible assemblies available.
  * Used by both the QC report and the UI workflow-list filter as the

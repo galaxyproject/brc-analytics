@@ -15,7 +15,6 @@ import {
   isOrganismWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
-import { indexWorkflowsById } from "@repo/shared/services/workflows/loader";
 import {
   getEntitiesById,
   getEntitiesByType,
@@ -23,7 +22,7 @@ import {
 } from "@repo/shared/services/workflows/store";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
-import { formatTrsId } from "@repo/shared/workflow/utils";
+import { formatTrsId, indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { cleanup, render, screen } from "@testing-library/react";
 import {
   buildWorkflow,

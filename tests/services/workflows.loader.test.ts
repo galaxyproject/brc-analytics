@@ -144,6 +144,17 @@ describe("workflows loader", () => {
       expect(byId?.has("custom-workflow")).toBe(true);
     });
 
+    test("throws when a catalog and an extra workflow share a URL-formatted id", async () => {
+      const categories = [{ workflows: [{ trsId: "#workflow/v0.1" }] }];
+      const extraWorkflows = [{ trsId: "workflow-v0-1" } as Workflow];
+
+      fetchMock.mockResolvedValue(mockFetchResponse(categories));
+
+      await expect(loadWorkflows(extraWorkflows)).rejects.toThrow(
+        'Workflows "#workflow/v0.1" and "workflow-v0-1" share the URL id "workflow-v0-1"'
+      );
+    });
+
     test("throws when workflow fetch fails", async () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse([], false));

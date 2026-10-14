@@ -1,6 +1,6 @@
 import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
-import { formatTrsId } from "@repo/shared/workflow/utils";
-import type { GetStaticPaths, GetStaticPathsResult } from "next";
+import { indexWorkflowsById } from "@repo/shared/workflow/utils";
+import type { GetStaticPaths } from "next";
 import type { WorkflowPageParams } from "./types";
 
 /**
@@ -8,25 +8,17 @@ import type { WorkflowPageParams } from "./types";
  * the catalog, plus the interim workflows that have no catalog category. Typed to
  * just the workflow trsIds it reads, so the catalog JSON is accepted directly.
  * @param workflowCategories - Workflow categories exposing their workflow trsIds.
- * @returns getStaticPaths.
+ * @returns getStaticPaths, which throws if two workflows with different trsIds
+ * share a URL-formatted trsId.
  */
 export function makeWorkflowStaticPaths(
   workflowCategories: { workflows: { trsId: string }[] }[]
 ): GetStaticPaths<WorkflowPageParams> {
-  return async () => {
-    const paths: GetStaticPathsResult<WorkflowPageParams>["paths"] = [];
-
-    for (const { workflows } of workflowCategories) {
-      for (const { trsId } of workflows) {
-        paths.push({ params: { trsId: formatTrsId(trsId) } });
-      }
-    }
-
-    // Interim workflows without a catalog category.
-    for (const { trsId } of UNCATALOGED_WORKFLOWS) {
-      paths.push({ params: { trsId: formatTrsId(trsId) } });
-    }
-
-    return { fallback: false, paths };
-  };
+  return async () => ({
+    fallback: false,
+    paths: Array.from(
+      indexWorkflowsById(workflowCategories, UNCATALOGED_WORKFLOWS).keys(),
+      (trsId) => ({ params: { trsId } })
+    ),
+  });
 }
