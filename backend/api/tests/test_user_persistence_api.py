@@ -706,6 +706,69 @@ def test_restore_reports_saved_only_to_the_account_it_is_saved_to(
     assert signed_out.json()["saved"] is False
 
 
+def test_chat_reports_the_saved_analysis_id(persistence_client):
+    """The client tells which saved analysis is on screen by this id, so the
+    turn that first saves a conversation has to report it, and later turns
+    the same one."""
+    client, _session_factory, _current_sub, _agent = persistence_client
+
+    first = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    assert first.json()["saved_analysis_id"] == analysis_id
+
+    second = client.post(
+        "/api/v1/assistant/chat",
+        json={"message": "and again", "session_id": first.json()["session_id"]},
+    )
+    assert second.json()["saved_analysis_id"] == analysis_id
+
+    with _signed_out(client):
+        anonymous = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    assert anonymous.json()["saved_analysis_id"] is None
+
+
+def test_restore_reports_the_saved_analysis_id_to_any_caller(persistence_client):
+    """Unlike `saved`, the id is not scoped to the caller: it only names the
+    analysis, and the client needs it signed out to know whether the
+    conversation on screen is kept."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    session_id = chat.json()["session_id"]
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+
+    with _signed_out(client):
+        signed_out = client.get(f"/api/v1/assistant/session/{session_id}")
+    assert signed_out.json()["saved_analysis_id"] == analysis_id
+
+    unsaved_id = uuid4().hex
+    agent.session_service.sessions[unsaved_id] = SessionState(
+        session_id=unsaved_id,
+        messages=[ChatMessage(role=MessageRole.USER, content="hello")],
+    )
+    unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
+    assert unsaved.json()["saved_analysis_id"] is None
+
+
+def test_restore_keeps_the_saved_analysis_id_across_a_new_session(
+    persistence_client,
+):
+    """Reopening an expired analysis moves it to a new session; its id is
+    what stays put."""
+    client, _session_factory, _current_sub, agent = persistence_client
+
+    chat = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+    analysis_id = client.get("/api/v1/saved_analyses").json()[0]["id"]
+    del agent.session_service.sessions[chat.json()["session_id"]]
+
+    opened = client.post(f"/api/v1/saved_analyses/{analysis_id}/open")
+    new_session_id = opened.json()["session_id"]
+    assert new_session_id != chat.json()["session_id"]
+
+    restored = client.get(f"/api/v1/assistant/session/{new_session_id}")
+    assert restored.json()["saved_analysis_id"] == analysis_id
+
+
 def test_autosave_writes_from_the_turn_rather_than_rereading_redis(
     persistence_client,
 ):

@@ -45,6 +45,7 @@ function chatResponse(sessionId: string, reply: string): ChatResponse {
     is_complete: false,
     reply,
     saved: false,
+    saved_analysis_id: null,
     schema_state: null,
     session_id: sessionId,
     suggestions: [],
@@ -212,6 +213,7 @@ function restoredConversation(
       { content: reply, role: "assistant" },
     ],
     saved: true,
+    saved_analysis_id: `analysis-${sessionId}`,
     schema_state: null,
     session_id: sessionId,
     suggestions: [],
@@ -343,7 +345,7 @@ describe("useAssistantChat switching conversations on the page", () => {
   });
 
   test("a save that lands for the conversation left behind is reported against it", async () => {
-    // The chat history checks the session saved, not the one showing, so a
+    // The chat history checks the analysis saved, not the one showing, so a
     // first save that lands after the user moved on still joins the list.
     const { rerender, result } = await renderRestored();
     const turn = deferred<ChatResponse>();
@@ -360,11 +362,17 @@ describe("useAssistantChat switching conversations on the page", () => {
     await waitFor(() => expect(result.current.shownSessionId).toBe(OPENED_ID));
 
     await act(async () => {
-      turn.resolve({ ...chatResponse(STORED_ID, "late reply"), saved: true });
+      turn.resolve({
+        ...chatResponse(STORED_ID, "late reply"),
+        saved: true,
+        saved_analysis_id: "analysis-left-behind",
+      });
       await sending;
     });
 
-    expect(result.current.lastSave).toEqual({ sessionId: STORED_ID });
+    expect(result.current.lastSave).toEqual({
+      savedAnalysisId: "analysis-left-behind",
+    });
   });
 
   test("a new analysis leaves the conversation's live session to expire", async () => {
@@ -414,5 +422,53 @@ describe("useAssistantChat switching conversations on the page", () => {
     expect(result.current.messages).toEqual([]);
     expect(result.current.shownSessionId).toBeNull();
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+  });
+
+  // The chat history selects the open conversation by its saved analysis id,
+  // so that has to follow whichever conversation is on screen.
+
+  test("a restore reports the saved analysis it brought back", async () => {
+    const { result } = await renderRestored();
+
+    expect(result.current.savedAnalysisId).toBe(`analysis-${STORED_ID}`);
+  });
+
+  test("a turn reports the saved analysis it belongs to", async () => {
+    mockClient.assistantChat.mockResolvedValueOnce({
+      ...chatResponse(STORED_ID, "ok"),
+      saved_analysis_id: "analysis-first-save",
+    });
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    expect(result.current.savedAnalysisId).toBeNull();
+
+    await act(async () => {
+      await result.current.sendMessage("hello");
+    });
+
+    expect(result.current.savedAnalysisId).toBe("analysis-first-save");
+  });
+
+  test("opening another conversation moves to its saved analysis", async () => {
+    const { rerender, result } = await renderRestored();
+
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(OPENED_ID, "opened reply")
+    );
+    rerender({ initialSessionId: OPENED_ID });
+
+    await waitFor(() =>
+      expect(result.current.savedAnalysisId).toBe(`analysis-${OPENED_ID}`)
+    );
+  });
+
+  test("a new analysis has no saved analysis until it is saved", async () => {
+    const { result } = await renderRestored();
+
+    act(() => result.current.resetSession());
+
+    expect(result.current.savedAnalysisId).toBeNull();
   });
 });

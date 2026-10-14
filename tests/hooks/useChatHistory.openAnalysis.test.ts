@@ -31,7 +31,6 @@ function handlers(): jest.Mocked<OpenAnalysisHandlers> {
     onOpened: jest.fn(),
     onOpeningChange: jest.fn(),
     onRetryRestore: jest.fn(),
-    setItems: jest.fn(),
     setOpenError: jest.fn(),
   } as jest.Mocked<OpenAnalysisHandlers>;
 }

@@ -65,6 +65,8 @@ export interface AssistantChatResponse {
   reply: string;
   /** True when the backend persisted this turn to the user's saved analyses. */
   saved: boolean;
+  /** The saved analysis this conversation belongs to, once one exists. */
+  saved_analysis_id: string | null;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
@@ -81,6 +83,8 @@ export interface SessionRestoreResponse {
   logan?: LoganContext | null;
   messages: { content: string; role: "user" | "assistant" }[];
   saved: boolean;
+  /** The saved analysis this conversation belongs to, whoever is asking. */
+  saved_analysis_id: string | null;
   schema_state: AnalysisSchema;
   session_id: string;
   suggestions: SuggestionChip[];
@@ -118,7 +122,6 @@ export interface FavoriteResponse {
 export interface SavedAnalysisSummary {
   created_at: string;
   id: string;
-  source_session: string | null;
   title: string | null;
   updated_at: string;
 }

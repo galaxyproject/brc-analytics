@@ -12,11 +12,12 @@ import type { SidebarProps } from "./types";
  * @param props - Component props.
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.disclaimer - AI disclaimer text.
- * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.lastSave - Most recent confirmed save, naming the saved analysis written.
  * @param props.onNewAnalysis - Starts a new conversation.
  * @param props.onOpened - Reports that the history opened a different conversation.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
  * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
+ * @param props.savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @param props.supportUrl - Feedback form URL; the feedback button is hidden without one.
  * @returns The sidebar element.
@@ -29,6 +30,7 @@ export const Sidebar = ({
   onOpened,
   onOpeningChange,
   onRetryRestore,
+  savedAnalysisId,
   sessionId,
   supportUrl,
 }: SidebarProps): JSX.Element => {
@@ -42,6 +44,7 @@ export const Sidebar = ({
         onOpened={onOpened}
         onOpeningChange={onOpeningChange}
         onRetryRestore={onRetryRestore}
+        savedAnalysisId={savedAnalysisId}
         sessionId={sessionId}
       />
       <Footer disclaimer={disclaimer} supportUrl={supportUrl} />

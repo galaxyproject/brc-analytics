@@ -7,5 +7,6 @@ export type ChatHistoryProps = Pick<
   | "onOpened"
   | "onOpeningChange"
   | "onRetryRestore"
+  | "savedAnalysisId"
   | "sessionId"
 >;

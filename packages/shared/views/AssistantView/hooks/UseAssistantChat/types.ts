@@ -10,11 +10,12 @@ export interface ChatMessageDisplay {
 }
 
 /**
- * A confirmed save of a conversation. Each save is a new object, so a change
- * of identity says another save happened, even of the same session.
+ * A confirmed save of a conversation, naming the saved analysis written. Each
+ * save is a new object, so a change of identity says another save happened,
+ * even of the same analysis.
  */
 export interface LastSave {
-  sessionId: string;
+  savedAnalysisId: string;
 }
 
 export interface UseAssistantChatOptions {
@@ -37,6 +38,7 @@ export interface UseAssistantChatReturn {
   onRetry?: () => Promise<void>;
   resetSession: () => void;
   retryRestore: () => Promise<void>;
+  savedAnalysisId: string | null;
   schema: AnalysisSchema | null;
   sendMessage: (message: string) => Promise<void>;
   shownSessionId: string | null;

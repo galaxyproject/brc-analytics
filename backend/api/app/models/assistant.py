@@ -174,6 +174,14 @@ class ChatResponse(BaseModel):
             "Always False for anonymous conversations."
         ),
     )
+    saved_analysis_id: Optional[str] = Field(
+        None,
+        description=(
+            "The saved analysis this conversation belongs to, once one exists. "
+            "Unlike the session id it never changes, so the client can tell "
+            "which saved analysis is on screen."
+        ),
+    )
 
 
 class SessionSaveResponse(BaseModel):
@@ -258,6 +266,9 @@ class SessionRestoreResponse(BaseModel):
     # only infer saved-ness from being signed in, which is not the same
     # question and costs a redundant save on every mount.
     saved: bool = False
+    # The saved analysis this conversation belongs to, whoever is asking. The
+    # session id can change when the analysis is reopened; this never does.
+    saved_analysis_id: Optional[str] = None
 
 
 class AssistantInfoResponse(BaseModel):
