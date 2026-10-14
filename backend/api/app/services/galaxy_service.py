@@ -1,6 +1,7 @@
 """Galaxy API integration service using BioBLEND."""
 
 import asyncio
+import base64
 import hashlib
 import json
 import logging
@@ -92,12 +93,18 @@ class KmindexFiltersUnavailable(Exception):
 
 
 class GalaxySubmitNotStarted(Exception):
-    """A submission failed before the tool was asked to run.
+    """A submission failed before Galaxy queued anything.
 
-    So no job can exist for it, and the caller is free to try again. Anything
-    that fails from the run_tool call on is ambiguous -- Galaxy may have queued
-    the job and lost the reply -- and is raised as a plain Exception instead.
+    So no job can exist for it, and the caller is free to try again: Galaxy
+    refused the tool request outright, or failed it before creating a job.
+    Anything after a request Galaxy may have accepted is ambiguous -- it may
+    have queued the job and lost the reply -- and is raised as a plain
+    Exception instead.
     """
+
+
+class ToolRequestUnconfirmed(Exception):
+    """A tool request went out and its answer never came back."""
 
 
 def _is_missing_history_error(e: BaseException) -> bool:
@@ -339,6 +346,13 @@ KMINDEX_INDEX_READ_TIMEOUT = 30.0
 # only a silent socket will. Therefore, a single timeout value is safe for every
 # call site, both short RPCs and long dataset downloads.
 GALAXY_REQUEST_TIMEOUT = 30.0
+
+# /api/jobs queues a tool request and creates the job in a background task, so a
+# submit polls for the job id. It showed up in about 2 s on
+# test.galaxyproject.org; a minute is far past slow, and past it the request may
+# still turn into a job, so giving up there is ambiguous rather than safe.
+KMINDEX_TOOL_REQUEST_TIMEOUT = 60.0
+KMINDEX_TOOL_REQUEST_POLL = 1.0
 
 # Aggregation is serialized per lane: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
@@ -829,7 +843,7 @@ class GalaxyService:
     async def submit_kmindex_query(
         self, submission: KmindexQuerySubmission
     ) -> GalaxyJobResponse:
-        """Upload a FASTA query and run kmindex against a Logan index."""
+        """Run kmindex against Logan indexes for a FASTA query."""
         if not self.is_available():
             raise Exception(
                 "Galaxy service not available - check API key configuration"
@@ -854,36 +868,27 @@ class GalaxyService:
         try:
             history_id = await self._get_or_create_shared_history()
             try:
-                upload_dataset_id = await self._upload_fasta(
-                    submission.sequence, submission.filename, history_id
+                tool_request_id = await self._request_kmindex_job(
+                    submission, history_id
                 )
             except Exception as e:
                 if not _is_missing_history_error(e):
                     raise
-                # Nothing has run yet, so one more go against a freshly
-                # resolved history is safe.
+                # Galaxy refused it over the history, so nothing was queued and
+                # one more go against a freshly resolved history is safe.
                 logger.warning(
                     "Cached history %s is gone; resolving it again", history_id
                 )
                 await self._forget_shared_history()
                 history_id = await self._get_or_create_shared_history()
-                upload_dataset_id = await self._upload_fasta(
-                    submission.sequence, submission.filename, history_id
+                tool_request_id = await self._request_kmindex_job(
+                    submission, history_id
                 )
             tool_requested = True
-            try:
-                job_id = await self._run_kmindex_query(
-                    upload_dataset_id, submission, history_id
-                )
-            except Exception as e:
-                # Not retried: the job may exist. Just stop handing out the id.
-                if _is_missing_history_error(e):
-                    await self._forget_shared_history()
-                raise
+            job_id = await self._job_for_tool_request(tool_request_id)
 
             return GalaxyJobResponse(
                 job_id=job_id,
-                upload_dataset_id=upload_dataset_id,
                 status="submitted",
                 identity=self.credential.kind if self.credential else None,
                 message=(
@@ -908,11 +913,120 @@ class GalaxyService:
                 if is_unlinked_account_error(e):
                     raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
-            if not tool_requested:
+            if isinstance(e, GalaxySubmitNotStarted):
+                raise
+            # A request Galaxy answered with an error queued nothing; one whose
+            # answer never arrived may have.
+            if not tool_requested and not isinstance(e, ToolRequestUnconfirmed):
                 raise GalaxySubmitNotStarted(
                     f"kmindex query submission failed: {str(e)}"
                 ) from e
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
+
+    async def _request_kmindex_job(
+        self, submission: KmindexQuerySubmission, history_id: str
+    ) -> str:
+        """
+        Ask Galaxy to run kmindex_query, returning the tool request's id.
+
+        The query goes in as a base64:// URL carrying its SHA-256 rather than as
+        a pasted upload. Galaxy materializes it before creating the job and
+        reuses an existing dataset with the same source and hash, so a repeat of
+        a query arrives as the same input, and use_cached_jobs can hand back the
+        finished job as a copy instead of queueing another whole Vista node. A
+        pasted upload is a new dataset every time and never matches. Probed on
+        test.galaxyproject.org on 2026-10-14: a hit within a history and across
+        histories of the same account. A repeat sent while the first job is
+        still running isn't matched; only finished jobs are.
+
+        @param submission: the validated query.
+        @param history_id: where the job should land.
+        @returns: the tool request id, to poll for the job.
+        @raises ToolRequestUnconfirmed: the request went out and no answer came
+            back, so Galaxy may or may not have queued it.
+        """
+        content = submission.sequence.encode("utf-8")
+        payload = {
+            "history_id": history_id,
+            # Nested state: the tool request API validates against the tool's
+            # parameter model, so the legacy flat "cond|param" keys don't apply.
+            "inputs": {
+                "db_opts": {
+                    "db_opts_selector": "db",
+                    # Sorted so the order a caller lists indexes in can't make
+                    # an otherwise identical search miss the cache.
+                    "kmindex": sorted(submission.indexes),
+                },
+                "fastx": {
+                    "ext": "fasta",
+                    "hashes": [
+                        {
+                            "hash_function": "SHA-256",
+                            "hash_value": hashlib.sha256(content).hexdigest(),
+                        }
+                    ],
+                    "name": submission.filename,
+                    "src": "url",
+                    "url": "base64://" + base64.b64encode(content).decode("ascii"),
+                },
+                "format": "json",
+                "threshold": submission.threshold,
+                "zvalue": submission.zvalue,
+            },
+            "tool_id": self.settings.GALAXY_KMINDEX_TOOL_ID,
+            "use_cached_jobs": self.settings.KMINDEX_USE_CACHED_JOBS,
+        }
+        try:
+            response = await asyncio.to_thread(
+                self.gi.make_post_request, f"{self.gi.url}/jobs", payload=payload
+            )
+        except BioblendConnectionError as e:
+            if getattr(e, "status_code", None) is None:
+                raise ToolRequestUnconfirmed(str(e)) from e
+            raise
+        except Exception as e:
+            raise ToolRequestUnconfirmed(str(e)) from e
+        return response["tool_request_id"]
+
+    async def _job_for_tool_request(self, tool_request_id: str) -> str:
+        """
+        Wait for Galaxy to create the job a tool request asked for.
+
+        @param tool_request_id: from _request_kmindex_job.
+        @returns: the job id.
+        @raises GalaxySubmitNotStarted: Galaxy failed the request, so no job
+            exists.
+        @raises Exception: no job within KMINDEX_TOOL_REQUEST_TIMEOUT. The
+            request may still become one, so this is ambiguous.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + KMINDEX_TOOL_REQUEST_TIMEOUT
+        while True:
+            try:
+                response = await asyncio.to_thread(
+                    self.gi.make_get_request,
+                    f"{self.gi.url}/tool_requests/{tool_request_id}",
+                )
+                detail = response.json() if response.status_code == 200 else {}
+            except Exception as e:
+                logger.warning(f"Reading tool request {tool_request_id} failed: {e}")
+                detail = {}
+            jobs = detail.get("jobs") or []
+            if jobs:
+                return jobs[0]["id"]
+            if detail.get("state") == "failed":
+                message = detail.get("state_message") or {}
+                if isinstance(message, dict):
+                    message = message.get("err_msg")
+                raise GalaxySubmitNotStarted(
+                    f"Galaxy could not queue the kmindex query: {message}"
+                )
+            if loop.time() >= deadline:
+                raise Exception(
+                    f"Galaxy accepted tool request {tool_request_id} but created no "
+                    f"job within {KMINDEX_TOOL_REQUEST_TIMEOUT:.0f}s"
+                )
+            await asyncio.sleep(KMINDEX_TOOL_REQUEST_POLL)
 
     def _fetch_shard(self, dataset_id: str) -> bytes:
         """
@@ -2190,70 +2304,6 @@ class GalaxyService:
         except Exception as e:
             logger.error(f"BioBLEND upload failed: {e}")
             raise Exception(f"Failed to upload data using BioBLEND: {str(e)}") from e
-
-    async def _upload_fasta(self, sequence: str, filename: str, history_id: str) -> str:
-        """Upload a FASTA query sequence and return the dataset ID."""
-        try:
-            upload_result = await asyncio.to_thread(
-                self.gi.tools.paste_content,
-                content=sequence,
-                history_id=history_id,
-                file_name=filename,
-                file_type="fasta",
-            )
-
-            outputs = upload_result.get("outputs", [])
-            if not outputs:
-                raise Exception("No outputs returned from FASTA upload")
-
-            dataset_id = outputs[0]["id"]
-            logger.info(f"Uploaded FASTA query to dataset: {dataset_id}")
-            return dataset_id
-
-        except Exception as e:
-            logger.error(f"FASTA upload failed: {e}")
-            raise Exception(f"Failed to upload FASTA query: {str(e)}") from e
-
-    async def _run_kmindex_query(
-        self, input_dataset_id: str, submission: KmindexQuerySubmission, history_id: str
-    ) -> str:
-        """Run kmindex_query against one or more Logan indexes, returning the job ID."""
-        try:
-            # Conditional params must use flattened "cond|param" keys. The nested
-            # dict form is accepted but silently drops the inner select, which
-            # runs kmindex with --index '' and fails on the node.
-            tool_inputs = {
-                "db_opts|db_opts_selector": "db",
-                # multiple="true" on the tool's select, so this takes the list as-is;
-                # a bare string would be read as a single index name.
-                "db_opts|kmindex": submission.indexes,
-                "fastx": {"src": "hda", "id": input_dataset_id},
-                "format": "json",
-                "threshold": submission.threshold,
-                "zvalue": submission.zvalue,
-            }
-
-            tool_response = await asyncio.to_thread(
-                self.gi.tools.run_tool,
-                history_id=history_id,
-                tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
-                tool_inputs=tool_inputs,
-            )
-
-            jobs = tool_response.get("jobs", [])
-            if not jobs:
-                raise Exception("No jobs returned from kmindex tool execution")
-
-            job_id = jobs[0]["id"]
-            logger.info(
-                f"Started kmindex query job {job_id} against "
-                f"{', '.join(submission.indexes)}"
-            )
-            return job_id
-
-        except Exception as e:
-            logger.error(f"kmindex tool execution failed: {e}")
-            raise Exception(f"Failed to run kmindex query: {str(e)}") from e
 
     async def _run_random_lines_tool(
         self, input_dataset_id: str, num_lines: int, history_id: str

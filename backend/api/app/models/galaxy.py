@@ -516,7 +516,10 @@ class GalaxyJobResponse(BaseModel):
     """Response model for job submission."""
 
     job_id: str = Field(..., description="Galaxy job ID for tracking")
-    upload_dataset_id: str = Field(..., description="ID of the uploaded dataset")
+    upload_dataset_id: Optional[str] = Field(
+        default=None,
+        description="ID of the uploaded dataset, for tools that upload one first",
+    )
     status: str = Field(default="submitted", description="Initial job status")
     message: str = Field(default="Job submitted successfully")
     identity: Optional[str] = Field(

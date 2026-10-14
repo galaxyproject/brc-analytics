@@ -451,13 +451,13 @@ def _known_indexes():
 
 
 @pytest.mark.asyncio
-async def test_an_unknown_index_is_refused_before_anything_is_uploaded():
+async def test_an_unknown_index_is_refused_before_anything_is_sent():
     from app.models.galaxy import KmindexQuerySubmission
     from app.services.galaxy_service import KmindexUnknownIndex
 
     svc = _user_service()
     svc._get_or_create_shared_history = AsyncMock(return_value="h1")
-    svc._upload_fasta = AsyncMock(return_value="d1")
+    svc._request_kmindex_job = AsyncMock(return_value="tr1")
     submission = KmindexQuerySubmission(
         sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
         indexes=["GENOMIC_BCT", "NOT_AN_INDEX"],
@@ -466,7 +466,7 @@ async def test_an_unknown_index_is_refused_before_anything_is_uploaded():
     with pytest.raises(KmindexUnknownIndex, match="NOT_AN_INDEX"):
         await svc.submit_kmindex_query(submission)
     svc._get_or_create_shared_history.assert_not_awaited()
-    svc._upload_fasta.assert_not_awaited()
+    svc._request_kmindex_job.assert_not_awaited()
 
 
 def _user_service() -> GalaxyService:
@@ -557,7 +557,7 @@ def _history_gone():
 
 
 @pytest.mark.asyncio
-async def test_a_gone_history_is_re_resolved_and_the_upload_retried():
+async def test_a_gone_history_is_re_resolved_and_the_request_retried():
     galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
     cache = FakeCache()
     svc = _service(galaxy, cache)
@@ -565,51 +565,56 @@ async def test_a_gone_history_is_re_resolved_and_the_upload_retried():
     # Someone deleted it by hand; the lookup only returns live histories.
     galaxy.histories.clear()
 
-    def paste_content(history_id, **kwargs):
-        if history_id == "stale":
+    def post(url, payload=None, **kwargs):
+        if payload["history_id"] == "stale":
             raise _history_gone()
-        return {"outputs": [{"id": "d1"}]}
+        return {"tool_request_id": "tr1"}
 
-    galaxy.gi.tools.paste_content = MagicMock(side_effect=paste_content)
-    svc._run_kmindex_query = AsyncMock(return_value="job1")
+    galaxy.gi.make_post_request = MagicMock(side_effect=post)
+    svc._job_for_tool_request = AsyncMock(return_value="job1")
 
     response = await svc.submit_kmindex_query(_submission())
 
     assert response.job_id == "job1"
-    fresh = svc._run_kmindex_query.await_args.args[2]
+    fresh = galaxy.gi.make_post_request.call_args.kwargs["payload"]["history_id"]
     assert fresh != "stale"
     assert list(galaxy_service._HISTORY_IDS.values()) == [fresh]
     assert list(cache.store.values()) == [fresh]
 
 
 @pytest.mark.asyncio
-async def test_a_gone_history_at_run_tool_clears_the_cache_without_a_retry():
-    galaxy = FakeGalaxy([{"id": "stale", "name": SERVICE_HISTORY}])
-    cache = FakeCache()
-    svc = _service(galaxy, cache)
-    svc._upload_fasta = AsyncMock(return_value="d1")
-    galaxy.gi.tools.run_tool = MagicMock(side_effect=_history_gone())
+async def test_a_refused_request_is_known_not_to_have_started():
+    # Galaxy answered with an error, so it queued nothing, and the cached
+    # history wasn't the problem.
+    from bioblend import ConnectionError as BioblendConnectionError
 
-    with pytest.raises(Exception):
-        await svc.submit_kmindex_query(_submission())
-
-    assert galaxy.gi.tools.run_tool.call_count == 1
-    assert galaxy_service._HISTORY_IDS == {}
-    assert cache.store == {}
-
-
-@pytest.mark.asyncio
-async def test_an_unrelated_upload_failure_keeps_the_cached_history():
     from app.services.galaxy_service import GalaxySubmitNotStarted
 
     galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
     svc = _service(galaxy)
-    galaxy.gi.tools.paste_content = MagicMock(side_effect=RuntimeError("timed out"))
+    galaxy.gi.make_post_request = MagicMock(
+        side_effect=BioblendConnectionError("500", body="oops", status_code=500)
+    )
 
     with pytest.raises(GalaxySubmitNotStarted):
         await svc.submit_kmindex_query(_submission())
-    assert galaxy.gi.tools.paste_content.call_count == 1
+    assert galaxy.gi.make_post_request.call_count == 1
     assert list(galaxy_service._HISTORY_IDS.values()) == ["h"]
+
+
+@pytest.mark.asyncio
+async def test_a_request_whose_answer_never_came_is_ambiguous():
+    # It went out; Galaxy may have queued it and lost the reply.
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
+    svc = _service(galaxy)
+    galaxy.gi.make_post_request = MagicMock(side_effect=RuntimeError("timed out"))
+
+    with pytest.raises(Exception) as excinfo:
+        await svc.submit_kmindex_query(_submission())
+    assert not isinstance(excinfo.value, GalaxySubmitNotStarted)
+    assert galaxy.gi.make_post_request.call_count == 1
 
 
 @pytest.mark.asyncio
@@ -622,8 +627,8 @@ async def test_submit_response_carries_credential_identity():
             credential=GalaxyCredential(kind="user", secret="t", user_sub="u1"),
         )
     svc._get_or_create_shared_history = AsyncMock(return_value="h1")
-    svc._upload_fasta = AsyncMock(return_value="d1")
-    svc._run_kmindex_query = AsyncMock(return_value="job1")
+    svc._request_kmindex_job = AsyncMock(return_value="tr1")
+    svc._job_for_tool_request = AsyncMock(return_value="job1")
 
     submission = KmindexQuerySubmission(
         sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT",
@@ -636,31 +641,26 @@ async def test_submit_response_carries_credential_identity():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("step", ["history", "upload"])
-async def test_a_failure_before_run_tool_is_known_not_to_have_started(step):
-    # Nothing asked Galaxy to run the tool, so no job can exist and the partner
-    # API is free to release the caller's Idempotency-Key.
+async def test_a_history_failure_is_known_not_to_have_started():
+    # Nothing was sent to Galaxy, so no job can exist and the partner API is
+    # free to release the caller's Idempotency-Key.
     from app.services.galaxy_service import GalaxySubmitNotStarted
 
     with patch("app.services.galaxy_service.GalaxyInstance"):
         svc = GalaxyService(
             MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
         )
-    svc._get_or_create_shared_history = AsyncMock(
-        side_effect=RuntimeError("boom") if step == "history" else None,
-        return_value="h1",
-    )
-    svc._upload_fasta = AsyncMock(side_effect=RuntimeError("boom"))
-    svc._run_kmindex_query = AsyncMock()
+    svc._get_or_create_shared_history = AsyncMock(side_effect=RuntimeError("boom"))
+    svc._request_kmindex_job = AsyncMock()
 
     with pytest.raises(GalaxySubmitNotStarted):
         await svc.submit_kmindex_query(_submission())
-    svc._run_kmindex_query.assert_not_awaited()
+    svc._request_kmindex_job.assert_not_awaited()
 
 
 @pytest.mark.asyncio
-async def test_a_failure_from_run_tool_on_is_ambiguous():
-    # Galaxy may have queued the job and lost the reply.
+async def test_no_job_after_an_accepted_request_is_ambiguous():
+    # The request is queued; it may still become a job.
     from app.services.galaxy_service import GalaxySubmitNotStarted
 
     with patch("app.services.galaxy_service.GalaxyInstance"):
@@ -668,9 +668,119 @@ async def test_a_failure_from_run_tool_on_is_ambiguous():
             MagicMock(), credential=GalaxyCredential(kind="service", secret="k")
         )
     svc._get_or_create_shared_history = AsyncMock(return_value="h1")
-    svc._upload_fasta = AsyncMock(return_value="ds1")
-    svc._run_kmindex_query = AsyncMock(side_effect=RuntimeError("read timed out"))
+    svc._request_kmindex_job = AsyncMock(return_value="tr1")
+    svc._job_for_tool_request = AsyncMock(side_effect=RuntimeError("no job yet"))
 
     with pytest.raises(Exception) as excinfo:
         await svc.submit_kmindex_query(_submission())
     assert not isinstance(excinfo.value, GalaxySubmitNotStarted)
+
+
+@pytest.mark.asyncio
+async def test_a_failed_tool_request_is_known_not_to_have_started():
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    galaxy = FakeGalaxy()
+    galaxy.gi.make_get_request = MagicMock(
+        return_value=MagicMock(
+            status_code=200,
+            json=MagicMock(
+                return_value={
+                    "jobs": [],
+                    "state": "failed",
+                    "state_message": {"err_msg": "bad input"},
+                }
+            ),
+        )
+    )
+    svc = _service(galaxy)
+
+    with pytest.raises(GalaxySubmitNotStarted, match="bad input"):
+        await svc._job_for_tool_request("tr1")
+
+
+@pytest.mark.asyncio
+async def test_the_job_is_read_off_the_tool_request_once_it_exists():
+    galaxy = FakeGalaxy()
+    answers = iter(
+        [
+            {"jobs": [], "state": "new"},
+            {"jobs": [{"id": "job9", "src": "job"}], "state": "submitted"},
+        ]
+    )
+    galaxy.gi.make_get_request = MagicMock(
+        side_effect=lambda url, **kw: MagicMock(
+            status_code=200, json=MagicMock(return_value=next(answers))
+        )
+    )
+    svc = _service(galaxy)
+
+    with patch.object(galaxy_service, "KMINDEX_TOOL_REQUEST_POLL", 0):
+        assert await svc._job_for_tool_request("tr1") == "job9"
+    assert galaxy.gi.make_get_request.call_args.args[0].endswith("/tool_requests/tr1")
+
+
+@pytest.mark.asyncio
+async def test_a_tool_request_that_never_makes_a_job_gives_up():
+    galaxy = FakeGalaxy()
+    galaxy.gi.make_get_request = MagicMock(
+        return_value=MagicMock(
+            status_code=200, json=MagicMock(return_value={"jobs": [], "state": "new"})
+        )
+    )
+    svc = _service(galaxy)
+
+    with (
+        patch.object(galaxy_service, "KMINDEX_TOOL_REQUEST_POLL", 0),
+        patch.object(galaxy_service, "KMINDEX_TOOL_REQUEST_TIMEOUT", 0.05),
+        pytest.raises(Exception, match="created no job"),
+    ):
+        await svc._job_for_tool_request("tr1")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("use_cached", [True, False])
+async def test_the_query_goes_to_galaxy_as_a_hashed_url(monkeypatch, use_cached):
+    import base64
+    import hashlib
+
+    from app.core.config import get_settings
+    from app.models.galaxy import KmindexQuerySubmission
+
+    monkeypatch.setenv("KMINDEX_USE_CACHED_JOBS", "true" if use_cached else "false")
+    get_settings.cache_clear()
+    try:
+        galaxy = FakeGalaxy()
+        galaxy.gi.make_post_request = MagicMock(return_value={"tool_request_id": "tr1"})
+        svc = _service(galaxy)
+        sequence = ">q\nACGTACGTACGTACGTACGTACGTACGTACGT"
+        submission = KmindexQuerySubmission(
+            sequence=sequence, indexes=["GENOMIC_INV", "GENOMIC_BCT"]
+        )
+
+        assert await svc._request_kmindex_job(submission, "h1") == "tr1"
+    finally:
+        get_settings.cache_clear()
+
+    url = galaxy.gi.make_post_request.call_args.args[0]
+    payload = galaxy.gi.make_post_request.call_args.kwargs["payload"]
+    assert url == "https://galaxy.example/api/jobs"
+    assert payload["history_id"] == "h1"
+    assert payload["use_cached_jobs"] is use_cached
+    inputs = payload["inputs"]
+    # Sorted, so the order a caller lists them in can't cause a cache miss.
+    assert inputs["db_opts"] == {
+        "db_opts_selector": "db",
+        "kmindex": ["GENOMIC_BCT", "GENOMIC_INV"],
+    }
+    fastx = inputs["fastx"]
+    assert fastx["src"] == "url"
+    assert base64.b64decode(fastx["url"].removeprefix("base64://")).decode() == sequence
+    assert fastx["hashes"] == [
+        {
+            "hash_function": "SHA-256",
+            "hash_value": hashlib.sha256(sequence.encode()).hexdigest(),
+        }
+    ]
+    assert inputs["threshold"] == submission.threshold
+    assert inputs["zvalue"] == submission.zvalue
