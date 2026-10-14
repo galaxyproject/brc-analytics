@@ -1,6 +1,6 @@
 import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { formatTrsId } from "@repo/shared/workflow/utils";
+import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { type EntitiesLoader } from "./hooks/UseEntities/types";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
@@ -35,30 +35,6 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
   if (!res.ok) throw new Error(`Failed to fetch: ${url}`);
 
   return (await res.json()) as unknown[];
-}
-
-/**
- * Indexes workflows by the id they are looked up under: their URL-formatted
- * TRS id, for catalog and extra workflows alike, so a workflow page's URL
- * finds either.
- * @param workflowCategories - Catalog workflow categories.
- * @param extraWorkflows - Additional workflows outside the catalog.
- * @returns Map of id to workflow.
- */
-export function indexWorkflowsById(
-  workflowCategories: WorkflowCategory[],
-  extraWorkflows: Workflow[] = []
-): Map<string, Workflow> {
-  const workflowById = new Map<string, Workflow>();
-  for (const { workflows } of workflowCategories) {
-    for (const workflow of workflows) {
-      workflowById.set(formatTrsId(workflow.trsId), workflow);
-    }
-  }
-  for (const workflow of extraWorkflows) {
-    workflowById.set(formatTrsId(workflow.trsId), workflow);
-  }
-  return workflowById;
 }
 
 /**
@@ -103,6 +79,7 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
  * Loads the workflows store with workflows from the API, plus any additional
  * workflows supplied by the caller.
  * @param extraWorkflows - Additional workflows to add to the store, keyed by their URL-formatted trsId.
+ * @throws If two workflows with different trsIds share a URL-formatted trsId.
  */
 export async function loadWorkflows(
   extraWorkflows: Workflow[] = []
