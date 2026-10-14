@@ -56,7 +56,8 @@ function isEntityRoute(route: string): route is EntityRoute {
  * loaded and a retry fetches only the rest.
  * @param config - Site config.
  * @returns Promise that resolves once every entity list is loaded, or rejects
- * with the first failed fetch once every fetch has settled.
+ * once every fetch has settled, with the failure of the first entity list (in
+ * config order) that failed.
  */
 export async function loadEntities(config: SiteConfig): Promise<void> {
   const results = await Promise.allSettled(config.entities.map(loadEntityList));
