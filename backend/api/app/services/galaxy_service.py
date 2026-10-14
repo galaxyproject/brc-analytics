@@ -107,6 +107,16 @@ class ToolRequestUnconfirmed(Exception):
     """A tool request went out and its answer never came back."""
 
 
+def _normalized_fasta(sequence: str) -> str:
+    """The query as Galaxy should see it: one line ending, no trailing blanks.
+
+    The job cache matches on the input's hash, so a paste that differs only in
+    CRLFs or a trailing newline would otherwise run the whole search again.
+    """
+    lines = sequence.replace("\r\n", "\n").replace("\r", "\n").strip().split("\n")
+    return "\n".join(line.rstrip() for line in lines) + "\n"
+
+
 def _is_missing_history_error(e: BaseException) -> bool:
     """Whether Galaxy refused a call because the history it named is gone.
 
@@ -131,8 +141,8 @@ def _is_missing_history_error(e: BaseException) -> bool:
 class KmindexUnknownIndex(GalaxySubmitNotStarted):
     """The submission names an index the pinned tool doesn't offer.
 
-    Caught before anything is uploaded: Galaxy would only reject it at run_tool,
-    after the query had already landed in the history.
+    Caught before anything is sent: Galaxy would only reject it once the tool
+    request was queued, after the query had already landed in the history.
     """
 
 
@@ -349,14 +359,23 @@ GALAXY_REQUEST_TIMEOUT = 30.0
 
 # /api/jobs queues a tool request and creates the job in a background task, so a
 # submit polls for the job id. It showed up in about 2 s on
-# test.galaxyproject.org; a minute is far past slow, and past it the request may
-# still turn into a job, so giving up there is ambiguous rather than safe.
-KMINDEX_TOOL_REQUEST_TIMEOUT = 60.0
+# test.galaxyproject.org, but a class submitting at once backs up the Celery
+# queue that creates it. Two minutes stays well inside the proxy's 300 s, and
+# past it the request may still turn into a job, so giving up is ambiguous.
+KMINDEX_TOOL_REQUEST_TIMEOUT = 120.0
 KMINDEX_TOOL_REQUEST_POLL = 1.0
 
 # A job-cache copy can itself be copied; following a few links is plenty, and
 # the cap keeps a cycle from spinning.
 KMINDEX_COPY_HOPS = 5
+# Copy -> original. Immutable once known, so it's kept long, and every results
+# page and export for a copy reads it instead of two job statuses -- which
+# also keeps a copy's export findable while Galaxy is down.
+KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v1"
+
+# Galaxy's job cache also requires the input datasets' names to match, so every
+# query goes in under this one rather than whatever filename the caller sent.
+KMINDEX_QUERY_DATASET_NAME = "query.fasta"
 
 # Aggregation is serialized per lane: it is I/O bound against a service that
 # rate-limits us, so overlapping runs make each other slower and can each end up
@@ -949,7 +968,7 @@ class GalaxyService:
         @raises ToolRequestUnconfirmed: the request went out and no answer came
             back, so Galaxy may or may not have queued it.
         """
-        content = submission.sequence.encode("utf-8")
+        content = _normalized_fasta(submission.sequence).encode("utf-8")
         payload = {
             "history_id": history_id,
             # Nested state: the tool request API validates against the tool's
@@ -969,7 +988,7 @@ class GalaxyService:
                             "hash_value": hashlib.sha256(content).hexdigest(),
                         }
                     ],
-                    "name": submission.filename,
+                    "name": KMINDEX_QUERY_DATASET_NAME,
                     "src": "url",
                     "url": "base64://" + base64.b64encode(content).decode("ascii"),
                 },
@@ -985,12 +1004,21 @@ class GalaxyService:
                 self.gi.make_post_request, f"{self.gi.url}/jobs", payload=payload
             )
         except BioblendConnectionError as e:
-            if getattr(e, "status_code", None) is None:
+            # Only a 4xx is Galaxy refusing the request. A 5xx can come from a
+            # proxy after Galaxy queued it, and bioblend also raises on a 200
+            # whose body won't decode.
+            status = getattr(e, "status_code", None)
+            if status is None or not 400 <= status < 500:
                 raise ToolRequestUnconfirmed(str(e)) from e
             raise
         except Exception as e:
             raise ToolRequestUnconfirmed(str(e)) from e
-        return response["tool_request_id"]
+        tool_request_id = (
+            response.get("tool_request_id") if isinstance(response, dict) else None
+        )
+        if not tool_request_id:
+            raise ToolRequestUnconfirmed(f"No tool request id in {response!r:.200}")
+        return tool_request_id
 
     async def _job_for_tool_request(self, tool_request_id: str) -> str:
         """
@@ -1381,6 +1409,9 @@ class GalaxyService:
         @returns: the source job's id, and its status, or None if reading it
             failed.
         """
+        known = await self._known_copy_of(job_id)
+        if known:
+            return known, None
         answered: Tuple[str, Optional[GalaxyJobStatus]] = (job_id, None)
         current, seen = job_id, {job_id}
         for _ in range(KMINDEX_COPY_HOPS):
@@ -1395,7 +1426,19 @@ class GalaxyService:
                 break
             seen.add(parent)
             current = parent
+        if answered[0] != job_id:
+            await self.cache.set(
+                self._copy_of_key(job_id), answered[0], CacheTTL.THIRTY_DAYS
+            )
         return answered
+
+    def _copy_of_key(self, job_id: str) -> str:
+        return self.cache.make_key(KMINDEX_COPY_OF_PREFIX, {"job_id": job_id})
+
+    async def _known_copy_of(self, job_id: str) -> Optional[str]:
+        """The original a copy was already resolved to, from Redis alone."""
+        known = await self.cache.get(self._copy_of_key(job_id))
+        return known if isinstance(known, str) and known else None
 
     async def _cached_copied_from(self, job_id: str) -> Optional[str]:
         """The job-cache original, read from the status cache alone.
@@ -1404,6 +1447,9 @@ class GalaxyService:
         @returns: the original's id, or None when it isn't a copy or its
             status isn't cached.
         """
+        known = await self._known_copy_of(job_id)
+        if known:
+            return known
         cached = await self.cache.get(
             self.cache.make_key("galaxy:job_status", {"job_id": job_id})
         )

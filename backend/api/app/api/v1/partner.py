@@ -64,7 +64,7 @@ RESULTS_RETRY_AFTER = "15"
 
 # A claim with no job recorded yet is held for the whole day, like a recorded
 # job. A submit normally fills it in within seconds; one that never does died
-# somewhere around run_tool, which is as ambiguous as a submit that failed
+# somewhere around the tool request, which is as ambiguous as a submit that failed
 # there, and letting the claim lapse would let a retry start a second search.
 #
 # These records sit in the cache Redis (allkeys-lru), so the guarantee holds
@@ -243,7 +243,7 @@ async def submit_job(
             await cache.delete(idem_key)
         raise HTTPException(status_code=400, detail=str(e)) from e
     except GalaxySubmitNotStarted as e:
-        # Nothing reached run_tool, so no job exists and a retry is safe.
+        # Galaxy queued nothing, so no job exists and a retry is safe.
         if idem_key is not None:
             await cache.delete(idem_key)
         logger.error(f"Partner {partner.partner_id} submit failed: {e}")

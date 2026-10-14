@@ -584,8 +584,8 @@ async def test_a_gone_history_is_re_resolved_and_the_request_retried():
 
 @pytest.mark.asyncio
 async def test_a_refused_request_is_known_not_to_have_started():
-    # Galaxy answered with an error, so it queued nothing, and the cached
-    # history wasn't the problem.
+    # Galaxy answered with a 4xx, so it queued nothing, and the cached history
+    # wasn't the problem.
     from bioblend import ConnectionError as BioblendConnectionError
 
     from app.services.galaxy_service import GalaxySubmitNotStarted
@@ -593,13 +593,40 @@ async def test_a_refused_request_is_known_not_to_have_started():
     galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
     svc = _service(galaxy)
     galaxy.gi.make_post_request = MagicMock(
-        side_effect=BioblendConnectionError("500", body="oops", status_code=500)
+        side_effect=BioblendConnectionError("400", body="bad", status_code=400)
     )
 
     with pytest.raises(GalaxySubmitNotStarted):
         await svc.submit_kmindex_query(_submission())
     assert galaxy.gi.make_post_request.call_count == 1
     assert list(galaxy_service._HISTORY_IDS.values()) == ["h"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "answer",
+    ["502", "504", "200 with a body that won't decode", "200 with no id"],
+)
+async def test_an_answer_that_doesnt_say_it_was_refused_is_ambiguous(answer):
+    # A 5xx can come from a proxy after Galaxy queued the request, and a 200
+    # means it was taken whatever the body says.
+    from bioblend import ConnectionError as BioblendConnectionError
+
+    from app.services.galaxy_service import GalaxySubmitNotStarted
+
+    galaxy = FakeGalaxy([{"id": "h", "name": SERVICE_HISTORY}])
+    svc = _service(galaxy)
+    if answer == "200 with no id":
+        galaxy.gi.make_post_request = MagicMock(return_value={"task_result": {}})
+    else:
+        code = int(answer[:3])
+        galaxy.gi.make_post_request = MagicMock(
+            side_effect=BioblendConnectionError(answer, body="", status_code=code)
+        )
+
+    with pytest.raises(Exception) as excinfo:
+        await svc.submit_kmindex_query(_submission())
+    assert not isinstance(excinfo.value, GalaxySubmitNotStarted)
 
 
 @pytest.mark.asyncio
@@ -775,12 +802,36 @@ async def test_the_query_goes_to_galaxy_as_a_hashed_url(monkeypatch, use_cached)
     }
     fastx = inputs["fastx"]
     assert fastx["src"] == "url"
-    assert base64.b64decode(fastx["url"].removeprefix("base64://")).decode() == sequence
+    sent = sequence + "\n"
+    assert base64.b64decode(fastx["url"].removeprefix("base64://")).decode() == sent
     assert fastx["hashes"] == [
         {
             "hash_function": "SHA-256",
-            "hash_value": hashlib.sha256(sequence.encode()).hexdigest(),
+            "hash_value": hashlib.sha256(sent.encode()).hexdigest(),
         }
     ]
+    # The job cache also matches on the input's name.
+    assert fastx["name"] == "query.fasta"
     assert inputs["threshold"] == submission.threshold
     assert inputs["zvalue"] == submission.zvalue
+
+
+@pytest.mark.asyncio
+async def test_pastes_that_differ_only_in_line_endings_send_the_same_bytes():
+    from app.models.galaxy import KmindexQuerySubmission
+
+    galaxy = FakeGalaxy()
+    galaxy.gi.make_post_request = MagicMock(return_value={"tool_request_id": "tr1"})
+    svc = _service(galaxy)
+    sent = []
+    for sequence, filename in [
+        (">q\nACGTACGTACGTACGTACGTACGTACGTACGT", "a.fa"),
+        (">q \r\nACGTACGTACGTACGTACGTACGTACGTACGT\r\n\r\n", "b.fasta"),
+    ]:
+        submission = KmindexQuerySubmission(
+            sequence=sequence, indexes=["GENOMIC_BCT"], filename=filename
+        )
+        await svc._request_kmindex_job(submission, "h1")
+        sent.append(galaxy.gi.make_post_request.call_args.kwargs["payload"]["inputs"])
+
+    assert sent[0]["fastx"] == sent[1]["fastx"]

@@ -1457,13 +1457,12 @@ class TestGeographyInTheAggregationWindow:
         """
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -1505,13 +1504,12 @@ class TestGeographyInTheAggregationWindow:
         # change of mirror may cost a re-aggregation.
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -3113,6 +3111,8 @@ class TestAggregationLanes:
         landed = _listing(1)
         reads = iter([None, None, None, landed])
         service.cache.get = AsyncMock(side_effect=lambda _key: next(reads, None))
+        # Not a job-cache copy; keeps that lookup out of the counted reads.
+        service._resolve_source = AsyncMock(return_value=("job1", None))
         service._aggregate_shards = AsyncMock()
 
         results = await service.get_kmindex_results("job1", lane="partner")
@@ -3798,3 +3798,31 @@ class TestExportOfACopy:
 
         assert looked_up == ["orig"]
         assert "copy1" in response.headers["content-disposition"]
+
+
+class TestCopyLinkIsRemembered:
+    @pytest.mark.asyncio
+    async def test_a_resolved_copy_needs_no_galaxy_afterwards(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "copy1": _status_of("copy1", copied_from="orig"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        assert await service.source_job_id("copy1") == "orig"
+
+        # Galaxy goes away: the export link the results page offered still
+        # finds its file under the original.
+        service.get_job_status = AsyncMock(side_effect=RuntimeError("down"))
+        assert await service.source_job_id("copy1") == "orig"
+        service.get_job_status.assert_not_awaited()
