@@ -47,7 +47,8 @@ function isEntityRoute(route: string): route is EntityRoute {
 }
 
 /**
- * Loads the entities store with entities from the API.
+ * Loads the entities store with entities from the API. Skips workflows, which
+ * `loadWorkflows` loads.
  * @param config - Site config.
  */
 export async function loadEntities(config: SiteConfig): Promise<void> {
@@ -55,6 +56,10 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
     const { getId, route } = entity;
 
     if (!isEntityRoute(route)) continue;
+
+    // Workflows are loaded by loadWorkflows: their API payload is workflow
+    // categories, not entities keyed by getId.
+    if (route === "workflows") continue;
 
     const apiRoute = API[route];
 
