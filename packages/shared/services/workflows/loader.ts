@@ -51,7 +51,8 @@ function isEntityRoute(route: string): route is EntityRoute {
 
 /**
  * Loads the entities store with entities from the API, fetching every entity
- * list at once. Each list is stored as soon as it arrives, and a failed fetch
+ * list it loads at once (see `loadEntityList` for the lists it skips). Each
+ * list is stored as soon as it arrives, and a failed fetch
  * is only reported once every fetch has settled, so the lists that loaded stay
  * loaded and a retry fetches only the rest.
  * @param config - Site config.
