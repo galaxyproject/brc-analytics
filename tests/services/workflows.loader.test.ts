@@ -66,6 +66,19 @@ describe("workflows loader", () => {
       expect(getEntitiesByType().size).toBe(0);
     });
 
+    test("skips the workflows route, which loadWorkflows owns", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockResolvedValue(mockFetchResponse());
+
+      await loadEntities({
+        entities: [{ getId, route: "workflows" }],
+      } as SiteConfig);
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(getEntitiesById().has("workflows")).toBe(false);
+      expect(getEntitiesByType().has("workflows")).toBe(false);
+    });
+
     test("skips entities when getId is not configured", async () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse());
