@@ -1,13 +1,10 @@
-import {
-  type EntityConfig,
-  type SiteConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
+import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { type EntitiesLoader } from "./hooks/UseEntities/types";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
-import type { EntityRoute } from "./types";
+import type { EntityGetId, EntityRoute } from "./types";
 
 /**
  * Creates a single-flight entities loader: concurrent and repeat calls share
@@ -51,44 +48,49 @@ function isEntityRoute(route: string): route is EntityRoute {
 
 /**
  * Loads the entities store with entities from the API, fetching every entity
- * list it loads at once (see `loadEntityList` for the lists it skips). Each
- * list is stored as soon as it arrives, and a failed fetch
- * is only reported once every fetch has settled, so the lists that loaded stay
- * loaded and a retry fetches only the rest.
+ * list at once. Skips routes not in the API, workflows (which `loadWorkflows`
+ * loads), lists already loaded, and entity configs with no getId. Each route is
+ * loaded once, by the first entity config for it that has a getId. Each list is
+ * stored as soon as it arrives, and a failed fetch is only reported once every
+ * fetch has settled, so the lists that loaded stay loaded and a retry fetches
+ * only the rest.
  * @param config - Site config.
  * @returns Promise that resolves once every entity list is loaded, or rejects
  * once every fetch has settled, with the failure of the first entity list (in
  * config order) that failed.
  */
 export async function loadEntities(config: SiteConfig): Promise<void> {
-  const results = await Promise.allSettled(config.entities.map(loadEntityList));
-  const failure = results.find(
-    (result): result is PromiseRejectedResult => result.status === "rejected"
+  const getIdByRoute = new Map<EntityRoute, EntityGetId>();
+  for (const { getId, route } of config.entities) {
+    if (!isEntityRoute(route)) continue;
+
+    // Workflows are loaded by loadWorkflows: their API payload is workflow
+    // categories, not entities keyed by getId.
+    if (route === "workflows") continue;
+
+    // Entities are already loaded; skip.
+    if (getEntitiesById().has(route)) continue;
+
+    // Get id function is not configured; entities are excluded from preloading.
+    if (!getId) continue;
+
+    // The route is loaded by the first config for it with a getId.
+    if (!getIdByRoute.has(route)) getIdByRoute.set(route, getId);
+  }
+  await settleAll(
+    [...getIdByRoute].map(([route, getId]) => loadEntityList(route, getId))
   );
-  if (failure) throw failure.reason;
 }
 
 /**
- * Loads one entity list into the entities store. Skips workflows, which
- * `loadWorkflows` loads.
- * @param entity - Entity config.
+ * Fetches one entity list and stores it, by id and as a list.
+ * @param route - Entity route.
+ * @param getId - Returns an entity's id.
  */
-async function loadEntityList(entity: EntityConfig): Promise<void> {
-  const { getId, route } = entity;
-
-  if (!isEntityRoute(route)) return;
-
-  // Workflows are loaded by loadWorkflows: their API payload is workflow
-  // categories, not entities keyed by getId.
-  if (route === "workflows") return;
-
-  // Entities are already loaded; skip.
-  if (getEntitiesById().has(route)) return;
-
-  // Get id function is not configured; entities are excluded from preloading.
-  if (!getId) return;
-
-  // Fetch the entities.
+async function loadEntityList(
+  route: EntityRoute,
+  getId: EntityGetId
+): Promise<void> {
   const entities = await fetchEntities(API[route]);
 
   const entityById = new Map<string, unknown>();
@@ -118,4 +120,22 @@ export async function loadWorkflows(
     indexWorkflowsById(workflowCategories, extraWorkflows)
   );
   setEntitiesByType("workflows", workflowCategories);
+}
+
+/**
+ * Waits for every load to settle, then rejects with the first failure (in the
+ * order given), if any. Unlike `Promise.all`, a failure is not reported while
+ * other loads are still running, so a caller that retries on failure (such as
+ * a `createEntitiesLoader` loader) never starts a download that is already in
+ * flight.
+ * @param loads - Loads.
+ * @returns Promise that resolves once every load has succeeded, or rejects once
+ * every load has settled, with the first failure.
+ */
+export async function settleAll(loads: Promise<void>[]): Promise<void> {
+  const results = await Promise.allSettled(loads);
+  const failure = results.find(
+    (result): result is PromiseRejectedResult => result.status === "rejected"
+  );
+  if (failure) throw failure.reason;
 }

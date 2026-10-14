@@ -4,6 +4,7 @@ import {
   createEntitiesLoader,
   loadEntities,
   loadWorkflows,
+  settleAll,
 } from "@repo/shared/services/workflows/loader";
 import { API } from "@repo/shared/services/workflows/routes";
 import {
@@ -46,6 +47,56 @@ describe("createEntitiesLoader", () => {
     await expect(ensureLoaded(CONFIG)).resolves.toBeUndefined();
 
     expect(load).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("settleAll", () => {
+  test("resolves once every load succeeds", async () => {
+    await expect(
+      settleAll([Promise.resolve(), Promise.resolve()])
+    ).resolves.toBeUndefined();
+  });
+
+  test("rejects with the first failure in order, only once every load has settled", async () => {
+    let slowSettled = false;
+    const slow = new Promise<void>((resolve) =>
+      setTimeout(() => {
+        slowSettled = true;
+        resolve();
+      }, 10)
+    );
+
+    await expect(
+      settleAll([
+        slow,
+        Promise.reject(new Error("first")),
+        Promise.reject(new Error("second")),
+      ])
+    ).rejects.toThrow("first");
+    expect(slowSettled).toBe(true);
+  });
+
+  test("keeps a createEntitiesLoader load shared until every load has settled", async () => {
+    let finishSlow = (): void => undefined;
+    const slowLoad = jest.fn(
+      () => new Promise<void>((resolve) => (finishSlow = resolve))
+    );
+    const ensureLoaded = createEntitiesLoader(() =>
+      settleAll([slowLoad(), Promise.reject(new Error("fast failure"))])
+    );
+    const config = {} as SiteConfig;
+
+    const first = ensureLoaded(config);
+    // Let the fast failure land, then retry while the slow load is still
+    // running: the retry joins the same load instead of starting the slow
+    // load again.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const retry = ensureLoaded(config);
+    finishSlow();
+
+    expect(retry).toBe(first);
+    await expect(first).rejects.toThrow("fast failure");
+    expect(slowLoad).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -159,6 +210,40 @@ describe("workflows loader", () => {
 
       expect(getEntitiesById().has("organisms")).toBe(true);
       expect(getEntitiesById().has("assemblies")).toBe(true);
+    });
+
+    test("fetches a route shared by two entity configs once, keyed by the first config with a getId", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockResolvedValue(mockFetchResponse([{ id: "1", name: "a" }]));
+
+      await loadEntities({
+        entities: [
+          { route: "assemblies" },
+          { getId, route: "assemblies" },
+          {
+            getId: (e: { name: string }): string => e.name,
+            route: "assemblies",
+          },
+        ],
+      } as SiteConfig);
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(getEntitiesById().get("assemblies")?.has("1")).toBe(true);
+    });
+
+    test("fetches a list again after its load failed", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock
+        .mockResolvedValueOnce(mockFetchResponse([], false))
+        .mockResolvedValueOnce(mockFetchResponse());
+
+      await expect(loadEntities(CONFIG)).rejects.toThrow(
+        `Failed to fetch: ${API.assemblies}`
+      );
+      await loadEntities(CONFIG);
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(getEntitiesById().get("assemblies")?.has("1")).toBe(true);
     });
 
     test("keeps the lists that loaded when another fetch fails", async () => {

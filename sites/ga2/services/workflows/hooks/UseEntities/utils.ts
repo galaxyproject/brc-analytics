@@ -3,6 +3,7 @@ import {
   createEntitiesLoader,
   loadEntities,
   loadWorkflows,
+  settleAll,
 } from "@repo/shared/services/workflows/loader";
 import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
 import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
@@ -14,7 +15,7 @@ import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
  */
 export const ensureEntitiesLoaded = createEntitiesLoader(
   async (config: SiteConfig): Promise<void> => {
-    await Promise.all([
+    await settleAll([
       loadWorkflows([CUSTOM_WORKFLOW, ...UNCATALOGED_WORKFLOWS]),
       loadEntities(config),
     ]);
