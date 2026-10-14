@@ -14,17 +14,17 @@ import type { HistoryItem, OpenAnalysisHandlers } from "./types";
  * rather than last activity so that opening or continuing a conversation does
  * not move it. Selecting the open one does nothing: it is already showing.
  * @param analyses - Saved conversations.
- * @param sessionId - Current assistant session id, or null before one is open.
+ * @param savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param onOpen - Opens a saved conversation in the chat.
  * @returns List items, newest first.
  */
 export function buildHistoryItems(
   analyses: SavedAnalysisSummary[],
-  sessionId: string | null,
+  savedAnalysisId: string | null,
   onOpen: (analysis: SavedAnalysisSummary) => void
 ): HistoryItem[] {
   return [...analyses].sort(compareNewestFirst).map((analysis) => {
-    const selected = isActiveAnalysis(analysis, sessionId);
+    const selected = analysis.id === savedAnalysisId;
     return {
       id: analysis.id,
       onOpen: (): void => {
@@ -66,47 +66,32 @@ export function getErrorMessage(
 }
 
 /**
- * Whether the conversation open in the chat is in the list yet.
+ * Whether a saved conversation is in the list yet.
  * @param analyses - Saved conversations.
- * @param sessionId - Current assistant session id, or null before one is open.
- * @returns True when one of the saved conversations is open in the chat.
+ * @param id - Saved conversation id.
+ * @returns True when the saved conversation is in the list.
  */
-export function hasActiveAnalysis(
+export function hasAnalysis(
   analyses: SavedAnalysisSummary[],
-  sessionId: string | null
+  id: string
 ): boolean {
-  return analyses.some((analysis) => isActiveAnalysis(analysis, sessionId));
+  return analyses.some((analysis) => analysis.id === id);
 }
 
 /**
- * Whether a saved conversation is the one open in the chat. The saved record
- * points at the live session it was last saved from.
- * @param analysis - Saved conversation.
- * @param sessionId - Current assistant session id, or null before one is open.
- * @returns True when the saved conversation is open in the chat.
- */
-export function isActiveAnalysis(
-  analysis: SavedAnalysisSummary,
-  sessionId: string | null
-): boolean {
-  return sessionId !== null && analysis.source_session === sessionId;
-}
-
-/**
- * Opens a saved conversation in the chat, in place of the one showing, and
- * mirrors the backend re-pointing its record at the live session it opened --
- * which selects it without reloading the list. Reports the open as in flight
- * until it settles, and a failure against the session that was showing. When
- * the URL already names the session opened -- one that failed to load -- the
- * navigation changes nothing, so the restore is asked to run again. An open
- * that reaches a conversation other than the one showing is reported as such.
+ * Opens a saved conversation in the chat, in place of the one showing. It is
+ * selected in the list once its restore puts it on screen. Reports the open as
+ * in flight until it settles, and a failure against the session that was
+ * showing. When the URL already names the session opened -- one that failed to
+ * load -- the navigation changes nothing, so the restore is asked to run again.
+ * An open that reaches a conversation other than the one showing is reported as
+ * such.
  * @param id - Saved conversation id.
  * @param sessionId - Session of the conversation on screen, or null while none is.
  * @param handlers - Where the open reports its progress.
  * @param handlers.onOpened - Reports that a different conversation was reached.
  * @param handlers.onOpeningChange - Reports whether the open is in flight.
  * @param handlers.onRetryRestore - Restores the conversation the URL names again.
- * @param handlers.setItems - Sets the saved conversations.
  * @param handlers.setOpenError - Sets the failed open, if any.
  */
 export async function openAnalysis(
@@ -116,7 +101,6 @@ export async function openAnalysis(
     onOpened,
     onOpeningChange,
     onRetryRestore,
-    setItems,
     setOpenError,
   }: OpenAnalysisHandlers
 ): Promise<void> {
@@ -128,7 +112,6 @@ export async function openAnalysis(
     const liveSessionId = await openSavedAnalysis(id, { replace: true });
     // A later navigation won: the page never reached this conversation.
     if (liveSessionId === null) return;
-    setItems((analyses) => repointAnalysis(analyses, id, liveSessionId));
     if (liveSessionId === requestedSessionId) onRetryRestore();
     else if (liveSessionId !== sessionId) onOpened();
   } catch {
@@ -136,24 +119,4 @@ export async function openAnalysis(
   } finally {
     onOpeningChange(false);
   }
-}
-
-/**
- * Points a saved conversation at a new live session -- what the backend does
- * to the record when the conversation is opened.
- * @param analyses - Saved conversations.
- * @param id - Saved conversation to re-point.
- * @param sourceSession - Live session the saved conversation now points at.
- * @returns Saved conversations, with that one re-pointed.
- */
-export function repointAnalysis(
-  analyses: SavedAnalysisSummary[],
-  id: string,
-  sourceSession: string
-): SavedAnalysisSummary[] {
-  return analyses.map((analysis) =>
-    analysis.id === id
-      ? { ...analysis, source_session: sourceSession }
-      : analysis
-  );
 }

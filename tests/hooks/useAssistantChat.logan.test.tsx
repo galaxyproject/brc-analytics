@@ -76,6 +76,8 @@ const SESSION = {
     total_matches: 17629,
   },
   messages: [{ content: "This Logan search ...", role: "assistant" as const }],
+  saved: false,
+  saved_analysis_id: null,
   schema_state: {
     analysis_type: { detail: null, status: "empty" as const, value: null },
     assembly: { detail: null, status: "empty" as const, value: null },

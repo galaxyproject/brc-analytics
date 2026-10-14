@@ -9,6 +9,7 @@ export interface SidebarProps {
   onOpened: () => void;
   onOpeningChange: (isOpening: boolean) => void;
   onRetryRestore: () => void;
+  savedAnalysisId: string | null;
   sessionId: string | null;
   supportUrl?: string;
 }

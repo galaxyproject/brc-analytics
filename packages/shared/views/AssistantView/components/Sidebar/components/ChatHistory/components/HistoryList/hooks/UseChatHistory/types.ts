@@ -1,4 +1,3 @@
-import type { SavedAnalysisSummary } from "@repo/shared/services/api-client/types";
 import type { Dispatch, SetStateAction } from "react";
 
 /**
@@ -18,7 +17,6 @@ export interface OpenAnalysisHandlers {
   onOpened: () => void;
   onOpeningChange: (isOpening: boolean) => void;
   onRetryRestore: () => void;
-  setItems: Dispatch<SetStateAction<SavedAnalysisSummary[]>>;
   setOpenError: Dispatch<SetStateAction<OpenError | null>>;
 }
 

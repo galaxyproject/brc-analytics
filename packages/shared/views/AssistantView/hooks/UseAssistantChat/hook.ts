@@ -22,6 +22,7 @@ import type {
   UseAssistantChatOptions,
   UseAssistantChatReturn,
 } from "./types";
+import { keepSavedAnalysisId } from "./utils";
 
 // A save that failed for one of these will fail the same way next time: the
 // deployment cannot save at all, there is nothing to save, the session is not
@@ -59,7 +60,7 @@ function isRetryableSaveFailure(error: unknown): boolean {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, the session on screen and last save, sendMessage, and reset/retry functions.
+ * @returns Chat state, the session and saved analysis on screen, the last save, sendMessage, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -108,6 +109,10 @@ export const useAssistantChat = ({
     },
     [sessionKey]
   );
+  // The saved analysis the conversation on screen belongs to, once one exists.
+  // Unlike the session id it never changes, so it is what tells a list of
+  // saved conversations which one is open.
+  const [savedAnalysisId, setSavedAnalysisId] = useState<string | null>(null);
   // Set each time the server confirms a conversation was written -- naming
   // which, since a reply can land for one no longer on screen -- so a
   // saved-conversation list can refresh without guessing.
@@ -143,6 +148,7 @@ export const useAssistantChat = ({
     conversationRef.current += 1;
     shownSessionRef.current = null;
     setShownSessionId(null);
+    setSavedAnalysisId(null);
     sendingRef.current = false;
     setMessages([]);
     setSchema(null);
@@ -207,6 +213,7 @@ export const useAssistantChat = ({
       .then((restored) => {
         if (isStale()) return;
         showSession(restored.session_id);
+        setSavedAnalysisId(restored.saved_analysis_id);
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
@@ -288,6 +295,7 @@ export const useAssistantChat = ({
         sessionIdRef.current = created.session_id;
         loganOpenedRef.current = true;
         localStorage.setItem(sessionKey, created.session_id);
+        setSavedAnalysisId(created.saved_analysis_id);
         setMessages(created.messages);
         setSchema(created.schema_state);
         setSuggestions(created.suggestions);
@@ -336,9 +344,16 @@ export const useAssistantChat = ({
     let cancelled = false;
     assistantAPIClient
       .assistantSaveSession(currentSessionId)
-      .then(() => {
+      .then(({ saved_analysis_id }) => {
         // On disk whether or not this run is still current.
-        setLastSave({ sessionId: currentSessionId });
+        setLastSave({ savedAnalysisId: saved_analysis_id });
+        // Checked against the session, not this run: a turn starting cancels
+        // the run, but the session is still the one just written, and a turn
+        // that fails would never say so. A conversation that replaced it has
+        // moved the session on.
+        if (sessionIdRef.current === currentSessionId) {
+          setSavedAnalysisId(saved_analysis_id);
+        }
         if (!cancelled) setIsSaved(true);
       })
       .catch((error: unknown) => {
@@ -414,12 +429,24 @@ export const useAssistantChat = ({
             session_id: sessionIdRef.current ?? undefined,
           });
         // On disk even if the conversation has since been replaced on screen.
-        if (response.saved) setLastSave({ sessionId: response.session_id });
+        if (response.saved && response.saved_analysis_id) {
+          setLastSave({ savedAnalysisId: response.saved_analysis_id });
+        }
         // The reply belongs to a conversation since replaced on screen, and
         // adopting its session would send later turns there.
         if (!isCurrent()) return;
 
+        // A turn that raced a save and failed its own reports no analysis,
+        // which for the same session is no news. See keepSavedAnalysisId.
+        const isSameSession = sessionIdRef.current === response.session_id;
         showSession(response.session_id);
+        setSavedAnalysisId((current) =>
+          keepSavedAnalysisId(
+            current,
+            response.saved_analysis_id,
+            isSameSession
+          )
+        );
 
         // Add assistant reply
         setMessages((prev) => [
@@ -530,6 +557,7 @@ export const useAssistantChat = ({
     onRetry,
     resetSession,
     retryRestore,
+    savedAnalysisId,
     schema,
     sendMessage,
     shownSessionId,

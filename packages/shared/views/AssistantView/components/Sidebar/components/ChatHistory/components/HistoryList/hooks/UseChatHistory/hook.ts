@@ -7,7 +7,7 @@ import type { OpenError, UseChatHistory } from "./types";
 import {
   buildHistoryItems,
   getErrorMessage,
-  hasActiveAnalysis,
+  hasAnalysis,
   openAnalysis,
 } from "./utils";
 
@@ -18,10 +18,11 @@ import {
  * which includes while another conversation is opening.
  * @param props - Hook props.
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
- * @param props.lastSave - Most recent confirmed save, naming the session saved.
+ * @param props.lastSave - Most recent confirmed save, naming the saved analysis written.
  * @param props.onOpened - Reports that the history opened a different conversation.
  * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
  * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
+ * @param props.savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns Chat history state and list items.
  */
@@ -31,6 +32,7 @@ export const useChatHistory = ({
   onOpened,
   onOpeningChange,
   onRetryRestore,
+  savedAnalysisId,
   sessionId,
 }: ChatHistoryProps): UseChatHistory => {
   const {
@@ -38,7 +40,6 @@ export const useChatHistory = ({
     isLoading,
     items,
     reload,
-    setItems,
     // An arrow property on a module-level object, so its identity is stable
     // and useUserResource doesn't refetch on every render.
   } = useUserResource<SavedAnalysisSummary>(apiClient.getSavedAnalyses);
@@ -55,9 +56,10 @@ export const useChatHistory = ({
     if (lastSave === null) return;
     // Only a conversation's first save adds a row. Later saves change nothing
     // the list shows -- the title is fixed when the row is created, and the list
-    // is ordered by when each conversation started. Checked against the session
-    // saved, not the one showing: a save can land after the user has moved on.
-    if (hasActiveAnalysis(items, lastSave.sessionId)) return;
+    // is ordered by when each conversation started. Checked against the
+    // analysis saved, not the one showing: a save can land after the user has
+    // moved on.
+    if (hasAnalysis(items, lastSave.savedAnalysisId)) return;
     void reload();
   }, [items, lastSave, reload]);
 
@@ -72,16 +74,15 @@ export const useChatHistory = ({
         onOpened,
         onOpeningChange,
         onRetryRestore,
-        setItems,
         setOpenError,
       });
     },
-    [disabled, onOpened, onOpeningChange, onRetryRestore, sessionId, setItems]
+    [disabled, onOpened, onOpeningChange, onRetryRestore, sessionId]
   );
 
   const historyItems = useMemo(
-    () => buildHistoryItems(items, sessionId, onOpen),
-    [items, onOpen, sessionId]
+    () => buildHistoryItems(items, savedAnalysisId, onOpen),
+    [items, onOpen, savedAnalysisId]
   );
 
   return {
