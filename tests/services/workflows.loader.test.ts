@@ -15,6 +15,13 @@ const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
 
+const TWO_ROUTE_CONFIG = {
+  entities: [
+    { getId, route: "organisms" },
+    { getId, route: "assemblies" },
+  ],
+} as SiteConfig;
+
 describe("createEntitiesLoader", () => {
   const CONFIG = {} as SiteConfig;
 
@@ -134,6 +141,41 @@ describe("workflows loader", () => {
       await expect(loadEntities(CONFIG)).rejects.toThrow(
         `Failed to fetch: ${API.assemblies}`
       );
+    });
+
+    test("fetches every entity list at once", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockResolvedValue(mockFetchResponse());
+
+      const loading = loadEntities(TWO_ROUTE_CONFIG);
+
+      // Both fetches start before either resolves: a sequential load would
+      // start the second only after awaiting the first.
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenCalledWith(API.organisms);
+      expect(fetchMock).toHaveBeenCalledWith(API.assemblies);
+
+      await loading;
+
+      expect(getEntitiesById().has("organisms")).toBe(true);
+      expect(getEntitiesById().has("assemblies")).toBe(true);
+    });
+
+    test("keeps the lists that loaded when another fetch fails", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockImplementation(async (url: string) => {
+        if (url === API.assemblies) return mockFetchResponse([], false);
+        // Organisms arrives after assemblies has already failed.
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return mockFetchResponse([{ id: "1" }]);
+      });
+
+      await expect(loadEntities(TWO_ROUTE_CONFIG)).rejects.toThrow(
+        `Failed to fetch: ${API.assemblies}`
+      );
+
+      expect(getEntitiesById().get("organisms")?.has("1")).toBe(true);
+      expect(getEntitiesById().has("assemblies")).toBe(false);
     });
   });
 

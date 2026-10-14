@@ -1,4 +1,7 @@
-import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import {
+  type EntityConfig,
+  type SiteConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { type EntitiesLoader } from "./hooks/UseEntities/types";
@@ -47,37 +50,50 @@ function isEntityRoute(route: string): route is EntityRoute {
 }
 
 /**
- * Loads the entities store with entities from the API. Skips workflows, which
- * `loadWorkflows` loads.
+ * Loads the entities store with entities from the API, fetching every entity
+ * list at once. Each list is stored as soon as it arrives, and a failed fetch
+ * is only reported once every fetch has settled, so the lists that loaded stay
+ * loaded and a retry fetches only the rest.
  * @param config - Site config.
+ * @returns Promise that resolves once every entity list is loaded, or rejects
+ * with the first failed fetch once every fetch has settled.
  */
 export async function loadEntities(config: SiteConfig): Promise<void> {
-  for (const entity of config.entities) {
-    const { getId, route } = entity;
+  const results = await Promise.allSettled(config.entities.map(loadEntityList));
+  const failure = results.find(
+    (result): result is PromiseRejectedResult => result.status === "rejected"
+  );
+  if (failure) throw failure.reason;
+}
 
-    if (!isEntityRoute(route)) continue;
+/**
+ * Loads one entity list into the entities store. Skips workflows, which
+ * `loadWorkflows` loads.
+ * @param entity - Entity config.
+ */
+async function loadEntityList(entity: EntityConfig): Promise<void> {
+  const { getId, route } = entity;
 
-    // Workflows are loaded by loadWorkflows: their API payload is workflow
-    // categories, not entities keyed by getId.
-    if (route === "workflows") continue;
+  if (!isEntityRoute(route)) return;
 
-    const apiRoute = API[route];
+  // Workflows are loaded by loadWorkflows: their API payload is workflow
+  // categories, not entities keyed by getId.
+  if (route === "workflows") return;
 
-    // Entities are already loaded; skip.
-    if (getEntitiesById().has(route)) continue;
+  // Entities are already loaded; skip.
+  if (getEntitiesById().has(route)) return;
 
-    // Get id function is not configured; entities are excluded from preloading.
-    if (!getId) continue;
+  // Get id function is not configured; entities are excluded from preloading.
+  if (!getId) return;
 
-    // Fetch the entities.
-    const entities = await fetchEntities(apiRoute);
+  // Fetch the entities.
+  const entities = await fetchEntities(API[route]);
 
-    const entityById = new Map<string, unknown>();
-    for (const entity of entities) entityById.set(getId(entity), entity);
+  const entityById = new Map<string, unknown>();
+  for (const entity of entities) entityById.set(getId(entity), entity);
 
-    setEntitiesById(route, entityById);
-    setEntitiesByType(route, entities);
-  }
+  setEntitiesById(route, entityById);
+  setEntitiesByType(route, entities);
 }
 
 /**
