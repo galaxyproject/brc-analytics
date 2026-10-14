@@ -24,7 +24,7 @@ export const Filters = <T extends RowData>({
 }: Props<T>): JSX.Element => {
   const { mdDown } = useBreakpoint();
   return (
-    <Sidebar>
+    <Sidebar label="Filters">
       <ColumnFiltersAdapter
         renderSurface={(props: SurfaceProps) => (
           <>
