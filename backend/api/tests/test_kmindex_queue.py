@@ -51,10 +51,14 @@ def _job(job_id, state, created_ago, updated_ago=None):
     }
 
 
-def _started(minutes_after_submit, job):
+def _started(minutes_after_submit, job, ran_for=None):
     created = datetime.fromisoformat(job["create_time"]).replace(tzinfo=timezone.utc)
     start = created + timedelta(minutes=minutes_after_submit)
-    return [{"name": "start_epoch", "raw_value": str(start.timestamp())}]
+    metrics = [{"name": "start_epoch", "raw_value": str(start.timestamp())}]
+    if ran_for is not None:
+        end = start + timedelta(minutes=ran_for)
+        metrics.append({"name": "end_epoch", "raw_value": str(end.timestamp())})
+    return metrics
 
 
 @pytest.fixture()
@@ -73,8 +77,8 @@ def _galaxy_with(svc, jobs, waits):
     """waits: job id -> minutes from submit to start (negative for a copy)."""
     by_id = {j["id"]: j for j in jobs}
 
-    def _listing(state, **_):
-        return [j for j in jobs if j["state"] in state]
+    def _listing(state=None, **_):
+        return [j for j in jobs if state is None or j["state"] in state]
 
     svc.gi.jobs.get_jobs = MagicMock(side_effect=_listing)
     svc.gi.jobs.get_metrics = MagicMock(
@@ -302,3 +306,109 @@ def test_a_failed_read_is_a_502_not_a_500(app_client):  # noqa: F811
 
     assert response.status_code == 502
     assert "galaxy down" not in response.text
+
+
+class TestHistory:
+    """The last day of searches, for the unlisted stats page."""
+
+    JOBS = [
+        _job("a", "ok", created_ago=600, updated_ago=500),
+        _job("copy", "ok", created_ago=300, updated_ago=300),
+        _job("run", "running", created_ago=40, updated_ago=10),
+        _job("wait", "queued", created_ago=20),
+        # Submitted before the window, finished inside it: not this day's.
+        _job("old", "ok", created_ago=1500, updated_ago=60),
+    ]
+
+    @pytest.fixture(autouse=True)
+    def _galaxy(self, service):
+        by_id = {j["id"]: j for j in self.JOBS}
+        timing = {"a": (90, 2), "copy": (-120, None), "old": (5, 1)}
+        service.gi.jobs.get_jobs = MagicMock(return_value=self.JOBS)
+        service.gi.jobs.get_metrics = MagicMock(
+            side_effect=lambda job_id: _started(
+                *timing[job_id][:1], by_id[job_id], ran_for=timing[job_id][1]
+            )
+        )
+
+    @pytest.mark.asyncio
+    async def test_each_search_in_the_window_gets_a_row(self, service):
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 4
+        rows = {r.state + ("+copy" if r.cached else ""): r for r in history.rows}
+        assert rows["ok"].wait_minutes == 90.0
+        assert rows["ok"].run_minutes == 2.0
+        # A cache hit never queued, so it has no wait to report.
+        assert rows["ok+copy"].wait_minutes is None
+        # A running job's start is when Galaxy last touched it.
+        assert rows["running"].wait_minutes == 30.0
+        assert rows["queued"].still_waiting
+        assert 19.5 <= rows["queued"].wait_minutes <= 20.5
+        assert [r.submitted for r in history.rows] == sorted(
+            r.submitted for r in history.rows
+        )
+
+    @pytest.mark.asyncio
+    async def test_the_summary_leaves_out_cache_hits_and_searches_still_waiting(
+        self, service
+    ):
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.cache_hits == 1
+        # The finished job's 90 min and the running job's 30 min.
+        assert history.wait_max_minutes == 90.0
+        assert history.wait_p50_minutes == 30.0
+        assert history.run_p50_minutes == 2.0
+        assert not history.truncated
+
+    @pytest.mark.asyncio
+    async def test_carries_no_job_ids(self, service):
+        history = await service.get_kmindex_queue_history(24)
+
+        dumped = json.dumps(history.model_dump())
+        for job in self.JOBS:
+            assert f'"{job["id"]}"' not in dumped
+
+    @pytest.mark.asyncio
+    async def test_is_cached_and_reuses_each_jobs_timing(self, service):
+        await service.get_kmindex_queue_history(24)
+        await service.get_kmindex_queue_history(24)
+        assert service.gi.jobs.get_jobs.call_count == 1
+
+        for key in [k for k in service.cache.store if "history" in k]:
+            del service.cache.store[key]
+        await service.get_kmindex_queue_history(24)
+
+        assert service.gi.jobs.get_jobs.call_count == 2
+        # "a" and "copy"; "old" is outside the window.
+        assert service.gi.jobs.get_metrics.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_hours_are_clamped(self, service):
+        history = await service.get_kmindex_queue_history(10_000)
+
+        assert history.hours == galaxy_service.KMINDEX_HISTORY_MAX_HOURS
+
+
+def test_the_history_route_bounds_hours(app_client):  # noqa: F811
+    app, client = app_client
+    stub = MagicMock()
+    stub.is_available.return_value = True
+    stub.get_kmindex_queue_history = AsyncMock(
+        return_value=galaxy_service.KmindexQueueHistory(
+            as_of=NOW.isoformat(),
+            cache_hits=0,
+            hours=24,
+            rows=[],
+            searches=0,
+            truncated=False,
+        )
+    )
+    app.dependency_overrides[get_queue_galaxy_service] = lambda: stub
+
+    assert client.get("/api/v1/galaxy/kmindex/queue/history").status_code == 200
+    stub.get_kmindex_queue_history.assert_awaited_with(24)
+    assert (
+        client.get("/api/v1/galaxy/kmindex/queue/history?hours=500").status_code == 422
+    )

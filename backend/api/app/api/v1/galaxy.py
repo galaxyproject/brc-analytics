@@ -29,6 +29,7 @@ from app.models.galaxy import (
     GalaxyJobSubmission,
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueHistory,
     KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
@@ -340,6 +341,24 @@ async def kmindex_queue(
         logger.error(f"Failed to read the kmindex queue: {e}")
         raise HTTPException(
             status_code=502, detail="Failed to read the search queue"
+        ) from e
+
+
+@router.get("/kmindex/queue/history", response_model=KmindexQueueHistory)
+async def kmindex_queue_history(
+    hours: int = Query(24, ge=1, le=72),
+    galaxy_service: GalaxyService = Depends(get_queue_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """Every Logan search submitted in the last `hours`, and how long each waited."""
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        return await galaxy_service.get_kmindex_queue_history(hours)
+    except Exception as e:
+        logger.error(f"Failed to read the kmindex queue history: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue history"
         ) from e
 
 

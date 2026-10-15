@@ -540,6 +540,40 @@ class KmindexQueueStatus(BaseModel):
     as_of: str = Field(..., description="When Galaxy was read, UTC ISO 8601")
 
 
+class KmindexQueueHistoryRow(BaseModel):
+    """One search, as far as timing goes. Deliberately no job id or query."""
+
+    submitted: str = Field(..., description="UTC ISO 8601")
+    state: str
+    cached: bool = Field(
+        ..., description="Answered from Galaxy's job cache; never queued"
+    )
+    still_waiting: bool = Field(
+        ..., description="Not started yet; wait_minutes is the wait so far"
+    )
+    wait_minutes: Optional[float] = None
+    run_minutes: Optional[float] = None
+
+
+class KmindexQueueHistory(BaseModel):
+    """Searches submitted over the last `hours`, for the unlisted stats page."""
+
+    as_of: str
+    hours: int
+    searches: int
+    cache_hits: int
+    wait_p50_minutes: Optional[float] = Field(
+        None, description="Over searches that started, excluding cache hits"
+    )
+    wait_p90_minutes: Optional[float] = None
+    wait_max_minutes: Optional[float] = None
+    run_p50_minutes: Optional[float] = None
+    truncated: bool = Field(
+        ..., description="Galaxy's listing hit its limit, so older rows are missing"
+    )
+    rows: List[KmindexQueueHistoryRow]
+
+
 class GalaxyJobResponse(BaseModel):
     """Response model for job submission."""
 
