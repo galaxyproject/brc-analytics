@@ -1,5 +1,6 @@
 import { InfoOutlined, Search, UploadFile } from "@mui/icons-material";
 import {
+  Alert,
   Button,
   Card,
   CardContent,
@@ -31,12 +32,14 @@ import {
   queryNameOf,
   type RecentSearch,
 } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import { busyNotice } from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
 import {
   describeIndexSet,
   parseQuery,
   selectIndexes,
   sortIndexes,
 } from "@repo/shared/components/LoganSearch/utils";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { type ChangeEvent, type JSX, useMemo, useState } from "react";
 
@@ -90,6 +93,9 @@ export const LoganSearchForm = ({
   onSubmitted,
   search,
 }: LoganSearchFormProps): JSX.Element => {
+  // Warn before submitting, not after: a search that then sits in Vista's
+  // queue for an hour reads as broken unless the reader saw it coming.
+  const busy = busyNotice(useKmindexQueue(true));
   const [sequence, setSequence] = useState(initial?.sequence ?? SAMPLE_QUERY);
   // Index names. null means "not touched": the default is derived from the
   // loaded list rather than seeded, because the list arrives asynchronously
@@ -372,6 +378,11 @@ export const LoganSearchForm = ({
                   Reset
                 </Button>
               </ControlRow>
+              {busy && (
+                <Alert severity="info" sx={{ py: 0 }}>
+                  {busy}
+                </Alert>
+              )}
             </ActionBar>
             {options.length > 0 && (
               <Typography

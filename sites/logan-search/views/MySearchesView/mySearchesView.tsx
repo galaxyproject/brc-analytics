@@ -5,6 +5,7 @@ import {
   SearchContainer,
 } from "@logan/views/LoganSearchSiteView/loganSearchSiteView.styles";
 import {
+  Alert,
   Button,
   Card,
   CardContent,
@@ -16,8 +17,13 @@ import {
 import { describeSearchScope } from "@repo/shared/components/LoganSearch/LoganQueryStrip/loganQueryStrip";
 import { type RecentSearch } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
 import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
+import {
+  describeQueue,
+  formatWait,
+} from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
 import { sortIndexes } from "@repo/shared/components/LoganSearch/utils";
 import { API_BASE_URL } from "@repo/shared/config/api";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import ky from "ky";
 import { type JSX, useEffect, useState } from "react";
 import {
@@ -37,6 +43,7 @@ const STATUS_CHIPS: Record<
   done: { color: "success", label: "Done" },
   expired: { color: "default", label: "Expired" },
   failed: { color: "error", label: "Failed" },
+  queued: { color: "warning", label: "Queued" },
   running: { color: "primary", label: "Running" },
   unknown: { color: "default", label: "Unknown" },
 };
@@ -64,6 +71,17 @@ function useRegisteredIndexes(): string[] {
     };
   }, []);
   return indexes;
+}
+
+/**
+ * How long a search has been waiting since this browser submitted it.
+ * @param submittedAt - ISO 8601 timestamp.
+ * @returns E.g. "waiting 1 h 12 min", or null if the time doesn't parse.
+ */
+function waitingFor(submittedAt: string): string | null {
+  const since = new Date(submittedAt).getTime();
+  if (Number.isNaN(since)) return null;
+  return `waiting ${formatWait(Math.max(0, Date.now() - since) / 60000)}`;
 }
 
 /**
@@ -103,6 +121,7 @@ const SearchItem = ({
   const chip = STATUS_CHIPS[status];
   const label = entry.queryName ?? `Job ${entry.jobId}`;
   const expired = status === "expired";
+  const waiting = status === "queued" ? waitingFor(entry.submittedAt) : null;
   return (
     <SearchRow>
       <Chip
@@ -129,6 +148,7 @@ const SearchItem = ({
         <Typography color="textSecondary" component="div" variant="caption">
           {describeSearchScope(registered, entry.indexes)} · threshold{" "}
           {entry.threshold.toFixed(2)} · {formatSubmitted(entry.submittedAt)}
+          {waiting && ` · ${waiting}`}
           {expired && entry.sequence && (
             <>
               {" · "}
@@ -162,6 +182,11 @@ export const MySearchesView = (): JSX.Element => {
   const { clear, searches } = useRecentSearches();
   const registered = useRegisteredIndexes();
   const statuses = useSearchStatuses(searches.map(({ jobId }) => jobId));
+  const anyQueued = Object.values(statuses).includes("queued");
+  // Only while one of these is waiting: the backlog is the answer to "is mine
+  // dead?", and noise otherwise.
+  const queue = useKmindexQueue(anyQueued);
+  const queueNote = anyQueued ? describeQueue(queue) : null;
 
   return (
     <>
@@ -204,6 +229,13 @@ export const MySearchesView = (): JSX.Element => {
                       Clear all
                     </Button>
                   </ListHeader>
+                  {anyQueued && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      {queueNote && `${queueNote} `}A queued search hasn&apos;t
+                      failed. It&apos;s waiting its turn, and its results will
+                      be here when it finishes.
+                    </Alert>
+                  )}
                   <SearchList>
                     {searches.map((entry) => (
                       <SearchItem
