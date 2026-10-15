@@ -7,6 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { ControlRow } from "@repo/shared/components/LoganSearch/loganSearch.styles";
+import { describeQueue } from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { type JSX } from "react";
@@ -27,6 +29,9 @@ const STATE_COLORS: Record<
 };
 
 // Galaxy's own vocabulary is terse; these read better next to a spinner.
+// States where the job is waiting its turn rather than running.
+const WAITING_STATES = new Set(["new", "queued"]);
+
 const STATE_LABELS: Record<string, string> = {
   new: "Submitted",
   ok: "Complete",
@@ -52,6 +57,13 @@ export const LoganSearchStatus = ({
   // it isn't an error -- but the job landed in the shared account rather than
   // theirs, and they'd otherwise never know.
   const ranAsSharedAccount = isAuthenticated && identity === "service";
+  const isWaiting =
+    Boolean(jobId) &&
+    !error &&
+    !results &&
+    WAITING_STATES.has(jobStatus?.state ?? "new");
+  const queue = useKmindexQueue(isWaiting);
+  const queueLines = queue && isWaiting ? describeQueue(queue) : [];
 
   if (error) {
     return (
@@ -94,6 +106,14 @@ export const LoganSearchStatus = ({
               <Alert severity="warning" sx={{ mt: 2 }}>
                 {pollWarning}
               </Alert>
+            )}
+            {isWaiting && (
+              <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
+                {queueLines.map((line) => `${line} `)}
+                Vista is shared with other TACC users, so waits vary from
+                minutes to hours. A long wait isn&apos;t an error; this page
+                keeps checking.
+              </Typography>
             )}
             {isLoadingResults && (
               <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
