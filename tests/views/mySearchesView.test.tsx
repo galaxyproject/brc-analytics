@@ -63,10 +63,23 @@ function entry(
 function galaxy(url: string): { json: () => Promise<unknown> } {
   const answer = (): unknown => {
     if (url.includes("/kmindex/indexes")) return { indexes: ["GENOMIC_INV"] };
+    if (url.includes("/kmindex/queue"))
+      return {
+        as_of: "2026-10-15T14:18:07+00:00",
+        oldest_waiting_minutes: 140.3,
+        recent_searches: 0,
+        recent_wait_minutes: null,
+        recent_wait_p90_minutes: null,
+        running: 1,
+        waiting: 4,
+        window_minutes: 120,
+      };
+    if (url.includes("/waiting/"))
+      return { is_complete: false, is_successful: false, state: "queued" };
     if (url.includes("/done/"))
       return { is_complete: true, is_successful: true };
     if (url.includes("/running/"))
-      return { is_complete: false, is_successful: false };
+      return { is_complete: false, is_successful: false, state: "running" };
     if (url.includes("/broke/"))
       return { is_complete: true, is_successful: false };
     throw new HTTPError(404);
@@ -130,6 +143,45 @@ describe("MySearchesView", () => {
     expect(
       within(row("gone")).getByRole("link", { name: "Run it again" })
     ).toHaveAttribute("href", "/?edit=gone");
+  });
+
+  test("tells a queued search apart, with its wait and the backlog", async () => {
+    const submitted = new Date(Date.now() - 72 * 60000).toISOString();
+    window.localStorage.setItem(
+      RECENT_SEARCHES_KEY,
+      JSON.stringify([
+        entry("waiting", { submittedAt: submitted }),
+        entry("running"),
+      ])
+    );
+
+    renderPage();
+
+    const row = (jobId: string): HTMLElement =>
+      screen.getByText(`query_${jobId}`).closest("li") as HTMLElement;
+    expect(await within(row("waiting")).findByText("Queued")).toBeTruthy();
+    expect(within(row("waiting")).getByText(/waiting 1 h 12 min/)).toBeTruthy();
+    expect(await within(row("running")).findByText("Running")).toBeTruthy();
+    expect(within(row("running")).queryByText(/waiting/)).toBeNull();
+    expect(
+      await screen.findByText(/Demand is quite high right now/)
+    ).toBeTruthy();
+    expect(screen.getByText(/A queued search hasn.t failed/)).toBeTruthy();
+  });
+
+  test("says nothing about the queue when nothing is waiting", async () => {
+    window.localStorage.setItem(
+      RECENT_SEARCHES_KEY,
+      JSON.stringify([entry("done")])
+    );
+
+    renderPage();
+
+    expect(await screen.findByText("Done")).toBeTruthy();
+    expect(screen.queryByText(/queued search/)).toBeNull();
+    expect(
+      mockKy.get.mock.calls.some(([url]) => String(url).includes("/queue"))
+    ).toBe(false);
   });
 
   test("says how to start when there is nothing stored", () => {

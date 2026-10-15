@@ -1,5 +1,8 @@
 import { type KmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 
+// Past this, a new search is likely to sit in line for a while too.
+export const QUEUE_BUSY_MINUTES = 10;
+
 /**
  * A wait in minutes, the way a person would say it.
  * @param minutes - Minutes, possibly fractional.
@@ -15,28 +18,40 @@ export function formatWait(minutes: number): string {
 }
 
 /**
- * Sentences about the queue, for a reader whose search hasn't started.
+ * How long searches have been waiting to start lately, when that's long
+ * enough to mention.
  *
- * Each figure is left out when there's nothing behind it, rather than shown
- * as zero: no finished searches in the window says nothing about the wait.
- * @param queue - The snapshot.
- * @returns The sentences, possibly none.
+ * The larger of the oldest search still in line and the recent typical wait:
+ * the recent figure only counts searches once they finish, so on its own it
+ * lags a backlog that is building right now.
+ * @param queue - The snapshot, or null before it lands.
+ * @returns Minutes, or null when the queue is moving.
  */
-export function describeQueue(queue: KmindexQueue): string[] {
-  const lines: string[] = [];
-  if (queue.waiting > 0) {
-    const searches = queue.waiting === 1 ? "search is" : "searches are";
-    let line = `${queue.waiting} ${searches} waiting for a node on TACC's Vista cluster`;
-    if (queue.oldest_waiting_minutes !== null && queue.waiting > 1)
-      line += `; the longest has waited ${formatWait(queue.oldest_waiting_minutes)}`;
-    lines.push(`${line}.`);
-  }
-  if (queue.recent_searches > 0 && queue.recent_wait_minutes !== null) {
-    const hours = Math.round(queue.window_minutes / 60);
-    const span = hours === 1 ? "hour" : `${hours} hours`;
-    lines.push(
-      `Searches that finished in the last ${span} waited about ${formatWait(queue.recent_wait_minutes)} to start.`
-    );
-  }
-  return lines;
+export function busyWait(queue: KmindexQueue | null): number | null {
+  if (!queue) return null;
+  const recent = queue.recent_searches > 0 ? queue.recent_wait_minutes : null;
+  const wait = Math.max(queue.oldest_waiting_minutes ?? 0, recent ?? 0);
+  return wait >= QUEUE_BUSY_MINUTES ? wait : null;
+}
+
+/**
+ * A heads-up for someone about to submit, when demand is high.
+ * @param queue - The snapshot, or null before it lands.
+ * @returns The sentence, or null when the queue is moving.
+ */
+export function busyNotice(queue: KmindexQueue | null): string | null {
+  const wait = busyWait(queue);
+  if (wait === null) return null;
+  return `Heads up, demand is quite high right now. Recent searches have waited about ${formatWait(wait)} to start.`;
+}
+
+/**
+ * What to tell someone whose search is in line, when demand is high.
+ * @param queue - The snapshot, or null before it lands.
+ * @returns The sentence, or null when the queue is moving.
+ */
+export function describeQueue(queue: KmindexQueue | null): string | null {
+  const wait = busyWait(queue);
+  if (wait === null) return null;
+  return `Demand is quite high right now; recent searches have waited about ${formatWait(wait)} to start.`;
 }

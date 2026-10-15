@@ -9,6 +9,7 @@ export type SearchStatus =
   | "done"
   | "expired"
   | "failed"
+  | "queued"
   | "running"
   | "unknown";
 
@@ -29,8 +30,13 @@ async function checkJob(jobId: string): Promise<SearchStatus> {
         retry: 0,
         timeout: 30000,
       })
-      .json<{ is_complete: boolean; is_successful: boolean }>();
-    if (!status.is_complete) return "running";
+      .json<{ is_complete: boolean; is_successful: boolean; state?: string }>();
+    // Waiting for a Vista node and searching are different stories to the
+    // reader: one can take hours on a busy day, the other a few minutes.
+    if (!status.is_complete)
+      return status.state === "new" || status.state === "queued"
+        ? "queued"
+        : "running";
     return status.is_successful ? "done" : "failed";
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404)

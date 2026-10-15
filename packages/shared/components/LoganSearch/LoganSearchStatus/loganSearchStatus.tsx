@@ -35,7 +35,7 @@ const WAITING_STATES = new Set(["new", "queued"]);
 const STATE_LABELS: Record<string, string> = {
   new: "Submitted",
   ok: "Complete",
-  queued: "Queued on Vista",
+  queued: "Queued",
   running: "Searching the index",
 };
 
@@ -63,7 +63,7 @@ export const LoganSearchStatus = ({
     !results &&
     WAITING_STATES.has(jobStatus?.state ?? "new");
   const queue = useKmindexQueue(isWaiting);
-  const queueLines = queue && isWaiting ? describeQueue(queue) : [];
+  const queueNote = isWaiting ? describeQueue(queue) : null;
 
   if (error) {
     return (
@@ -109,10 +109,9 @@ export const LoganSearchStatus = ({
             )}
             {isWaiting && (
               <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
-                {queueLines.map((line) => `${line} `)}
-                Vista is shared with other TACC users, so waits vary from
-                minutes to hours. A long wait isn&apos;t an error; this page
-                keeps checking.
+                {queueNote && `${queueNote} `}
+                Waits can range from minutes to hours. A long wait isn&apos;t an
+                error; this page keeps checking.
               </Typography>
             )}
             {isLoadingResults && (

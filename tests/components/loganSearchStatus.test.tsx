@@ -1,6 +1,7 @@
 import { LoganSearchForm } from "@repo/shared/components/LoganSearch/LoganSearchForm/loganSearchForm";
 import { LoganSearchStatus } from "@repo/shared/components/LoganSearch/LoganSearchStatus/loganSearchStatus";
 import {
+  busyNotice,
   describeQueue,
   formatWait,
 } from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
@@ -73,25 +74,35 @@ describe("formatWait", () => {
 });
 
 describe("describeQueue", () => {
-  test("names the backlog and the recent wait", () => {
-    expect(describeQueue(BACKED_UP)).toEqual([
-      "5 searches are waiting for a node on TACC's Vista cluster; the longest has waited 2 h 20 min.",
-      "Searches that finished in the last 2 hours waited about 12 min to start.",
-    ]);
+  test("says how long recent searches waited when demand is high", () => {
+    expect(describeQueue(BACKED_UP)).toBe(
+      "Demand is quite high right now; recent searches have waited about 2 h 20 min to start."
+    );
   });
 
-  test("leaves out what there's nothing behind", () => {
-    // Nothing finished in the window says nothing about the wait, so it
-    // isn't shown as zero.
+  test("goes by the longer of the backlog and the recent wait", () => {
+    // Recent waits only count finished searches, so a backlog building right
+    // now shows up in the oldest wait first -- and the other way round once
+    // it drains.
+    expect(describeQueue({ ...BACKED_UP, oldest_waiting_minutes: 3 })).toBe(
+      "Demand is quite high right now; recent searches have waited about 12 min to start."
+    );
+  });
+
+  test("says nothing when the queue is moving", () => {
     expect(
       describeQueue({
         ...BACKED_UP,
-        oldest_waiting_minutes: null,
-        recent_searches: 0,
-        recent_wait_minutes: null,
-        waiting: 0,
+        oldest_waiting_minutes: 4,
+        recent_wait_minutes: 2,
       })
-    ).toEqual([]);
+    ).toBeNull();
+    expect(describeQueue(null)).toBeNull();
+  });
+
+  test("never names the cluster or who runs it", () => {
+    const text = `${describeQueue(BACKED_UP)} ${busyNotice(BACKED_UP)}`;
+    expect(text).not.toMatch(/Vista|TACC|cluster/);
   });
 });
 
@@ -100,7 +111,8 @@ describe("LoganSearchStatus queue note", () => {
     renderStatus("queued");
 
     expect(useKmindexQueue).toHaveBeenLastCalledWith(true);
-    expect(screen.getByText(/5 searches are waiting/)).toBeTruthy();
+    expect(screen.getByText(/Demand is quite high right now/)).toBeTruthy();
+    expect(screen.getByText("Queued")).toBeTruthy();
     expect(screen.getByText(/A long wait isn.t an error/)).toBeTruthy();
   });
 
@@ -108,7 +120,7 @@ describe("LoganSearchStatus queue note", () => {
     renderStatus("running");
 
     expect(useKmindexQueue).toHaveBeenLastCalledWith(false);
-    expect(screen.queryByText(/searches are waiting/)).toBeNull();
+    expect(screen.queryByText(/Demand is quite high/)).toBeNull();
   });
 
   test("still reassures before the first reading lands", () => {
@@ -117,7 +129,7 @@ describe("LoganSearchStatus queue note", () => {
     renderStatus("new");
 
     expect(screen.getByText(/A long wait isn.t an error/)).toBeTruthy();
-    expect(screen.queryByText(/searches are waiting/)).toBeNull();
+    expect(screen.queryByText(/Demand is quite high/)).toBeNull();
   });
 });
 

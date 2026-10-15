@@ -1,5 +1,6 @@
 import { LOGAN_EXAMPLES } from "@repo/shared/components/LoganSearch/LoganSearchForm/examples";
 import { LoganSearchForm } from "@repo/shared/components/LoganSearch/LoganSearchForm/loganSearchForm";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import {
   fireEvent,
@@ -16,6 +17,12 @@ import {
 jest.mock("ky", () => ({
   __esModule: true,
   default: { get: jest.fn(), post: jest.fn() },
+}));
+
+// The busy notice reads the queue snapshot; null is "not landed yet", which
+// shows nothing, so every other test sees the form as it always was.
+jest.mock("@repo/shared/hooks/useKmindexQueue", () => ({
+  useKmindexQueue: jest.fn(() => null),
 }));
 
 type Search = ReturnType<typeof useKmindexSearch>;
@@ -173,6 +180,43 @@ function searchButton(): HTMLButtonElement {
     name: "Search Logan",
   }) as HTMLButtonElement;
 }
+
+describe("LoganSearchForm busy notice", () => {
+  const snapshot = (oldest: number | null): unknown => ({
+    as_of: "2026-10-15T14:18:07+00:00",
+    oldest_waiting_minutes: oldest,
+    recent_searches: 0,
+    recent_wait_minutes: null,
+    recent_wait_p90_minutes: null,
+    running: 1,
+    waiting: oldest === null ? 0 : 4,
+    window_minutes: 120,
+  });
+
+  afterEach(() => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(null);
+  });
+
+  test("warns before submitting when searches are backed up", () => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(snapshot(100));
+
+    renderForm();
+
+    expect(
+      screen.getByText(
+        "Heads up, demand is quite high right now. Recent searches have waited about 1 h 40 min to start."
+      )
+    ).toBeTruthy();
+  });
+
+  test("says nothing when the queue is moving", () => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(snapshot(4));
+
+    renderForm();
+
+    expect(screen.queryByText(/demand is quite high/)).toBeNull();
+  });
+});
 
 describe("LoganSearchForm index picker", () => {
   test("offers a card per Logan group", () => {
