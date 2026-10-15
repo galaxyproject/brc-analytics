@@ -32,6 +32,7 @@ from app.core.partner_keys import Partner, sunset_header
 from app.models.galaxy import (
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
 )
@@ -171,6 +172,19 @@ async def list_indexes(galaxy: GalaxyService = Depends(get_partner_galaxy_servic
             status_code=502, detail="Failed to list kmindex indexes"
         ) from e
     return {"count": len(indexes), "indexes": indexes}
+
+
+@router.get("/queue", response_model=KmindexQueueStatus)
+async def queue(galaxy: GalaxyService = Depends(get_partner_galaxy_service)):
+    """How many searches are waiting to start, and how long recent ones waited."""
+    _require_galaxy(galaxy)
+    try:
+        return await galaxy.get_kmindex_queue()
+    except Exception as e:
+        logger.error(f"Partner queue read failed: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue"
+        ) from e
 
 
 @router.post("/jobs", response_model=PartnerJobCreated, status_code=202)

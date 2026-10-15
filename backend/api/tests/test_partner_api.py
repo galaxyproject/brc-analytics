@@ -22,7 +22,7 @@ from app.core.partner_keys import (
     hash_partner_key,
     sunset_header,
 )
-from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus
+from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus, KmindexQueueStatus
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotFound,
@@ -158,6 +158,7 @@ def test_every_call_needs_the_key(partner_env):
 
     for method, path in [
         ("get", f"{BASE}/indexes"),
+        ("get", f"{BASE}/queue"),
         ("post", f"{BASE}/jobs"),
         ("get", f"{BASE}/jobs/{JOB_ID}"),
         ("get", f"{BASE}/jobs/{JOB_ID}/results"),
@@ -190,6 +191,29 @@ def test_a_path_that_only_shares_the_prefix_carries_no_sunset(partner_env):
     client, _, _ = partner_env
 
     assert "Sunset" not in client.get("/api/v1/partner/loganx/indexes").headers
+
+
+def test_the_queue_snapshot_is_served_to_the_partner(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_queue = AsyncMock(
+        return_value=KmindexQueueStatus(
+            as_of="2026-10-15T13:00:00+00:00",
+            oldest_waiting_minutes=84.0,
+            recent_searches=6,
+            recent_wait_minutes=12.5,
+            recent_wait_p90_minutes=51.0,
+            running=2,
+            waiting=5,
+            window_minutes=120,
+        )
+    )
+
+    response = client.get(f"{BASE}/queue", headers=HEADERS)
+
+    assert response.status_code == 200
+    assert response.json()["waiting"] == 5
+    assert response.json()["oldest_waiting_minutes"] == 84.0
+    assert response.headers["Sunset"] == sunset_header(SUNSET)
 
 
 def test_a_submit_starts_a_job_and_records_it_as_partner_traffic(partner_env):

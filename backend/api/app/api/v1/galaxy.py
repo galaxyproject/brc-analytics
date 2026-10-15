@@ -29,6 +29,7 @@ from app.models.galaxy import (
     GalaxyJobSubmission,
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
     KmindexSummary,
@@ -309,6 +310,36 @@ async def list_kmindex_indexes(
         logger.error(f"Failed to list kmindex indexes: {str(e)}")
         raise HTTPException(
             status_code=500, detail="Failed to list kmindex indexes"
+        ) from e
+
+
+def get_queue_galaxy_service(
+    cache: CacheService = Depends(get_cache_service),
+) -> GalaxyService:
+    """The service account, whoever is asking.
+
+    The queue is the service account's jobs, so a signed-in reader still has
+    to read them as the service account -- their own token would list theirs.
+    """
+    key = get_settings().GALAXY_API_KEY
+    credential = GalaxyCredential(kind="service", secret=key) if key else None
+    return GalaxyService(cache, credential=credential)
+
+
+@router.get("/kmindex/queue", response_model=KmindexQueueStatus)
+async def kmindex_queue(
+    galaxy_service: GalaxyService = Depends(get_queue_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """How many Logan searches are waiting, and how long recent ones waited."""
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        return await galaxy_service.get_kmindex_queue()
+    except Exception as e:
+        logger.error(f"Failed to read the kmindex queue: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue"
         ) from e
 
 

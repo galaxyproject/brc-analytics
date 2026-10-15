@@ -10,7 +10,7 @@ import re
 import tempfile
 import zipfile
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple
 
@@ -34,6 +34,7 @@ from app.models.galaxy import (
     KmindexHit,
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
     KmindexSummary,
@@ -350,6 +351,29 @@ KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 # second, so half a minute is already far past "slow".
 KMINDEX_INDEX_READ_TIMEOUT = 30.0
 
+# The queue snapshot. One Galaxy job listing plus a metrics read per newly
+# finished job, shared by every caller for a minute: logan-search.org and the
+# results page both ask while a job waits, and the answer moves on the scale of
+# Vista's queue, not seconds.
+KMINDEX_QUEUE_PREFIX = "galaxy:kmindex_queue:v1"
+KMINDEX_QUEUE_TTL = 60
+# A finished job's wait never changes, so it is read from Galaxy once.
+KMINDEX_QUEUE_WAIT_PREFIX = "galaxy:kmindex_wait:v1"
+KMINDEX_QUEUE_WINDOW_MINUTES = 120
+KMINDEX_QUEUE_LISTING_LIMIT = 500
+# Bounds the metrics reads one rebuild can make; anything past it is left for
+# the next rebuild rather than holding this one up.
+KMINDEX_QUEUE_METRIC_READS = 40
+KMINDEX_QUEUE_READ_TIMEOUT = 30.0
+# When Galaxy doesn't answer: hold off re-reading for a bit, and serve the last
+# snapshot that worked for up to an hour, its as_of showing its age.
+KMINDEX_QUEUE_COOLDOWN_PREFIX = "galaxy:kmindex_queue_cooldown:v1"
+KMINDEX_QUEUE_COOLDOWN_SECONDS = 30
+KMINDEX_QUEUE_LAST_GOOD_PREFIX = "galaxy:kmindex_queue_last_good:v1"
+KMINDEX_QUEUE_LAST_GOOD_TTL = CacheTTL.ONE_HOUR
+_KMINDEX_WAITING_STATES = frozenset({"new", "queued", "waiting", "resubmitted"})
+_KMINDEX_FINISHED_STATES = frozenset({"ok", "error"})
+
 # bioblend sets no socket timeout by default. We set a global request timeout
 # here because requests' timeout is connect + inter-byte read, not total transfer
 # time. This means a download that is actually progressing will never trip it,
@@ -439,6 +463,22 @@ def _today() -> str:
 # share a slot. Holding the task here is also what keeps it from being garbage
 # collected mid-read, since the request that started it does not wait for it.
 _INDEX_REFRESHES: Dict[str, asyncio.Task] = {}
+
+
+# Concurrent misses wait for one rebuild rather than each listing Galaxy's jobs.
+_QUEUE_READ_LOCK = asyncio.Lock()
+
+
+def _galaxy_time(value: str) -> datetime:
+    """Galaxy's timestamps are naive UTC."""
+    return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
+
+
+def _percentile(values: List[float], fraction: float) -> float:
+    """Nearest-rank percentile of a non-empty list."""
+    ordered = sorted(values)
+    rank = max(1, -(-len(ordered) * fraction // 1))
+    return ordered[int(rank) - 1]
 
 
 def _forget_index_refresh(key: str, task: asyncio.Task) -> None:
@@ -2314,6 +2354,143 @@ class GalaxyService:
             order=order,
             hits=[KmindexHit(**h) for h in page],
         )
+
+    async def get_kmindex_queue(self) -> KmindexQueueStatus:
+        """How many searches are waiting, and how long recent ones waited.
+
+        Read as whoever this service is -- callers hand in the service account,
+        whose jobs are the ones worth counting. Cached for a minute.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+
+        key = self._index_cache_key(KMINDEX_QUEUE_PREFIX)
+        cached = await self.cache.get(key)
+        if cached:
+            return KmindexQueueStatus(**cached)
+        async with _QUEUE_READ_LOCK:
+            cached = await self.cache.get(key)
+            if cached:
+                return KmindexQueueStatus(**cached)
+            last_good_key = self._index_cache_key(KMINDEX_QUEUE_LAST_GOOD_PREFIX)
+            cooldown_key = self._index_cache_key(KMINDEX_QUEUE_COOLDOWN_PREFIX)
+            # A read that just failed isn't retried by every caller in turn --
+            # each would wait out its own timeout behind the lock.
+            if not await self.cache.get(cooldown_key):
+                try:
+                    status = await asyncio.wait_for(
+                        self._read_kmindex_queue(), KMINDEX_QUEUE_READ_TIMEOUT
+                    )
+                except Exception as e:
+                    logger.error(f"kmindex queue read failed: {e}")
+                    await self.cache.set(
+                        cooldown_key, True, KMINDEX_QUEUE_COOLDOWN_SECONDS
+                    )
+                else:
+                    snapshot = status.model_dump()
+                    await self.cache.set(key, snapshot, KMINDEX_QUEUE_TTL)
+                    await self.cache.set(
+                        last_good_key, snapshot, KMINDEX_QUEUE_LAST_GOOD_TTL
+                    )
+                    return status
+            # Galaxy didn't answer. An older snapshot, with its as_of saying
+            # how old, beats an error for something polled to show a person.
+            last_good = await self.cache.get(last_good_key)
+            if last_good:
+                return KmindexQueueStatus(**last_good)
+            raise Exception("Galaxy did not answer for the kmindex queue")
+
+    async def _read_kmindex_queue(self) -> KmindexQueueStatus:
+        now = datetime.now(timezone.utc)
+        tool_id = self.settings.GALAXY_KMINDEX_TOOL_ID
+        # Unfinished jobs get a listing of their own. Galaxy lists newest
+        # update first, and a queued job's update_time stops moving once it is
+        # queued, so in one shared listing the longest waits are the first to
+        # fall off the end.
+        active = await asyncio.to_thread(
+            self.gi.jobs.get_jobs,
+            state=sorted(_KMINDEX_WAITING_STATES | {"running"}),
+            tool_id=tool_id,
+            limit=KMINDEX_QUEUE_LISTING_LIMIT,
+        )
+        waiting = [j for j in active if j.get("state") in _KMINDEX_WAITING_STATES]
+        running = sum(1 for j in active if j.get("state") == "running")
+        oldest = min((_galaxy_time(j["create_time"]) for j in waiting), default=None)
+
+        since = now - timedelta(minutes=KMINDEX_QUEUE_WINDOW_MINUTES)
+        # date_range_min is a date, matched against update_time.
+        recent = await asyncio.to_thread(
+            self.gi.jobs.get_jobs,
+            state=sorted(_KMINDEX_FINISHED_STATES),
+            tool_id=tool_id,
+            date_range_min=since.date().isoformat(),
+            limit=KMINDEX_QUEUE_LISTING_LIMIT,
+            order_by="update_time",
+        )
+        finished = [
+            j
+            for j in recent
+            if j.get("state") in _KMINDEX_FINISHED_STATES
+            and _galaxy_time(j["update_time"]) >= since
+        ]
+        finished.sort(key=lambda j: j["update_time"], reverse=True)
+
+        reads = 0
+        waits: List[float] = []
+        for job in finished:
+            wait_key = self.cache.make_key(
+                KMINDEX_QUEUE_WAIT_PREFIX,
+                {"job": job["id"], "url": self.settings.GALAXY_API_URL},
+            )
+            entry = await self.cache.get(wait_key)
+            if entry is None:
+                if reads >= KMINDEX_QUEUE_METRIC_READS:
+                    continue
+                reads += 1
+                try:
+                    entry = {"wait": await self._job_queue_wait(job)}
+                except Exception as e:
+                    # Not cached, so the next rebuild tries again.
+                    logger.warning(
+                        f"kmindex queue: no metrics for job {job['id']}: {e}"
+                    )
+                    continue
+                await self.cache.set(wait_key, entry, CacheTTL.THIRTY_DAYS)
+            if entry.get("wait") is not None:
+                waits.append(entry["wait"])
+
+        def minutes(seconds: Optional[float]) -> Optional[float]:
+            return None if seconds is None else round(seconds / 60, 1)
+
+        return KmindexQueueStatus(
+            as_of=now.isoformat(timespec="seconds"),
+            oldest_waiting_minutes=minutes(
+                (now - oldest).total_seconds() if oldest else None
+            ),
+            recent_searches=len(waits),
+            recent_wait_minutes=minutes(_percentile(waits, 0.5) if waits else None),
+            recent_wait_p90_minutes=minutes(_percentile(waits, 0.9) if waits else None),
+            running=running,
+            waiting=len(waiting),
+            window_minutes=KMINDEX_QUEUE_WINDOW_MINUTES,
+        )
+
+    async def _job_queue_wait(self, job: dict) -> Optional[float]:
+        """Seconds from submit to the job starting on a node, or None.
+
+        None for a job-cache copy, which never queued: Galaxy copies the
+        original's metrics onto it, so its start lands before its own submit.
+        Also None for a job that finished without a start time.
+        """
+        metrics = await asyncio.to_thread(self.gi.jobs.get_metrics, job["id"])
+        start = next(
+            (m.get("raw_value") for m in metrics if m.get("name") == "start_epoch"),
+            None,
+        )
+        if start is None:
+            return None
+        wait = float(start) - _galaxy_time(job["create_time"]).timestamp()
+        return wait if wait >= 0 else None
 
     async def get_job_status(self, job_id: str) -> GalaxyJobStatus:
         """Get the current status of a Galaxy job using BioBLEND."""

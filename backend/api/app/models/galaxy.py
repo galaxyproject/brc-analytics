@@ -512,6 +512,34 @@ class KmindexSummary(BaseModel):
     total_matches: int = Field(..., description="Rows of the whole match set")
 
 
+class KmindexQueueStatus(BaseModel):
+    """
+    How backed up Logan searches are right now, from Galaxy's view.
+
+    Covers searches on the BRC service account -- every partner search and
+    anonymous site search, not ones signed-in users run as themselves. Galaxy
+    can't see the rest of the cluster's queue, so this says how our own jobs
+    are faring rather than predicting a start time.
+    """
+
+    waiting: int = Field(..., description="Searches submitted but not started")
+    running: int
+    oldest_waiting_minutes: Optional[float] = Field(
+        None, description="How long the longest-waiting search has waited so far"
+    )
+    recent_wait_minutes: Optional[float] = Field(
+        None,
+        description="Median wait from submit to start, over searches that "
+        "finished within window_minutes; None when there were none",
+    )
+    recent_wait_p90_minutes: Optional[float] = None
+    recent_searches: int = Field(
+        ..., description="Searches the recent figures are drawn from"
+    )
+    window_minutes: int
+    as_of: str = Field(..., description="When Galaxy was read, UTC ISO 8601")
+
+
 class GalaxyJobResponse(BaseModel):
     """Response model for job submission."""
 
