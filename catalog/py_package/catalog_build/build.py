@@ -1226,6 +1226,7 @@ def build_files(
             workflows_path=None if workflows_path is None else Path(workflows_path),
             taxa_path=None if taxa_path is None else Path(taxa_path),
             outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+            ucsc_assemblies_url=ucsc_assemblies_url,
         )
     )
     source_list_df = load_and_transform_result.assemblies_source
