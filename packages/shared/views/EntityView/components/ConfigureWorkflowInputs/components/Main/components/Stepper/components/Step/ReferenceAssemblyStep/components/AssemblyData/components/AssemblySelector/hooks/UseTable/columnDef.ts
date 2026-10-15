@@ -3,7 +3,7 @@ import {
   renderNTagCell,
 } from "@repo/shared/components/Table/components/TableCell/components/NTagCell/utils";
 import { renderScientificName } from "@repo/shared/components/Table/components/TableCell/components/ScientificName/utils";
-import { SelectCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
+import { SelectCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/components/TableCell/components/SelectCell/selectCell";
 import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
