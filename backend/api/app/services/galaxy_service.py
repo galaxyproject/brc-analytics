@@ -377,15 +377,20 @@ KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v1"
 # query goes in under this one rather than whatever filename the caller sent.
 KMINDEX_QUERY_DATASET_NAME = "query.fasta"
 
-# Aggregation is serialized per lane: it is I/O bound against a service that
-# rate-limits us, so overlapping runs make each other slower and can each end up
-# with a different partial view of the same job. There are two lanes rather than
-# one lock so that partner traffic, which searches every index and so merges
-# thousands of shards a job, never parks a BRC user's results behind it.
+# Cold merges are capped per lane. There are two lanes so that partner traffic,
+# which searches every index and so merges thousands of shards a job, never parks
+# a BRC user's results behind it. The partner lane used to be one at a time too,
+# back when Galaxy rate-limited our downloads; from TACC it no longer does, and
+# an all-index merge is mostly waiting on its one collection download (11-16 s
+# on brc-dev, with the backend's memory flat), so a classroom's distinct queries
+# can overlap. Each running merge still holds its whole hit list -- ~500 MB at
+# peak for a million-hit conserved query -- and the host has ~3 GB to spare, so
+# two partner merges plus a native one is as far as this goes.
 AggregationLane = Literal["native", "partner"]
-_AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
-    "native": asyncio.Lock(),
-    "partner": asyncio.Lock(),
+KMINDEX_PARTNER_MERGES = 2
+_AGGREGATION_LANES: dict[str, asyncio.Semaphore] = {
+    "native": asyncio.Semaphore(1),
+    "partner": asyncio.Semaphore(KMINDEX_PARTNER_MERGES),
 }
 
 # How long a merged aggregate and its sort orders sit in Redis, for every job.
@@ -1191,11 +1196,11 @@ class GalaxyService:
     ) -> KmindexResults:
         """Merge a kmindex job's per-shard outputs into one ranked hit list.
 
-        @param lane: whose aggregation lock a cold merge takes. The native lane
+        @param lane: whose merge slots a cold merge takes. The native lane
             waits its turn, as it always has; the partner lane answers
-            GalaxyJobAggregating instead of waiting, because its callers poll
-            and a connection parked behind another partner merge is one the
-            proxy will cut anyway.
+            GalaxyJobAggregating when all its slots are taken instead of
+            waiting, because its callers poll and a connection parked behind
+            other partner merges is one the proxy will cut anyway.
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
@@ -1261,24 +1266,22 @@ class GalaxyService:
                     f"Results for job {job_id} are still being merged"
                 )
 
-            # Serialize aggregation within the lane. Without this, several
-            # callers landing on a cold cache each pull every shard at once,
-            # which multiplies the load Galaxy is already rate-limiting and
-            # leaves them racing to overwrite the same cache entry with partial
-            # results.
-            lock = _AGGREGATION_LOCKS[lane]
+            # Cap cold merges within the lane: each one holds every hit in
+            # memory until it is ranked and capped. Two readers of the same job
+            # never both merge -- that is the claim below, not this.
+            slots = _AGGREGATION_LANES[lane]
             # No await between this check and the acquire below, so on one event
-            # loop a free lock is still free when async-with takes it.
-            if lane == "partner" and lock.locked():
+            # loop a free slot is still free when async-with takes it.
+            if lane == "partner" and slots.locked():
                 raise GalaxyJobAggregating(
-                    f"Results for job {job_id} are queued behind another merge"
+                    f"Results for job {job_id} are queued behind other merges"
                 )
-            async with lock:
+            async with slots:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
-                    # The lane lock only serializes its own lane, and the check
-                    # above races, so the job itself is claimed atomically: one
+                    # The lane only caps its own merges, and the check above
+                    # races, so the job itself is claimed atomically: one
                     # merge per job across both lanes, and whoever loses is told
                     # to come back rather than merging it a second time.
                     if not await self.cache.claim(marker_key, CacheTTL.ONE_HOUR):
@@ -1432,8 +1435,8 @@ class GalaxyService:
         """Page a job's aggregate if -- and only if -- it is already cached.
 
         The assistant's read path. get_kmindex_results builds the aggregate on
-        a miss, which pulls every shard from Galaxy under the process-wide
-        lock and takes over a minute cold; a chat turn has 110 seconds and a
+        a miss, which pulls every shard from Galaxy in a capped merge lane and
+        can take over a minute cold; a chat turn has 110 seconds and a
         tool call far less. So this never aggregates: a miss is None and the
         caller sends the user to the results page, which does.
 
@@ -1807,8 +1810,8 @@ class GalaxyService:
         Same window and the same reason as _cohort_for: the pre-cap list is
         alive here and nowhere else. Once aggregation returns, the aggregate
         holds 50,000 hits with no metadata on them, so rebuilding the full
-        enriched set would mean re-downloading every shard from a rate-limited
-        Galaxy behind the process-wide lock.
+        enriched set would mean re-downloading every shard and taking another
+        merge slot.
 
         Additive, so it cannot cost anyone their search: a write that fails
         leaves the results correct and simply without a download. Returns
@@ -2126,8 +2129,8 @@ class GalaxyService:
             # refusal above is about the hit list itself being wrong; the
             # cohort is an optional enrichment over a hit list that is correct,
             # and letting it block the cache inverts the cost. Re-aggregation
-            # is 84-280 shard downloads from a rate-limited Galaxy behind a
-            # process-wide lock, and the failure need not be transient.
+            # is 84-280 shard downloads and a merge slot, and the failure need
+            # not be transient.
             #
             # The cause that produced this TTL -- a mirror on an older schema
             # reporting available and raising on every call, so every results

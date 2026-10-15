@@ -215,9 +215,8 @@ EXPORT_UNAVAILABLE = "unavailable"
 # runs -- so a pathological selection is an order of magnitude past that. 5M
 # is ~3.3x the largest measured probe and holds the artifact to ~75 MB parquet
 # / ~740 MB TSV and the write to ~7s, which matters because the write happens
-# inside the process-wide aggregation lock where it delays every other user's
-# search. Past that a browser download stops being a useful way to move the
-# data anyway.
+# inside a merge slot, holding the full hit list in memory while it runs. Past
+# that a browser download stops being a useful way to move the data anyway.
 EXPORT_MAX_ROWS = 5_000_000
 
 # Retention. Exports are ~16 MB each and nothing else ever deletes them.

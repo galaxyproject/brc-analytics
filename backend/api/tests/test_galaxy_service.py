@@ -1310,8 +1310,7 @@ class TestCohortOverTheFullHitSet:
         reaches the query. What that check cannot see remains: a corrupt page,
         a revoked file handle, a duckdb version disagreement. Every results
         poll and every page click would otherwise re-download all 84 shard
-        datasets from a rate-limited Galaxy, serialized against every other
-        kmindex user on the process-wide aggregation lock.
+        datasets from Galaxy, each time taking one of the few merge slots.
         """
         store = {}
         service.cache.make_key = MagicMock(
@@ -3076,20 +3075,24 @@ class TestAggregatingMarker:
 
 class TestAggregationLanes:
     """
-    Partner merges and BRC merges hold separate locks.
+    Partner merges and BRC merges take slots in separate lanes.
 
     A partner search covers every index, so its cold merge can run for
     minutes; with one process-wide lock, every BRC user's cold read would sit
-    behind it. And a partner caller polls, so when its own lane is busy it is
-    told to come back rather than parked on the lock.
+    behind it. Partner merges overlap up to KMINDEX_PARTNER_MERGES, and a
+    partner caller polls, so when every slot is taken it is told to come back
+    rather than parked.
     """
 
     @pytest.fixture(autouse=True)
     def _fresh_locks(self, monkeypatch):
         monkeypatch.setattr(
             galaxy_service,
-            "_AGGREGATION_LOCKS",
-            {"native": asyncio.Lock(), "partner": asyncio.Lock()},
+            "_AGGREGATION_LANES",
+            {
+                "native": asyncio.Semaphore(1),
+                "partner": asyncio.Semaphore(galaxy_service.KMINDEX_PARTNER_MERGES),
+            },
         )
 
     @pytest.mark.asyncio
@@ -3099,9 +3102,11 @@ class TestAggregationLanes:
             side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
         )
         release = asyncio.Event()
+        partner_merging = asyncio.Event()
 
         async def _aggregate(job_id, *_, **__):
             if job_id == "partner_job":
+                partner_merging.set()
                 await release.wait()
             return _listing(1)
 
@@ -3111,12 +3116,8 @@ class TestAggregationLanes:
             service.get_kmindex_results("partner_job", lane="partner")
         )
         # Looking up whether the job is a job-cache copy comes first, so the
-        # merge takes the lock a few turns of the loop later, not on the first.
-        for _ in range(100):
-            if galaxy_service._AGGREGATION_LOCKS["partner"].locked():
-                break
-            await asyncio.sleep(0.01)
-        assert galaxy_service._AGGREGATION_LOCKS["partner"].locked()
+        # merge starts a few turns of the loop later, not on the first.
+        await asyncio.wait_for(partner_merging.wait(), timeout=1)
 
         native = await asyncio.wait_for(
             service.get_kmindex_results("native_job"), timeout=1
@@ -3176,31 +3177,71 @@ class TestAggregationLanes:
         service._aggregate_shards.assert_awaited_once()
 
     @pytest.mark.asyncio
-    async def test_a_busy_partner_lane_answers_come_back_later(self, service):
+    async def test_a_full_partner_lane_answers_come_back_later(self, service):
         service.sra_mirror = None
         service._aggregate_shards = AsyncMock()
-        lock = galaxy_service._AGGREGATION_LOCKS["partner"]
+        slots = galaxy_service._AGGREGATION_LANES["partner"]
 
-        await lock.acquire()
+        for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+            await slots.acquire()
         try:
             with pytest.raises(GalaxyJobAggregating, match="queued"):
                 await service.get_kmindex_results("job2", lane="partner")
         finally:
-            lock.release()
+            for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+                slots.release()
 
         service._aggregate_shards.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_partner_merges_of_different_jobs_overlap(self, service):
+        # A classroom's distinct queries finish together; they should merge
+        # side by side up to the cap, and only the one past it is turned away.
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service._resolve_source = AsyncMock(side_effect=lambda job_id: (job_id, None))
+        cap = galaxy_service.KMINDEX_PARTNER_MERGES
+        started = 0
+        release = asyncio.Event()
+
+        async def _aggregate(*_, **__):
+            nonlocal started
+            started += 1
+            await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        merges = [
+            asyncio.create_task(service.get_kmindex_results(f"job{i}", lane="partner"))
+            for i in range(cap)
+        ]
+        for _ in range(100):
+            if started == cap:
+                break
+            await asyncio.sleep(0.01)
+        assert started == cap
+
+        with pytest.raises(GalaxyJobAggregating, match="queued"):
+            await service.get_kmindex_results("one_too_many", lane="partner")
+
+        release.set()
+        for merge in merges:
+            assert (await merge).total_hits == 1
 
     @pytest.mark.asyncio
     async def test_a_busy_native_lane_still_waits_its_turn(self, service):
         service.sra_mirror = None
         service._aggregate_shards = AsyncMock(return_value=_listing(1))
-        lock = galaxy_service._AGGREGATION_LOCKS["native"]
+        slots = galaxy_service._AGGREGATION_LANES["native"]
 
-        await lock.acquire()
+        await slots.acquire()
         reader = asyncio.create_task(service.get_kmindex_results("job3"))
         await asyncio.sleep(0.01)
         assert not reader.done()
-        lock.release()
+        slots.release()
 
         assert (await reader).total_hits == 1
 
