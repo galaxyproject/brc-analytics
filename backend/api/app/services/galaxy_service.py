@@ -514,6 +514,79 @@ def _decode_tool_param(value: object) -> object:
     return value
 
 
+def _merge_shard_hits(
+    shards: List[Optional[dict]], threshold: Optional[float]
+) -> Tuple[List[dict], Optional[str], int, int, int]:
+    """
+    Flatten downloaded shards into one ranked hit list.
+
+    Pure CPU -- a conserved query is over a million hits -- so the caller
+    runs it off the event loop, where it would otherwise stall every status
+    poll for as long as it takes.
+
+    @param shards: one parsed shard per output, None where it failed.
+    @param threshold: the job's threshold, re-applied to corrected scores.
+    @returns: hits, query name, shards with hits, shards failed, and how
+        many hits the false-positive correction dropped.
+    """
+    hits: List[dict] = []
+    query_name = None
+    shards_with_hits = 0
+    shards_failed = 0
+    corrected_out = 0
+    for shard in shards:
+        if not shard:
+            shards_failed += 1
+            continue
+        # Shape is {shard_name: {query_name: {accession: score}}}.
+        shard_had_hits = False
+        for shard_name, queries in shard.items():
+            for name, accessions in (queries or {}).items():
+                query_name = query_name or name
+                for accession, raw_score in (accessions or {}).items():
+                    # Logan's own site subtracts a false-positive baseline
+                    # for 227 saturated samples and re-applies the
+                    # threshold to what is left. kmindex applied it to the
+                    # raw ratio, so a hit that only cleared it because its
+                    # Bloom filter matches everything is dropped here.
+                    score, baseline = correct_score(accession, raw_score)
+                    hit = {
+                        "accession": accession,
+                        "score": score,
+                        "shard": shard_name,
+                    }
+                    if baseline is not None:
+                        if threshold is not None and score < threshold:
+                            corrected_out += 1
+                            continue
+                        hit["fp_correction"] = baseline
+                    # Count the shard, not the (shard, query) pair -- the
+                    # latter can exceed shards_searched. Counted on the
+                    # kept hit, so a shard whose only matches were dropped
+                    # saturated samples reports no hits rather than one.
+                    shard_had_hits = True
+                    hits.append(hit)
+        if shard_had_hits:
+            shards_with_hits += 1
+
+    # Sort on more than score: ties are common, and shards land in completion
+    # order, so score alone leaves equal-scoring hits free to reshuffle
+    # between aggregations and make paged offsets incoherent.
+    #
+    # The second key has to be a hash rather than the accession itself. Ties
+    # are not a rare edge here -- a conserved query returns them by the
+    # hundred thousand (a 16S fragment at threshold 0.5 gave 305,061 hits
+    # scoring exactly 1.0 against a 50,000 cap), so the cap boundary sits
+    # inside one tie band and the tie-break alone decides the whole result
+    # set. Accession order is archive-prefix order, and the prefix predicts
+    # the submitting country: DRR is DDBJ, ERR is ENA, SRR is NCBI. Sorting
+    # by accession returned zero SRR rows out of a true 65.1%, so the
+    # country column reported a distribution manufactured by the sort.
+    # md5 reproduces the real composition to within 0.2 points.
+    hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
+    return hits, query_name, shards_with_hits, shards_failed, corrected_out
+
+
 def _default_order(sort: str) -> str:
     """Score reads best high to low; text and dates read best A to Z, old to new."""
     return "desc" if sort == "score" else "asc"
@@ -1936,45 +2009,13 @@ class GalaxyService:
         if shards is None:
             shards = await self._download_each_shard(job_id, status)
 
-        hits: List[dict] = []
-        query_name = None
-        shards_with_hits = 0
-        shards_failed = 0
-        corrected_out = 0
-        for shard in shards:
-            if not shard:
-                shards_failed += 1
-                continue
-            # Shape is {shard_name: {query_name: {accession: score}}}.
-            shard_had_hits = False
-            for shard_name, queries in shard.items():
-                for name, accessions in (queries or {}).items():
-                    query_name = query_name or name
-                    for accession, raw_score in (accessions or {}).items():
-                        # Logan's own site subtracts a false-positive baseline
-                        # for 227 saturated samples and re-applies the
-                        # threshold to what is left. kmindex applied it to the
-                        # raw ratio, so a hit that only cleared it because its
-                        # Bloom filter matches everything is dropped here.
-                        score, baseline = correct_score(accession, raw_score)
-                        hit = {
-                            "accession": accession,
-                            "score": score,
-                            "shard": shard_name,
-                        }
-                        if baseline is not None:
-                            if threshold is not None and score < threshold:
-                                corrected_out += 1
-                                continue
-                            hit["fp_correction"] = baseline
-                        # Count the shard, not the (shard, query) pair -- the
-                        # latter can exceed shards_searched. Counted on the
-                        # kept hit, so a shard whose only matches were dropped
-                        # saturated samples reports no hits rather than one.
-                        shard_had_hits = True
-                        hits.append(hit)
-            if shard_had_hits:
-                shards_with_hits += 1
+        (
+            hits,
+            query_name,
+            shards_with_hits,
+            shards_failed,
+            corrected_out,
+        ) = await asyncio.to_thread(_merge_shard_hits, shards, threshold)
 
         if corrected_out:
             logger.info(
@@ -1982,22 +2023,6 @@ class GalaxyService:
                 f"under the {threshold} threshold once their false-positive "
                 "baseline was subtracted"
             )
-
-        # Sort on more than score: ties are common, and shards land in completion
-        # order, so score alone leaves equal-scoring hits free to reshuffle
-        # between aggregations and make paged offsets incoherent.
-        #
-        # The second key has to be a hash rather than the accession itself. Ties
-        # are not a rare edge here -- a conserved query returns them by the
-        # hundred thousand (a 16S fragment at threshold 0.5 gave 305,061 hits
-        # scoring exactly 1.0 against a 50,000 cap), so the cap boundary sits
-        # inside one tie band and the tie-break alone decides the whole result
-        # set. Accession order is archive-prefix order, and the prefix predicts
-        # the submitting country: DRR is DDBJ, ERR is ENA, SRR is NCBI. Sorting
-        # by accession returned zero SRR rows out of a true 65.1%, so the
-        # country column reported a distribution manufactured by the sort.
-        # md5 reproduces the real composition to within 0.2 points.
-        hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
 
         # Count before capping. The true match count is the number the caller
         # needs to judge the answer -- a 16S fragment matched 1,133,516

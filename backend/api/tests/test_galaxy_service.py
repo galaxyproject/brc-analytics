@@ -322,6 +322,30 @@ class TestMergeBookkeeping:
         assert aggregate["shards_with_hits"] <= aggregate["shards_searched"]
 
     @pytest.mark.asyncio
+    async def test_hits_are_merged_off_the_event_loop(self, service, monkeypatch):
+        # A million-hit merge on the loop would stall every status poll while
+        # it ran, and with partner merges overlapping that stall would stack.
+        import threading
+
+        merged_on = []
+        real = galaxy_service._merge_shard_hits
+
+        def _spy(*args):
+            merged_on.append(threading.get_ident())
+            return real(*args)
+
+        monkeypatch.setattr(galaxy_service, "_merge_shard_hits", _spy)
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {"SRR1": 0.9}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["total_matches"] == 1
+        assert merged_on and merged_on[0] != threading.get_ident()
+
+    @pytest.mark.asyncio
     async def test_equal_scores_order_deterministically(self, service):
         # Same hits, shards arriving in opposite order, must page identically.
         shard_a = {"IDX_1": {"q": {"SRRb": 0.5, "SRRa": 0.5}}}
