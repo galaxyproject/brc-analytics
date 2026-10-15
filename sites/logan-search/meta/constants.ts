@@ -17,6 +17,11 @@ export const LOGAN_PAGE_META = {
       "The Logan searches this browser has run, with their status and how many runs each matched.",
     pageTitle: "My searches",
   },
+  QUEUE: {
+    pageDescription:
+      "How long Logan searches have waited to start, right now and over the last day.",
+    pageTitle: "Search queue",
+  },
   RESULTS: {
     pageDescription:
       "Logan Search results: the SRA runs a sequence occurs in, where they were sampled, and the full match set to download.",
