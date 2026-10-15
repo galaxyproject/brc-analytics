@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 
 from ..utils import get_db_path_string
+from .load import LoadDestinationParams
 
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"
@@ -202,7 +203,7 @@ def download_taxdump(temp_folder_path: Path, fetched_md5: str):
         )
 
 
-def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> str:
+def load_ncbi_taxonomy(dest: LoadDestinationParams) -> str:
     """
     Download the NCBI taxdump, verify its MD5, and load its nodes and names into DuckDB.
 
@@ -214,8 +215,9 @@ def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> s
       The verified MD5 digest of the downloaded taxdump archive
     """
     fetched_md5 = fetch_taxdump_md5()
-    download_taxdump(temp_folder_path, fetched_md5)
+    download_taxdump(dest.temp_folder_path, fetched_md5)
     load_taxdump(
-        temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
+        temp_folder_path=dest.temp_folder_path,
+        dlt_pipeline_prefix=dest.dlt_pipeline_prefix,
     )
     return fetched_md5

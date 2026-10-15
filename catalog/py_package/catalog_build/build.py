@@ -14,7 +14,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from .load import do_dlt_load
+from .load import LoadParams, do_dlt_load
 from .qc_utils import (
     format_list_section,
     format_markdown_table,
@@ -1069,6 +1069,18 @@ def save_build_metadata(path: str, meta: BuildMetadata):
 
 
 @dataclass
+class LoadAndTransformParams(LoadParams):
+    """
+    LoadParams necessary to load catalog data, extended with parameters needed to transform the loaded data.
+
+    Attributes:
+      taxonomic_levels: Taxonomic levels to build columns for during transformation
+    """
+
+    taxonomic_levels: list[str]
+
+
+@dataclass
 class LoadAndTransformResult:
     assemblies_source: pd.DataFrame
     organisms_source: pd.DataFrame
@@ -1082,17 +1094,7 @@ class LoadAndTransformResult:
     dbt_test_results: list[DBTTestResult]
 
 
-def load_and_transform(
-    *,
-    temp_folder_path_string: str,
-    dlt_pipeline_prefix: str,
-    taxonomic_levels: list[str],
-    assemblies_path: Path,
-    organisms_path: Path,
-    workflows_path: Path | None,
-    taxa_path: Path | None,
-    outbreaks_path: Path | None,
-):
+def load_and_transform(params: LoadAndTransformParams):
     """
     Load source data and NCBI taxonomy via dlt, transform it via dbt, and return the results.
 
@@ -1100,20 +1102,13 @@ def load_and_transform(
     so that runs are consistent.
 
     Args:
-      temp_folder_path_string: Path of the temporary folder to hold downloads and the DuckDB database
-      dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
-      taxonomic_levels: Taxonomic levels to build columns for during transformation
-      assemblies_path: Path to source assemblies YAML
-      organisms_path: Path to source organisms YAML
-      workflows_path: Path to source workflows YAML, or None for catalogs that don't build workflows
-      taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
-      outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
+      params: LoadAndTransformParams instance
 
     Returns:
       A LoadAndTransformResult containing the loaded and transformed data (as dataframes), the NCBI
       taxdump MD5, and the dbt test results
     """
-    temp_folder_path = Path(temp_folder_path_string).resolve()
+    temp_folder_path = params.temp_folder_path
 
     print("Loading and transforming data via dlt + dbt")
 
@@ -1124,23 +1119,20 @@ def load_and_transform(
     get_db_path(temp_folder_path).unlink(missing_ok=True)
 
     # Load data via dlt
-    load_result = do_dlt_load(
-        temp_folder_path=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        assemblies_path=assemblies_path,
-        organisms_path=organisms_path,
-        workflows_path=workflows_path,
-        taxa_path=taxa_path,
-        outbreaks_path=outbreaks_path,
-    )
+    load_result = do_dlt_load(params)
+
+    # Determine presence of optional entity types
+    has_curated_taxa = params.taxa_path is not None
+    has_outbreaks = params.outbreaks_path is not None
+    has_workflows = params.workflows_path is not None
 
     # Transform loaded data via dbt
     transform_result = do_dbt_transformations(
         temp_folder_path,
-        taxonomic_levels=taxonomic_levels,
-        has_curated_taxa=taxa_path is not None,
-        has_outbreaks=outbreaks_path is not None,
-        has_workflows=workflows_path is not None,
+        taxonomic_levels=params.taxonomic_levels,
+        has_curated_taxa=has_curated_taxa,
+        has_outbreaks=has_outbreaks,
+        has_workflows=has_workflows,
     )
 
     # Get transformed data and return along with metadata
@@ -1149,22 +1141,22 @@ def load_and_transform(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
             organisms_source=con.query("select * from catalog_input_organisms").df(),
             workflows_source=(
-                None
-                if workflows_path is None
-                else con.query("select * from catalog_input_workflows").df()
+                con.query("select * from catalog_input_workflows").df()
+                if has_workflows
+                else None
             ),
             outbreaks_source=(
-                None
-                if outbreaks_path is None
-                else con.query("select * from catalog_input_outbreaks").df()
+                con.query("select * from catalog_input_outbreaks").df()
+                if has_outbreaks
+                else None
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=(
-                None
-                if outbreaks_path is None
-                else con.query("select * from taxonomy_outbreaks").df()
+                con.query("select * from taxonomy_outbreaks").df()
+                if has_outbreaks
+                else None
             ),
             ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
             dbt_test_results=transform_result.dbt_test_results,
@@ -1225,14 +1217,16 @@ def build_files(
 
     # Do database-based loading and transformation
     load_and_transform_result = load_and_transform(
-        temp_folder_path_string=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        taxonomic_levels=taxonomic_levels_for_tree,
-        assemblies_path=Path(assemblies_path),
-        organisms_path=Path(organisms_path),
-        workflows_path=None if workflows_path is None else Path(workflows_path),
-        taxa_path=None if taxa_path is None else Path(taxa_path),
-        outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+        LoadAndTransformParams(
+            temp_folder_path=Path(temp_folder_path),
+            dlt_pipeline_prefix=dlt_pipeline_prefix,
+            taxonomic_levels=taxonomic_levels_for_tree,
+            assemblies_path=Path(assemblies_path),
+            organisms_path=Path(organisms_path),
+            workflows_path=None if workflows_path is None else Path(workflows_path),
+            taxa_path=None if taxa_path is None else Path(taxa_path),
+            outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+        )
     )
     source_list_df = load_and_transform_result.assemblies_source
     source_organisms_df = load_and_transform_result.organisms_source.sort_values(
