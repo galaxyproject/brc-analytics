@@ -14,6 +14,7 @@ export const DEFAULT_CONFIGURED_INPUT: {
   designFormula: undefined,
   geneModelUrl: undefined,
   numberOfHits: undefined,
+  organism: undefined,
   primaryContrasts: undefined,
   primaryFactor: undefined,
   readRunPairedFile: undefined,

@@ -72,7 +72,7 @@ export function isWorkflowListedForOrganism(
  * @param organism - The organism to check compatibility against.
  * @returns True if the workflow is compatible with the organism, false otherwise.
  */
-function workflowIsCompatibleWithOrganism(
+export function workflowIsCompatibleWithOrganism(
   workflow: Workflow,
   organism: OrganismContract
 ): boolean {
