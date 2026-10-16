@@ -1,4 +1,7 @@
-import { type DropdownMenuButtonProps } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/common/entities";
+import {
+  type DropdownMenuButtonKey,
+  type DropdownMenuButtonProps,
+} from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/common/entities";
 import { DropdownMenu } from "@databiosphere/findable-ui/lib/components/common/DropdownMenu/dropdownMenu";
 import { CHIP_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/chip";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
@@ -12,6 +15,14 @@ import {
 } from "./exampleQueries.styles";
 import type { Props } from "./types";
 
+/**
+ * Example questions under the hero prompt. The menus render in a portal, outside the
+ * prompt form, so each question is a submit button tied to the form by `form={formId}`;
+ * the form reads the question from the submitter's `data-query`.
+ * @param props - Component props.
+ * @param props.formId - Id of the prompt form the questions submit.
+ * @returns The example question chips and their menus.
+ */
 export const ExampleQueries = ({ formId }: Props): JSX.Element => {
   return (
     <StyledExampleQueries>
@@ -42,13 +53,15 @@ export const ExampleQueries = ({ formId }: Props): JSX.Element => {
 };
 
 function renderButton(
-  { onClick, open }: DropdownMenuButtonProps,
+  {
+    open: _open,
+    ...props
+  }: Pick<DropdownMenuButtonProps, DropdownMenuButtonKey>,
   label: string
 ): JSX.Element {
   return (
     <StyledChip
-      aria-expanded={open}
-      aria-haspopup="menu"
+      {...props}
       color={CHIP_PROPS.COLOR.SECONDARY}
       component="button"
       label={
@@ -60,7 +73,6 @@ function renderButton(
           />
         </>
       }
-      onClick={onClick}
       variant={CHIP_PROPS.VARIANT.OUTLINED}
     />
   );
