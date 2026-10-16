@@ -13,7 +13,6 @@ jest.mock(
 );
 
 import {
-  findCladeOrganism,
   getCladeOrganisms,
   hasCladeOrganisms,
 } from "@repo/shared/workflow/cladeOrganisms";
@@ -24,7 +23,6 @@ import {
   IN_CLADE_ORGANISM_A,
   IN_CLADE_ORGANISM_B,
   NO_TAXONOMY_WORKFLOW,
-  OUT_OF_CLADE_ORGANISM,
   SPECIES_WORKFLOW,
 } from "./cladeFixtures";
 
@@ -70,34 +68,6 @@ describe("cladeOrganisms", () => {
     test("is false for assembly-scoped and no-taxonomyId workflows", () => {
       expect(hasCladeOrganisms(ASSEMBLY_WORKFLOW)).toBe(false);
       expect(hasCladeOrganisms(NO_TAXONOMY_WORKFLOW)).toBe(false);
-    });
-  });
-
-  describe("findCladeOrganism", () => {
-    test("returns an organism picked within the clade", () => {
-      expect(
-        findCladeOrganism(CLADE_WORKFLOW, IN_CLADE_ORGANISM_B.ncbiTaxonomyId)
-      ).toBe(IN_CLADE_ORGANISM_B);
-    });
-
-    test("ignores an organism outside the clade", () => {
-      expect(
-        findCladeOrganism(CLADE_WORKFLOW, OUT_OF_CLADE_ORGANISM.ncbiTaxonomyId)
-      ).toBeUndefined();
-    });
-
-    test("ignores an unknown taxonomy ID", () => {
-      expect(findCladeOrganism(CLADE_WORKFLOW, "12345")).toBeUndefined();
-    });
-
-    test("returns undefined when no organism is picked", () => {
-      expect(findCladeOrganism(CLADE_WORKFLOW, undefined)).toBeUndefined();
-    });
-
-    test("returns undefined when the workflow is not a clade", () => {
-      expect(
-        findCladeOrganism(SPECIES_WORKFLOW, IN_CLADE_ORGANISM_A.ncbiTaxonomyId)
-      ).toBeUndefined();
     });
   });
 });

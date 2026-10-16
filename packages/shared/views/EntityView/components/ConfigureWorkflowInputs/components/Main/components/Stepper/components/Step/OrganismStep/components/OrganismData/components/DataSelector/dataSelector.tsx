@@ -1,8 +1,8 @@
 import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Stack, Typography } from "@mui/material";
+import { StyledPaper } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDataSelector/selectorDataSelector.styles";
 import { type JSX } from "react";
-import { StyledPaper } from "./dataSelector.styles";
 import { type Props } from "./types";
 
 /**

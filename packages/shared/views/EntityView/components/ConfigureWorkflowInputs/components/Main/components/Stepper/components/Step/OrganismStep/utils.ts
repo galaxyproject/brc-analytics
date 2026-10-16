@@ -1,5 +1,5 @@
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
-import { findOrganism } from "@repo/shared/services/workflows/entities";
+import { getOrganism } from "@repo/shared/services/workflows/entities";
 import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 /**
@@ -12,5 +12,5 @@ export function getOrganismSpecies({
   organism,
 }: ConfiguredInput): string | undefined {
   if (!organism) return;
-  return findOrganism(sanitizeEntityId(organism))?.taxonomicLevelSpecies;
+  return getOrganism(sanitizeEntityId(organism)).taxonomicLevelSpecies;
 }

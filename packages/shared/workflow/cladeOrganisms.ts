@@ -9,26 +9,6 @@ import {
 import { workflowIsCompatibleWithOrganism } from "@repo/shared/workflow/organismWorkflows";
 
 /**
- * Finds the catalog organism picked within an organism-scoped workflow's clade.
- * Returns undefined when the workflow's taxonomyId is not a clade, or when the
- * organism is not in the catalog or not within the clade.
- * @param workflow - Workflow being configured.
- * @param taxonomyId - Taxonomy ID of the picked organism, if any.
- * @returns The picked organism, or undefined.
- */
-export function findCladeOrganism(
-  workflow: Workflow,
-  taxonomyId: string | undefined
-): OrganismContract | undefined {
-  if (!taxonomyId || !isCladeWorkflow(workflow)) return;
-  const organism = findOrganism<OrganismContract>(sanitizeEntityId(taxonomyId));
-  if (!organism || !workflowIsCompatibleWithOrganism(workflow, organism)) {
-    return;
-  }
-  return organism;
-}
-
-/**
  * Finds the catalog organism an organism-scoped workflow's taxonomyId resolves
  * to directly, i.e. when the taxonomyId is itself a catalog organism.
  * @param workflow - Workflow being configured.
@@ -62,16 +42,13 @@ export function getCladeOrganisms(workflow: Workflow): OrganismContract[] {
 
 /**
  * Determines whether an organism-scoped workflow's clade has any catalog
- * organism to pick. Stops at the first match.
+ * organism to pick.
  * @param workflow - Workflow being configured.
  * @returns True when the workflow's taxonomyId is a clade with at least one
  * catalog organism.
  */
 export function hasCladeOrganisms(workflow: Workflow): boolean {
-  if (!isCladeWorkflow(workflow)) return false;
-  return getOrganisms().some((organism) =>
-    workflowIsCompatibleWithOrganism(workflow, organism)
-  );
+  return getCladeOrganisms(workflow).length > 0;
 }
 
 /**

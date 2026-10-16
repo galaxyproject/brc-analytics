@@ -1,14 +1,14 @@
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { getAssembly } from "@repo/shared/services/workflows/entities";
+import {
+  getAssembly,
+  getOrganism,
+} from "@repo/shared/services/workflows/entities";
 import { mapOrganismEntityToOrganism } from "@repo/shared/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@repo/shared/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@repo/shared/views/WorkflowInputsView/utils";
-import {
-  findCladeOrganism,
-  findWorkflowTaxonOrganism,
-} from "@repo/shared/workflow/cladeOrganisms";
+import { findWorkflowTaxonOrganism } from "@repo/shared/workflow/cladeOrganisms";
 
 /**
  * Resolves the reference-assembly genome, when one is configured.
@@ -45,16 +45,17 @@ export function getWorkflowOrganism(
  * within that clade, if any.
  * @param workflow - Workflow being configured.
  * @param configuredOrganism - Taxonomy ID of the organism picked within the
- * workflow's clade, if any.
- * @returns The organism entity, or undefined for assembly-scoped / no-taxonomyId
- * workflows, or clades where no organism within the clade has been picked.
+ * workflow's clade, if any. Only the organism picker sets it, from its
+ * clade-filtered rows.
+ * @returns The workflow's taxonomyId organism, else the picked organism, or
+ * undefined when the taxonomyId is not a catalog organism and nothing has been
+ * picked.
  */
 export function getWorkflowOrganismEntity(
   workflow: Workflow,
   configuredOrganism: string | undefined
 ): OrganismContract | undefined {
-  return (
-    findWorkflowTaxonOrganism(workflow) ??
-    findCladeOrganism(workflow, configuredOrganism)
-  );
+  const organism = findWorkflowTaxonOrganism(workflow);
+  if (organism || !configuredOrganism) return organism;
+  return getOrganism<OrganismContract>(sanitizeEntityId(configuredOrganism));
 }
