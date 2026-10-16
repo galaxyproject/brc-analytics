@@ -5,7 +5,8 @@ import type { ChatMessageDisplay } from "@repo/shared/views/AssistantView/hooks/
  * rendered: the wording should not change between where a question is typed
  * and where it is answered.
  */
-export const ASSISTANT_INPUT_PLACEHOLDER = "Ask about genomic data...";
+export const ASSISTANT_INPUT_PLACEHOLDER =
+  "Ask about organisms, analyses, or workflows...";
 
 /**
  * Who sent a chat message.
