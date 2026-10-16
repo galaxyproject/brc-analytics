@@ -1,10 +1,9 @@
-import { EXAMPLE_CATEGORIES } from "@brc/views/HomeView/components/SectionHero/components/AssistantPrompt/components/ExampleQueries/constants";
 import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { expect, test } from "./utils/fixtures";
 
 const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
-const [EXAMPLE_CATEGORY] = EXAMPLE_CATEGORIES;
-const [EXAMPLE_QUESTION] = EXAMPLE_CATEGORY.queries;
+const EXAMPLE_CATEGORY = "Assemblies";
+const EXAMPLE_QUESTION = "What assemblies do you have for Plasmodium vivax?";
 
 test.describe("BRC Analytics - Home Assistant Prompt", () => {
   test("the send button waits for a question to send", async ({ page }) => {
@@ -41,13 +40,11 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
   test("an example question opens the assistant with it", async ({ page }) => {
     await page.goto("/");
 
-    await page
-      .locator("form")
-      .getByRole("button", { name: EXAMPLE_CATEGORY.label })
-      .click();
-    await page.getByRole("menuitem", { name: EXAMPLE_QUESTION }).click();
-
-    await page.waitForURL(/\/assistant/);
+    await page.getByRole("button", { name: EXAMPLE_CATEGORY }).click();
+    await Promise.all([
+      page.waitForURL(/\/assistant/),
+      page.getByRole("menuitem", { name: EXAMPLE_QUESTION }).click(),
+    ]);
     await expect(page.getByText(EXAMPLE_QUESTION).first()).toBeVisible();
   });
 
