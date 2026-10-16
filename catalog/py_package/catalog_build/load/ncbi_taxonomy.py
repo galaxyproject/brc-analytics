@@ -1,14 +1,13 @@
 import hashlib
 import tarfile
-from itertools import batched
 from pathlib import Path
 
 import dlt
-import pandas as pd
 import requests
 
 from ..utils import get_db_path_string
 from .load import LoadDestinationParams
+from .utils import rows_to_chunked_dataframes
 
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"
@@ -60,10 +59,7 @@ def dmp_rows(path: Path, cols: list[str | None]):
 
 def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
     """
-    Yield DataFrames of at most `DMP_CHUNK_SIZE` rows parsed from a `.dmp` file.
-
-    Chunking the file into multiple DataFrames avoids materializing the entire file
-    in memory at once, at the cost of more items handed to dlt.
+    Yield limited-length DataFrames constructed from rows parsed from a `.dmp` file.
 
     Args:
       path: Path of the `.dmp` file to read
@@ -73,8 +69,7 @@ def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
     Yields:
       A DataFrame for each chunk of rows read from the file
     """
-    for chunk in batched(dmp_rows(path, cols), DMP_CHUNK_SIZE):
-        yield pd.DataFrame(chunk).astype(dtypes)
+    yield from rows_to_chunked_dataframes(dmp_rows(path, cols), dtypes)
 
 
 @dlt.resource(name="taxonomy_names", write_disposition="replace")
