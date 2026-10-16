@@ -3,7 +3,8 @@
  * rendered: the wording should not change between where a question is typed
  * and where it is answered.
  */
-export const ASSISTANT_INPUT_PLACEHOLDER = "Ask about genomic data...";
+export const ASSISTANT_INPUT_PLACEHOLDER =
+  "Ask about organisms, analyses, or workflows...";
 
 /**
  * Title shown for a saved conversation the assistant has not titled.
