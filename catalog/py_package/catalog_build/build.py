@@ -1087,6 +1087,7 @@ class LoadAndTransformResult:
     workflows_source: pd.DataFrame | None
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
+    ucsc_assemblies: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
     taxonomy_outbreaks: pd.DataFrame | None
@@ -1151,6 +1152,7 @@ def load_and_transform(params: LoadAndTransformParams):
                 else None
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
+            ucsc_assemblies=con.query("select * from ucsc.assembly_list").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=(
@@ -1238,6 +1240,7 @@ def build_files(
     if source_outbreaks_df is not None:
         source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
     source_workflows_df = load_and_transform_result.workflows_source
+    ucsc_assemblies_df = load_and_transform_result.ucsc_assemblies
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
@@ -1331,18 +1334,14 @@ def build_files(
         genomes_with_species_df
     )
 
-    assemblies_df = pd.DataFrame(requests.get(ucsc_assemblies_url).json()["data"])[
-        ["ucscBrowser", "genBank", "refSeq"]
-    ]
-
     # Create a mapping of both GenBank and RefSeq accessions to UCSC browser IDs
     ucsc_mapping = (
         pd.concat(
             [
-                assemblies_df[["ucscBrowser", "genBank"]].rename(
+                ucsc_assemblies_df[["ucscBrowser", "genBank"]].rename(
                     columns={"genBank": "accession"}
                 ),
-                assemblies_df[["ucscBrowser", "refSeq"]].rename(
+                ucsc_assemblies_df[["ucscBrowser", "refSeq"]].rename(
                     columns={"refSeq": "accession"}
                 ),
             ]
@@ -1361,8 +1360,8 @@ def build_files(
         "accessions",
         "matched in assembly list",
         genomes_with_species_df["accession"],
-        assemblies_df["genBank"],
-        assemblies_df["refSeq"],
+        ucsc_assemblies_df["genBank"],
+        ucsc_assemblies_df["refSeq"],
     )
 
     genomes_df = genomes_df.merge(
