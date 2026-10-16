@@ -1,9 +1,18 @@
-import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
+import type {
+  AnalysisSchema,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
+import { AnalysisSetup } from "@repo/shared/views/AssistantView/components/AnalysisSetup/analysisSetup";
 import { Action } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/action";
+import { ACTION_PLACEMENT } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/constants";
 import { FilledValue } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/filledValue";
 import { FieldValueSelector } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/selector/fieldValueSelector";
+import { Header } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Header/header";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Router from "next/router";
+import type { ComponentProps } from "react";
 
 jest.mock("next/router", () => ({
   __esModule: true,
@@ -197,6 +206,7 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
@@ -209,9 +219,24 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Not set")).toBeTruthy();
+  });
+
+  test("shows an empty field optional for the chosen workflow as optional", () => {
+    render(
+      <FieldValueSelector
+        field={{ detail: null, status: "empty", value: null }}
+        fieldKey="gene_annotation"
+        loading={false}
+        onSend={jest.fn()}
+        optional
+      />
+    );
+    expect(screen.getByText("Optional")).toBeTruthy();
+    expect(screen.queryByText("Not set")).toBeNull();
   });
 
   test("shows the reason a field needs attention", () => {
@@ -225,9 +250,49 @@ describe("FieldValueSelector", () => {
         fieldKey="assembly"
         loading={false}
         onSend={jest.fn()}
+        optional={false}
       />
     );
     expect(screen.getByText("Assembly not found")).toBeTruthy();
+  });
+});
+
+describe("Header", () => {
+  const SET: SchemaFieldState = { detail: null, status: "filled", value: "x" };
+  const SCHEMA: AnalysisSchema = {
+    analysis_type: SET,
+    assembly: SET,
+    data_characteristics: SET,
+    data_source: SET,
+    gene_annotation: { detail: null, status: "empty", value: null },
+    organism: SET,
+    workflow: SET,
+  };
+
+  test("counts every field before the assistant has returned a schema", () => {
+    render(<Header schema={null} />);
+    expect(screen.getByText("0 of 7 set")).toBeTruthy();
+  });
+
+  test("leaves gene annotation out of the count when the workflow doesn't need it", () => {
+    render(<Header schema={SCHEMA} />);
+    expect(screen.getByText("6 of 6 set")).toBeTruthy();
+  });
+
+  test("counts gene annotation when it needs attention", () => {
+    render(
+      <Header
+        schema={{
+          ...SCHEMA,
+          gene_annotation: {
+            detail: "No gene model for the selected assembly",
+            status: "needs_attention",
+            value: "Reference GTF",
+          },
+        }}
+      />
+    );
+    expect(screen.getByText("6 of 7 set")).toBeTruthy();
   });
 });
 
@@ -247,6 +312,21 @@ describe("Action", () => {
     workflow: ORGANISM,
   };
 
+  /**
+   * Renders the action at the panel's end under the app theme, which its
+   * narrow-screen styles read breakpoints from.
+   * @param props - Action props, less its placement.
+   */
+  function renderAction(
+    props: Omit<ComponentProps<typeof Action>, "placement">
+  ): void {
+    render(
+      <ThemeProvider theme={createAppTheme()}>
+        <Action {...props} placement={ACTION_PLACEMENT.END} />
+      </ThemeProvider>
+    );
+  }
+
   function getButton(): HTMLButtonElement {
     return screen.getByRole("button", {
       name: "Continue to workflow setup",
@@ -254,17 +334,36 @@ describe("Action", () => {
   }
 
   test("is disabled until the assistant produces a handoff", () => {
-    render(<Action handoffUrl={null} loading={false} schema={SCHEMA} />);
+    renderAction({ handoffUrl: null, loading: false, schema: SCHEMA });
     expect(getButton().disabled).toBe(true);
   });
 
   test("is disabled while a reply is in flight", () => {
-    render(<Action handoffUrl={HANDOFF_URL} loading={true} schema={SCHEMA} />);
+    renderAction({ handoffUrl: HANDOFF_URL, loading: true, schema: SCHEMA });
     expect(getButton().disabled).toBe(true);
   });
 
+  // The panel renders it at its start too once complete, for narrow screens;
+  // only one copy may be exposed at a time. jsdom applies no media queries, so
+  // this checks the wide-screen styles; the narrow swap is checked in a browser.
+  test("is offered once by the panel on wide screens", () => {
+    render(
+      <ThemeProvider theme={createAppTheme()}>
+        <AnalysisSetup
+          handoffUrl={HANDOFF_URL}
+          loading={false}
+          onSend={jest.fn()}
+          schema={SCHEMA}
+        />
+      </ThemeProvider>
+    );
+    expect(
+      screen.getAllByRole("button", { name: "Continue to workflow setup" })
+    ).toHaveLength(1);
+  });
+
   test("hands off the captured accessions and navigates to setup", () => {
-    render(<Action handoffUrl={HANDOFF_URL} loading={false} schema={SCHEMA} />);
+    renderAction({ handoffUrl: HANDOFF_URL, loading: false, schema: SCHEMA });
     fireEvent.click(getButton());
     expect(onSetHandoff).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -2,5 +2,11 @@ import type { SidebarProps } from "@repo/shared/views/AssistantView/components/S
 
 export type ChatHistoryProps = Pick<
   SidebarProps,
-  "disabled" | "lastSave" | "onOpeningChange" | "onRetryRestore" | "sessionId"
+  | "disabled"
+  | "lastSave"
+  | "onOpened"
+  | "onOpeningChange"
+  | "onRetryRestore"
+  | "savedAnalysisId"
+  | "sessionId"
 >;

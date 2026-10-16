@@ -24,17 +24,27 @@ const config = [
       "**/.venv/**",
       "**/.pytest_cache/**",
       "**/.ruff_cache/**",
+      "**/.mypy_cache/**",
       "**/__pycache__/**",
       "**/generated/**",
       "**/playwright-report/**",
       "**/test-results/**",
       ".github/**",
-      "public/favicons/**",
-      "next-env.d.ts",
-      "next.config.mjs",
+      "**/public/favicons/**",
+      "**/next-env.d.ts",
+      "**/next.config.mjs",
     ],
   },
   ...next,
+  {
+    // Pages live under each site rather than at the repo root, so point
+    // no-html-link-for-pages at sites/*/ — otherwise it warns that no pages
+    // directory exists and checks nothing. Raised to error so an <a> with a
+    // literal href to an internal route fails lint instead of passing with a
+    // warning.
+    rules: { "@next/next/no-html-link-for-pages": "error" },
+    settings: { next: { rootDir: [path.join(__dirname, "sites/*/")] } },
+  },
   sonarjs.configs.recommended,
   ...compat.config({
     extends: [
@@ -127,23 +137,6 @@ const config = [
   // deep a file happens to sit. Uses the typescript-eslint variant so it also
   // catches `import type` specifiers.
   {
-    files: ["app/**/*.{ts,tsx}"],
-    rules: {
-      "@typescript-eslint/no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["..", "../*", "../**"],
-              message:
-                "Reach outside this directory via the @/… alias; relative imports are for ./ same-dir and descendants only.",
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
     files: ["packages/shared/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-restricted-imports": [
@@ -188,23 +181,6 @@ const config = [
               group: ["..", "../*", "../**"],
               message:
                 "Reach outside this directory via the @ga2/… alias; relative imports are for ./ same-dir and descendants only.",
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ["pages/**/*.{ts,tsx}"],
-    rules: {
-      "@typescript-eslint/no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["..", "../*", "../**"],
-              message:
-                "Reach outside this directory via an alias (@pages/…, @/…); relative imports are for ./ same-dir and descendants only.",
             },
           ],
         },

@@ -15,6 +15,13 @@ const CONFIG = {
   entities: [{ getId, route: "assemblies" }],
 } as SiteConfig;
 
+const TWO_ROUTE_CONFIG = {
+  entities: [
+    { getId, route: "organisms" },
+    { getId, route: "assemblies" },
+  ],
+} as SiteConfig;
+
 describe("createEntitiesLoader", () => {
   const CONFIG = {} as SiteConfig;
 
@@ -64,6 +71,19 @@ describe("workflows loader", () => {
       expect(fetchMock).not.toHaveBeenCalled();
       expect(getEntitiesById().size).toBe(0);
       expect(getEntitiesByType().size).toBe(0);
+    });
+
+    test("skips the workflows route, which loadWorkflows owns", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockResolvedValue(mockFetchResponse());
+
+      await loadEntities({
+        entities: [{ getId, route: "workflows" }],
+      } as SiteConfig);
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(getEntitiesById().has("workflows")).toBe(false);
+      expect(getEntitiesByType().has("workflows")).toBe(false);
     });
 
     test("skips entities when getId is not configured", async () => {
@@ -122,6 +142,39 @@ describe("workflows loader", () => {
         `Failed to fetch: ${API.assemblies}`
       );
     });
+
+    test("fetches every entity list at once", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock.mockResolvedValue(mockFetchResponse());
+
+      const loading = loadEntities(TWO_ROUTE_CONFIG);
+
+      // Both fetches start before either resolves: a sequential load would
+      // start the second only after awaiting the first.
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenCalledWith(API.organisms);
+      expect(fetchMock).toHaveBeenCalledWith(API.assemblies);
+
+      await loading;
+
+      expect(getEntitiesById().has("organisms")).toBe(true);
+      expect(getEntitiesById().has("assemblies")).toBe(true);
+    });
+
+    test("fetches a list again after its load failed", async () => {
+      const fetchMock = global.fetch as jest.Mock;
+      fetchMock
+        .mockResolvedValueOnce(mockFetchResponse([], false))
+        .mockResolvedValueOnce(mockFetchResponse());
+
+      await expect(loadEntities(CONFIG)).rejects.toThrow(
+        `Failed to fetch: ${API.assemblies}`
+      );
+      await loadEntities(CONFIG);
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(getEntitiesById().get("assemblies")?.has("1")).toBe(true);
+    });
   });
 
   describe("loadWorkflows", () => {
@@ -142,6 +195,17 @@ describe("workflows loader", () => {
 
       expect(byId?.has("trs-1")).toBe(true);
       expect(byId?.has("custom-workflow")).toBe(true);
+    });
+
+    test("throws when a catalog and an extra workflow share a URL-formatted id", async () => {
+      const categories = [{ workflows: [{ trsId: "#workflow/v0.1" }] }];
+      const extraWorkflows = [{ trsId: "workflow-v0-1" } as Workflow];
+
+      fetchMock.mockResolvedValue(mockFetchResponse(categories));
+
+      await expect(loadWorkflows(extraWorkflows)).rejects.toThrow(
+        'Workflows "#workflow/v0.1" and "workflow-v0-1" share the URL id "workflow-v0-1"'
+      );
     });
 
     test("throws when workflow fetch fails", async () => {

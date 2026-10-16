@@ -1,7 +1,10 @@
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Stack } from "@mui/material";
 import { FieldRow } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/fieldRow";
-import { getField } from "@repo/shared/views/AssistantView/components/AnalysisSetup/utils";
+import {
+  getField,
+  isOptionalField,
+} from "@repo/shared/views/AssistantView/components/AnalysisSetup/utils";
 import { type JSX } from "react";
 import { StyledTypography } from "./fieldGroup.styles";
 import type { FieldGroupProps } from "./types";
@@ -37,6 +40,7 @@ export const FieldGroup = ({
           fieldKey={fieldKey}
           loading={loading}
           onSend={onSend}
+          optional={isOptionalField(schema, fieldKey)}
         />
       ))}
     </Stack>

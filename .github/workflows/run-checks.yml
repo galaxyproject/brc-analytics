@@ -4,6 +4,7 @@ on: [pull_request]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,6 +29,7 @@ jobs:
 
   ga2-smoke-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -56,6 +58,7 @@ jobs:
 
   run-checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -81,6 +84,8 @@ jobs:
         run: pip install -r ./catalog/build/py/requirements.txt
       - name: Check Python formatting
         run: npm run format:python -- --check
+      - name: Lint Python
+        run: npm run lint:python
       - name: Run linkml-lint
         # Run linting on the LinkML schemas, to enforce conventions such as in naming, and to catch simple errors.
         run: npm run lint-schema
@@ -99,6 +104,7 @@ jobs:
 
   api-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
 

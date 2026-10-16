@@ -1,6 +1,5 @@
-import { Stack } from "@mui/material";
 import { type JSX } from "react";
-import { StyledStack } from "./chat.styles";
+import { StyledChatInner, StyledStack } from "./chat.styles";
 import type { Props } from "./types";
 
 /**
@@ -9,10 +8,10 @@ import type { Props } from "./types";
  * @param props.children - Chat panel.
  * @returns Chat column.
  */
-export const Chat = ({ children }: Props): JSX.Element => {
+export const Chat = ({ children, ...props }: Props): JSX.Element => {
   return (
-    <StyledStack>
-      <Stack>{children}</Stack>
+    <StyledStack {...props}>
+      <StyledChatInner>{children}</StyledChatInner>
     </StyledStack>
   );
 };

@@ -7,9 +7,12 @@ import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import type { AssistantInfoResponse } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
+import { useConversationKey } from "@repo/shared/views/AssistantView/hooks/UseConversationKey/hook";
 import { type JSX, useEffect, useState } from "react";
 import { AnalysisSetup } from "./components/AnalysisSetup/analysisSetup";
+import { TabLabel as SetupTabLabel } from "./components/AnalysisSetup/components/TabLabel/tabLabel";
 import { ChatPanel } from "./components/ChatPanel/chatPanel";
+import { Conversation } from "./components/Conversation/conversation";
 import { Layout as AssistantUILayout } from "./components/Layout/layout";
 import { LegacyLayout } from "./components/LegacyLayout/legacyLayout";
 import { LoganCohortCard } from "./components/LoganCohortCard/loganCohortCard";
@@ -37,6 +40,7 @@ export const AssistantView = ({
     onRetry,
     resetSession,
     retryRestore,
+    savedAnalysisId,
     schema,
     sendMessage,
     shownSessionId,
@@ -51,6 +55,8 @@ export const AssistantView = ({
   // A conversation opening from the history: until its restore takes over,
   // nothing else may start or send, or the open would wipe it.
   const [isOpening, setIsOpening] = useState(false);
+  const { conversationKey, onNewAnalysis, onOpened } =
+    useConversationKey(resetSession);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -74,21 +80,6 @@ export const AssistantView = ({
 
   const modelLabel = formatModelLabel(info);
   const retentionNotice = formatRetentionNotice(info);
-  const chat = {
-    children: (
-      <ChatPanel
-        error={error}
-        introText={introText}
-        isRestoring={isRestoring || isOpening}
-        isSaved={isSaved}
-        loading={loading}
-        messages={messages}
-        onRetry={onRetry}
-        onSend={sendMessage}
-        suggestions={suggestions}
-      />
-    ),
-  };
   const disclaimer = (
     <>
       AI assistant — {modelLabel}. Your messages are sent to the model provider
@@ -101,21 +92,44 @@ export const AssistantView = ({
   if (isAssistantUIEnabled) {
     return (
       <AssistantUILayout
+        conversationKey={conversationKey}
         slotProps={{
-          chat,
+          chat: {
+            children: (
+              // Keyed by conversation, so an unsent draft doesn't follow the
+              // user into the next one.
+              <Conversation
+                key={conversationKey}
+                error={error}
+                handoffUrl={handoffUrl}
+                introText={introText}
+                isRestoring={isRestoring || isOpening}
+                loading={loading}
+                messages={messages}
+                onRetry={onRetry}
+                onSend={sendMessage}
+                schema={schema}
+                suggestions={suggestions}
+              />
+            ),
+            tabLabel: "Chat",
+          },
           history: {
             children: (
               <Sidebar
                 disabled={loading || isRestoring || isOpening}
                 disclaimer={disclaimer}
                 lastSave={lastSave}
-                onNewAnalysis={resetSession}
+                onNewAnalysis={onNewAnalysis}
+                onOpened={onOpened}
                 onOpeningChange={setIsOpening}
                 onRetryRestore={retryRestore}
+                savedAnalysisId={savedAnalysisId}
                 sessionId={shownSessionId}
                 supportUrl={supportUrl}
               />
             ),
+            tabLabel: "History",
           },
           setup: {
             // The new UI leaves out the Logan cohort card for now.
@@ -127,6 +141,7 @@ export const AssistantView = ({
                 schema={schema}
               />
             ),
+            tabLabel: <SetupTabLabel handoffUrl={handoffUrl} schema={schema} />,
           },
         }}
       />
@@ -140,7 +155,21 @@ export const AssistantView = ({
   return (
     <LegacyLayout
       slotProps={{
-        chat,
+        chat: {
+          children: (
+            <ChatPanel
+              error={error}
+              introText={introText}
+              isRestoring={isRestoring || isOpening}
+              isSaved={isSaved}
+              loading={loading}
+              messages={messages}
+              onRetry={onRetry}
+              onSend={sendMessage}
+              suggestions={suggestions}
+            />
+          ),
+        },
         history: {
           disclaimer,
           feedbackButton: supportUrl && (

@@ -33,6 +33,21 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 const SESSION_KEY = "brc-assistant-session-id";
 const STORED_ID = "stored1111222233334444555566667777";
+const OPENED_ID = "opened111122223333444455556666777";
+
+type SaveResponse = Awaited<ReturnType<typeof mockClient.assistantSaveSession>>;
+
+/**
+ * A promise whose settling the test controls, to hold a request in flight.
+ * @returns The promise and its resolve handle
+ */
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
 
 /**
  * Shaped like the ky HTTPError the client throws -- the hook reads
@@ -54,6 +69,7 @@ function chatReply(): Awaited<ReturnType<typeof mockClient.assistantChat>> {
     is_complete: false,
     reply: "ok",
     saved: false,
+    saved_analysis_id: null,
     schema_state: null,
     session_id: STORED_ID,
     suggestions: [],
@@ -88,6 +104,7 @@ function restored(): Awaited<ReturnType<typeof mockClient.assistantRestore>> {
       { content: "hello back", role: "assistant" },
     ],
     saved: false,
+    saved_analysis_id: null,
     schema_state: null,
     session_id: STORED_ID,
     suggestions: [],
@@ -343,7 +360,7 @@ describe("useAssistantChat auto-save", () => {
     expect(result.current.isSaved).toBe(true);
   });
 
-  test("a confirmed save is reported with the session it saved", async () => {
+  test("a confirmed save is reported with the analysis it saved", async () => {
     // The chat history refreshes on this, so a newly saved conversation joins
     // the list without a page reload.
     auth(true);
@@ -353,8 +370,11 @@ describe("useAssistantChat auto-save", () => {
     );
 
     await waitFor(() =>
-      expect(result.current.lastSave).toEqual({ sessionId: STORED_ID })
+      expect(result.current.lastSave).toEqual({ savedAnalysisId: "analysis-1" })
     );
+    // Signing in saves without a turn, so the save is the only thing that can
+    // tell the chat history which row is now open.
+    expect(result.current.savedAnalysisId).toBe("analysis-1");
   });
 
   test("only a turn the backend wrote is reported as a save", async () => {
@@ -373,12 +393,16 @@ describe("useAssistantChat auto-save", () => {
 
     expect(result.current.lastSave).toBeNull();
 
-    mockClient.assistantChat.mockResolvedValue({ ...chatReply(), saved: true });
+    mockClient.assistantChat.mockResolvedValue({
+      ...chatReply(),
+      saved: true,
+      saved_analysis_id: "analysis-1",
+    });
     await act(async () => {
       await result.current.sendMessage("again");
     });
 
-    expect(result.current.lastSave).toEqual({ sessionId: STORED_ID });
+    expect(result.current.lastSave).toEqual({ savedAnalysisId: "analysis-1" });
   });
 
   test("the save is attempted once per session, not once per render", async () => {
@@ -397,5 +421,67 @@ describe("useAssistantChat auto-save", () => {
 
     await waitFor(() => expect(result.current.isRestoring).toBe(false));
     expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1);
+  });
+
+  test("a save that lands after switching conversations leaves the new one selected", async () => {
+    // The save still joins the list through lastSave, but it is no longer the
+    // conversation on screen, so it must not take the selection.
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+
+    const { rerender, result } = renderHook(
+      ({ initialSessionId }: { initialSessionId?: string }) =>
+        useAssistantChat({ initialSessionId, sessionKey: SESSION_KEY }),
+      { initialProps: {} }
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    mockClient.assistantRestore.mockResolvedValueOnce({
+      ...restored(),
+      saved: true,
+      saved_analysis_id: "analysis-opened",
+      session_id: OPENED_ID,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+    rerender({ initialSessionId: OPENED_ID });
+    await waitFor(() =>
+      expect(result.current.savedAnalysisId).toBe("analysis-opened")
+    );
+
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-left-behind" });
+    });
+
+    expect(result.current.lastSave).toEqual({
+      savedAnalysisId: "analysis-left-behind",
+    });
+    expect(result.current.savedAnalysisId).toBe("analysis-opened");
+  });
+
+  test("a save that lands after a turn started still selects its analysis", async () => {
+    // A turn starting cancels the save's effect run, but the conversation on
+    // screen is still the one just saved -- and a turn that fails never says so.
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+    mockClient.assistantChat.mockRejectedValueOnce(httpError(500));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    await act(async () => {
+      await result.current.sendMessage("still there?");
+    });
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+
+    expect(result.current.savedAnalysisId).toBe("analysis-1");
   });
 });
