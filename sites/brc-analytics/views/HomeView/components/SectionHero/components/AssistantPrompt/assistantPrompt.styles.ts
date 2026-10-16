@@ -69,6 +69,7 @@ export const StyledForm = styled.form`
       }
 
       &:active {
+        background-color: ${PALETTE.PRIMARY_DARK};
         box-shadow: none;
       }
 
