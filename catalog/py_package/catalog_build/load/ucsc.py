@@ -23,7 +23,7 @@ def load_gen_ark_file_list():
     with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
         for line in f:
             line = line.decode("utf-8").strip()
-            yield {"url": line}
+            yield {"path": line}
 
 
 @dlt.resource(name="gen_ark_file_list", write_disposition="replace")
