@@ -1,4 +1,7 @@
-import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import type {
+  EntityConfig,
+  SiteConfig,
+} from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { type EntitiesLoader } from "./hooks/UseEntities/types";
@@ -47,21 +50,23 @@ function isEntityRoute(route: string): route is EntityRoute {
 }
 
 /**
- * Loads the entities store with entities from the API. Skips workflows, which
- * `loadWorkflows` loads.
+ * Loads the entities store with entities from the API, fetching the entity
+ * lists in parallel. Skips routes not in the API, workflows (which
+ * `loadWorkflows` loads), lists already loaded, and entity configs with no
+ * getId.
  * @param config - Site config.
+ * @returns Promise that resolves once every entity list is loaded, or rejects
+ * as soon as any fetch fails, with that failure. Lists that load are stored
+ * as they arrive.
  */
 export async function loadEntities(config: SiteConfig): Promise<void> {
-  for (const entity of config.entities) {
-    const { getId, route } = entity;
-
+  const loads: Promise<void>[] = [];
+  for (const { getId, route } of config.entities) {
     if (!isEntityRoute(route)) continue;
 
     // Workflows are loaded by loadWorkflows: their API payload is workflow
     // categories, not entities keyed by getId.
     if (route === "workflows") continue;
-
-    const apiRoute = API[route];
 
     // Entities are already loaded; skip.
     if (getEntitiesById().has(route)) continue;
@@ -69,15 +74,27 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
     // Get id function is not configured; entities are excluded from preloading.
     if (!getId) continue;
 
-    // Fetch the entities.
-    const entities = await fetchEntities(apiRoute);
-
-    const entityById = new Map<string, unknown>();
-    for (const entity of entities) entityById.set(getId(entity), entity);
-
-    setEntitiesById(route, entityById);
-    setEntitiesByType(route, entities);
+    loads.push(loadEntityList(route, getId));
   }
+  await Promise.all(loads);
+}
+
+/**
+ * Fetches one entity list and stores it, by id and as a list.
+ * @param route - Entity route.
+ * @param getId - Returns an entity's id.
+ */
+async function loadEntityList(
+  route: EntityRoute,
+  getId: NonNullable<EntityConfig["getId"]>
+): Promise<void> {
+  const entities = await fetchEntities(API[route]);
+
+  const entityById = new Map<string, unknown>();
+  for (const entity of entities) entityById.set(getId(entity), entity);
+
+  setEntitiesById(route, entityById);
+  setEntitiesByType(route, entities);
 }
 
 /**
