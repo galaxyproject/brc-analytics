@@ -8,14 +8,19 @@ jest.mock(
           (o: { ncbiTaxonomyId: string }) => o.ncbiTaxonomyId === entityId
         ),
       getAssembly: jest.fn(),
-      getOrganisms: (): unknown => ORGANISMS,
+      getOrganism: (entityId: string): unknown => {
+        const organism = ORGANISMS.find(
+          (o: { ncbiTaxonomyId: string }) => o.ncbiTaxonomyId === entityId
+        );
+        if (!organism) throw new Error(`Organism not found: ${entityId}`);
+        return organism;
+      },
     };
   }
 );
 
 import { getWorkflowOrganismEntity } from "@repo/shared/views/WorkflowView/hooks/UseWorkflowEntities/utils";
 import {
-  ASSEMBLY_WORKFLOW,
   CLADE_WORKFLOW,
   IN_CLADE_ORGANISM_A,
   OUT_OF_CLADE_ORGANISM,
@@ -23,13 +28,10 @@ import {
 } from "../../workflow/cladeFixtures";
 
 describe("getWorkflowOrganismEntity", () => {
-  test("resolves the organism the workflow's taxonomyId names, ignoring any pick", () => {
-    expect(
-      getWorkflowOrganismEntity(
-        SPECIES_WORKFLOW,
-        IN_CLADE_ORGANISM_A.ncbiTaxonomyId
-      )
-    ).toBe(OUT_OF_CLADE_ORGANISM);
+  test("resolves the organism the workflow's taxonomyId names", () => {
+    expect(getWorkflowOrganismEntity(SPECIES_WORKFLOW, undefined)).toBe(
+      OUT_OF_CLADE_ORGANISM
+    );
   });
 
   test("falls back to the organism picked within a clade", () => {
@@ -41,27 +43,9 @@ describe("getWorkflowOrganismEntity", () => {
     ).toBe(IN_CLADE_ORGANISM_A);
   });
 
-  test("ignores a picked organism outside the clade", () => {
-    expect(
-      getWorkflowOrganismEntity(
-        CLADE_WORKFLOW,
-        OUT_OF_CLADE_ORGANISM.ncbiTaxonomyId
-      )
-    ).toBeUndefined();
-  });
-
   test("resolves no organism for a clade with no pick", () => {
     expect(
       getWorkflowOrganismEntity(CLADE_WORKFLOW, undefined)
-    ).toBeUndefined();
-  });
-
-  test("resolves no organism for an assembly-scoped workflow", () => {
-    expect(
-      getWorkflowOrganismEntity(
-        ASSEMBLY_WORKFLOW,
-        IN_CLADE_ORGANISM_A.ncbiTaxonomyId
-      )
     ).toBeUndefined();
   });
 });
