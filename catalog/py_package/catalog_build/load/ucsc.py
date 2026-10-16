@@ -7,8 +7,7 @@ import requests
 from pydantic import BaseModel
 
 from ..utils import get_db_path_string
-from .load import LoadDestinationParams
-from .utils import rows_to_chunked_dataframes
+from .common import LoadDestinationParams, rows_to_chunked_dataframes
 
 
 class UcscAssembly(BaseModel):

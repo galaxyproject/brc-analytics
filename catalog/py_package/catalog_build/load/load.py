@@ -2,23 +2,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .catalog_source import load_catalog_source_data
+from .common import LoadDestinationParams
 from .ncbi_api import load_ncbi_api_data
 from .ncbi_taxonomy import load_ncbi_taxonomy
 from .ucsc import load_ucsc_data
-
-
-@dataclass
-class LoadDestinationParams:
-    """
-    Parameters used to determine the destinations at which to load catalog data.
-
-    Attributes:
-        temp_folder_path: Path of the temporary folder holding the DuckDB database
-        dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
-    """
-
-    temp_folder_path: Path
-    dlt_pipeline_prefix: str
 
 
 @dataclass

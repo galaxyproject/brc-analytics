@@ -6,8 +6,7 @@ import dlt
 import requests
 
 from ..utils import get_db_path_string
-from .load import LoadDestinationParams
-from .utils import rows_to_chunked_dataframes
+from .common import LoadDestinationParams, rows_to_chunked_dataframes
 
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"

@@ -6,7 +6,7 @@ import requests
 from pydantic import BaseModel
 
 from ..utils import get_db_path
-from .load import LoadDestinationParams
+from .common import LoadDestinationParams
 
 
 class NcbiGenomeAnnotationInfo(BaseModel):

@@ -5,7 +5,7 @@ import yaml
 
 from ..generated_schema import schema
 from ..utils import get_db_path_string
-from .load import LoadDestinationParams
+from .common import LoadDestinationParams
 
 
 def read_entity_list_from_yaml(yaml_path: Path, list_key: str):
