@@ -1240,7 +1240,13 @@ def build_files(
     if source_outbreaks_df is not None:
         source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
     source_workflows_df = load_and_transform_result.workflows_source
-    ucsc_assemblies_df = load_and_transform_result.ucsc_assemblies
+    ucsc_assemblies_df = load_and_transform_result.ucsc_assemblies.rename(
+        {
+            "ucsc_browser": "ucscBrowser",
+            "gen_bank": "genBank",
+            "ref_seq": "refSeq",
+        }
+    )
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
