@@ -12,6 +12,9 @@ export const Alert = ({
   if (enaTaxonomyId.isLoading) return null;
   if (!enaTaxonomyId.isEnabled) return null;
 
+  // Not counted yet (the read runs haven't reached the table): don't flash the
+  // alert before the count is known.
+  if (taxonomyMatches === null) return null;
   if (taxonomyMatches > 0) return null;
 
   return (

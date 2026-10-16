@@ -6,5 +6,5 @@ export interface Props {
   onOpen: () => void;
   selectedCount: number;
   taxonomyCount?: number;
-  taxonomyMatches: number;
+  taxonomyMatches: number | null;
 }
