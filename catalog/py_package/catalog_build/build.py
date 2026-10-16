@@ -1,6 +1,4 @@
 import datetime
-import gzip
-import io
 import json
 import logging
 import os
@@ -267,82 +265,73 @@ def get_genomes_df(source_ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
     return ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand")
 
 
-def _get_gene_model_urls_from_genark_list():
-    """Download and parse the genArkFileList.txt.gz file to extract GTF URLs.
+def _get_gene_model_urls_from_genark_list(gen_ark_file_list: pd.DataFrame):
+    """Extract GTF URLs from loaded file list.
 
     Returns:
         dict: A dictionary mapping genome assembly IDs to their GTF file URLs
     """
 
-    print("Downloading genArkFileList.txt.gz...")
-    genark_url = "https://hgdownload.soe.ucsc.edu/hubs/genArkFileList.txt.gz"
     download_base_url = "https://hgdownload.soe.ucsc.edu/hubs"
-    response = requests.get(genark_url)
-    response.raise_for_status()
 
     # Dictionary to store the best GTF URL for each assembly ID
     gene_model_urls = {}
 
     # Process the gzipped file content
-    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
-        for line in f:
-            line = line.decode("utf-8").strip()
-            # Filter for GTF files
-            if line.endswith(".gtf.gz"):
-                # Extract assembly ID from the path
-                # Format: GCF/001/559/675/GCF_001559675.1/genes/GCF_001559675.1.ncbiGene.gtf.gz
-                parts = line.split("/")
+    for line in gen_ark_file_list["url"]:
+        line = line.decode("utf-8").strip()
+        # Filter for GTF files
+        if line.endswith(".gtf.gz"):
+            # Extract assembly ID from the path
+            # Format: GCF/001/559/675/GCF_001559675.1/genes/GCF_001559675.1.ncbiGene.gtf.gz
+            parts = line.split("/")
 
-                # We need at least 7 parts to have a valid path with genes directory
-                if len(parts) >= 7:
-                    # Check if the 6th part (index 5) is 'genes'
-                    if parts[5] == "genes":
-                        # The assembly ID is in the 5th position (index 4)
-                        asm_id = parts[4]
+            # We need at least 7 parts to have a valid path with genes directory
+            if len(parts) >= 7:
+                # Check if the 6th part (index 5) is 'genes'
+                if parts[5] == "genes":
+                    # The assembly ID is in the 5th position (index 4)
+                    asm_id = parts[4]
 
-                        if asm_id:
-                            # Apply the same priority logic as before
-                            url = urllib.parse.urljoin(f"{download_base_url}/", line)
+                    if asm_id:
+                        # Apply the same priority logic as before
+                        url = urllib.parse.urljoin(f"{download_base_url}/", line)
 
-                            # If we haven't seen this assembly yet, add it
-                            if asm_id not in gene_model_urls:
+                        # If we haven't seen this assembly yet, add it
+                        if asm_id not in gene_model_urls:
+                            gene_model_urls[asm_id] = url
+                        else:
+                            # Apply priority logic: ncbiRefSeq > ncbiGene > augustus
+                            current_url = gene_model_urls[asm_id]
+
+                            # Replace with higher priority URL if found
+                            if "ncbiRefSeq" in url and "ncbiRefSeq" not in current_url:
                                 gene_model_urls[asm_id] = url
-                            else:
-                                # Apply priority logic: ncbiRefSeq > ncbiGene > augustus
-                                current_url = gene_model_urls[asm_id]
-
-                                # Replace with higher priority URL if found
-                                if (
-                                    "ncbiRefSeq" in url
-                                    and "ncbiRefSeq" not in current_url
-                                ):
-                                    gene_model_urls[asm_id] = url
-                                elif "ncbiGene" in url and not any(
-                                    x in current_url for x in ["ncbiRefSeq"]
-                                ):
-                                    gene_model_urls[asm_id] = url
-                                elif "augustus" in url and not any(
-                                    x in current_url for x in ["ncbiRefSeq", "ncbiGene"]
-                                ):
-                                    gene_model_urls[asm_id] = url
+                            elif "ncbiGene" in url and not any(
+                                x in current_url for x in ["ncbiRefSeq"]
+                            ):
+                                gene_model_urls[asm_id] = url
+                            elif "augustus" in url and not any(
+                                x in current_url for x in ["ncbiRefSeq", "ncbiGene"]
+                            ):
+                                gene_model_urls[asm_id] = url
 
     print(f"Found GTF URLs for {len(gene_model_urls)} assemblies")
     return gene_model_urls
 
 
-def add_gene_model_url(genomes_df: pd.DataFrame):
+def add_gene_model_url(genomes_df: pd.DataFrame, gen_ark_file_list: pd.DataFrame):
     """Add gene model URLs to the genomes DataFrame using the genArkFileList.txt.gz file.
 
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
+        gen_ark_file_list: DataFrame containing file files loaded from genArkFileList.txt.gz.
 
     Returns:
         DataFrame with added 'geneModelUrl' column
     """
-    print("Fetching gene model URLs from genArkFileList.txt.gz")
-
     # Get all gene model URLs at once
-    gene_model_urls = _get_gene_model_urls_from_genark_list()
+    gene_model_urls = _get_gene_model_urls_from_genark_list(gen_ark_file_list)
 
     # Map accessions to URLs
     gene_model_url_series = genomes_df["accession"].map(gene_model_urls)
@@ -1088,6 +1077,7 @@ class LoadAndTransformResult:
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
     ucsc_assemblies: pd.DataFrame
+    gen_ark_file_list: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
     taxonomy_outbreaks: pd.DataFrame | None
@@ -1153,6 +1143,7 @@ def load_and_transform(params: LoadAndTransformParams):
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             ucsc_assemblies=con.query("select * from ucsc.assembly_list").df(),
+            gen_ark_file_list=con.query("select * from ucsc.gen_ark_file_list").df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=(
@@ -1382,7 +1373,9 @@ def build_files(
     print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
     if do_gene_model_urls:
-        genomes_df = add_gene_model_url(genomes_df)
+        genomes_df = add_gene_model_url(
+            genomes_df, load_and_transform_result.gen_ark_file_list
+        )
         qc_report_params["missing_gene_model_urls"] = report_missing_values(
             "accessions",
             "matched with gene model URLs",
