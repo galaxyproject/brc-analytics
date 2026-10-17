@@ -5,7 +5,6 @@ from pathlib import Path
 import dlt
 import requests
 
-from ..utils import get_db_path_string
 from .common import LoadDestinationParams, rows_to_chunked_dataframes
 
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
@@ -137,13 +136,13 @@ def ncbi_taxdump(dmp_dir: Path):
     ]
 
 
-def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
+def load_taxdump(dest: LoadDestinationParams):
     pipeline = dlt.pipeline(
-        pipeline_name=dlt_pipeline_prefix + "ncbi_taxonomy",
-        destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("ncbi_taxonomy"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="ncbi",
     )
-    pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
+    pipeline.run(ncbi_taxdump(dest.temp_folder_path / TAXDUMP_DIR_NAME))
 
 
 def calc_taxdump_md5(temp_folder_path: Path) -> str:
@@ -210,8 +209,5 @@ def load_ncbi_taxonomy(dest: LoadDestinationParams) -> str:
     """
     fetched_md5 = fetch_taxdump_md5()
     download_taxdump(dest.temp_folder_path, fetched_md5)
-    load_taxdump(
-        temp_folder_path=dest.temp_folder_path,
-        dlt_pipeline_prefix=dest.dlt_pipeline_prefix,
-    )
+    load_taxdump(dest)
     return fetched_md5

@@ -4,7 +4,6 @@ import dlt
 import yaml
 
 from ..generated_schema import schema
-from ..utils import get_db_path_string
 from .common import LoadDestinationParams
 
 
@@ -120,8 +119,8 @@ def load_catalog_source_data(
       outbreaks_path: Path of source outbreaks YAML, or None for catalogs without outbreaks
     """
     pipeline = dlt.pipeline(
-        pipeline_name=dest.dlt_pipeline_prefix + "catalog_source",
-        destination=dlt.destinations.duckdb(get_db_path_string(dest.temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("catalog_source"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="catalog_source",
     )
     pipeline.run(

@@ -3,7 +3,6 @@ import dlt
 import requests
 from bs4 import BeautifulSoup
 
-from ..utils import get_db_path_string
 from .common import LoadDestinationParams
 
 
@@ -41,8 +40,8 @@ def galaxy_data(*, datacache_directory_url: str):
 
 def load_galaxy_data(dest: LoadDestinationParams, galaxy_datacache_directory_url: str):
     pipeline = dlt.pipeline(
-        pipeline_name=dest.dlt_pipeline_prefix + "galaxy",
-        destination=dlt.destinations.duckdb(get_db_path_string(dest.temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("galaxy"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="galaxy",
     )
     pipeline.run(galaxy_data(datacache_directory_url=galaxy_datacache_directory_url))

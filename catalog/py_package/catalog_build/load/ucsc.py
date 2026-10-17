@@ -5,7 +5,6 @@ import dlt
 import requests
 from pydantic import BaseModel
 
-from ..utils import get_db_path_string
 from .common import LoadDestinationParams, rows_to_chunked_dataframes
 
 
@@ -43,8 +42,8 @@ def ucsc_data(*, assemblies_url: str):
 
 def load_ucsc_data(dest: LoadDestinationParams, ucsc_assemblies_url: str):
     pipeline = dlt.pipeline(
-        pipeline_name=dest.dlt_pipeline_prefix + "ucsc",
-        destination=dlt.destinations.duckdb(get_db_path_string(dest.temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("ucsc"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="ucsc",
     )
     pipeline.run(ucsc_data(assemblies_url=ucsc_assemblies_url))

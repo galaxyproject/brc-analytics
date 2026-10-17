@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from ..utils import get_db_path, get_db_path_string
+
 # Rows per yielded DataFrame for large input datasets. Tuning knob: larger means
 # fewer dlt round-trips but higher peak memory; smaller means lower memory but
 # more per-chunk overhead.
@@ -23,6 +25,15 @@ class LoadDestinationParams:
 
     temp_folder_path: Path
     dlt_pipeline_prefix: str
+
+    def get_db_path(self):
+        return get_db_path(self.temp_folder_path)
+
+    def get_db_path_string(self):
+        return get_db_path_string(self.temp_folder_path)
+
+    def get_dlt_pipeline_name(self, base_name: str):
+        return self.dlt_pipeline_prefix + base_name
 
 
 def rows_to_chunked_dataframes(rows: Iterable, dtypes: dict[str, str] | None = None):
