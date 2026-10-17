@@ -241,13 +241,13 @@ def get_genome_row(genome_info: pd.Series):
 
 def get_genomes_df(source_ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Takes loaded NCBI genomes and creates DataFrames for genomes and biosample data.
+    Takes loaded NCBI genomes and creates a DataFrame for genomes data.
 
     Args:
       source_ncbi_genomes_df: Dataframe of genome metadata loaded via dlt
 
     Returns:
-      Tuple of (genomes_df, biosample_df)
+      Genomes DataFrame
     """
     json_column_names = [
         "annotation_info",
