@@ -1187,6 +1187,10 @@ def build_files(
     """
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}
+
+    if not datacache_base_url.endswith("/"):
+        datacache_base_url = f"{datacache_base_url}/"
+
     print("Building files")
 
     start_time = datetime.datetime.now(datetime.UTC).isoformat()
@@ -1205,9 +1209,7 @@ def build_files(
             taxa_path=None if taxa_path is None else Path(taxa_path),
             outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
             ucsc_assemblies_url=ucsc_assemblies_url,
-            galaxy_datacache_directory_url=datacache_base_url
-            if datacache_base_url.endswith("/")
-            else f"{datacache_base_url}/",
+            galaxy_datacache_directory_url=datacache_base_url,
         )
     )
     source_list_df = load_and_transform_result.assemblies_source
