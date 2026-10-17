@@ -850,3 +850,180 @@ describe("sorting and page size", () => {
     expect(screen.getAllByText(/101.150 of 400/)[0]).toBeTruthy();
   });
 });
+
+describe("the column chooser", () => {
+  const annotated = {
+    ...BASE_RESULTS,
+    hits: [
+      hit({
+        sra: sraMeta({
+          assay_type: "WGS",
+          bioproject: "PRJNA123456",
+          instrument: "Illumina NovaSeq 6000",
+          library_layout: "PAIRED",
+          mbases: 12345,
+          study: "SRP654321",
+        }),
+      }),
+    ],
+    sra_annotated: 1,
+    sra_mirror_available: true,
+  };
+
+  /**
+   * The header labels, in order.
+   * @returns Each column header's text.
+   */
+  function headers(): string[] {
+    return screen
+      .getAllByRole("columnheader")
+      .map((cell) => cell.textContent ?? "");
+  }
+
+  /**
+   * Open the chooser, flip one column and close it again.
+   * @param label - The column's label in the menu.
+   */
+  function toggle(label: string): void {
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: label }));
+    // The menu stays open on a pick and, being modal, hides the table from
+    // role queries until it closes.
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+  }
+
+  test("keeps the table as it was until a column is picked", () => {
+    renderResults(annotated);
+
+    expect(headers()).toEqual([
+      "Accession",
+      "k-mer coverage",
+      "ANI est.",
+      "Organism",
+      "Platform",
+      "Country",
+      "Released",
+    ]);
+  });
+
+  test("offers every mirror field the API returns", () => {
+    renderResults(annotated);
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
+
+    const items = screen.getAllByRole("menuitemcheckbox");
+    expect(items.map((item) => item.textContent)).toEqual([
+      "Platform",
+      "Country",
+      "Released",
+      "Instrument",
+      "Assay type",
+      "Layout",
+      "Mbases",
+      "BioProject",
+      "Study",
+    ]);
+    expect(items.map((item) => item.getAttribute("aria-checked"))).toEqual([
+      "true",
+      "true",
+      "true",
+      ...Array(6).fill("false"),
+    ]);
+  });
+
+  test("adds a column in its place rather than at the end", () => {
+    renderResults(annotated);
+    toggle("Study");
+    toggle("Instrument");
+
+    // Config order, not click order, so a column lands in the same place
+    // however it was switched on.
+    expect(headers().slice(4)).toEqual([
+      "Platform",
+      "Country",
+      "Released",
+      "Instrument",
+      "Study",
+    ]);
+    const row = screen.getByText("Plasmodium falciparum").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("Illumina NovaSeq 6000");
+  });
+
+  test("hides a default column", () => {
+    renderResults(annotated);
+    toggle("Country");
+
+    expect(headers()).not.toContain("Country");
+    expect(screen.queryByRole("cell", { name: "Malawi" })).toBeNull();
+  });
+
+  test("hiding the sorted column goes back to score order", () => {
+    const { actions } = renderResults({
+      ...annotated,
+      order: "asc",
+      sort: "country",
+    });
+    toggle("Country");
+
+    expect(actions.setSort).toHaveBeenCalledWith("score");
+  });
+
+  test("hiding a column the table isn't sorted by leaves the sort alone", () => {
+    const { actions } = renderResults(annotated);
+    toggle("Country");
+
+    expect(actions.setSort).not.toHaveBeenCalled();
+  });
+
+  test("links the BioProject and the study out to NCBI", () => {
+    renderResults(annotated);
+    toggle("BioProject");
+    toggle("Study");
+
+    expect(
+      screen
+        .getByRole("link", { name: "PRJNA123456 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/bioproject/PRJNA123456");
+    expect(
+      screen
+        .getByRole("link", { name: "SRP654321 (opens NCBI in a new tab)" })
+        .getAttribute("href")
+    ).toBe("https://www.ncbi.nlm.nih.gov/sra/?term=SRP654321");
+  });
+
+  test("groups the Mbases digits and dims what the mirror lacks", () => {
+    renderResults({
+      ...annotated,
+      hits: [
+        ...annotated.hits,
+        hit({ accession: "SRR000002", sra: sraMeta() }),
+      ],
+      total_hits: 2,
+      total_matches: 2,
+    });
+    toggle("Mbases");
+    toggle("BioProject");
+
+    expect(screen.getByText("12,345")).toBeTruthy();
+    const row = screen.getByText("SRR000002").closest("tr");
+    const cells = within(row as HTMLElement).getAllByRole("cell");
+    expect(cells[7].textContent).toBe("--");
+    expect(cells[8].textContent).toBe("--");
+    expect(
+      within(row as HTMLElement).queryByRole("link", { name: /NCBI in/ })
+    ).toBeNull();
+  });
+
+  test("sorts only the columns the API can order by", () => {
+    const { actions } = renderResults(annotated);
+    toggle("Instrument");
+
+    // The three default columns keep their sort; a new one is a plain header,
+    // since the API cannot order by it.
+    const instrument = screen.getByRole("columnheader", { name: "Instrument" });
+    expect(within(instrument).queryByRole("button")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Platform" }));
+    expect(actions.setSort).toHaveBeenCalledWith("platform");
+  });
+});

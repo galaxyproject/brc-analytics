@@ -94,6 +94,21 @@ def test_upgrade_head_creates_kmindex_submissions(migrated_db):
         engine.dispose()
 
 
+def test_kmindex_submissions_has_a_per_user_history_index(migrated_db):
+    engine = create_engine(migrated_db)
+    try:
+        indexes = {
+            i["name"]: i["column_names"]
+            for i in inspect(engine).get_indexes("kmindex_submissions")
+        }
+        assert indexes["ix_kmindex_submissions_user_id_created_at"] == [
+            "user_id",
+            "created_at",
+        ]
+    finally:
+        engine.dispose()
+
+
 def test_upgrade_head_creates_galaxy_jobs(migrated_db):
     engine = create_engine(migrated_db)
     try:
