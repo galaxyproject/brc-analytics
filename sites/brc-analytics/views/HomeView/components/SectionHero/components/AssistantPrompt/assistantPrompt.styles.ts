@@ -3,13 +3,28 @@ import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/
 import { bpDownSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 
-export const StyledForm = styled.form`
+export const StyledAssistantPrompt = styled.div`
+  display: grid;
+  gap: 16px;
   max-width: 560px;
   width: 100%;
 
+  ${bpDownSm} {
+    /* Deliberately wider than the headline column so the box can hold
+       ASSISTANT_INPUT_PLACEHOLDER on one line, and capped so it stays tied to
+       it. That placeholder renders at 356px and the field padding and send
+       button take another 64px, needing 420px, rounded up to 424px.
+       The cap only decides the width once the viewport can afford it, from
+       around 456px up; below that the viewport is the narrower constraint and
+       the placeholder wraps to two lines. Re-measure if its wording changes. */
+    max-width: 424px;
+  }
+`;
+
+export const StyledForm = styled.form`
   /* The input ships with padding around its paper, a plain icon button, and the
      field stacked above the button so the row beneath it can hold more actions.
-     The hero has no other actions: it renders the paper flush, the field and
+     The input has no other actions: it renders the paper flush, the field and
      the send action on a single row, and the send action as a primary button. */
   && {
     .MuiBox-root {
@@ -23,6 +38,12 @@ export const StyledForm = styled.form`
         inset 0 0 0 1px ${PALETTE.SMOKE_DARK},
         ${SHADOWS["02"]};
       flex-direction: row;
+
+      &:has(.MuiInputBase-root.Mui-focused) {
+        box-shadow:
+          inset 0 0 0 1px ${PALETTE.INK_MAIN},
+          ${SHADOWS["02"]};
+      }
     }
 
     .MuiInputBase-root {
@@ -35,14 +56,21 @@ export const StyledForm = styled.form`
       }
     }
 
+    /* Input renders a secondary icon button: replace its grey inset outline. */
     .MuiIconButton-root {
       background-color: ${PALETTE.PRIMARY_MAIN};
       border-radius: 4px;
+      box-shadow: 0 1px 0 0 ${PALETTE.PRIMARY_DARK};
       color: ${PALETTE.COMMON_WHITE};
       padding: 6px;
 
       &:hover {
         background-color: ${PALETTE.PRIMARY_DARK};
+      }
+
+      &:active {
+        background-color: ${PALETTE.PRIMARY_DARK};
+        box-shadow: none;
       }
 
       &.Mui-disabled {
@@ -51,16 +79,5 @@ export const StyledForm = styled.form`
         opacity: 0.5;
       }
     }
-  }
-
-  ${bpDownSm} {
-    /* Deliberately wider than the headline column so the box can hold
-       ASSISTANT_INPUT_PLACEHOLDER on one line, and capped so it stays tied to
-       it. That placeholder renders at 356px and the field padding and send
-       button take another 64px, needing 420px, rounded up to 424px.
-       The cap only decides the width once the viewport can afford it, from
-       around 456px up; below that the viewport is the narrower constraint and
-       the placeholder wraps to two lines. Re-measure if its wording changes. */
-    max-width: 424px;
   }
 `;
