@@ -1221,7 +1221,7 @@ def build_files(
         source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
     source_workflows_df = load_and_transform_result.workflows_source
     ucsc_assemblies_df = load_and_transform_result.ucsc_assemblies.rename(
-        {
+        columns={
             "ucsc_browser": "ucscBrowser",
             "gen_bank": "genBank",
             "ref_seq": "refSeq",
