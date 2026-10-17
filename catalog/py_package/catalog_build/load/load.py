@@ -12,16 +12,16 @@ from .ucsc import load_ucsc_data
 @dataclass
 class LoadParams(LoadDestinationParams):
     """
-    Parameters required to load catalog data.
+    Parameters required to load catalog data, including those from LoadDestinationParams.
 
     Attributes:
-        temp_folder_path: Path of the temporary folder holding the DuckDB database
-        dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
         assemblies_path: Path to source assemblies YAML
         organisms_path: Path to source organisms YAML
         workflows_path: Path to source workflows YAML, or None for catalogs that don't build workflows
         taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
         outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
+        ucsc_assemblies_url: URL of UCSC assembly list JSON
+        galaxy_datacache_directory_url: URL of a Galaxy Datacache genomes directory listing. Must end in a slash.
     """
 
     assemblies_path: Path
