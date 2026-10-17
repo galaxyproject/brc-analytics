@@ -1,8 +1,8 @@
 {
-    "assembly_count": 5505,
+    "assembly_count": 5506,
     "children": [
         {
-            "assembly_count": 397,
+            "assembly_count": 398,
             "children": [
                 {
                     "assembly_count": 65,
@@ -1220,7 +1220,7 @@
                     "rank": "kingdom"
                 },
                 {
-                    "assembly_count": 330,
+                    "assembly_count": 331,
                     "children": [
                         {
                             "assembly_count": 10,
@@ -1485,7 +1485,7 @@
                             "rank": "phylum"
                         },
                         {
-                            "assembly_count": 227,
+                            "assembly_count": 228,
                             "children": [
                                 {
                                     "assembly_count": 93,
@@ -2584,7 +2584,7 @@
                                     "rank": "class"
                                 },
                                 {
-                                    "assembly_count": 87,
+                                    "assembly_count": 88,
                                     "children": [
                                         {
                                             "assembly_count": 28,
@@ -2887,13 +2887,13 @@
                                             "rank": "order"
                                         },
                                         {
-                                            "assembly_count": 59,
+                                            "assembly_count": 60,
                                             "children": [
                                                 {
-                                                    "assembly_count": 43,
+                                                    "assembly_count": 44,
                                                     "children": [
                                                         {
-                                                            "assembly_count": 42,
+                                                            "assembly_count": 43,
                                                             "children": [
                                                                 {
                                                                     "assembly_count": 1,
@@ -3271,6 +3271,13 @@
                                                                     "children": [],
                                                                     "name": "Rickettsia endosymbiont of Pantilius tunicatus",
                                                                     "ncbi_tax_id": "3066267",
+                                                                    "rank": "species"
+                                                                },
+                                                                {
+                                                                    "assembly_count": 1,
+                                                                    "children": [],
+                                                                    "name": "Rickettsia endosymbiont of Nabis limbatus",
+                                                                    "ncbi_tax_id": "3066268",
                                                                     "rank": "species"
                                                                 },
                                                                 {

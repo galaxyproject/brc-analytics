@@ -2,7 +2,7 @@
 
 ## Assemblies not found on NCBI
 
-- GCF_965196655.1
+None
 
 ## Assemblies not found in UCSC list
 
@@ -16,10 +16,7 @@ None
 
 ## Assemblies with datacache URLs not found
 
-- GCA_004302925.2
 - GCA_006535965.1
-- GCA_051144935.1
-- GCA_051144965.1
 - GCF_000008445.1
 - GCF_000017685.1
 - GCF_000018225.1
@@ -386,7 +383,6 @@ None
 - 2956251: Orthopicobirnavirus equi
 - 2971765: Langya virus
 - 3048399: Betatorquevirus homini32
-- 3066268: Rickettsia endosymbiont of Nabis limbatus
 - 3429217: Hepatovirus fejalco
 - 3703201: 3703201
 - 3703354: 3703354
