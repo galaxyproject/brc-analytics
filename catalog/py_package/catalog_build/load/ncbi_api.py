@@ -12,20 +12,9 @@ class NcbiGenomeAnnotationInfo(BaseModel):
     status: str | None = None
 
 
-class NcbiGenomeAssemblyInfoBiosampleId(BaseModel):
-    db: str | None = None
-    value: str
-
-
-class NcbiGenomeAssemblyInfoBiosample(BaseModel):
-    accession: str
-    sample_ids: list[NcbiGenomeAssemblyInfoBiosampleId] | None = None
-
-
 class NcbiGenomeAssemblyInfo(BaseModel):
     assembly_level: str
     assembly_status: str | None = None
-    biosample: NcbiGenomeAssemblyInfoBiosample | None = None
     refseq_category: str | None = None
     release_date: str
 
