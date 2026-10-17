@@ -3,6 +3,7 @@ from pathlib import Path
 
 from .catalog_source import load_catalog_source_data
 from .common import LoadDestinationParams
+from .galaxy import load_galaxy_data
 from .ncbi_api import load_ncbi_api_data
 from .ncbi_taxonomy import load_ncbi_taxonomy
 from .ucsc import load_ucsc_data
@@ -29,6 +30,7 @@ class LoadParams(LoadDestinationParams):
     taxa_path: Path | None
     outbreaks_path: Path | None
     ucsc_assemblies_url: str
+    galaxy_datacache_directory_url: str
 
 
 @dataclass
@@ -60,5 +62,7 @@ def do_dlt_load(params: LoadParams):
     load_ncbi_api_data(params)
 
     load_ucsc_data(params, ucsc_assemblies_url=params.ucsc_assemblies_url)
+
+    load_galaxy_data(params, params.galaxy_datacache_directory_url)
 
     return LoadResult(ncbi_taxdump_md5=ncbi_taxdump_md5)

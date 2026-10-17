@@ -6,11 +6,8 @@ import urllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-import bs4
 import duckdb
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 
 from .load import LoadParams, do_dlt_load
 from .qc_utils import (
@@ -982,44 +979,31 @@ def save_workflow_taxonomy_mapping(source_workflows_df: pd.DataFrame, output_pat
     print(f"Wrote workflow taxonomy mapping to {output_path}")
 
 
-def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
+def add_galaxy_datacache_url(
+    genomes_df, normalized_base_url, directory_listing: pd.DataFrame
+):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
 
-    Fetches the parent directory listing once and checks accession membership
-    against it, rather than issuing a request per accession.
-
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
-        base_url: Base URL used to construct the datacache link per accession
-        timeout: Timeout in seconds for the listing request (default: 30)
+        normalized_base_url: Base URL used to construct the datacache link per accession. Must end in a slash.
+        directory_listing: DataFrame containing link URLs from the datacache directory listing.
 
     Returns:
         tuple: (updated genomes_df with galaxyDatacacheUrl column, list of missing accessions)
     """
     genomes_df = genomes_df.copy()
 
-    if not base_url:
-        genomes_df["galaxyDatacacheUrl"] = ""
-        return genomes_df, []
-
-    normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
-
     print("Validating Galaxy Datacache URLs...")
 
-    response = requests.get(normalized_base_url, timeout=timeout)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
     available = {
         href[:-1]
-        for link in soup.find_all("a")
-        if isinstance(link, bs4.element.Tag)
-        and isinstance(href := link.get("href"), str)
-        and href.endswith("/")
-        and not href.startswith(("/", ".", "?", "http"))
+        for href in directory_listing["url"]
+        if href.endswith("/") and not href.startswith(("/", ".", "?", "http"))
     }
 
-    # If the response's contents are not as expected, we'd otherwise
+    # If the listing's contents are not as expected, we'd otherwise
     # silently mark every accession as missing. Fail loudly instead.
     if not available:
         raise RuntimeError(
@@ -1078,6 +1062,7 @@ class LoadAndTransformResult:
     ncbi_genomes: pd.DataFrame
     ucsc_assemblies: pd.DataFrame
     gen_ark_file_list: pd.DataFrame
+    galaxy_datacache_listing: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
     taxonomy_outbreaks: pd.DataFrame | None
@@ -1144,6 +1129,9 @@ def load_and_transform(params: LoadAndTransformParams):
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             ucsc_assemblies=con.query("select * from ucsc.assembly_list").df(),
             gen_ark_file_list=con.query("select * from ucsc.gen_ark_file_list").df(),
+            galaxy_datacache_listing=con.query(
+                "select * from galaxy.datacache_directory_listing"
+            ).df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
             taxonomy_outbreaks=(
@@ -1166,6 +1154,7 @@ def build_files(
     temp_folder_path,
     dlt_pipeline_prefix,
     build_meta_output_path,
+    datacache_base_url,
     taxonomic_group_sets=None,
     do_gene_model_urls=True,
     qc_report_path=None,
@@ -1177,7 +1166,6 @@ def build_files(
     workflow_taxonomy_mapping_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
-    datacache_base_url=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1220,6 +1208,9 @@ def build_files(
             taxa_path=None if taxa_path is None else Path(taxa_path),
             outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
             ucsc_assemblies_url=ucsc_assemblies_url,
+            galaxy_datacache_directory_url=datacache_base_url
+            if datacache_base_url.endswith("/")
+            else f"{datacache_base_url}/",
         )
     )
     source_list_df = load_and_transform_result.assemblies_source
@@ -1385,17 +1376,12 @@ def build_files(
     else:
         genomes_df["geneModelUrl"] = ""
 
-    if datacache_base_url:
-        genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
-            genomes_df, datacache_base_url
-        )
-        qc_report_params["missing_datacache_urls"] = missing_datacache_urls
-    else:
-        print(
-            "No Galaxy Datacache base URL provided; skipping datacache link generation."
-        )
-        genomes_df["galaxyDatacacheUrl"] = ""
-        qc_report_params["missing_datacache_urls"] = []
+    genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
+        genomes_df,
+        datacache_base_url,
+        load_and_transform_result.galaxy_datacache_listing,
+    )
+    qc_report_params["missing_datacache_urls"] = missing_datacache_urls
 
     # Find outdated accessions (where accession != currentAccession)
     if qc_report_path:
