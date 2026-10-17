@@ -172,6 +172,8 @@ class SraRunMetadata(BaseModel):
 
     assay_type: Optional[str] = None
     bioproject: Optional[str] = None
+    # Null on a mirror older than schema_version 5, which has no such column.
+    biosample: Optional[str] = None
     country: Optional[str] = None
     instrument: Optional[str] = None
     library_layout: Optional[str] = None
@@ -477,7 +479,37 @@ class KmindexResults(BaseModel):
     sra_annotated: int = Field(
         default=0, description="Hits on this page found in the SRA mirror"
     )
+    filtered: bool = Field(
+        default=False,
+        description="True when f.* filter parameters were applied. The page is "
+        "then served from the export parquet, filtering the whole match set "
+        "(not the capped listing): filtered_matches is how many rows the "
+        "filter keeps, total_hits is that capped as the listing is, truncated "
+        "says whether the cap bit, per_index is empty, and cohort/geography "
+        "stay the unfiltered ones; the filtered pair is GET .../summary",
+    )
+    filtered_matches: Optional[int] = Field(
+        default=None,
+        description="Rows the filter keeps, before the cap; set only when "
+        "filtered. The filtered export carries all of them",
+    )
     hits: List[KmindexHit] = []
+
+
+class KmindexSummary(BaseModel):
+    """The cohort and geography of a filtered match set."""
+
+    cohort: KmindexCohort = Field(
+        ...,
+        description="Headline counts apply every filter; each facet is counted "
+        "with every filter except its own, so its parts sum to its own total "
+        "rather than to in_mirror",
+    )
+    geography: KmindexGeography = Field(
+        ..., description="Counted with every filter except country"
+    )
+    matched: int = Field(..., description="Rows of the match set the filter keeps")
+    total_matches: int = Field(..., description="Rows of the whole match set")
 
 
 class GalaxyJobResponse(BaseModel):

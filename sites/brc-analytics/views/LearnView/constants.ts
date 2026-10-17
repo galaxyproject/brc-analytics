@@ -1,3 +1,4 @@
+import { ROUTES } from "@brc/routes/constants";
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
 import { ArticleIcon } from "@repo/shared/components/CustomIcon/components/ArticleIcon/articleIcon";
 import { BookmarkStarIcon } from "@repo/shared/components/CustomIcon/components/BookmarkStarIcon/bookmarkStarIcon";
@@ -66,6 +67,14 @@ export const CARDS: LearnCard[] = [
     secondaryText:
       "Search SRA by genetic content using kmindex and LexicMap workflows.",
     title: "Sequence Search Workflows",
+  },
+  {
+    StartIcon: SearchIcon,
+    href: ROUTES.LOGAN_SEARCH_LEARN,
+    isLoganSearchGated: true,
+    secondaryText:
+      "Find the SRA runs a DNA sequence occurs in, with Logan's assembled contigs: inputs, scores, limits and export.",
+    title: "Logan Search",
   },
   {
     StartIcon: SmartToyIcon,
