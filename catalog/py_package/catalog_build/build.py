@@ -276,7 +276,6 @@ def _get_gene_model_urls_from_genark_list(gen_ark_file_list: pd.DataFrame):
 
     # Process the gzipped file content
     for line in gen_ark_file_list["path"]:
-        line = line.decode("utf-8").strip()
         # Filter for GTF files
         if line.endswith(".gtf.gz"):
             # Extract assembly ID from the path
