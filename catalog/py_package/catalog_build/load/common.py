@@ -19,7 +19,7 @@ class LoadDestinationParams:
     Parameters used to determine the destinations at which to load catalog data.
 
     Attributes:
-        temp_folder_path: Path of the temporary folder holding the DuckDB database
+        temp_folder_path: Absolute path of the temporary folder holding the DuckDB database
         dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
     """
 

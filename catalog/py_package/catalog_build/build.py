@@ -1197,7 +1197,7 @@ def build_files(
     # Do database-based loading and transformation
     load_and_transform_result = load_and_transform(
         LoadAndTransformParams(
-            temp_folder_path=Path(temp_folder_path),
+            temp_folder_path=Path(temp_folder_path).resolve(),
             dlt_pipeline_prefix=dlt_pipeline_prefix,
             taxonomic_levels=taxonomic_levels_for_tree,
             assemblies_path=Path(assemblies_path),
