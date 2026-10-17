@@ -1156,7 +1156,6 @@ def build_files(
     build_meta_output_path,
     datacache_base_url,
     taxonomic_group_sets=None,
-    do_gene_model_urls=True,
     qc_report_path=None,
     organisms_path,
     taxa_path=None,
@@ -1177,7 +1176,6 @@ def build_files(
       tree_output_path: Path to save tree of cataloged taxa to
       taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level (with order being insignificant for categories that are at the same level as each other)
       taxonomic_group_sets: Dict describing taxa or groups of taxa to be given specified names in the "taxonomic group" field
-      do_gene_model_urls: Boolean specifying whether to fetch gene model URLs (if False, the `geneModelUrl` column is filled with empty string)
       qc_report_path: Path to save QC report to (if omitted, no report is generated)
       organisms_path: Path of input organisms YAML, used to perform checks
       taxa_path: Path of input curated taxa YAML
@@ -1363,18 +1361,15 @@ def build_files(
     )
     print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-    if do_gene_model_urls:
-        genomes_df = add_gene_model_url(
-            genomes_df, load_and_transform_result.gen_ark_file_list
-        )
-        qc_report_params["missing_gene_model_urls"] = report_missing_values(
-            "accessions",
-            "matched with gene model URLs",
-            genomes_df["accession"],
-            genomes_df["geneModelUrl"].notna(),
-        )
-    else:
-        genomes_df["geneModelUrl"] = ""
+    genomes_df = add_gene_model_url(
+        genomes_df, load_and_transform_result.gen_ark_file_list
+    )
+    qc_report_params["missing_gene_model_urls"] = report_missing_values(
+        "accessions",
+        "matched with gene model URLs",
+        genomes_df["accession"],
+        genomes_df["geneModelUrl"].notna(),
+    )
 
     genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
         genomes_df,
