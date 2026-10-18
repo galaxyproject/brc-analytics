@@ -321,7 +321,7 @@ def add_gene_model_url(genomes_df: pd.DataFrame, gen_ark_file_list: pd.DataFrame
 
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
-        gen_ark_file_list: DataFrame containing file files loaded from genArkFileList.txt.gz.
+        gen_ark_file_list: DataFrame containing file paths loaded from genArkFileList.txt.gz.
 
     Returns:
         DataFrame with added 'geneModelUrl' column
