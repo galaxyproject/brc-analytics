@@ -1127,7 +1127,9 @@ def load_and_transform(params: LoadAndTransformParams):
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
             ucsc_assemblies=con.query("select * from ucsc.assembly_list").df(),
-            gen_ark_file_list=con.query("select * from ucsc.gen_ark_file_list").df(),
+            gen_ark_file_list=con.query(
+                "select * from ucsc.gen_ark_file_list order by path"
+            ).df(),
             galaxy_datacache_listing=con.query(
                 "select * from galaxy.datacache_directory_listing"
             ).df(),
