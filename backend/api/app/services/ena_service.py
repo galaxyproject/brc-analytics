@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, Dict, List
 
 import httpx
@@ -17,17 +18,24 @@ ORGANISM_GENERA = [
     "aspergillus",
 ]
 
-LIBRARY_STRATEGY_TERMS = [
-    "rna-seq",
-    "wgs",
-    "chip-seq",
-    "atac-seq",
-    "whole genome",
-    "wxs",
-    "wes",
-    "exome",
-    "amplicon",
-    "bisulfite",
+# Ordered (pattern, ENA term) pairs. Word boundaries keep short tokens like
+# "wes" from matching inside unrelated words ("West Nile virus").
+FACET_PATTERNS = [
+    (r"rna-seq", 'library_strategy="RNA-Seq"'),
+    (r"wgs|whole genome", 'library_strategy="WGS"'),
+    (r"wxs|wes|exome", 'library_strategy="WXS"'),
+    (r"chip-seq", 'library_strategy="ChIP-Seq"'),
+    (r"atac-seq", 'library_strategy="ATAC-seq"'),
+    (r"amplicon", 'library_strategy="AMPLICON"'),
+    (r"bisulfite", 'library_strategy="Bisulfite-Seq"'),
+    (r"illumina|miseq|hiseq|novaseq|nextseq", "instrument_platform=ILLUMINA"),
+    (r"pacbio", "instrument_platform=PACBIO_SMRT"),
+    (r"nanopore|oxford", "instrument_platform=OXFORD_NANOPORE"),
+    (r"ion torrent", "instrument_platform=ION_TORRENT"),
+]
+_FACET_REGEXES = [
+    (re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE), term)
+    for pattern, term in FACET_PATTERNS
 ]
 
 LIBRARY_SOURCES = [
@@ -42,7 +50,8 @@ LIBRARY_SOURCES = [
 GENERIC_KEYWORDS = ["data", "sequencing"]
 
 SUPPORTED_KEYWORDS_HINT = (
-    "organism names from the genera "
+    "one facet per keyword -- full organism names (e.g. 'Plasmodium "
+    "falciparum') from the genera "
     + ", ".join(g.capitalize() for g in ORGANISM_GENERA)
     + "; library strategies (RNA-Seq, WGS, WXS/exome, ChIP-Seq, ATAC-seq, "
     "amplicon, bisulfite); platforms (Illumina, MiSeq/HiSeq/NovaSeq/NextSeq, "
@@ -51,6 +60,10 @@ SUPPORTED_KEYWORDS_HINT = (
     + ")"
 )
 
+# Caps how much caller input gets echoed back in the error message.
+MAX_ECHOED_KEYWORDS = 10
+MAX_ECHOED_KEYWORD_LENGTH = 64
+
 
 class UnsupportedKeywordsError(ValueError):
     """Keywords that can't be expressed as an ENA portal query."""
@@ -58,9 +71,13 @@ class UnsupportedKeywordsError(ValueError):
     def __init__(self, keywords: List[str]):
         self.keywords = keywords
         if keywords:
-            problem = "Unsupported ENA search keywords: " + ", ".join(
-                repr(k) for k in keywords
-            )
+            shown = [
+                repr(k[:MAX_ECHOED_KEYWORD_LENGTH])
+                for k in keywords[:MAX_ECHOED_KEYWORDS]
+            ]
+            if len(keywords) > MAX_ECHOED_KEYWORDS:
+                shown.append(f"and {len(keywords) - MAX_ECHOED_KEYWORDS} more")
+            problem = "Unsupported ENA search keywords: " + ", ".join(shown)
         else:
             problem = "No searchable ENA keywords given"
         super().__init__(f"{problem}. Supported: {SUPPORTED_KEYWORDS_HINT}.")
@@ -68,34 +85,17 @@ class UnsupportedKeywordsError(ValueError):
 
 def _keyword_term(keyword: str) -> str | None:
     """Map one cleaned keyword to an ENA query term, or None if unsupported."""
-    lower = keyword.lower()
-    if any(genus in lower for genus in ORGANISM_GENERA):
+    facet_term = next(
+        (term for regex, term in _FACET_REGEXES if regex.search(keyword)), None
+    )
+    if any(genus in keyword.lower() for genus in ORGANISM_GENERA):
+        # "Candida auris RNA-Seq" would become an exact scientific_name match
+        # on the whole string and silently return nothing.
+        if facet_term is not None:
+            return None
         return f'scientific_name="{keyword}"'
-    if any(term in lower for term in LIBRARY_STRATEGY_TERMS):
-        if "rna" in lower:
-            return 'library_strategy="RNA-Seq"'
-        if "wgs" in lower or "whole genome" in lower:
-            return 'library_strategy="WGS"'
-        if "wxs" in lower or "wes" in lower or "exome" in lower:
-            return 'library_strategy="WXS"'
-        if "chip" in lower:
-            return 'library_strategy="ChIP-Seq"'
-        if "atac" in lower:
-            return 'library_strategy="ATAC-seq"'
-        if "amplicon" in lower:
-            return 'library_strategy="AMPLICON"'
-        if "bisulfite" in lower:
-            return 'library_strategy="Bisulfite-Seq"'
-    if "illumina" in lower:
-        return "instrument_platform=ILLUMINA"
-    if "pacbio" in lower:
-        return "instrument_platform=PACBIO_SMRT"
-    if "nanopore" in lower or "oxford" in lower:
-        return "instrument_platform=OXFORD_NANOPORE"
-    if "ion torrent" in lower:
-        return "instrument_platform=ION_TORRENT"
-    if any(word in lower for word in ["miseq", "hiseq", "novaseq", "nextseq"]):
-        return "instrument_platform=ILLUMINA"
+    if facet_term is not None:
+        return facet_term
     if keyword.upper() in LIBRARY_SOURCES:
         return f'library_source="{keyword.upper()}"'
     return None
@@ -109,16 +109,17 @@ def build_keyword_query(keywords: List[str]) -> str:
     sent. Dropping it silently would broaden the search without telling the
     caller, and an all-dropped input would match every run in ENA.
     """
-    terms = []
+    terms: List[str] = []
     unsupported = []
     for keyword in keywords:
-        clean_keyword = keyword.replace('"', "").replace("'", "").strip()
+        # Backslashes too, so a value can't escape its closing quote.
+        clean_keyword = re.sub(r"[\"'\\]", "", keyword).strip()
         if not clean_keyword or clean_keyword.lower() in GENERIC_KEYWORDS:
             continue
         term = _keyword_term(clean_keyword)
         if term is None:
             unsupported.append(clean_keyword)
-        else:
+        elif term not in terms:
             terms.append(term)
     if unsupported or not terms:
         raise UnsupportedKeywordsError(unsupported)
@@ -227,7 +228,7 @@ class ENAService:
         """Search for sequencing data by keywords"""
         query_string = build_keyword_query(keywords)
 
-        cache_params = {"keywords": sorted(keywords), "limit": limit}
+        cache_params = {"query": query_string, "limit": limit}
         cache_key = self.cache.make_key("ena:search", cache_params)
 
         # Check cache first
