@@ -446,6 +446,9 @@ class TestParseStructuredOutput:
 
 # ---------- _apply_schema_updates ----------
 
+_RNASEQ_TRS = "#workflow/github.com/iwc/rnaseq-pe/main/versions/v1.4"
+_FLYE_TRS = "#workflow/github.com/iwc/assembly-with-flye/main"
+
 
 class TestApplySchemaUpdates:
     def test_empty_updates_reconciles_copy(self, agent):
@@ -540,6 +543,53 @@ class TestApplySchemaUpdates:
         )
         assert result.workflow.status == FieldStatus.FILLED
         assert result.workflow.detail == "#workflow/github.com/iwc/rnaseq-pe/main"
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "#workflow/github.com/iwc/rnaseq-pe/main",
+            "RNA-Seq (#workflow/github.com/iwc/rnaseq-pe/main/versions/v1.3)",
+            "workflow/github.com/iwc/rnaseq-pe/main/",
+        ],
+    )
+    def test_workflow_trs_id_value_resolves(self, agent, value):
+        # The model sees TRS ids in tool output and may restate the workflow as
+        # one, usually without the catalog's /versions/... suffix; the detail is
+        # always the catalog's own trsId.
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "TRANSCRIPTOMICS",
+                "workflows": [
+                    {
+                        "iwcId": "rnaseq-pe-main",
+                        "workflowName": "RNA-Seq Paired End",
+                        "trsId": _RNASEQ_TRS,
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(AnalysisSchema(), {"workflow": value})
+        assert result.workflow.status == FieldStatus.FILLED
+        assert result.workflow.detail == _RNASEQ_TRS
+
+    def test_organism_scope_trs_id_value_not_resolved(self, agent):
+        agent.catalog.workflows_by_category = [
+            {
+                "category": "ASSEMBLY",
+                "workflows": [
+                    {
+                        "iwcId": "assembly-with-flye-main",
+                        "scope": "ORGANISM",
+                        "trsId": _FLYE_TRS + "/versions/v0.4",
+                    }
+                ],
+            }
+        ]
+        result = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"workflow": _FLYE_TRS},
+        )
+        assert result.workflow.detail is None
 
     def test_workflow_no_match(self, agent):
         agent.catalog.workflows_by_category = [
