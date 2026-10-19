@@ -171,7 +171,8 @@ def create_mcp_server(
     async def search_ena_keywords(keywords: List[str]) -> dict:
         """Search the European Nucleotide Archive by keywords (organism names,
         library strategies like RNA-Seq/WGS, platforms like Illumina/PacBio).
-        Returns up to 50 read run records. Check has_more to see if
+        Free-text keywords outside those categories are rejected with an
+        error listing what is supported. Returns up to 50 read run records. Check has_more to see if
         additional results exist beyond the cap."""
         try:
             result = await ena_service.search_by_keywords(
