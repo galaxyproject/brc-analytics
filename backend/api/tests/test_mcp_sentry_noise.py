@@ -11,9 +11,10 @@ import sentry_sdk
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
 from mcp.shared.exceptions import McpError
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 from sentry_sdk.transport import Transport
 
+from app.core.errors import CallerInputError
 from app.core.sentry import before_send
 from app.services.catalog_data import CatalogData
 from app.services.mcp_server import create_mcp_server
@@ -49,6 +50,8 @@ def sentry_events():
 def catalog(tmp_path):
     (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
     (tmp_path / "workflows.json").write_text(json.dumps(SAMPLE_WORKFLOWS))
+    # All three files, or the missing-file error is itself a Sentry event.
+    (tmp_path / "assemblies.json").write_text("[]")
     return CatalogData(str(tmp_path))
 
 
@@ -148,3 +151,66 @@ def test_pydantic_error_from_a_tool_body_is_still_reported(sentry_events, catalo
 
     sentry_sdk.flush()
     assert "ValidationError" in _exception_types(sentry_events)
+
+
+def test_call_titled_error_from_a_tool_body_is_still_reported(sentry_events, catalog):
+    # A TypeAdapter over a helper also titles its error "call[...]", so the
+    # title alone can't tell argument validation from a bug in the tool body.
+    def helper(n: int) -> int:
+        return n
+
+    def broken(*_a, **_k):
+        TypeAdapter(helper).validate_python({"n": "not a number"})
+
+    catalog.get_organism_by_taxonomy_id = MagicMock(side_effect=broken)
+    mcp = create_mcp_server(catalog, MagicMock())
+
+    _call(mcp, "get_organism", {"taxonomy_id": "5833"})
+
+    sentry_sdk.flush()
+    assert "ValidationError" in _exception_types(sentry_events)
+
+
+def test_failure_while_handling_a_caller_error_is_still_reported():
+    # Only fastmcp's own wrappers are looked through; a RuntimeError between
+    # the ToolError and the CallerInputError is a real fault.
+    try:
+        try:
+            raise CallerInputError("no such id")
+        except CallerInputError as e:
+            raise RuntimeError("recovery failed") from e
+    except RuntimeError as e:
+        inner = e
+    try:
+        raise ToolError("Error calling tool 'x'") from inner
+    except ToolError as e:
+        outer = e
+
+    event = {"contexts": {"trace": {"op": "mcp.server"}}}
+    hint = {"exc_info": (type(outer), outer, outer.__traceback__)}
+    assert before_send(event, hint) is event
+
+
+def test_wrapped_caller_error_is_dropped():
+    try:
+        try:
+            raise CallerInputError("no such id")
+        except CallerInputError as e:
+            raise ToolError("Error calling tool 'x'") from e
+    except ToolError as e:
+        outer = e
+
+    hint = {"exc_info": (type(outer), outer, outer.__traceback__)}
+    assert before_send({}, hint) is None
+
+
+def test_missing_catalog_file_is_logged_as_an_error(tmp_path, caplog):
+    # With a file missing every lookup is a not-found, which Sentry now
+    # ignores -- so the missing file itself has to be loud.
+    (tmp_path / "organisms.json").write_text(json.dumps(SAMPLE_ORGANISMS))
+    with caplog.at_level("ERROR", logger="app.services.catalog_data"):
+        CatalogData(str(tmp_path))
+    assert any(
+        r.levelname == "ERROR" and "workflows.json" in r.getMessage()
+        for r in caplog.records
+    )

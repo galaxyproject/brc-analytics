@@ -41,7 +41,9 @@ class CatalogData:
         for name in ("organisms", "assemblies", "workflows"):
             path = self.catalog_path / f"{name}.json"
             if not path.exists():
-                logger.warning(f"Catalog file not found: {path}")
+                # Error, not warning: with a file missing every lookup becomes a
+                # not-found, and those are kept out of Sentry as caller errors.
+                logger.error(f"Catalog file not found: {path}")
                 continue
             with open(path) as f:
                 data = json.load(f)
