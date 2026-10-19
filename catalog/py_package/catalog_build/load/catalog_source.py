@@ -4,7 +4,7 @@ import dlt
 import yaml
 
 from ..generated_schema import schema
-from ..utils import get_db_path_string
+from .common import LoadDestinationParams
 
 
 def read_entity_list_from_yaml(yaml_path: Path, list_key: str):
@@ -97,9 +97,8 @@ def catalog_source(
 
 
 def load_catalog_source_data(
+    dest: LoadDestinationParams,
     *,
-    temp_folder_path: Path,
-    dlt_pipeline_prefix: str,
     assemblies_path: Path,
     organisms_path: Path,
     workflows_path: Path | None,
@@ -120,8 +119,8 @@ def load_catalog_source_data(
       outbreaks_path: Path of source outbreaks YAML, or None for catalogs without outbreaks
     """
     pipeline = dlt.pipeline(
-        pipeline_name=dlt_pipeline_prefix + "catalog_source",
-        destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("catalog_source"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="catalog_source",
     )
     pipeline.run(

@@ -1,13 +1,11 @@
 import hashlib
 import tarfile
-from itertools import batched
 from pathlib import Path
 
 import dlt
-import pandas as pd
 import requests
 
-from ..utils import get_db_path_string
+from .common import LoadDestinationParams, rows_to_chunked_dataframes
 
 TAXDUMP_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 TAXDUMP_MD5_URL = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz.md5"
@@ -16,10 +14,6 @@ TAXDUMP_DIR_NAME = "ncbi_taxdump"
 TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
 TAXDUMP_MERGED_FILE_NAME = "merged.dmp"
-
-# Rows per yielded DataFrame. Tuning knob: larger means fewer dlt round-trips but
-# higher peak memory; smaller means lower memory but more per-chunk overhead.
-DMP_CHUNK_SIZE = 100_000
 
 
 def dmp_rows(path: Path, cols: list[str | None]):
@@ -59,10 +53,7 @@ def dmp_rows(path: Path, cols: list[str | None]):
 
 def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
     """
-    Yield DataFrames of at most `DMP_CHUNK_SIZE` rows parsed from a `.dmp` file.
-
-    Chunking the file into multiple DataFrames avoids materializing the entire file
-    in memory at once, at the cost of more items handed to dlt.
+    Yield limited-length DataFrames constructed from rows parsed from a `.dmp` file.
 
     Args:
       path: Path of the `.dmp` file to read
@@ -72,8 +63,7 @@ def dmp_dataframes(path: Path, cols: list[str | None], dtypes: dict[str, str]):
     Yields:
       A DataFrame for each chunk of rows read from the file
     """
-    for chunk in batched(dmp_rows(path, cols), DMP_CHUNK_SIZE):
-        yield pd.DataFrame(chunk).astype(dtypes)
+    yield from rows_to_chunked_dataframes(dmp_rows(path, cols), dtypes)
 
 
 @dlt.resource(name="taxonomy_names", write_disposition="replace")
@@ -142,13 +132,13 @@ def ncbi_taxdump(dmp_dir: Path):
     ]
 
 
-def load_taxdump(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
+def load_taxdump(dest: LoadDestinationParams):
     pipeline = dlt.pipeline(
-        pipeline_name=dlt_pipeline_prefix + "ncbi_taxonomy",
-        destination=dlt.destinations.duckdb(get_db_path_string(temp_folder_path)),
+        pipeline_name=dest.get_dlt_pipeline_name("ncbi_taxonomy"),
+        destination=dlt.destinations.duckdb(dest.get_db_path_string()),
         dataset_name="ncbi",
     )
-    pipeline.run(ncbi_taxdump(temp_folder_path / TAXDUMP_DIR_NAME))
+    pipeline.run(ncbi_taxdump(dest.temp_folder_path / TAXDUMP_DIR_NAME))
 
 
 def calc_taxdump_md5(temp_folder_path: Path) -> str:
@@ -202,7 +192,7 @@ def download_taxdump(temp_folder_path: Path, fetched_md5: str):
         )
 
 
-def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> str:
+def load_ncbi_taxonomy(dest: LoadDestinationParams) -> str:
     """
     Download the NCBI taxdump, verify its MD5, and load its nodes and names into DuckDB.
 
@@ -214,8 +204,6 @@ def load_ncbi_taxonomy(*, temp_folder_path: Path, dlt_pipeline_prefix: str) -> s
       The verified MD5 digest of the downloaded taxdump archive
     """
     fetched_md5 = fetch_taxdump_md5()
-    download_taxdump(temp_folder_path, fetched_md5)
-    load_taxdump(
-        temp_folder_path=temp_folder_path, dlt_pipeline_prefix=dlt_pipeline_prefix
-    )
+    download_taxdump(dest.temp_folder_path, fetched_md5)
+    load_taxdump(dest)
     return fetched_md5
