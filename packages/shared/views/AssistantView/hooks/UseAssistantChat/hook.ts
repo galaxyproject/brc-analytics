@@ -460,6 +460,8 @@ export const useAssistantChat = ({
         // line, as it does in the stored transcript, then the reply.
         const { note } = response;
         setMessages((prev) => {
+          // A clear of a field already empty changed nothing and gets no reply.
+          if (!note && !response.reply) return prev;
           const reply = { content: response.reply, role: "assistant" } as const;
           if (!note) return [...prev, reply];
           const noteLine = { content: note, role: "system" } as const;

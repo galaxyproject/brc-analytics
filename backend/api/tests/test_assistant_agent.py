@@ -3188,15 +3188,20 @@ class TestPanelClears:
         ]
 
     @pytest.mark.asyncio
-    async def test_clearing_an_empty_field_leaves_no_note(self, agent):
+    async def test_clearing_an_empty_field_skips_the_model(self, agent):
+        # A retry of a clear that already landed, or another tab beating us to
+        # it: nothing changed, so there is nothing for the model to answer.
         state = _filled_session(agent)
         state.schema_state.data_source = SchemaField()
+        before = list(state.messages)
         resp = await agent.chat(None, session_id="s1", clear_fields=["data_source"])
 
-        assert MessageRole.SYSTEM not in [m.role for m in state.messages]
+        assert state.messages == before
         assert resp.note is None
-        prompt = agent._run_agent_with_retry.await_args.args[0]
-        assert "just cleared" not in prompt
+        assert resp.reply == ""
+        assert resp.schema_state.organism.value == "Plasmodium falciparum"
+        agent._run_agent_with_retry.assert_not_awaited()
+        agent.session_service.save_session.assert_not_awaited()
 
     @pytest.mark.asyncio
     async def test_rejects_a_derived_field(self, agent):

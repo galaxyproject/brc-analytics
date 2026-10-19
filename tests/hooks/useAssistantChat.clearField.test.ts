@@ -158,6 +158,21 @@ describe("useAssistantChat clearField", () => {
     expect(result.current.loading).toBe(false);
   });
 
+  test("a clear that changed nothing adds no lines but syncs the schema", async () => {
+    const { result } = await renderRestored();
+    const before = result.current.messages;
+    mockClient.assistantChat.mockResolvedValue(
+      turn({ reply: "", schema_state: CLEARED })
+    );
+
+    await act(async () => {
+      await result.current.clearField("organism");
+    });
+
+    expect(result.current.messages).toEqual(before);
+    expect(result.current.schema).toEqual(CLEARED);
+  });
+
   test("a message turn with a note puts the note before the user's line", async () => {
     const { result } = await renderRestored();
     mockClient.assistantChat.mockResolvedValue(turn({ note: NOTE }));

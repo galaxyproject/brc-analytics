@@ -1325,6 +1325,32 @@ class AssistantAgent:
         # (#1796). Same apply path as the extractor's updates, so the dependent
         # clears hold. The transcript gets a note rather than a fake user line.
         cleared = self._apply_panel_clears(state, clear_fields or [])
+        if not message and not cleared:
+            # The field was already empty -- a retry of a clear that landed, or
+            # another tab got there first. There is nothing for the model to
+            # answer, so hand back the state as it stands and leave the
+            # conversation alone.
+            is_complete, handoff_url = self.compute_handoff(
+                state.schema_state, session_id=state.session_id
+            )
+            response = ChatResponse(
+                session_id=state.session_id,
+                reply="",
+                schema_state=state.schema_state,
+                suggestions=state.suggestions,
+                is_complete=is_complete,
+                handoff_url=handoff_url,
+                logan=logan_context_from(state.metadata),
+            )
+            telemetry = TurnTelemetry(
+                turn_id=turn_id,
+                session_id=state.session_id,
+                turn_index=turn_index,
+                owner_keycloak_sub=owner_keycloak_sub,
+                user_message=self._logged_message(message, clear_fields or []),
+                latency_ms=int((time.monotonic() - turn_start) * 1000),
+            )
+            return response, telemetry, state
 
         # Record user message
         if message:
