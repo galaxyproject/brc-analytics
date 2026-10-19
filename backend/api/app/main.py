@@ -124,6 +124,12 @@ def create_app() -> FastAPI:
                     "conversations will not be recorded beyond the Redis session TTL"
                 )
 
+            if settings.SESSION_COOKIE_SECRET_EPHEMERAL:
+                logger.warning(
+                    "SESSION_COOKIE_SECRET is unset; using a generated one, so "
+                    "assistant sessions lose their cookie binding on restart"
+                )
+
             # Off the boot path on purpose: nothing here has to finish before
             # the app can serve, and a Galaxy that is slow to answer must not
             # hold up a restart.

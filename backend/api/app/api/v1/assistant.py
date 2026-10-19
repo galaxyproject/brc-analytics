@@ -86,7 +86,7 @@ async def assistant_chat(
     # it -- possession of the signed session cookie. Session IDs travel in
     # URLs (e.g. the assistantSessionId handoff param), so knowing the id
     # alone must not let a caller continue or mutate a session, anonymous or
-    # owned. No-ops in local/dev where SESSION_COOKIE_SECRET is unset.
+    # owned.
     if request.session_id:
         require_session_cookie(request.session_id, session_cookie)
 
