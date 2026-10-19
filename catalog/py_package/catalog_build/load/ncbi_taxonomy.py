@@ -15,10 +15,6 @@ TAXDUMP_NODES_FILE_NAME = "nodes.dmp"
 TAXDUMP_NAMES_FILE_NAME = "names.dmp"
 TAXDUMP_MERGED_FILE_NAME = "merged.dmp"
 
-# Rows per yielded DataFrame. Tuning knob: larger means fewer dlt round-trips but
-# higher peak memory; smaller means lower memory but more per-chunk overhead.
-DMP_CHUNK_SIZE = 100_000
-
 
 def dmp_rows(path: Path, cols: list[str | None]):
     """
