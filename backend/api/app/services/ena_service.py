@@ -274,7 +274,7 @@ class ENAService:
                     "result": "study",
                     "query": f"study_accession={study_accession}",
                     "format": "json",
-                    "fields": "study_accession,study_title,study_description,study_abstract,center_name,broker_name,submission_date,first_public,last_updated",
+                    "fields": "study_accession,study_title,study_description,center_name,broker_name,first_public,last_updated",
                 }
 
                 logger.info(f"Making ENA API request for study: {study_accession}")
