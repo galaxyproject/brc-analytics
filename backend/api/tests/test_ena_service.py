@@ -2,13 +2,17 @@
 
 ENA rejects the whole search with a 400 if any requested field is unknown, so
 the study lookup is pinned against a snapshot of ENA's study return fields
-rather than the live endpoint.
+rather than the live endpoint. The route tests cover accession validation,
+since the accession ends up inside ENA's query language.
 """
 
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
+from app.api.v1 import ena
 from app.services import ena_service
 from app.services.ena_service import ENAService
 
@@ -100,3 +104,39 @@ async def test_study_lookup_field_list(service, captured_params):
     ]
     assert captured_params["params"]["result"] == "study"
     assert captured_params["params"]["query"] == "study_accession=PRJEB8667"
+
+
+@pytest.fixture()
+def study_client(captured_params):
+    app = FastAPI()
+    app.include_router(ena.router, prefix="/ena")
+    app.dependency_overrides[ena.get_ena_service] = lambda: ENAService(
+        cache=MagicMock()
+    )
+    return TestClient(app)
+
+
+@pytest.mark.parametrize("accession", ["PRJEB8667", "PRJNA123456", "PRJDB4176"])
+def test_study_route_accepts_study_accessions(study_client, captured_params, accession):
+    response = study_client.get(f"/ena/study/{accession}?use_cache=false")
+
+    assert response.status_code == 200
+    assert captured_params["params"]["query"] == f"study_accession={accession}"
+
+
+@pytest.mark.parametrize(
+    "accession",
+    [
+        "PRJEB8667 OR tax_tree(5833)",
+        "PRJEB8667%20OR%20tax_tree(5833)",
+        "*",
+        "SRR000001",
+        "ERP009123",
+    ],
+)
+def test_study_route_rejects_non_accessions(study_client, captured_params, accession):
+    response = study_client.get(f"/ena/study/{accession}?use_cache=false")
+
+    # Anything else gets spliced into ENA's query language as-is.
+    assert response.status_code == 422
+    assert "params" not in captured_params
