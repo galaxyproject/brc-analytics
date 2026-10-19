@@ -52,5 +52,5 @@ export interface Props {
   selectedCount: number;
   switchBrowseMethod: (data?: BaseReadRun[]) => void;
   table: Table<ReadRun>;
-  taxonomyMatches: number;
+  taxonomyMatches: number | null;
 }

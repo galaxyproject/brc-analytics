@@ -2,5 +2,5 @@ import { type ENAReadRunsQuery } from "@repo/shared/views/EntityView/components/
 
 export interface Props {
   enaTaxonomyId: ENAReadRunsQuery;
-  taxonomyMatches: number;
+  taxonomyMatches: number | null;
 }
