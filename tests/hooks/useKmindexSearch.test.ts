@@ -1173,7 +1173,7 @@ describe("polling a job while Galaxy is unreachable", () => {
     expect(statusCalls()).toBe(4);
   });
 
-  it("keeps the job's status up through a short blip", async () => {
+  it("says nothing about a short blip", async () => {
     const { result } = await pollingWith([running, galaxyDown, running]);
 
     await advance(3000);
@@ -1181,6 +1181,7 @@ describe("polling a job while Galaxy is unreachable", () => {
 
     await advance(3000);
     expect(statusCalls()).toBe(2);
+    expect(result.current.pollWarning).toBeNull();
     expect(result.current.error).toBeNull();
     expect(result.current.jobStatus?.state).toBe("running");
   });
@@ -1196,17 +1197,21 @@ describe("polling a job while Galaxy is unreachable", () => {
 
     await advance(3000 + 3000 + 6000);
     expect(statusCalls()).toBe(3);
-    expect(result.current.error).toBeNull();
+    expect(result.current.pollWarning).toBeNull();
 
     await advance(12000);
     expect(statusCalls()).toBe(4);
-    expect(result.current.error).toBe(
+    expect(result.current.pollWarning).toBe(
       "Failed to get job status: down -- still trying."
     );
+    // A warning, not a stop: the job's last known state stays up, and
+    // nothing reads the search as over.
+    expect(result.current.error).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
 
     await advance(24000);
     expect(statusCalls()).toBe(5);
-    expect(result.current.error).toBeNull();
+    expect(result.current.pollWarning).toBeNull();
     expect(result.current.jobStatus?.state).toBe("running");
   });
 
@@ -1220,6 +1225,7 @@ describe("polling a job while Galaxy is unreachable", () => {
 
     await advance(3000);
     expect(result.current.error).toBe("Job not found");
+    expect(result.current.pollWarning).toBeNull();
 
     await advance(10 * 60000);
     expect(statusCalls()).toBe(1);
@@ -1232,6 +1238,18 @@ describe("polling a job while Galaxy is unreachable", () => {
     await advance(3000);
     await advance(30000);
     expect(statusCalls()).toBe(1);
+  });
+
+  it("a warning does not outlive the search it was about", async () => {
+    const { result } = await pollingWith([galaxyDown]);
+
+    await advance(3000 + 6000 + 12000);
+    expect(result.current.pollWarning).not.toBeNull();
+
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.pollWarning).toBeNull();
   });
 
   it("a request out when the search is reset does not start polling again", async () => {

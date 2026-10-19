@@ -248,6 +248,10 @@ interface KmindexSearchState {
   // and `appliedSort(results)` and has to keep doing so -- a header wired to
   // `sort` here would light a column the server may never have sorted by.
   pageSize: number;
+  // Status requests have been failing for a while but the poller is still
+  // going. Kept apart from `error`, which means the search has stopped: the
+  // job's last known state stays on screen and the form stays "running".
+  pollWarning: string | null;
   results: KmindexResults | null;
   sort: KmindexSort;
 }
@@ -283,10 +287,9 @@ const POLLING_INTERVAL = 3000;
 // no give-up: a search can sit in a queue for most of an hour, and a reader
 // left watching it should not have to reload once an outage ends.
 const POLLING_BACKOFF_CAP_MS = 60000;
-// One failed request is a blip and should not replace the job's status with a
-// banner. Three in a row is about twenty seconds of silence, which is worth
-// saying out loud.
-const POLLING_FAILURES_BEFORE_ERROR = 3;
+// One failed request is a blip and not worth a warning. Three in a row is at
+// least twenty seconds of silence, which is worth saying out loud.
+const POLLING_FAILURES_BEFORE_WARNING = 3;
 // Merging the shards of a search that fanned out over many indexes runs well
 // past the 300 s this request and dev's nginx both give up at. The backend
 // finishes the merge regardless and caches what it got, so asking again is
@@ -339,6 +342,7 @@ const INITIAL_STATE: KmindexSearchState = {
   jobId: null,
   jobStatus: null,
   pageSize: PAGE_SIZE,
+  pollWarning: null,
   results: null,
   sort: DEFAULT_SORT,
 };
@@ -727,9 +731,6 @@ export const useKmindexSearch = (
       stopPolling();
       const generation = pollGenerationRef.current;
       let failures = 0;
-      // The banner this poller raised, if any, so a recovery clears that one
-      // and leaves alone anything else that has been said since.
-      let raised: string | null = null;
 
       /**
        * Book the next status request.
@@ -754,14 +755,15 @@ export const useKmindexSearch = (
         // no such job -- a mistyped or expired ?job= link. Asking again will
         // not change that.
         if (error instanceof HTTPError && error.response.status === 404) {
-          setState((prev) => ({ ...prev, error: message }));
+          setState((prev) => ({ ...prev, error: message, pollWarning: null }));
           return;
         }
         failures += 1;
-        if (failures >= POLLING_FAILURES_BEFORE_ERROR) {
-          const banner = `${message} -- still trying.`;
-          raised = banner;
-          setState((prev) => ({ ...prev, error: banner }));
+        if (failures >= POLLING_FAILURES_BEFORE_WARNING) {
+          setState((prev) => ({
+            ...prev,
+            pollWarning: `${message} -- still trying.`,
+          }));
         }
         schedule(pollDelay(failures));
       };
@@ -789,13 +791,7 @@ export const useKmindexSearch = (
         }
         if (generation !== pollGenerationRef.current) return;
         failures = 0;
-        const cleared = raised;
-        raised = null;
-        setState((prev) => ({
-          ...prev,
-          error: cleared !== null && prev.error === cleared ? null : prev.error,
-          jobStatus: status,
-        }));
+        setState((prev) => ({ ...prev, jobStatus: status, pollWarning: null }));
 
         if (!status.is_complete) {
           schedule(POLLING_INTERVAL);
@@ -858,6 +854,7 @@ export const useKmindexSearch = (
         isSubmitting: true,
         jobId: null,
         jobStatus: null,
+        pollWarning: null,
         results: null,
         sort: DEFAULT_SORT,
       }));
