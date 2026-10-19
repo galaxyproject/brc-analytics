@@ -777,6 +777,9 @@ export const useKmindexSearch = (
           status = await ky
             .get(`${API_BASE_URL}/galaxy/jobs/${jobId}/status`, {
               credentials: "include",
+              // ky retries a failed GET twice on its own by default, which
+              // would triple every failure the backoff here is spacing out.
+              retry: 0,
               timeout: 30000,
             })
             .json<KmindexJobStatus>();

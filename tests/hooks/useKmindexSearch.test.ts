@@ -1153,6 +1153,16 @@ describe("polling a job while Galaxy is unreachable", () => {
     expect(statusCalls()).toBe(7);
   });
 
+  it("leaves the retrying to the backoff rather than ky", async () => {
+    await pollingWith([galaxyDown]);
+
+    await advance(3000);
+    const [, options] = mockKy.get.mock.calls.find(([url]) =>
+      String(url).includes("/status")
+    );
+    expect(options).toMatchObject({ retry: 0 });
+  });
+
   it("goes back to the normal interval once a request succeeds", async () => {
     await pollingWith([galaxyDown, galaxyDown, running]);
 
