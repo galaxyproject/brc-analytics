@@ -70,6 +70,8 @@ class TestWorkflowDetailsById:
             # the details report the catalog's version.
             "#workflow/github.com/iwc/rnaseq-pe/main/versions/v1.3",
             "workflow/github.com/iwc/rnaseq-pe/main",
+            f"{RNASEQ_TRS}/",
+            f"{RNASEQ_TRS_BASE}/",
             "  #Workflow/GitHub.com/IWC/RNAseq-PE/main  ",
         ],
     )

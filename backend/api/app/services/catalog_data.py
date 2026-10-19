@@ -14,7 +14,7 @@ def trs_id_key(workflow_id: str) -> str:
     (`#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4`) but a
     model often passes the bare form, or drops the `#`; the catalog carries
     one version per workflow, so any version names the same entry."""
-    key = _TRS_VERSION_SUFFIX.sub("", workflow_id.strip().lower())
+    key = _TRS_VERSION_SUFFIX.sub("", workflow_id.strip().lower().rstrip("/"))
     return key if key.startswith("#") else f"#{key}"
 
 
