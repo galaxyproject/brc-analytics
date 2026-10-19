@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from fastmcp import FastMCP
 
+from app.core.errors import CallerInputError
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
@@ -67,8 +68,9 @@ def create_mcp_server(
 
     # Catalog tools use two error conventions:
     # - Single-entity lookups (get_organism, get_assembly_details, etc.) raise
-    #   ValueError when the entity doesn't exist, since there's no meaningful
-    #   empty response for a specific ID lookup.
+    #   CallerInputError when the entity doesn't exist, since there's no
+    #   meaningful empty response for a specific ID lookup. It's the caller's
+    #   mistake, so it reaches the client as a tool error but not Sentry.
     # - Multi-result searches (search_organisms, get_assemblies, etc.) return
     #   {"count": 0, ...} with an empty list, since zero results is a valid
     #   search outcome.
@@ -87,7 +89,9 @@ def create_mcp_server(
         """Get a single organism by its NCBI taxonomy ID."""
         result = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
         if not result:
-            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+            raise CallerInputError(
+                f"No organism found with taxonomy ID '{taxonomy_id}'"
+            )
         return result
 
     @mcp.tool()
@@ -103,7 +107,7 @@ def create_mcp_server(
         (e.g. GCF_000005845.2)."""
         result = catalog_data.get_assembly_details(accession)
         if not result:
-            raise ValueError(f"No assembly found with accession '{accession}'")
+            raise CallerInputError(f"No assembly found with accession '{accession}'")
         return result
 
     @mcp.tool()
@@ -132,7 +136,7 @@ def create_mcp_server(
         """Get full details of a workflow by its IWC ID."""
         result = catalog_data.get_workflow_details(iwc_id)
         if not result:
-            raise ValueError(f"No workflow found with IWC ID '{iwc_id}'")
+            raise CallerInputError(f"No workflow found with IWC ID '{iwc_id}'")
         return result
 
     @mcp.tool()
@@ -340,7 +344,9 @@ def create_mcp_server(
         """Get details for a specific organism by NCBI taxonomy ID."""
         org = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
         if not org:
-            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+            raise CallerInputError(
+                f"No organism found with taxonomy ID '{taxonomy_id}'"
+            )
         return json.dumps(org, indent=2)
 
     # -- Guided prompts --
