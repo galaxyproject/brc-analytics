@@ -135,7 +135,14 @@ class BioblendWrongIdFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         if record.levelno >= logging.ERROR:
             match = BIOBLEND_GET_ERROR.match(record.getMessage())
-            if match and _names_missing_job(int(match[1]), match[2]):
+            # A 404 without Galaxy's JSON error body came from a proxy or a
+            # wrong GALAXY_URL. The route still answers it as a missing job,
+            # so this record is the only place it shows up.
+            if (
+                match
+                and _names_missing_job(int(match[1]), match[2])
+                and (match[1] != "404" or "err_code" in match[2])
+            ):
                 record.levelno = logging.WARNING
                 record.levelname = logging.getLevelName(logging.WARNING)
         return True

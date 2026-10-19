@@ -118,6 +118,10 @@ def test_bioblend_wrong_id_log_is_demoted_to_warning(caplog, message):
         # something else, not a wrong id.
         'GET: error 400: b\'{"err_msg":"Bad request","err_code":400008}\', '
         "0 attempts left",
+        # A 404 that isn't Galaxy's own error body is a proxy or a wrong
+        # GALAXY_URL, and on the polling path this log is the only trace of it.
+        "GET: error 404: b'<html><body><h1>404 Not Found</h1></body></html>', "
+        "0 attempts left",
     ],
 )
 def test_other_bioblend_errors_stay_errors(caplog, message):
