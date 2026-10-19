@@ -38,7 +38,7 @@ To stop the stack:
 cd backend && docker compose down
 ```
 
-Note: The backend uses `backend/api/.env.example` for default configuration. To customize settings, create `backend/api/.env` which will override the defaults.
+Note: The backend uses `backend/api/.env.example` for default configuration. To customize settings, create `backend/api/.env` which will override the defaults. Settings that switch a feature on just by being present, like `DATABASE_URL` and `AI_API_KEY`, are commented out there and need to go in `backend/api/.env`.
 
 # BRC Analytics Data Catalog
 
