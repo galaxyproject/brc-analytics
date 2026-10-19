@@ -3204,6 +3204,16 @@ class TestPanelClears:
         agent.session_service.save_session.assert_not_awaited()
 
     @pytest.mark.asyncio
+    async def test_duplicate_clears_count_once(self, agent):
+        state = _filled_session(agent)
+        resp = await agent.chat(
+            None, session_id="s1", clear_fields=["organism", "organism"]
+        )
+
+        assert resp.note == "Organism cleared, along with assembly and workflow."
+        assert [m.role for m in state.messages].count(MessageRole.SYSTEM) == 1
+
+    @pytest.mark.asyncio
     async def test_rejects_a_derived_field(self, agent):
         _filled_session(agent)
         with pytest.raises(ValueError):

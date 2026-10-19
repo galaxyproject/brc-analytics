@@ -1237,7 +1237,7 @@ class AssistantAgent:
         # turns would clobber each other. _run_turn fills this in as soon as it
         # has a session, so a failure can still name the session it belonged to.
         progress: dict = {}
-        clear_fields = list(clear_fields or [])
+        clear_fields = list(dict.fromkeys(clear_fields or []))
         unknown = [name for name in clear_fields if name not in _FIELD_LABELS]
         if unknown:
             raise ValueError(f"Not clearable: {', '.join(unknown)}")
