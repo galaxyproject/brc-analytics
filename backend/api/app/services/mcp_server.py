@@ -129,7 +129,10 @@ def create_mcp_server(
 
     @mcp.tool()
     def get_workflow_details(iwc_id: str) -> dict:
-        """Get full details of a workflow by its IWC ID."""
+        """Get full details of a workflow.
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         result = catalog_data.get_workflow_details(iwc_id)
         if not result:
             raise ValueError(f"No workflow found with IWC ID '{iwc_id}'")
@@ -138,7 +141,10 @@ def create_mcp_server(
     @mcp.tool()
     def check_compatibility(iwc_id: str, accession: str) -> dict:
         """Check whether a workflow is compatible with a specific genome assembly.
-        Returns compatibility status and any issues (ploidy/taxonomy mismatches)."""
+        Returns compatibility status and any issues (ploidy/taxonomy mismatches).
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         return catalog_data.check_workflow_assembly_compatibility(iwc_id, accession)
 
     @mcp.tool()
@@ -146,7 +152,10 @@ def create_mcp_server(
         """Resolve deterministic workflow inputs for a workflow + assembly pair.
         Returns resolved values (reference genome URL, gene model, accession)
         and unresolved inputs the researcher must provide (sequencing data).
-        Also includes compatibility check results."""
+        Also includes compatibility check results.
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         return catalog_data.resolve_workflow_inputs(iwc_id, accession)
 
     # -- ENA tools (async, HTTP) --

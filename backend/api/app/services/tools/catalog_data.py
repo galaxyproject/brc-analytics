@@ -8,6 +8,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from app.services.catalog_data import trs_id_key
+
 logger = logging.getLogger(__name__)
 
 # NOTE: the workflow/organism compatibility rule (taxonomy lineage + ploidy +
@@ -45,6 +47,7 @@ class CatalogData:
         # category that lists it.
         self._workflows_by_iwc_id: Dict[str, Dict[str, Any]] = {}
         self._categories_by_iwc_id: Dict[str, List[str]] = {}
+        self._iwc_id_by_trs_key: Dict[str, str] = {}
         self._load()
 
     def _load(self) -> None:
@@ -60,6 +63,8 @@ class CatalogData:
                 if not iwc_id or not _is_assembly_scope(wf):
                     continue
                 self._workflows_by_iwc_id.setdefault(iwc_id, wf)
+                if wf.get("trsId"):
+                    self._iwc_id_by_trs_key.setdefault(trs_id_key(wf["trsId"]), iwc_id)
                 categories = self._categories_by_iwc_id.setdefault(iwc_id, [])
                 name = cat.get("name", "")
                 if name not in categories:
@@ -318,7 +323,11 @@ class CatalogData:
         return results
 
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
+        """Look up a workflow by IWC id or TRS id (any version, or none)."""
         wf = self._workflows_by_iwc_id.get(iwc_id)
+        if wf is None and iwc_id:
+            trs_iwc_id = self._iwc_id_by_trs_key.get(trs_id_key(iwc_id))
+            wf = self._workflows_by_iwc_id.get(trs_iwc_id) if trs_iwc_id else None
         if wf is None:
             return None
         return self._summarize_workflow(wf, include_params=True)
