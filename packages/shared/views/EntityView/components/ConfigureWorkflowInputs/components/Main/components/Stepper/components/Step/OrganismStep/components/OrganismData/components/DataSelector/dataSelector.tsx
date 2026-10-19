@@ -30,7 +30,7 @@ export const DataSelector = ({
           color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
           variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
         >
-          Browse to find and select an organism, or continue without one
+          Browse to find and select an organism
         </Typography>
       </Stack>
       <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>

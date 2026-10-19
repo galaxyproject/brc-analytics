@@ -41,15 +41,15 @@ export function getWorkflowOrganism(
  * Resolves the organism entity for organism-scoped workflows (these workflows
  * have no assembly). Anchored by the workflow's taxonomyId when it is a catalog
  * organism; otherwise the taxonomyId is a clade (e.g. Viruses, taxid 10239)
- * with no organism entry, and the organism is the species the user picked
- * within that clade, if any.
+ * with no organism entry, and the organism is the species the user picks
+ * within that clade (required before the read-run step).
  * @param workflow - Workflow being configured.
  * @param configuredOrganism - Taxonomy ID of the organism picked within the
  * workflow's clade, if any. Only the organism picker sets it, from its
  * clade-filtered rows.
  * @returns The workflow's taxonomyId organism, else the picked organism, or
- * undefined when the taxonomyId is not a catalog organism and nothing has been
- * picked.
+ * undefined when the taxonomyId is not a catalog organism and no species has
+ * been picked yet.
  */
 export function getWorkflowOrganismEntity(
   workflow: Workflow,

@@ -480,14 +480,25 @@ test.describe("Clade organism picker", () => {
       layoutByTaxonomyId
     );
 
+    // A species is required: Continue stays disabled until one is picked.
+    await expect(
+      organismStep.getByRole("button", { name: "Continue" })
+    ).toBeDisabled();
+
     // Paired-end read runs match the paired-end workflow: no alert.
     await organismStep.getByRole("button", { name: "Browse" }).click();
     await pickOrganism(page, layoutByTaxonomyId, 0, "PAIRED");
     await expect(browseReadRuns).toBeVisible();
     await expect(alert).toBeHidden();
 
+    // Back on the Organism step with a species set, Continue is enabled.
+    await organismStep.getByRole("button", { name: "Edit" }).click();
+    await expect(
+      organismStep.getByRole("button", { name: "Continue" })
+    ).toBeEnabled();
+
     // Single-end read runs don't match: the alert shows.
-    await reopenOrganismPicker(organismStep);
+    await organismStep.getByRole("button", { name: "Edit" }).click();
     await pickOrganism(page, layoutByTaxonomyId, 1, "SINGLE");
     await expect(browseReadRuns).toBeVisible();
     await expect(alert).toBeVisible();

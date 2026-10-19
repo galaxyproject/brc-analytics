@@ -31,11 +31,10 @@ function hasSequencingStep(configuredSteps: StepConfig[]): boolean {
 
 /**
  * Inserts the Organism step ahead of the other steps when an organism-scoped
- * workflow's taxonomyId is a clade above species, so the user can pick the
- * species that scopes the read-run step (picking is optional). The step is
- * only inserted when the workflow has a read-run step to scope and the clade
- * has at least one catalog organism to pick; otherwise the steps are returned
- * unchanged.
+ * workflow's taxonomyId is a clade above species, so the user picks the
+ * species that scopes the read-run step. The step is only inserted when the
+ * workflow has a read-run step to scope and the clade has at least one catalog
+ * organism to pick; otherwise the steps are returned unchanged.
  * @param configuredSteps - Configured steps.
  * @param workflow - Workflow being configured.
  * @returns The configured steps, with the Organism step first when applicable.

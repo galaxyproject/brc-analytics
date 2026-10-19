@@ -13,8 +13,9 @@ import { getOrganismSpecies } from "./utils";
 
 /**
  * Organism step component for picking a species when an organism-scoped
- * workflow's taxonomyId is a clade above species. Picking is optional:
- * continuing without a species leaves the read-run step unscoped.
+ * workflow's taxonomyId is a clade above species. A species is required:
+ * Continue stays disabled until one is picked, so the read-run step is always
+ * scoped to it.
  * @param props - Component props.
  * @param props.active - Whether the step is active.
  * @param props.completed - Whether the step is completed.
@@ -58,9 +59,7 @@ export const OrganismStep = ({
           optional={
             completed && (
               <Fragment>
-                <Optional>
-                  {getOrganismSpecies(configuredInput) ?? "None"}
-                </Optional>
+                <Optional>{getOrganismSpecies(configuredInput)}</Optional>
                 {!disabled && (
                   <Button onClick={() => onEdit(index)}>Edit</Button>
                 )}
@@ -75,6 +74,7 @@ export const OrganismStep = ({
           {!last && (
             <Button
               {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              disabled={!configuredInput.organism}
               onClick={() => onContinue()}
             >
               Continue
