@@ -1076,3 +1076,172 @@ describe("submit errors", () => {
     expect(result.current.error).toBe("HTTP 422");
   });
 });
+
+describe("polling a job while Galaxy is unreachable", () => {
+  const RUNNING_STATUS = {
+    is_complete: false,
+    is_successful: false,
+    job_id: JOB_ID,
+    state: "running",
+  };
+
+  /**
+   * Status requests made so far.
+   * @returns How many times the status endpoint was asked.
+   */
+  function statusCalls(): number {
+    return mockKy.get.mock.calls.filter(([url]) =>
+      String(url).includes("/status")
+    ).length;
+  }
+
+  /**
+   * Reattach to a job, answering each status request in turn.
+   * @param answers - One per status request; the last one repeats.
+   * @returns The rendered hook result, before the first tick.
+   */
+  async function pollingWith(
+    answers: (() => unknown)[]
+  ): Promise<
+    ReturnType<typeof renderHook<ReturnType<typeof useKmindexSearch>, unknown>>
+  > {
+    setUrl(`?job=${JOB_ID}`);
+    let asked = 0;
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      if (url.includes("/status")) {
+        const answer = answers[Math.min(asked, answers.length - 1)];
+        asked += 1;
+        return answer();
+      }
+      return jsonOf(RESULTS);
+    });
+    return renderSettled();
+  }
+
+  const galaxyDown = (): unknown => ({
+    json: (): Promise<unknown> =>
+      Promise.reject(new MockHTTPError(500, "Failed to get job status: down")),
+  });
+  const running = (): unknown => jsonOf(RUNNING_STATUS);
+
+  /**
+   * Advance fake time, letting each request settle before the next timer.
+   * @param ms - Milliseconds to advance.
+   */
+  async function advance(ms: number): Promise<void> {
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(ms);
+    });
+  }
+
+  it("backs off on consecutive failures, capped at a minute", async () => {
+    await pollingWith([galaxyDown]);
+
+    // 3 s to the first ask, then 6, 12, 24, 48, and a minute from there on.
+    await advance(3000);
+    expect(statusCalls()).toBe(1);
+    await advance(5999);
+    expect(statusCalls()).toBe(1);
+    await advance(1);
+    expect(statusCalls()).toBe(2);
+    await advance(12000 + 24000 + 48000);
+    expect(statusCalls()).toBe(5);
+    await advance(60000);
+    expect(statusCalls()).toBe(6);
+    await advance(60000);
+    expect(statusCalls()).toBe(7);
+  });
+
+  it("goes back to the normal interval once a request succeeds", async () => {
+    await pollingWith([galaxyDown, galaxyDown, running]);
+
+    await advance(3000 + 6000 + 12000);
+    expect(statusCalls()).toBe(3);
+
+    await advance(3000);
+    expect(statusCalls()).toBe(4);
+  });
+
+  it("keeps the job's status up through a short blip", async () => {
+    const { result } = await pollingWith([running, galaxyDown, running]);
+
+    await advance(3000);
+    expect(result.current.jobStatus?.state).toBe("running");
+
+    await advance(3000);
+    expect(statusCalls()).toBe(2);
+    expect(result.current.error).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
+  });
+
+  it("says so once the failures persist, and clears it on recovery", async () => {
+    const { result } = await pollingWith([
+      running,
+      galaxyDown,
+      galaxyDown,
+      galaxyDown,
+      running,
+    ]);
+
+    await advance(3000 + 3000 + 6000);
+    expect(statusCalls()).toBe(3);
+    expect(result.current.error).toBeNull();
+
+    await advance(12000);
+    expect(statusCalls()).toBe(4);
+    expect(result.current.error).toBe(
+      "Failed to get job status: down -- still trying."
+    );
+
+    await advance(24000);
+    expect(statusCalls()).toBe(5);
+    expect(result.current.error).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
+  });
+
+  it("stops asking about a job Galaxy says does not exist", async () => {
+    const { result } = await pollingWith([
+      (): unknown => ({
+        json: (): Promise<unknown> =>
+          Promise.reject(new MockHTTPError(404, "Job not found")),
+      }),
+    ]);
+
+    await advance(3000);
+    expect(result.current.error).toBe("Job not found");
+
+    await advance(10 * 60000);
+    expect(statusCalls()).toBe(1);
+  });
+
+  it("does not stack a second request behind a slow one", async () => {
+    const pending = deferred();
+    await pollingWith([(): unknown => ({ json: () => pending.promise })]);
+
+    await advance(3000);
+    await advance(30000);
+    expect(statusCalls()).toBe(1);
+  });
+
+  it("a request out when the search is reset does not start polling again", async () => {
+    const pending = deferred();
+    const { result } = await pollingWith([
+      (): unknown => ({ json: () => pending.promise }),
+      running,
+    ]);
+
+    await advance(3000);
+    act(() => {
+      result.current.reset();
+    });
+    await act(async () => {
+      pending.resolve(RUNNING_STATUS);
+      await Promise.resolve();
+    });
+
+    await advance(60000);
+    expect(statusCalls()).toBe(1);
+    expect(result.current.jobStatus).toBeNull();
+  });
+});
