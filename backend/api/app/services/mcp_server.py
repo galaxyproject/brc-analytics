@@ -51,7 +51,7 @@ def create_mcp_server(
             "build, resilient to ENA/EBI outages. Prefer the SRA tools for "
             "broad or filtered 'what data exists' queries; prefer the ENA "
             "tools (search_ena, search_ena_keywords) for submissions newer "
-            "than the mirror or free-text keyword search."
+            "than the mirror."
         )
     if logan_enabled:
         instructions += (
@@ -171,8 +171,10 @@ def create_mcp_server(
     async def search_ena_keywords(keywords: List[str]) -> dict:
         """Search the European Nucleotide Archive by keywords (organism names,
         library strategies like RNA-Seq/WGS, platforms like Illumina/PacBio).
-        Free-text keywords outside those categories are rejected with an
-        error listing what is supported. Returns up to 50 read run records. Check has_more to see if
+        Pass one facet per keyword. Free-text keywords outside those
+        categories are rejected with an error listing what is supported;
+        for organisms outside the supported genera use search_ena with a
+        taxonomy ID. Returns up to 50 read run records. Check has_more to see if
         additional results exist beyond the cap."""
         try:
             result = await ena_service.search_by_keywords(
