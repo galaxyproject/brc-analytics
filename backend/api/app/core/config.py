@@ -1,4 +1,5 @@
 import os
+import secrets
 from functools import lru_cache
 from typing import List
 
@@ -191,26 +192,29 @@ class Settings:
             "TRUST_PROXY_HEADERS", "false"
         ).lower() in ("1", "true", "yes")
 
-        # Assistant session cookie. When SESSION_COOKIE_SECRET is set, /chat
-        # issues an httpOnly Same-Site=Strict cookie binding the session_id
-        # to the browser; GET/DELETE /session endpoints require the cookie.
-        # Empty secret = legacy unbound mode (any caller with the session_id
-        # can read/delete) -- fine for local dev, must be set in prod.
+        # Assistant session cookie. /chat issues an httpOnly Same-Site=Strict
+        # cookie binding the session_id to the browser; continuing, reading
+        # or deleting a session requires it.
         self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
         self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
-        # Refuse to silently boot with session-cookie binding disabled in
-        # deployed environments -- empty secret falls back to legacy unbound
-        # mode where any caller with the session_id can read/delete. Mirrors
-        # the CORS wildcard guard above.
+        # Deployed environments must configure the secret: a generated one
+        # changes on every restart, dropping every session's binding.
         if (
             not self.SESSION_COOKIE_SECRET
             and self.ENVIRONMENT.lower() not in DEV_ENVIRONMENTS
         ):
             raise ValueError(
                 f"SESSION_COOKIE_SECRET must be set when ENVIRONMENT={self.ENVIRONMENT!r}; "
-                "empty secret disables session-cookie binding."
+                "a generated one would not survive a restart."
             )
+        # Generated rather than left empty so binding can't be switched off by
+        # omission -- a server that inherited ENVIRONMENT=development used to
+        # run unbound. Fine for one dev process; sessions started before a
+        # restart lose access to their cookie.
+        self.SESSION_COOKIE_SECRET_EPHEMERAL: bool = not self.SESSION_COOKIE_SECRET
+        if self.SESSION_COOKIE_SECRET_EPHEMERAL:
+            self.SESSION_COOKIE_SECRET = secrets.token_urlsafe(48)
 
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
