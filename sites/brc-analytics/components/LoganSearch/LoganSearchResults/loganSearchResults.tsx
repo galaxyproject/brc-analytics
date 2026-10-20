@@ -6,16 +6,21 @@ import {
   OrganismMeta,
   ResultsToolbar,
 } from "@brc/components/LoganSearch/loganSearch.styles";
+import { ViewColumn } from "@mui/icons-material";
 import {
   Alert,
   Box,
   Button,
   Card,
   CardContent,
+  Checkbox,
   Chip,
   Collapse,
   LinearProgress,
   Link,
+  ListItemText,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -38,19 +43,28 @@ import {
   type KmindexSort,
   type KmindexSortColumn,
   PAGE_SIZE_OPTIONS,
+  type SraRunMetadata,
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
-import { type ChangeEvent, type ElementType, type JSX, useState } from "react";
+import {
+  type ChangeEvent,
+  type ElementType,
+  type JSX,
+  type ReactNode,
+  useState,
+} from "react";
 
 interface LoganSearchResultsProps {
   search: ReturnType<typeof useKmindexSearch>;
 }
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
+const BIOPROJECT_URL = "https://www.ncbi.nlm.nih.gov/bioproject/";
 
 // The truncation disclosure, named so the toggle can point aria-controls at
 // what it opens. One card per page, so a constant is enough.
 const WHY_ID = "logan-why-capped";
+const COLUMNS_MENU_ID = "logan-columns-menu";
 
 // How many indexes the disclosure spells out before rolling the rest into one
 // line, and they are the ten largest matchers rather than the ten largest
@@ -66,6 +80,44 @@ const MAX_INDEX_LINES = 10;
 const MetaCell = muiStyled(TableCell)`
   ${MetaCellStyles}
 `;
+
+// The chooser only changes columns the narrow layout drops, so on a phone it
+// would toggle nothing visible.
+const ColumnsButton = muiStyled(Button)`
+  ${MetaCellStyles}
+`;
+
+type MetaColumnKey = keyof Omit<SraRunMetadata, "organism">;
+
+interface MetaColumn {
+  key: MetaColumnKey;
+  label: string;
+  // Only the columns the API can order by; the rest sort nothing server-side
+  // and a header that looks clickable but is not is worse than a plain one.
+  sort?: KmindexSortColumn;
+}
+
+// Every mirror field the API returns bar the organism, which has its own
+// column. The first three are the table as it was before the chooser existed,
+// so they stay on by default; the rest are there for the reader who wants to
+// tell a WGS run from an amplicon one without leaving the page.
+const META_COLUMNS: MetaColumn[] = [
+  { key: "platform", label: "Platform", sort: "platform" },
+  { key: "country", label: "Country", sort: "country" },
+  { key: "release_date", label: "Released", sort: "release_date" },
+  { key: "instrument", label: "Instrument" },
+  { key: "assay_type", label: "Assay type" },
+  { key: "library_layout", label: "Layout" },
+  { key: "mbases", label: "Mbases" },
+  { key: "bioproject", label: "BioProject" },
+  { key: "study", label: "Study" },
+];
+
+export const DEFAULT_META_COLUMNS: MetaColumnKey[] = [
+  "platform",
+  "country",
+  "release_date",
+];
 
 // The mirror is a local copy of run metadata for every run in SRA at the time
 // it was built, not a BRC-filtered subset -- an earlier tooltip said the
@@ -182,6 +234,137 @@ function describeMeta(hit: KmindexHit): string {
 }
 
 /**
+ * An NCBI link for a BioProject or study accession, or the dimmed dash when
+ * the mirror had none.
+ * @param props - Component props.
+ * @param props.href - Where the accession resolves at NCBI.
+ * @param props.value - The accession, or null when not recorded.
+ * @returns The link, or the dash.
+ */
+function MetaLink({
+  href,
+  value,
+}: {
+  href: string;
+  value?: string | null;
+}): JSX.Element {
+  if (!value) return <Meta value={value} />;
+  return (
+    <Typography variant="caption">
+      <Link
+        href={href}
+        rel="noopener noreferrer"
+        target="_blank"
+        underline="hover"
+      >
+        {value}
+        <Box component="span" sx={visuallyHidden}>
+          {" "}
+          (opens NCBI in a new tab)
+        </Box>
+      </Link>
+    </Typography>
+  );
+}
+
+/**
+ * One mirror field's cell content for a hit.
+ * @param key - Which field.
+ * @param sra - The hit's mirror record, or null when the mirror had none.
+ * @returns The cell content.
+ */
+function renderMetaValue(
+  key: MetaColumnKey,
+  sra: SraRunMetadata | null
+): ReactNode {
+  switch (key) {
+    case "bioproject":
+      return (
+        <MetaLink
+          href={`${BIOPROJECT_URL}${encodeURIComponent(sra?.bioproject ?? "")}`}
+          value={sra?.bioproject}
+        />
+      );
+    case "study":
+      // NCBI has no study landing page of its own; an SRA search on the
+      // accession lists the study's runs, which is what the reader is after.
+      return (
+        <MetaLink
+          href={`${SRA_RUN_URL}${encodeURIComponent(sra?.study ?? "")}`}
+          value={sra?.study}
+        />
+      );
+    case "mbases":
+      return <Meta numeric value={sra?.mbases?.toLocaleString() ?? null} />;
+    case "release_date":
+      return <Meta numeric value={sra?.release_date?.slice(0, 10)} />;
+    default:
+      return <Meta value={sra?.[key]} />;
+  }
+}
+
+/**
+ * The button and menu that pick which mirror columns the table shows.
+ * @param props - Component props.
+ * @param props.onToggle - Called with a column to show or hide it.
+ * @param props.visible - Columns currently shown.
+ * @returns The chooser.
+ */
+function ColumnChooser({
+  onToggle,
+  visible,
+}: {
+  onToggle: (key: MetaColumnKey) => void;
+  visible: MetaColumnKey[];
+}): JSX.Element {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  return (
+    <>
+      <ColumnsButton
+        aria-controls={anchor ? COLUMNS_MENU_ID : undefined}
+        aria-expanded={Boolean(anchor)}
+        aria-haspopup="menu"
+        onClick={(event): void => setAnchor(event.currentTarget)}
+        size="small"
+        startIcon={<ViewColumn />}
+      >
+        Columns
+      </ColumnsButton>
+      <Menu
+        anchorEl={anchor}
+        id={COLUMNS_MENU_ID}
+        onClose={(): void => setAnchor(null)}
+        open={Boolean(anchor)}
+      >
+        {/* Stays open on a click: picking three columns should not take
+            three trips to the button. */}
+        {META_COLUMNS.map(({ key, label }) => {
+          const checked = visible.includes(key);
+          return (
+            <MenuItem
+              aria-checked={checked}
+              dense
+              key={key}
+              onClick={(): void => onToggle(key)}
+              role="menuitemcheckbox"
+            >
+              <Checkbox
+                checked={checked}
+                disableRipple
+                edge="start"
+                size="small"
+                tabIndex={-1}
+              />
+              <ListItemText primary={label} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </>
+  );
+}
+
+/**
  * The warning that part of the index could not be read.
  *
  * Shared by the listing and the empty state rather than living in the
@@ -268,6 +451,8 @@ export const LoganSearchResults = ({
   // search stood open over the next one, explaining a cap that may not have
   // bitten and naming indexes that were not searched.
   const [whyOpenFor, setWhyOpenFor] = useState<string | null>(null);
+  const [visibleColumns, setVisibleColumns] =
+    useState<MetaColumnKey[]>(DEFAULT_META_COLUMNS);
 
   if (!results) return null;
 
@@ -303,6 +488,23 @@ export const LoganSearchResults = ({
   const restNote = describeRestIndexes(perIndex.slice(indexLines));
 
   const whyOpen = whyOpenFor === results.job_id;
+
+  // Filtered from the config rather than kept in click order, so a column
+  // always lands in the same place however it was switched on.
+  const metaColumns = META_COLUMNS.filter(({ key }) =>
+    visibleColumns.includes(key)
+  );
+  const toggleColumn = (key: MetaColumnKey): void => {
+    const hiding = visibleColumns.includes(key);
+    // A table ordered by a column nobody can see has no lit header to explain
+    // it, so hiding the sorted column goes back to score order.
+    const column = META_COLUMNS.find((c) => c.key === key);
+    if (hiding && column?.sort && column.sort === appliedSort(results).column)
+      void setSort("score");
+    setVisibleColumns((shown) =>
+      shown.includes(key) ? shown.filter((k) => k !== key) : [...shown, key]
+    );
+  };
 
   // A backend predating the breakdown sends neither total_matches nor
   // per_index, so both need the same guard: an unguarded read of
@@ -395,7 +597,10 @@ export const LoganSearchResults = ({
               </Typography>
             )}
           </div>
-          <TablePagination {...paginationProps} />
+          <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
+            <ColumnChooser onToggle={toggleColumn} visible={visibleColumns} />
+            <TablePagination {...paginationProps} />
+          </Box>
         </ResultsToolbar>
 
         {results.truncated && (
@@ -509,27 +714,25 @@ export const LoganSearchResults = ({
                   label="Organism"
                   onSort={setSort}
                 />
-                <SortableHeader
-                  applied={applied}
-                  column="platform"
-                  component={MetaCell}
-                  label="Platform"
-                  onSort={setSort}
-                />
-                <SortableHeader
-                  applied={applied}
-                  column="country"
-                  component={MetaCell}
-                  label="Country"
-                  onSort={setSort}
-                />
-                <SortableHeader
-                  applied={applied}
-                  column="release_date"
-                  component={MetaCell}
-                  label="Released"
-                  onSort={setSort}
-                />
+                {metaColumns.map(({ key, label, sort }) =>
+                  sort ? (
+                    <SortableHeader
+                      applied={applied}
+                      column={sort}
+                      component={MetaCell}
+                      key={key}
+                      label={label}
+                      onSort={setSort}
+                    />
+                  ) : (
+                    <MetaCell
+                      align={key === "mbases" ? "right" : undefined}
+                      key={key}
+                    >
+                      {label}
+                    </MetaCell>
+                  )
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -615,15 +818,14 @@ export const LoganSearchResults = ({
                       </OrganismMeta>
                     )}
                   </TableCell>
-                  <MetaCell>
-                    <Meta value={hit.sra?.platform} />
-                  </MetaCell>
-                  <MetaCell>
-                    <Meta value={hit.sra?.country} />
-                  </MetaCell>
-                  <MetaCell>
-                    <Meta numeric value={hit.sra?.release_date?.slice(0, 10)} />
-                  </MetaCell>
+                  {metaColumns.map(({ key }) => (
+                    <MetaCell
+                      align={key === "mbases" ? "right" : undefined}
+                      key={key}
+                    >
+                      {renderMetaValue(key, hit.sra)}
+                    </MetaCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>

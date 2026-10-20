@@ -241,7 +241,8 @@ interface KmindexSearchActions {
   reset: () => void;
   setPageSize: (size: number) => Promise<void>;
   setSort: (column: KmindexSortColumn) => Promise<void>;
-  submit: (submission: KmindexSubmission) => Promise<void>;
+  // Resolves to the new job's id, or null when the submission failed.
+  submit: (submission: KmindexSubmission) => Promise<string | null>;
 }
 
 export type KmindexSortColumn =
@@ -326,11 +327,32 @@ async function toErrorMessage(
 ): Promise<string> {
   if (error && typeof error === "object" && "response" in error) {
     const { response } = error as {
-      response: { json: () => Promise<{ detail?: string }>; status: number };
+      response: { json: () => Promise<{ detail?: unknown }>; status: number };
     };
     try {
       const body = await response.json();
-      return body.detail || `HTTP ${response.status}`;
+      const { detail } = body;
+      // FastAPI's validation 422 carries a list of objects; React can't
+      // render those, so pull out their messages.
+      if (Array.isArray(detail)) {
+        const messages = detail
+          .map((item) =>
+            item && typeof item === "object" && "msg" in item
+              ? (item as { msg: unknown }).msg
+              : null
+          )
+          .filter((msg): msg is string => typeof msg === "string" && !!msg);
+        return messages.length
+          ? messages.join("; ")
+          : `HTTP ${response.status}`;
+      }
+      if (typeof detail !== "string" || !detail)
+        return `HTTP ${response.status}`;
+      // A backend that relays an upstream error page as its detail would
+      // otherwise put a whole HTML document in the banner.
+      if (/<(!doctype|html|head|body)\b/i.test(detail))
+        return `HTTP ${response.status}`;
+      return detail;
     } catch {
       return `HTTP ${response.status}`;
     }
@@ -632,7 +654,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
   }, []);
 
   const submit = useCallback(
-    async (submission: KmindexSubmission): Promise<void> => {
+    async (submission: KmindexSubmission): Promise<string | null> => {
       stopPolling();
       fetchedRef.current = null;
       resultsRef.current = null;
@@ -674,9 +696,11 @@ export const useKmindexSearch = (): KmindexSearchActions &
         }));
         syncJobParam(job_id);
         startPolling(job_id);
+        return job_id;
       } catch (error: unknown) {
         const message = await toErrorMessage(error, "Failed to submit query");
         setState((prev) => ({ ...prev, error: message, isSubmitting: false }));
+        return null;
       }
     },
     [startPolling, stopPolling]
