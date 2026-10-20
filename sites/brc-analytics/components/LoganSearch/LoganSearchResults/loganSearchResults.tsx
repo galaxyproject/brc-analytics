@@ -60,6 +60,11 @@ interface LoganSearchResultsProps {
 
 const SRA_RUN_URL = "https://www.ncbi.nlm.nih.gov/sra/?term=";
 const BIOPROJECT_URL = "https://www.ncbi.nlm.nih.gov/bioproject/";
+const BIOSAMPLE_URL = "https://www.ncbi.nlm.nih.gov/biosample/";
+const OPENVIROME_URL = "https://openvirome.com/";
+
+// The filter prefixes OpenVirome reads, as logan-search.org links them.
+export type OpenViromeField = "bioproject" | "biosample" | "runId";
 
 // The truncation disclosure, named so the toggle can point aria-controls at
 // what it opens. One card per page, so a constant is enough.
@@ -110,6 +115,7 @@ const META_COLUMNS: MetaColumn[] = [
   { key: "library_layout", label: "Layout" },
   { key: "mbases", label: "Mbases" },
   { key: "bioproject", label: "BioProject" },
+  { key: "biosample", label: "BioSample" },
   { key: "study", label: "Study" },
 ];
 
@@ -151,8 +157,8 @@ function describeIndexShare(summary: KmindexIndexSummary, cap: number): string {
     matched <= cap
       ? `alone it would return all ${total}`
       : `alone it would still cap at ${cap.toLocaleString()}`;
-  if (kept === 0) return `${total} matched, none listed -- ${alone}`;
-  return `${listed} of ${total} listed -- ${alone}`;
+  if (kept === 0) return `${total} matched, none listed (${alone})`;
+  return `${listed} of ${total} listed (${alone})`;
 }
 
 /**
@@ -184,7 +190,7 @@ function describeCorrection(hit: KmindexHit): string {
   return (
     `kmindex reported ${raw.toFixed(4)}. This run's index is saturated and ` +
     `matches about ${(hit.fp_correction ?? 0).toFixed(4)} of any query's ` +
-    `k-mers, so that baseline is subtracted -- as logan-search.org does.`
+    `k-mers, so that baseline is subtracted, as logan-search.org does.`
   );
 }
 
@@ -206,7 +212,7 @@ function Meta({
   if (!value) {
     return (
       <Typography color="text.disabled" variant="caption">
-        --
+        –
       </Typography>
     );
   }
@@ -234,18 +240,79 @@ function describeMeta(hit: KmindexHit): string {
 }
 
 /**
- * An NCBI link for a BioProject or study accession, or the dimmed dash when
- * the mirror had none.
+ * An OpenVirome search filtered to one accession.
+ *
+ * The filter is a JSON array in the query string, so it is encoded as a whole
+ * rather than pasted in raw the way logan-search.org does: brackets and quotes
+ * are not safe in a query and an accession is no guarantee of tidy input.
+ * @param field - Which OpenVirome filter the accession goes in.
+ * @param accession - The run or BioProject accession.
+ * @returns e.g. https://openvirome.com/?filters=%5B%22runId-SRR1197259%22%5D.
+ */
+export function openViromeUrl(
+  field: OpenViromeField,
+  accession: string
+): string {
+  const filters = JSON.stringify([`${field}-${accession}`]);
+  return `${OPENVIROME_URL}?filters=${encodeURIComponent(filters)}`;
+}
+
+/**
+ * A compact OpenVirome link to sit after an accession's NCBI link.
+ *
+ * "OV" is what logan-search.org prints, and spelling the name out on every
+ * row would double the width of the accession column. The tooltip names it
+ * for a sighted reader, keyboard included, and the hidden text names it for a
+ * screen reader; describeChild keeps the tooltip from replacing that name.
+ * @param props - Component props.
+ * @param props.accession - The accession to search for.
+ * @param props.field - Which OpenVirome filter the accession goes in.
+ * @returns The link.
+ */
+function OpenViromeLink({
+  accession,
+  field,
+}: {
+  accession: string;
+  field: OpenViromeField;
+}): JSX.Element {
+  return (
+    <Tooltip describeChild title="Find this accession on OpenVirome">
+      <Link
+        href={openViromeUrl(field, accession)}
+        rel="noopener noreferrer"
+        target="_blank"
+        underline="hover"
+        variant="caption"
+      >
+        OV
+        <Box component="span" sx={visuallyHidden}>
+          {" "}
+          ({accession} on OpenVirome, opens in a new tab)
+        </Box>
+      </Link>
+    </Tooltip>
+  );
+}
+
+/**
+ * An NCBI link for a BioProject, BioSample or study accession, with an
+ * OpenVirome link beside it where asked for, or the dimmed dash when the
+ * mirror had none.
  * @param props - Component props.
  * @param props.href - Where the accession resolves at NCBI.
+ * @param props.openVirome - OpenVirome filter for a second link beside the
+ * NCBI one, for the accession kinds OpenVirome can filter on.
  * @param props.value - The accession, or null when not recorded.
  * @returns The link, or the dash.
  */
 function MetaLink({
   href,
+  openVirome,
   value,
 }: {
   href: string;
+  openVirome?: OpenViromeField;
   value?: string | null;
 }): JSX.Element {
   if (!value) return <Meta value={value} />;
@@ -263,6 +330,12 @@ function MetaLink({
           (opens NCBI in a new tab)
         </Box>
       </Link>
+      {openVirome && (
+        <>
+          {" "}
+          <OpenViromeLink accession={value} field={openVirome} />
+        </>
+      )}
     </Typography>
   );
 }
@@ -282,7 +355,16 @@ function renderMetaValue(
       return (
         <MetaLink
           href={`${BIOPROJECT_URL}${encodeURIComponent(sra?.bioproject ?? "")}`}
+          openVirome="bioproject"
           value={sra?.bioproject}
+        />
+      );
+    case "biosample":
+      return (
+        <MetaLink
+          href={`${BIOSAMPLE_URL}${encodeURIComponent(sra?.biosample ?? "")}`}
+          openVirome="biosample"
+          value={sra?.biosample}
         />
       );
     case "study":
@@ -456,6 +538,19 @@ export const LoganSearchResults = ({
 
   if (!results) return null;
 
+  // Filtered to nothing is the reader's filter, not the query: blaming the
+  // threshold here would send them to change the wrong thing.
+  if (results.filtered && results.total_hits === 0) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <ShardWarning noun="search" results={results} />
+        <Alert severity="info">
+          No runs match these filters. Remove one above to widen the set.
+        </Alert>
+      </Box>
+    );
+  }
+
   if (results.total_hits === 0) {
     return (
       <Box sx={{ mt: 2 }}>
@@ -510,7 +605,11 @@ export const LoganSearchResults = ({
   // per_index, so both need the same guard: an unguarded read of
   // total_matches throws inside render and unmounts the whole card, which is
   // worse than the count it was meant to show being missing.
-  const totalMatches = results.total_matches ?? results.total_hits;
+  // A filtered page is capped against what the filter keeps, not against
+  // the whole match set.
+  const totalMatches = results.filtered
+    ? (results.filtered_matches ?? results.total_hits)
+    : (results.total_matches ?? results.total_hits);
   const notListed = Math.max(totalMatches - results.total_hits, 0);
   // While truncated the listing is exactly the cap, so total_hits names it.
   const cap = results.total_hits;
@@ -520,16 +619,23 @@ export const LoganSearchResults = ({
   // under any sort, because the cap is applied on score before the listing is
   // re-sorted, so the listed rows are the highest-coverage ones however they
   // are ordered on screen.
-  let listWindow = `All ${results.total_hits.toLocaleString()} hits`;
+  let listWindow = results.filtered
+    ? `All ${results.total_hits.toLocaleString()} runs that match these filters`
+    : `All ${results.total_hits.toLocaleString()} hits`;
   let capNote: string | null = null;
   if (results.truncated) {
-    listWindow = `Listing the ${cap.toLocaleString()} highest-coverage hits`;
+    listWindow = results.filtered
+      ? `Listing the ${cap.toLocaleString()} highest-coverage runs that match these filters`
+      : `Listing the ${cap.toLocaleString()} highest-coverage hits`;
     // notListed is 0 only when the match count went missing; "the remaining 0"
     // would be a worse answer than naming the cap and leaving it there.
     capNote =
       notListed > 0
         ? `The remaining ${notListed.toLocaleString()} cannot be paged to.`
         : `More accessions matched than can be listed.`;
+    // The filtered download is not capped, so it is the way to the rest.
+    if (results.filtered)
+      capNote += " Download the filtered runs above for the full set.";
   }
 
   // What the response says it did, not what was clicked: a metadata sort the
@@ -624,7 +730,7 @@ export const LoganSearchResults = ({
                     <Typography variant="body2" sx={{ mt: 1 }}>
                       The cap is one score sort across every index, applied
                       after the shards merge, so each index keeps only what
-                      ranked highest overall -- an index with few matches can
+                      ranked highest overall, so an index with few matches can
                       keep none of them.
                     </Typography>
                     {perIndex.slice(0, indexLines).map((summary) => (
@@ -659,14 +765,14 @@ export const LoganSearchResults = ({
                   k-mers, so ties are common and a conserved query can put every
                   row listed here on a single one. Where the cut falls inside a
                   tie, a stable hash of the accession decides which
-                  equally-scoring runs made the list -- arbitrary, but the same
-                  on every reload.
+                  equally-scoring runs made the list: arbitrary, but the same on
+                  every reload.
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   A longer query is not a more specific one: kmindex scores the
                   fraction of your query&apos;s k-mers a run shares, so
                   extending into conserved flanking sequence raises that
-                  fraction in unrelated runs too -- a 4x longer version of the
+                  fraction in unrelated runs too. A 4x longer version of the
                   same 18S query matched more runs here, not fewer. The match
                   set responds to how rare your k-mers are and to the threshold
                   above, not to query length.
@@ -752,7 +858,8 @@ export const LoganSearchResults = ({
                         {" "}
                         (opens NCBI SRA in a new tab)
                       </Box>
-                    </Link>
+                    </Link>{" "}
+                    <OpenViromeLink accession={hit.accession} field="runId" />
                   </TableCell>
                   <TableCell align="right">
                     <CoverageCell>
@@ -795,7 +902,7 @@ export const LoganSearchResults = ({
                   </TableCell>
                   <MetaCell align="right">
                     <Numeric>
-                      {hit.ani == null ? "--" : hit.ani.toFixed(4)}
+                      {hit.ani == null ? "–" : hit.ani.toFixed(4)}
                     </Numeric>
                   </MetaCell>
                   <TableCell>

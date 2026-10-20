@@ -50,34 +50,55 @@ function isRecentSearch(value: unknown): value is RecentSearch {
 }
 
 /**
+ * What a read of the stored list found. "unavailable" is kept apart from an
+ * empty list so a caller never writes over history it simply couldn't see.
+ */
+export type RecentSearchesRead =
+  | { searches: RecentSearch[]; status: "ok" }
+  | { status: "unavailable" };
+
+/**
  * The searches this browser has submitted, newest first.
  *
  * Storage can be missing, blocked, or throw on access (private windows,
  * cleared site data, a sandboxed preview), and none of that should cost the
  * page anything but this list.
- * @returns The stored searches, or an empty list when storage is unavailable.
+ * @returns The stored searches, or "unavailable" when storage can't be read.
  */
-export function readRecentSearches(): RecentSearch[] {
+export function readRecentSearches(): RecentSearchesRead {
+  let raw: string | null;
   try {
-    const raw = window.localStorage.getItem(RECENT_SEARCHES_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isRecentSearch).slice(0, MAX_RECENT_SEARCHES);
+    raw = window.localStorage.getItem(RECENT_SEARCHES_KEY);
   } catch {
-    return [];
+    return { status: "unavailable" };
+  }
+  if (!raw) return { searches: [], status: "ok" };
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return { searches: [], status: "ok" };
+    return {
+      searches: parsed.filter(isRecentSearch).slice(0, MAX_RECENT_SEARCHES),
+      status: "ok",
+    };
+  } catch {
+    // Unparseable is readable but empty: there is nothing in it to keep, and
+    // refusing to overwrite it would leave the list broken for good.
+    return { searches: [], status: "ok" };
   }
 }
 
 /**
  * Store the list, quietly giving up if storage refuses it.
  * @param searches - The list to keep.
+ * @returns Whether the list was stored.
  */
-function writeRecentSearches(searches: RecentSearch[]): void {
+export function writeRecentSearches(searches: RecentSearch[]): boolean {
   try {
     window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+    return true;
   } catch {
     // Full or blocked storage just means the list doesn't outlive the page.
+    return false;
   }
 }
 
@@ -86,18 +107,16 @@ function writeRecentSearches(searches: RecentSearch[]): void {
  * job and anything past the cap.
  * @param searches - The current list.
  * @param search - The search just submitted.
- * @returns The new list, which has also been stored.
+ * @returns The new list. Nothing is stored.
  */
-export function addRecentSearch(
+export function withRecentSearch(
   searches: RecentSearch[],
   search: RecentSearch
 ): RecentSearch[] {
-  const next = [
+  return [
     search,
     ...searches.filter((entry) => entry.jobId !== search.jobId),
   ].slice(0, MAX_RECENT_SEARCHES);
-  writeRecentSearches(next);
-  return next;
 }
 
 /**

@@ -6,7 +6,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from bioblend import ConnectionError as BioblendConnectionError
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, StreamingResponse
 
 from app.core.cache import CacheService
@@ -31,6 +31,7 @@ from app.models.galaxy import (
     KmindexQuerySubmission,
     KmindexResults,
     KmindexSort,
+    KmindexSummary,
 )
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
@@ -39,9 +40,16 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    KmindexFiltersUnavailable,
     KmindexUnknownIndex,
     ShardFetchError,
     is_unlinked_account_error,
+)
+from app.services.kmindex_filters import (
+    KmindexFilters,
+    iter_subset_tsv,
+    parse_filter_params,
+    subset_row_count,
 )
 from app.services.kmindex_submissions import record_submission
 from app.services.sra_mirror import (
@@ -138,6 +146,36 @@ async def get_galaxy_service(
 ) -> GalaxyService:
     """Dependency to get Galaxy service instance."""
     return GalaxyService(cache, sra_mirror=sra_mirror, credential=credential)
+
+
+def get_kmindex_filters(request: Request) -> Optional[KmindexFilters]:
+    """
+    The f.* filter parameters on a request, or None when none were sent.
+
+    Read off the raw query string rather than declared one by one, because the
+    field set is the filter model's to own and a repeated key (f.country=A&
+    f.country=B) is the encoding.
+
+    @param request: the incoming request.
+    @returns: the filter, or None.
+    @raises HTTPException: 422 on an unknown field or malformed value.
+    """
+    try:
+        return parse_filter_params(request.query_params.multi_items())
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+
+def filters_unavailable(e: KmindexFiltersUnavailable) -> HTTPException:
+    """
+    The 409 a filtered read answers when there is no export to filter over.
+
+    @param e: the service's exception, whose message is the reader-facing reason.
+    @returns: the HTTPException to raise.
+    """
+    return HTTPException(
+        status_code=409, detail={"code": "filters_unavailable", "reason": str(e)}
+    )
 
 
 @router.get("/health")
@@ -373,6 +411,7 @@ async def get_kmindex_results(
         default=None,
         description="asc or desc; defaults to desc for score and asc otherwise",
     ),
+    filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
     galaxy_service: GalaxyService = Depends(get_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
@@ -383,6 +422,10 @@ async def get_kmindex_results(
     ranked list so callers don't have to fetch and merge dozens of datasets.
     Sorting is over that listing -- the top of the score range -- not over the
     whole match set, which the export carries.
+
+    With f.* filter parameters the page comes from the export parquet
+    instead, over every row the filter keeps; without them this is the
+    listing exactly as before.
     """
     try:
         if not galaxy_service.is_available():
@@ -390,12 +433,18 @@ async def get_kmindex_results(
                 status_code=503, detail="Galaxy service is not available"
             )
 
+        if filters is not None and not filters.is_empty():
+            return await galaxy_service.get_filtered_kmindex_results(
+                job_id, filters, limit, offset, sort=sort, order=order
+            )
         return await galaxy_service.get_kmindex_results(
             job_id, limit, offset, sort=sort, order=order
         )
 
     except HTTPException:
         raise
+    except KmindexFiltersUnavailable as e:
+        raise filters_unavailable(e) from e
     except GalaxyJobAggregating as e:
         # Same answer as a job that has not finished: come back for it. The
         # job is done, but another request is still merging its shards, and
@@ -415,10 +464,58 @@ async def get_kmindex_results(
         ) from e
 
 
+@router.get("/kmindex/jobs/{job_id}/summary", response_model=KmindexSummary)
+async def get_kmindex_summary(
+    job_id: str,
+    filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """
+    The cohort and geography of a filtered match set.
+
+    Same shapes the results response carries for the whole set, so the card
+    and the map render them unchanged. Headline counts apply every filter;
+    each breakdown leaves its own field out, so a picked value's siblings stay
+    visible. Served from the export parquet, and 409 when there is none --
+    never by counting the capped listing instead.
+
+    @param job_id: the completed kmindex job.
+    @returns: the filtered cohort, geography and counts.
+    """
+    try:
+        if not galaxy_service.is_available():
+            raise HTTPException(
+                status_code=503, detail="Galaxy service is not available"
+            )
+        return await galaxy_service.get_filtered_kmindex_summary(
+            job_id, filters or KmindexFilters()
+        )
+    except HTTPException:
+        raise
+    except KmindexFiltersUnavailable as e:
+        raise filters_unavailable(e) from e
+    except GalaxyJobAggregating as e:
+        raise HTTPException(status_code=202, detail=str(e)) from e
+    except GalaxyJobNotComplete as e:
+        raise HTTPException(status_code=202, detail=str(e)) from e
+    except GalaxyJobFailed as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    except GalaxyJobNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logger.error(f"Failed to summarize kmindex results for {job_id}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=error_detail("Failed to summarize kmindex results", e),
+        ) from e
+
+
 @router.get("/kmindex/jobs/{job_id}/export")
 async def export_kmindex_results(
     job_id: str,
     format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
+    filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
@@ -436,20 +533,36 @@ async def export_kmindex_results(
     same rows are 168 MB as text.
 
     @param job_id: the completed kmindex job.
-    @param format: parquet or tsv.
-    @returns: the export as an attachment, named for the job and its row count.
-    """
-    return await serve_kmindex_export(job_id, format)
-
-
-async def serve_kmindex_export(job_id: str, format: str) -> Response:
-    """
-    The export as an attachment, or a 404 if there is no current one.
-
-    Shared with the partner API, which serves the same files.
+    With f.* filter parameters only the rows the filter keeps are sent, as
+    TSV. A filtered parquet needs a temporary file and a path that reliably
+    removes it, so for now it is refused rather than served unfiltered.
 
     @param job_id: the completed kmindex job.
     @param format: parquet or tsv.
+    @returns: the export as an attachment, named for the job and its row count.
+    """
+    if filters is not None and not filters.is_empty():
+        if format != "tsv":
+            raise HTTPException(
+                status_code=422,
+                detail="A filtered download is TSV only for now",
+            )
+        return await serve_kmindex_export(job_id, format, filters=filters)
+    return await serve_kmindex_export(job_id, format)
+
+
+async def serve_kmindex_export(
+    job_id: str, format: str, filters: Optional[KmindexFilters] = None
+) -> Response:
+    """
+    The export as an attachment, or a 404 if there is no current one.
+
+    Shared with the partner API, which serves the same files and never passes
+    a filter.
+
+    @param job_id: the completed kmindex job.
+    @param format: parquet or tsv.
+    @param filters: a non-empty filter to narrow a TSV download, or None.
     @returns: the file response.
     """
     path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
@@ -475,7 +588,10 @@ async def serve_kmindex_export(job_id: str, format: str) -> Response:
             )
         # Read from the parquet footer, so the count in the filename describes
         # the bytes being sent rather than a cache entry that outlived them.
-        rows = await asyncio.to_thread(export_row_count, path)
+        if filters is not None:
+            rows = await asyncio.to_thread(subset_row_count, path, filters)
+        else:
+            rows = await asyncio.to_thread(export_row_count, path)
     except HTTPException:
         raise
     except Exception as e:
@@ -490,8 +606,12 @@ async def serve_kmindex_export(job_id: str, format: str) -> Response:
 
     if format == "tsv":
         filename = export_download_name(job_id, rows, "tsv")
+        if filters is not None:
+            filename = filename.replace("-runs.tsv", "-filtered-runs.tsv")
         return StreamingResponse(
-            iter_export_tsv(path),
+            iter_subset_tsv(path, filters)
+            if filters is not None
+            else iter_export_tsv(path),
             media_type="text/tab-separated-values",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )

@@ -5,6 +5,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export interface SraRunMetadata {
   assay_type: string | null;
   bioproject: string | null;
+  // Optional because a backend predating it omits the key, and null on a
+  // mirror built before the column existed.
+  biosample?: string | null;
   country: string | null;
   instrument: string | null;
   library_layout: string | null;
@@ -167,6 +170,15 @@ export interface KmindexResults {
   // Optional for the same reason cohort is: a backend predating the export
   // omits it entirely.
   export_status?: KmindexExportStatus;
+  // True when the page was served for a filter (f.* params), from the export
+  // parquet. The filter runs over the whole match set, then what can be paged
+  // is capped as the listing is: total_hits is the capped count, truncated
+  // says whether the cap bit, and per_index is empty. cohort and geography
+  // stay the unfiltered ones; the filtered pair comes from .../summary.
+  filtered?: boolean;
+  // Rows the filter keeps, before the cap. Set only when filtered; absent on
+  // a backend predating the cap, which never truncated a filtered page.
+  filtered_matches?: number | null;
   // Absent on a backend predating the map, on a job whose mirror was
   // unavailable, and on one whose mirror predates the columns the geography
   // query needs -- geography closes on its own so the rest of the mirror
@@ -216,6 +228,10 @@ export interface KmindexSubmission {
 
 interface KmindexSearchState {
   error: string | null;
+  // Why the last filtered request could not be served (no export on disk to
+  // filter over). Kept apart from `error` because the page is still fine: the
+  // unfiltered results stay on screen, and clearing the filter is the fix.
+  filterError: string | null;
   // Which Galaxy account the running search was submitted under: "user" for
   // the signed-in visitor's own, "service" for the shared BRC account. Null
   // until a submission answers -- a job reattached from ?job= never learns it.
@@ -303,6 +319,7 @@ export function appliedSort(results: KmindexResults): KmindexSort {
 
 const INITIAL_STATE: KmindexSearchState = {
   error: null,
+  filterError: null,
   identity: null,
   indexes: [],
   isLoadingIndexes: true,
@@ -314,6 +331,60 @@ const INITIAL_STATE: KmindexSearchState = {
   results: null,
   sort: DEFAULT_SORT,
 };
+
+/**
+ * A response detail with a filtered read's 409 unwrapped. That 409 answers
+ * {code, reason} when there is no export to filter over, and the reason is
+ * written for the reader.
+ * @param detail - The response body's detail.
+ * @returns The reason for that shape, and the detail unchanged otherwise.
+ */
+function unwrapRefusal(detail: unknown): unknown {
+  if (!detail || typeof detail !== "object" || !("reason" in detail))
+    return detail;
+  return (detail as { reason: unknown }).reason;
+}
+
+/**
+ * Which message slot a failed results request belongs in: a filter the
+ * backend could not serve is the filter's problem, not the page's.
+ * @param error - Error thrown by ky.
+ * @param filterQuery - The filter the request carried.
+ * @returns "filterError" for a 409 on a filtered request, else "error".
+ */
+function failureSlot(
+  error: unknown,
+  filterQuery: string
+): "error" | "filterError" {
+  return Boolean(filterQuery) &&
+    error instanceof HTTPError &&
+    error.response.status === 409
+    ? "filterError"
+    : "error";
+}
+
+/**
+ * The results request's query parameters.
+ *
+ * Pairs rather than an object only when there is a filter, because f.* keys
+ * repeat; with none the request is the one it always was.
+ * @param base - Paging and sort parameters.
+ * @param filterQuery - f.* filter parameters as a query string, or "".
+ * @returns What ky is given as searchParams.
+ */
+function resultsSearchParams(
+  base: Record<string, number | string>,
+  filterQuery: string
+): Record<string, number | string> | [string, string][] {
+  if (!filterQuery) return base;
+  return [
+    ...Object.entries(base).map(([key, value]): [string, string] => [
+      key,
+      String(value),
+    ]),
+    ...new URLSearchParams(filterQuery).entries(),
+  ];
+}
 
 /**
  * Pull a readable message out of a ky HTTPError, falling back to its status.
@@ -331,7 +402,7 @@ async function toErrorMessage(
     };
     try {
       const body = await response.json();
-      const { detail } = body;
+      const detail = unwrapRefusal(body.detail);
       // FastAPI's validation 422 carries a list of objects; React can't
       // render those, so pull out their messages.
       if (Array.isArray(detail)) {
@@ -395,10 +466,13 @@ function syncJobParam(jobId: string | null): void {
  * Drives a Logan/kmindex sequence search: lists the available indexes, submits
  * a FASTA query, polls the resulting Galaxy job, and pages through the merged
  * hits once it completes.
+ * @param filterQuery - f.* filter parameters as a query string, sent with
+ * every results request; "" (the default) sends exactly what it always has.
  * @returns Search state and actions.
  */
-export const useKmindexSearch = (): KmindexSearchActions &
-  KmindexSearchState => {
+export const useKmindexSearch = (
+  filterQuery = ""
+): KmindexSearchActions & KmindexSearchState => {
   const [state, setState] = useState<KmindexSearchState>(INITIAL_STATE);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
   // A poll tick already in flight when the job completes can fire a second
@@ -410,6 +484,9 @@ export const useKmindexSearch = (): KmindexSearchActions &
   // choice without re-arming the interval on every change.
   const pageSizeRef = useRef(PAGE_SIZE);
   const sortRef = useRef<KmindexSort>(DEFAULT_SORT);
+  // Same reasoning as the two above: a poll tick or a scheduled re-ask reads
+  // the filter in force when it fires, not the one it was created under.
+  const filterQueryRef = useRef(filterQuery);
   // The last page that landed, whichever request brought it back. It is what
   // the paginator and the headers are drawn from, so it is also what a failed
   // request has to leave the refs agreeing with.
@@ -491,8 +568,12 @@ export const useKmindexSearch = (): KmindexSearchActions &
       /**
        * Raise the banner, leaving the refs agreeing with what is on screen.
        * @param message - What to tell the reader.
+       * @param field - Which message slot it goes in.
        */
-      const failWith = (message: string): void => {
+      const failWith = (
+        message: string,
+        field: "error" | "filterError" = "error"
+      ): void => {
         // The refs are what the next request sends; the response is what the
         // paginator and the lit header show. This is the newest request and it
         // brought nothing back, so nothing else is coming to reconcile the
@@ -505,7 +586,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
         }
         setState((prev) => ({
           ...prev,
-          error: message,
+          [field]: message,
           isLoadingResults: false,
           pageSize: pageSizeRef.current,
           sort: sortRef.current,
@@ -535,6 +616,10 @@ export const useKmindexSearch = (): KmindexSearchActions &
       };
 
       try {
+        const searchParams = resultsSearchParams(
+          { limit: pageSizeRef.current, offset, order, sort: column },
+          filterQueryRef.current
+        );
         // The Response first, not .json(): the backend answers 202 with a
         // {detail} body while another request is still merging this job's
         // shards, ky does not throw on it, and parsing that body as a results
@@ -543,12 +628,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
           `${API_BASE_URL}/galaxy/kmindex/jobs/${jobId}/results`,
           {
             credentials: "include",
-            searchParams: {
-              limit: pageSizeRef.current,
-              offset,
-              order,
-              sort: column,
-            },
+            searchParams,
             // Cold aggregation pulls every shard from Galaxy; the warm path
             // returns from cache in milliseconds.
             timeout: 300000,
@@ -572,6 +652,7 @@ export const useKmindexSearch = (): KmindexSearchActions &
         sortRef.current = appliedSort(results);
         setState((prev) => ({
           ...prev,
+          filterError: null,
           isLoadingResults: false,
           pageSize: pageSizeRef.current,
           results,
@@ -587,7 +668,10 @@ export const useKmindexSearch = (): KmindexSearchActions &
           return;
         }
         mergeStartedRef.current = null;
-        failWith(await toErrorMessage(error, "Failed to load results"));
+        failWith(
+          await toErrorMessage(error, "Failed to load results"),
+          failureSlot(error, filterQueryRef.current)
+        );
       }
     },
     []
@@ -600,6 +684,18 @@ export const useKmindexSearch = (): KmindexSearchActions &
   useEffect(() => {
     fetchResultsRef.current = fetchResults;
   }, [fetchResults]);
+
+  // A new filter re-asks from the first page, the way a new sort does: page
+  // three of one filtered set names nothing in another. Before the first page
+  // has landed there is nothing to re-ask; the first request reads the ref.
+  useEffect(() => {
+    if (filterQueryRef.current === filterQuery) return;
+    filterQueryRef.current = filterQuery;
+    // A reason given for the old filter says nothing about the new one.
+    setState((prev) => ({ ...prev, filterError: null }));
+    const jobId = resultsRef.current?.job_id;
+    if (jobId) void fetchResults(jobId, 0);
+  }, [fetchResults, filterQuery]);
 
   const startPolling = useCallback(
     (jobId: string): void => {

@@ -208,7 +208,7 @@ describe("LoganSearchForm index picker", () => {
       chip("Organism", "Environmental").getAttribute("aria-disabled")
     ).toBe("true");
     expect(await tooltipOf("Organism", "Environmental")).toBe(
-      "ENV -- no index pairs it with the selected library types."
+      "ENV: no index pairs it with the selected library types."
     );
 
     fireEvent.click(chip("Library type", "All"));
@@ -258,7 +258,7 @@ describe("LoganSearchForm index picker", () => {
     renderForm();
 
     expect(await tooltipOf("Organism", "Invertebrates")).toBe(
-      "INV -- 9 indexes. GenBank's invertebrate division, which also holds " +
+      "INV: 9 indexes. GenBank's invertebrate division, which also holds " +
         "protists such as Plasmodium."
     );
   });
@@ -345,6 +345,65 @@ describe("LoganSearchForm index picker", () => {
     expect(screen.queryByRole("group", { name: "Library type" })).toBeNull();
   });
 
+  test("submits a pasted FASTQ record as FASTA, named by its header", async () => {
+    const onSubmitted = jest.fn();
+    const submit = jest.fn().mockResolvedValue("job456");
+    render(
+      <LoganSearchForm onSubmitted={onSubmitted} search={search({ submit })} />
+    );
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "@read7 run=SRR1\nACGTACGT\n+\nIIIIIII#\n" },
+    });
+    expect(
+      screen.getByText(
+        "8 bases. FASTQ; headers and quality scores are ignored."
+      )
+    ).toBeTruthy();
+    fireEvent.click(searchButton());
+
+    expect(submit).toHaveBeenCalledWith({
+      indexes: ["GENOMIC_INV"],
+      sequence: ">read7 run=SRR1\nACGTACGT\n",
+      threshold: 0.5,
+      zvalue: 6,
+    });
+    await waitFor(() =>
+      expect(onSubmitted).toHaveBeenCalledWith(
+        expect.objectContaining({ jobId: "job456", queryName: "read7" })
+      )
+    );
+  });
+
+  test("holds back a multi-record FASTQ the way it does FASTA", () => {
+    const { submit } = renderForm();
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "@a\nACGT\n+\nIIII\n@b\nACGT\n+\nIIII\n" },
+    });
+
+    expect(
+      screen.getByText("2 records, but a query is one sequence")
+    ).toBeTruthy();
+    expect(searchButton().disabled).toBe(true);
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  test("says what is wrong with a malformed FASTQ and won't submit it", () => {
+    renderForm();
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "@a\nACGTA\n+\nIIII\n" },
+    });
+
+    expect(
+      screen.getByText(
+        "Malformed FASTQ: record 1 has 5 bases but 4 quality scores."
+      )
+    ).toBeTruthy();
+    expect(searchButton().disabled).toBe(true);
+  });
+
   test("will not submit an empty query", () => {
     renderForm();
 
@@ -405,7 +464,7 @@ describe("LoganSearchForm query file", () => {
   });
 
   /**
-   * The hidden file input behind the Load FASTA file button.
+   * The hidden file input behind the Load FASTA/FASTQ file button.
    * @returns The input.
    */
   function fileInput(): HTMLInputElement {
@@ -423,11 +482,25 @@ describe("LoganSearchForm query file", () => {
     fireEvent.change(fileInput(), { target: { files: [file] } });
   }
 
-  test("accepts the FASTA extensions and plain text", () => {
+  test("accepts the FASTA and FASTQ extensions and plain text", () => {
     renderForm();
 
-    expect(screen.getByText("Load FASTA file").closest("label")).toBeTruthy();
-    expect(fileInput().accept).toBe(".fa,.fasta,.fna,.txt");
+    expect(
+      screen.getByText("Load FASTA/FASTQ file").closest("label")
+    ).toBeTruthy();
+    expect(fileInput().accept).toBe(".fa,.fasta,.fna,.fq,.fastq,.txt");
+  });
+
+  test("reads a FASTQ file into the query box as written", async () => {
+    renderForm();
+    pick(new File(["@r1\nACGTACGTAC\n+\nIIIIIIIIII\n"], "reads.fq"));
+
+    await screen.findByText(
+      "10 bases. FASTQ; headers and quality scores are ignored."
+    );
+    expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
+      "@r1\nACGTACGTAC\n+\nIIIIIIIIII\n"
+    );
   });
 
   test("reads the file into the query box", async () => {
@@ -443,7 +516,7 @@ describe("LoganSearchForm query file", () => {
     const { submit } = renderForm();
     pick(new File([`>long\n${"A".repeat(5001)}\n`], "long.fasta"));
 
-    await screen.findByText(/5001 bases -- queries are capped at 5000/);
+    await screen.findByText(/5001 bases, but queries are capped at 5000/);
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
   });
@@ -452,7 +525,7 @@ describe("LoganSearchForm query file", () => {
     const { submit } = renderForm();
     pick(new File([">a\r\nACGTACGT\r\n>b\r\nACGT\r\n"], "primers.fa"));
 
-    await screen.findByText("2 records -- a query is one sequence");
+    await screen.findByText("2 records, but a query is one sequence");
     expect(searchButton().disabled).toBe(true);
     expect(submit).not.toHaveBeenCalled();
   });
@@ -465,7 +538,7 @@ describe("LoganSearchForm query file", () => {
     );
 
     expect((await screen.findByRole("alert")).textContent).toMatch(
-      /q\.fa isn't a plain-text FASTA file/
+      /q\.fa isn't a plain-text FASTA or FASTQ file/
     );
     expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
       before
@@ -558,7 +631,7 @@ describe("LoganSearchForm presets", () => {
     renderForm();
 
     expect(await tooltipOf("Presets", "Transcriptomic")).toBe(
-      "Transcriptomic on logan-search.org -- Bulk and single-cell " +
+      "Transcriptomic on logan-search.org: Bulk and single-cell " +
         "transcriptomic libraries. 24 indexes."
     );
   });
