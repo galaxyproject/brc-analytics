@@ -1,4 +1,4 @@
-import { ButtonPrimary } from "@databiosphere/findable-ui/lib/components/common/Button/components/ButtonPrimary/buttonPrimary";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { AlertIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/AlertIcon/alertIcon";
 import { SectionActions } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Error/error.styles";
 import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { type JSX } from "react";
 import { type Props } from "./types";
@@ -61,9 +61,13 @@ export const WorkflowNotFound = ({
             </Typography>
           </SectionContent>
           <SectionActions>
-            <ButtonPrimary component={Link} href={href}>
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              href={href}
+              LinkComponent={Link}
+            >
               View Available Workflows
-            </ButtonPrimary>
+            </Button>
           </SectionActions>
         </ErrorSection>
       </StyledError>
