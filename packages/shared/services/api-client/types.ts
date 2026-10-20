@@ -46,7 +46,9 @@ export interface DataSourceDetail {
 }
 
 export interface AssistantChatRequest {
-  message: string;
+  /** Setup-panel fields to clear before the turn, applied without the model. */
+  clear_fields?: ClearableField[];
+  message?: string;
   session_id?: string;
 }
 
@@ -58,10 +60,34 @@ export interface TokenUsage {
   total_tokens: number;
 }
 
+/**
+ * Who a transcript line is from. A "system" line is the app's own note, such as
+ * a field cleared from the setup panel.
+ */
+export type ChatMessageRole = "assistant" | "system" | "user";
+
+export interface ChatMessage {
+  content: string;
+  role: ChatMessageRole;
+}
+
+/**
+ * Fields the user chooses in conversation, and so can clear from the setup
+ * panel. The rest are derived from the workflow and assembly.
+ */
+export type ClearableField =
+  | "analysis_type"
+  | "assembly"
+  | "data_source"
+  | "organism"
+  | "workflow";
+
 export interface AssistantChatResponse {
   handoff_url: string | null;
   is_complete: boolean;
   logan?: LoganContext | null;
+  /** The app's own line for this turn, e.g. "Organism cleared.", if any. */
+  note?: string | null;
   reply: string;
   /** True when the backend persisted this turn to the user's saved analyses. */
   saved: boolean;
@@ -81,7 +107,7 @@ export interface SessionRestoreResponse {
   handoff_url: string | null;
   is_complete: boolean;
   logan?: LoganContext | null;
-  messages: { content: string; role: "user" | "assistant" }[];
+  messages: ChatMessage[];
   saved: boolean;
   /** The saved analysis this conversation belongs to, whoever is asking. */
   saved_analysis_id: string | null;
@@ -127,10 +153,7 @@ export interface SavedAnalysisSummary {
 }
 
 export interface SavedAnalysisDetail extends SavedAnalysisSummary {
-  messages: Array<{
-    content: string;
-    role: "user" | "assistant";
-  }>;
+  messages: ChatMessage[];
   schema: AnalysisSchema;
 }
 

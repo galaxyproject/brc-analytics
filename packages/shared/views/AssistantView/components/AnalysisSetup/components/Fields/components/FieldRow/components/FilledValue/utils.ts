@@ -1,6 +1,10 @@
-import type { SchemaFieldState } from "@repo/shared/services/api-client/types";
+import type {
+  ClearableField,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
 import { FIELD_LABELS } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/constants";
 import type { SchemaFieldKey } from "@repo/shared/views/AssistantView/components/AnalysisSetup/types";
+import { CLEARABLE_FIELDS } from "./constants";
 
 /**
  * Chip label for a set field. An assembly shows its accession, which the
@@ -29,4 +33,15 @@ export function getRemoveLabel(
   label: string
 ): string {
   return `Remove ${FIELD_LABELS[fieldKey].toLowerCase()}: ${label}`;
+}
+
+/**
+ * Whether the user can clear a field from the panel.
+ * @param fieldKey - Schema field key.
+ * @returns True for a field the user chose in conversation.
+ */
+export function isClearableField(
+  fieldKey: SchemaFieldKey
+): fieldKey is ClearableField {
+  return CLEARABLE_FIELDS.has(fieldKey);
 }

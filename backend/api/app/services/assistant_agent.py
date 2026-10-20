@@ -384,6 +384,10 @@ Rules:
   organism clears a stale assembly and workflow; a new analysis type clears a \
   stale workflow. analysis_type does not depend on organism, and data_source \
   is always independent.
+- Fields listed as cleared from the setup panel were removed by the user \
+  directly before this message; the prior tracker already has them null. Leave \
+  them null unless the user picks a value again in THIS message -- the \
+  assistant restating or recalling the old choice is not a new commitment.
 - If unsure, keep the prior value. When in doubt, do not change state.
 """
 
@@ -499,6 +503,16 @@ _STATE_FIELDS = (
     "workflow",
     "data_source",
 )
+
+# Row labels from the setup panel, so the transcript note a clear leaves behind
+# names what the user actually clicked.
+_FIELD_LABELS = {
+    "organism": "Organism",
+    "assembly": "Assembly",
+    "analysis_type": "Analysis type",
+    "workflow": "Workflow",
+    "data_source": "Data source",
+}
 
 
 async def _safe_record(
@@ -921,7 +935,32 @@ class AssistantAgent:
         return f"[Analysis progress: {', '.join(parts)}]"
 
     @staticmethod
-    def _wrap_user_message(schema: AnalysisSchema, message: str) -> str:
+    def _build_clears_note(cleared: Optional[List[str]]) -> Optional[str]:
+        """Tell the model which fields the user just cleared from the setup panel.
+
+        The model's history still holds the old choices, so say so outright
+        rather than leave it to spot a "pending" in the progress prefix. Only
+        field names from _FIELD_LABELS get through, so nothing user-controlled
+        lands outside the <user_input> fence.
+        """
+        names = [
+            _FIELD_LABELS[name].lower()
+            for name in cleared or []
+            if name in _FIELD_LABELS
+        ]
+        if not names:
+            return None
+        return (
+            "[The user just cleared these from the analysis setup panel: "
+            f"{', '.join(names)}. They are undecided now; do not carry the "
+            "earlier choices forward. Everything else in the setup still "
+            f"stands. Acknowledge briefly and help them choose a new {names[0]}.]"
+        )
+
+    @staticmethod
+    def _wrap_user_message(
+        schema: AnalysisSchema, message: str, cleared: Optional[List[str]] = None
+    ) -> str:
         """Combine the schema-state prefix with a fenced user message.
 
         The user body is wrapped in <user_input>...</user_input>; any literal
@@ -930,6 +969,13 @@ class AssistantAgent:
         treat the fenced content as untrusted data, not instructions.
         """
         prefix = AssistantAgent._build_context_prefix(schema)
+        clears_note = AssistantAgent._build_clears_note(cleared)
+        if clears_note:
+            prefix = f"{prefix}\n{clears_note}"
+        if not message:
+            # A clear on its own: there is no user text to fence, and the note
+            # is what the model should answer.
+            return prefix
         # Insert U+200B (zero-width space) inside any closing-tag variant in
         # the body so the fence stays unambiguous. The model still reads the
         # user's text but cannot terminate the fence early. The regex catches
@@ -1039,7 +1085,10 @@ class AssistantAgent:
 
     @staticmethod
     def build_extract_payload(
-        prior: AnalysisSchema, user_message: str, reply: str
+        prior: AnalysisSchema,
+        user_message: str,
+        reply: str,
+        cleared: Optional[List[str]] = None,
     ) -> str:
         """The extractor's input: prior tracker + the exchange, all JSON-encoded.
 
@@ -1050,9 +1099,16 @@ class AssistantAgent:
         interpolation had.
         """
         prior_state = {name: getattr(prior, name).value for name in _STATE_FIELDS}
+        payload = f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
+        # Without this the extractor only sees a null where a value was, and a
+        # reply that mentions the old choice in passing can fill it right back.
+        panel_clears = [name for name in cleared or [] if name in _FIELD_LABELS]
+        if panel_clears:
+            payload += (
+                f"Cleared from the setup panel (JSON): {json.dumps(panel_clears)}\n"
+            )
         return (
-            f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
-            f"User message (JSON string): {json.dumps(user_message)}\n"
+            payload + f"User message (JSON string): {json.dumps(user_message)}\n"
             f"Assistant reply (JSON string): {json.dumps(reply)}"
         )
 
@@ -1062,6 +1118,7 @@ class AssistantAgent:
         user_message: str,
         reply: str,
         timeout: float = EXTRACT_RUN_TIMEOUT_SECONDS,
+        cleared: Optional[List[str]] = None,
     ) -> tuple[Dict[str, Optional[str]], Any]:
         """Extract the tracker snapshot via the focused second call.
 
@@ -1074,7 +1131,7 @@ class AssistantAgent:
         non-critical -- the user already has their reply -- so on ANY failure we
         carry the prior tracker forward (empty updates) rather than fail the turn.
         """
-        payload = self.build_extract_payload(prior, user_message, reply)
+        payload = self.build_extract_payload(prior, user_message, reply, cleared)
         try:
             # No retry: the extractor is the optional last call in the turn, so a
             # transient failure should fail fast and copy forward rather than
@@ -1150,26 +1207,28 @@ class AssistantAgent:
 
     async def chat(
         self,
-        message: str,
+        message: Optional[str],
         session_id: Optional[str] = None,
         owner_keycloak_sub: Optional[str] = None,
+        clear_fields: Optional[List[str]] = None,
     ) -> ChatResponse:
         """Process one user message and return the assistant's reply.
 
         Creates a new session if session_id is None or not found.
         """
         response, _telemetry, _state = await self.chat_with_telemetry(
-            message, session_id, owner_keycloak_sub
+            message, session_id, owner_keycloak_sub, clear_fields=clear_fields
         )
         return response
 
     async def chat_with_telemetry(
         self,
-        message: str,
+        message: Optional[str],
         session_id: Optional[str] = None,
         owner_keycloak_sub: Optional[str] = None,
         turn_id: Optional[UUID] = None,
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]] = None,
+        clear_fields: Optional[List[str]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         """Same as chat(), plus the per-turn record the API layer logs and the
         session state this turn left behind.
@@ -1184,15 +1243,22 @@ class AssistantAgent:
         # turns would clobber each other. _run_turn fills this in as soon as it
         # has a session, so a failure can still name the session it belonged to.
         progress: dict = {}
+        clear_fields = list(dict.fromkeys(clear_fields or []))
+        unknown = [name for name in clear_fields if name not in _FIELD_LABELS]
+        if unknown:
+            raise ValueError(f"Not clearable: {', '.join(unknown)}")
+        if not message and not clear_fields:
+            raise ValueError("A turn needs a message or a field to clear")
         try:
             return await self._run_turn(
-                message,
+                message or "",
                 session_id,
                 owner_keycloak_sub,
                 turn_id,
                 turn_start,
                 on_turn,
                 progress,
+                clear_fields,
             )
         except PermissionError:
             # Session belongs to someone else. Recording it would file this
@@ -1211,7 +1277,7 @@ class AssistantAgent:
                         session_id=progress.get("session_id"),
                         turn_index=progress.get("turn_index"),
                         owner_keycloak_sub=owner_keycloak_sub,
-                        user_message=message,
+                        user_message=self._logged_message(message, clear_fields),
                         latency_ms=int((time.monotonic() - turn_start) * 1000),
                         model=self.settings.AI_PRIMARY_MODEL or None,
                         provider=self.get_provider(),
@@ -1228,6 +1294,7 @@ class AssistantAgent:
         turn_start: float,
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]],
         progress: dict,
+        clear_fields: Optional[List[str]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         if not self.is_available():
             raise AssistantUnavailableError(
@@ -1259,8 +1326,41 @@ class AssistantAgent:
         progress["session_id"] = state.session_id
         progress["turn_index"] = turn_index
 
+        # Fields cleared from the setup panel are applied here, before either
+        # model call, so the clear can't hinge on how the model reads anything
+        # (#1796). Same apply path as the extractor's updates, so the dependent
+        # clears hold. The transcript gets a note rather than a fake user line.
+        cleared = self._apply_panel_clears(state, clear_fields or [])
+        if not message and not cleared:
+            # The field was already empty -- a retry of a clear that landed, or
+            # another tab got there first. There is nothing for the model to
+            # answer, so hand back the state as it stands and leave the
+            # conversation alone.
+            is_complete, handoff_url = self.compute_handoff(
+                state.schema_state, session_id=state.session_id
+            )
+            response = ChatResponse(
+                session_id=state.session_id,
+                reply="",
+                schema_state=state.schema_state,
+                suggestions=state.suggestions,
+                is_complete=is_complete,
+                handoff_url=handoff_url,
+                logan=logan_context_from(state.metadata),
+            )
+            telemetry = TurnTelemetry(
+                turn_id=turn_id,
+                session_id=state.session_id,
+                turn_index=turn_index,
+                owner_keycloak_sub=owner_keycloak_sub,
+                user_message=self._logged_message(message, clear_fields or []),
+                latency_ms=int((time.monotonic() - turn_start) * 1000),
+            )
+            return response, telemetry, state
+
         # Record user message
-        state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
+        if message:
+            state.messages.append(ChatMessage(role=MessageRole.USER, content=message))
 
         # Restore pydantic-ai message history from session
         agent_history = None
@@ -1278,7 +1378,12 @@ class AssistantAgent:
 
         # Wrap user message in a clearly-delimited fence so the model treats
         # its contents as untrusted data, not instructions.
-        augmented_message = self._wrap_user_message(state.schema_state, message)
+        # Both calls hear about the clears: the reply should not reuse a cleared
+        # choice, and the extractor should not refill one from a reply that
+        # mentions it.
+        augmented_message = self._wrap_user_message(
+            state.schema_state, message, cleared
+        )
 
         # 1) Conversational reply -- plain text, so it can't fail on structured
         # grounds. This is the only thing the user waits on for their answer.
@@ -1309,7 +1414,12 @@ class AssistantAgent:
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
         remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
-        if remaining < EXTRACT_MIN_BUDGET_SECONDS:
+        if not message:
+            # A clear on its own: the user said nothing they could have
+            # committed to, so there is nothing to extract -- and skipping it
+            # means a reply that recalls the old choice can't refill it.
+            schema_updates, extract_usage = {}, None
+        elif remaining < EXTRACT_MIN_BUDGET_SECONDS:
             logger.warning(
                 "Reply used the turn budget (%.1fs left); skipping extraction, "
                 "copying the tracker forward",
@@ -1322,6 +1432,7 @@ class AssistantAgent:
                 message,
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
+                cleared=cleared,
             )
         schema_state = self._apply_schema_updates(
             state.schema_state,
@@ -1367,6 +1478,7 @@ class AssistantAgent:
         response = ChatResponse(
             session_id=state.session_id,
             reply=reply_text,
+            note=self._clear_note(cleared) if cleared else None,
             schema_state=schema_state,
             suggestions=suggestions,
             is_complete=is_complete,
@@ -1384,7 +1496,7 @@ class AssistantAgent:
             session_id=state.session_id,
             turn_index=turn_index,
             owner_keycloak_sub=owner_keycloak_sub,
-            user_message=message,
+            user_message=self._logged_message(message, clear_fields),
             assistant_reply=reply_text,
             outcome=TurnOutcome.SUCCESS,
             transcript=transcript,
@@ -1404,6 +1516,60 @@ class AssistantAgent:
         # still DB-agnostic -- what keeps this layer out of the database is
         # that it doesn't write to one, not that it withholds what it has.
         return response, telemetry, state
+
+    def _apply_panel_clears(
+        self, state: SessionState, clear_fields: List[str]
+    ) -> List[str]:
+        """Clear setup-panel fields on the session and note it in the transcript.
+
+        Returns what actually went: the requested fields that were set, then
+        whatever they took with them (an organism its assembly and workflow, an
+        analysis type its workflow). A field that was already empty is skipped,
+        so clearing nothing leaves no note.
+        """
+        prior = state.schema_state
+        requested = [
+            name for name in clear_fields if getattr(prior, name) != SchemaField()
+        ]
+        if not requested:
+            return []
+        schema = self._apply_schema_updates(
+            prior,
+            {name: None for name in requested},
+            logan=state.metadata.get("logan"),
+        )
+        cleared = requested + [
+            name
+            for name in _STATE_FIELDS
+            if name not in requested
+            and getattr(prior, name).status != FieldStatus.EMPTY
+            and getattr(schema, name).status == FieldStatus.EMPTY
+        ]
+        state.schema_state = schema
+        state.messages.append(
+            ChatMessage(role=MessageRole.SYSTEM, content=self._clear_note(cleared))
+        )
+        return cleared
+
+    @staticmethod
+    def _logged_message(message: Optional[str], clear_fields: List[str]) -> str:
+        """What the turn log records as the user's side of a turn."""
+        if not clear_fields:
+            return message or ""
+        clears = f"[cleared from setup panel: {', '.join(clear_fields)}]"
+        return f"{clears} {message}" if message else clears
+
+    @staticmethod
+    def _clear_note(cleared: List[str]) -> str:
+        """The transcript line for a setup-panel clear, e.g. "Organism cleared,
+        along with assembly and workflow." """
+        first, *rest = (_FIELD_LABELS[name] for name in cleared)
+        if not rest:
+            return f"{first} cleared."
+        others = [label.lower() for label in rest]
+        if len(others) > 1:
+            others = [", ".join(others[:-1]), others[-1]]
+        return f"{first} cleared, along with {' and '.join(others)}."
 
     def _build_transcript(self, result: Any, serialized: list) -> tuple[list, bool]:
         """Take this turn's messages off the already-serialized history.

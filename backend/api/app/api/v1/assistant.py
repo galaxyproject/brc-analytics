@@ -118,6 +118,7 @@ async def assistant_chat(
             request.session_id,
             current_user.sub if current_user else None,
             turn_id=turn_id,
+            clear_fields=request.clear_fields,
             # The agent records the turn itself, success or failure -- it is
             # the only layer that knows the session it created before a
             # failure. Awaited inline: the insert is milliseconds against a

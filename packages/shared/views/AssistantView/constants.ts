@@ -17,6 +17,7 @@ export const ASSISTANT_INPUT_PLACEHOLDER =
  */
 export const MESSAGE_ROLE = {
   ASSISTANT: "assistant",
+  SYSTEM: "system",
   USER: "user",
 } as const satisfies Record<string, ChatMessageDisplay["role"]>;
 
