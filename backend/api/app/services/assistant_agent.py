@@ -54,7 +54,11 @@ from app.services.logan_snapshot import (
 )
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
-from app.services.tools.catalog_data import CatalogData, _is_assembly_scope
+from app.services.tools.catalog_data import (
+    CatalogData,
+    _is_assembly_scope,
+    trs_id_key,
+)
 from app.services.tools.catalog_query import (
     CatalogQuery,  # noqa: F401 (tool annotation)
 )
@@ -98,6 +102,8 @@ _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
 # ends agree on what "my own data" looks like.
 _TOP_N_RE = re.compile(r"\btop\s+(\d{1,3})\b", re.IGNORECASE)
 _RUN_ACCESSION_RE = re.compile(r"\b[ESD]RR\d{6,}\b")
+# A TRS id inside free text, e.g. "RNA-Seq (#workflow/github.com/.../main)".
+_TRS_ID_IN_TEXT = re.compile(r"#?workflow/[^\s()\[\]{},;\"']+", re.IGNORECASE)
 _UPLOAD_RE = re.compile(r"\b(upload|user|own|local)\b", re.IGNORECASE)
 
 # Either structured-output trailer keyword. Used to bound a malformed marker's
@@ -1937,11 +1943,14 @@ class AssistantAgent:
                 else:
                     field.detail = self._find_assembly_accession(str(value), schema)
 
-            # For workflow, try to match iwcId in the value string, falling
-            # back to a case-insensitive name match against the catalog.
+            # For workflow, try a TRS id in the value string, then the iwcId,
+            # falling back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
+                field.detail = self._find_workflow_by_trs_value(workflow_value)
                 for cat in self.catalog.workflows_by_category:
+                    if field.detail:
+                        break
                     for wf in cat.get("workflows", []):
                         # Skip non-ASSEMBLY-scope workflows so an LLM-emitted
                         # SCHEMA_UPDATE can't populate a handoff-capable detail
@@ -1955,8 +1964,6 @@ class AssistantAgent:
                             # absent, so default to iwc_id on falsy values.
                             field.detail = wf.get("trsId") or iwc_id
                             break
-                    if field.detail:
-                        break
                 if not field.detail:
                     field.detail = self._find_workflow_trs_id(workflow_value)
                 if not field.detail:
@@ -2251,6 +2258,20 @@ class AssistantAgent:
         accession = candidates[0].get("accession")
         logger.info("Assembly fallback matched '%s'", accession)
         return accession
+
+    def _find_workflow_by_trs_value(self, value: str) -> Optional[str]:
+        """The catalog trsId of the visible workflow whose TRS id appears in
+        `value`. Tool output shows the model TRS ids, which it restates in any
+        version or none, so match on the normalised form."""
+        keys = {trs_id_key(m.rstrip(".")) for m in _TRS_ID_IN_TEXT.findall(value)}
+        if not keys:
+            return None
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                trs_id = wf.get("trsId")
+                if _is_assembly_scope(wf) and trs_id and trs_id_key(trs_id) in keys:
+                    return trs_id
+        return None
 
     def _find_workflow_trs_id(self, value: str) -> Optional[str]:
         """Fallback: match a workflow by name when iwcId isn't in the value."""

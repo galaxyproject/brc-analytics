@@ -97,7 +97,7 @@ def get_workflow_details(deps: AssistantDeps, iwc_id: str) -> str:
     """Get detailed information about a specific workflow including its parameters.
 
     Args:
-        iwc_id: the IWC workflow identifier
+        iwc_id: the workflow's IWC id or TRS id (with or without /versions/...)
     """
     details = deps.catalog.get_workflow_details(iwc_id)
     if not details:
@@ -109,7 +109,7 @@ def check_compatibility(deps: AssistantDeps, iwc_id: str, accession: str) -> str
     """Check whether a workflow and genome assembly are compatible (ploidy, taxonomy, annotation).
 
     Args:
-        iwc_id: the IWC workflow identifier
+        iwc_id: the workflow's IWC id or TRS id (with or without /versions/...)
         accession: the genome assembly accession
     """
     result = deps.catalog.check_workflow_assembly_compatibility(iwc_id, accession)
