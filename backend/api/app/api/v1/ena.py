@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.core.cache import CacheService
 from app.core.dependencies import get_cache_service
-from app.services.ena_service import ENAService
+from app.services.ena_service import ENAService, UnsupportedKeywordsError
 
 router = APIRouter()
 
@@ -103,6 +103,8 @@ async def search_by_keywords(
 
     except HTTPException:
         raise
+    except UnsupportedKeywordsError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
 
