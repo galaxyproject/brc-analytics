@@ -3,6 +3,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from app.core.errors import CallerInputError
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,9 @@ class CatalogData:
         for name in ("organisms", "assemblies", "workflows"):
             path = self.catalog_path / f"{name}.json"
             if not path.exists():
-                logger.warning(f"Catalog file not found: {path}")
+                # Error, not warning: with a file missing every lookup becomes a
+                # not-found, and those are kept out of Sentry as caller errors.
+                logger.error(f"Catalog file not found: {path}")
                 continue
             with open(path) as f:
                 data = json.load(f)
@@ -324,10 +328,10 @@ class CatalogData:
         # would expose its name/TRS id/parameters by IWC id even though the
         # listing tools hide it (#1321).
         if not wf or not _is_assembly_scope(wf):
-            raise ValueError(f"Workflow '{iwc_id}' not found")
+            raise CallerInputError(f"Workflow '{iwc_id}' not found")
         asm = self._assemblies_by_accession.get(accession)
         if not asm:
-            raise ValueError(f"Assembly '{accession}' not found")
+            raise CallerInputError(f"Assembly '{accession}' not found")
 
         resolved: Dict[str, Any] = {}
         unresolved: List[Dict[str, Any]] = []

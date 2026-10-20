@@ -32,6 +32,7 @@ from app.core.dependencies import (
     get_sra_mirror_service,
     reset_all_services,
 )
+from app.core.sentry import before_send
 from app.db.session import close_db, init_db
 from app.services import turn_log
 from app.services.galaxy_service import cancel_kmindex_index_refreshes
@@ -97,6 +98,7 @@ def create_app() -> FastAPI:
             environment=settings.ENVIRONMENT,
             release=settings.APP_VERSION,
             traces_sample_rate=1.0,
+            before_send=before_send,
         )
 
     mcp = create_mcp_server(
