@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import random
+import re
 import tempfile
 import time
 import zipfile
@@ -100,18 +101,56 @@ class KmindexUnknownIndex(GalaxySubmitNotStarted):
 MALFORMED_ID_MARKERS = ("400009", "malformed id", "invalid id")
 
 
-def is_missing_job_error(e: BioblendConnectionError) -> bool:
-    """Whether Galaxy is saying this job id names no job."""
-    status = getattr(e, "status_code", None)
+def _names_missing_job(status: Optional[int], body: object) -> bool:
     if status == 404:
         return True
     if status != 400:
         return False
-    body = getattr(e, "body", None) or ""
     if isinstance(body, bytes):
         body = body.decode("utf-8", errors="replace")
-    lowered = str(body).lower()
+    lowered = str(body or "").lower()
     return any(marker in lowered for marker in MALFORMED_ID_MARKERS)
+
+
+def is_missing_job_error(e: BioblendConnectionError) -> bool:
+    """Whether Galaxy is saying this job id names no job."""
+    return _names_missing_job(getattr(e, "status_code", None), getattr(e, "body", None))
+
+
+# bioblend logs a GET's final failure at ERROR before raising it, and Sentry
+# turns that record into an issue whatever the caller does with the exception.
+# The record carries only the formatted message, so the status is read back
+# out of it -- see GalaxyClient._get.
+BIOBLEND_GET_ERROR = re.compile(r"^GET: error (\d{3}): (.*), \d+ attempts left$", re.S)
+
+
+class BioblendWrongIdFilter(logging.Filter):
+    """Demote bioblend's log of a GET Galaxy refused for a wrong id to WARNING.
+
+    The ConnectionError still reaches the caller, which decides what it means
+    (the job routes answer 404) and logs it at ERROR if it is one. Any other
+    failure, an outage included, keeps bioblend's ERROR.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if record.levelno >= logging.ERROR:
+            match = BIOBLEND_GET_ERROR.match(record.getMessage())
+            # A 404 without Galaxy's JSON error body came from a proxy or a
+            # wrong GALAXY_URL. The route still answers it as a missing job,
+            # so this record is the only place it shows up.
+            if (
+                match
+                and _names_missing_job(int(match[1]), match[2])
+                and (match[1] != "404" or "err_code" in match[2])
+            ):
+                record.levelno = logging.WARNING
+                record.levelname = logging.getLevelName(logging.WARNING)
+        return True
+
+
+_bioblend_logger = logging.getLogger("bioblend")
+if not any(isinstance(f, BioblendWrongIdFilter) for f in _bioblend_logger.filters):
+    _bioblend_logger.addFilter(BioblendWrongIdFilter())
 
 
 # A running job's status is cached only this long. Every open search polls, and
