@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.core.cache import CacheService
 from app.core.dependencies import get_cache_service
 from app.services.ena_service import ENAService
 
 router = APIRouter()
+
+# ENA's study_accession is the BioProject accession (PRJEB/PRJNA/PRJDB...);
+# ERP/SRP/DRP ids are secondary and never match. The accession is spliced into
+# ENA's query language, so anything looser lets a caller widen the search.
+STUDY_ACCESSION_PATTERN = r"^PRJ[EDN][A-Z]\d+$"
 
 
 async def get_ena_service(
@@ -104,7 +109,7 @@ async def search_by_keywords(
 
 @router.get("/study/{study_accession}")
 async def get_study_info(
-    study_accession: str,
+    study_accession: str = Path(pattern=STUDY_ACCESSION_PATTERN),
     use_cache: bool = Query(default=True),
     ena_service: ENAService = Depends(get_ena_service),
 ):
