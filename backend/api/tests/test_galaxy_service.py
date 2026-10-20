@@ -46,10 +46,12 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    KmindexFiltersUnavailable,
     _default_order,
     _submitted_index_names,
     _submitted_threshold,
 )
+from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.sra_mirror import _SORTABLE_COLUMNS
 
@@ -3831,6 +3833,43 @@ class TestJobCacheCopies:
         assert page.job_id == "copy1"
         assert page.total_hits == 2
 
+    @pytest.mark.asyncio
+    async def test_a_filtered_page_of_a_copy_reads_the_originals_export(
+        self, wired, monkeypatch, tmp_path
+    ):
+        service, _, merged = wired
+        service._filterable_export = AsyncMock(return_value=tmp_path / "x.parquet")
+        service._fill_biosample = AsyncMock()
+        monkeypatch.setattr(
+            galaxy_service.kmindex_filters,
+            "subset_page",
+            lambda *args: {"hits": [], "matched": 0},
+        )
+
+        page = await service.get_filtered_kmindex_results(
+            "copy1", KmindexFilters(platform=["ILLUMINA"])
+        )
+
+        assert merged == ["orig"]
+        assert service._filterable_export.call_args.args[1] == "orig"
+        assert service._export_state.call_args.args[1] == "orig"
+        assert page.job_id == "copy1"
+        assert page.filtered
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_summary_of_a_copy_reads_the_originals_export(self, wired):
+        service, _, _ = wired
+        service._filterable_export = AsyncMock(
+            side_effect=KmindexFiltersUnavailable("none")
+        )
+
+        with pytest.raises(KmindexFiltersUnavailable):
+            await service.get_filtered_kmindex_summary(
+                "copy1", KmindexFilters(platform=["ILLUMINA"])
+            )
+
+        assert service._filterable_export.call_args.args[1] == "orig"
+
 
 class TestExportOfACopy:
     """A job-cache copy's export is the file its original wrote."""
@@ -3863,6 +3902,43 @@ class TestExportOfACopy:
 
         assert looked_up == ["orig"]
         assert "copy1" in response.headers["content-disposition"]
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_download_of_a_copy_is_cut_from_the_originals_file(
+        self, tmp_path, monkeypatch
+    ):
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        path.write_bytes(b"")
+        looked_up = []
+        monkeypatch.setattr(
+            galaxy_module,
+            "export_file_path",
+            lambda _d, job_id: looked_up.append(job_id) or path,
+        )
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        monkeypatch.setattr(galaxy_module, "subset_row_count", lambda _p, _f: 1)
+        monkeypatch.setattr(
+            galaxy_module, "iter_subset_tsv", lambda _p, _f: iter([b"SRR1\t0.9\n"])
+        )
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(return_value="orig")
+
+        # Through the endpoint, so the filtered branch is held to passing the
+        # service along too.
+        response = await galaxy_module.export_kmindex_results(
+            "copy1",
+            format="tsv",
+            filters=KmindexFilters(platform=["ILLUMINA"]),
+            galaxy_service=galaxy,
+            _rate_limit=None,
+        )
+
+        assert looked_up == ["orig"]
+        disposition = response.headers["content-disposition"]
+        assert "copy1" in disposition and "filtered" in disposition
 
 
 class TestCopyLinkIsRemembered:
