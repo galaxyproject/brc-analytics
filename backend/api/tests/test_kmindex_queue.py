@@ -37,6 +37,12 @@ class DictCache:
         return f"{prefix}:{json.dumps(params, sort_keys=True)}"
 
 
+class _FrozenDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return NOW if tz else NOW.replace(tzinfo=None)
+
+
 def _stamp(minutes_ago):
     # Galaxy's own format: naive UTC.
     return (NOW - timedelta(minutes=minutes_ago)).replace(tzinfo=None).isoformat()
@@ -64,6 +70,9 @@ def _started(minutes_after_submit, job, ran_for=None):
 @pytest.fixture()
 def service(monkeypatch):
     monkeypatch.setenv("GALAXY_API_KEY", "test-key")
+    # NOW is taken at import; a real clock drifts from it by however long the
+    # suite takes to reach these tests.
+    monkeypatch.setattr(galaxy_service, "datetime", _FrozenDatetime)
     from app.core.config import get_settings
 
     get_settings.cache_clear()
@@ -102,7 +111,7 @@ async def test_counts_waiting_and_running_and_ages_the_oldest(service):
 
     assert queue.waiting == 2
     assert queue.running == 1
-    assert 89.5 <= queue.oldest_waiting_minutes <= 90.5
+    assert queue.oldest_waiting_minutes == 90.0
     assert queue.recent_searches == 0
     assert queue.recent_wait_minutes is None
 
@@ -344,7 +353,7 @@ class TestHistory:
         # A running job's start is when Galaxy last touched it.
         assert rows["running"].wait_minutes == 30.0
         assert rows["queued"].still_waiting
-        assert 19.5 <= rows["queued"].wait_minutes <= 20.5
+        assert rows["queued"].wait_minutes == 20.0
         assert [r.submitted for r in history.rows] == sorted(
             r.submitted for r in history.rows
         )
