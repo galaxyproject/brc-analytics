@@ -248,6 +248,10 @@ interface KmindexSearchState {
   // and `appliedSort(results)` and has to keep doing so -- a header wired to
   // `sort` here would light a column the server may never have sorted by.
   pageSize: number;
+  // Status requests have been failing for a while but the poller is still
+  // going. Kept apart from `error`, which means the search has stopped: the
+  // job's last known state stays on screen and the form stays "running".
+  pollWarning: string | null;
   results: KmindexResults | null;
   sort: KmindexSort;
 }
@@ -276,6 +280,16 @@ export interface KmindexSort {
 }
 
 const POLLING_INTERVAL = 3000;
+// A status request that fails is usually Galaxy being down, and every retry
+// is another request to it. Doubling from the normal interval and capping at
+// a minute takes a tab from twenty requests a minute to one within five
+// failures, while still noticing within a minute that Galaxy is back. There is
+// no give-up: a search can sit in a queue for most of an hour, and a reader
+// left watching it should not have to reload once an outage ends.
+const POLLING_BACKOFF_CAP_MS = 60000;
+// One failed request is a blip and not worth a warning. Three in a row is at
+// least twenty seconds of silence, which is worth saying out loud.
+const POLLING_FAILURES_BEFORE_WARNING = 3;
 // Merging the shards of a search that fanned out over many indexes runs well
 // past the 300 s this request and dev's nginx both give up at. The backend
 // finishes the merge regardless and caches what it got, so asking again is
@@ -328,6 +342,7 @@ const INITIAL_STATE: KmindexSearchState = {
   jobId: null,
   jobStatus: null,
   pageSize: PAGE_SIZE,
+  pollWarning: null,
   results: null,
   sort: DEFAULT_SORT,
 };
@@ -433,6 +448,15 @@ async function toErrorMessage(
 }
 
 /**
+ * How long to wait before the next status request.
+ * @param failures - Consecutive status requests that have failed.
+ * @returns Delay in milliseconds.
+ */
+export function pollDelay(failures: number): number {
+  return Math.min(POLLING_INTERVAL * 2 ** failures, POLLING_BACKOFF_CAP_MS);
+}
+
+/**
  * Whether a failed results request means the merge is still running.
  * @param error - Error thrown by ky.
  * @returns True when the page should ask again rather than raise a banner.
@@ -475,6 +499,10 @@ export const useKmindexSearch = (
 ): KmindexSearchActions & KmindexSearchState => {
   const [state, setState] = useState<KmindexSearchState>(INITIAL_STATE);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+  // Bumped by stopPolling. A status request outlives the timer that sent it,
+  // so a tick checks this on return before booking the next one; otherwise a
+  // stopped poller would start itself again.
+  const pollGenerationRef = useRef(0);
   // A poll tick already in flight when the job completes can fire a second
   // first-page fetch. Cold aggregation is expensive, so make sure only one
   // wins per job.
@@ -510,8 +538,9 @@ export const useKmindexSearch = (
   >(null);
 
   const stopPolling = useCallback((): void => {
+    pollGenerationRef.current += 1;
     if (pollRef.current) {
-      clearInterval(pollRef.current);
+      clearTimeout(pollRef.current);
       pollRef.current = null;
     }
     // A pending re-ask is the same kind of scheduled work as the poll tick and
@@ -700,36 +729,90 @@ export const useKmindexSearch = (
   const startPolling = useCallback(
     (jobId: string): void => {
       stopPolling();
-      pollRef.current = setInterval(async () => {
+      const generation = pollGenerationRef.current;
+      let failures = 0;
+
+      /**
+       * Book the next status request.
+       * @param delay - Milliseconds to wait.
+       */
+      const schedule = (delay: number): void => {
+        pollRef.current = setTimeout(() => {
+          pollRef.current = null;
+          void tick();
+        }, delay);
+      };
+
+      /**
+       * Wait longer before asking again, and say so once it keeps happening.
+       * @param error - Error thrown by ky.
+       */
+      const onFailure = async (error: unknown): Promise<void> => {
+        if (generation !== pollGenerationRef.current) return;
+        const message = await toErrorMessage(error, "Lost track of the job");
+        if (generation !== pollGenerationRef.current) return;
+        // The backend only says 404 when Galaxy itself answered that it has
+        // no such job -- a mistyped or expired ?job= link. Asking again will
+        // not change that.
+        if (error instanceof HTTPError && error.response.status === 404) {
+          setState((prev) => ({ ...prev, error: message, pollWarning: null }));
+          return;
+        }
+        failures += 1;
+        if (failures >= POLLING_FAILURES_BEFORE_WARNING) {
+          setState((prev) => ({
+            ...prev,
+            pollWarning: `${message} -- still trying.`,
+          }));
+        }
+        schedule(pollDelay(failures));
+      };
+
+      /**
+       * Ask once, then book the next ask unless the job is done or the page
+       * has moved on. A chained timeout rather than an interval, so a slow
+       * request never has a second one stacked behind it.
+       */
+      const tick = async (): Promise<void> => {
+        let status: KmindexJobStatus;
         try {
-          const status = await ky
+          status = await ky
             .get(`${API_BASE_URL}/galaxy/jobs/${jobId}/status`, {
               credentials: "include",
+              // ky retries a failed GET twice on its own by default, which
+              // would triple every failure the backoff here is spacing out.
+              retry: 0,
               timeout: 30000,
             })
             .json<KmindexJobStatus>();
-          setState((prev) => ({ ...prev, jobStatus: status }));
-
-          if (status.is_complete) {
-            stopPolling();
-            if (status.is_successful) {
-              if (fetchedRef.current === jobId) return;
-              fetchedRef.current = jobId;
-              await fetchResults(jobId, 0);
-            } else {
-              setState((prev) => ({
-                ...prev,
-                error: `Job ${status.state}${
-                  status.stderr ? `: ${status.stderr.slice(0, 500)}` : ""
-                }`,
-              }));
-            }
-          }
         } catch (error: unknown) {
-          const message = await toErrorMessage(error, "Lost track of the job");
-          setState((prev) => ({ ...prev, error: message }));
+          await onFailure(error);
+          return;
         }
-      }, POLLING_INTERVAL);
+        if (generation !== pollGenerationRef.current) return;
+        failures = 0;
+        setState((prev) => ({ ...prev, jobStatus: status, pollWarning: null }));
+
+        if (!status.is_complete) {
+          schedule(POLLING_INTERVAL);
+          return;
+        }
+        stopPolling();
+        if (status.is_successful) {
+          if (fetchedRef.current === jobId) return;
+          fetchedRef.current = jobId;
+          await fetchResults(jobId, 0);
+        } else {
+          setState((prev) => ({
+            ...prev,
+            error: `Job ${status.state}${
+              status.stderr ? `: ${status.stderr.slice(0, 500)}` : ""
+            }`,
+          }));
+        }
+      };
+
+      schedule(POLLING_INTERVAL);
     },
     [fetchResults, stopPolling]
   );
@@ -771,6 +854,7 @@ export const useKmindexSearch = (
         isSubmitting: true,
         jobId: null,
         jobStatus: null,
+        pollWarning: null,
         results: null,
         sort: DEFAULT_SORT,
       }));

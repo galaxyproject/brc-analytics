@@ -37,8 +37,15 @@ const STATE_LABELS: Record<string, string> = {
 export const LoganSearchStatus = ({
   search,
 }: LoganSearchStatusProps): JSX.Element | null => {
-  const { error, identity, isLoadingResults, jobId, jobStatus, results } =
-    search;
+  const {
+    error,
+    identity,
+    isLoadingResults,
+    jobId,
+    jobStatus,
+    pollWarning,
+    results,
+  } = search;
   const { isAuthenticated } = useAuth();
   // A signed-in visitor whose search still ran under the service key means the
   // session couldn't be turned into a Galaxy credential. The search works, so
@@ -83,6 +90,11 @@ export const LoganSearchStatus = ({
               />
             </ControlRow>
             <LinearProgress sx={{ mt: 2 }} />
+            {pollWarning && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                {pollWarning}
+              </Alert>
+            )}
             {isLoadingResults && (
               <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
                 Merging hits across index shards. A search over many indexes can
