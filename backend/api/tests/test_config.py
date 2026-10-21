@@ -68,8 +68,21 @@ class TestSessionCookieSecretValidation:
     def test_empty_secret_in_local_is_allowed(self, monkeypatch):
         monkeypatch.setenv("ENVIRONMENT", "local")
         monkeypatch.delenv("SESSION_COOKIE_SECRET", raising=False)
-        # Should not raise -- legacy unbound mode is fine in dev.
+        # Should not raise -- dev gets an ephemeral secret instead.
         Settings()
+
+    def test_empty_secret_in_dev_generates_ephemeral_one(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        monkeypatch.delenv("SESSION_COOKIE_SECRET", raising=False)
+        s = Settings()
+        # Never empty, so session binding can't be switched off by omission.
+        assert len(s.SESSION_COOKIE_SECRET) >= 32
+        assert s.SESSION_COOKIE_SECRET_EPHEMERAL is True
+        assert Settings().SESSION_COOKIE_SECRET != s.SESSION_COOKIE_SECRET
+
+    def test_configured_secret_is_not_ephemeral(self, monkeypatch):
+        monkeypatch.setenv("SESSION_COOKIE_SECRET", "some-secret")
+        assert Settings().SESSION_COOKIE_SECRET_EPHEMERAL is False
 
     def test_empty_secret_in_development_is_allowed(self, monkeypatch):
         monkeypatch.setenv("ENVIRONMENT", "development")

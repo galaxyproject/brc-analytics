@@ -93,12 +93,13 @@ class FakeAssistantAgent:
 
     async def chat_with_telemetry(
         self,
-        message: str,
+        message: str | None,
         session_id: str | None,
         owner_keycloak_sub: str | None,
         *,
         turn_id=None,
         on_turn=None,
+        clear_fields=None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         """Stub a turn, handing back the state auto-save writes from."""
         state = self.session_service.sessions.get(session_id or "")
@@ -603,6 +604,13 @@ async def _repoint_analysis(session_factory, analysis_id: str, source_session: s
         await repoint_saved_analysis_session(session, user, analysis_id, source_session)
 
 
+def _bind_cookie(client, session_id: str) -> None:
+    """Hold the signed cookie for a session the test planted directly in the
+    store, the way a browser that started it with /chat would."""
+    secret = get_settings().SESSION_COOKIE_SECRET
+    client.cookies.set(SESSION_COOKIE_NAME, sign_session_id(session_id, secret))
+
+
 @contextmanager
 def _signed_out(client):
     """Run a block with nobody signed in, then put the test user back.
@@ -675,6 +683,7 @@ def test_restore_reports_whether_the_conversation_is_already_saved(
         messages=[ChatMessage(role=MessageRole.USER, content="hello")],
     )
 
+    _bind_cookie(client, unsaved_id)
     unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
     assert unsaved.json()["saved"] is False
 
@@ -746,6 +755,7 @@ def test_restore_reports_the_saved_analysis_id_to_any_caller(persistence_client)
         session_id=unsaved_id,
         messages=[ChatMessage(role=MessageRole.USER, content="hello")],
     )
+    _bind_cookie(client, unsaved_id)
     unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
     assert unsaved.json()["saved_analysis_id"] is None
 
@@ -801,10 +811,9 @@ def test_saving_enforces_the_session_cookie_when_secret_set(
     """With SESSION_COOKIE_SECRET configured, saving an anonymous session
     requires a valid signed cookie -- knowing the session_id is not enough.
 
-    The other save tests here succeed cookieless only because the fixture
-    leaves the secret unset; this one pins the gate so it cannot be silently
-    dropped. Without it, any authenticated user who learns an anonymous
-    session id could claim and persist someone else's conversation.
+    This one pins the gate so it cannot be silently dropped. Without it, any
+    authenticated user who learns an anonymous session id could claim and
+    persist someone else's conversation.
     """
     client, _session_factory, current_sub, agent = persistence_client
 
@@ -846,6 +855,7 @@ def test_saving_an_empty_session_is_not_reported_as_saved(persistence_client):
 
     session_id = uuid4().hex
     agent.session_service.sessions[session_id] = SessionState(session_id=session_id)
+    _bind_cookie(client, session_id)
 
     response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
@@ -870,6 +880,7 @@ def test_saving_without_a_user_row_is_not_reported_as_nothing_to_save(
     # Authenticated as the session's own owner -- the JWT is valid, the users
     # row it names is not there.
     current_sub["value"] = "user-gone"
+    _bind_cookie(client, session_id)
 
     response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
@@ -880,7 +891,10 @@ def test_saving_without_a_user_row_is_not_reported_as_nothing_to_save(
 def test_saving_an_expired_session_is_a_404(persistence_client):
     client, _session_factory, _current_sub, _agent = persistence_client
 
-    response = client.post(f"/api/v1/assistant/session/{uuid4().hex}/save")
+    session_id = uuid4().hex
+    _bind_cookie(client, session_id)
+
+    response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
     assert response.status_code == 404
 

@@ -17,6 +17,7 @@ export interface ConfiguredInput {
   designFormula?: string | null;
   geneModelUrl?: string | null;
   numberOfHits?: number;
+  organism?: string;
   primaryContrasts?: PrimaryContrasts | null;
   primaryFactor?: string | null;
   readRunPairedFile?: EnaSequencingReads | null;

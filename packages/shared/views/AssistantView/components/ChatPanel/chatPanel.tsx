@@ -7,17 +7,15 @@ import {
   Typography,
 } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
-import type { SuggestionChip } from "@repo/shared/services/api-client/types";
+import type {
+  ChatMessage as ChatMessageDisplay,
+  SuggestionChip,
+} from "@repo/shared/services/api-client/types";
 import { ChatMessage } from "@repo/shared/views/AssistantView/components/ChatMessage/chatMessage";
 import { SuggestionChips } from "@repo/shared/views/AssistantView/components/SuggestionChips/suggestionChips";
 import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { type JSX, useEffect, useRef, useState } from "react";
 import { ChatContainer, InputRow, MessagesContainer } from "./chatPanel.styles";
-
-interface ChatMessageDisplay {
-  content: string;
-  role: "user" | "assistant";
-}
 
 interface ChatPanelProps {
   error: string | null;

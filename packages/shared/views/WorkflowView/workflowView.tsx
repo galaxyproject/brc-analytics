@@ -33,11 +33,12 @@ export const WorkflowView = ({ trsId }: Props): JSX.Element => {
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
   // Resolve the assembly/organism that anchors the workflow config (and the ENA
-  // picker + side panel) — by reference assembly, or by the workflow's taxonomy
-  // for organism-scoped workflows.
+  // picker + side panel) — by reference assembly, or for organism-scoped
+  // workflows by the workflow's taxonomy or the species picked within it.
   const { genome, organism, workflowEntityValue } = useWorkflowEntities(
     workflow,
-    configuredInput.referenceAssembly
+    configuredInput.referenceAssembly,
+    configuredInput.organism
   );
 
   return (

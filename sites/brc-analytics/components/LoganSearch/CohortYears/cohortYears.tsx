@@ -1,9 +1,15 @@
 import {
+  describeYears,
+  yearSelected,
+} from "@brc/components/LoganSearch/LoganSearchFilters/filters";
+import { type LoganFilterControls } from "@brc/components/LoganSearch/LoganSearchFilters/types";
+import {
   YearBand,
   YearBar,
   YearColumn,
   YearLabel,
   YearRow,
+  YearToggle,
 } from "@brc/components/LoganSearch/loganSearch.styles";
 import { Box, Typography } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
@@ -12,6 +18,8 @@ import { type JSX } from "react";
 
 interface CohortYearsProps {
   facet: KmindexFacet;
+  // Present only with the logan-filters flag on.
+  filtering?: LoganFilterControls;
 }
 
 interface YearBarDatum {
@@ -45,8 +53,11 @@ export function yearBars(facet: KmindexFacet): YearBarDatum[] {
 
 export const CohortYears = ({
   facet,
+  filtering,
 }: CohortYearsProps): JSX.Element | null => {
   const bars = yearBars(facet);
+  const clickable = Boolean(filtering && !filtering.disabledReason);
+  const range = filtering?.filters.year ?? null;
   if (bars.length === 0) return null;
   const max = Math.max(...bars.map((bar) => bar.count));
   const counted = bars.reduce((sum, bar) => sum + bar.count, 0);
@@ -63,13 +74,13 @@ export const CohortYears = ({
   // The range alone says nothing about the shape, and the drawing is hidden
   // from a screen reader. Naming the peak gives it the fact the picture leads
   // with; the hidden list below carries the rest.
-  const range = `Runs released per year, ${bars[0].year} to ${
+  const span = `Runs released per year, ${bars[0].year} to ${
     bars[bars.length - 1].year
   }`;
   const label =
     max > 0
-      ? `${range}; most in ${peak.year}, with ${peak.count.toLocaleString()}`
-      : range;
+      ? `${span}; most in ${peak.year}, with ${peak.count.toLocaleString()}`
+      : span;
   return (
     /* The margin lives here rather than on a wrapper in the card, so a facet
        with no years leaves no gap behind it. */
@@ -85,32 +96,63 @@ export const CohortYears = ({
         {facet.other > 0 &&
           `, ${facet.other.toLocaleString()} in years not listed`}
       </Typography>
-      <YearRow aria-label={label} role="img">
-        {bars.map((bar, i) => (
-          <YearColumn
-            key={bar.year}
-            title={`${bar.year}: ${bar.count.toLocaleString()} runs`}
-          >
-            <YearBand>
-              <YearBar
-                style={{
-                  height: `${max > 0 ? Math.round((bar.count / max) * 100) : 0}%`,
-                  // A year that rounds to nothing against the tallest still
-                  // happened: 81 runs beside 402,118 is under half a pixel,
-                  // and the stub is what keeps it on the axis. A year with
-                  // nothing in it draws nothing, and the baseline under the
-                  // band is what says it was counted.
-                  minHeight: bar.count > 0 ? 1 : 0,
-                }}
-              />
-            </YearBand>
-            <YearLabel>
-              {i % labelEvery === 0 || (labelLast && i === bars.length - 1)
-                ? bar.year
-                : ""}
-            </YearLabel>
-          </YearColumn>
-        ))}
+      {range && (
+        <Typography color="textSecondary" component="div" variant="caption">
+          Filtered to runs released {describeYears(range)}. Click a year outside
+          it to stretch the range, or inside it to narrow to that year.
+        </Typography>
+      )}
+      {/* Clickable, each year is its own button and names itself, so the row
+          is a group rather than one image with a hidden list beside it. */}
+      <YearRow aria-label={label} role={clickable ? "group" : "img"}>
+        {bars.map((bar, i) => {
+          const picked = Boolean(
+            filtering && yearSelected(filtering.filters, bar.year)
+          );
+          const column = (
+            <>
+              <YearBand>
+                <YearBar
+                  style={{
+                    height: `${max > 0 ? Math.round((bar.count / max) * 100) : 0}%`,
+                    // A year that rounds to nothing against the tallest still
+                    // happened: 81 runs beside 402,118 is under half a pixel,
+                    // and the stub is what keeps it on the axis. A year with
+                    // nothing in it draws nothing, and the baseline under the
+                    // band is what says it was counted.
+                    minHeight: bar.count > 0 ? 1 : 0,
+                    opacity: range && !picked ? 0.4 : 1,
+                  }}
+                />
+              </YearBand>
+              <YearLabel>
+                {i % labelEvery === 0 || (labelLast && i === bars.length - 1)
+                  ? bar.year
+                  : ""}
+              </YearLabel>
+            </>
+          );
+          const title = `${bar.year}: ${bar.count.toLocaleString()} runs`;
+          if (clickable && filtering) {
+            return (
+              <YearToggle
+                aria-label={title}
+                aria-pressed={picked}
+                key={bar.year}
+                onClick={(): void => filtering.onToggleYear(bar.year)}
+                title={title}
+                type="button"
+              >
+                {column}
+              </YearToggle>
+            );
+          }
+          return (
+            <YearColumn key={bar.year} title={title}>
+              {column}
+            </YearColumn>
+          );
+        })}
       </YearRow>
       {/* The per-year counts are otherwise hover-only: role="img" hides the
           columns, and a title attribute is not read out. */}

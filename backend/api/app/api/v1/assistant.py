@@ -86,7 +86,7 @@ async def assistant_chat(
     # it -- possession of the signed session cookie. Session IDs travel in
     # URLs (e.g. the assistantSessionId handoff param), so knowing the id
     # alone must not let a caller continue or mutate a session, anonymous or
-    # owned. No-ops in local/dev where SESSION_COOKIE_SECRET is unset.
+    # owned.
     if request.session_id:
         require_session_cookie(request.session_id, session_cookie)
 
@@ -118,6 +118,7 @@ async def assistant_chat(
             request.session_id,
             current_user.sub if current_user else None,
             turn_id=turn_id,
+            clear_fields=request.clear_fields,
             # The agent records the turn itself, success or failure -- it is
             # the only layer that knows the session it created before a
             # failure. Awaited inline: the insert is milliseconds against a

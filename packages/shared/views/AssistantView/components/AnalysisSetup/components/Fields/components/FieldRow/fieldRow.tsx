@@ -13,7 +13,7 @@ import type { FieldRowProps } from "./types";
  * @param props.field - Field state.
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
  * @param props.optional - Whether the field is optional for the chosen workflow.
  * @returns The field row element.
  */
@@ -21,7 +21,7 @@ export const FieldRow = ({
   field,
   fieldKey,
   loading,
-  onSend,
+  onClearField,
   optional,
 }: FieldRowProps): JSX.Element => {
   return (
@@ -36,7 +36,7 @@ export const FieldRow = ({
         field={field}
         fieldKey={fieldKey}
         loading={loading}
-        onSend={onSend}
+        onClearField={onClearField}
         optional={optional}
       />
     </StyledStack>

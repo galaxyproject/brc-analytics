@@ -1,9 +1,23 @@
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from app.core.errors import CallerInputError
+
 logger = logging.getLogger(__name__)
+
+_TRS_VERSION_SUFFIX = re.compile(r"/versions/[^/]+$")
+
+
+def trs_id_key(workflow_id: str) -> str:
+    """Normalise a TRS id for lookup. The catalog stores versioned ids
+    (`#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.4`) but a
+    model often passes the bare form, or drops the `#`; the catalog carries
+    one version per workflow, so any version names the same entry."""
+    key = _TRS_VERSION_SUFFIX.sub("", workflow_id.strip().lower().rstrip("/"))
+    return key if key.startswith("#") else f"#{key}"
 
 
 def _is_assembly_scope(wf: Dict[str, Any]) -> bool:
@@ -31,6 +45,7 @@ class CatalogData:
         self._assemblies_by_accession: Dict[str, Dict[str, Any]] = {}
         self._assemblies_by_tax_id: Dict[str, List[Dict[str, Any]]] = {}
         self._workflows_by_iwc_id: Dict[str, Dict[str, Any]] = {}
+        self._iwc_id_by_trs_key: Dict[str, str] = {}
         self._lineage_by_tax_id: Dict[str, Set[str]] = {}
 
         self._load()
@@ -39,7 +54,9 @@ class CatalogData:
         for name in ("organisms", "assemblies", "workflows"):
             path = self.catalog_path / f"{name}.json"
             if not path.exists():
-                logger.warning(f"Catalog file not found: {path}")
+                # Error, not warning: with a file missing every lookup becomes a
+                # not-found, and those are kept out of Sentry as caller errors.
+                logger.error(f"Catalog file not found: {path}")
                 continue
             with open(path) as f:
                 data = json.load(f)
@@ -107,6 +124,16 @@ class CatalogData:
                 name = cat.get("name", "")
                 if _is_assembly_scope(wf) and name not in existing["_categories"]:
                     existing["_categories"].append(name)
+
+        # Index TRS ids from the deduplicated entries, ASSEMBLY scope first, so
+        # a TRS id never resolves to a hidden copy when a servable one exists.
+        indexed = sorted(
+            self._workflows_by_iwc_id.items(),
+            key=lambda item: not _is_assembly_scope(item[1]),
+        )
+        for iwc_id, wf in indexed:
+            if wf.get("trsId"):
+                self._iwc_id_by_trs_key.setdefault(trs_id_key(wf["trsId"]), iwc_id)
 
     # -- Organism methods --
 
@@ -262,8 +289,17 @@ class CatalogData:
             wf for wf in self._workflows_by_iwc_id.values() if _is_assembly_scope(wf)
         ]
 
+    def _find_workflow(self, workflow_id: str) -> Optional[Dict[str, Any]]:
+        """Look up a workflow by IWC id or TRS id. Returns it regardless of
+        scope -- callers apply the ASSEMBLY-scope check."""
+        wf = self._workflows_by_iwc_id.get(workflow_id)
+        if wf is None and workflow_id:
+            iwc_id = self._iwc_id_by_trs_key.get(trs_id_key(workflow_id))
+            wf = self._workflows_by_iwc_id.get(iwc_id) if iwc_id else None
+        return wf
+
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
-        wf = self._workflows_by_iwc_id.get(iwc_id)
+        wf = self._find_workflow(iwc_id)
         if wf and _is_assembly_scope(wf):
             return self._condense_workflow(wf)
         return None
@@ -271,7 +307,7 @@ class CatalogData:
     def check_workflow_assembly_compatibility(
         self, iwc_id: str, accession: str
     ) -> Dict[str, Any]:
-        wf = self._workflows_by_iwc_id.get(iwc_id)
+        wf = self._find_workflow(iwc_id)
         asm = self._assemblies_by_accession.get(accession)
         if not wf or not _is_assembly_scope(wf):
             return {"compatible": False, "reason": f"Workflow '{iwc_id}' not found"}
@@ -319,15 +355,15 @@ class CatalogData:
         gene model URL, accession) and flags user-supplied inputs
         (sequencing data) as unresolved.
         """
-        wf = self._workflows_by_iwc_id.get(iwc_id)
+        wf = self._find_workflow(iwc_id)
         # Fail closed for non-ASSEMBLY-scope workflows: resolving inputs for one
-        # would expose its name/TRS id/parameters by IWC id even though the
-        # listing tools hide it (#1321).
+        # would expose its name/TRS id/parameters by IWC or TRS id even though
+        # the listing tools hide it (#1321).
         if not wf or not _is_assembly_scope(wf):
-            raise ValueError(f"Workflow '{iwc_id}' not found")
+            raise CallerInputError(f"Workflow '{iwc_id}' not found")
         asm = self._assemblies_by_accession.get(accession)
         if not asm:
-            raise ValueError(f"Assembly '{accession}' not found")
+            raise CallerInputError(f"Assembly '{accession}' not found")
 
         resolved: Dict[str, Any] = {}
         unresolved: List[Dict[str, Any]] = []

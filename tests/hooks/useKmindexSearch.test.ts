@@ -10,7 +10,7 @@ import ky, { HTTPError, TimeoutError } from "ky";
 jest.mock("ky", () => {
   class StubHTTPError extends Error {
     response: { json: () => Promise<unknown>; status: number };
-    constructor(status: number, detail: string) {
+    constructor(status: number, detail: unknown) {
       super(`HTTP ${status}`);
       this.response = {
         json: (): Promise<unknown> => Promise.resolve({ detail }),
@@ -36,7 +36,7 @@ const mockKy = ky as unknown as {
 // a test actually cares about.
 const MockHTTPError = HTTPError as unknown as new (
   status: number,
-  detail: string
+  detail: unknown
 ) => Error;
 const MockTimeoutError = TimeoutError as unknown as new () => Error;
 
@@ -978,5 +978,298 @@ describe("a merge that outlives the request", () => {
     expect(result.current.error).toBe("Failed to get kmindex results: boom");
     expect(result.current.isLoadingResults).toBe(false);
     expect(resultsCalls()).toBe(1);
+  });
+});
+
+describe("submit errors", () => {
+  const SUBMISSION = {
+    indexes: ["GENOMIC_BCT"],
+    sequence: ">q\nACGT",
+    threshold: 0.5,
+    zvalue: 6,
+  };
+
+  it("resolves to the new job id", async () => {
+    const { result } = await renderSettled();
+
+    let jobId: string | null = null;
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBe(JOB_ID);
+  });
+
+  it("shows the status, not an upstream HTML error page, as the message", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(
+            502,
+            "<!DOCTYPE html><html><head><title>502 Bad Gateway</title></head><body>nginx</body></html>"
+          )
+        ),
+    });
+    const { result } = await renderSettled();
+
+    let jobId: string | null = "unset";
+    await act(async () => {
+      jobId = await result.current.submit(SUBMISSION);
+    });
+
+    expect(jobId).toBeNull();
+    expect(result.current.error).toBe("HTTP 502");
+  });
+
+  it("keeps a plain-text detail", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(400, "Query sequence cannot be empty")
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("Query sequence cannot be empty");
+  });
+
+  it("reads the messages out of a FastAPI validation list", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(
+          new MockHTTPError(422, [
+            {
+              input: ">a\nACGT\n>b\nACGT",
+              loc: ["body", "sequence"],
+              msg: "Value error, Submit one sequence per query; multi-record FASTA is not supported",
+              type: "value_error",
+            },
+          ])
+        ),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe(
+      "Value error, Submit one sequence per query; multi-record FASTA is not supported"
+    );
+  });
+
+  it("falls back to the status for a detail that is neither text nor messages", async () => {
+    mockKy.post.mockReturnValue({
+      json: (): Promise<unknown> =>
+        Promise.reject(new MockHTTPError(422, [{ loc: ["body"] }])),
+    });
+    const { result } = await renderSettled();
+
+    await act(async () => {
+      await result.current.submit(SUBMISSION);
+    });
+
+    expect(result.current.error).toBe("HTTP 422");
+  });
+});
+
+describe("polling a job while Galaxy is unreachable", () => {
+  const RUNNING_STATUS = {
+    is_complete: false,
+    is_successful: false,
+    job_id: JOB_ID,
+    state: "running",
+  };
+
+  /**
+   * Status requests made so far.
+   * @returns How many times the status endpoint was asked.
+   */
+  function statusCalls(): number {
+    return mockKy.get.mock.calls.filter(([url]) =>
+      String(url).includes("/status")
+    ).length;
+  }
+
+  /**
+   * Reattach to a job, answering each status request in turn.
+   * @param answers - One per status request; the last one repeats.
+   * @returns The rendered hook result, before the first tick.
+   */
+  async function pollingWith(
+    answers: (() => unknown)[]
+  ): Promise<
+    ReturnType<typeof renderHook<ReturnType<typeof useKmindexSearch>, unknown>>
+  > {
+    setUrl(`?job=${JOB_ID}`);
+    let asked = 0;
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      if (url.includes("/status")) {
+        const answer = answers[Math.min(asked, answers.length - 1)];
+        asked += 1;
+        return answer();
+      }
+      return jsonOf(RESULTS);
+    });
+    return renderSettled();
+  }
+
+  const galaxyDown = (): unknown => ({
+    json: (): Promise<unknown> =>
+      Promise.reject(new MockHTTPError(500, "Failed to get job status: down")),
+  });
+  const running = (): unknown => jsonOf(RUNNING_STATUS);
+
+  /**
+   * Advance fake time, letting each request settle before the next timer.
+   * @param ms - Milliseconds to advance.
+   */
+  async function advance(ms: number): Promise<void> {
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(ms);
+    });
+  }
+
+  it("backs off on consecutive failures, capped at a minute", async () => {
+    await pollingWith([galaxyDown]);
+
+    // 3 s to the first ask, then 6, 12, 24, 48, and a minute from there on.
+    await advance(3000);
+    expect(statusCalls()).toBe(1);
+    await advance(5999);
+    expect(statusCalls()).toBe(1);
+    await advance(1);
+    expect(statusCalls()).toBe(2);
+    await advance(12000 + 24000 + 48000);
+    expect(statusCalls()).toBe(5);
+    await advance(60000);
+    expect(statusCalls()).toBe(6);
+    await advance(60000);
+    expect(statusCalls()).toBe(7);
+  });
+
+  it("leaves the retrying to the backoff rather than ky", async () => {
+    await pollingWith([galaxyDown]);
+
+    await advance(3000);
+    const [, options] = mockKy.get.mock.calls.find(([url]) =>
+      String(url).includes("/status")
+    );
+    expect(options).toMatchObject({ retry: 0 });
+  });
+
+  it("goes back to the normal interval once a request succeeds", async () => {
+    await pollingWith([galaxyDown, galaxyDown, running]);
+
+    await advance(3000 + 6000 + 12000);
+    expect(statusCalls()).toBe(3);
+
+    await advance(3000);
+    expect(statusCalls()).toBe(4);
+  });
+
+  it("says nothing about a short blip", async () => {
+    const { result } = await pollingWith([running, galaxyDown, running]);
+
+    await advance(3000);
+    expect(result.current.jobStatus?.state).toBe("running");
+
+    await advance(3000);
+    expect(statusCalls()).toBe(2);
+    expect(result.current.pollWarning).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
+  });
+
+  it("says so once the failures persist, and clears it on recovery", async () => {
+    const { result } = await pollingWith([
+      running,
+      galaxyDown,
+      galaxyDown,
+      galaxyDown,
+      running,
+    ]);
+
+    await advance(3000 + 3000 + 6000);
+    expect(statusCalls()).toBe(3);
+    expect(result.current.pollWarning).toBeNull();
+
+    await advance(12000);
+    expect(statusCalls()).toBe(4);
+    expect(result.current.pollWarning).toBe(
+      "Failed to get job status: down -- still trying."
+    );
+    // A warning, not a stop: the job's last known state stays up, and
+    // nothing reads the search as over.
+    expect(result.current.error).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
+
+    await advance(24000);
+    expect(statusCalls()).toBe(5);
+    expect(result.current.pollWarning).toBeNull();
+    expect(result.current.jobStatus?.state).toBe("running");
+  });
+
+  it("stops asking about a job Galaxy says does not exist", async () => {
+    const { result } = await pollingWith([
+      (): unknown => ({
+        json: (): Promise<unknown> =>
+          Promise.reject(new MockHTTPError(404, "Job not found")),
+      }),
+    ]);
+
+    await advance(3000);
+    expect(result.current.error).toBe("Job not found");
+    expect(result.current.pollWarning).toBeNull();
+
+    await advance(10 * 60000);
+    expect(statusCalls()).toBe(1);
+  });
+
+  it("does not stack a second request behind a slow one", async () => {
+    const pending = deferred();
+    await pollingWith([(): unknown => ({ json: () => pending.promise })]);
+
+    await advance(3000);
+    await advance(30000);
+    expect(statusCalls()).toBe(1);
+  });
+
+  it("a warning does not outlive the search it was about", async () => {
+    const { result } = await pollingWith([galaxyDown]);
+
+    await advance(3000 + 6000 + 12000);
+    expect(result.current.pollWarning).not.toBeNull();
+
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.pollWarning).toBeNull();
+  });
+
+  it("a request out when the search is reset does not start polling again", async () => {
+    const pending = deferred();
+    const { result } = await pollingWith([
+      (): unknown => ({ json: () => pending.promise }),
+      running,
+    ]);
+
+    await advance(3000);
+    act(() => {
+      result.current.reset();
+    });
+    await act(async () => {
+      pending.resolve(RUNNING_STATUS);
+      await Promise.resolve();
+    });
+
+    await advance(60000);
+    expect(statusCalls()).toBe(1);
+    expect(result.current.jobStatus).toBeNull();
   });
 });

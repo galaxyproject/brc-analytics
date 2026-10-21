@@ -12,8 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
+import {
+  StyledRoundedPaper,
+  StyledStack,
+} from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorSummary/selectorSummary.styles";
 import { Fragment, type JSX } from "react";
-import { StyledRoundedPaper, StyledStack } from "./assemblySummary.styles";
 import { type Props } from "./types";
 
 /**

@@ -1,14 +1,14 @@
-import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {
-  findOrganism,
   getAssembly,
+  getOrganism,
 } from "@repo/shared/services/workflows/entities";
 import { mapOrganismEntityToOrganism } from "@repo/shared/views/OrganismWorkflowInputsView/utils";
 import type { Assembly } from "@repo/shared/views/WorkflowInputsView/types";
 import { mapAssemblyToOrganism } from "@repo/shared/views/WorkflowInputsView/utils";
+import { findWorkflowTaxonOrganism } from "@repo/shared/workflow/cladeOrganisms";
 
 /**
  * Resolves the reference-assembly genome, when one is configured.
@@ -38,20 +38,24 @@ export function getWorkflowOrganism(
 }
 
 /**
- * Resolves the organism entity for organism-scoped workflows, anchored by the
- * workflow's taxonomyId (these workflows have no assembly). Matches by taxonomy
- * id and returns undefined when no catalog organism exists — organism-scoped
- * workflows may target a clade (e.g. Viruses, taxid 10239) with no organism
- * entry, which must not crash the view.
+ * Resolves the organism entity for organism-scoped workflows (these workflows
+ * have no assembly). Anchored by the workflow's taxonomyId when it is a catalog
+ * organism; otherwise the taxonomyId is a clade (e.g. Viruses, taxid 10239)
+ * with no organism entry, and the organism is the species the user picks
+ * within that clade (required before the read-run step).
  * @param workflow - Workflow being configured.
- * @returns The organism entity, or undefined for assembly-scoped / no-taxonomyId
- * workflows, or clades without a catalog organism.
+ * @param configuredOrganism - Taxonomy ID of the organism picked within the
+ * workflow's clade, if any. Only the organism picker sets it, from its
+ * clade-filtered rows.
+ * @returns The workflow's taxonomyId organism, else the picked organism, or
+ * undefined when the taxonomyId is not a catalog organism and no species has
+ * been picked yet.
  */
 export function getWorkflowOrganismEntity(
-  workflow: Workflow
+  workflow: Workflow,
+  configuredOrganism: string | undefined
 ): OrganismContract | undefined {
-  if (workflow.scope !== WORKFLOW_SCOPE.ORGANISM || !workflow.taxonomyId) {
-    return undefined;
-  }
-  return findOrganism<OrganismContract>(sanitizeEntityId(workflow.taxonomyId));
+  const organism = findWorkflowTaxonOrganism(workflow);
+  if (organism || !configuredOrganism) return organism;
+  return getOrganism<OrganismContract>(sanitizeEntityId(configuredOrganism));
 }

@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from fastmcp import FastMCP
 
+from app.core.errors import CallerInputError
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
@@ -51,7 +52,7 @@ def create_mcp_server(
             "build, resilient to ENA/EBI outages. Prefer the SRA tools for "
             "broad or filtered 'what data exists' queries; prefer the ENA "
             "tools (search_ena, search_ena_keywords) for submissions newer "
-            "than the mirror or free-text keyword search."
+            "than the mirror."
         )
     if logan_enabled:
         instructions += (
@@ -67,8 +68,9 @@ def create_mcp_server(
 
     # Catalog tools use two error conventions:
     # - Single-entity lookups (get_organism, get_assembly_details, etc.) raise
-    #   ValueError when the entity doesn't exist, since there's no meaningful
-    #   empty response for a specific ID lookup.
+    #   CallerInputError when the entity doesn't exist, since there's no
+    #   meaningful empty response for a specific ID lookup. It's the caller's
+    #   mistake, so it reaches the client as a tool error but not Sentry.
     # - Multi-result searches (search_organisms, get_assemblies, etc.) return
     #   {"count": 0, ...} with an empty list, since zero results is a valid
     #   search outcome.
@@ -87,7 +89,9 @@ def create_mcp_server(
         """Get a single organism by its NCBI taxonomy ID."""
         result = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
         if not result:
-            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+            raise CallerInputError(
+                f"No organism found with taxonomy ID '{taxonomy_id}'"
+            )
         return result
 
     @mcp.tool()
@@ -103,7 +107,7 @@ def create_mcp_server(
         (e.g. GCF_000005845.2)."""
         result = catalog_data.get_assembly_details(accession)
         if not result:
-            raise ValueError(f"No assembly found with accession '{accession}'")
+            raise CallerInputError(f"No assembly found with accession '{accession}'")
         return result
 
     @mcp.tool()
@@ -129,16 +133,22 @@ def create_mcp_server(
 
     @mcp.tool()
     def get_workflow_details(iwc_id: str) -> dict:
-        """Get full details of a workflow by its IWC ID."""
+        """Get full details of a workflow.
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         result = catalog_data.get_workflow_details(iwc_id)
         if not result:
-            raise ValueError(f"No workflow found with IWC ID '{iwc_id}'")
+            raise CallerInputError(f"No workflow found with IWC ID '{iwc_id}'")
         return result
 
     @mcp.tool()
     def check_compatibility(iwc_id: str, accession: str) -> dict:
         """Check whether a workflow is compatible with a specific genome assembly.
-        Returns compatibility status and any issues (ploidy/taxonomy mismatches)."""
+        Returns compatibility status and any issues (ploidy/taxonomy mismatches).
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         return catalog_data.check_workflow_assembly_compatibility(iwc_id, accession)
 
     @mcp.tool()
@@ -146,7 +156,10 @@ def create_mcp_server(
         """Resolve deterministic workflow inputs for a workflow + assembly pair.
         Returns resolved values (reference genome URL, gene model, accession)
         and unresolved inputs the researcher must provide (sequencing data).
-        Also includes compatibility check results."""
+        Also includes compatibility check results.
+        Accepts the workflow's IWC id (e.g. rnaseq-pe-main) or its TRS id
+        (e.g. #workflow/github.com/iwc-workflows/rnaseq-pe/main, with or without
+        a /versions/... suffix)."""
         return catalog_data.resolve_workflow_inputs(iwc_id, accession)
 
     # -- ENA tools (async, HTTP) --
@@ -171,7 +184,10 @@ def create_mcp_server(
     async def search_ena_keywords(keywords: List[str]) -> dict:
         """Search the European Nucleotide Archive by keywords (organism names,
         library strategies like RNA-Seq/WGS, platforms like Illumina/PacBio).
-        Returns up to 50 read run records. Check has_more to see if
+        Pass one facet per keyword. Free-text keywords outside those
+        categories are rejected with an error listing what is supported;
+        for organisms outside the supported genera use search_ena with a
+        taxonomy ID. Returns up to 50 read run records. Check has_more to see if
         additional results exist beyond the cap."""
         try:
             result = await ena_service.search_by_keywords(
@@ -340,7 +356,9 @@ def create_mcp_server(
         """Get details for a specific organism by NCBI taxonomy ID."""
         org = catalog_data.get_organism_by_taxonomy_id(taxonomy_id)
         if not org:
-            raise ValueError(f"No organism found with taxonomy ID '{taxonomy_id}'")
+            raise CallerInputError(
+                f"No organism found with taxonomy ID '{taxonomy_id}'"
+            )
         return json.dumps(org, indent=2)
 
     # -- Guided prompts --

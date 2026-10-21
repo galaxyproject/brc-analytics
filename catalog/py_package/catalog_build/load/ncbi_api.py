@@ -1,32 +1,20 @@
 import time
-from pathlib import Path
 
 import dlt
 import duckdb
 import requests
 from pydantic import BaseModel
 
-from ..utils import get_db_path
+from .common import LoadDestinationParams
 
 
 class NcbiGenomeAnnotationInfo(BaseModel):
     status: str | None = None
 
 
-class NcbiGenomeAssemblyInfoBiosampleId(BaseModel):
-    db: str | None = None
-    value: str
-
-
-class NcbiGenomeAssemblyInfoBiosample(BaseModel):
-    accession: str
-    sample_ids: list[NcbiGenomeAssemblyInfoBiosampleId] | None = None
-
-
 class NcbiGenomeAssemblyInfo(BaseModel):
     assembly_level: str
     assembly_status: str | None = None
-    biosample: NcbiGenomeAssemblyInfoBiosample | None = None
     refseq_category: str | None = None
     release_date: str
 
@@ -250,14 +238,14 @@ def ncbi_api_data(*, assembly_accessions: list[str]):
     return [ncbi_genomes(assembly_accessions)]
 
 
-def load_ncbi_api_data(*, temp_folder_path: Path, dlt_pipeline_prefix: str):
-    with duckdb.connect(get_db_path(temp_folder_path)) as con:
+def load_ncbi_api_data(dest: LoadDestinationParams):
+    with duckdb.connect(dest.get_db_path()) as con:
         # Query a list of unique accessions and select the list from the first item of the first row
         accessions = con.query(
             "select list(distinct accession order by accession) from catalog_source.assemblies"
         ).fetchall()[0][0]
         pipeline = dlt.pipeline(
-            pipeline_name=dlt_pipeline_prefix + "ncbi_api",
+            pipeline_name=dest.get_dlt_pipeline_name("ncbi_api"),
             destination=dlt.destinations.duckdb(con),
             dataset_name="ncbi_api",
         )

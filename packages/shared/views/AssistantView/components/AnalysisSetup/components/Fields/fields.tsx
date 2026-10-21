@@ -8,13 +8,13 @@ import type { FieldsProps } from "./types";
  * Renders the analysis schema fields, group by group, divided.
  * @param props - Component props.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
  * @param props.schema - Current analysis schema, or null before the assistant has returned one.
  * @returns The field groups.
  */
 export const Fields = ({
   loading,
-  onSend,
+  onClearField,
   schema,
 }: FieldsProps): JSX.Element => {
   return (
@@ -25,7 +25,7 @@ export const Fields = ({
           <FieldGroup
             group={group}
             loading={loading}
-            onSend={onSend}
+            onClearField={onClearField}
             schema={schema}
           />
         </Fragment>

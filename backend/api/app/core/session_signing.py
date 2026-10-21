@@ -37,14 +37,8 @@ def verify_session_id(session_id: str, signature: str, secret: str) -> bool:
 
 
 def require_session_cookie(session_id: str, cookie_value: Optional[str]) -> None:
-    """Raise 403 unless the cookie's HMAC matches session_id.
-
-    If no SESSION_COOKIE_SECRET is configured (legacy/local-dev mode), all
-    requests are allowed -- the binding is opt-in via env var.
-    """
+    """Raise 403 unless the cookie's HMAC matches session_id."""
     settings = get_settings()
-    if not settings.SESSION_COOKIE_SECRET:
-        return
     if not verify_session_id(
         session_id, cookie_value or "", settings.SESSION_COOKIE_SECRET
     ):
@@ -54,8 +48,6 @@ def require_session_cookie(session_id: str, cookie_value: Optional[str]) -> None
 def set_session_cookie(response: Response, session_id: str) -> None:
     """Issue an httpOnly Same-Site=Strict cookie binding the session to this client."""
     settings = get_settings()
-    if not settings.SESSION_COOKIE_SECRET:
-        return
     # Only allow plain-HTTP cookies in DEV_ENVIRONMENTS. Anywhere else
     # (staging, prod, anything that could ever see a non-TLS hop) must
     # mark the cookie Secure so the browser refuses to send it over HTTP.

@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.models.logan import LoganContext
 
@@ -67,6 +67,9 @@ class AnalysisSchema(BaseModel):
 class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
+    # A note from the app itself, e.g. a field cleared from the setup panel.
+    # Transcript only: the model's history is kept separately.
+    SYSTEM = "system"
 
 
 class ChatMessage(BaseModel):
@@ -129,13 +132,38 @@ class AnalysisStateUpdate(BaseModel):
     )
 
 
+# The fields a user chooses in conversation, and so can clear from the setup
+# panel. The rest are derived from the workflow and assembly and recomputed on
+# every apply, so a clear of one would not stick.
+ClearableField = Literal[
+    "organism", "assembly", "analysis_type", "workflow", "data_source"
+]
+
+
 class ChatRequest(BaseModel):
     """Request body for POST /api/v1/assistant/chat."""
 
-    message: str = Field(..., min_length=1, max_length=4000)
+    message: Optional[str] = Field(None, min_length=1, max_length=4000)
     session_id: Optional[str] = Field(
         None, description="Existing session to continue; omit to start fresh"
     )
+    clear_fields: List[ClearableField] = Field(
+        default_factory=list,
+        max_length=5,
+        description=(
+            "Setup-panel fields to clear before this turn, applied directly "
+            "rather than through the model. A turn may be a clear on its own."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _message_or_clear(self) -> "ChatRequest":
+        if not self.message and not self.clear_fields:
+            raise ValueError("Send a message, a field to clear, or both")
+        if not self.message and not self.session_id:
+            # A new session has nothing to clear.
+            raise ValueError("A clear on its own needs an existing session")
+        return self
 
 
 class TokenUsage(BaseModel):
@@ -153,6 +181,13 @@ class ChatResponse(BaseModel):
 
     session_id: str
     reply: str
+    note: Optional[str] = Field(
+        None,
+        description=(
+            "The app's own transcript line for this turn, placed before the "
+            "user's message, e.g. 'Organism cleared.' after a setup-panel clear"
+        ),
+    )
     schema_state: AnalysisSchema
     suggestions: List[SuggestionChip] = Field(default_factory=list)
     is_complete: bool = Field(

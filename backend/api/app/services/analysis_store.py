@@ -129,8 +129,12 @@ async def _write(state: SessionState) -> str | None:
         # claims the session and persists it.
         return None
 
-    if not any(message.role == MessageRole.USER for message in state.messages):
-        # Nothing the user would recognise in a list.
+    if not any(
+        message.role in (MessageRole.USER, MessageRole.SYSTEM)
+        for message in state.messages
+    ):
+        # Nothing the user did yet, so nothing they would recognise in a list.
+        # A setup-panel clear counts: it leaves a system note, not a user line.
         return None
 
     async with db_session() as session:

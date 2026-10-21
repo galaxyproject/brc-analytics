@@ -216,7 +216,7 @@ function SummaryExport({
       <Typography color="textSecondary" component="div" variant="caption">
         {rows > SPREADSHEET_ROW_LIMIT ? (
           <>
-            Too many rows for a spreadsheet -- Excel and Calc stop at{" "}
+            Too many rows for a spreadsheet: Excel and Calc stop at{" "}
             {SPREADSHEET_ROW_LIMIT.toLocaleString()} and drop the rest without
             saying which. Parquet is the smaller download, keeps its column
             types, and reads whole in pandas, R or DuckDB.

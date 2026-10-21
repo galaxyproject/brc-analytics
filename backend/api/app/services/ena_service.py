@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, Dict, List
 
 import httpx
@@ -7,6 +8,122 @@ from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+
+ORGANISM_GENERA = [
+    "plasmodium",
+    "candida",
+    "escherichia",
+    "mycobacterium",
+    "cryptococcus",
+    "aspergillus",
+]
+
+# Ordered (pattern, ENA term) pairs. Word boundaries keep short tokens like
+# "wes" from matching inside unrelated words ("West Nile virus").
+FACET_PATTERNS = [
+    (r"rna-seq", 'library_strategy="RNA-Seq"'),
+    (r"wgs|whole genome", 'library_strategy="WGS"'),
+    (r"wxs|wes|exome", 'library_strategy="WXS"'),
+    (r"chip-seq", 'library_strategy="ChIP-Seq"'),
+    (r"atac-seq", 'library_strategy="ATAC-seq"'),
+    (r"amplicon", 'library_strategy="AMPLICON"'),
+    (r"bisulfite", 'library_strategy="Bisulfite-Seq"'),
+    (r"illumina|miseq|hiseq|novaseq|nextseq", "instrument_platform=ILLUMINA"),
+    (r"pacbio", "instrument_platform=PACBIO_SMRT"),
+    (r"nanopore|oxford", "instrument_platform=OXFORD_NANOPORE"),
+    (r"ion torrent", "instrument_platform=ION_TORRENT"),
+]
+_FACET_REGEXES = [
+    (re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE), term)
+    for pattern, term in FACET_PATTERNS
+]
+
+LIBRARY_SOURCES = [
+    "GENOMIC",
+    "TRANSCRIPTOMIC",
+    "METAGENOMIC",
+    "METATRANSCRIPTOMIC",
+    "SYNTHETIC",
+    "VIRAL RNA",
+]
+
+GENERIC_KEYWORDS = ["data", "sequencing"]
+
+SUPPORTED_KEYWORDS_HINT = (
+    "one facet per keyword -- full organism names (e.g. 'Plasmodium "
+    "falciparum') from the genera "
+    + ", ".join(g.capitalize() for g in ORGANISM_GENERA)
+    + "; library strategies (RNA-Seq, WGS, WXS/exome, ChIP-Seq, ATAC-seq, "
+    "amplicon, bisulfite); platforms (Illumina, MiSeq/HiSeq/NovaSeq/NextSeq, "
+    "PacBio, Nanopore, Ion Torrent); library sources ("
+    + ", ".join(LIBRARY_SOURCES)
+    + ")"
+)
+
+# Caps how much caller input gets echoed back in the error message.
+MAX_ECHOED_KEYWORDS = 10
+MAX_ECHOED_KEYWORD_LENGTH = 64
+
+
+class UnsupportedKeywordsError(ValueError):
+    """Keywords that can't be expressed as an ENA portal query."""
+
+    def __init__(self, keywords: List[str]):
+        self.keywords = keywords
+        if keywords:
+            shown = [
+                repr(k[:MAX_ECHOED_KEYWORD_LENGTH])
+                for k in keywords[:MAX_ECHOED_KEYWORDS]
+            ]
+            if len(keywords) > MAX_ECHOED_KEYWORDS:
+                shown.append(f"and {len(keywords) - MAX_ECHOED_KEYWORDS} more")
+            problem = "Unsupported ENA search keywords: " + ", ".join(shown)
+        else:
+            problem = "No searchable ENA keywords given"
+        super().__init__(f"{problem}. Supported: {SUPPORTED_KEYWORDS_HINT}.")
+
+
+def _keyword_term(keyword: str) -> str | None:
+    """Map one cleaned keyword to an ENA query term, or None if unsupported."""
+    facet_term = next(
+        (term for regex, term in _FACET_REGEXES if regex.search(keyword)), None
+    )
+    if any(genus in keyword.lower() for genus in ORGANISM_GENERA):
+        # "Candida auris RNA-Seq" would become an exact scientific_name match
+        # on the whole string and silently return nothing.
+        if facet_term is not None:
+            return None
+        return f'scientific_name="{keyword}"'
+    if facet_term is not None:
+        return facet_term
+    if keyword.upper() in LIBRARY_SOURCES:
+        return f'library_source="{keyword.upper()}"'
+    return None
+
+
+def build_keyword_query(keywords: List[str]) -> str:
+    """Build an ENA portal query from free-form keywords.
+
+    ENA rejects bare free text (and unquoted values with spaces) with a 400,
+    so anything that doesn't map to a known field raises instead of being
+    sent. Dropping it silently would broaden the search without telling the
+    caller, and an all-dropped input would match every run in ENA.
+    """
+    terms: List[str] = []
+    unsupported = []
+    for keyword in keywords:
+        # Backslashes too, so a value can't escape its closing quote.
+        clean_keyword = re.sub(r"[\"'\\]", "", keyword).strip()
+        if not clean_keyword or clean_keyword.lower() in GENERIC_KEYWORDS:
+            continue
+        term = _keyword_term(clean_keyword)
+        if term is None:
+            unsupported.append(clean_keyword)
+        elif term not in terms:
+            terms.append(term)
+    if unsupported or not terms:
+        raise UnsupportedKeywordsError(unsupported)
+    return " AND ".join(terms)
 
 
 class ENAService:
@@ -109,111 +226,9 @@ class ENAService:
         self, keywords: List[str], limit: int = 300, use_cache: bool = True
     ) -> Dict[str, Any]:
         """Search for sequencing data by keywords"""
-        # Create query string from keywords
-        # Use proper ENA query syntax
-        query_terms = []
-        for keyword in keywords:
-            if keyword.strip():
-                # Remove quotes and special characters
-                clean_keyword = keyword.replace('"', "").replace("'", "").strip()
-                # For organisms, search scientific name (no quotes needed)
-                if any(
-                    word in clean_keyword.lower()
-                    for word in [
-                        "plasmodium",
-                        "candida",
-                        "escherichia",
-                        "mycobacterium",
-                        "cryptococcus",
-                        "aspergillus",
-                    ]
-                ):
-                    query_terms.append(f"scientific_name={clean_keyword}")
-                # For library strategies (RNA-Seq, WGS, etc.)
-                elif any(
-                    word in clean_keyword.lower()
-                    for word in [
-                        "rna-seq",
-                        "wgs",
-                        "chip-seq",
-                        "atac-seq",
-                        "whole genome",
-                        "wxs",
-                        "wes",
-                        "exome",
-                        "amplicon",
-                        "bisulfite",
-                    ]
-                ):
-                    # Map common terms to ENA library_strategy values (with quotes)
-                    if "rna" in clean_keyword.lower():
-                        query_terms.append('library_strategy="RNA-Seq"')
-                    elif (
-                        "wgs" in clean_keyword.lower()
-                        or "whole genome" in clean_keyword.lower()
-                    ):
-                        query_terms.append('library_strategy="WGS"')
-                    elif (
-                        "wxs" in clean_keyword.lower()
-                        or "wes" in clean_keyword.lower()
-                        or "exome" in clean_keyword.lower()
-                    ):
-                        query_terms.append('library_strategy="WXS"')
-                    elif "chip" in clean_keyword.lower():
-                        query_terms.append('library_strategy="ChIP-Seq"')
-                    elif "atac" in clean_keyword.lower():
-                        query_terms.append('library_strategy="ATAC-seq"')
-                    elif "amplicon" in clean_keyword.lower():
-                        query_terms.append('library_strategy="AMPLICON"')
-                    elif "bisulfite" in clean_keyword.lower():
-                        query_terms.append('library_strategy="Bisulfite-Seq"')
-                # For sequencing platforms/technologies - map to ENA platform codes
-                elif "illumina" in clean_keyword.lower():
-                    query_terms.append("instrument_platform=ILLUMINA")
-                elif "pacbio" in clean_keyword.lower():
-                    query_terms.append("instrument_platform=PACBIO_SMRT")
-                elif (
-                    "nanopore" in clean_keyword.lower()
-                    or "oxford" in clean_keyword.lower()
-                ):
-                    query_terms.append("instrument_platform=OXFORD_NANOPORE")
-                elif "ion torrent" in clean_keyword.lower():
-                    query_terms.append("instrument_platform=ION_TORRENT")
-                elif any(
-                    word in clean_keyword.lower()
-                    for word in ["miseq", "hiseq", "novaseq", "nextseq"]
-                ):
-                    # These are Illumina instruments
-                    query_terms.append("instrument_platform=ILLUMINA")
-                # For library sources
-                elif clean_keyword.upper() in [
-                    "GENOMIC",
-                    "TRANSCRIPTOMIC",
-                    "METAGENOMIC",
-                    "METATRANSCRIPTOMIC",
-                    "SYNTHETIC",
-                    "VIRAL RNA",
-                ]:
-                    query_terms.append(f"library_source={clean_keyword.upper()}")
-                # For assembly levels
-                elif any(
-                    word in clean_keyword.lower()
-                    for word in ["complete genome", "chromosome", "scaffold", "contig"]
-                ):
-                    # These might not be directly searchable in ENA, but include as text search
-                    query_terms.append(clean_keyword)
-                # Skip generic keywords that would cause issues
-                elif clean_keyword.lower() in ["data", "sequencing"]:
-                    continue
-                # Default: text search
-                else:
-                    query_terms.append(clean_keyword)
+        query_string = build_keyword_query(keywords)
 
-        query_string = " AND ".join(query_terms) if query_terms else ""
-        if not query_string:
-            return {"data": [], "cached": False}
-
-        cache_params = {"keywords": sorted(keywords), "limit": limit}
+        cache_params = {"query": query_string, "limit": limit}
         cache_key = self.cache.make_key("ena:search", cache_params)
 
         # Check cache first
@@ -274,7 +289,7 @@ class ENAService:
                     "result": "study",
                     "query": f"study_accession={study_accession}",
                     "format": "json",
-                    "fields": "study_accession,study_title,study_description,study_abstract,center_name,broker_name,submission_date,first_public,last_updated",
+                    "fields": "study_accession,study_title,study_description,center_name,broker_name,first_public,last_updated",
                 }
 
                 logger.info(f"Making ENA API request for study: {study_accession}")

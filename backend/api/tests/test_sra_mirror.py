@@ -53,7 +53,7 @@ def _build_mirror(path: str) -> None:
             assay_type VARCHAR, platform VARCHAR, instrument VARCHAR,
             librarylayout VARCHAR, releasedate DATE,
             geo_loc_name_country_calc VARCHAR, mbases INTEGER,
-            lat DOUBLE, lon DOUBLE
+            lat DOUBLE, lon DOUBLE, biosample VARCHAR
         )
         """
     )
@@ -62,21 +62,22 @@ def _build_mirror(path: str) -> None:
         INSERT INTO runs VALUES
             ('SRR001','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
              'ILLUMINA','HiSeq','PAIRED', DATE '2020-06-01','Kenya', 100,
-             -1.2921, 36.8219),
+             -1.2921, 36.8219, 'SAMN00000001'),
+            -- A blank BioSample, which has to come back as absent.
             ('SRR002','SRP001','PRJNA12345','Plasmodium falciparum','WGS',
              'OXFORD_NANOPORE','MinION','SINGLE', DATE '2021-06-01',
-             'United Kingdom', 200, NULL, NULL),
+             'United Kingdom', 200, NULL, NULL, ''),
             ('SRR003','SRP002','PRJNA99999','Mycobacterium tuberculosis','WGS',
              'ILLUMINA','NovaSeq','PAIRED', DATE '2019-01-01','USA', 300,
-             38.9072, -77.0369),
+             38.9072, -77.0369, 'SAMN00000003'),
             -- Three runs with an identical releasedate, inserted ascending by
             -- accession, so an ORDER BY without a tiebreaker is ambiguous.
             ('SRRA','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 1, NULL, NULL),
+             'PAIRED', DATE '2022-01-01','Kenya', 1, NULL, NULL, NULL),
             ('SRRB','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 2, NULL, NULL),
+             'PAIRED', DATE '2022-01-01','Kenya', 2, NULL, NULL, NULL),
             ('SRRC','SRP9','PRJNA9','Sameday organism','WGS','ILLUMINA','X',
-             'PAIRED', DATE '2022-01-01','Kenya', 3, NULL, NULL)
+             'PAIRED', DATE '2022-01-01','Kenya', 3, NULL, NULL, NULL)
         """
     )
     con.close()
@@ -109,13 +110,15 @@ def deployed_mirror(tmp_path):
 
     Coordinates land with the rebuild, and the rebuild is a manual 10 GB copy
     that will follow the code by some unknown amount of time. This fixture is
-    that window.
+    that window. BioSample predates coordinates in the builder but not in this
+    file, so it goes too.
     """
     path = str(tmp_path / "deployed-mirror.duckdb")
     _build_mirror(path)
     con = duckdb.connect(path)
     con.execute("ALTER TABLE runs DROP COLUMN lat")
     con.execute("ALTER TABLE runs DROP COLUMN lon")
+    con.execute("ALTER TABLE runs DROP COLUMN biosample")
     con.execute("INSERT INTO mirror_meta VALUES ('schema_version', '3')")
     con.close()
     svc = SRAMirrorService(path)
@@ -271,17 +274,18 @@ class TestCapabilityGating:
             assert mirror.has_capability(capability), capability
             assert mirror.missing_columns(capability) == []
 
-    def test_only_coordinates_needs_anything_the_deployed_mirror_lacks(self):
-        # The reason the point layer is a capability of its own rather than
-        # part of geography: everything else, the country choropleth included,
-        # still answers off the file that is on the host today.
+    def test_only_the_optional_layers_need_anything_the_deployed_mirror_lacks(
+        self,
+    ):
+        # The reason the point layer and BioSample are capabilities of their
+        # own rather than part of geography and annotation: everything else,
+        # the country choropleth included, still answers off the file that is
+        # on the host today.
         deployed = set(self._DEPLOYED_COLUMNS)
+        ahead = {"biosample": {"biosample"}, "coordinates": {"lat", "lon"}}
         for capability, needed in sra_mirror._CAPABILITY_COLUMNS.items():
             behind = set(needed) - deployed
-            if capability == "coordinates":
-                assert behind == {"lat", "lon"}
-            else:
-                assert behind == set(), capability
+            assert behind == ahead.get(capability, set()), capability
 
     def test_a_missing_column_only_closes_the_capabilities_that_read_it(
         self, tmp_path, caplog
@@ -327,6 +331,17 @@ class TestCapabilityGating:
         assert cohort is not None and cohort["in_mirror"] == 3
         detail = deployed_mirror.runs_by_accession(["SRR001"])
         assert detail["SRR001"]["country"] == "Kenya"
+
+    def test_biosample_closes_without_taking_annotation_with_it(self, deployed_mirror):
+        # Annotating a page reads biosample when it can; on a file without
+        # the column it has to keep annotating and say nothing about it.
+        assert deployed_mirror.has_capability("biosample") is False
+        assert deployed_mirror.missing_columns("biosample") == ["biosample"]
+        assert deployed_mirror.has_capability("annotation")
+        detail = deployed_mirror.runs_by_accession(["SRR001", "SRR003"])
+        assert detail["SRR001"]["bioproject"] == "PRJNA12345"
+        assert detail["SRR001"]["biosample"] is None
+        assert detail["SRR003"]["biosample"] is None
 
     def test_the_choropleth_still_draws_on_a_mirror_with_no_coordinates(
         self, deployed_mirror
@@ -672,6 +687,28 @@ class TestConcurrentAccess:
             list(pool.map(hammer, range(n_iter)))
 
         assert not errors, errors[:5]
+
+
+class TestRunsByAccessionBioSample:
+    """BioSample rides along on per-hit annotation when the mirror carries it."""
+
+    def test_biosample_is_returned_with_the_rest_of_the_run(self, mirror):
+        detail = mirror.runs_by_accession(["SRR001", "SRR003"])
+
+        assert detail["SRR001"]["biosample"] == "SAMN00000001"
+        assert detail["SRR003"]["biosample"] == "SAMN00000003"
+
+    def test_a_blank_biosample_is_absent_rather_than_empty(self, mirror):
+        # An empty string would render as a link to nothing.
+        assert mirror.runs_by_accession(["SRR002"])["SRR002"]["biosample"] is None
+
+    def test_the_api_model_keeps_it(self, mirror):
+        # pydantic drops keys a model does not declare, so without the field
+        # the value would be read from the mirror and silently thrown away.
+        from app.models.galaxy import SraRunMetadata
+
+        record = mirror.runs_by_accession(["SRR001"])["SRR001"]
+        assert SraRunMetadata(**record).biosample == "SAMN00000001"
 
 
 class TestAccessionBatching:

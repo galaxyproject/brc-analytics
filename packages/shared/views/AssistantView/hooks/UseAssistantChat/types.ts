@@ -1,12 +1,14 @@
 import type {
   AnalysisSchema,
+  ChatMessageRole,
+  ClearableField,
   LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
 
 export interface ChatMessageDisplay {
   content: string;
-  role: "user" | "assistant";
+  role: ChatMessageRole;
 }
 
 /**
@@ -18,6 +20,14 @@ export interface LastSave {
   savedAnalysisId: string;
 }
 
+/**
+ * One chat turn: a message, setup-panel fields to clear, or both.
+ */
+export interface TurnRequest {
+  clearFields?: ClearableField[];
+  message?: string;
+}
+
 export interface UseAssistantChatOptions {
   initialLoganJobId?: string;
   initialMessage?: string;
@@ -26,6 +36,7 @@ export interface UseAssistantChatOptions {
 }
 
 export interface UseAssistantChatReturn {
+  clearField: (field: ClearableField) => Promise<void>;
   error: string | null;
   handoffUrl: string | null;
   isComplete: boolean;

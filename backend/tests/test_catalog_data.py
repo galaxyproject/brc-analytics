@@ -348,6 +348,16 @@ class TestResolveWorkflowInputs:
         with pytest.raises(ValueError, match="not found"):
             catalog.resolve_workflow_inputs("amr_gene_detection-main", "GCF_FAKE.0")
 
+    def test_accepts_unversioned_trs_id(self, catalog):
+        # The exact call from Sentry BRC-ANALYTICS-DEV-4J; the catalog stores
+        # this workflow's TRS id with a /versions/... suffix.
+        result = catalog.resolve_workflow_inputs(
+            "#workflow/github.com/iwc-workflows/rnaseq-pe/main", "GCF_000005845.2"
+        )
+        assert result["trs_id"].startswith(
+            "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/"
+        )
+
 
 class TestBuildFastaUrl:
     def test_valid_accession(self, catalog):

@@ -37,8 +37,15 @@ const STATE_LABELS: Record<string, string> = {
 export const LoganSearchStatus = ({
   search,
 }: LoganSearchStatusProps): JSX.Element | null => {
-  const { error, identity, isLoadingResults, jobId, jobStatus, results } =
-    search;
+  const {
+    error,
+    identity,
+    isLoadingResults,
+    jobId,
+    jobStatus,
+    pollWarning,
+    results,
+  } = search;
   const { isAuthenticated } = useAuth();
   // A signed-in visitor whose search still ran under the service key means the
   // session couldn't be turned into a Galaxy credential. The search works, so
@@ -64,8 +71,7 @@ export const LoganSearchStatus = ({
       {ranAsSharedAccount && (
         <Alert severity="info" sx={{ mt: 2 }}>
           This search ran under the shared BRC account because your session
-          couldn&apos;t be verified -- sign in again to run searches as
-          yourself.
+          couldn&apos;t be verified. Sign in again to run searches as yourself.
         </Alert>
       )}
       {/* Only while the search is still running. Once results are in, the job
@@ -84,6 +90,11 @@ export const LoganSearchStatus = ({
               />
             </ControlRow>
             <LinearProgress sx={{ mt: 2 }} />
+            {pollWarning && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                {pollWarning}
+              </Alert>
+            )}
             {isLoadingResults && (
               <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
                 Merging hits across index shards. A search over many indexes can

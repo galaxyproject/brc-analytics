@@ -138,6 +138,15 @@ describe("Messages", () => {
     );
   });
 
+  test("renders the app's own note, labelled as a note", () => {
+    const log = renderMessages([
+      { content: "Organism cleared.", role: "system" },
+      ...TURN,
+    ]);
+
+    expect(log).toHaveTextContent(/^Note:\s*Organism cleared\.\s*You:/);
+  });
+
   // Opening from the history keeps the old messages on screen until the
   // restore starts; the list is pinned to its end, so the status must be there.
   test("shows the restoring status after the messages", () => {

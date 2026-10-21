@@ -9,6 +9,7 @@ export const ARIA_LABEL = {
  */
 export const SENDER_LABEL = {
   [MESSAGE_ROLE.ASSISTANT]: "Assistant:",
+  [MESSAGE_ROLE.SYSTEM]: "Note:",
   [MESSAGE_ROLE.USER]: "You:",
 } as const;
 

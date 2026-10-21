@@ -2,6 +2,7 @@ import { useAuth } from "@repo/shared/providers/authentication/provider";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
+  ClearableField,
   LoganContext,
   SuggestionChip,
 } from "@repo/shared/services/api-client/types";
@@ -19,6 +20,7 @@ import {
 import type {
   ChatMessageDisplay,
   LastSave,
+  TurnRequest,
   UseAssistantChatOptions,
   UseAssistantChatReturn,
 } from "./types";
@@ -60,7 +62,7 @@ function isRetryableSaveFailure(error: unknown): boolean {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, the session and saved analysis on screen, the last save, sendMessage, and reset/retry functions.
+ * @returns Chat state, the session and saved analysis on screen, the last save, sendMessage, clearField, and reset/retry functions.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -78,9 +80,8 @@ export const useAssistantChat = ({
   const [loading, setLoading] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
-    null
-  );
+  const [lastFailedRequest, setLastFailedRequest] =
+    useState<TurnRequest | null>(null);
   // A restore that failed for a reason a retry could fix, and the count of
   // retries asked for: bumping it re-runs the restore, which a URL already
   // naming the session would not do on its own.
@@ -160,7 +161,7 @@ export const useAssistantChat = ({
     setLoading(false);
     setIsRestoring(false);
     setError(null);
-    setLastFailedMessage(null);
+    setLastFailedRequest(null);
     setIsRestoreFailed(false);
     return conversationRef.current;
   }, []);
@@ -408,23 +409,30 @@ export const useAssistantChat = ({
     setIsSaved(false);
   }, [isAuthLoading, isAuthenticated, isConfigured]);
 
-  const sendMessage = useCallback(
-    async (message: string): Promise<void> => {
-      if (!message.trim() || sendingRef.current) return;
+  // One path for every turn. A setup-panel clear rides it too, as structured
+  // clear_fields the server applies before the model runs, so the clear can't
+  // hinge on how the model reads a message and the assistant still answers it.
+  const runTurn = useCallback(
+    async ({ clearFields, message }: TurnRequest): Promise<void> => {
+      if ((!message?.trim() && !clearFields?.length) || sendingRef.current)
+        return;
       sendingRef.current = true;
       const conversation = conversationRef.current;
       const isCurrent = (): boolean => conversationRef.current === conversation;
 
       setLoading(true);
       setError(null);
-      setLastFailedMessage(null);
+      setLastFailedRequest(null);
 
       // Add user message immediately for responsiveness
-      setMessages((prev) => [...prev, { content: message, role: "user" }]);
+      if (message) {
+        setMessages((prev) => [...prev, { content: message, role: "user" }]);
+      }
 
       try {
         const response: AssistantChatResponse =
           await assistantAPIClient.assistantChat({
+            clear_fields: clearFields,
             message,
             session_id: sessionIdRef.current ?? undefined,
           });
@@ -448,11 +456,19 @@ export const useAssistantChat = ({
           )
         );
 
-        // Add assistant reply
-        setMessages((prev) => [
-          ...prev,
-          { content: response.reply, role: "assistant" },
-        ]);
+        // The turn's note (e.g. "Organism cleared.") sits before the user's
+        // line, as it does in the stored transcript, then the reply.
+        const { note } = response;
+        setMessages((prev) => {
+          // A clear of a field already empty changed nothing and gets no reply.
+          if (!note && !response.reply) return prev;
+          const reply = { content: response.reply, role: "assistant" } as const;
+          if (!note) return [...prev, reply];
+          const noteLine = { content: note, role: "system" } as const;
+          return message
+            ? [...prev.slice(0, -1), noteLine, ...prev.slice(-1), reply]
+            : [...prev, noteLine, reply];
+        });
 
         setSchema(response.schema_state);
         setSuggestions(response.suggestions);
@@ -467,7 +483,7 @@ export const useAssistantChat = ({
         if (!isCurrent()) return;
         const errorMessage = handleChatError(err);
         setError(errorMessage);
-        setLastFailedMessage(message);
+        setLastFailedRequest({ clearFields, message });
       } finally {
         // Whatever replaced the conversation already let go of the send.
         if (isCurrent()) {
@@ -477,6 +493,20 @@ export const useAssistantChat = ({
       }
     },
     [showSession]
+  );
+
+  const sendMessage = useCallback(
+    (message: string): Promise<void> => runTurn({ message }),
+    [runTurn]
+  );
+
+  const clearField = useCallback(
+    async (field: ClearableField): Promise<void> => {
+      // Nothing to clear before there is a conversation to clear it on.
+      if (!sessionIdRef.current) return;
+      await runTurn({ clearFields: [field] });
+    },
+    [runTurn]
   );
 
   // Ask the handed-over question once, then drop it from the URL: it outlives
@@ -507,13 +537,14 @@ export const useAssistantChat = ({
   }, [question, router, sendMessage, sessionKey]);
 
   const retry = useCallback(async (): Promise<void> => {
-    if (!lastFailedMessage) return;
-    const msg = lastFailedMessage;
-    setLastFailedMessage(null);
+    if (!lastFailedRequest) return;
+    const request = lastFailedRequest;
+    setLastFailedRequest(null);
     setError(null);
-    setMessages((prev) => prev.slice(0, -1));
-    await sendMessage(msg);
-  }, [lastFailedMessage, sendMessage]);
+    // Only a message left a line behind; a clear on its own added nothing.
+    if (request.message) setMessages((prev) => prev.slice(0, -1));
+    await runTurn(request);
+  }, [lastFailedRequest, runTurn]);
 
   const retryRestore = useCallback((): Promise<void> => {
     setRestoreAttempt((attempt) => attempt + 1);
@@ -541,10 +572,11 @@ export const useAssistantChat = ({
 
   // A failed message retries that message; a failed restore, the restore.
   let onRetry: (() => Promise<void>) | undefined;
-  if (lastFailedMessage) onRetry = retry;
+  if (lastFailedRequest) onRetry = retry;
   else if (isRestoreFailed) onRetry = retryRestore;
 
   return {
+    clearField,
     error,
     handoffUrl,
     isComplete,
