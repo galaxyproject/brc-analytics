@@ -10,7 +10,7 @@ import duckdb
 import pandas as pd
 
 from .load import LoadParams, do_dlt_load
-from .qc_utils import (
+from .qc_report import (
     format_list_section,
     format_markdown_table,
     format_raw_section,

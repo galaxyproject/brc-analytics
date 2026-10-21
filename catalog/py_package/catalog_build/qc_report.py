@@ -1,5 +1,65 @@
+from __future__ import annotations
+
 import os
 from typing import Iterable, List, Sequence, Tuple
+
+from pydantic import BaseModel
+
+
+class QcDiffEmptyType:
+    def __repr__(self) -> str:
+        return "<QC_DIFF_EMPTY>"
+
+
+QC_DIFF_EMPTY = QcDiffEmptyType()
+
+
+class QcReportElement(BaseModel):
+    def format_markdown(self) -> str:
+        raise Exception("Unimplemented")
+
+
+class QcReportList(QcReportElement):
+    data: list
+
+
+class QcReportKeyedList(QcReportElement):
+    data: dict
+
+
+def get_qc_report_diff(prev, current):
+    if prev is None:
+        return QC_DIFF_EMPTY if current is None else current
+
+    if isinstance(current, QcReportList):
+        if not isinstance(prev, QcReportList):
+            raise ValueError("Cannot diff QcReportList against another type")
+        diff_data = [v for v in current.data if v in prev.data]
+        return (
+            current.model_copy(update={"data": diff_data})
+            if diff_data
+            else QC_DIFF_EMPTY
+        )
+
+    if isinstance(current, QcReportKeyedList):
+        if not isinstance(prev, QcReportKeyedList):
+            raise ValueError("Cannot diff QcReportKeyedList against another type")
+        diff_data = {}
+        for k, v in current.data.items():
+            item_diff = get_qc_report_diff(prev.data.get(k), v)
+            if item_diff is not QC_DIFF_EMPTY:
+                diff_data[k] = item_diff
+        return current.model_copy(update={"data": diff_data})
+
+    if isinstance(current, QcReportElement):
+        update = {}
+        for k in type(current).model_fields.keys():
+            attr_diff = get_qc_report_diff(getattr(prev, k), getattr(current, k))
+            if attr_diff is not QC_DIFF_EMPTY:
+                update[k] = attr_diff
+        return current.model_copy(update=update) if update else QC_DIFF_EMPTY
+
+    return QC_DIFF_EMPTY if current == prev else current
 
 
 def write_markdown(path: str, text: str) -> None:

@@ -18,7 +18,7 @@ from .generated_schema.schema import (
     WorkflowPloidy,
     Workflows,
 )
-from .qc_utils import format_list_section, join_report, write_markdown
+from .qc_report import format_list_section, join_report, write_markdown
 
 URL = "https://iwc.galaxyproject.org/workflow_manifest.json"
 DOCKSTORE_COLLECTION_TO_CATEGORY = {
