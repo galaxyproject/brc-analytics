@@ -414,8 +414,9 @@ KMINDEX_TOOL_REQUEST_POLL = 1.0
 KMINDEX_COPY_HOPS = 5
 # Copy -> original. Immutable once known, so it's kept long, and every results
 # page and export for a copy reads it instead of two job statuses -- which
-# also keeps a copy's export findable while Galaxy is down.
-KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v1"
+# also keeps a copy's export findable while Galaxy is down. v2 because v1 could
+# hold a link that stopped short at another copy when a read failed mid-walk.
+KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v2"
 
 # Galaxy's job cache also requires the input datasets' names to match, so every
 # query goes in under this one rather than whatever filename the caller sent.
