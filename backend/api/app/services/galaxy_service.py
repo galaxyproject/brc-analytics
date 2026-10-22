@@ -373,6 +373,13 @@ KMINDEX_QUEUE_READ_TIMEOUT = 30.0
 # snapshot that worked for up to an hour, its as_of showing its age.
 KMINDEX_QUEUE_COOLDOWN_PREFIX = "galaxy:kmindex_queue_cooldown:v1"
 KMINDEX_QUEUE_COOLDOWN_SECONDS = 30
+
+# The service account's own Galaxy user id, by Galaxy URL. Galaxy narrows a job
+# listing to the caller's own jobs only for a non-admin; an admin key would list
+# every user's kmindex jobs, so the queue readers name the account explicitly.
+# A key can't change under a running process, so one read each is enough.
+_SERVICE_USER_IDS: Dict[str, str] = {}
+
 KMINDEX_QUEUE_LAST_GOOD_PREFIX = "galaxy:kmindex_queue_last_good:v1"
 KMINDEX_QUEUE_LAST_GOOD_TTL = CacheTTL.ONE_HOUR
 # The 24-hour view behind the unlisted stats page. Its first build reads every
@@ -455,6 +462,7 @@ _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 # Keyed by Galaxy URL, account and history name (see _history_cache_key).
 _HISTORY_IDS: Dict[str, str] = {}
 HISTORY_ID_CACHE_PREFIX = "galaxy:history_id:v1"
+
 # A user's history is one long-lived history in their own account; a gone one
 # is caught on use (_is_missing_history_error), so the TTL only bounds staleness.
 HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
@@ -2419,9 +2427,34 @@ class GalaxyService:
                 return KmindexQueueStatus(**last_good)
             raise Exception("Galaxy did not answer for the kmindex queue")
 
+    async def _service_user_id(self) -> str:
+        """The service account's Galaxy user id, so a listing is its jobs only.
+
+        Raises rather than returning nothing: listing without a user_id would
+        count every user's searches on an admin key, and a failed read here
+        then takes the same path as any failed queue read -- a cooldown and
+        the last good snapshot.
+
+        @returns: the encoded id.
+        @raises Exception: when this isn't the service account, or Galaxy
+            didn't say who it is.
+        """
+        if self.credential is not None and self.credential.kind != "service":
+            raise Exception("The kmindex queue is read as the service account")
+        url = self.settings.GALAXY_API_URL
+        if url in _SERVICE_USER_IDS:
+            return _SERVICE_USER_IDS[url]
+        user = await asyncio.to_thread(self.gi.users.get_current_user)
+        user_id = user.get("id") if isinstance(user, dict) else None
+        if not isinstance(user_id, str) or not user_id:
+            raise Exception("Galaxy did not say which user the service key is")
+        _SERVICE_USER_IDS[url] = user_id
+        return user_id
+
     async def _read_kmindex_queue(self) -> KmindexQueueStatus:
         now = datetime.now(timezone.utc)
         tool_id = self.settings.GALAXY_KMINDEX_TOOL_ID
+        user_id = await self._service_user_id()
         # Unfinished jobs get a listing of their own. Galaxy lists newest
         # update first, and a queued job's update_time stops moving once it is
         # queued, so in one shared listing the longest waits are the first to
@@ -2430,6 +2463,7 @@ class GalaxyService:
             self.gi.jobs.get_jobs,
             state=sorted(_KMINDEX_WAITING_STATES | {"running"}),
             tool_id=tool_id,
+            user_id=user_id,
             limit=KMINDEX_QUEUE_LISTING_LIMIT,
         )
         waiting = [j for j in active if j.get("state") in _KMINDEX_WAITING_STATES]
@@ -2442,6 +2476,7 @@ class GalaxyService:
             self.gi.jobs.get_jobs,
             state=sorted(_KMINDEX_FINISHED_STATES),
             tool_id=tool_id,
+            user_id=user_id,
             date_range_min=since.date().isoformat(),
             limit=KMINDEX_QUEUE_LISTING_LIMIT,
             order_by="update_time",
@@ -2568,11 +2603,13 @@ class GalaxyService:
     async def _read_kmindex_history(self, hours: int) -> KmindexQueueHistory:
         now = datetime.now(timezone.utc)
         since = now - timedelta(hours=hours)
+        user_id = await self._service_user_id()
         # date_range_min is a date matched against update_time, and a job
         # submitted in the window was updated in it too, so this covers it.
         jobs = await asyncio.to_thread(
             self.gi.jobs.get_jobs,
             tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
+            user_id=user_id,
             date_range_min=since.date().isoformat(),
             limit=KMINDEX_HISTORY_LISTING_LIMIT,
             order_by="create_time",

@@ -73,11 +73,13 @@ def service(monkeypatch):
     # NOW is taken at import; a real clock drifts from it by however long the
     # suite takes to reach these tests.
     monkeypatch.setattr(galaxy_service, "datetime", _FrozenDatetime)
+    monkeypatch.setattr(galaxy_service, "_SERVICE_USER_IDS", {})
     from app.core.config import get_settings
 
     get_settings.cache_clear()
     svc = GalaxyService(DictCache())
     svc.gi = MagicMock()
+    svc.gi.users.get_current_user = MagicMock(return_value={"id": "svc"})
     yield svc
     get_settings.cache_clear()
 
@@ -138,6 +140,69 @@ async def test_recent_waits_come_from_finished_jobs_in_the_window(service):
     assert queue.window_minutes == galaxy_service.KMINDEX_QUEUE_WINDOW_MINUTES
     read = {c.args[0] for c in service.gi.jobs.get_metrics.call_args_list}
     assert "old" not in read
+
+
+@pytest.mark.asyncio
+async def test_the_listings_name_the_service_account(service):
+    # Galaxy narrows a listing to the caller's jobs only for a non-admin, so an
+    # admin key would otherwise count every user's searches.
+    _galaxy_with(service, [], {})
+    service.gi.users.get_current_user = MagicMock(return_value={"id": "svc"})
+
+    await service.get_kmindex_queue()
+    await service.get_kmindex_queue_history(24)
+
+    calls = service.gi.jobs.get_jobs.call_args_list
+    assert len(calls) == 3
+    assert [c.kwargs["user_id"] for c in calls] == ["svc"] * 3
+    service.gi.users.get_current_user.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_an_unknown_account_never_lists_unscoped(service):
+    # On an admin key an unscoped listing is every user's searches, so a failed
+    # lookup fails the read instead -- and its snapshot never gets cached.
+    _galaxy_with(service, [_job("w1", "queued", created_ago=5)], {})
+    service.gi.users.get_current_user = MagicMock(side_effect=RuntimeError("down"))
+
+    with pytest.raises(Exception):
+        await service.get_kmindex_queue()
+
+    service.gi.jobs.get_jobs.assert_not_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "first", [RuntimeError("down"), {"username": "no id"}, {"id": ""}, None]
+)
+async def test_a_failed_lookup_is_not_remembered(service, first):
+    _galaxy_with(service, [], {})
+    answers = iter([first, {"id": "svc"}])
+
+    def _current_user():
+        answer = next(answers)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    service.gi.users.get_current_user = MagicMock(side_effect=_current_user)
+
+    with pytest.raises(Exception):
+        await service._service_user_id()
+    assert galaxy_service._SERVICE_USER_IDS == {}
+    assert await service._service_user_id() == "svc"
+
+
+@pytest.mark.asyncio
+async def test_a_user_credential_cannot_stand_in_for_the_service_account(service):
+    from app.core.galaxy_credential import GalaxyCredential
+
+    service.credential = GalaxyCredential(kind="user", secret="tok", user_sub="u1")
+    service.gi.users.get_current_user = MagicMock(return_value={"id": "u1-galaxy"})
+
+    with pytest.raises(Exception):
+        await service._service_user_id()
+    assert galaxy_service._SERVICE_USER_IDS == {}
 
 
 @pytest.mark.asyncio
