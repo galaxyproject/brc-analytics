@@ -11,6 +11,13 @@ case "$SITE" in
 	*) echo "Unknown site: '$SITE' (expected brc-analytics, ga2 or logan-search)" >&2; exit 1 ;;
 esac
 
+# Say so up front rather than let next build fail later on a missing analytics
+# domain; the reason is in the prod .env.
+if [ "$SITE" = "logan-search" ] && [ "$ENV" = "prod" ]; then
+	echo "logan-search has no prod build yet; see site-config/logan-search/prod/.env" >&2
+	exit 1
+fi
+
 DIR="./site-config/$SITE/images/favicons/"
 PUBLIC_DIR="$PROJECT_DIR/public/favicons/"
 # init
