@@ -1359,7 +1359,7 @@ class GalaxyService:
             marker_key = self._aggregating_key(job_id)
             if await self.cache.get(marker_key):
                 raise GalaxyJobAggregating(
-                    f"Results for job {job_id} are still being merged"
+                    f"Results for job {requested_job_id} are still being merged"
                 )
 
             # Cap cold merges within the lane: each one holds every hit in
@@ -1370,7 +1370,7 @@ class GalaxyService:
             # loop a free slot is still free when async-with takes it.
             if lane == "partner" and slots.locked():
                 raise GalaxyJobAggregating(
-                    f"Results for job {job_id} are queued behind other merges"
+                    f"Results for job {requested_job_id} are queued behind other merges"
                 )
             async with slots:
                 # Re-check: whoever held the lock may have just built it.
@@ -1382,7 +1382,7 @@ class GalaxyService:
                     # to come back rather than merging it a second time.
                     if not await self.cache.claim(marker_key, CacheTTL.ONE_HOUR):
                         raise GalaxyJobAggregating(
-                            f"Results for job {job_id} are still being merged"
+                            f"Results for job {requested_job_id} are still being merged"
                         )
                     try:
                         # Re-check once more under the claim: the other lane can

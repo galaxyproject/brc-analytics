@@ -3856,6 +3856,28 @@ class TestJobCacheCopies:
         assert service._export_state.call_args.args[1] == "orig"
 
     @pytest.mark.asyncio
+    async def test_a_copys_merge_is_claimed_under_the_original(self, wired):
+        service, _, _ = wired
+
+        await service.get_kmindex_results("copy1")
+
+        claimed = service.cache.claim.call_args.args[0]
+        assert claimed == service._aggregating_key("orig")
+
+    @pytest.mark.asyncio
+    async def test_a_copy_waiting_on_a_merge_hears_its_own_id(self, wired):
+        # The partner API hands this message back as the 202 detail, and the
+        # original's id belongs to whoever ran it first.
+        service, store, _ = wired
+        store[service._aggregating_key("orig")] = True
+
+        with pytest.raises(GalaxyJobAggregating) as raised:
+            await service.get_kmindex_results("copy1")
+
+        assert "copy1" in str(raised.value)
+        assert "orig" not in str(raised.value)
+
+    @pytest.mark.asyncio
     async def test_a_job_that_isnt_a_copy_is_its_own_source(self, wired):
         service, _, merged = wired
 
