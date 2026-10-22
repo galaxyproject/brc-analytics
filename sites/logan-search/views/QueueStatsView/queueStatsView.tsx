@@ -1,4 +1,3 @@
-"use client";
 import { LoganHero } from "@logan/components/layout/LoganHero/loganHero";
 import {
   ResultsSection,

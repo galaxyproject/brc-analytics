@@ -54,7 +54,7 @@ function sequenceLine(fasta: string): string {
  * Which indexes a search ran over, by preset name when it was exactly one.
  * @param registered - Every registered index name.
  * @param indexes - The indexes searched.
- * @returns e.g. "Eukaryotes · 6 indexes", or just the count.
+ * @returns e.g. "All · 109 indexes", or just the count.
  */
 export function describeSearchScope(
   registered: string[],

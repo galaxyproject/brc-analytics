@@ -35,14 +35,26 @@ export function busyWait(queue: KmindexQueue | null): number | null {
 }
 
 /**
+ * A sentence about the recent wait, when demand is high enough to mention.
+ * @param queue - The snapshot, or null before it lands.
+ * @param lead - Everything before the wait itself.
+ * @returns The sentence, or null when the queue is moving.
+ */
+function busySentence(queue: KmindexQueue | null, lead: string): string | null {
+  const wait = busyWait(queue);
+  return wait === null ? null : `${lead} ${formatWait(wait)} to start.`;
+}
+
+/**
  * A heads-up for someone about to submit, when demand is high.
  * @param queue - The snapshot, or null before it lands.
  * @returns The sentence, or null when the queue is moving.
  */
 export function busyNotice(queue: KmindexQueue | null): string | null {
-  const wait = busyWait(queue);
-  if (wait === null) return null;
-  return `Heads up, demand is quite high right now. Recent searches have waited about ${formatWait(wait)} to start.`;
+  return busySentence(
+    queue,
+    "Heads up, demand is quite high right now. Recent searches have waited about"
+  );
 }
 
 /**
@@ -51,7 +63,8 @@ export function busyNotice(queue: KmindexQueue | null): string | null {
  * @returns The sentence, or null when the queue is moving.
  */
 export function describeQueue(queue: KmindexQueue | null): string | null {
-  const wait = busyWait(queue);
-  if (wait === null) return null;
-  return `Demand is quite high right now; recent searches have waited about ${formatWait(wait)} to start.`;
+  return busySentence(
+    queue,
+    "Demand is quite high right now; recent searches have waited about"
+  );
 }
