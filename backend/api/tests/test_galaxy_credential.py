@@ -219,6 +219,7 @@ SERVICE_HISTORY = f"BRC ANALYTICS JOBS - {TODAY}"
 def _fresh_history_state(monkeypatch):
     monkeypatch.setattr(galaxy_service, "_HISTORY_LOCKS", defaultdict(asyncio.Lock))
     monkeypatch.setattr(galaxy_service, "_HISTORY_IDS", {})
+    monkeypatch.setattr(galaxy_service, "_SERVICE_HISTORY_DAYS", {})
     monkeypatch.setattr(galaxy_service, "_today", lambda: TODAY)
 
 
@@ -283,6 +284,45 @@ async def test_service_histories_carry_the_utc_date(monkeypatch):
         SERVICE_HISTORY,
         "BRC ANALYTICS JOBS - 2026-10-09",
     ]
+
+
+@pytest.mark.asyncio
+async def test_a_passed_days_service_entries_are_dropped(monkeypatch):
+    galaxy = FakeGalaxy()
+    await _service(galaxy)._get_or_create_shared_history()
+    user_history = await _service(
+        galaxy, credential=USER
+    )._get_or_create_shared_history()
+
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+    today = await _service(galaxy)._get_or_create_shared_history()
+
+    assert sorted(galaxy_service._HISTORY_IDS.values()) == sorted([user_history, today])
+    assert set(galaxy_service._HISTORY_LOCKS) == {
+        "u1",
+        ("service", "BRC ANALYTICS JOBS - 2026-10-09"),
+    }
+    # The bookkeeping itself doesn't grow either.
+    assert set(galaxy_service._SERVICE_HISTORY_DAYS.values()) == {"2026-10-09"}
+    assert len(galaxy_service._SERVICE_HISTORY_DAYS) == 2
+
+
+@pytest.mark.asyncio
+async def test_a_held_lock_from_a_passed_day_is_left_alone(monkeypatch):
+    galaxy = FakeGalaxy()
+    await _service(galaxy)._get_or_create_shared_history()
+    old = ("service", SERVICE_HISTORY)
+    lock = galaxy_service._HISTORY_LOCKS[old]
+    await lock.acquire()
+    monkeypatch.setattr(galaxy_service, "_today", lambda: "2026-10-09")
+
+    await _service(galaxy)._get_or_create_shared_history()
+    assert galaxy_service._HISTORY_LOCKS.get(old) is lock
+
+    # Once it's free, the next submit takes it.
+    lock.release()
+    await _service(galaxy)._get_or_create_shared_history()
+    assert old not in galaxy_service._HISTORY_LOCKS
 
 
 def test_the_date_is_the_utc_date(monkeypatch):

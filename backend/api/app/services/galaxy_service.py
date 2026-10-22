@@ -471,9 +471,42 @@ HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
 SERVICE_HISTORY_ID_TTL = 2 * CacheTTL.ONE_DAY
 
 
+# The service account's history changes name every UTC day, and each name gets
+# its own lock and id-cache entry above. This records the day of each one --
+# keyed by its lock account or its id-cache key -- so a passed day's entries can
+# be dropped instead of accumulating for as long as the process runs. A user's
+# entries are one per user and stay.
+_SERVICE_HISTORY_DAYS: Dict[object, str] = {}
+
+
 def _today() -> str:
     """Today's UTC date, which names the day's service history."""
     return datetime.now(timezone.utc).date().isoformat()
+
+
+def _forget_past_service_histories(today: str) -> None:
+    """Drop past days' service-history locks and cached ids from this process.
+
+    Redis keeps its own copies under a TTL, so this only stops the in-process
+    maps growing. A held lock is kept and tried again on a later call. That is
+    not a promise nobody is waiting on it: locked() reads False between a
+    release and the woken waiter running, so a lock can go with a waiter still
+    queued on it. That waiter re-reads the id, which Redis still has, so the
+    cost is a repeated lookup rather than a second history.
+
+    @param today: the UTC date whose entries are still in use.
+    """
+    for entry, day in list(_SERVICE_HISTORY_DAYS.items()):
+        if day == today:
+            continue
+        if isinstance(entry, tuple):
+            lock = _HISTORY_LOCKS.get(entry)
+            if lock is not None and lock.locked():
+                continue
+            _HISTORY_LOCKS.pop(entry, None)
+        else:
+            _HISTORY_IDS.pop(entry, None)
+        del _SERVICE_HISTORY_DAYS[entry]
 
 
 # One Galaxy read per cold cache, process-wide, rather than one per miss. The
@@ -2925,8 +2958,11 @@ class GalaxyService:
             logger.error(f"BioBLEND error getting dataset content: {e}")
             return f"Error retrieving dataset content: {str(e)}"
 
-    def _history_target(self) -> Tuple[str, object, int]:
+    def _history_target(self, today: str) -> Tuple[str, object, int]:
         """The history jobs land in: its name, its lock's account, its TTL.
+
+        @param today: the UTC date that names a service history, read once by
+            the caller so the name and the day it's filed under agree.
 
         Service-account jobs go to a "BRC ANALYTICS JOBS - <UTC date>" history
         (or history_name's, if the service was built with one); a signed-in
@@ -2940,7 +2976,7 @@ class GalaxyService:
         """
         if self.credential is not None and self.credential.kind == "user":
             return "BRC Logan Search", self.credential.user_sub, HISTORY_ID_TTL
-        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {_today()}"
+        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {today}"
         # Keyed by name too: two service histories on one account are separate
         # find-or-creates, and must not wait on each other.
         return name, ("service", name), SERVICE_HISTORY_ID_TTL
@@ -2970,9 +3006,15 @@ class GalaxyService:
         before anything ran, so the submit is safe to retry, and a timestamped
         stray per failure only made the account's history list longer.
         """
-        name, account, ttl = self._history_target()
+        today = _today()
+        name, account, ttl = self._history_target(today)
         key = self._history_cache_key(account, name)
         self._history_key = key
+        if isinstance(account, tuple):
+            _forget_past_service_histories(today)
+            _SERVICE_HISTORY_DAYS[account] = today
+            if key:
+                _SERVICE_HISTORY_DAYS[key] = today
 
         cached = await self._cached_history_id(key)
         if cached:
