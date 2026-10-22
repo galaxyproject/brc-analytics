@@ -11,6 +11,12 @@ import {
   within,
 } from "@testing-library/react";
 
+// Every test here renders the full 109-cell index matrix, and the slowest
+// take about 2s alone -- close enough to Jest's 5s default that a machine
+// also running lint and typecheck trips it. The headroom is for load only;
+// none of these wait on a timer.
+jest.setTimeout(15_000);
+
 // The form renders the Galaxy link prompt, which reaches for the network on
 // mount through ky -- ESM only, which Jest cannot parse. Mocking the module
 // path instead is not an option here: next/jest resolves the @brc alias in the
