@@ -12,8 +12,12 @@ from app.db.models import Base
 
 config = context.config
 
+# The app runs this in-process on startup (app.db.session._run_migrations_sync),
+# after every app.* module has created its logger. fileConfig's default would
+# disable all of them, which silenced every warning the backend logged -- and
+# Sentry's logging integration with them -- for the life of the process.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
