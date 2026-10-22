@@ -76,6 +76,20 @@ describe("LoganQueryStrip", () => {
     expect(screen.getByRole("link", { name: "New search" })).toBeTruthy();
   });
 
+  test("leaves the unattributed bucket out of a stranger's scope", () => {
+    renderStrip({
+      results: {
+        ...RESULTS,
+        per_index: [
+          ...RESULTS.per_index,
+          { hits_after_cap: 1, hits_before_cap: 1, index: "(unattributed)" },
+        ],
+      } as unknown as KmindexResults,
+    });
+
+    expect(screen.getByText("2 indexes")).toBeTruthy();
+  });
+
   test("names the job while a stranger's search is still running", () => {
     renderStrip({});
 

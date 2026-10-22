@@ -54,7 +54,7 @@ const TSV_BYTES_PER_ROW = 148;
 const SPREADSHEET_ROW_LIMIT = 1048576;
 
 // Mirrors KMINDEX_UNATTRIBUTED in the backend's galaxy_service.py.
-const UNATTRIBUTED_INDEX = "(unattributed)";
+export const UNATTRIBUTED_INDEX = "(unattributed)";
 
 // What the copy button says in each of its three states.
 const COPY_LABELS = {

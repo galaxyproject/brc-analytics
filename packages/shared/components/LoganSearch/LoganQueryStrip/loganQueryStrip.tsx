@@ -1,6 +1,7 @@
 import { Link as LinkIcon } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
 import { type RecentSearch } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import { UNATTRIBUTED_INDEX } from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
 import {
   countBases,
   indexPresets,
@@ -95,8 +96,15 @@ export const LoganQueryStrip = ({
 
   const name = entry?.queryName ?? results?.query_name ?? `Job ${jobId}`;
   const sequence = entry?.sequence;
+  // Someone else's link has only the results to go on, and their per-index
+  // rows can include the backend's bucket for shards it couldn't place,
+  // which isn't an index anyone picked.
   const indexes =
-    entry?.indexes ?? results?.per_index.map(({ index }) => index) ?? [];
+    entry?.indexes ??
+    results?.per_index
+      .map(({ index }) => index)
+      .filter((index) => index !== UNATTRIBUTED_INDEX) ??
+    [];
 
   const copyLink = async (): Promise<void> => {
     try {
