@@ -4079,3 +4079,38 @@ class TestCopyLinkIsRemembered:
         assert await service.source_job_id("copy1") == "orig"
         assert await service.source_job_id("orig") == "orig"
 
+    @pytest.mark.asyncio
+    async def test_a_chain_cut_short_by_a_failed_read_is_not_remembered(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "c1": _status_of("c1", copied_from="orig"),
+            "c2": _status_of("c2", copied_from="c1"),
+        }
+        orig_down = True
+
+        async def _status(job_id):
+            if job_id == "orig" and orig_down:
+                raise RuntimeError("transient")
+            return statuses[job_id]
+
+        service.get_job_status = AsyncMock(side_effect=_status)
+
+        # It stops at the last job that answered, as before, but says nothing
+        # of it for the next read.
+        assert await service.source_job_id("c2") == "c1"
+        assert store == {}
+
+        orig_down = False
+        assert await service.source_job_id("c2") == "orig"
+        assert list(store.values()) == ["orig"]

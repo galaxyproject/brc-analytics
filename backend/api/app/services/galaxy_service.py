@@ -1556,9 +1556,14 @@ class GalaxyService:
                 break
             seen.add(parent)
             current = parent
-        if answered[0] != job_id:
+        source, status = answered
+        # Only a walk that reached a job which isn't itself a copy is worth
+        # remembering for a month. One cut short by a failed read stops at a
+        # copy, and caching that would keep this job merging there rather than
+        # sharing the original's aggregate once Galaxy answers again.
+        if source != job_id and status is not None and not status.copied_from_job_id:
             await self.cache.set(
-                self._copy_of_key(job_id), answered[0], CacheTTL.THIRTY_DAYS
+                self._copy_of_key(job_id), source, CacheTTL.THIRTY_DAYS
             )
         return answered
 
