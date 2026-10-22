@@ -43,7 +43,7 @@
     "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^57.0.1",
+    "@databiosphere/findable-ui": "^57.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11",
     "@emotion/styled": "^11.14.1",
