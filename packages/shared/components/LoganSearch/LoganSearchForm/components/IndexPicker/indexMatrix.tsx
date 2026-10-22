@@ -85,6 +85,9 @@ export const IndexMatrix = ({
   latest.current = selected;
   // While a drag is on: whether it is turning cells on or off.
   const painting = useRef<boolean | null>(null);
+  // A touch that turns into a scroll still fires pointerdown, so touch
+  // toggles on the tap's click instead, which a scroll never sends.
+  const lastPointer = useRef<string | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const [hover, setHover] = useState<Position | null>(null);
   const [focus, setFocus] = useState<Position>(() => {
@@ -273,15 +276,23 @@ export const IndexMatrix = ({
                         data-crossed={crossed(row, col)}
                         data-pos={`${row}:${col}`}
                         onClick={(event): void => {
-                          // Pointer clicks are handled on pointerdown so a
-                          // drag can start there. A click with no pointer
-                          // behind it is the keyboard or assistive tech.
-                          if (event.detail === 0)
+                          // Mouse and pen clicks are handled on pointerdown
+                          // so a drag can start there. A click with no
+                          // pointer behind it is the keyboard or assistive
+                          // tech, and a touch is handled here (see above).
+                          if (
+                            event.detail === 0 ||
+                            lastPointer.current === "touch"
+                          )
                             setCell(index, !latest.current.includes(index));
                         }}
                         onFocus={(): void => setFocus({ col, row })}
                         onPointerDown={(event: PointerEvent): void => {
-                          // Primary button or a touch; not a right click.
+                          lastPointer.current = event.pointerType;
+                          // Touch can't drag-paint anyway: its pointer stays
+                          // captured by the cell it went down on.
+                          if (event.pointerType === "touch") return;
+                          // Primary button; not a right click.
                           if (event.button > 0) return;
                           const on = !latest.current.includes(index);
                           painting.current = on;

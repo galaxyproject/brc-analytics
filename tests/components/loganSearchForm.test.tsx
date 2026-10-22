@@ -3,6 +3,7 @@ import { LoganSearchForm } from "@repo/shared/components/LoganSearch/LoganSearch
 import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import {
+  createEvent,
   fireEvent,
   render,
   screen,
@@ -218,6 +219,17 @@ describe("LoganSearchForm busy notice", () => {
   });
 });
 
+/**
+ * Put a finger down on el. jsdom has no PointerEvent, so fireEvent drops
+ * pointerType; it is set on the event directly instead.
+ * @param el - The element touched.
+ */
+function touchDown(el: Element): void {
+  const event = createEvent.pointerDown(el, { button: 0 });
+  Object.defineProperty(event, "pointerType", { value: "touch" });
+  fireEvent(el, event);
+}
+
 describe("LoganSearchForm index picker", () => {
   test("offers a card per Logan group", () => {
     renderForm();
@@ -373,6 +385,31 @@ describe("LoganSearchForm index picker", () => {
 
     expect(sentence()).toBe(
       "Searching 4 of 109 indexes: GENOMIC_HUMAN, GENOMIC_INV, METAGENOMIC_HUMAN, TRANSCRIPTOMIC_HUMAN."
+    );
+  });
+
+  test("a touch that turns into a scroll leaves the cell alone", () => {
+    renderForm();
+
+    // Swiping across the matrix to scroll it starts on a cell, and the
+    // browser cancels the pointer once it takes the gesture as a scroll.
+    touchDown(cell("Genomic", "Bacteria"));
+    fireEvent.pointerCancel(window);
+
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "false"
+    );
+  });
+
+  test("a tap toggles a cell once", () => {
+    renderForm();
+
+    touchDown(cell("Genomic", "Bacteria"));
+    fireEvent.pointerUp(window);
+    fireEvent.click(cell("Genomic", "Bacteria"), { detail: 1 });
+
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "true"
     );
   });
 
