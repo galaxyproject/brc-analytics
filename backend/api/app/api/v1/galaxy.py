@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from bioblend import ConnectionError as BioblendConnectionError
@@ -575,10 +576,9 @@ async def export_kmindex_results(
     This is the whole match set, not the 50,000 the results endpoint pages and
     not the 25 rows it annotates -- on a real job, 1,133,516 rows against a
     displayed 50,000. It was written once during aggregation, which is the only
-    moment the full list exists, so this only ever serves a finished file. The
-    one Galaxy read is the job's status, usually cached, to find a job-cache
-    copy's original, which the file was written under; if Galaxy can't answer,
-    the file is looked up under the job asked for.
+    moment the full list exists, so this only ever serves a finished file.
+    Galaxy is only asked when there is no file under the job asked for, to find
+    a job-cache copy's original, which the file was written under.
 
     parquet is the file as materialized, served byte for byte (16 MB on the
     measured job). tsv is converted on the way out for anything that wants a
@@ -605,10 +605,22 @@ async def export_kmindex_results(
     return await serve_kmindex_export(job_id, format, galaxy_service)
 
 
+def _usable_export(path: Path) -> bool:
+    """Whether the file at path is there and written by the current scorer.
+
+    @param path: a candidate export file.
+    @returns: True only for a current, readable file.
+    """
+    try:
+        return path.is_file() and export_is_current(path)
+    except Exception:
+        return False
+
+
 async def serve_kmindex_export(
     job_id: str,
     format: str,
-    galaxy_service: Optional[GalaxyService] = None,
+    galaxy_service: GalaxyService,
     filters: Optional[KmindexFilters] = None,
 ) -> Response:
     """
@@ -620,15 +632,31 @@ async def serve_kmindex_export(
     @param job_id: the completed kmindex job.
     @param format: parquet or tsv.
     @param galaxy_service: to find a job-cache copy's original, which the file
-        was written under. Without one, the file is looked up under job_id.
+        was written under, when there is no usable one under job_id itself.
     @param filters: a non-empty filter to narrow a TSV download, or None.
     @returns: the file response, named for job_id either way.
     """
-    source_job_id = job_id
-    if galaxy_service is not None and galaxy_service.is_available():
+    export_dir = get_settings().KMINDEX_EXPORT_DIR
+    path = export_file_path(export_dir, job_id)
+    if path is None:
+        # No export directory, or an id that can't name a file: there is
+        # nothing to find under an original either.
+        raise HTTPException(
+            status_code=404,
+            detail=f"No downloadable export for job {job_id}",
+        )
+    # Only a job-cache copy lacks a usable file of its own, so downloading an
+    # original never waits on Galaxy, which can take 30s to fail when it's
+    # down. A stale file counts as missing: a copy can still hold one written
+    # before copies shared their original's, and nothing rewrites it now.
+    # source_job_id reads a remembered link from Redis before asking Galaxy,
+    # so a known copy resolves even with Galaxy off.
+    if not await asyncio.to_thread(_usable_export, path):
         source_job_id = await galaxy_service.source_job_id(job_id)
-    path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, source_job_id)
-    if path is None or not path.is_file():
+        source_path = export_file_path(export_dir, source_job_id)
+        if source_job_id != job_id and source_path is not None:
+            path = source_path
+    if not path.is_file():
         raise HTTPException(
             status_code=404,
             detail=f"No downloadable export for job {job_id}",

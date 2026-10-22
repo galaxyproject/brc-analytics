@@ -519,6 +519,35 @@ def test_a_request_is_charged_to_the_budget_once(partner_env):
     assert limiter.check.await_count == 1
 
 
+def test_a_copys_export_is_its_originals_file(partner_env, tmp_path, monkeypatch):
+    import duckdb
+
+    from app.api.v1 import galaxy as galaxy_module
+
+    client, galaxy, _ = partner_env
+    path = tmp_path / "orig.parquet"
+    duckdb.sql(
+        "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+        f"TO '{path}' (FORMAT parquet)"
+    )
+    monkeypatch.setattr(
+        galaxy_module,
+        "export_file_path",
+        lambda _d, job_id: path if job_id == "orig" else tmp_path / f"{job_id}.parquet",
+    )
+    monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+    galaxy.source_job_id = AsyncMock(return_value="orig")
+
+    response = client.get(
+        f"{BASE}/jobs/{JOB_ID}/export?format=parquet", headers=HEADERS
+    )
+
+    assert response.status_code == 200
+    assert response.content == path.read_bytes()
+    assert JOB_ID in response.headers["content-disposition"]
+    galaxy.source_job_id.assert_awaited_once_with(JOB_ID)
+
+
 @pytest.mark.parametrize("fmt", ["tsv", "parquet"])
 def test_an_export_streams_with_its_sunset(partner_env, tmp_path, monkeypatch, fmt):
     import duckdb

@@ -2054,13 +2054,15 @@ class TestExportEndpoint:
     """
 
     @staticmethod
-    def _client(export_dir, monkeypatch):
+    def _client(export_dir, monkeypatch, galaxy=None):
         """A test client over the galaxy router alone, with the export
         directory configured.
 
         @param export_dir: value for KMINDEX_EXPORT_DIR, or None to leave it
             unset.
         @param monkeypatch: the test's monkeypatch fixture.
+        @param galaxy: the service the endpoint gets; by default one that
+            knows of no copies, so no test here can reach a real Galaxy.
         @returns: a TestClient.
         """
         from fastapi import FastAPI
@@ -2074,10 +2076,27 @@ class TestExportEndpoint:
             monkeypatch.setenv("KMINDEX_EXPORT_DIR", str(export_dir))
         get_settings.cache_clear()
 
+        if galaxy is None:
+            galaxy = MagicMock()
+            galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
         app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: galaxy
         return TestClient(app)
+
+    @staticmethod
+    def _copy_of(original):
+        """A service that knows every job asked about is a copy of original."""
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(return_value=original)
+        return galaxy
+
+    @staticmethod
+    def _never_asked():
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("asked Galaxy"))
+        return galaxy
 
     @staticmethod
     def _export(directory, job_id="job1", accessions=("SRR1", "SRR2"), columns=None):
@@ -2152,6 +2171,54 @@ class TestExportEndpoint:
         assert (
             client.get("/galaxy/kmindex/jobs/job1/export?format=tsv").status_code == 404
         )
+
+    def test_a_copy_with_no_file_of_its_own_downloads_its_originals(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig", accessions=("SRR1", "SRR2", "SRR3"))
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+        assert "copy1" in response.headers["content-disposition"]
+
+    def test_a_copys_stale_file_gives_way_to_its_originals(self, tmp_path, monkeypatch):
+        # Written under the copy's own id before copies shared their
+        # original's, and before the score correction. Nothing rewrites it.
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig")
+        self._export(
+            tmp_path,
+            job_id="copy1",
+            columns=[c for c in EXPORT_COLUMNS if c not in ("ani", "fp_correction")],
+        )
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+
+    def test_an_original_with_a_current_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        self._export(tmp_path)
+
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 200
+
+    def test_a_download_that_cannot_name_a_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job.1/export").status_code == 404
+
+        monkeypatch.delenv("KMINDEX_EXPORT_DIR", raising=False)
+        client = self._client(None, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 404
 
     def test_a_job_id_that_is_not_an_identifier_404s(self, tmp_path, monkeypatch):
         # It is a filename here, so it never gets to be a path.
@@ -3891,7 +3958,10 @@ class TestExportOfACopy:
         monkeypatch.setattr(
             galaxy_module,
             "export_file_path",
-            lambda _d, job_id: looked_up.append(job_id) or path,
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
         )
         monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
         galaxy = MagicMock()
@@ -3900,8 +3970,32 @@ class TestExportOfACopy:
 
         response = await galaxy_module.serve_kmindex_export("copy1", "parquet", galaxy)
 
-        assert looked_up == ["orig"]
+        assert looked_up == ["copy1", "orig"]
         assert "copy1" in response.headers["content-disposition"]
+
+    @pytest.mark.asyncio
+    async def test_an_original_with_its_own_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        import duckdb
+
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        duckdb.sql(
+            "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+            f"TO '{path}' (FORMAT parquet)"
+        )
+        monkeypatch.setattr(galaxy_module, "export_file_path", lambda _d, _j: path)
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("Galaxy"))
+
+        response = await galaxy_module.serve_kmindex_export("orig", "parquet", galaxy)
+
+        assert "orig" in response.headers["content-disposition"]
+        galaxy.source_job_id.assert_not_awaited()
 
     @pytest.mark.asyncio
     async def test_a_filtered_download_of_a_copy_is_cut_from_the_originals_file(
@@ -3915,7 +4009,10 @@ class TestExportOfACopy:
         monkeypatch.setattr(
             galaxy_module,
             "export_file_path",
-            lambda _d, job_id: looked_up.append(job_id) or path,
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
         )
         monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
         monkeypatch.setattr(galaxy_module, "subset_row_count", lambda _p, _f: 1)
@@ -3936,7 +4033,7 @@ class TestExportOfACopy:
             _rate_limit=None,
         )
 
-        assert looked_up == ["orig"]
+        assert looked_up == ["copy1", "orig"]
         disposition = response.headers["content-disposition"]
         assert "copy1" in disposition and "filtered" in disposition
 
@@ -3967,3 +4064,18 @@ class TestCopyLinkIsRemembered:
         service.get_job_status = AsyncMock(side_effect=RuntimeError("down"))
         assert await service.source_job_id("copy1") == "orig"
         service.get_job_status.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_remembered_link_resolves_with_galaxy_off(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        store[service._copy_of_key("copy1")] = "orig"
+        service.gi = None
+
+        assert not service.is_available()
+        assert await service.source_job_id("copy1") == "orig"
+        assert await service.source_job_id("orig") == "orig"
+
