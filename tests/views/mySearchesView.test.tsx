@@ -10,7 +10,7 @@ import {
 } from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
 import { type AppSiteConfig } from "@repo/shared/config/types";
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import ky from "ky";
 
 jest.mock("ky", () => {
@@ -167,6 +167,47 @@ describe("MySearchesView", () => {
       await screen.findByText(/Demand is quite high right now/)
     ).toBeTruthy();
     expect(screen.getByText(/A queued search hasn.t failed/)).toBeTruthy();
+  });
+
+  test("keeps checking a search until it settles, and only that one", async () => {
+    jest.useFakeTimers();
+    try {
+      window.localStorage.setItem(
+        RECENT_SEARCHES_KEY,
+        JSON.stringify([entry("waiting"), entry("done")])
+      );
+      let finished = false;
+      mockKy.get.mockImplementation((url: string) =>
+        galaxy(finished ? url.replace("/waiting/", "/done/") : url)
+      );
+      const statusCalls = (jobId: string): number =>
+        mockKy.get.mock.calls.filter(([url]) =>
+          String(url).includes(`/jobs/${jobId}/status`)
+        ).length;
+
+      renderPage();
+      const row = (jobId: string): HTMLElement =>
+        screen.getByText(`query_${jobId}`).closest("li") as HTMLElement;
+      expect(await within(row("waiting")).findByText("Queued")).toBeTruthy();
+      expect(await within(row("done")).findByText("Done")).toBeTruthy();
+
+      finished = true;
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(60_000);
+      });
+
+      expect(within(row("waiting")).getByText("Done")).toBeTruthy();
+      expect(statusCalls("waiting")).toBe(2);
+      // Already finished: nothing later could change it.
+      expect(statusCalls("done")).toBe(1);
+
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(60_000);
+      });
+      expect(statusCalls("waiting")).toBe(2);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   test("says nothing about the queue when nothing is waiting", async () => {
