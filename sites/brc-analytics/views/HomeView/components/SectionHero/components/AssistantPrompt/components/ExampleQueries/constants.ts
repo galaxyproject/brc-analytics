@@ -22,14 +22,6 @@ export const EXAMPLE_CATEGORIES: ExampleCategory[] = [
       "Which workflows can I run on Anopheles gambiae RNA-seq data?",
     ],
   },
-  {
-    label: "Sequencing data",
-    queries: [
-      "What public sequencing data do you have for Aedes aegypti?",
-      "Which countries have the most Plasmodium vivax samples?",
-      "Find RNA-seq runs for Trypanosoma cruzi",
-    ],
-  },
 ];
 
 export const MENU_PROPS: Partial<MenuProps> = {
