@@ -14,16 +14,11 @@ export const MDX_COMPONENTS: MDXComponents = {
   Alert,
   AnchorLink,
   Figure,
+  LightboxFigure,
   SectionContentCards,
   SectionOverview,
   VegaEmbed,
   Video,
   a: Link,
   table: Table,
-};
-
-// Blog posts add the lightbox figure; other learn pages don't register it.
-export const BLOG_MDX_COMPONENTS: MDXComponents = {
-  ...MDX_COMPONENTS,
-  LightboxFigure,
 };
