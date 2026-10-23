@@ -441,16 +441,14 @@ requires Python 3.8 or later, and depends only on standard scientific libraries 
 
 The two pipelines do the same job in the same order. What differs is the implementation of each stage:
 
-<Figure
+<LightboxFigure
   alt="The legacy CDC typing pipeline and PyEuk compared stage by stage"
   caption={
-    <figcaption>
-      <span>
-        Figure 1. The legacy CDC pipeline and PyEuk side by side. The two do the
-        same job in the same order; what differs is the implementation of each
-        stage.
-      </span>
-    </figcaption>
+    <span>
+      Figure 1. The legacy CDC pipeline and PyEuk side by side. The two do the
+      same job in the same order; what differs is the implementation of each
+      stage.
+    </span>
   }
   src="/learn/blog/genotyping-cyclospora-from-haplotype-calls-to-outbreak-clusters/pipeline-compare.svg"
 />
@@ -462,16 +460,14 @@ scores 144 of the 153 specimens because 9 fall below its completeness filter.
 
 ### Workflow overview
 
-<Figure
+<LightboxFigure
   alt="PyEuk's path from a haplotype sheet to outbreak clusters"
   caption={
-    <figcaption>
-      <span>
-        Figure 2. PyEuk's path from a haplotype sheet to outbreak clusters:
-        completeness filtering, allele weighting, pairwise distance, Euclidean
-        repair, Ward linkage and dynamic tree cutting.
-      </span>
-    </figcaption>
+    <span>
+      Figure 2. PyEuk's path from a haplotype sheet to outbreak clusters:
+      completeness filtering, allele weighting, pairwise distance, Euclidean
+      repair, Ward linkage and dynamic tree cutting.
+    </span>
   }
   src="/learn/blog/genotyping-cyclospora-from-haplotype-calls-to-outbreak-clusters/distance-path.svg"
 />

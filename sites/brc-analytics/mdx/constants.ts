@@ -1,6 +1,7 @@
 import { Alert } from "@databiosphere/findable-ui/lib/components/common/Alert/alert";
 import { AnchorLink } from "@databiosphere/findable-ui/lib/components/common/AnchorLink/anchorLink";
 import { Figure } from "@repo/shared/components/mdx/Figure/figure";
+import { LightboxFigure } from "@repo/shared/components/mdx/LightboxFigure/lightboxFigure";
 import { Link } from "@repo/shared/components/mdx/Link/link";
 import { Table } from "@repo/shared/components/mdx/Table/table";
 import { VegaEmbed } from "@repo/shared/components/mdx/VegaEmbed/vegaEmbed";
@@ -13,6 +14,7 @@ export const MDX_COMPONENTS: MDXComponents = {
   Alert,
   AnchorLink,
   Figure,
+  LightboxFigure,
   SectionContentCards,
   SectionOverview,
   VegaEmbed,
