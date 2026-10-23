@@ -1,13 +1,21 @@
-import { LOGAN_EXAMPLES } from "@brc/components/LoganSearch/LoganSearchForm/examples";
-import { LoganSearchForm } from "@brc/components/LoganSearch/LoganSearchForm/loganSearchForm";
+import { LOGAN_EXAMPLES } from "@repo/shared/components/LoganSearch/LoganSearchForm/examples";
+import { LoganSearchForm } from "@repo/shared/components/LoganSearch/LoganSearchForm/loganSearchForm";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
 import {
+  createEvent,
   fireEvent,
   render,
   screen,
   waitFor,
   within,
 } from "@testing-library/react";
+
+// Every test here renders the full 109-cell index matrix, and the slowest
+// take about 2s alone -- close enough to Jest's 5s default that a machine
+// also running lint and typecheck trips it. The headroom is for load only;
+// none of these wait on a timer.
+jest.setTimeout(15_000);
 
 // The form renders the Galaxy link prompt, which reaches for the network on
 // mount through ky -- ESM only, which Jest cannot parse. Mocking the module
@@ -16,6 +24,12 @@ import {
 jest.mock("ky", () => ({
   __esModule: true,
   default: { get: jest.fn(), post: jest.fn() },
+}));
+
+// The busy notice reads the queue snapshot; null is "not landed yet", which
+// shows nothing, so every other test sees the form as it always was.
+jest.mock("@repo/shared/hooks/useKmindexQueue", () => ({
+  useKmindexQueue: jest.fn(() => null),
 }));
 
 type Search = ReturnType<typeof useKmindexSearch>;
@@ -58,7 +72,11 @@ const INDEXES = STRATEGY_CODES.flatMap((strategy) =>
 
 const VIRAL_ONLY = INDEXES.filter((index) => index.endsWith("_VRL"));
 
-const DEFAULT_SENTENCE = "Searching 1 of 109 indexes: GENOMIC_INV.";
+const DEFAULT_SENTENCE =
+  "Searching 1 of 109 indexes: invertebrate genomic, where the sample query's hits are.";
+
+// The same single index, once someone has picked it rather than inherited it.
+const PICKED_INV = "Searching 1 of 109 indexes: GENOMIC_INV.";
 
 /**
  * A search-hook stub carrying only what the form reads.
@@ -99,34 +117,65 @@ function renderForm(overrides: Record<string, unknown> = {}): {
 }
 
 /**
- * One of the two chip rows.
- * @param name - The row's label, which names its group.
+ * A labelled group of buttons: the scope cards or the examples.
+ * @param name - The group's accessible name.
  * @returns The group element.
  */
-function row(name: string): HTMLElement {
+function group(name: string): HTMLElement {
   return screen.getByRole("group", { name });
 }
 
 /**
- * A chip in a row.
- * @param name - The row's label.
+ * A chip in a labelled group.
+ * @param name - The group's name.
  * @param label - The chip's text.
  * @returns The chip, which is the element carrying the button role.
  */
 function chip(name: string, label: string): HTMLElement {
-  return within(row(name)).getByRole("button", { name: label });
+  return within(group(name)).getByRole("button", { name: label });
 }
 
 /**
- * The tooltip a chip shows, hovering the chip itself -- an unavailable value
- * is marked rather than disabled, so it still takes pointer events.
- * @param name - The row's label.
- * @param label - The chip's text.
- * @returns The tooltip text.
+ * A scope card, found by its title. A card's accessible name is all of its
+ * text, so the title is matched at the start.
+ * @param title - The card's title.
+ * @returns The card.
  */
-async function tooltipOf(name: string, label: string): Promise<string> {
-  fireEvent.mouseOver(chip(name, label));
-  return (await screen.findByRole("tooltip")).textContent ?? "";
+function card(title: string): HTMLElement {
+  return within(group("Index presets")).getByRole("button", {
+    // The title, then the note, which starts with a capital: so "All" doesn't
+    // also find "All but viral and human".
+    name: new RegExp(`^${title} [A-Z]`),
+  });
+}
+
+/**
+ * One matrix cell.
+ * @param library - The library type's label.
+ * @param organism - The organism group's label.
+ * @returns The cell's button.
+ */
+function cell(library: string, organism: string): HTMLElement {
+  return screen.getByRole("button", { name: `${library}, ${organism}` });
+}
+
+/**
+ * A row or column label on the matrix.
+ * @param label - The organism group's or library type's label.
+ * @returns The label's button.
+ */
+function line(label: string): HTMLElement {
+  return screen.getByRole("button", {
+    name: new RegExp(`^${label}, \\d+ index`),
+  });
+}
+
+/**
+ * The sentence beside the Search button.
+ * @returns Its text.
+ */
+function sentence(): string {
+  return screen.getByText(/^(Searching|Pick at least)/).textContent ?? "";
 }
 
 /**
@@ -139,142 +188,265 @@ function searchButton(): HTMLButtonElement {
   }) as HTMLButtonElement;
 }
 
-describe("LoganSearchForm index picker", () => {
-  test("offers All plus every registered value on each row", () => {
-    renderForm();
-
-    expect(within(row("Organism")).getAllByRole("button")).toHaveLength(14);
-    expect(within(row("Library type")).getAllByRole("button")).toHaveLength(10);
-    expect(
-      within(row("Organism"))
-        .getAllByRole("button")
-        .slice(0, 4)
-        .map((button) => button.textContent)
-    ).toEqual(["All", "Bacteria", "Viruses", "Phage"]);
+describe("LoganSearchForm busy notice", () => {
+  const snapshot = (oldest: number | null): unknown => ({
+    as_of: "2026-10-15T14:18:07+00:00",
+    oldest_waiting_minutes: oldest,
+    recent_searches: 0,
+    recent_wait_minutes: null,
+    recent_wait_p90_minutes: null,
+    running: 1,
+    waiting: oldest === null ? 0 : 4,
+    window_minutes: 120,
   });
 
-  test("starts on the pair the sample query was written for", () => {
-    renderForm();
-
-    expect(chip("Organism", "Invertebrates").getAttribute("aria-pressed")).toBe(
-      "true"
-    );
-    expect(chip("Library type", "Genomic").getAttribute("aria-pressed")).toBe(
-      "true"
-    );
-    expect(chip("Organism", "All").getAttribute("aria-pressed")).toBe("false");
-    expect(chip("Library type", "All").getAttribute("aria-pressed")).toBe(
-      "false"
-    );
-    expect(screen.getByText(DEFAULT_SENTENCE)).toBeTruthy();
+  afterEach(() => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(null);
   });
 
-  test("adding an organism adds its index", () => {
+  test("warns before submitting when searches are backed up", () => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(snapshot(100));
+
     renderForm();
-
-    fireEvent.click(chip("Organism", "Bacteria"));
-
-    expect(
-      screen.getByText("Searching 2 of 109 indexes: GENOMIC_BCT, GENOMIC_INV.")
-    ).toBeTruthy();
-  });
-
-  test("All on one row lifts that row's constraint", () => {
-    renderForm();
-
-    fireEvent.click(chip("Organism", "Bacteria"));
-    fireEvent.click(chip("Library type", "All"));
 
     expect(
       screen.getByText(
-        "Searching 18 of 109 indexes: bacteria and invertebrates; every library type."
+        "Heads up, demand is quite high right now. Recent searches have waited about 1 h 40 min to start."
       )
     ).toBeTruthy();
   });
 
-  test("All on both rows is the whole registry", () => {
+  test("says nothing when the queue is moving", () => {
+    (useKmindexQueue as jest.Mock).mockReturnValue(snapshot(4));
+
     renderForm();
 
-    fireEvent.click(chip("Library type", "All"));
-    fireEvent.click(chip("Organism", "All"));
+    expect(screen.queryByText(/demand is quite high/)).toBeNull();
+  });
+});
 
-    expect(screen.getByText("Searching all 109 indexes.")).toBeTruthy();
+/**
+ * Put a finger down on el. jsdom has no PointerEvent, so fireEvent drops
+ * pointerType; it is set on the event directly instead.
+ * @param el - The element touched.
+ */
+function touchDown(el: Element): void {
+  const event = createEvent.pointerDown(el, { button: 0 });
+  Object.defineProperty(event, "pointerType", { value: "touch" });
+  fireEvent(el, event);
+}
+
+describe("LoganSearchForm index picker", () => {
+  test("offers a card per Logan group", () => {
+    renderForm();
+
+    const titles = [
+      "All",
+      "All but viral and human",
+      "Transcriptomic",
+      "Metatranscriptomic",
+      "Metagenomic",
+    ];
+    expect(within(group("Index presets")).getAllByRole("button")).toEqual(
+      titles.map(card)
+    );
+    expect(card("All but viral and human").textContent).toContain("82 indexes");
   });
 
-  test("a value with nothing to pair with is marked, with the reason", async () => {
+  test("starts on the index the sample query was written for", () => {
     renderForm();
 
-    expect(
-      chip("Organism", "Environmental").getAttribute("aria-disabled")
-    ).toBe("true");
-    expect(await tooltipOf("Organism", "Environmental")).toBe(
-      "ENV: no index pairs it with the selected library types."
+    expect(sentence()).toBe(DEFAULT_SENTENCE);
+    for (const preset of within(group("Index presets")).getAllByRole("button"))
+      expect(preset.getAttribute("aria-pressed")).toBe("false");
+    expect(cell("Genomic", "Invertebrates").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(screen.getByText("of 109 indexes")).toBeTruthy();
+  });
+
+  test("says why the default is what it is until something is picked", () => {
+    renderForm();
+    const why = /where the sample query's hits are/;
+
+    expect(sentence()).toMatch(why);
+    fireEvent.click(card("Metagenomic"));
+    expect(sentence()).not.toMatch(why);
+    fireEvent.click(cell("Metagenomic", "Bacteria"));
+    fireEvent.click(line("Metagenomic"));
+    expect(sentence()).not.toMatch(why);
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(sentence()).toMatch(why);
+  });
+
+  test("a card selects its scope and lights up", () => {
+    const { submit } = renderForm();
+
+    fireEvent.click(card("All but viral and human"));
+    fireEvent.click(searchButton());
+
+    expect(card("All but viral and human").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    const sent: string[] = submit.mock.calls[0][0].indexes;
+    expect(sent).toHaveLength(82);
+    expect(sent.some((index) => /_(VRL|PHG|HUMAN)$/.test(index))).toBe(false);
+  });
+
+  test("names the logan-search.org group on each card", () => {
+    renderForm();
+
+    expect(card("All but viral and human").textContent).toContain(
+      "logan-search.org:All_No_viral_human"
+    );
+  });
+
+  test("says why some logan-search.org groups are missing", async () => {
+    renderForm();
+
+    fireEvent.mouseOver(
+      screen.getByLabelText("Why some logan-search.org groups are missing")
     );
 
-    fireEvent.click(chip("Library type", "All"));
-
-    expect(
-      chip("Organism", "Environmental").getAttribute("aria-disabled")
-    ).toBeNull();
+    const tip = (await screen.findByRole("tooltip")).textContent;
+    expect(tip).toMatch(/Fast groups aren't here/);
+    expect(tip).toMatch(/GenBank_RefSeq/);
   });
 
-  test("an unavailable value keeps its place in the tab order", () => {
+  test("shows the matrix from the start, with a phone-only toggle", () => {
     renderForm();
 
-    expect(chip("Organism", "Environmental").getAttribute("tabindex")).toBe(
-      "0"
+    expect(screen.getByRole("grid")).toBeTruthy();
+    // Hidden by CSS until the screen is phone-sized, which jsdom never is, so
+    // it has no accessible name here and is found by its text instead.
+    const toggle = screen.getByText("Pick index by index");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.textContent).toBe("Hide the matrix");
+  });
+
+  test("a cell adds or drops its index", () => {
+    renderForm();
+
+    fireEvent.click(cell("Genomic", "Bacteria"));
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "true"
+    );
+    expect(sentence()).toBe(
+      "Searching 2 of 109 indexes: GENOMIC_BCT, GENOMIC_INV."
+    );
+
+    fireEvent.click(cell("Genomic", "Invertebrates"));
+    expect(sentence()).toBe("Searching 1 of 109 indexes: GENOMIC_BCT.");
+  });
+
+  test("a row label takes the whole row, then drops it", () => {
+    renderForm();
+
+    fireEvent.click(line("Bacteria"));
+    expect(sentence()).toBe(
+      "Searching 10 of 109 indexes: a custom set across 9 library types and 2 organism groups."
+    );
+    expect(line("Bacteria").getAttribute("aria-pressed")).toBe("true");
+
+    fireEvent.click(line("Bacteria"));
+    expect(sentence()).toBe(PICKED_INV);
+  });
+
+  test("a column label that matches a card lights the card", () => {
+    renderForm();
+
+    fireEvent.click(cell("Genomic", "Invertebrates"));
+    fireEvent.click(line("Metagenomic"));
+
+    expect(card("Metagenomic").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  test("the corner All takes everything, and clearing it closes Search", () => {
+    renderForm();
+
+    fireEvent.click(within(screen.getByRole("grid")).getByText("All"));
+    expect(sentence()).toBe("Searching all 109 indexes.");
+    expect(card("All").getAttribute("aria-pressed")).toBe("true");
+
+    fireEvent.click(within(screen.getByRole("grid")).getByText("All"));
+    expect(sentence()).toBe("Pick at least one index to search.");
+    expect(searchButton().disabled).toBe(true);
+  });
+
+  test("a drag paints every cell it crosses the way the first one went", () => {
+    renderForm();
+
+    fireEvent.pointerDown(cell("Genomic", "Human"), { button: 0 });
+    fireEvent.pointerEnter(cell("Metagenomic", "Human"));
+    fireEvent.pointerEnter(cell("Transcriptomic", "Human"));
+    fireEvent.pointerUp(window);
+    // Released: passing over a cell no longer paints it.
+    fireEvent.pointerEnter(cell("Synthetic", "Human"));
+
+    expect(sentence()).toBe(
+      "Searching 4 of 109 indexes: GENOMIC_HUMAN, GENOMIC_INV, METAGENOMIC_HUMAN, TRANSCRIPTOMIC_HUMAN."
     );
   });
 
-  test("clicking an unavailable value changes nothing", () => {
+  test("a touch that turns into a scroll leaves the cell alone", () => {
     renderForm();
 
-    fireEvent.click(chip("Organism", "Environmental"));
+    // Swiping across the matrix to scroll it starts on a cell, and the
+    // browser cancels the pointer once it takes the gesture as a scroll.
+    touchDown(cell("Genomic", "Bacteria"));
+    fireEvent.pointerCancel(window);
 
-    expect(screen.getByText(DEFAULT_SENTENCE)).toBeTruthy();
-    expect(chip("Organism", "Environmental").getAttribute("aria-pressed")).toBe(
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
       "false"
     );
   });
 
-  test("says so when the two rows cross to nothing", () => {
+  test("a tap toggles a cell once", () => {
     renderForm();
 
-    // The only empty product is one that was reachable a click earlier: ENV
-    // pairs with nothing genomic, but sits beside BCT under All until the
-    // library row narrows and BCT is then taken away.
-    fireEvent.click(chip("Library type", "All"));
-    fireEvent.click(chip("Organism", "Bacteria"));
-    fireEvent.click(chip("Organism", "Invertebrates"));
-    fireEvent.click(chip("Organism", "Environmental"));
-    fireEvent.click(chip("Library type", "Genomic"));
-    fireEvent.click(chip("Organism", "Bacteria"));
+    touchDown(cell("Genomic", "Bacteria"));
+    fireEvent.pointerUp(window);
+    fireEvent.click(cell("Genomic", "Bacteria"), { detail: 1 });
 
-    expect(screen.getByText("No index matches that combination.")).toBeTruthy();
-    expect(searchButton().disabled).toBe(true);
-  });
-
-  test("an enabled chip names its code, its count and its caveat", async () => {
-    renderForm();
-
-    expect(await tooltipOf("Organism", "Invertebrates")).toBe(
-      "INV: 9 indexes. GenBank's invertebrate division, which also holds " +
-        "protists such as Plasmodium."
+    expect(cell("Genomic", "Bacteria").getAttribute("aria-pressed")).toBe(
+      "true"
     );
   });
 
-  test("submits the product the chips describe", () => {
-    const { submit } = renderForm();
+  test("shows a hole in the grid as a hole, not a cell", () => {
+    renderForm();
 
-    fireEvent.click(searchButton());
+    expect(
+      screen.queryByRole("button", { name: "Genomic, Environmental" })
+    ).toBeNull();
+    expect(
+      screen.getByTitle("No genomic index for environmental")
+    ).toBeTruthy();
+    expect(cell("Metagenomic", "Environmental")).toBeTruthy();
+  });
 
-    expect(submit).toHaveBeenCalledTimes(1);
-    expect(submit).toHaveBeenCalledWith({
-      indexes: ["GENOMIC_INV"],
-      sequence: expect.stringContaining("Plasmodium_falciparum_18S"),
-      threshold: 0.5,
-      zvalue: 6,
-    });
+  test("is one tab stop, moved by the arrow keys past holes", () => {
+    renderForm();
+    const grid = screen.getByRole("grid");
+
+    const stops = within(grid)
+      .getAllByRole("button")
+      .filter((button) => button.getAttribute("tabindex") === "0");
+    expect(stops).toEqual([cell("Genomic", "Invertebrates")]);
+
+    cell("Genomic", "Human").focus();
+    fireEvent.keyDown(cell("Genomic", "Human"), { key: "ArrowDown" });
+    // Genomic has no environmental index, so the step lands a row further.
+    expect(document.activeElement).toBe(cell("Genomic", "Unclassified"));
+
+    fireEvent.keyDown(document.activeElement as Element, { key: "ArrowLeft" });
+    expect(document.activeElement).toBe(line("Unclassified"));
   });
 
   test("hands an accepted search to the history list", async () => {
@@ -287,10 +459,17 @@ describe("LoganSearchForm index picker", () => {
     fireEvent.click(searchButton());
 
     await waitFor(() => expect(onSubmitted).toHaveBeenCalledTimes(1));
+    expect(submit).toHaveBeenCalledWith({
+      indexes: ["GENOMIC_INV"],
+      sequence: expect.stringContaining("Plasmodium_falciparum_18S"),
+      threshold: 0.5,
+      zvalue: 6,
+    });
     expect(onSubmitted).toHaveBeenCalledWith({
       indexes: ["GENOMIC_INV"],
       jobId: "job123",
       queryName: "Plasmodium_falciparum_18S",
+      sequence: submit.mock.calls[0][0].sequence,
       submittedAt: expect.any(String),
       threshold: 0.5,
     });
@@ -309,14 +488,14 @@ describe("LoganSearchForm index picker", () => {
     expect(onSubmitted).not.toHaveBeenCalled();
   });
 
-  test("Reset puts both rows back to the derived default", () => {
+  test("Reset puts the selection back to the derived default", () => {
     const { reset } = renderForm();
 
-    fireEvent.click(chip("Organism", "Bacteria"));
+    fireEvent.click(card("All"));
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
     expect(reset).toHaveBeenCalledTimes(1);
-    expect(screen.getByText(DEFAULT_SENTENCE)).toBeTruthy();
+    expect(sentence()).toBe(DEFAULT_SENTENCE);
   });
 
   test("falls back to the first index when the instance lacks the default", () => {
@@ -324,15 +503,8 @@ describe("LoganSearchForm index picker", () => {
 
     // Not All: resting on everything would make one click on an untouched
     // form the most expensive job the instance can run.
-    expect(chip("Organism", "Viruses").getAttribute("aria-pressed")).toBe(
-      "true"
-    );
-    expect(chip("Library type", "Genomic").getAttribute("aria-pressed")).toBe(
-      "true"
-    );
-    expect(
-      screen.getByText("Searching 1 of 9 indexes: GENOMIC_VRL.")
-    ).toBeTruthy();
+    expect(sentence()).toBe("Searching 1 of 9 indexes: GENOMIC_VRL.");
+    expect(sentence()).not.toMatch(/sample query/);
   });
 
   test("says so when the instance has no indexes at all", () => {
@@ -341,8 +513,7 @@ describe("LoganSearchForm index picker", () => {
     expect(
       screen.getByText("No indexes are available right now.")
     ).toBeTruthy();
-    expect(screen.queryByRole("group", { name: "Organism" })).toBeNull();
-    expect(screen.queryByRole("group", { name: "Library type" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Index presets" })).toBeNull();
   });
 
   test("submits a pasted FASTQ record as FASTA, named by its header", async () => {
@@ -557,82 +728,6 @@ describe("LoganSearchForm query file", () => {
     );
     expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
       before
-    );
-  });
-});
-
-describe("LoganSearchForm presets", () => {
-  test("offers Logan's groups and says why the others are missing", () => {
-    renderForm();
-
-    expect(
-      within(row("Presets"))
-        .getAllByRole("button")
-        .map((button) => button.textContent)
-    ).toEqual([
-      "All",
-      "All but viral and human",
-      "Transcriptomic",
-      "Metatranscriptomic",
-      "Metagenomic",
-    ]);
-    expect(screen.getByText(/Fast groups aren't here/)).toBeTruthy();
-    expect(screen.getByText(/GenBank_RefSeq/)).toBeTruthy();
-  });
-
-  test("a preset sets the chip rows, which stay editable", () => {
-    renderForm();
-
-    fireEvent.click(chip("Presets", "Metagenomic"));
-    expect(
-      chip("Library type", "Metagenomic").getAttribute("aria-pressed")
-    ).toBe("true");
-    expect(chip("Organism", "All").getAttribute("aria-pressed")).toBe("true");
-    expect(
-      screen.getByText(
-        "Searching 13 of 109 indexes: every organism; metagenomic."
-      )
-    ).toBeTruthy();
-
-    fireEvent.click(chip("Organism", "Bacteria"));
-    expect(
-      screen.getByText("Searching 1 of 109 indexes: METAGENOMIC_BCT.")
-    ).toBeTruthy();
-    // The rows no longer come to the preset, so it is no longer lit.
-    expect(chip("Presets", "Metagenomic").getAttribute("aria-pressed")).toBe(
-      "false"
-    );
-  });
-
-  test("submits what All but viral and human comes to", () => {
-    const { submit } = renderForm();
-
-    fireEvent.click(chip("Presets", "All but viral and human"));
-    fireEvent.click(searchButton());
-
-    const sent: string[] = submit.mock.calls[0][0].indexes;
-    expect(sent).toHaveLength(82);
-    expect(sent.some((index) => /_(VRL|PHG|HUMAN)$/.test(index))).toBe(false);
-  });
-
-  test("lights a preset reached by hand", () => {
-    renderForm();
-
-    fireEvent.click(chip("Organism", "All"));
-    fireEvent.click(chip("Library type", "All"));
-
-    expect(chip("Presets", "All").getAttribute("aria-pressed")).toBe("true");
-    expect(chip("Presets", "Transcriptomic").getAttribute("aria-pressed")).toBe(
-      "false"
-    );
-  });
-
-  test("names the logan-search.org group and its size on hover", async () => {
-    renderForm();
-
-    expect(await tooltipOf("Presets", "Transcriptomic")).toBe(
-      "Transcriptomic on logan-search.org: Bulk and single-cell " +
-        "transcriptomic libraries. 24 indexes."
     );
   });
 });

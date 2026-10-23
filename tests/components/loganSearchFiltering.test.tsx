@@ -1,18 +1,18 @@
 import {
   buildSpec,
   CohortGeography,
-} from "@brc/components/LoganSearch/CohortGeography/cohortGeography";
-import { CohortYears } from "@brc/components/LoganSearch/CohortYears/cohortYears";
-import { LoganSearchCohort } from "@brc/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
+} from "@repo/shared/components/LoganSearch/CohortGeography/cohortGeography";
+import { CohortYears } from "@repo/shared/components/LoganSearch/CohortYears/cohortYears";
+import { LoganSearchCohort } from "@repo/shared/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
 import {
   EMPTY_FILTERS,
   type LoganFilters,
   NONE_VALUE,
-} from "@brc/components/LoganSearch/LoganSearchFilters/filters";
-import { LoganSearchFilterBar } from "@brc/components/LoganSearch/LoganSearchFilters/loganSearchFilterBar";
-import { type LoganFilterControls } from "@brc/components/LoganSearch/LoganSearchFilters/types";
-import { type UseLoganFilters } from "@brc/components/LoganSearch/LoganSearchFilters/useLoganFilters";
-import { LoganSearchResults } from "@brc/components/LoganSearch/LoganSearchResults/loganSearchResults";
+} from "@repo/shared/components/LoganSearch/LoganSearchFilters/filters";
+import { LoganSearchFilterBar } from "@repo/shared/components/LoganSearch/LoganSearchFilters/loganSearchFilterBar";
+import { type LoganFilterControls } from "@repo/shared/components/LoganSearch/LoganSearchFilters/types";
+import { type UseLoganFilters } from "@repo/shared/components/LoganSearch/LoganSearchFilters/useLoganFilters";
+import { LoganSearchResults } from "@repo/shared/components/LoganSearch/LoganSearchResults/loganSearchResults";
 import {
   type KmindexCohort,
   type KmindexGeography,
