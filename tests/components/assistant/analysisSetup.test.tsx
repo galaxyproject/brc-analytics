@@ -8,6 +8,7 @@ import { AnalysisSetup } from "@repo/shared/views/AssistantView/components/Analy
 import { Action } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/action";
 import { ACTION_PLACEMENT } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/constants";
 import { FilledValue } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/components/FilledValue/filledValue";
+import { FieldRow } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/fieldRow";
 import { FieldValueSelector } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Fields/components/FieldRow/selector/fieldValueSelector";
 import { Header } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Header/header";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -63,6 +64,7 @@ describe("FilledValue", () => {
         fieldKey="organism"
         loading={false}
         onClearField={onClearField}
+        onKeyboardClear={jest.fn()}
       />
     );
     fireEvent.click(
@@ -85,6 +87,7 @@ describe("FilledValue", () => {
         fieldKey="organism"
         loading={false}
         onClearField={onClearField}
+        onKeyboardClear={jest.fn()}
       />
     );
     fireEvent.keyDown(screen.getByRole("button"), { key: "Enter" });
@@ -99,6 +102,7 @@ describe("FilledValue", () => {
         fieldKey="organism"
         loading={false}
         onClearField={onClearField}
+        onKeyboardClear={jest.fn()}
       />
     );
     fireEvent.click(screen.getByText("Plasmodium falciparum"));
@@ -113,6 +117,7 @@ describe("FilledValue", () => {
         fieldKey="organism"
         loading={true}
         onClearField={onClearField}
+        onKeyboardClear={jest.fn()}
       />
     );
     const chip = screen.getByRole("button");
@@ -136,6 +141,7 @@ describe("FilledValue", () => {
         fieldKey="data_characteristics"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
       />
     );
     expect(screen.getByText("Paired-end WGS reads")).toBeTruthy();
@@ -162,6 +168,7 @@ describe("FilledValue tooltip focus", () => {
         fieldKey="data_characteristics"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
       />
     );
     expect(getWrapper(container)?.getAttribute("tabindex")).toBe("0");
@@ -174,6 +181,7 @@ describe("FilledValue tooltip focus", () => {
         fieldKey="data_characteristics"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
       />
     );
     expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
@@ -187,9 +195,80 @@ describe("FilledValue tooltip focus", () => {
         fieldKey="organism"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
       />
     );
     expect(getWrapper(container)?.hasAttribute("tabindex")).toBe(false);
+  });
+});
+
+describe("FieldRow keyboard clear focus", () => {
+  // A chip cleared from the keyboard is disabled while the reply is in flight
+  // and then unmounts; either would otherwise drop focus to the page.
+  function renderRow(loading = false): {
+    chip: HTMLElement;
+    onClearField: jest.Mock;
+    row: HTMLElement;
+  } {
+    const onClearField = jest.fn().mockResolvedValue(undefined);
+    render(
+      <FieldRow
+        field={ORGANISM}
+        fieldKey="organism"
+        loading={loading}
+        onClearField={onClearField}
+        optional={false}
+      />
+    );
+    const chip = screen.getByRole("button");
+    const row = chip.closest<HTMLElement>('[tabindex="-1"]');
+    if (!row) throw new Error("row is not focusable");
+    return { chip, onClearField, row };
+  }
+
+  test.each(["Enter", " "])(
+    "moves focus to the row when %p clears the chip",
+    (key) => {
+      const { chip, onClearField, row } = renderRow();
+      chip.focus();
+      fireEvent.keyDown(chip, { key });
+      expect(onClearField).toHaveBeenCalledWith("organism");
+      expect(document.activeElement).toBe(row);
+    }
+  );
+
+  test.each(["Backspace", "Delete"])(
+    "moves focus to the row when %p clears the chip",
+    (key) => {
+      const { chip, onClearField, row } = renderRow();
+      chip.focus();
+      fireEvent.keyUp(chip, { key });
+      expect(onClearField).toHaveBeenCalledWith("organism");
+      expect(document.activeElement).toBe(row);
+    }
+  );
+
+  test("leaves focus alone when the × is clicked", () => {
+    const { chip, onClearField } = renderRow();
+    // A pointer press on the × focuses the chip; jsdom doesn't, so focus it.
+    chip.focus();
+    fireEvent.click(getDeleteIcon(chip));
+    expect(onClearField).toHaveBeenCalledWith("organism");
+    expect(document.activeElement).toBe(chip);
+  });
+
+  test("leaves focus on the chip while a reply is in flight", () => {
+    const { chip, onClearField } = renderRow(true);
+    chip.focus();
+    fireEvent.keyDown(chip, { key: "Enter" });
+    fireEvent.keyUp(chip, { key: "Backspace" });
+    expect(onClearField).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(chip);
+  });
+
+  test("keeps the row out of the tab order", () => {
+    const { row } = renderRow();
+    expect(row.tabIndex).toBe(-1);
   });
 });
 
@@ -205,6 +284,7 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
         optional={false}
       />
     );
@@ -218,6 +298,7 @@ describe("FieldValueSelector", () => {
         fieldKey="organism"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
         optional={false}
       />
     );
@@ -231,6 +312,7 @@ describe("FieldValueSelector", () => {
         fieldKey="gene_annotation"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
         optional
       />
     );
@@ -249,6 +331,7 @@ describe("FieldValueSelector", () => {
         fieldKey="assembly"
         loading={false}
         onClearField={jest.fn()}
+        onKeyboardClear={jest.fn()}
         optional={false}
       />
     );

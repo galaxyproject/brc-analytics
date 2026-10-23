@@ -21,6 +21,7 @@ import type { FieldValueSelectorProps } from "./types";
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
  * @param props.onClearField - Clears a field without asking the assistant.
+ * @param props.onKeyboardClear - Moves focus off a chip cleared from the keyboard.
  * @param props.optional - Whether the field is optional for the chosen workflow.
  * @returns The selected field value component.
  */
@@ -29,6 +30,7 @@ export const FieldValueSelector = ({
   fieldKey,
   loading,
   onClearField,
+  onKeyboardClear,
   optional,
 }: FieldValueSelectorProps): JSX.Element => {
   switch (field.status) {
@@ -39,6 +41,7 @@ export const FieldValueSelector = ({
           fieldKey={fieldKey}
           loading={loading}
           onClearField={onClearField}
+          onKeyboardClear={onKeyboardClear}
         />
       );
     case FIELD_STATUS.NEEDS_ATTENTION:

@@ -1,6 +1,6 @@
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, SyntheticEvent } from "react";
 
 export interface UseClearField {
-  onClear: () => void;
+  onClear: (event: SyntheticEvent) => void;
   onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
