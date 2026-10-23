@@ -1,9 +1,11 @@
 import { FONT } from "@databiosphere/findable-ui/lib/styles/common/constants/font";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpUpSm } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { type ThemeProps } from "@databiosphere/findable-ui/lib/theme/types";
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 
-export const Figure = styled.figure`
+export const figure = (props: ThemeProps) => css`
   margin: 16px 0;
 
   img {
@@ -18,7 +20,7 @@ export const Figure = styled.figure`
     margin-top: 32px;
     text-align: justify;
 
-    ${bpUpSm} {
+    ${bpUpSm(props)} {
       display: flex;
       gap: 0 64px;
       margin-top: 52px;
@@ -29,4 +31,8 @@ export const Figure = styled.figure`
       }
     }
   }
+`;
+
+export const Figure = styled.figure`
+  ${figure};
 `;
