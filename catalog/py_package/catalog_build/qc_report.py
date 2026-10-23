@@ -233,7 +233,7 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
         ]
 
 
-class QcResultRoot(QcReportElement):
+class QcResultDataReport(QcReportElement):
     dbt_test_results: QcResultDbtTestResults
     inconsistent_taxonomy_ids: QcResultInconsistentTaxonomyIds
     missing_datacache_urls: QcResultMissingDatacacheUrls
@@ -244,7 +244,9 @@ class QcResultRoot(QcReportElement):
     missing_ucsc_assemblies: QcResultMissingUcscAssemblies
     organisms_not_species_rank: QcResultOrganismsNotSpeciesRank
     organisms_without_assemblies: QcResultOrganismsWithoutAssemblies
-    outbreak_taxonomy_issues: QcResultOutbreakTaxonomyIssues
+    outbreak_taxonomy_issues: QcResultOutbreakTaxonomyIssues = (
+        QcResultOutbreakTaxonomyIssues(data=[])
+    )
     outdated_accessions: QcResultOutdatedAccessions
     paired_accessions: QcResultGcaWithPairedGcf
     suppressed_genomes: QcResultSupressedGenomes

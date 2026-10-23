@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import urllib
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -11,10 +12,28 @@ import pandas as pd
 
 from .load import LoadParams, do_dlt_load
 from .qc_report import (
-    format_list_section,
-    format_markdown_table,
-    format_raw_section,
-    join_report,
+    QcResultDataReport,
+    QcResultDbtTest,
+    QcResultDbtTestFailures,
+    QcResultDbtTestFailureSample,
+    QcResultDbtTestResults,
+    QcResultGcaWithPairedGcf,
+    QcResultInconsistentTaxonomyIds,
+    QcResultMissingDatacacheUrls,
+    QcResultMissingGeneModelUrls,
+    QcResultMissingNcbiAssemblies,
+    QcResultMissingOutbreakDescendants,
+    QcResultMissingPloidyAssemblies,
+    QcResultMissingUcscAssemblies,
+    QcResultOrganismsNotSpeciesRank,
+    QcResultOrganismsWithoutAssemblies,
+    QcResultOutbreakTaxonomyIssues,
+    QcResultOutdatedAccessions,
+    QcResultSupressedGenomes,
+    QcResultTaxonomyTreeChecks,
+    QcResultTaxonomyTreeLeavesMissingSpecies,
+    QcResultTaxonomyTreeMissingRanks,
+    QcResultTaxonomyTreeZeroAssembliesTaxa,
 )
 from .transform import DBTTestResult, do_dbt_transformations
 from .utils import get_db_path
@@ -342,20 +361,32 @@ def add_gene_model_url(genomes_df: pd.DataFrame, gen_ark_file_list: pd.DataFrame
     )
 
 
-def report_missing_values_from(
-    values_name, message_predicate, all_values_series, *partial_values_series
-):
+def report_missing_values_from[T](
+    qc_result_model: Callable[..., T],
+    values_name: str,
+    message_predicate: str,
+    all_values_series: pd.Series,
+    *partial_values_series: pd.Series,
+) -> T:
     present_values_mask = pd.Series(False, index=all_values_series.index)
     for series in partial_values_series:
         present_values_mask |= all_values_series.isin(series)
     return report_missing_values(
-        values_name, message_predicate, all_values_series, present_values_mask
+        qc_result_model,
+        values_name,
+        message_predicate,
+        all_values_series,
+        present_values_mask,
     )
 
 
-def report_missing_values(
-    values_name, message_predicate, values_series, present_values_mask
-):
+def report_missing_values[T](
+    qc_result_model: Callable[..., T],
+    values_name: str,
+    message_predicate: str,
+    values_series: pd.Series,
+    present_values_mask: pd.Series[bool],
+) -> T:
     missing_values = values_series[~present_values_mask]
     if len(missing_values) > 0:
         if len(missing_values) > len(values_series) / 2:
@@ -369,10 +400,12 @@ def report_missing_values(
                 f"{len(missing_values)} {values_name} not {message_predicate}: "
                 f"{', '.join(missing_values)}"
             )
-    return missing_values
+    return qc_result_model(data=list(missing_values))
 
 
-def report_inconsistent_taxonomy_ids(df: pd.DataFrame):
+def report_inconsistent_taxonomy_ids(
+    df: pd.DataFrame,
+) -> QcResultInconsistentTaxonomyIds:
     inconsistent_ids_series = (
         # Rows with missing species can't be reported on meaningfully
         df.dropna(subset="species")
@@ -398,10 +431,12 @@ def report_inconsistent_taxonomy_ids(df: pd.DataFrame):
         print(
             f"Taxa with inconsistent taxonomy IDs: {inconsistent_taxonmy_ids_combined}"
         )
-    return inconsistent_ids_strings
+    return QcResultInconsistentTaxonomyIds(data=inconsistent_ids_strings)
 
 
-def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
+def do_taxonomy_tree_checks(
+    tree, taxonomic_levels, assembly_count
+) -> QcResultTaxonomyTreeChecks:
     zero_assemblies_taxa = []
     leaves_missing_species = []
     present_ranks = set()
@@ -432,22 +467,28 @@ def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
 
     combined_assembly_count = check_node(tree)
 
-    return {
-        "assemblies_actual_vs_expected": (
+    return QcResultTaxonomyTreeChecks(
+        assemblies_actual_vs_expected=(
             None
             if combined_assembly_count == assembly_count
             else (combined_assembly_count, assembly_count)
         ),
-        "leaves_missing_species": leaves_missing_species,
-        "zero_assemblies_taxa": zero_assemblies_taxa,
+        leaves_missing_species=QcResultTaxonomyTreeLeavesMissingSpecies(
+            data=leaves_missing_species
+        ),
+        zero_assemblies_taxa=QcResultTaxonomyTreeZeroAssembliesTaxa(
+            data=zero_assemblies_taxa
+        ),
         # Filter rather than taking a set difference, to report the ranks in the order given
-        "missing_ranks": [
-            level for level in taxonomic_levels if level not in present_ranks
-        ],
-    }
+        missing_ranks=QcResultTaxonomyTreeMissingRanks(
+            data=[level for level in taxonomic_levels if level not in present_ranks]
+        ),
+    )
 
 
-def report_missing_ploidy_info(genomes_df: pd.DataFrame):
+def report_missing_ploidy_info(
+    genomes_df: pd.DataFrame,
+) -> QcResultMissingPloidyAssemblies:
     """
     Reports assemblies that are missing ploidy information.
 
@@ -467,16 +508,20 @@ def report_missing_ploidy_info(genomes_df: pd.DataFrame):
         for _, row in missing_ploidy.iterrows():
             print(f"  {row['accession']}: {row['speciesTaxonomyId']}")
 
-    return list(
-        zip(
-            missing_ploidy["accession"],
-            missing_ploidy["speciesTaxonomyId"],
-            strict=True,
+    return QcResultMissingPloidyAssemblies(
+        data=list(
+            zip(
+                missing_ploidy["accession"],
+                missing_ploidy["speciesTaxonomyId"],
+                strict=True,
+            )
         )
     )
 
 
-def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
+def check_missing_outbreak_descendants(
+    outbreak_taxonomy_ids, all_taxonomy_ids
+) -> QcResultMissingOutbreakDescendants:
     """
     Check for outbreak taxonomy IDs that are not found in the genomes data.
 
@@ -495,10 +540,10 @@ def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
         tax_id for tax_id in outbreak_taxonomy_ids if tax_id not in all_taxonomy_ids_set
     ]
 
-    return missing_ids
+    return QcResultMissingOutbreakDescendants(data=missing_ids)
 
 
-def find_outdated_accessions(genomes_df):
+def find_outdated_accessions(genomes_df) -> QcResultOutdatedAccessions:
     """
     Identifies assemblies where the accession is outdated (different from current_accession).
 
@@ -512,10 +557,10 @@ def find_outdated_accessions(genomes_df):
     outdated_assemblies = genomes_df[outdated_mask][
         ["accession", "currentAccession"]
     ].values.tolist()
-    return outdated_assemblies
+    return QcResultOutdatedAccessions(data=outdated_assemblies)
 
 
-def find_suppressed_genomes(genomes_df):
+def find_suppressed_genomes(genomes_df) -> QcResultSupressedGenomes:
     """
     Identifies assemblies that have been suppressed by NCBI.
 
@@ -530,10 +575,10 @@ def find_suppressed_genomes(genomes_df):
     suppressed_assemblies = genomes_df[suppressed_mask][
         ["accession", "assemblyStatus"]
     ].values.tolist()
-    return suppressed_assemblies
+    return QcResultSupressedGenomes(data=suppressed_assemblies)
 
 
-def find_gca_with_paired_gcf(genomes_df):
+def find_gca_with_paired_gcf(genomes_df) -> QcResultGcaWithPairedGcf:
     """
     Identifies GenBank (GCA) assemblies that have paired RefSeq (GCF) accessions available.
 
@@ -557,7 +602,7 @@ def find_gca_with_paired_gcf(genomes_df):
     paired_assemblies = genomes_df[paired_mask][
         ["accession", "pairedAccession"]
     ].values.tolist()
-    return paired_assemblies
+    return QcResultGcaWithPairedGcf(data=paired_assemblies)
 
 
 def check_outbreak_taxonomy_issues(
@@ -566,7 +611,7 @@ def check_outbreak_taxonomy_issues(
     taxon_name_map,
     all_lineage_ids,
     taxonomic_levels_for_tree,
-):
+) -> QcResultOutbreakTaxonomyIssues:
     """
     Check outbreak primary taxonomy IDs for two issues:
     - Not found in any assembly's lineage (not in catalog)
@@ -595,10 +640,12 @@ def check_outbreak_taxonomy_issues(
             issues.append((tax_id, name, "not in catalog"))
         elif rank and rank in sub_species_ranks:
             issues.append((tax_id, name, f"below species rank ({rank})"))
-    return issues
+    return QcResultOutbreakTaxonomyIssues(data=issues)
 
 
-def check_organism_ranks(organism_taxonomy_ids, taxon_rank_map, taxon_name_map):
+def check_organism_ranks(
+    organism_taxonomy_ids, taxon_rank_map, taxon_name_map
+) -> QcResultOrganismsNotSpeciesRank:
     """
     Check organism taxonomy IDs for non-species rank.
     Organisms are expected to always be at species rank by convention.
@@ -611,20 +658,22 @@ def check_organism_ranks(organism_taxonomy_ids, taxon_rank_map, taxon_name_map):
     Returns:
         List of (id, name, rank) tuples for organisms not at species rank
     """
-    return [
-        (
-            tax_id,
-            taxon_name_map.get(str(tax_id), str(tax_id)),
-            taxon_rank_map.get(str(tax_id), "unknown").lower(),
-        )
-        for tax_id in organism_taxonomy_ids
-        if taxon_rank_map.get(str(tax_id), "").lower() != "species"
-    ]
+    return QcResultOrganismsNotSpeciesRank(
+        data=[
+            (
+                tax_id,
+                taxon_name_map.get(str(tax_id), str(tax_id)),
+                taxon_rank_map.get(str(tax_id), "unknown").lower(),
+            )
+            for tax_id in organism_taxonomy_ids
+            if taxon_rank_map.get(str(tax_id), "").lower() != "species"
+        ]
+    )
 
 
 def check_organisms_without_assemblies(
     organism_taxonomy_ids, species_taxonomy_ids, taxon_name_map
-):
+) -> QcResultOrganismsWithoutAssemblies:
     """
     Check for organisms whose taxonomy ID does not appear as any assembly's species
     taxonomy ID. This can indicate missing catalog coverage or a non-species-rank ID.
@@ -638,239 +687,13 @@ def check_organisms_without_assemblies(
         List of (id, name) tuples for organisms with no matching assemblies
     """
     species_ids_set = {str(t) for t in species_taxonomy_ids}
-    return [
-        (tax_id, taxon_name_map.get(str(tax_id), str(tax_id)))
-        for tax_id in organism_taxonomy_ids
-        if str(tax_id) not in species_ids_set
-    ]
-
-
-def format_dbt_test_failures_section(title, dbt_test_results):
-    """
-    Render the unsuccessful dbt tests, each with a sample of failing rows.
-
-    Each entry is keyed by the readable test name (set in schema.yml) and shows
-    the status, failing-row count, dbt's message, and a small table of sample
-    failing rows when available.
-    """
-    lines = [title, ""]
-    unsuccessful = [result for result in dbt_test_results if not result.success]
-    if not unsuccessful:
-        lines += ["None", ""]
-        return lines
-    for result in unsuccessful:
-        count = result.failure_count
-        count_text = (
-            f", {count} failing row{'' if count == 1 else 's'}"
-            if count is not None
-            else ""
-        )
-        lines += [
-            f"### `{result.test_name}` — status `{result.status}`{count_text}",
-            "",
+    return QcResultOrganismsWithoutAssemblies(
+        data=[
+            (tax_id, taxon_name_map.get(str(tax_id), str(tax_id)))
+            for tax_id in organism_taxonomy_ids
+            if str(tax_id) not in species_ids_set
         ]
-        if result.message:
-            lines += [result.message, ""]
-        if result.failure_sample:
-            sample_rows = result.failure_sample
-            lines += format_markdown_table(sample_rows, cell_truncation_threshold=200)
-            if count is not None and count > len(sample_rows):
-                lines += [
-                    f"_Showing {len(sample_rows)} of {count} failing rows._",
-                    "",
-                ]
-    return lines
-
-
-def make_qc_report(
-    *,
-    missing_ncbi_assemblies,
-    inconsistent_taxonomy_ids,
-    missing_ucsc_assemblies,
-    dbt_test_results,
-    missing_gene_model_urls=None,
-    missing_datacache_urls=None,
-    missing_ploidy_assemblies=None,
-    missing_outbreak_descendants=None,
-    tree_checks=None,
-    outdated_accessions=None,
-    suppressed_genomes=None,
-    paired_accessions=None,
-    outbreak_taxonomy_issues=None,
-    organisms_not_species_rank=None,
-    organisms_without_assemblies=None,
-):
-    """
-    Render the catalog data QC report as markdown.
-
-    The report is committed to the repo, so its contents should be consistent between
-    runs on unchanged data. This function renders each list in the order given rather
-    than sorting it, so the callers are responsible for passing consistently-ordered
-    values. In particular, anything derived from a set needs sorting first, since set
-    iteration order isn't consistent between runs.
-    """
-    # Convert simple lists to items for format_list_section
-    ncbi_assemblies_items = (
-        list(missing_ncbi_assemblies) if len(missing_ncbi_assemblies) > 0 else []
     )
-    ucsc_assemblies_items = (
-        list(missing_ucsc_assemblies) if len(missing_ucsc_assemblies) > 0 else []
-    )
-    gene_model_urls_items = (
-        list(missing_gene_model_urls)
-        if missing_gene_model_urls is not None and len(missing_gene_model_urls) > 0
-        else None
-    )
-    datacache_urls_items = (
-        list(missing_datacache_urls)
-        if missing_datacache_urls is not None and len(missing_datacache_urls) > 0
-        else []
-    )
-    taxonomy_ids_items = (
-        [f"{taxon}: {ids}" for taxon, ids in inconsistent_taxonomy_ids]
-        if inconsistent_taxonomy_ids
-        else []
-    )
-    ploidy_assemblies_items = (
-        [
-            f"{accession} (speciesTaxonomyId: {tax_id})"
-            for accession, tax_id in missing_ploidy_assemblies
-        ]
-        if missing_ploidy_assemblies
-        else None
-    )
-    outbreak_descendants_items = (
-        [str(tax_id) for tax_id in missing_outbreak_descendants]
-        if missing_outbreak_descendants
-        else []
-    )
-    if tree_checks is None:
-        tree_checks_text = "No checks done"
-    else:
-        tree_assemblies_actual_vs_expected = tree_checks[
-            "assemblies_actual_vs_expected"
-        ]
-        tree_leaves_missing_species = tree_checks["leaves_missing_species"]
-        tree_zero_assemblies_taxa = tree_checks["zero_assemblies_taxa"]
-        tree_missing_ranks = tree_checks["missing_ranks"]
-        tree_checks_text = "Assembly count mismatch: " + (
-            "None"
-            if tree_assemblies_actual_vs_expected is None
-            else f"Found combined assembly count of {tree_assemblies_actual_vs_expected[0]} among nodes of species rank, expected {tree_assemblies_actual_vs_expected[1]}"
-        )
-        tree_checks_text += "\n\nList of leaves without species in lineage: " + (
-            "None"
-            if not tree_leaves_missing_species
-            else ", ".join(tree_leaves_missing_species)
-        )
-        tree_checks_text += "\n\nList of taxa with assembly count 0: " + (
-            "None"
-            if not tree_zero_assemblies_taxa
-            else ", ".join(tree_zero_assemblies_taxa)
-        )
-        tree_checks_text += (
-            "\n\nList of taxonomic levels specified in parameters but absent in tree: "
-            + ("None" if not tree_missing_ranks else ", ".join(tree_missing_ranks))
-        )
-
-    outdated_accessions_items = (
-        [f"{acc} (current: {curr_acc})" for acc, curr_acc in outdated_accessions]
-        if outdated_accessions
-        else []
-    )
-    suppressed_genomes_items = (
-        [f"{acc} (status: {status})" for acc, status in suppressed_genomes]
-        if suppressed_genomes
-        else []
-    )
-    paired_accessions_items = (
-        [f"{gca} (paired RefSeq: {gcf})" for gca, gcf in paired_accessions]
-        if paired_accessions
-        else []
-    )
-    outbreak_taxonomy_issues_items = (
-        [
-            f"{tax_id}: {name} ({reason})"
-            for tax_id, name, reason in outbreak_taxonomy_issues
-        ]
-        if outbreak_taxonomy_issues
-        else []
-    )
-    organisms_not_species_rank_items = (
-        [
-            f"{tax_id}: {name} (rank: {rank})"
-            for tax_id, name, rank in organisms_not_species_rank
-        ]
-        if organisms_not_species_rank
-        else []
-    )
-    organisms_without_assemblies_items = (
-        [f"{tax_id}: {name}" for tax_id, name in organisms_without_assemblies]
-        if organisms_without_assemblies
-        else []
-    )
-
-    # Compose report modularly using shared QC utils
-    lines = ["# Catalog Data QC report", ""]
-    lines += format_list_section(
-        "## Assemblies not found on NCBI", ncbi_assemblies_items
-    )
-    lines += format_list_section(
-        "## Assemblies not found in UCSC list", ucsc_assemblies_items
-    )
-    # Gene model URLs can be None (N/A case)
-    if gene_model_urls_items is None:
-        lines += format_raw_section(
-            "## Assemblies with gene model URLs not found", "N/A"
-        )
-    else:
-        lines += format_list_section(
-            "## Assemblies with gene model URLs not found", gene_model_urls_items
-        )
-    lines += format_list_section(
-        "## Assemblies with datacache URLs not found", datacache_urls_items
-    )
-    lines += format_list_section(
-        "## Species and strain combinations with multiple taxonomy IDs",
-        taxonomy_ids_items,
-    )
-    # Ploidy assemblies can be None (N/A case)
-    if ploidy_assemblies_items is None:
-        lines += format_raw_section("## Assemblies without ploidy information", "N/A")
-    else:
-        lines += format_list_section(
-            "## Assemblies without ploidy information", ploidy_assemblies_items
-        )
-    lines += format_list_section(
-        "## Outbreak descendant taxonomy IDs not found in genomes data",
-        outbreak_descendants_items,
-    )
-    lines += format_list_section(
-        "## Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
-        outbreak_taxonomy_issues_items,
-    )
-    lines += format_list_section(
-        "## Organisms not at species rank", organisms_not_species_rank_items
-    )
-    lines += format_list_section(
-        "## Organisms not matched to any assembly", organisms_without_assemblies_items
-    )
-    lines += format_list_section(
-        "## Outdated assembly accessions", outdated_accessions_items
-    )
-    lines += format_list_section(
-        "## Suppressed or retired genomes", suppressed_genomes_items
-    )
-    lines += format_list_section(
-        "## GenBank assemblies with paired RefSeq accessions",
-        paired_accessions_items,
-    )
-    lines += format_raw_section("## Taxonomy tree", tree_checks_text)
-    lines += format_dbt_test_failures_section(
-        "## Unsuccessful dbt tests", dbt_test_results
-    )
-
-    return join_report(lines)
 
 
 def build_taxon_maps(taxonomy_df):
@@ -1233,7 +1056,27 @@ def build_files(
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
-    qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
+    qc_report_params["dbt_test_results"] = QcResultDbtTestResults(
+        data={
+            result.test_name: QcResultDbtTest(
+                test_name=result.test_name,
+                success=result.success,
+                status=result.status,
+                message=result.message,
+                failures=(
+                    None
+                    if result.failure_count is None and not result.failure_sample
+                    else QcResultDbtTestFailures(
+                        count=result.failure_count or 0,
+                        sample=QcResultDbtTestFailureSample(
+                            data=result.failure_sample or []
+                        ),
+                    )
+                ),
+            )
+            for result in load_and_transform_result.dbt_test_results
+        }
+    )
 
     if workflow_taxonomy_mapping_path is not None and source_workflows_df is not None:
         save_workflow_taxonomy_mapping(
@@ -1243,6 +1086,7 @@ def build_files(
     base_genomes_df = get_genomes_df(load_and_transform_result.ncbi_genomes)
 
     qc_report_params["missing_ncbi_assemblies"] = report_missing_values_from(
+        QcResultMissingNcbiAssemblies,
         "accessions",
         "found on NCBI",
         source_list_df["accession"],
@@ -1309,6 +1153,7 @@ def build_files(
     )
 
     report_missing_values_from(
+        lambda **_: None,
         "species",
         "found on NCBI",
         base_genomes_df["taxonomyId"],
@@ -1346,6 +1191,7 @@ def build_files(
     ).sort_values("accession", kind="stable")
 
     qc_report_params["missing_ucsc_assemblies"] = report_missing_values_from(
+        QcResultMissingUcscAssemblies,
         "accessions",
         "matched in assembly list",
         genomes_with_species_df["accession"],
@@ -1368,6 +1214,7 @@ def build_files(
         genomes_df, load_and_transform_result.gen_ark_file_list
     )
     qc_report_params["missing_gene_model_urls"] = report_missing_values(
+        QcResultMissingGeneModelUrls,
         "accessions",
         "matched with gene model URLs",
         genomes_df["accession"],
@@ -1379,7 +1226,9 @@ def build_files(
         datacache_base_url,
         load_and_transform_result.galaxy_datacache_listing,
     )
-    qc_report_params["missing_datacache_urls"] = missing_datacache_urls
+    qc_report_params["missing_datacache_urls"] = QcResultMissingDatacacheUrls(
+        data=missing_datacache_urls
+    )
 
     # Find outdated accessions (where accession != currentAccession)
     if qc_report_path:
@@ -1446,15 +1295,14 @@ def build_files(
 
     print(f"Wrote to {genomes_output_path}")
 
-    if len(taxonomic_levels_for_tree) > 0:
-        # Use the assemblies info from genomes_df to build the species tree
-        species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
-        # Dump with sorted keys and consistent indentation
-        save_json_file(tree_output_path, species_tree, indent=4, sort_keys=True)
-        print(f"Wrote to {tree_output_path}")
-        qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
-            species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
-        )
+    # Use the assemblies info from genomes_df to build the species tree
+    species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
+    # Dump with sorted keys and consistent indentation
+    save_json_file(tree_output_path, species_tree, indent=4, sort_keys=True)
+    print(f"Wrote to {tree_output_path}")
+    qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
+        species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
+    )
 
     organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
         organism_taxonomy_df
@@ -1473,7 +1321,7 @@ def build_files(
     )
 
     if qc_report_path is not None:
-        qc_report_text = make_qc_report(**qc_report_params)
+        qc_report_text = QcResultDataReport(**qc_report_params).format_markdown_text()
         with open(qc_report_path, "w") as file:
             file.write(qc_report_text)
 
