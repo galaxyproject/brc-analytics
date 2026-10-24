@@ -1,0 +1,2651 @@
+{
+  "dbt_test_results": {
+    "data": {
+      "assembly_taxonomy_has_ids": {
+        "test_name": "assembly_taxonomy_has_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "assembly_taxonomy_has_lineage_ids": {
+        "test_name": "assembly_taxonomy_has_lineage_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "assembly_taxonomy_has_other_names": {
+        "test_name": "assembly_taxonomy_has_other_names",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "assembly_taxonomy_has_species": {
+        "test_name": "assembly_taxonomy_has_species",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "assembly_taxonomy_has_species_ids": {
+        "test_name": "assembly_taxonomy_has_species_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "assembly_taxonomy_unique_ids": {
+        "test_name": "assembly_taxonomy_unique_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_assemblies_have_accessions": {
+        "test_name": "catalog_assemblies_have_accessions",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_assemblies_unique_accessions": {
+        "test_name": "catalog_assemblies_unique_accessions",
+        "success": false,
+        "status": "warn",
+        "message": "Got 56 results, configured to warn if != 0",
+        "failures": {
+          "count": 56,
+          "sample": {
+            "data": [
+              {
+                "unique_field": "GCA_004786555.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCA_023969395.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCA_031116565.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCA_900537975.2",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCA_964014045.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000002765.6",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000003225.4",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000007025.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000007765.2",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000008045.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000012565.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000013145.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000013165.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000018205.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000018225.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000026005.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000165365.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000165395.2",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000166935.1",
+                "n_records": 2
+              },
+              {
+                "unique_field": "GCF_000237845.1",
+                "n_records": 2
+              }
+            ]
+          }
+        }
+      },
+      "catalog_curated_taxa_have_tax_ids": {
+        "test_name": "catalog_curated_taxa_have_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_curated_taxa_in_lineages": {
+        "test_name": "catalog_curated_taxa_in_lineages",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_curated_taxa_unique_ids": {
+        "test_name": "catalog_curated_taxa_unique_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_organism_taxa_in_organism_taxonomy": {
+        "test_name": "catalog_organism_taxa_in_organism_taxonomy",
+        "success": false,
+        "status": "warn",
+        "message": "Got 2 results, configured to warn if != 0",
+        "failures": {
+          "count": 2,
+          "sample": {
+            "data": [
+              {
+                "from_field": 3703201
+              },
+              {
+                "from_field": 3703354
+              }
+            ]
+          }
+        }
+      },
+      "catalog_organisms_have_tax_ids": {
+        "test_name": "catalog_organisms_have_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_organisms_unique_tax_ids": {
+        "test_name": "catalog_organisms_unique_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_outbreak_taxa_in_outbreak_taxonomy": {
+        "test_name": "catalog_outbreak_taxa_in_outbreak_taxonomy",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_outbreaks_have_tax_ids": {
+        "test_name": "catalog_outbreaks_have_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_outbreaks_unique_tax_ids": {
+        "test_name": "catalog_outbreaks_unique_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_taxa_have_ids": {
+        "test_name": "catalog_taxa_have_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_taxa_in_taxonomy_lineages": {
+        "test_name": "catalog_taxa_in_taxonomy_lineages",
+        "success": false,
+        "status": "warn",
+        "message": "Got 2 results, configured to warn if != 0",
+        "failures": {
+          "count": 2,
+          "sample": {
+            "data": [
+              {
+                "from_field": 3703201
+              },
+              {
+                "from_field": 3703354
+              }
+            ]
+          }
+        }
+      },
+      "catalog_taxa_unique_ids": {
+        "test_name": "catalog_taxa_unique_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_workflows_have_trs_ids": {
+        "test_name": "catalog_workflows_have_trs_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "catalog_workflows_unique_trs_ids": {
+        "test_name": "catalog_workflows_unique_trs_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "curated_taxa_tax_ids_are_latest": {
+        "test_name": "curated_taxa_tax_ids_are_latest",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_genomes_have_accessions": {
+        "test_name": "ncbi_genomes_have_accessions",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_merged_have_new_id": {
+        "test_name": "ncbi_merged_have_new_id",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_merged_have_old_id": {
+        "test_name": "ncbi_merged_have_old_id",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_names_have_classes": {
+        "test_name": "ncbi_names_have_classes",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_names_have_names": {
+        "test_name": "ncbi_names_have_names",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_names_have_tax_ids": {
+        "test_name": "ncbi_names_have_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_nodes_have_parents": {
+        "test_name": "ncbi_nodes_have_parents",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_nodes_have_ranks": {
+        "test_name": "ncbi_nodes_have_ranks",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "ncbi_nodes_have_tax_ids": {
+        "test_name": "ncbi_nodes_have_tax_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "organism_tax_ids_are_latest": {
+        "test_name": "organism_tax_ids_are_latest",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "organism_taxonomy_has_ids": {
+        "test_name": "organism_taxonomy_has_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "organism_taxonomy_has_names": {
+        "test_name": "organism_taxonomy_has_names",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "organism_taxonomy_has_ranks": {
+        "test_name": "organism_taxonomy_has_ranks",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "organism_taxonomy_unique_ids": {
+        "test_name": "organism_taxonomy_unique_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_descendant_tax_ids_are_latest": {
+        "test_name": "outbreak_descendant_tax_ids_are_latest",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_tax_ids_are_latest": {
+        "test_name": "outbreak_tax_ids_are_latest",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_taxonomy_has_ids": {
+        "test_name": "outbreak_taxonomy_has_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_taxonomy_has_names": {
+        "test_name": "outbreak_taxonomy_has_names",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_taxonomy_has_ranks": {
+        "test_name": "outbreak_taxonomy_has_ranks",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "outbreak_taxonomy_unique_ids": {
+        "test_name": "outbreak_taxonomy_unique_ids",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      },
+      "workflow_tax_ids_are_latest": {
+        "test_name": "workflow_tax_ids_are_latest",
+        "success": true,
+        "status": "pass",
+        "message": null,
+        "failures": {
+          "count": 0,
+          "sample": {
+            "data": []
+          }
+        }
+      }
+    }
+  },
+  "inconsistent_taxonomy_ids": {
+    "data": [
+      [
+        "Acanthamoeba castellanii strain Neff",
+        "5755, 1257118"
+      ],
+      [
+        "Aedes aegypti",
+        "7159, 1769044"
+      ],
+      [
+        "Alphapapillomavirus 12",
+        "10570, 990303"
+      ],
+      [
+        "Alphapapillomavirus 14",
+        "120686, 333769"
+      ],
+      [
+        "Alphapapillomavirus 6",
+        "10611, 333765"
+      ],
+      [
+        "Asfivirus haemorrhagiae",
+        "10497, 443876, 443878"
+      ],
+      [
+        "Batrachochytrium dendrobatidis strain JEL423",
+        "109871, 403673"
+      ],
+      [
+        "Betacoronavirus pandemicum",
+        "227984, 2697049"
+      ],
+      [
+        "Betapapillomavirus 1",
+        "333923, 889813"
+      ],
+      [
+        "Blumeria graminis",
+        "62690, 1689686"
+      ],
+      [
+        "Candida albicans strain SC5314",
+        "5476, 237561"
+      ],
+      [
+        "Candida tropicalis strain MYA-3404",
+        "5482, 294747"
+      ],
+      [
+        "Cryptococcus gattii strain WM276",
+        "37769, 367775"
+      ],
+      [
+        "Cryptococcus neoformans strain A5-35-17",
+        "5207, 1230080"
+      ],
+      [
+        "Cryptococcus neoformans strain C23",
+        "5207, 1295831"
+      ],
+      [
+        "Cryptococcus neoformans strain H99",
+        "5207, 235443"
+      ],
+      [
+        "Cryptosporidium parvum",
+        "5807, 353152"
+      ],
+      [
+        "Culex pipiens",
+        "7175, 42434, 233155"
+      ],
+      [
+        "Deltaretrovirus priTlym1",
+        "11908, 194440"
+      ],
+      [
+        "Dependoparvovirus mammalian1",
+        "82300, 256548"
+      ],
+      [
+        "Dependoparvovirus primate1",
+        "10804, 57579, 85106, 202812, 202813"
+      ],
+      [
+        "Encephalitozoon intestinalis strain ATCC 50506",
+        "58839, 876142"
+      ],
+      [
+        "Enterovirus alphacoxsackie",
+        "150846, 156647"
+      ],
+      [
+        "Enterovirus betarhino",
+        "12131, 44130"
+      ],
+      [
+        "Fusarium fujikuroi strain B14",
+        "5127, 1215603"
+      ],
+      [
+        "Fusarium oxysporum strain Fo5176",
+        "5507, 100902"
+      ],
+      [
+        "Fusarium oxysporum",
+        "5507, 61366, 61374, 224912, 299031, 330941, 396575, 654392, 1229664, 1940294"
+      ],
+      [
+        "Fusarium vanettenii",
+        "660122, 2747968"
+      ],
+      [
+        "Fusarium verticillioides strain 7600",
+        "117187, 334819"
+      ],
+      [
+        "Gammapapillomavirus 11",
+        "1070409, 1070413, 1195796"
+      ],
+      [
+        "Gammapapillomavirus 12",
+        "746832, 909331"
+      ],
+      [
+        "Gammapapillomavirus 15",
+        "1070408, 1472342"
+      ],
+      [
+        "Gammapapillomavirus 19",
+        "1315259, 1315264"
+      ],
+      [
+        "Gemykibivirus humas1",
+        "1516081, 1519409"
+      ],
+      [
+        "Giardia duodenalis",
+        "5741, 941442"
+      ],
+      [
+        "Glossina fuscipes",
+        "7396, 201502"
+      ],
+      [
+        "Heligmosomoides polygyrus",
+        "6339, 375939"
+      ],
+      [
+        "Hemileia vastatrix",
+        "203904, 1291517"
+      ],
+      [
+        "Leishmania braziliensis",
+        "5660, 420245"
+      ],
+      [
+        "Leishmania infantum",
+        "5671, 435258"
+      ],
+      [
+        "Meyerozyma guilliermondii strain ATCC 6260",
+        "4929, 294746"
+      ],
+      [
+        "Microsporum canis strain CBS 113480",
+        "63405, 554155"
+      ],
+      [
+        "Mucor lusitanicus strain CBS 277.49",
+        "29924, 747725"
+      ],
+      [
+        "Norovirus norwalkense",
+        "122928, 122929, 490039, 1246677, 1529909, 1529918, 1529924"
+      ],
+      [
+        "Orthoflavivirus denguei",
+        "11053, 11069, 11070"
+      ],
+      [
+        "Orthohepacivirus hominis",
+        "33745, 356114, 1544901"
+      ],
+      [
+        "Orthomarburgvirus marburgense",
+        "448086, 3052505"
+      ],
+      [
+        "Pegivirus columbiaense",
+        "1704090, 1729141"
+      ],
+      [
+        "Plasmodium falciparum",
+        "5833, 36329"
+      ],
+      [
+        "Plasmodium ovale",
+        "864141, 864142"
+      ],
+      [
+        "Plasmodium vinckei",
+        "5860, 54757, 119398, 138297, 138298"
+      ],
+      [
+        "Plasmodium yoelii strain 17X",
+        "5861, 1323249"
+      ],
+      [
+        "Puccinia striiformis strain 93-210",
+        "27350, 168172"
+      ],
+      [
+        "Small anellovirus",
+        "289366, 289367"
+      ],
+      [
+        "Torbevirus brisa",
+        "2571075, 2571076, 2571077, 2571078"
+      ],
+      [
+        "Toxoplasma gondii strain ME49",
+        "5811, 508771"
+      ],
+      [
+        "Trichoderma virens strain Gv29-8",
+        "29875, 413071"
+      ],
+      [
+        "Trichophyton rubrum strain CBS 289.86",
+        "5551, 1215329"
+      ],
+      [
+        "Trichophyton rubrum strain CBS 735.88",
+        "5551, 1215332"
+      ],
+      [
+        "Trypanosoma cruzi strain Dm28c",
+        "5693, 85057, 1416333"
+      ],
+      [
+        "Vesivirus exanthema",
+        "35612, 146073"
+      ]
+    ]
+  },
+  "missing_datacache_urls": {
+    "data": [
+      "GCA_004302925.2",
+      "GCA_006535965.1",
+      "GCA_051144935.1",
+      "GCA_051144965.1",
+      "GCF_000008445.1",
+      "GCF_000017685.1",
+      "GCF_000018225.1"
+    ]
+  },
+  "missing_gene_model_urls": {
+    "data": [
+      "GCA_902369275.1",
+      "GCF_002986165.1",
+      "GCF_002986195.1"
+    ]
+  },
+  "missing_ncbi_assemblies": {
+    "data": [
+      "GCF_965196655.1"
+    ]
+  },
+  "missing_outbreak_descendants": {
+    "data": []
+  },
+  "missing_ploidy_assemblies": {
+    "data": []
+  },
+  "missing_ucsc_assemblies": {
+    "data": []
+  },
+  "organisms_not_species_rank": {
+    "data": [
+      [
+        "5702",
+        "Trypanosoma brucei brucei",
+        "subspecies"
+      ],
+      [
+        "5851",
+        "Plasmodium knowlesi strain H",
+        "strain"
+      ],
+      [
+        "10255",
+        "Variola virus",
+        "no rank"
+      ],
+      [
+        "10258",
+        "Orf virus",
+        "no rank"
+      ],
+      [
+        "10279",
+        "Molluscum contagiosum virus",
+        "no rank"
+      ],
+      [
+        "10497",
+        "African swine fever virus",
+        "no rank"
+      ],
+      [
+        "11020",
+        "Barmah Forest virus",
+        "no rank"
+      ],
+      [
+        "11029",
+        "Ross River virus",
+        "no rank"
+      ],
+      [
+        "11033",
+        "Semliki Forest virus",
+        "no rank"
+      ],
+      [
+        "11137",
+        "Human coronavirus 229E",
+        "no rank"
+      ],
+      [
+        "11976",
+        "Rabbit hemorrhagic disease virus",
+        "no rank"
+      ],
+      [
+        "11978",
+        "Feline calicivirus",
+        "no rank"
+      ],
+      [
+        "11983",
+        "Norwalk virus",
+        "no rank"
+      ],
+      [
+        "12092",
+        "Hepatovirus A",
+        "no rank"
+      ],
+      [
+        "12475",
+        "Hepatitis delta virus",
+        "no rank"
+      ],
+      [
+        "28875",
+        "Rotavirus A",
+        "no rank"
+      ],
+      [
+        "28876",
+        "Rotavirus B",
+        "no rank"
+      ],
+      [
+        "33756",
+        "European brown hare syndrome virus",
+        "no rank"
+      ],
+      [
+        "35612",
+        "Vesicular exanthema of swine virus",
+        "no rank"
+      ],
+      [
+        "36329",
+        "Plasmodium falciparum 3D7",
+        "isolate"
+      ],
+      [
+        "36427",
+        "Rotavirus C",
+        "no rank"
+      ],
+      [
+        "38804",
+        "Yaba monkey tumor virus",
+        "no rank"
+      ],
+      [
+        "40052",
+        "Changuinola virus",
+        "no rank"
+      ],
+      [
+        "40053",
+        "Corriparta virus",
+        "no rank"
+      ],
+      [
+        "40057",
+        "Lebombo virus",
+        "no rank"
+      ],
+      [
+        "40058",
+        "Orungo virus",
+        "no rank"
+      ],
+      [
+        "54757",
+        "Plasmodium vinckei vinckei",
+        "subspecies"
+      ],
+      [
+        "59301",
+        "Mayaro virus",
+        "no rank"
+      ],
+      [
+        "73239",
+        "Plasmodium yoelii yoelii",
+        "subspecies"
+      ],
+      [
+        "83332",
+        "Mycobacterium tuberculosis H37Rv",
+        "strain"
+      ],
+      [
+        "85056",
+        "Trypanosoma cruzi marinkellei",
+        "subspecies"
+      ],
+      [
+        "85057",
+        "Trypanosoma cruzi cruzi",
+        "subspecies"
+      ],
+      [
+        "93678",
+        "TTV-like mini virus",
+        "no rank"
+      ],
+      [
+        "95342",
+        "Sapporo virus",
+        "no rank"
+      ],
+      [
+        "99000",
+        "Tanapox virus",
+        "no rank"
+      ],
+      [
+        "118027",
+        "Nelson Bay orthoreovirus",
+        "no rank"
+      ],
+      [
+        "119398",
+        "Plasmodium vinckei brucechwatti",
+        "subspecies"
+      ],
+      [
+        "138297",
+        "Plasmodium vinckei lentum",
+        "subspecies"
+      ],
+      [
+        "138298",
+        "Plasmodium vinckei petteri",
+        "subspecies"
+      ],
+      [
+        "180454",
+        "Anopheles gambiae str. PEST",
+        "strain"
+      ],
+      [
+        "185431",
+        "Trypanosoma brucei brucei TREU927",
+        "strain"
+      ],
+      [
+        "194440",
+        "Primate T-lymphotropic virus 1",
+        "no rank"
+      ],
+      [
+        "194441",
+        "Primate T-lymphotropic virus 2",
+        "no rank"
+      ],
+      [
+        "194443",
+        "Primate T-lymphotropic virus 3",
+        "no rank"
+      ],
+      [
+        "201502",
+        "Glossina fuscipes fuscipes",
+        "subspecies"
+      ],
+      [
+        "204269",
+        "Great Island virus",
+        "no rank"
+      ],
+      [
+        "214684",
+        "Cryptococcus deneoformans JEC21",
+        "strain"
+      ],
+      [
+        "235443",
+        "Cryptococcus neoformans H99",
+        "strain"
+      ],
+      [
+        "246410",
+        "Coccidioides immitis RS",
+        "strain"
+      ],
+      [
+        "277944",
+        "Human coronavirus NL63",
+        "no rank"
+      ],
+      [
+        "283643",
+        "Cryptococcus deneoformans B-3501A",
+        "strain"
+      ],
+      [
+        "284591",
+        "Yarrowia lipolytica CLIB122",
+        "strain"
+      ],
+      [
+        "290028",
+        "Human coronavirus HKU1",
+        "no rank"
+      ],
+      [
+        "294747",
+        "Candida tropicalis MYA-3404",
+        "strain"
+      ],
+      [
+        "332952",
+        "Aspergillus flavus NRRL3357",
+        "strain"
+      ],
+      [
+        "352914",
+        "Plasmodium yoelii yoelii 17XNL",
+        "strain"
+      ],
+      [
+        "353151",
+        "Cryptosporidium hominis TU502",
+        "strain"
+      ],
+      [
+        "353152",
+        "Cryptosporidium parvum Iowa II",
+        "strain"
+      ],
+      [
+        "366581",
+        "Trypanosoma cruzi strain Esmeraldo",
+        "strain"
+      ],
+      [
+        "380704",
+        "Aspergillus niger ATCC 1015",
+        "strain"
+      ],
+      [
+        "383379",
+        "Toxoplasma gondii RH",
+        "strain"
+      ],
+      [
+        "396776",
+        "Coccidioides immitis H538.4",
+        "strain"
+      ],
+      [
+        "404692",
+        "Coccidioides immitis RMSCC 2394",
+        "strain"
+      ],
+      [
+        "425264",
+        "Malassezia restricta CBS 7877",
+        "strain"
+      ],
+      [
+        "432359",
+        "Toxoplasma gondii VEG",
+        "strain"
+      ],
+      [
+        "441960",
+        "Talaromyces marneffei ATCC 18224",
+        "strain"
+      ],
+      [
+        "447093",
+        "Histoplasma capsulatum G186AR",
+        "strain"
+      ],
+      [
+        "454286",
+        "Coccidioides immitis RMSCC 3703",
+        "strain"
+      ],
+      [
+        "507601",
+        "Toxoplasma gondii GT1",
+        "strain"
+      ],
+      [
+        "508771",
+        "Toxoplasma gondii ME49",
+        "strain"
+      ],
+      [
+        "544711",
+        "Histoplasma capsulatum var. duboisii H88",
+        "strain"
+      ],
+      [
+        "544712",
+        "Histoplasma capsulatum H143",
+        "strain"
+      ],
+      [
+        "578460",
+        "Vairimorpha ceranae BRL01",
+        "strain"
+      ],
+      [
+        "598745",
+        "Giardia duodenalis ATCC 50581",
+        "strain"
+      ],
+      [
+        "658858",
+        "Giardia lamblia P15",
+        "strain"
+      ],
+      [
+        "679716",
+        "Trypanosoma brucei gambiense DAL972",
+        "strain"
+      ],
+      [
+        "869250",
+        "Theileria orientalis strain Shintoku",
+        "strain"
+      ],
+      [
+        "889389",
+        "Calicivirus chicken/V0021/Bayern/2004",
+        "no rank"
+      ],
+      [
+        "907965",
+        "Encephalitozoon hellem ATCC 50504",
+        "strain"
+      ],
+      [
+        "914063",
+        "Trypanosoma cruzi JR cl. 4",
+        "strain"
+      ],
+      [
+        "933077",
+        "Toxoplasma gondii VAND",
+        "strain"
+      ],
+      [
+        "935652",
+        "Toxoplasma gondii RUB",
+        "strain"
+      ],
+      [
+        "941442",
+        "Giardia duodenalis assemblage A",
+        "clade"
+      ],
+      [
+        "943118",
+        "Toxoplasma gondii MAS",
+        "strain"
+      ],
+      [
+        "943119",
+        "Toxoplasma gondii p89",
+        "strain"
+      ],
+      [
+        "943120",
+        "Toxoplasma gondii TgCATBr9",
+        "strain"
+      ],
+      [
+        "943121",
+        "Toxoplasma gondii TgCATBr5",
+        "strain"
+      ],
+      [
+        "943122",
+        "Toxoplasma gondii CAST",
+        "isolate"
+      ],
+      [
+        "943167",
+        "Toxoplasma gondii FOU",
+        "strain"
+      ],
+      [
+        "983644",
+        "Cordyceps militaris CM01",
+        "strain"
+      ],
+      [
+        "1068625",
+        "Trypanosoma congolense IL3000",
+        "strain"
+      ],
+      [
+        "1074872",
+        "Toxoplasma gondii ARI",
+        "strain"
+      ],
+      [
+        "1074873",
+        "Toxoplasma gondii COUG",
+        "strain"
+      ],
+      [
+        "1089451",
+        "Fusarium odoratissimum NRRL 54006",
+        "strain"
+      ],
+      [
+        "1120755",
+        "Plasmodium cynomolgi strain B",
+        "strain"
+      ],
+      [
+        "1130820",
+        "Toxoplasma gondii GAB2-2007-GAL-DOM2",
+        "strain"
+      ],
+      [
+        "1130821",
+        "Toxoplasma gondii TgCatPRC2",
+        "strain"
+      ],
+      [
+        "1133968",
+        "Babesia microti strain RI",
+        "strain"
+      ],
+      [
+        "1137138",
+        "Pleurotus ostreatus PC15",
+        "strain"
+      ],
+      [
+        "1194599",
+        "Toxoplasma gondii CtCo5",
+        "strain"
+      ],
+      [
+        "1206070",
+        "Trypanosoma cruzi Tula cl2",
+        "strain"
+      ],
+      [
+        "1227346",
+        "Fusarium proliferatum ET1",
+        "strain"
+      ],
+      [
+        "1239565",
+        "Mamastrovirus 1",
+        "no rank"
+      ],
+      [
+        "1239570",
+        "Mamastrovirus 6",
+        "no rank"
+      ],
+      [
+        "1239573",
+        "Mamastrovirus 9",
+        "no rank"
+      ],
+      [
+        "1240240",
+        "Anncaliia algerae PRA109",
+        "strain"
+      ],
+      [
+        "1257118",
+        "Acanthamoeba castellanii str. Neff",
+        "strain"
+      ],
+      [
+        "1279043",
+        "Cladophialophora carrionii CBS 160.54",
+        "strain"
+      ],
+      [
+        "1288291",
+        "Anncaliia algerae PRA339",
+        "strain"
+      ],
+      [
+        "1295531",
+        "Cryptococcus depauperatus CBS 7841",
+        "strain"
+      ],
+      [
+        "1295824",
+        "Leishmania panamensis MHOM/COL/81/L13",
+        "strain"
+      ],
+      [
+        "1335626",
+        "Middle East respiratory syndrome-related coronavirus",
+        "no rank"
+      ],
+      [
+        "1341019",
+        "Parvovirus NIH-CQV",
+        "no rank"
+      ],
+      [
+        "1348384",
+        "Rotavirus H",
+        "no rank"
+      ],
+      [
+        "1353008",
+        "Aspergillus niger ATCC 13496",
+        "strain"
+      ],
+      [
+        "1354746",
+        "Ordospora colligata OC4",
+        "strain"
+      ],
+      [
+        "1394984",
+        "Giardia duodenalis assemblage B",
+        "clade"
+      ],
+      [
+        "1396488",
+        "Cryptococcus deneoformans XL280",
+        "strain"
+      ],
+      [
+        "1408657",
+        "Pneumocystis jirovecii RU7",
+        "strain"
+      ],
+      [
+        "1416333",
+        "Trypanosoma cruzi Dm28c",
+        "strain"
+      ],
+      [
+        "1440170",
+        "Madariaga virus",
+        "no rank"
+      ],
+      [
+        "1525173",
+        "Human circovirus VS6600022",
+        "no rank"
+      ],
+      [
+        "1903318",
+        "Primate norovirus",
+        "no rank"
+      ],
+      [
+        "2170030",
+        "Newbury 1 virus",
+        "no rank"
+      ],
+      [
+        "2304647",
+        "Beiji nairovirus",
+        "no rank"
+      ],
+      [
+        "2499242",
+        "Caaingua virus",
+        "no rank"
+      ],
+      [
+        "2732655",
+        "Vientovirus",
+        "no rank"
+      ],
+      [
+        "2795181",
+        "Songling virus",
+        "no rank"
+      ],
+      [
+        "2971765",
+        "Langya virus",
+        "no rank"
+      ],
+      [
+        "3703201",
+        "3703201",
+        "unknown"
+      ],
+      [
+        "3703354",
+        "3703354",
+        "unknown"
+      ]
+    ]
+  },
+  "organisms_without_assemblies": {
+    "data": [
+      [
+        "5702",
+        "Trypanosoma brucei brucei"
+      ],
+      [
+        "5851",
+        "Plasmodium knowlesi strain H"
+      ],
+      [
+        "9606",
+        "Homo sapiens"
+      ],
+      [
+        "10255",
+        "Variola virus"
+      ],
+      [
+        "10258",
+        "Orf virus"
+      ],
+      [
+        "10279",
+        "Molluscum contagiosum virus"
+      ],
+      [
+        "10497",
+        "African swine fever virus"
+      ],
+      [
+        "11020",
+        "Barmah Forest virus"
+      ],
+      [
+        "11029",
+        "Ross River virus"
+      ],
+      [
+        "11033",
+        "Semliki Forest virus"
+      ],
+      [
+        "11137",
+        "Human coronavirus 229E"
+      ],
+      [
+        "11976",
+        "Rabbit hemorrhagic disease virus"
+      ],
+      [
+        "11978",
+        "Feline calicivirus"
+      ],
+      [
+        "11983",
+        "Norwalk virus"
+      ],
+      [
+        "12092",
+        "Hepatovirus A"
+      ],
+      [
+        "12475",
+        "Hepatitis delta virus"
+      ],
+      [
+        "28875",
+        "Rotavirus A"
+      ],
+      [
+        "28876",
+        "Rotavirus B"
+      ],
+      [
+        "29930",
+        "Ixodes pacificus"
+      ],
+      [
+        "33756",
+        "European brown hare syndrome virus"
+      ],
+      [
+        "35612",
+        "Vesicular exanthema of swine virus"
+      ],
+      [
+        "36329",
+        "Plasmodium falciparum 3D7"
+      ],
+      [
+        "36427",
+        "Rotavirus C"
+      ],
+      [
+        "38804",
+        "Yaba monkey tumor virus"
+      ],
+      [
+        "40052",
+        "Changuinola virus"
+      ],
+      [
+        "40053",
+        "Corriparta virus"
+      ],
+      [
+        "40057",
+        "Lebombo virus"
+      ],
+      [
+        "40058",
+        "Orungo virus"
+      ],
+      [
+        "40437",
+        "Fomitopsis quercina"
+      ],
+      [
+        "48507",
+        "Fusarium denticulatum"
+      ],
+      [
+        "54757",
+        "Plasmodium vinckei vinckei"
+      ],
+      [
+        "59301",
+        "Mayaro virus"
+      ],
+      [
+        "70186",
+        "Spongospora subterranea"
+      ],
+      [
+        "73239",
+        "Plasmodium yoelii yoelii"
+      ],
+      [
+        "83332",
+        "Mycobacterium tuberculosis H37Rv"
+      ],
+      [
+        "85056",
+        "Trypanosoma cruzi marinkellei"
+      ],
+      [
+        "85057",
+        "Trypanosoma cruzi cruzi"
+      ],
+      [
+        "86630",
+        "Rhizopus azygosporus"
+      ],
+      [
+        "93678",
+        "TTV-like mini virus"
+      ],
+      [
+        "95342",
+        "Sapporo virus"
+      ],
+      [
+        "99000",
+        "Tanapox virus"
+      ],
+      [
+        "118027",
+        "Nelson Bay orthoreovirus"
+      ],
+      [
+        "119398",
+        "Plasmodium vinckei brucechwatti"
+      ],
+      [
+        "126728",
+        "Bonamia ostreae"
+      ],
+      [
+        "138297",
+        "Plasmodium vinckei lentum"
+      ],
+      [
+        "138298",
+        "Plasmodium vinckei petteri"
+      ],
+      [
+        "180454",
+        "Anopheles gambiae str. PEST"
+      ],
+      [
+        "185431",
+        "Trypanosoma brucei brucei TREU927"
+      ],
+      [
+        "194440",
+        "Primate T-lymphotropic virus 1"
+      ],
+      [
+        "194441",
+        "Primate T-lymphotropic virus 2"
+      ],
+      [
+        "194443",
+        "Primate T-lymphotropic virus 3"
+      ],
+      [
+        "195010",
+        "Mikrocytos mackini"
+      ],
+      [
+        "201502",
+        "Glossina fuscipes fuscipes"
+      ],
+      [
+        "204269",
+        "Great Island virus"
+      ],
+      [
+        "214684",
+        "Cryptococcus deneoformans JEC21"
+      ],
+      [
+        "235443",
+        "Cryptococcus neoformans H99"
+      ],
+      [
+        "239206",
+        "Trametes polyzona"
+      ],
+      [
+        "246404",
+        "Chytriomyces confervae"
+      ],
+      [
+        "246410",
+        "Coccidioides immitis RS"
+      ],
+      [
+        "277944",
+        "Human coronavirus NL63"
+      ],
+      [
+        "283643",
+        "Cryptococcus deneoformans B-3501A"
+      ],
+      [
+        "284591",
+        "Yarrowia lipolytica CLIB122"
+      ],
+      [
+        "290028",
+        "Human coronavirus HKU1"
+      ],
+      [
+        "294747",
+        "Candida tropicalis MYA-3404"
+      ],
+      [
+        "332952",
+        "Aspergillus flavus NRRL3357"
+      ],
+      [
+        "352914",
+        "Plasmodium yoelii yoelii 17XNL"
+      ],
+      [
+        "353151",
+        "Cryptosporidium hominis TU502"
+      ],
+      [
+        "353152",
+        "Cryptosporidium parvum Iowa II"
+      ],
+      [
+        "366581",
+        "Trypanosoma cruzi strain Esmeraldo"
+      ],
+      [
+        "380704",
+        "Aspergillus niger ATCC 1015"
+      ],
+      [
+        "383379",
+        "Toxoplasma gondii RH"
+      ],
+      [
+        "396776",
+        "Coccidioides immitis H538.4"
+      ],
+      [
+        "404692",
+        "Coccidioides immitis RMSCC 2394"
+      ],
+      [
+        "425264",
+        "Malassezia restricta CBS 7877"
+      ],
+      [
+        "432359",
+        "Toxoplasma gondii VEG"
+      ],
+      [
+        "441960",
+        "Talaromyces marneffei ATCC 18224"
+      ],
+      [
+        "447093",
+        "Histoplasma capsulatum G186AR"
+      ],
+      [
+        "454286",
+        "Coccidioides immitis RMSCC 3703"
+      ],
+      [
+        "483020",
+        "Lignosus rhinocerus"
+      ],
+      [
+        "487220",
+        "Fusarium sp. NRRL 22101"
+      ],
+      [
+        "507601",
+        "Toxoplasma gondii GT1"
+      ],
+      [
+        "508771",
+        "Toxoplasma gondii ME49"
+      ],
+      [
+        "544711",
+        "Histoplasma capsulatum var. duboisii H88"
+      ],
+      [
+        "544712",
+        "Histoplasma capsulatum H143"
+      ],
+      [
+        "578460",
+        "Vairimorpha ceranae BRL01"
+      ],
+      [
+        "598745",
+        "Giardia duodenalis ATCC 50581"
+      ],
+      [
+        "658858",
+        "Giardia lamblia P15"
+      ],
+      [
+        "679716",
+        "Trypanosoma brucei gambiense DAL972"
+      ],
+      [
+        "869250",
+        "Theileria orientalis strain Shintoku"
+      ],
+      [
+        "889389",
+        "Calicivirus chicken/V0021/Bayern/2004"
+      ],
+      [
+        "907965",
+        "Encephalitozoon hellem ATCC 50504"
+      ],
+      [
+        "914063",
+        "Trypanosoma cruzi JR cl. 4"
+      ],
+      [
+        "933077",
+        "Toxoplasma gondii VAND"
+      ],
+      [
+        "935652",
+        "Toxoplasma gondii RUB"
+      ],
+      [
+        "941442",
+        "Giardia duodenalis assemblage A"
+      ],
+      [
+        "943118",
+        "Toxoplasma gondii MAS"
+      ],
+      [
+        "943119",
+        "Toxoplasma gondii p89"
+      ],
+      [
+        "943120",
+        "Toxoplasma gondii TgCATBr9"
+      ],
+      [
+        "943121",
+        "Toxoplasma gondii TgCATBr5"
+      ],
+      [
+        "943122",
+        "Toxoplasma gondii CAST"
+      ],
+      [
+        "943167",
+        "Toxoplasma gondii FOU"
+      ],
+      [
+        "983644",
+        "Cordyceps militaris CM01"
+      ],
+      [
+        "1068625",
+        "Trypanosoma congolense IL3000"
+      ],
+      [
+        "1074872",
+        "Toxoplasma gondii ARI"
+      ],
+      [
+        "1074873",
+        "Toxoplasma gondii COUG"
+      ],
+      [
+        "1089451",
+        "Fusarium odoratissimum NRRL 54006"
+      ],
+      [
+        "1120755",
+        "Plasmodium cynomolgi strain B"
+      ],
+      [
+        "1130820",
+        "Toxoplasma gondii GAB2-2007-GAL-DOM2"
+      ],
+      [
+        "1130821",
+        "Toxoplasma gondii TgCatPRC2"
+      ],
+      [
+        "1133968",
+        "Babesia microti strain RI"
+      ],
+      [
+        "1137138",
+        "Pleurotus ostreatus PC15"
+      ],
+      [
+        "1142505",
+        "Homolaphlyctis polyrhiza"
+      ],
+      [
+        "1194599",
+        "Toxoplasma gondii CtCo5"
+      ],
+      [
+        "1206070",
+        "Trypanosoma cruzi Tula cl2"
+      ],
+      [
+        "1227346",
+        "Fusarium proliferatum ET1"
+      ],
+      [
+        "1239565",
+        "Mamastrovirus 1"
+      ],
+      [
+        "1239570",
+        "Mamastrovirus 6"
+      ],
+      [
+        "1239573",
+        "Mamastrovirus 9"
+      ],
+      [
+        "1240240",
+        "Anncaliia algerae PRA109"
+      ],
+      [
+        "1257118",
+        "Acanthamoeba castellanii str. Neff"
+      ],
+      [
+        "1279043",
+        "Cladophialophora carrionii CBS 160.54"
+      ],
+      [
+        "1288291",
+        "Anncaliia algerae PRA339"
+      ],
+      [
+        "1295531",
+        "Cryptococcus depauperatus CBS 7841"
+      ],
+      [
+        "1295824",
+        "Leishmania panamensis MHOM/COL/81/L13"
+      ],
+      [
+        "1335626",
+        "Middle East respiratory syndrome-related coronavirus"
+      ],
+      [
+        "1341019",
+        "Parvovirus NIH-CQV"
+      ],
+      [
+        "1348384",
+        "Rotavirus H"
+      ],
+      [
+        "1353008",
+        "Aspergillus niger ATCC 13496"
+      ],
+      [
+        "1354746",
+        "Ordospora colligata OC4"
+      ],
+      [
+        "1394984",
+        "Giardia duodenalis assemblage B"
+      ],
+      [
+        "1396488",
+        "Cryptococcus deneoformans XL280"
+      ],
+      [
+        "1408657",
+        "Pneumocystis jirovecii RU7"
+      ],
+      [
+        "1416333",
+        "Trypanosoma cruzi Dm28c"
+      ],
+      [
+        "1440170",
+        "Madariaga virus"
+      ],
+      [
+        "1525173",
+        "Human circovirus VS6600022"
+      ],
+      [
+        "1882483",
+        "Testicularia cyperi"
+      ],
+      [
+        "1903318",
+        "Primate norovirus"
+      ],
+      [
+        "2126942",
+        "Fomitopsis schrenkii"
+      ],
+      [
+        "2170030",
+        "Newbury 1 virus"
+      ],
+      [
+        "2184066",
+        "Marteilia pararefringens"
+      ],
+      [
+        "2219844",
+        "Amphigerontia contaminata"
+      ],
+      [
+        "2304647",
+        "Beiji nairovirus"
+      ],
+      [
+        "2499242",
+        "Caaingua virus"
+      ],
+      [
+        "2670341",
+        "Nematocida sp. AWRm78"
+      ],
+      [
+        "2692428",
+        "Fusarium sp. NRRL 66182"
+      ],
+      [
+        "2732655",
+        "Vientovirus"
+      ],
+      [
+        "2795181",
+        "Songling virus"
+      ],
+      [
+        "2956251",
+        "Orthopicobirnavirus equi"
+      ],
+      [
+        "2971765",
+        "Langya virus"
+      ],
+      [
+        "3048399",
+        "Betatorquevirus homini32"
+      ],
+      [
+        "3066268",
+        "Rickettsia endosymbiont of Nabis limbatus"
+      ],
+      [
+        "3429217",
+        "Hepatovirus fejalco"
+      ],
+      [
+        "3703201",
+        "3703201"
+      ],
+      [
+        "3703354",
+        "3703354"
+      ]
+    ]
+  },
+  "outbreak_taxonomy_issues": {
+    "data": []
+  },
+  "outdated_accessions": {
+    "data": [
+      [
+        "GCA_000855695.1",
+        "GCA_000855695.2"
+      ],
+      [
+        "GCA_003336725.1",
+        "GCA_003336725.2"
+      ],
+      [
+        "GCA_022627015.2",
+        "GCA_022627015.3"
+      ],
+      [
+        "GCA_029168785.1",
+        "GCA_029168785.2"
+      ],
+      [
+        "GCA_029168835.1",
+        "GCA_029168835.2"
+      ],
+      [
+        "GCA_051549955.1",
+        "GCA_051549955.2"
+      ],
+      [
+        "GCA_051943415.1",
+        "GCA_051943415.2"
+      ],
+      [
+        "GCA_051943445.1",
+        "GCA_051943445.2"
+      ],
+      [
+        "GCA_051943485.1",
+        "GCA_051943485.2"
+      ],
+      [
+        "GCA_051943505.1",
+        "GCA_051943505.2"
+      ],
+      [
+        "GCA_051943535.1",
+        "GCA_051943535.2"
+      ],
+      [
+        "GCA_051943595.1",
+        "GCA_051943595.2"
+      ],
+      [
+        "GCA_051943615.1",
+        "GCA_051943615.2"
+      ],
+      [
+        "GCA_051943635.1",
+        "GCA_051943635.2"
+      ],
+      [
+        "GCA_051943695.1",
+        "GCA_051943695.2"
+      ],
+      [
+        "GCA_051943715.1",
+        "GCA_051943715.2"
+      ],
+      [
+        "GCA_051943735.1",
+        "GCA_051943735.2"
+      ],
+      [
+        "GCA_051943755.1",
+        "GCA_051943755.2"
+      ],
+      [
+        "GCA_051943775.1",
+        "GCA_051943775.2"
+      ],
+      [
+        "GCA_051943795.1",
+        "GCA_051943795.2"
+      ],
+      [
+        "GCA_051943815.1",
+        "GCA_051943815.2"
+      ],
+      [
+        "GCA_051943835.1",
+        "GCA_051943835.2"
+      ],
+      [
+        "GCA_051943855.1",
+        "GCA_051943855.2"
+      ],
+      [
+        "GCA_051943875.1",
+        "GCA_051943875.2"
+      ],
+      [
+        "GCA_051943895.1",
+        "GCA_051943895.2"
+      ],
+      [
+        "GCA_051943915.1",
+        "GCA_051943915.2"
+      ],
+      [
+        "GCA_051943935.1",
+        "GCA_051943935.2"
+      ],
+      [
+        "GCA_051944115.1",
+        "GCA_051944115.2"
+      ],
+      [
+        "GCA_051944135.1",
+        "GCA_051944135.2"
+      ],
+      [
+        "GCA_051944165.1",
+        "GCA_051944165.2"
+      ],
+      [
+        "GCA_051944255.1",
+        "GCA_051944255.2"
+      ],
+      [
+        "GCA_051944275.1",
+        "GCA_051944275.2"
+      ],
+      [
+        "GCA_051988445.1",
+        "GCA_051988445.2"
+      ],
+      [
+        "GCA_051988555.1",
+        "GCA_051988555.2"
+      ],
+      [
+        "GCA_051996105.1",
+        "GCA_051996105.2"
+      ],
+      [
+        "GCA_051996125.1",
+        "GCA_051996125.2"
+      ],
+      [
+        "GCA_052058435.1",
+        "GCA_052058435.2"
+      ],
+      [
+        "GCA_053754955.1",
+        "GCA_053754955.2"
+      ],
+      [
+        "GCA_053754965.1",
+        "GCA_053754965.2"
+      ],
+      [
+        "GCA_904845305.1",
+        "GCA_904845305.2"
+      ],
+      [
+        "GCF_902374465.1",
+        "GCF_902374465.2"
+      ],
+      [
+        "GCF_943734665.1",
+        "GCF_943734665.2"
+      ]
+    ]
+  },
+  "paired_accessions": {
+    "data": [
+      [
+        "GCA_002759435.3",
+        "GCF_002759435.1"
+      ],
+      [
+        "GCA_031319335.1",
+        "GCF_031319335.1"
+      ],
+      [
+        "GCA_050947815.1",
+        "GCF_050947815.1"
+      ],
+      [
+        "GCA_943734665.2",
+        "GCF_943734665.2"
+      ]
+    ]
+  },
+  "suppressed_genomes": {
+    "data": [
+      [
+        "GCA_000469785.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000001985.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000002525.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000002545.3",
+        "suppressed"
+      ],
+      [
+        "GCF_000002825.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000003085.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000003835.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000004015.4",
+        "suppressed"
+      ],
+      [
+        "GCF_000005575.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000006255.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000149205.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000149685.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000151335.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000151735.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000182805.3",
+        "suppressed"
+      ],
+      [
+        "GCF_000182985.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000184105.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000208615.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000209185.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000209485.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000226395.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000230375.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000258005.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000271745.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000315645.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000364345.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000371365.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000457365.2",
+        "suppressed"
+      ],
+      [
+        "GCF_000507365.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000709005.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000723685.1",
+        "suppressed"
+      ],
+      [
+        "GCF_000769155.1",
+        "suppressed"
+      ],
+      [
+        "GCF_001015335.1",
+        "suppressed"
+      ],
+      [
+        "GCF_001021295.1",
+        "suppressed"
+      ],
+      [
+        "GCF_001189475.1",
+        "suppressed"
+      ],
+      [
+        "GCF_001629985.1",
+        "suppressed"
+      ],
+      [
+        "GCF_001876365.2",
+        "suppressed"
+      ],
+      [
+        "GCF_001983325.1",
+        "suppressed"
+      ],
+      [
+        "GCF_002775015.1",
+        "suppressed"
+      ],
+      [
+        "GCF_002892825.2",
+        "suppressed"
+      ],
+      [
+        "GCF_003108605.1",
+        "suppressed"
+      ],
+      [
+        "GCF_003339765.1",
+        "suppressed"
+      ],
+      [
+        "GCF_004786575.1",
+        "suppressed"
+      ],
+      [
+        "GCF_004786635.1",
+        "suppressed"
+      ],
+      [
+        "GCF_004788235.1",
+        "suppressed"
+      ],
+      [
+        "GCF_004788295.1",
+        "suppressed"
+      ],
+      [
+        "GCF_006496715.2",
+        "suppressed"
+      ],
+      [
+        "GCF_008766715.1",
+        "suppressed"
+      ],
+      [
+        "GCF_008766755.1",
+        "suppressed"
+      ],
+      [
+        "GCF_008776015.1",
+        "suppressed"
+      ],
+      [
+        "GCF_013339725.1",
+        "suppressed"
+      ],
+      [
+        "GCF_014117465.1",
+        "suppressed"
+      ],
+      [
+        "GCF_014883685.1",
+        "suppressed"
+      ],
+      [
+        "GCF_014883695.1",
+        "suppressed"
+      ],
+      [
+        "GCF_014883705.1",
+        "suppressed"
+      ],
+      [
+        "GCF_014883715.1",
+        "suppressed"
+      ],
+      [
+        "GCF_015227675.2",
+        "suppressed"
+      ],
+      [
+        "GCF_016920705.1",
+        "suppressed"
+      ],
+      [
+        "GCF_020744495.1",
+        "suppressed"
+      ],
+      [
+        "GCF_033876835.1",
+        "suppressed"
+      ],
+      [
+        "GCF_048819275.1",
+        "suppressed"
+      ],
+      [
+        "GCF_900007375.1",
+        "suppressed"
+      ],
+      [
+        "GCF_902374465.1",
+        "suppressed"
+      ]
+    ]
+  },
+  "tree_checks": {
+    "assemblies_actual_vs_expected": null,
+    "leaves_missing_species": {
+      "data": []
+    },
+    "zero_assemblies_taxa": {
+      "data": []
+    },
+    "missing_ranks": {
+      "data": []
+    }
+  }
+}
