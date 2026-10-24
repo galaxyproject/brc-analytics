@@ -18,6 +18,7 @@ OUTBREAK_TAXONOMY_MAPPING_PATH = (
 
 BUILD_META_OUTPUT_PATH = "catalog/output/data-build-meta.json"
 QC_REPORT_PATH = "catalog/output/qc-report.data.md"
+QC_REPORT_JSON_PATH = "catalog/output/qc-report.data.json"
 TREE_OUTPUT_PATH = "catalog/output/ncbi-taxa-tree.json"
 
 TEMP_FOLDER_PATH = "catalog/build/temp"
@@ -75,6 +76,7 @@ if __name__ == "__main__":
         taxonomic_group_sets={"taxonomicGroup": TAXONOMIC_GROUPS_BY_TAXONOMY_ID},
         build_meta_output_path=BUILD_META_OUTPUT_PATH,
         qc_report_path=QC_REPORT_PATH,
+        qc_report_json_path=QC_REPORT_JSON_PATH,
         organisms_path=ORGANISMS_PATH,
         taxa_path=TAXA_PATH,
         outbreaks_path=OUTBREAKS_PATH,

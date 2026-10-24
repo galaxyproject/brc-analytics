@@ -981,6 +981,7 @@ def build_files(
     datacache_base_url,
     taxonomic_group_sets=None,
     qc_report_path=None,
+    qc_report_json_path=None,
     organisms_path,
     taxa_path=None,
     outbreaks_path=None,
@@ -1320,8 +1321,11 @@ def build_files(
         )
     )
 
+    qc_report = QcResultDataReport(**qc_report_params)
+    if qc_report_json_path is not None:
+        save_json_file(qc_report_json_path, qc_report.model_dump(mode="json"), indent=2)
     if qc_report_path is not None:
-        qc_report_text = QcResultDataReport(**qc_report_params).format_markdown_text()
+        qc_report_text = qc_report.format_markdown_text()
         with open(qc_report_path, "w") as file:
             file.write(qc_report_text)
 
