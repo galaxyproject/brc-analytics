@@ -385,7 +385,7 @@ def report_missing_values[T](
     values_name: str,
     message_predicate: str,
     values_series: pd.Series,
-    present_values_mask: pd.Series[bool],
+    present_values_mask: pd.Series,
 ) -> T:
     missing_values = values_series[~present_values_mask]
     if len(missing_values) > 0:
