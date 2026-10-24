@@ -98,7 +98,7 @@ class QcResultGcaWithPairedGcf(QcReportList[tuple[Any, Any]]):
         )
 
 
-class QcResultInconsistentTaxonomyIds(QcReportList):
+class QcResultInconsistentTaxonomyIds(QcReportList[tuple[Any, Any]]):
     def format_markdown(self) -> List[str]:
         return format_list_section(
             "## Species and strain combinations with multiple taxonomy IDs",
