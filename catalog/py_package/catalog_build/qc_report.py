@@ -281,7 +281,7 @@ def get_qc_report_diff(prev, current):
     if isinstance(current, QcReportList):
         if not isinstance(prev, QcReportList):
             raise ValueError("Cannot diff QcReportList against another type")
-        diff_data = [v for v in current.data if v in prev.data]
+        diff_data = [v for v in current.data if v not in prev.data]
         return (
             current.model_copy(update={"data": diff_data})
             if diff_data
