@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Iterable, List, Sequence, Tuple
+from collections.abc import Mapping
+from typing import Any, Iterable, List, Self, Sequence, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class QcDiffEmptyType:
@@ -15,6 +16,9 @@ QC_DIFF_EMPTY = QcDiffEmptyType()
 
 
 class QcReportElement(BaseModel):
+    def derive_diff_data(self, changed: Mapping[str, Any]) -> Self:
+        return self.model_copy(update=changed)
+
     def format_markdown(self) -> list[str]:
         raise Exception("Unimplemented")
 
@@ -234,6 +238,7 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
 
 
 class QcResultDataReport(QcReportElement):
+    diff_changed_fields: set[str] | None = Field(default=None, exclude=True)
     dbt_test_results: QcResultDbtTestResults
     inconsistent_taxonomy_ids: QcResultInconsistentTaxonomyIds
     missing_datacache_urls: QcResultMissingDatacacheUrls
@@ -252,26 +257,40 @@ class QcResultDataReport(QcReportElement):
     suppressed_genomes: QcResultSupressedGenomes
     tree_checks: QcResultTaxonomyTreeChecks
 
+    def derive_diff_data(self, changed: Mapping[str, Any]) -> Self:
+        diff = super().derive_diff_data(changed)
+        diff.diff_changed_fields = set(changed.keys())
+        return diff
+
     def format_markdown(self) -> list[str]:
-        return [
+        sections_order = [
+            "missing_ncbi_assemblies",
+            "missing_ucsc_assemblies",
+            "missing_gene_model_urls",
+            "missing_datacache_urls",
+            "inconsistent_taxonomy_ids",
+            "missing_ploidy_assemblies",
+            "missing_outbreak_descendants",
+            "outbreak_taxonomy_issues",
+            "organisms_not_species_rank",
+            "organisms_without_assemblies",
+            "outdated_accessions",
+            "suppressed_genomes",
+            "paired_accessions",
+            "tree_checks",
+            "dbt_test_results",
+        ]
+        if self.diff_changed_fields is not None:
+            sections_order = [
+                k for k in sections_order if k in self.diff_changed_fields
+            ]
+        lines = [
             "# Catalog Data QC report",
             "",
-            *self.missing_ncbi_assemblies.format_markdown(),
-            *self.missing_ucsc_assemblies.format_markdown(),
-            *self.missing_gene_model_urls.format_markdown(),
-            *self.missing_datacache_urls.format_markdown(),
-            *self.inconsistent_taxonomy_ids.format_markdown(),
-            *self.missing_ploidy_assemblies.format_markdown(),
-            *self.missing_outbreak_descendants.format_markdown(),
-            *self.outbreak_taxonomy_issues.format_markdown(),
-            *self.organisms_not_species_rank.format_markdown(),
-            *self.organisms_without_assemblies.format_markdown(),
-            *self.outdated_accessions.format_markdown(),
-            *self.suppressed_genomes.format_markdown(),
-            *self.paired_accessions.format_markdown(),
-            *self.tree_checks.format_markdown(),
-            *self.dbt_test_results.format_markdown(),
         ]
+        for k in sections_order:
+            lines += getattr(self, k).format_markdown()
+        return lines
 
 
 def get_qc_report_diff(prev, current):
@@ -283,7 +302,7 @@ def get_qc_report_diff(prev, current):
             raise ValueError("Cannot diff QcReportList against another type")
         diff_data = [v for v in current.data if v not in prev.data]
         return (
-            current.model_copy(update={"data": diff_data})
+            current.derive_diff_data(changed={"data": diff_data})
             if diff_data
             else QC_DIFF_EMPTY
         )
@@ -296,15 +315,17 @@ def get_qc_report_diff(prev, current):
             item_diff = get_qc_report_diff(prev.data.get(k), v)
             if item_diff is not QC_DIFF_EMPTY:
                 diff_data[k] = item_diff
-        return current.model_copy(update={"data": diff_data})
+        return current.derive_diff_data(changed={"data": diff_data})
 
     if isinstance(current, QcReportElement):
-        update = {}
-        for k in type(current).model_fields.keys():
+        changed = {}
+        for k, info in type(current).model_fields.items():
+            if info.exclude:
+                continue
             attr_diff = get_qc_report_diff(getattr(prev, k), getattr(current, k))
             if attr_diff is not QC_DIFF_EMPTY:
-                update[k] = attr_diff
-        return current.model_copy(update=update) if update else QC_DIFF_EMPTY
+                changed[k] = attr_diff
+        return current.derive_diff_data(changed=changed) if changed else QC_DIFF_EMPTY
 
     return QC_DIFF_EMPTY if current == prev else current
 
