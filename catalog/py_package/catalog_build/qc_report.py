@@ -2,22 +2,26 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
-from typing import Any, Iterable, List, Self, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Any, Iterable, List, Sequence, Tuple
 
 from pydantic import BaseModel, Field
 
 
-class QcDiffEmptyType:
-    def __repr__(self) -> str:
-        return "<QC_DIFF_EMPTY>"
-
-
-QC_DIFF_EMPTY = QcDiffEmptyType()
+@dataclass
+class QcDiffResult[T]:
+    diff: T
+    has_content: bool
 
 
 class QcReportElement(BaseModel):
-    def derive_diff_data(self, changed: Mapping[str, Any]) -> Self:
-        return self.model_copy(update=changed)
+    def derive_diff_result(
+        self, field_results: Mapping[str, QcDiffResult]
+    ) -> QcDiffResult:
+        return QcDiffResult(
+            self.model_copy(update={k: res.diff for k, res in field_results.items()}),
+            has_content=any(res.has_content for res in field_results.values()),
+        )
 
     def format_markdown(self) -> list[str]:
         raise Exception("Unimplemented")
@@ -238,7 +242,7 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
 
 
 class QcResultDataReport(QcReportElement):
-    diff_changed_fields: set[str] | None = Field(default=None, exclude=True)
+    diff_content_fields: set[str] | None = Field(default=None, exclude=True)
     dbt_test_results: QcResultDbtTestResults
     inconsistent_taxonomy_ids: QcResultInconsistentTaxonomyIds
     missing_datacache_urls: QcResultMissingDatacacheUrls
@@ -257,10 +261,14 @@ class QcResultDataReport(QcReportElement):
     suppressed_genomes: QcResultSupressedGenomes
     tree_checks: QcResultTaxonomyTreeChecks
 
-    def derive_diff_data(self, changed: Mapping[str, Any]) -> Self:
-        diff = super().derive_diff_data(changed)
-        diff.diff_changed_fields = set(changed.keys())
-        return diff
+    def derive_diff_result(
+        self, field_results: Mapping[str, QcDiffResult]
+    ) -> QcDiffResult:
+        result = super().derive_diff_result(field_results)
+        result.diff.diff_content_fields = set(
+            k for k, res in field_results.items() if res.has_content
+        )
+        return result
 
     def format_markdown(self) -> list[str]:
         sections_order = [
@@ -280,9 +288,9 @@ class QcResultDataReport(QcReportElement):
             "tree_checks",
             "dbt_test_results",
         ]
-        if self.diff_changed_fields is not None:
+        if self.diff_content_fields is not None:
             sections_order = [
-                k for k in sections_order if k in self.diff_changed_fields
+                k for k in sections_order if k in self.diff_content_fields
             ]
         lines = [
             "# Catalog Data QC report",
@@ -293,41 +301,41 @@ class QcResultDataReport(QcReportElement):
         return lines
 
 
-def get_qc_report_diff(prev, current):
+def get_qc_report_diff[T](prev, current: T) -> QcDiffResult[T]:
     if prev is None:
-        return QC_DIFF_EMPTY if current is None else current
+        return QcDiffResult(current, has_content=current is not None)
 
     if isinstance(current, QcReportList):
         if not isinstance(prev, QcReportList):
             raise ValueError("Cannot diff QcReportList against another type")
-        diff_data = [v for v in current.data if v not in prev.data]
-        return (
-            current.derive_diff_data(changed={"data": diff_data})
-            if diff_data
-            else QC_DIFF_EMPTY
+        diff_list = [v for v in current.data if v not in prev.data]
+        return current.derive_diff_result(
+            {"data": QcDiffResult(diff_list, has_content=bool(diff_list))}
         )
 
     if isinstance(current, QcReportKeyedList):
         if not isinstance(prev, QcReportKeyedList):
             raise ValueError("Cannot diff QcReportKeyedList against another type")
-        diff_data = {}
+        diff_dict = {}
+        has_content = False
         for k, v in current.data.items():
-            item_diff = get_qc_report_diff(prev.data.get(k), v)
-            if item_diff is not QC_DIFF_EMPTY:
-                diff_data[k] = item_diff
-        return current.derive_diff_data(changed={"data": diff_data})
+            item_result = get_qc_report_diff(prev.data.get(k), v)
+            diff_dict[k] = item_result.diff
+            if item_result.has_content:
+                has_content = True
+        return current.derive_diff_result(
+            {"data": QcDiffResult(diff_dict, has_content=has_content)}
+        )
 
     if isinstance(current, QcReportElement):
-        changed = {}
+        field_results: dict[str, QcDiffResult] = {}
         for k, info in type(current).model_fields.items():
             if info.exclude:
                 continue
-            attr_diff = get_qc_report_diff(getattr(prev, k), getattr(current, k))
-            if attr_diff is not QC_DIFF_EMPTY:
-                changed[k] = attr_diff
-        return current.derive_diff_data(changed=changed) if changed else QC_DIFF_EMPTY
+            field_results[k] = get_qc_report_diff(getattr(prev, k), getattr(current, k))
+        return current.derive_diff_result(field_results)
 
-    return QC_DIFF_EMPTY if current == prev else current
+    return QcDiffResult(current, has_content=current != prev)
 
 
 def write_markdown(path: str, text: str) -> None:
