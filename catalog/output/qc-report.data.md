@@ -2,7 +2,7 @@
 
 ## Assemblies not found on NCBI
 
-- GCF_965196655.1
+None
 
 ## Assemblies not found in UCSC list
 
@@ -16,13 +16,7 @@ None
 
 ## Assemblies with datacache URLs not found
 
-- GCA_004302925.2
-- GCA_006535965.1
-- GCA_051144935.1
-- GCA_051144965.1
-- GCF_000008445.1
-- GCF_000017685.1
-- GCF_000018225.1
+None
 
 ## Species and strain combinations with multiple taxonomy IDs
 
@@ -386,7 +380,6 @@ None
 - 2956251: Orthopicobirnavirus equi
 - 2971765: Langya virus
 - 3048399: Betatorquevirus homini32
-- 3066268: Rickettsia endosymbiont of Nabis limbatus
 - 3429217: Hepatovirus fejalco
 - 3703201: 3703201
 - 3703354: 3703354
@@ -504,6 +497,7 @@ None
 
 ## GenBank assemblies with paired RefSeq accessions
 
+- GCA_001445615.2 (paired RefSeq: GCF_001445615.1)
 - GCA_002759435.3 (paired RefSeq: GCF_002759435.1)
 - GCA_031319335.1 (paired RefSeq: GCF_031319335.1)
 - GCA_050947815.1 (paired RefSeq: GCF_050947815.1)
@@ -520,35 +514,6 @@ List of taxa with assembly count 0: None
 List of taxonomic levels specified in parameters but absent in tree: None
 
 ## Unsuccessful dbt tests
-
-### `catalog_assemblies_unique_accessions` — status `warn`, 56 failing rows
-
-Got 56 results, configured to warn if != 0
-
-| unique_field | n_records |
-| --- | --- |
-| GCA_004786555.1 | 2 |
-| GCA_023969395.1 | 2 |
-| GCA_031116565.1 | 2 |
-| GCA_900537975.2 | 2 |
-| GCA_964014045.1 | 2 |
-| GCF_000002765.6 | 2 |
-| GCF_000003225.4 | 2 |
-| GCF_000007025.1 | 2 |
-| GCF_000007765.2 | 2 |
-| GCF_000008045.1 | 2 |
-| GCF_000012565.1 | 2 |
-| GCF_000013145.1 | 2 |
-| GCF_000013165.1 | 2 |
-| GCF_000018205.1 | 2 |
-| GCF_000018225.1 | 2 |
-| GCF_000026005.1 | 2 |
-| GCF_000165365.1 | 2 |
-| GCF_000165395.2 | 2 |
-| GCF_000166935.1 | 2 |
-| GCF_000237845.1 | 2 |
-
-_Showing 20 of 56 failing rows._
 
 ### `catalog_organism_taxa_in_organism_taxonomy` — status `warn`, 2 failing rows
 
