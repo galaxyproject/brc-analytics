@@ -317,14 +317,12 @@ def get_qc_report_diff[T](prev, current: T) -> QcDiffResult[T]:
         if not isinstance(prev, QcReportKeyedList):
             raise ValueError("Cannot diff QcReportKeyedList against another type")
         diff_dict = {}
-        has_content = False
         for k, v in current.data.items():
             item_result = get_qc_report_diff(prev.data.get(k), v)
-            diff_dict[k] = item_result.diff
             if item_result.has_content:
-                has_content = True
+                diff_dict[k] = item_result.diff
         return current.derive_diff_result(
-            {"data": QcDiffResult(diff_dict, has_content=has_content)}
+            {"data": QcDiffResult(diff_dict, has_content=bool(diff_dict))}
         )
 
     if isinstance(current, QcReportElement):
