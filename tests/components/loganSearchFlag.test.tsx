@@ -1,4 +1,4 @@
-import { LoganSearch } from "@brc/components/LoganSearch/loganSearch";
+import { LoganSearch } from "@repo/shared/components/LoganSearch/loganSearch";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import ky from "ky";
 
@@ -91,7 +91,7 @@ async function openFilteredLink(): Promise<void> {
     "",
     `/logan-search?job=${JOB_ID}&f.platform=ILLUMINA`
   );
-  render(<LoganSearch />);
+  render(<LoganSearch routes={{ searchPath: "/logan-search" }} />);
   await act(async () => {
     jest.advanceTimersByTime(3000);
   });
