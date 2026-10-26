@@ -137,6 +137,23 @@ async def test_a_stuck_search_is_counted_but_not_aged(service):
 
 
 @pytest.mark.asyncio
+async def test_a_search_just_inside_the_stuck_horizon_still_ages(service):
+    _galaxy_with(
+        service,
+        [
+            _job("old", "queued", created_ago=24 * 60 - 1),
+            _job("stuck", "queued", created_ago=24 * 60 + 1),
+        ],
+        {},
+    )
+
+    queue = await service.get_kmindex_queue()
+
+    assert queue.waiting == 2
+    assert queue.oldest_waiting_minutes == 24 * 60 - 1
+
+
+@pytest.mark.asyncio
 async def test_only_stuck_searches_waiting_leave_no_oldest(service):
     _galaxy_with(service, [_job("stuck", "new", created_ago=25 * 60)], {})
 
