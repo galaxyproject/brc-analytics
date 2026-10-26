@@ -1970,6 +1970,40 @@ class TestExportHits:
 
         assert list(exports.iterdir()) == []
 
+    def test_a_connection_that_cannot_open_a_cursor_leaves_no_partial(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        # The partial is created before the cursor is opened. A cursor that
+        # failed outside the cleanup left an empty .partial per attempt on
+        # brc-dev, one for every job that re-aggregated.
+        svc, accessions = cohort_mirror
+
+        class NoCursor:
+            def cursor(self):
+                raise duckdb.ConnectionException("connection unusable")
+
+        monkeypatch.setattr(svc, "_con", NoCursor())
+
+        with pytest.raises(duckdb.ConnectionException):
+            svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert list(exports.iterdir()) == []
+
+    def test_a_failed_rename_leaves_no_partial(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        svc, accessions = cohort_mirror
+
+        def refuse(self, target):
+            raise OSError("rename refused")
+
+        monkeypatch.setattr(sra_mirror.Path, "replace", refuse)
+
+        with pytest.raises(OSError, match="rename refused"):
+            svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert list(exports.iterdir()) == []
+
     def test_staging_file_is_removed_even_when_the_write_fails(
         self, cohort_mirror, exports, monkeypatch, tmp_path
     ):

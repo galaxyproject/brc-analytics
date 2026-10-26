@@ -39,6 +39,7 @@ POST /jobs                 -> 202 {job_id, status_url, results_url, export_url}
 GET  /jobs/{id}            -> 202 + Retry-After while running, 200 when done
 GET  /jobs/{id}/results    -> 202 until merged, then a page of hits
 GET  /jobs/{id}/export     -> every hit, as TSV (or parquet)
+GET  /queue                -> how backed up searches are right now
 ```
 
 `status_url`, `results_url` and `export_url` are paths relative to the host.
@@ -95,6 +96,36 @@ successfully or not.
 **Honor `Retry-After`.** Status only changes every ten seconds or so, and
 searches take anywhere from a couple of minutes to more than half an hour when
 Galaxy is busy. When a job fails, `error` carries the end of the tool's stderr.
+
+A search that is still `queued` hasn't failed: it's waiting for a node on
+TACC's Vista cluster, and on a busy day that can take well over an hour. Keep
+polling, and use `/queue` to tell people what they're waiting on.
+
+### Queue
+
+```sh
+curl -H "X-API-Key: $KEY" $BASE/queue
+# {"waiting": 5, "running": 1, "oldest_waiting_minutes": 84.0,
+#  "recent_wait_minutes": 12.5, "recent_wait_p90_minutes": 51.0,
+#  "recent_searches": 6, "window_minutes": 120, "as_of": "2026-10-15T13:00:00+00:00"}
+```
+
+How many searches are waiting to start, and how long recent ones waited. It
+covers every search run on the BRC service account, which includes all of
+yours, and is refreshed at most once a minute.
+
+- `waiting` / `running` -- searches submitted but not started, and running now.
+- `oldest_waiting_minutes` -- how long the longest-waiting search has waited
+  so far. This is the live signal: when it's large, a new search will wait too.
+- `recent_wait_minutes` / `recent_wait_p90_minutes` -- median and 90th
+  percentile wait from submit to start, over `recent_searches` searches that
+  finished in the last `window_minutes`. Repeats answered from Galaxy's job
+  cache never queued and aren't counted. These lag: a search stuck right now
+  only shows up here once it finishes, so read them alongside
+  `oldest_waiting_minutes`.
+
+This is a report, not a prediction. Vista's queue is shared with every other
+TACC user, and we only see our own jobs in it.
 
 ### Results
 

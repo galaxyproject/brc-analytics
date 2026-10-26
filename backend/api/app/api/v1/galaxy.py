@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from bioblend import ConnectionError as BioblendConnectionError
@@ -29,6 +30,8 @@ from app.models.galaxy import (
     GalaxyJobSubmission,
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueHistory,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
     KmindexSummary,
@@ -312,6 +315,54 @@ async def list_kmindex_indexes(
         ) from e
 
 
+def get_queue_galaxy_service(
+    cache: CacheService = Depends(get_cache_service),
+) -> GalaxyService:
+    """The service account, whoever is asking.
+
+    The queue is the service account's jobs, so a signed-in reader still has
+    to read them as the service account -- their own token would list theirs.
+    """
+    key = get_settings().GALAXY_API_KEY
+    credential = GalaxyCredential(kind="service", secret=key) if key else None
+    return GalaxyService(cache, credential=credential)
+
+
+@router.get("/kmindex/queue", response_model=KmindexQueueStatus)
+async def kmindex_queue(
+    galaxy_service: GalaxyService = Depends(get_queue_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """How many Logan searches are waiting, and how long recent ones waited."""
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        return await galaxy_service.get_kmindex_queue()
+    except Exception as e:
+        logger.error(f"Failed to read the kmindex queue: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue"
+        ) from e
+
+
+@router.get("/kmindex/queue/history", response_model=KmindexQueueHistory)
+async def kmindex_queue_history(
+    hours: int = Query(24, ge=1, le=72),
+    galaxy_service: GalaxyService = Depends(get_queue_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+):
+    """Every Logan search submitted in the last `hours`, and how long each waited."""
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        return await galaxy_service.get_kmindex_queue_history(hours)
+    except Exception as e:
+        logger.error(f"Failed to read the kmindex queue history: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue history"
+        ) from e
+
+
 @router.post("/kmindex/submit", response_model=GalaxyJobResponse)
 async def submit_kmindex_query(
     submission: KmindexQuerySubmission,
@@ -516,6 +567,7 @@ async def export_kmindex_results(
     job_id: str,
     format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
@@ -524,15 +576,15 @@ async def export_kmindex_results(
     This is the whole match set, not the 50,000 the results endpoint pages and
     not the 25 rows it annotates -- on a real job, 1,133,516 rows against a
     displayed 50,000. It was written once during aggregation, which is the only
-    moment the full list exists, so this only ever serves a finished file and
-    never touches Galaxy.
+    moment the full list exists, so this only ever serves a finished file.
+    Galaxy is only asked when there is no file under the job asked for, to find
+    a job-cache copy's original, which the file was written under.
 
     parquet is the file as materialized, served byte for byte (16 MB on the
     measured job). tsv is converted on the way out for anything that wants a
     plain text table, and streams rather than being assembled in memory -- the
     same rows are 168 MB as text.
 
-    @param job_id: the completed kmindex job.
     With f.* filter parameters only the rows the filter keeps are sent, as
     TSV. A filtered parquet needs a temporary file and a path that reliably
     removes it, so for now it is refused rather than served unfiltered.
@@ -547,12 +599,29 @@ async def export_kmindex_results(
                 status_code=422,
                 detail="A filtered download is TSV only for now",
             )
-        return await serve_kmindex_export(job_id, format, filters=filters)
-    return await serve_kmindex_export(job_id, format)
+        return await serve_kmindex_export(
+            job_id, format, galaxy_service, filters=filters
+        )
+    return await serve_kmindex_export(job_id, format, galaxy_service)
+
+
+def _usable_export(path: Path) -> bool:
+    """Whether the file at path is there and written by the current scorer.
+
+    @param path: a candidate export file.
+    @returns: True only for a current, readable file.
+    """
+    try:
+        return path.is_file() and export_is_current(path)
+    except Exception:
+        return False
 
 
 async def serve_kmindex_export(
-    job_id: str, format: str, filters: Optional[KmindexFilters] = None
+    job_id: str,
+    format: str,
+    galaxy_service: GalaxyService,
+    filters: Optional[KmindexFilters] = None,
 ) -> Response:
     """
     The export as an attachment, or a 404 if there is no current one.
@@ -562,11 +631,32 @@ async def serve_kmindex_export(
 
     @param job_id: the completed kmindex job.
     @param format: parquet or tsv.
+    @param galaxy_service: to find a job-cache copy's original, which the file
+        was written under, when there is no usable one under job_id itself.
     @param filters: a non-empty filter to narrow a TSV download, or None.
-    @returns: the file response.
+    @returns: the file response, named for job_id either way.
     """
-    path = export_file_path(get_settings().KMINDEX_EXPORT_DIR, job_id)
-    if path is None or not path.is_file():
+    export_dir = get_settings().KMINDEX_EXPORT_DIR
+    path = export_file_path(export_dir, job_id)
+    if path is None:
+        # No export directory, or an id that can't name a file: there is
+        # nothing to find under an original either.
+        raise HTTPException(
+            status_code=404,
+            detail=f"No downloadable export for job {job_id}",
+        )
+    # Only a job-cache copy lacks a usable file of its own, so downloading an
+    # original never waits on Galaxy, which can take 30s to fail when it's
+    # down. A stale file counts as missing: a copy can still hold one written
+    # before copies shared their original's, and nothing rewrites it now.
+    # source_job_id reads a remembered link from Redis before asking Galaxy,
+    # so a known copy resolves even with Galaxy off.
+    if not await asyncio.to_thread(_usable_export, path):
+        source_job_id = await galaxy_service.source_job_id(job_id)
+        source_path = export_file_path(export_dir, source_job_id)
+        if source_job_id != job_id and source_path is not None:
+            path = source_path
+    if not path.is_file():
         raise HTTPException(
             status_code=404,
             detail=f"No downloadable export for job {job_id}",

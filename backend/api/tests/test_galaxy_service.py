@@ -46,10 +46,12 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    KmindexFiltersUnavailable,
     _default_order,
     _submitted_index_names,
     _submitted_threshold,
 )
+from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.sra_mirror import _SORTABLE_COLUMNS
 
@@ -320,6 +322,30 @@ class TestMergeBookkeeping:
         assert aggregate["shards_searched"] == 1
         assert aggregate["shards_with_hits"] == 1
         assert aggregate["shards_with_hits"] <= aggregate["shards_searched"]
+
+    @pytest.mark.asyncio
+    async def test_hits_are_merged_off_the_event_loop(self, service, monkeypatch):
+        # A million-hit merge on the loop would stall every status poll while
+        # it ran, and with partner merges overlapping that stall would stack.
+        import threading
+
+        merged_on = []
+        real = galaxy_service._merge_shard_hits
+
+        def _spy(*args):
+            merged_on.append(threading.get_ident())
+            return real(*args)
+
+        monkeypatch.setattr(galaxy_service, "_merge_shard_hits", _spy)
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {"SRR1": 0.9}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["total_matches"] == 1
+        assert merged_on and merged_on[0] != threading.get_ident()
 
     @pytest.mark.asyncio
     async def test_equal_scores_order_deterministically(self, service):
@@ -1286,8 +1312,7 @@ class TestCohortOverTheFullHitSet:
         reaches the query. What that check cannot see remains: a corrupt page,
         a revoked file handle, a duckdb version disagreement. Every results
         poll and every page click would otherwise re-download all 84 shard
-        datasets from a rate-limited Galaxy, serialized against every other
-        kmindex user on the process-wide aggregation lock.
+        datasets from Galaxy, each time taking one of the few merge slots.
         """
         store = {}
         service.cache.make_key = MagicMock(
@@ -1457,13 +1482,12 @@ class TestGeographyInTheAggregationWindow:
         """
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -1505,13 +1529,12 @@ class TestGeographyInTheAggregationWindow:
         # change of mirror may cost a re-aggregation.
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -2025,19 +2048,21 @@ class TestExportOfTheFullMatchSet:
 class TestExportEndpoint:
     """Serving a materialized export.
 
-    The file is a finished artifact: the endpoint never touches Galaxy and
-    never needs the mirror, so a job whose export exists stays downloadable
-    even while both are down.
+    The file is a finished artifact: the endpoint never needs the mirror, and
+    Galaxy only to follow a job-cache copy to its original, so a job whose
+    export exists stays downloadable even while both are down.
     """
 
     @staticmethod
-    def _client(export_dir, monkeypatch):
+    def _client(export_dir, monkeypatch, galaxy=None):
         """A test client over the galaxy router alone, with the export
         directory configured.
 
         @param export_dir: value for KMINDEX_EXPORT_DIR, or None to leave it
             unset.
         @param monkeypatch: the test's monkeypatch fixture.
+        @param galaxy: the service the endpoint gets; by default one that
+            knows of no copies, so no test here can reach a real Galaxy.
         @returns: a TestClient.
         """
         from fastapi import FastAPI
@@ -2051,10 +2076,27 @@ class TestExportEndpoint:
             monkeypatch.setenv("KMINDEX_EXPORT_DIR", str(export_dir))
         get_settings.cache_clear()
 
+        if galaxy is None:
+            galaxy = MagicMock()
+            galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
         app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: galaxy
         return TestClient(app)
+
+    @staticmethod
+    def _copy_of(original):
+        """A service that knows every job asked about is a copy of original."""
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(return_value=original)
+        return galaxy
+
+    @staticmethod
+    def _never_asked():
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("asked Galaxy"))
+        return galaxy
 
     @staticmethod
     def _export(directory, job_id="job1", accessions=("SRR1", "SRR2"), columns=None):
@@ -2129,6 +2171,54 @@ class TestExportEndpoint:
         assert (
             client.get("/galaxy/kmindex/jobs/job1/export?format=tsv").status_code == 404
         )
+
+    def test_a_copy_with_no_file_of_its_own_downloads_its_originals(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig", accessions=("SRR1", "SRR2", "SRR3"))
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+        assert "copy1" in response.headers["content-disposition"]
+
+    def test_a_copys_stale_file_gives_way_to_its_originals(self, tmp_path, monkeypatch):
+        # Written under the copy's own id before copies shared their
+        # original's, and before the score correction. Nothing rewrites it.
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig")
+        self._export(
+            tmp_path,
+            job_id="copy1",
+            columns=[c for c in EXPORT_COLUMNS if c not in ("ani", "fp_correction")],
+        )
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+
+    def test_an_original_with_a_current_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        self._export(tmp_path)
+
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 200
+
+    def test_a_download_that_cannot_name_a_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job.1/export").status_code == 404
+
+        monkeypatch.delenv("KMINDEX_EXPORT_DIR", raising=False)
+        client = self._client(None, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 404
 
     def test_a_job_id_that_is_not_an_identifier_404s(self, tmp_path, monkeypatch):
         # It is a filename here, so it never gets to be a path.
@@ -2994,7 +3084,7 @@ class TestAggregatingMarker:
         marker_key = self._keyed(service)
         during = {}
 
-        async def _aggregate(_job_id, **_):
+        async def _aggregate(_job_id, *_, **__):
             during["claimed"] = list(service.cache.claim.call_args_list)
             during["deleted"] = list(service.cache.delete.call_args_list)
             return _listing(3)
@@ -3054,20 +3144,24 @@ class TestAggregatingMarker:
 
 class TestAggregationLanes:
     """
-    Partner merges and BRC merges hold separate locks.
+    Partner merges and BRC merges take slots in separate lanes.
 
     A partner search covers every index, so its cold merge can run for
     minutes; with one process-wide lock, every BRC user's cold read would sit
-    behind it. And a partner caller polls, so when its own lane is busy it is
-    told to come back rather than parked on the lock.
+    behind it. Partner merges overlap up to KMINDEX_PARTNER_MERGES, and a
+    partner caller polls, so when every slot is taken it is told to come back
+    rather than parked.
     """
 
     @pytest.fixture(autouse=True)
     def _fresh_locks(self, monkeypatch):
         monkeypatch.setattr(
             galaxy_service,
-            "_AGGREGATION_LOCKS",
-            {"native": asyncio.Lock(), "partner": asyncio.Lock()},
+            "_AGGREGATION_LANES",
+            {
+                "native": asyncio.Semaphore(1),
+                "partner": asyncio.Semaphore(galaxy_service.KMINDEX_PARTNER_MERGES),
+            },
         )
 
     @pytest.mark.asyncio
@@ -3077,9 +3171,11 @@ class TestAggregationLanes:
             side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
         )
         release = asyncio.Event()
+        partner_merging = asyncio.Event()
 
-        async def _aggregate(job_id, **_):
+        async def _aggregate(job_id, *_, **__):
             if job_id == "partner_job":
+                partner_merging.set()
                 await release.wait()
             return _listing(1)
 
@@ -3088,8 +3184,9 @@ class TestAggregationLanes:
         partner = asyncio.create_task(
             service.get_kmindex_results("partner_job", lane="partner")
         )
-        await asyncio.sleep(0)
-        assert galaxy_service._AGGREGATION_LOCKS["partner"].locked()
+        # Looking up whether the job is a job-cache copy comes first, so the
+        # merge starts a few turns of the loop later, not on the first.
+        await asyncio.wait_for(partner_merging.wait(), timeout=1)
 
         native = await asyncio.wait_for(
             service.get_kmindex_results("native_job"), timeout=1
@@ -3108,6 +3205,8 @@ class TestAggregationLanes:
         landed = _listing(1)
         reads = iter([None, None, None, landed])
         service.cache.get = AsyncMock(side_effect=lambda _key: next(reads, None))
+        # Not a job-cache copy; keeps that lookup out of the counted reads.
+        service._resolve_source = AsyncMock(return_value=("job1", None))
         service._aggregate_shards = AsyncMock()
 
         results = await service.get_kmindex_results("job1", lane="partner")
@@ -3131,7 +3230,7 @@ class TestAggregationLanes:
         service.cache.claim = AsyncMock(side_effect=_claim)
         release = asyncio.Event()
 
-        async def _aggregate(_job_id, **_):
+        async def _aggregate(_job_id, *_, **__):
             await release.wait()
             return _listing(1)
 
@@ -3147,31 +3246,71 @@ class TestAggregationLanes:
         service._aggregate_shards.assert_awaited_once()
 
     @pytest.mark.asyncio
-    async def test_a_busy_partner_lane_answers_come_back_later(self, service):
+    async def test_a_full_partner_lane_answers_come_back_later(self, service):
         service.sra_mirror = None
         service._aggregate_shards = AsyncMock()
-        lock = galaxy_service._AGGREGATION_LOCKS["partner"]
+        slots = galaxy_service._AGGREGATION_LANES["partner"]
 
-        await lock.acquire()
+        for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+            await slots.acquire()
         try:
             with pytest.raises(GalaxyJobAggregating, match="queued"):
                 await service.get_kmindex_results("job2", lane="partner")
         finally:
-            lock.release()
+            for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+                slots.release()
 
         service._aggregate_shards.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_partner_merges_of_different_jobs_overlap(self, service):
+        # A classroom's distinct queries finish together; they should merge
+        # side by side up to the cap, and only the one past it is turned away.
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service._resolve_source = AsyncMock(side_effect=lambda job_id: (job_id, None))
+        cap = galaxy_service.KMINDEX_PARTNER_MERGES
+        started = 0
+        release = asyncio.Event()
+
+        async def _aggregate(*_, **__):
+            nonlocal started
+            started += 1
+            await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        merges = [
+            asyncio.create_task(service.get_kmindex_results(f"job{i}", lane="partner"))
+            for i in range(cap)
+        ]
+        for _ in range(100):
+            if started == cap:
+                break
+            await asyncio.sleep(0.01)
+        assert started == cap
+
+        with pytest.raises(GalaxyJobAggregating, match="queued"):
+            await service.get_kmindex_results("one_too_many", lane="partner")
+
+        release.set()
+        for merge in merges:
+            assert (await merge).total_hits == 1
 
     @pytest.mark.asyncio
     async def test_a_busy_native_lane_still_waits_its_turn(self, service):
         service.sra_mirror = None
         service._aggregate_shards = AsyncMock(return_value=_listing(1))
-        lock = galaxy_service._AGGREGATION_LOCKS["native"]
+        slots = galaxy_service._AGGREGATION_LANES["native"]
 
-        await lock.acquire()
+        await slots.acquire()
         reader = asyncio.create_task(service.get_kmindex_results("job3"))
         await asyncio.sleep(0.01)
         assert not reader.done()
-        lock.release()
+        slots.release()
 
         assert (await reader).total_hits == 1
 
@@ -3646,3 +3785,354 @@ class TestCollectionDownload:
         assert aggregate["shards_searched"] == 2
         assert aggregate["shards_failed"] == 0
         assert service._download_shard.await_count == 2
+
+
+def _status_of(job_id, copied_from=None):
+    """A finished job's status, as get_job_status would build it."""
+    return GalaxyJobStatus(
+        copied_from_job_id=copied_from,
+        created_time="t0",
+        is_complete=True,
+        is_successful=True,
+        job_id=job_id,
+        state="ok",
+        updated_time="t1",
+    )
+
+
+class TestJobCacheCopies:
+    """
+    Galaxy answers a repeated query with a copy of the finished job, under a
+    new id. A classroom of copies has to read one aggregate, built once under
+    the original, rather than each re-merging thousands of shards from Galaxy.
+    """
+
+    @pytest.fixture()
+    def wired(self, service):
+        store = {}
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "copy1": _status_of("copy1", copied_from="orig"),
+            "copy2": _status_of("copy2", copied_from="orig"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        merged = []
+
+        async def _aggregate(job_id, status=None):
+            merged.append(job_id)
+            store[f"{KMINDEX_AGG_CACHE_PREFIX}:{job_id}"] = _listing(2)
+            return _listing(2)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+        service._export_state = MagicMock(
+            return_value={"bytes": None, "rows": None, "status": "unavailable"}
+        )
+        return service, store, merged
+
+    @pytest.mark.asyncio
+    async def test_copies_share_one_merge_under_the_original(self, wired):
+        service, _, merged = wired
+
+        first = await service.get_kmindex_results("copy1")
+        second = await service.get_kmindex_results("copy2")
+
+        assert merged == ["orig"]
+        # Each caller's page still names the job they asked for.
+        assert (first.job_id, second.job_id) == ("copy1", "copy2")
+        assert first.total_hits == second.total_hits == 2
+        # The export file was written under the original, so that's where its
+        # state is read from.
+        assert service._export_state.call_args.args[1] == "orig"
+
+    @pytest.mark.asyncio
+    async def test_a_copys_merge_is_claimed_under_the_original(self, wired):
+        service, _, _ = wired
+
+        await service.get_kmindex_results("copy1")
+
+        claimed = service.cache.claim.call_args.args[0]
+        assert claimed == service._aggregating_key("orig")
+
+    @pytest.mark.asyncio
+    async def test_a_copy_waiting_on_a_merge_hears_its_own_id(self, wired):
+        # The partner API hands this message back as the 202 detail, and the
+        # original's id belongs to whoever ran it first.
+        service, store, _ = wired
+        store[service._aggregating_key("orig")] = True
+
+        with pytest.raises(GalaxyJobAggregating) as raised:
+            await service.get_kmindex_results("copy1")
+
+        assert "copy1" in str(raised.value)
+        assert "orig" not in str(raised.value)
+
+    @pytest.mark.asyncio
+    async def test_a_job_that_isnt_a_copy_is_its_own_source(self, wired):
+        service, _, merged = wired
+
+        assert await service.source_job_id("orig") == "orig"
+        await service.get_kmindex_results("orig")
+        assert merged == ["orig"]
+
+    @pytest.mark.asyncio
+    async def test_an_unreadable_original_stops_at_the_copy(self, service):
+        # The copy's outputs are still the original's datasets, so merging the
+        # copy itself is the right fallback when the link can't be followed.
+        async def _status(job_id):
+            if job_id == "orig":
+                raise GalaxyJobNotFound("purged")
+            return _status_of(job_id, copied_from="orig")
+
+        service.get_job_status = AsyncMock(side_effect=_status)
+        assert await service.source_job_id("copy1") == "copy1"
+
+    @pytest.mark.asyncio
+    async def test_a_copy_cycle_does_not_spin(self, service):
+        statuses = {
+            "a": _status_of("a", copied_from="b"),
+            "b": _status_of("b", copied_from="a"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        assert await service.source_job_id("a") == "b"
+        assert service.get_job_status.await_count == 2
+
+    @pytest.mark.asyncio
+    async def test_the_assistant_read_follows_a_cached_copy_link(self, wired):
+        service, store, _ = wired
+        await service.get_kmindex_results("orig")
+        store["galaxy:job_status:copy1"] = _status_of(
+            "copy1", copied_from="orig"
+        ).model_dump()
+        service.get_job_status = AsyncMock(side_effect=AssertionError("Galaxy"))
+
+        page = await service.get_cached_kmindex_results("copy1")
+
+        assert page is not None
+        assert page.job_id == "copy1"
+        assert page.total_hits == 2
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_page_of_a_copy_reads_the_originals_export(
+        self, wired, monkeypatch, tmp_path
+    ):
+        service, _, merged = wired
+        service._filterable_export = AsyncMock(return_value=tmp_path / "x.parquet")
+        service._fill_biosample = AsyncMock()
+        monkeypatch.setattr(
+            galaxy_service.kmindex_filters,
+            "subset_page",
+            lambda *args: {"hits": [], "matched": 0},
+        )
+
+        page = await service.get_filtered_kmindex_results(
+            "copy1", KmindexFilters(platform=["ILLUMINA"])
+        )
+
+        assert merged == ["orig"]
+        assert service._filterable_export.call_args.args[1] == "orig"
+        assert service._export_state.call_args.args[1] == "orig"
+        assert page.job_id == "copy1"
+        assert page.filtered
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_summary_of_a_copy_reads_the_originals_export(self, wired):
+        service, _, _ = wired
+        service._filterable_export = AsyncMock(
+            side_effect=KmindexFiltersUnavailable("none")
+        )
+
+        with pytest.raises(KmindexFiltersUnavailable):
+            await service.get_filtered_kmindex_summary(
+                "copy1", KmindexFilters(platform=["ILLUMINA"])
+            )
+
+        assert service._filterable_export.call_args.args[1] == "orig"
+
+
+class TestExportOfACopy:
+    """A job-cache copy's export is the file its original wrote."""
+
+    @pytest.mark.asyncio
+    async def test_the_file_is_found_under_the_original_and_named_for_the_copy(
+        self, tmp_path, monkeypatch
+    ):
+        import duckdb
+
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        duckdb.sql(
+            "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+            f"TO '{path}' (FORMAT parquet)"
+        )
+        looked_up = []
+        monkeypatch.setattr(
+            galaxy_module,
+            "export_file_path",
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
+        )
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(return_value="orig")
+
+        response = await galaxy_module.serve_kmindex_export("copy1", "parquet", galaxy)
+
+        assert looked_up == ["copy1", "orig"]
+        assert "copy1" in response.headers["content-disposition"]
+
+    @pytest.mark.asyncio
+    async def test_an_original_with_its_own_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        import duckdb
+
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        duckdb.sql(
+            "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+            f"TO '{path}' (FORMAT parquet)"
+        )
+        monkeypatch.setattr(galaxy_module, "export_file_path", lambda _d, _j: path)
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("Galaxy"))
+
+        response = await galaxy_module.serve_kmindex_export("orig", "parquet", galaxy)
+
+        assert "orig" in response.headers["content-disposition"]
+        galaxy.source_job_id.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_download_of_a_copy_is_cut_from_the_originals_file(
+        self, tmp_path, monkeypatch
+    ):
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        path.write_bytes(b"")
+        looked_up = []
+        monkeypatch.setattr(
+            galaxy_module,
+            "export_file_path",
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
+        )
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        monkeypatch.setattr(galaxy_module, "subset_row_count", lambda _p, _f: 1)
+        monkeypatch.setattr(
+            galaxy_module, "iter_subset_tsv", lambda _p, _f: iter([b"SRR1\t0.9\n"])
+        )
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(return_value="orig")
+
+        # Through the endpoint, so the filtered branch is held to passing the
+        # service along too.
+        response = await galaxy_module.export_kmindex_results(
+            "copy1",
+            format="tsv",
+            filters=KmindexFilters(platform=["ILLUMINA"]),
+            galaxy_service=galaxy,
+            _rate_limit=None,
+        )
+
+        assert looked_up == ["copy1", "orig"]
+        disposition = response.headers["content-disposition"]
+        assert "copy1" in disposition and "filtered" in disposition
+
+
+class TestCopyLinkIsRemembered:
+    @pytest.mark.asyncio
+    async def test_a_resolved_copy_needs_no_galaxy_afterwards(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "copy1": _status_of("copy1", copied_from="orig"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        assert await service.source_job_id("copy1") == "orig"
+
+        # Galaxy goes away: the export link the results page offered still
+        # finds its file under the original.
+        service.get_job_status = AsyncMock(side_effect=RuntimeError("down"))
+        assert await service.source_job_id("copy1") == "orig"
+        service.get_job_status.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_remembered_link_resolves_with_galaxy_off(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        store[service._copy_of_key("copy1")] = "orig"
+        service.gi = None
+
+        assert not service.is_available()
+        assert await service.source_job_id("copy1") == "orig"
+        assert await service.source_job_id("orig") == "orig"
+
+    @pytest.mark.asyncio
+    async def test_a_chain_cut_short_by_a_failed_read_is_not_remembered(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "c1": _status_of("c1", copied_from="orig"),
+            "c2": _status_of("c2", copied_from="c1"),
+        }
+        orig_down = True
+
+        async def _status(job_id):
+            if job_id == "orig" and orig_down:
+                raise RuntimeError("transient")
+            return statuses[job_id]
+
+        service.get_job_status = AsyncMock(side_effect=_status)
+
+        # It stops at the last job that answered, as before, but says nothing
+        # of it for the next read.
+        assert await service.source_job_id("c2") == "c1"
+        assert store == {}
+
+        orig_down = False
+        assert await service.source_job_id("c2") == "orig"
+        assert list(store.values()) == ["orig"]
