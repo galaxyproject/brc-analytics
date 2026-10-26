@@ -25,24 +25,37 @@ export function formatWait(minutes: number): string {
  * the recent figure only counts searches once they finish, so on its own it
  * lags a backlog that is building right now.
  * @param queue - The snapshot, or null before it lands.
- * @returns Minutes, or null when the queue is moving.
+ * @returns Minutes, and whether they belong to the oldest search still in
+ * line; or null when the queue is moving.
  */
-export function busyWait(queue: KmindexQueue | null): number | null {
+export function busyWait(
+  queue: KmindexQueue | null
+): { inLine: boolean; minutes: number } | null {
   if (!queue) return null;
   const recent = queue.recent_searches > 0 ? queue.recent_wait_minutes : null;
-  const wait = Math.max(queue.oldest_waiting_minutes ?? 0, recent ?? 0);
-  return wait >= QUEUE_BUSY_MINUTES ? wait : null;
+  const oldest = queue.oldest_waiting_minutes ?? 0;
+  const minutes = Math.max(oldest, recent ?? 0);
+  if (minutes < QUEUE_BUSY_MINUTES) return null;
+  return { inLine: oldest > (recent ?? 0), minutes };
 }
 
 /**
- * A sentence about the recent wait, when demand is high enough to mention.
+ * A sentence about the wait, when demand is high enough to mention.
  * @param queue - The snapshot, or null before it lands.
  * @param lead - Everything before the wait itself.
  * @returns The sentence, or null when the queue is moving.
  */
 function busySentence(queue: KmindexQueue | null, lead: string): string | null {
   const wait = busyWait(queue);
-  return wait === null ? null : `${lead} ${formatWait(wait)} to start.`;
+  if (!wait) return null;
+  // Say whose wait it is: one long-queued search isn't what recent ones saw.
+  const clause = wait.inLine
+    ? `the oldest search in line has been waiting about ${formatWait(wait.minutes)}`
+    : `recent searches have waited about ${formatWait(wait.minutes)} to start`;
+  const rest = lead.endsWith(".")
+    ? clause[0].toUpperCase() + clause.slice(1)
+    : clause;
+  return `${lead} ${rest}.`;
 }
 
 /**
@@ -51,10 +64,7 @@ function busySentence(queue: KmindexQueue | null, lead: string): string | null {
  * @returns The sentence, or null when the queue is moving.
  */
 export function busyNotice(queue: KmindexQueue | null): string | null {
-  return busySentence(
-    queue,
-    "Heads up, demand is quite high right now. Recent searches have waited about"
-  );
+  return busySentence(queue, "Heads up, demand is quite high right now.");
 }
 
 /**
@@ -63,8 +73,5 @@ export function busyNotice(queue: KmindexQueue | null): string | null {
  * @returns The sentence, or null when the queue is moving.
  */
 export function describeQueue(queue: KmindexQueue | null): string | null {
-  return busySentence(
-    queue,
-    "Demand is quite high right now; recent searches have waited about"
-  );
+  return busySentence(queue, "Demand is quite high right now;");
 }
