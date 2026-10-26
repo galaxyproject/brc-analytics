@@ -16,7 +16,7 @@ class QcDiffResult[T]:
 
 @dataclass
 class QcReportRenderContext:
-    is_diff: bool
+    is_diff: bool = False
     containing_section_level: int = 0
 
     def get_empty_list_text(self):

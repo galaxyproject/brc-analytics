@@ -12,6 +12,7 @@ import pandas as pd
 
 from .load import LoadParams, do_dlt_load
 from .qc_report import (
+    QcReportRenderContext,
     QcResultDataReport,
     QcResultDbtTest,
     QcResultDbtTestFailures,
@@ -1325,7 +1326,7 @@ def build_files(
     if qc_report_json_path is not None:
         save_json_file(qc_report_json_path, qc_report.model_dump(mode="json"), indent=2)
     if qc_report_path is not None:
-        qc_report_text = qc_report.format_markdown_text()
+        qc_report_text = qc_report.format_markdown_text(QcReportRenderContext())
         with open(qc_report_path, "w") as file:
             file.write(qc_report_text)
 
