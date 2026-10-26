@@ -93,6 +93,12 @@ describe("describeQueue", () => {
     );
   });
 
+  test("credits recent searches when the two figures tie", () => {
+    expect(describeQueue({ ...BACKED_UP, oldest_waiting_minutes: 12.4 })).toBe(
+      "Demand is quite high right now; recent searches have waited about 12 min to start."
+    );
+  });
+
   test("goes by the longer of the backlog and the recent wait", () => {
     // Recent waits only count finished searches, so a backlog building right
     // now shows up in the oldest wait first -- and the other way round once

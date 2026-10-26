@@ -43,18 +43,21 @@ export function busyWait(
  * A sentence about the wait, when demand is high enough to mention.
  * @param queue - The snapshot, or null before it lands.
  * @param lead - Everything before the wait itself.
+ * @param newSentence - Whether the wait starts a sentence of its own.
  * @returns The sentence, or null when the queue is moving.
  */
-function busySentence(queue: KmindexQueue | null, lead: string): string | null {
+function busySentence(
+  queue: KmindexQueue | null,
+  lead: string,
+  newSentence: boolean
+): string | null {
   const wait = busyWait(queue);
   if (!wait) return null;
   // Say whose wait it is: one long-queued search isn't what recent ones saw.
   const clause = wait.inLine
     ? `the oldest search in line has been waiting about ${formatWait(wait.minutes)}`
     : `recent searches have waited about ${formatWait(wait.minutes)} to start`;
-  const rest = lead.endsWith(".")
-    ? clause[0].toUpperCase() + clause.slice(1)
-    : clause;
+  const rest = newSentence ? clause[0].toUpperCase() + clause.slice(1) : clause;
   return `${lead} ${rest}.`;
 }
 
@@ -64,7 +67,7 @@ function busySentence(queue: KmindexQueue | null, lead: string): string | null {
  * @returns The sentence, or null when the queue is moving.
  */
 export function busyNotice(queue: KmindexQueue | null): string | null {
-  return busySentence(queue, "Heads up, demand is quite high right now.");
+  return busySentence(queue, "Heads up, demand is quite high right now.", true);
 }
 
 /**
@@ -73,5 +76,5 @@ export function busyNotice(queue: KmindexQueue | null): string | null {
  * @returns The sentence, or null when the queue is moving.
  */
 export function describeQueue(queue: KmindexQueue | null): string | null {
-  return busySentence(queue, "Demand is quite high right now;");
+  return busySentence(queue, "Demand is quite high right now;", false);
 }
