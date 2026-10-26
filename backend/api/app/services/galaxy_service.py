@@ -393,6 +393,10 @@ KMINDEX_HISTORY_METRIC_READS = 400
 KMINDEX_HISTORY_READ_TIMEOUT = 90.0
 _KMINDEX_WAITING_STATES = frozenset({"new", "queued", "waiting", "resubmitted"})
 _KMINDEX_FINISHED_STATES = frozenset({"ok", "error"})
+# A search waiting longer than this is stuck, not queued behind others: one
+# such job would otherwise set the "oldest waiting" age the busy note shows.
+# It still counts as waiting; only its age is left out.
+KMINDEX_STUCK_AFTER = timedelta(hours=24)
 
 # bioblend sets no socket timeout by default. We set a global request timeout
 # here because requests' timeout is connect + inter-byte read, not total transfer
@@ -2502,7 +2506,14 @@ class GalaxyService:
         )
         waiting = [j for j in active if j.get("state") in _KMINDEX_WAITING_STATES]
         running = sum(1 for j in active if j.get("state") == "running")
-        oldest = min((_galaxy_time(j["create_time"]) for j in waiting), default=None)
+        oldest = min(
+            (
+                created
+                for created in (_galaxy_time(j["create_time"]) for j in waiting)
+                if now - created <= KMINDEX_STUCK_AFTER
+            ),
+            default=None,
+        )
 
         since = now - timedelta(minutes=KMINDEX_QUEUE_WINDOW_MINUTES)
         # date_range_min is a date, matched against update_time.
@@ -2686,7 +2697,8 @@ class GalaxyService:
                 wait = (_galaxy_time(job["update_time"]) - created).total_seconds()
             elif state in _KMINDEX_WAITING_STATES:
                 waiting = True
-                wait = (now - created).total_seconds()
+                if now - created <= KMINDEX_STUCK_AFTER:
+                    wait = (now - created).total_seconds()
             rows.append(
                 KmindexQueueHistoryRow(
                     cached=cached,

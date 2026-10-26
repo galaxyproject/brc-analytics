@@ -119,6 +119,34 @@ async def test_counts_waiting_and_running_and_ages_the_oldest(service):
 
 
 @pytest.mark.asyncio
+async def test_a_stuck_search_is_counted_but_not_aged(service):
+    _galaxy_with(
+        service,
+        [
+            _job("stuck", "queued", created_ago=12633),
+            _job("w1", "queued", created_ago=30),
+            _job("r1", "running", created_ago=20),
+        ],
+        {},
+    )
+
+    queue = await service.get_kmindex_queue()
+
+    assert queue.waiting == 2
+    assert queue.oldest_waiting_minutes == 30.0
+
+
+@pytest.mark.asyncio
+async def test_only_stuck_searches_waiting_leave_no_oldest(service):
+    _galaxy_with(service, [_job("stuck", "new", created_ago=25 * 60)], {})
+
+    queue = await service.get_kmindex_queue()
+
+    assert queue.waiting == 1
+    assert queue.oldest_waiting_minutes is None
+
+
+@pytest.mark.asyncio
 async def test_recent_waits_come_from_finished_jobs_in_the_window(service):
     jobs = [
         _job("a", "ok", created_ago=60, updated_ago=30),
@@ -456,6 +484,17 @@ class TestHistory:
         assert history.wait_p50_minutes == 30.0
         assert history.run_p50_minutes == 2.0
         assert not history.truncated
+
+    @pytest.mark.asyncio
+    async def test_a_stuck_search_shows_as_waiting_with_no_wait(self, service):
+        stuck = _job("stuck", "queued", created_ago=30 * 60)
+        service.gi.jobs.get_jobs = MagicMock(return_value=[*self.JOBS, stuck])
+
+        history = await service.get_kmindex_queue_history(72)
+
+        row = history.rows[0]
+        assert row.still_waiting
+        assert row.wait_minutes is None
 
     @pytest.mark.asyncio
     async def test_carries_no_job_ids(self, service):
