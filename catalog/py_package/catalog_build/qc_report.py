@@ -348,7 +348,13 @@ class QcResultDataReport(QcReportElement):
                 k for k in sections_order if k in self.diff_content_fields
             ]
         lines = [
-            format_heading("Catalog Data QC report", 1, context),
+            format_heading(
+                "New and changed QC report items"
+                if context.is_diff
+                else "Catalog Data QC report",
+                1,
+                context,
+            ),
             "",
         ]
         for k in sections_order:
