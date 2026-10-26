@@ -382,6 +382,27 @@ def test_a_failed_read_is_a_502_not_a_500(app_client):  # noqa: F811
     assert "galaxy down" not in response.text
 
 
+@pytest.mark.asyncio
+async def test_a_lagging_node_clock_does_not_make_a_real_job_a_copy(service):
+    # The node stamps start and end; Galaxy stamps create_time. A node a
+    # minute behind puts this job's start before its submit, but it ran for
+    # ten minutes past it, which no copy of a finished job can.
+    job = _job("skewed", "ok", created_ago=30, updated_ago=20)
+    service.gi.jobs.get_metrics = MagicMock(return_value=_started(-1, job, ran_for=10))
+
+    timing = await service._job_timing(job)
+
+    assert timing == {"copy": False, "run": 600.0, "wait": 0.0}
+
+
+@pytest.mark.asyncio
+async def test_a_copy_ends_before_it_was_submitted(service):
+    job = _job("copy", "ok", created_ago=30, updated_ago=30)
+    service.gi.jobs.get_metrics = MagicMock(return_value=_started(-20, job, ran_for=5))
+
+    assert (await service._job_timing(job))["copy"] is True
+
+
 class TestHistory:
     """The last day of searches, for the unlisted stats page."""
 

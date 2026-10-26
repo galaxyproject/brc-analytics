@@ -2591,18 +2591,26 @@ class GalaxyService:
         metrics onto it, so its start lands before its own submit. It comes
         back as a copy with neither figure. A job that finished without a
         start time has neither too.
+
+        The metrics are stamped by the compute node's clock and create_time by
+        Galaxy's, so a node running behind can put a real job's start before
+        its submit too. Galaxy only reuses finished jobs, so a copy's end is
+        before its submit as well; a real job's end is after it, by its whole
+        run.
         """
         metrics = await asyncio.to_thread(self.gi.jobs.get_metrics, job["id"])
         raw = {m.get("name"): m.get("raw_value") for m in metrics}
         if raw.get("start_epoch") is None:
             return {"copy": False, "run": None, "wait": None}
         start = float(raw["start_epoch"])
-        wait = start - _galaxy_time(job["create_time"]).timestamp()
-        if wait < 0:
+        created = _galaxy_time(job["create_time"]).timestamp()
+        wait = start - created
+        end = float(raw["end_epoch"]) if raw.get("end_epoch") is not None else None
+        if wait < 0 and (end is None or end < created):
             return {"copy": True, "run": None, "wait": None}
-        end = raw.get("end_epoch")
-        run = float(end) - start if end is not None else None
-        return {"copy": False, "run": run, "wait": wait}
+        run = end - start if end is not None else None
+        # A skewed clock that hides the wait means it was shorter than the skew.
+        return {"copy": False, "run": run, "wait": max(wait, 0.0)}
 
     async def get_kmindex_queue_history(self, hours: int = 24) -> KmindexQueueHistory:
         """Every search submitted in the last `hours`, with how long it waited.
