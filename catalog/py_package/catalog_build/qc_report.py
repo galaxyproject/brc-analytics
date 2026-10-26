@@ -14,6 +14,14 @@ class QcDiffResult[T]:
     has_content: bool
 
 
+@dataclass
+class QcReportRenderContext:
+    is_diff: bool
+
+    def get_empty_list_text(self):
+        return "No new items" if self.is_diff else "None"
+
+
 class QcReportElement(BaseModel):
     def derive_diff_result(
         self, field_results: Mapping[str, QcDiffResult]
@@ -23,11 +31,11 @@ class QcReportElement(BaseModel):
             has_content=any(res.has_content for res in field_results.values()),
         )
 
-    def format_markdown(self) -> list[str]:
+    def format_markdown(self, context: QcReportRenderContext) -> list[str]:
         raise Exception("Unimplemented")
 
-    def format_markdown_text(self) -> str:
-        return join_report(self.format_markdown())
+    def format_markdown_text(self, context: QcReportRenderContext) -> str:
+        return join_report(self.format_markdown(context))
 
 
 class QcReportList[T](QcReportElement):
@@ -39,7 +47,7 @@ class QcReportKeyedList[T](QcReportElement):
 
 
 class QcResultDbtTestFailureSample(QcReportList[dict]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_markdown_table(self.data, cell_truncation_threshold=200)
 
 
@@ -47,9 +55,9 @@ class QcResultDbtTestFailures(QcReportElement):
     count: int
     sample: QcResultDbtTestFailureSample
 
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return [
-            *self.sample.format_markdown(),
+            *self.sample.format_markdown(context),
             *(
                 [
                     f"_Showing {len(self.sample.data)} of {self.count} failing rows._",
@@ -68,7 +76,7 @@ class QcResultDbtTest(QcReportElement):
     message: str | None
     failures: QcResultDbtTestFailures | None
 
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         count = self.failures.count if self.failures else None
         count_text = (
             f", {count} failing row{'' if count == 1 else 's'}"
@@ -79,137 +87,150 @@ class QcResultDbtTest(QcReportElement):
             f"### `{self.test_name}` — status `{self.status}`{count_text}",
             "",
             *([self.message, ""] if self.message else []),
-            *(self.failures.format_markdown() if self.failures else []),
+            *(self.failures.format_markdown(context) if self.failures else []),
         ]
 
 
 class QcResultDbtTestResults(QcReportKeyedList[QcResultDbtTest]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         unsuccessful = [result for result in self.data.values() if not result.success]
         lines = [
             "## Unsuccessful dbt tests",
             "",
         ]
         if not unsuccessful:
-            lines += ["None", ""]
+            lines += [context.get_empty_list_text(), ""]
             return lines
         for result in unsuccessful:
-            lines += result.format_markdown()
+            lines += result.format_markdown(context)
         return lines
 
 
 class QcResultGcaWithPairedGcf(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## GenBank assemblies with paired RefSeq accessions",
             [f"{gca} (paired RefSeq: {gcf})" for gca, gcf in self.data],
+            context,
         )
 
 
 class QcResultInconsistentTaxonomyIds(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Species and strain combinations with multiple taxonomy IDs",
             [f"{taxon}: {ids}" for taxon, ids in self.data],
+            context,
         )
 
 
 class QcResultMissingDatacacheUrls(QcReportList):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies with datacache URLs not found", self.data
+            "## Assemblies with datacache URLs not found", self.data, context
         )
 
 
 class QcResultMissingGeneModelUrls(QcReportList):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies with gene model URLs not found", self.data
+            "## Assemblies with gene model URLs not found", self.data, context
         )
 
 
 class QcResultMissingNcbiAssemblies(QcReportList):
-    def format_markdown(self) -> List[str]:
-        return format_list_section("## Assemblies not found on NCBI", self.data)
+    def format_markdown(self, context) -> List[str]:
+        return format_list_section(
+            "## Assemblies not found on NCBI", self.data, context
+        )
 
 
 class QcResultMissingOutbreakDescendants(QcReportList):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Outbreak descendant taxonomy IDs not found in genomes data",
             self.data,
+            context,
         )
 
 
 class QcResultMissingPloidyAssemblies(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Assemblies without ploidy information",
             [
                 f"{accession} (speciesTaxonomyId: {tax_id})"
                 for accession, tax_id in self.data
             ],
+            context,
         )
 
 
 class QcResultMissingUcscAssemblies(QcReportList):
-    def format_markdown(self) -> List[str]:
-        return format_list_section("## Assemblies not found in UCSC list", self.data)
+    def format_markdown(self, context) -> List[str]:
+        return format_list_section(
+            "## Assemblies not found in UCSC list", self.data, context
+        )
 
 
 class QcResultOrganismsNotSpeciesRank(QcReportList[tuple[Any, Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Organisms not at species rank",
             [f"{tax_id}: {name} (rank: {rank})" for tax_id, name, rank in self.data],
+            context,
         )
 
 
 class QcResultOrganismsWithoutAssemblies(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Organisms not matched to any assembly",
             [f"{tax_id}: {name}" for tax_id, name in self.data],
+            context,
         )
 
 
 class QcResultOutbreakTaxonomyIssues(QcReportList[tuple[Any, Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
             [f"{tax_id}: {name} ({reason})" for tax_id, name, reason in self.data],
+            context,
         )
 
 
 class QcResultOutdatedAccessions(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Outdated assembly accessions",
             [f"{acc} (current: {curr_acc})" for acc, curr_acc in self.data],
+            context,
         )
 
 
 class QcResultSupressedGenomes(QcReportList[tuple[Any, Any]]):
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return format_list_section(
             "## Suppressed or retired genomes",
             [f"{acc} (status: {status})" for acc, status in self.data],
+            context,
         )
 
 
 class QcResultTaxonomyTreeLeavesMissingSpecies(QcReportList):
-    def format_markdown_text(self) -> str:
-        return format_inline_list(self.data)
+    def format_markdown_text(self, context) -> str:
+        return format_inline_list(self.data, context)
 
 
 class QcResultTaxonomyTreeZeroAssembliesTaxa(QcReportList):
-    def format_markdown_text(self) -> str:
-        return format_inline_list(self.data)
+    def format_markdown_text(self, context) -> str:
+        return format_inline_list(self.data, context)
 
 
 class QcResultTaxonomyTreeMissingRanks(QcReportList[str]):
-    def format_markdown_text(self) -> str:
-        return format_inline_list(self.data)
+    def format_markdown_text(self, context) -> str:
+        return format_inline_list(self.data, context)
 
 
 class QcResultTaxonomyTreeChecks(QcReportElement):
@@ -218,7 +239,7 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
     zero_assemblies_taxa: QcResultTaxonomyTreeZeroAssembliesTaxa
     missing_ranks: QcResultTaxonomyTreeMissingRanks
 
-    def format_markdown(self) -> List[str]:
+    def format_markdown(self, context) -> List[str]:
         return [
             "## Taxonomy tree",
             "",
@@ -230,13 +251,13 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
             ),
             "",
             "List of leaves without species in lineage: "
-            + self.leaves_missing_species.format_markdown_text(),
+            + self.leaves_missing_species.format_markdown_text(context),
             "",
             "List of taxa with assembly count 0: "
-            + self.zero_assemblies_taxa.format_markdown_text(),
+            + self.zero_assemblies_taxa.format_markdown_text(context),
             "",
             "List of taxonomic levels specified in parameters but absent in tree: "
-            + self.missing_ranks.format_markdown_text(),
+            + self.missing_ranks.format_markdown_text(context),
             "",
         ]
 
@@ -270,7 +291,7 @@ class QcResultDataReport(QcReportElement):
         )
         return result
 
-    def format_markdown(self) -> list[str]:
+    def format_markdown(self, context) -> list[str]:
         sections_order = [
             "missing_ncbi_assemblies",
             "missing_ucsc_assemblies",
@@ -375,18 +396,22 @@ def format_markdown_table(table_rows: list[dict], **cell_options) -> list[str]:
     return lines
 
 
-def format_inline_list(items: Sequence[str] | None) -> str:
-    return ", ".join(items) if items else "None"
+def format_inline_list(
+    items: Sequence[str] | None, context: QcReportRenderContext
+) -> str:
+    return ", ".join(items) if items else context.get_empty_list_text()
 
 
 def section_header(title: str) -> List[str]:
     return [title, ""]
 
 
-def format_list_section(title: str, items: Sequence) -> List[str]:
+def format_list_section(
+    title: str, items: Sequence, context: QcReportRenderContext | None = None
+) -> List[str]:
     lines = section_header(title)
     if not items:
-        lines += ["None", ""]
+        lines += ["None" if context is None else context.get_empty_list_text(), ""]
     else:
         lines += [f"- {item}" for item in items] + [""]
     return lines
