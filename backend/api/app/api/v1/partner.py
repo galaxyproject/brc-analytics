@@ -304,7 +304,8 @@ async def job_status(
     except GalaxyJobNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
-        logger.error(f"Partner status for {job_id} failed: {e}")
+        # Warning, not error: the 502 below already reaches Sentry.
+        logger.warning("Partner status for %s failed: %s", job_id, e)
         raise HTTPException(status_code=502, detail="Failed to get job status") from e
 
     if not status.is_complete:

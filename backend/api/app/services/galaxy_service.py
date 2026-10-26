@@ -2100,10 +2100,10 @@ class GalaxyService:
         except BioblendConnectionError as e:
             if is_missing_job_error(e):
                 raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
-            logger.error(f"BioBLEND error getting job status: {e}")
+            logger.error("BioBLEND error getting job status for %s: %s", job_id, e)
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
         except Exception as e:
-            logger.error(f"BioBLEND error getting job status: {e}")
+            logger.error("BioBLEND error getting job status for %s: %s", job_id, e)
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
 
     async def _report_paused_job(self, job_id: str, job_data: dict) -> None:
