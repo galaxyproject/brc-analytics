@@ -29,16 +29,16 @@ The threshold is the minimum fraction of the query's k-mers a run must contain t
 
 ## Indexes and presets
 
-The archive is split into 109 indexes, each one organism group crossed with one library type: `GENOMIC_BCT` is genomic runs of bacteria, `METATRANSCRIPTOMIC_ENV` is metatranscriptomes from environmental samples, and so on. The two rows of chips pick from each axis, and the search covers every index that matches both. The sentence under the chips says exactly which indexes that comes to.
+The archive is split into 109 indexes, each one organism group crossed with one library type: `GENOMIC_BCT` is genomic runs of bacteria, `METATRANSCRIPTOMIC_ENV` is metatranscriptomes from environmental samples, and so on. The matrix shows them all at once, organism groups down and library types across: click a cell to add or drop one index, click a row or column label to take the whole line, or drag across cells to paint several. Gaps in the grid are pairs with no index, such as environmental samples, which only have a metagenomic one. The count and sentence beside the Search button say exactly which indexes the search will cover.
 
-The **presets** set the chips to the logan-search.org groups we can reproduce faithfully over these 109 indexes:
+The **presets** beside the matrix select the logan-search.org groups we can reproduce faithfully over these 109 indexes:
 
 - **All**: every index.
 - **All but viral and human**: everything except the viral, phage and human indexes.
 - **Transcriptomic**: bulk and single-cell transcriptomic runs.
 - **Metatranscriptomic** and **Metagenomic**: the indexes of those library types.
 
-A preset only sets the chips; you can adjust from there. logan-search.org's "Fast" groups aren't offered because they leave out small sub-indexes inside each division, which these indexes can't express. Its GenBank/RefSeq group isn't available here either, because that index isn't deployed on Galaxy Test, the Galaxy server these searches run on.
+Each one names the logan-search.org group it matches, and it stays highlighted while the selection is exactly that group. A preset is a starting point: adjust the matrix from there, and the highlight goes away once the selection is your own. logan-search.org's "Fast" groups aren't offered because they leave out small sub-indexes inside each division, which these indexes can't express. Its GenBank/RefSeq group isn't available here either, because that index isn't deployed on Galaxy Test, the Galaxy server these searches run on.
 
 Searching more indexes costs more: the default is the single index that pairs with the first example, and All is the most expensive job on offer.
 

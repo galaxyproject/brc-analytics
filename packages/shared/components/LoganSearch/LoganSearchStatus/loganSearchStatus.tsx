@@ -1,0 +1,128 @@
+import {
+  Alert,
+  Card,
+  CardContent,
+  Chip,
+  LinearProgress,
+  Typography,
+} from "@mui/material";
+import { ControlRow } from "@repo/shared/components/LoganSearch/loganSearch.styles";
+import { describeQueue } from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
+import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
+import { type useKmindexSearch } from "@repo/shared/hooks/useKmindexSearch";
+import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { type JSX } from "react";
+
+interface LoganSearchStatusProps {
+  search: ReturnType<typeof useKmindexSearch>;
+}
+
+const STATE_COLORS: Record<
+  string,
+  "default" | "error" | "info" | "success" | "warning"
+> = {
+  error: "error",
+  new: "default",
+  ok: "success",
+  queued: "warning",
+  running: "info",
+};
+
+// Galaxy's own vocabulary is terse; these read better next to a spinner.
+// States where the job is waiting its turn rather than running.
+const WAITING_STATES = new Set(["new", "queued"]);
+
+const STATE_LABELS: Record<string, string> = {
+  new: "Submitted",
+  ok: "Complete",
+  queued: "Queued",
+  running: "Searching the index",
+};
+
+export const LoganSearchStatus = ({
+  search,
+}: LoganSearchStatusProps): JSX.Element | null => {
+  const {
+    error,
+    identity,
+    isLoadingResults,
+    jobId,
+    jobStatus,
+    pollWarning,
+    results,
+  } = search;
+  const { isAuthenticated } = useAuth();
+  // A signed-in visitor whose search still ran under the service key means the
+  // session couldn't be turned into a Galaxy credential. The search works, so
+  // it isn't an error -- but the job landed in the shared account rather than
+  // theirs, and they'd otherwise never know.
+  const ranAsSharedAccount = isAuthenticated && identity === "service";
+  const isWaiting =
+    Boolean(jobId) &&
+    !error &&
+    !results &&
+    WAITING_STATES.has(jobStatus?.state ?? "new");
+  const queue = useKmindexQueue(isWaiting);
+  const queueNote = isWaiting ? describeQueue(queue) : null;
+
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
+
+  if (!jobId) return null;
+
+  const state = jobStatus?.state ?? "new";
+  const isDone = Boolean(results);
+
+  return (
+    <>
+      {ranAsSharedAccount && (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          This search ran under the shared BRC account because your session
+          couldn&apos;t be verified. Sign in again to run searches as yourself.
+        </Alert>
+      )}
+      {/* Only while the search is still running. Once results are in, the job
+          id and the state it reached are both said better by the summary
+          strip, and a card whose only content is "Complete" is a row of
+          furniture between the query and its answer. */}
+      {!isDone && (
+        <Card sx={{ mt: 2 }}>
+          <CardContent>
+            <ControlRow>
+              <Typography variant="subtitle1">Job {jobId}</Typography>
+              <Chip
+                color={STATE_COLORS[state] ?? "default"}
+                label={STATE_LABELS[state] ?? state}
+                size="small"
+              />
+            </ControlRow>
+            <LinearProgress sx={{ mt: 2 }} />
+            {pollWarning && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                {pollWarning}
+              </Alert>
+            )}
+            {isWaiting && (
+              <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
+                {queueNote && `${queueNote} `}
+                Waits can range from minutes to hours. A long wait isn&apos;t an
+                error; this page keeps checking.
+              </Typography>
+            )}
+            {isLoadingResults && (
+              <Typography color="textSecondary" sx={{ mt: 1 }} variant="body2">
+                Merging hits across index shards. A search over many indexes can
+                take a while; this page keeps checking.
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+};
