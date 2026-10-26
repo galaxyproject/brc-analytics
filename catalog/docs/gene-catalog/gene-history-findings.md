@@ -6,7 +6,7 @@ Checked 2026-10-24. The scripts and results were in a local prototype directory 
 
 We can rebuild a gene-by-gene history for VEuPathDB organisms: when each gene ID was last seen, and whether it was renamed, merged or retired. VEuPathDB keeps every release's GFF3 and previous-ID file back to release 24. Comparing two releases' files gives the history, with VEuPathDB's own statements as the links and position overlap as a check. A test on _P. falciparum_ 3D7, release 24 against release 71, worked.
 
-This contradicts the spec's future use case "What changed in this gene over time?", which says "past changes mostly can't be rebuilt". For VEuPathDB they can.
+The spec's future use case "What changed in this gene over time?" said past changes mostly can't be rebuilt; for VEuPathDB they can, and the spec was updated (see What this changes in the spec).
 
 Whether anyone needs it is unproven; see Use cases.
 

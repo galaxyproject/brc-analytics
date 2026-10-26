@@ -1,6 +1,6 @@
 # Gene Annotation Provenance Spec
 
-Draft, 2026-09-30. Related: #1776 (gene pages), #1777 (gene list prototype). Database design: [gene-annotation-schema.md](gene-annotation-schema.md).
+Draft, 2026-09-30. Related: #1776 (gene pages), #1777 (gene list prototype). Database design: [gene-annotation-schema.md](gene-annotation-schema.md). **Where this differs from [gene-catalog-contract.md](gene-catalog-contract.md), the contract wins** (terms, table columns, field names, scope). Its "v1 (P01)" predates the contract's scope: the contract's v0 is gene pages from the publisher's files, and its v1 adds linking workflow runs through their GTFs.
 
 ## What this enables
 
@@ -36,7 +36,7 @@ Draft, 2026-09-30. Related: #1776 (gene pages), #1777 (gene list prototype). Dat
 - **Release labels are missing or inconsistent:** none of the 2,031 UCSC `ncbiGene` tracks has one. Elsewhere they read "release 68", `RS_2026_09` or "INSDC submitter (2023-10-05)".
 - **Mirrors lag:** 321 of the 2,419 catalog UCSC `ncbiGene` and `ncbiRefSeq` GTFs (13%) were built before NCBI last changed the annotation's locations, a median of 179 days before; 306 of the 321 are bacteria (#1874, GenArk GTFs behind NCBI's annotation; checked 2026-10-15).
 - **How much the copies differ** (UCSC `ncbiGene` GTF vs NCBI's current GFF3, protein-coding genes by coding coordinates; 500 more assemblies, 2026-10-14): 76% identical. Eukaryotes: 15 of 239 differ, median 0.2% of genes. Bacteria differ almost always: 80 of 80 where UCSC is behind NCBI (median 2.4% of genes, up to 5%), and 18 of 19 where it isn't (median 1.3%). Viruses: 6 of 160.
-- **Gene IDs differ between copies; same-name genes are merged:** UCSC's GTF converter (`genePredToGtf`) writes the gene symbol as `gene_id` when there is one, else the locus tag. It makes repeated transcript IDs unique (`_2`) but not gene IDs, so separate genes sharing a symbol become one `gene_id`. In _Rickettsia helvetica_ (`GCF_963970025.1`), NCBI's two `lpdA` genes (`AB1146_RS01845`, `AB1146_RS07020`, 870 kb apart) are one `gene_id` "lpdA", and likewise `def` and `gltX`. The BRC RNA-seq workflows (v1.4) count by `gene_id` (STAR GeneCounts, featureCounts), so reads from both genes land in one row. Measured on 1,059 `ncbiGene` and 80 `ncbiRefSeq` GTFs (2026-10-15): merges in 207 of 211 bacteria (median 0.95% of genes, max 6%; not related to UCSC lag), 9 of 331 viruses (herpes simplex, mpox, HHV-6/7 repeat-copy genes), 31 of 515 eukaryotes on `ncbiGene` (mostly under 1.5%, but _Toxocara canis_ 16%, mostly coding genes) and 23 of 80 on `ncbiRefSeq` (mostly tRNA genes, up to 21% of genes in ticks). NCBI's own GTF keeps every one of these merges apart. Curated genomes (_E. coli_ K-12, _M. tuberculosis_ H37Rv) have unique symbols and no merges. Where UCSC's copy is up to date, the remaining eukaryotic differences are mostly **partial genes** (coding sequence running off a contig end; 370 in the 500-assembly sample, 326 in one microsporidian); how UCSC converts those is not yet checked.
+- **Gene IDs differ between copies; same-name genes are merged:** UCSC's GTF converter writes the gene symbol as `gene_id` when there is one, else the locus tag, so separate genes sharing a symbol become one `gene_id` and the RNA-seq workflows count them as one gene. It happens in almost every bacterium and in some eukaryotes; NCBI's own GTF keeps them apart. Measurements and examples: [ucsc-gtf-gene-merge-findings.md](ucsc-gtf-gene-merge-findings.md). Where UCSC's copy is up to date, the remaining eukaryotic differences are mostly **partial genes** (coding sequence running off a contig end; 370 in the 500-assembly sample, 326 in one microsporidian); how UCSC converts those is not yet checked.
 - **Copies are thinner:** UCSC GTFs have no products, biotypes or cross-references. In _P. vivax_ P01 (`GCA_900093555.2`), UCSC also splits multi-exon genes into single-exon transcripts.
 - **GenBank lacks what RefSeq adds:** 3D7's GenBank annotation has no gene symbols and no NCBI GeneIDs; its RefSeq annotation has 2,152 symbols and a GeneID on every gene.
 - **RefSeq can arrive years after the paper:** labs submit only to GenBank (or ENA or DDBJ), and NCBI builds RefSeq later, if at all. _E. cuniculi_'s genome paper is from 2001; its RefSeq annotation, with new `NM_` and `NP_` accessions, is dated 2022-12-22. So the IDs a paper cites and NCBI's current IDs often differ.
@@ -151,7 +151,7 @@ Every link records its **source** (link type, the publisher that stated it, and 
 | **Merged**  | The page of the gene it merged into. Its ID becomes a previous name of that gene                | 3D7's `PF3D7_0105400.1` and `.2` → `PF3D7_0105400` (per RefSeq) |
 | **Split**   | A short notice, "This gene was split into", linking to the current pages of the genes it became | A declared one-to-many replacement in NCBI's `gene_history`     |
 
-**Going forward, a change set per gene.** Each refresh can record what changed for each gene (a new symbol, a moved exon, a merge), so a gene's changes over time can be shown later. This works only from when we start recording: past states mostly can't be rebuilt, because NCBI overwrites its files in place.
+**Going forward, a change set per gene.** Each refresh can record what changed for each gene (a new symbol, a moved exon, a merge), so a gene's changes over time can be shown later. This works only from when we start recording: NCBI's past states mostly can't be rebuilt, because NCBI overwrites its files in place. VEuPathDB's can: it keeps every release back to release 24 ([gene-history-findings.md](gene-history-findings.md)).
 
 In the change set, a new protein accession version (`XP_001348015.1` → `.2`) means the gene model changed: the protein is different. A new mRNA accession version with the same protein version means a smaller change, such as a UTR or an untranslated exon boundary.
 
@@ -412,7 +412,7 @@ Proposed 2026-10-22; not decided. For assemblies with NCBI annotation, workflows
 
 ### Why
 
-Today 2,421 catalog assemblies run their workflows on a UCSC copy of NCBI's annotation. That copy has two problems that change results:
+Today 2,421 catalog assemblies run their workflows on a UCSC copy of NCBI's annotation (2,031 `ncbiGene` and 390 `ncbiRefSeq`, per the gene list prototype's inventory of 2026-09-28; #1874's check covered 2,419 of them). That copy has two problems that change results:
 
 - **It lags.** 321 (13%) were built before NCBI last changed the annotation's locations, a median of 179 days before (#1874, GenArk GTFs behind NCBI's annotation). Dates don't catch all of it: 8 of 30 bacteria that look current by date still differ from NCBI's GFF3 on core hash (see Hashes per annotation file).
 - **It merges genes that share a symbol** into one `gene_id`: 98% of bacterial assemblies at about 1% of genes, some eukaryotes at up to 16–21% (#1875, UCSC same-name gene merging). Gene-level counts add the copies together, and a merged row can't link to one gene page.
@@ -471,12 +471,7 @@ Open conversion rules:
 
 Every `gene_id` is unique and every coding gene has an `exon` line in all seven.
 
-**Workflow test, 2026-10-22.** The converted P01 GTF and UCSC's P01 `ncbiGene` GTF were each run through `rnaseq-pe` on usegalaxy.org, unstranded, with featureCounts on, on one _P. vivax_ sample (SRR19882863, PRJNA853709, from a study of schizont-stage transcriptomes; 584,000 read pairs after fastp, 95% uniquely mapped). The workflow was IWC `main`, not v1.4: STAR and featureCounts are the same versions with the same settings, and fastp and MultiQC are newer.
-
-- Both runs finished with no errors. featureCounts assigned 398,588 read pairs with the converted GTF and 398,532 with UCSC's, 69% in both.
-- 6,671 of 6,836 shared genes have the same count. The 165 that differ are all multi-exon genes, and they differ by 210 read pairs in all.
-- UCSC's GTF has no multi-exon transcripts: each exon of a multi-exon gene is its own transcript (`VVA00346.1`, `VVA00346.1_2`), so STAR gets no annotated introns from it, while the converted GTF gives it 10,918. Gene counts barely change because featureCounts groups exons by `gene_id`; alignments, StringTie expression, translated proteins and SnpEff variant effects do change.
-- The same split affects 107 eukaryote `ncbiGene` GTFs in the catalog, including 31 _Plasmodium_; see [ucsc-gtf-split-transcripts-findings.md](ucsc-gtf-split-transcripts-findings.md).
+**Workflow test, 2026-10-22.** On one P01 sample run through `rnaseq-pe`, the converted GTF and UCSC's gave the same gene counts for 6,671 of 6,836 genes; the 165 that differ are multi-exon genes. UCSC's GTF splits every multi-exon gene into one-exon transcripts, so STAR gets no annotated introns from it, and alignments, transcript-level results, translated proteins and variant effects change. Details, and the 107 eukaryote `ncbiGene` GTFs the split affects: [ucsc-gtf-split-transcripts-findings.md](ucsc-gtf-split-transcripts-findings.md).
 
 **Checks before it replaces UCSC's copy**, per converted file:
 

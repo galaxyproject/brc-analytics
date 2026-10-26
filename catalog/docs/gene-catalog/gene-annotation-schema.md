@@ -1,6 +1,6 @@
 # Gene Annotation Schema
 
-Draft, 2026-10-08; updated 2026-10-14. Related: #1776 (gene pages), #1777 (gene list prototype), #1783 (gene search API).
+Draft, 2026-10-08; updated 2026-10-26. Related: #1776 (gene pages), #1777 (gene list prototype), #1783 (gene search API). **Where this differs from [gene-catalog-contract.md](gene-catalog-contract.md), the contract wins** (terms, table columns, field names, scope). Its "v1 (P01)" predates the contract's scope: the contract's v0 is gene pages from the publisher's files, and its v1 adds linking workflow runs through their GTFs.
 
 The tables that hold what [gene-provenance-spec.md](gene-provenance-spec.md) requires. The spec is the background and requirements; this doc is the database design. Terms (annotation set, annotation file, gene record, canonical record) are defined in the spec's Key terms. This doc refines two: an **annotation file** is a slot ("UCSC's augustus GTF for this assembly"), not a URL; the **canonical record** is the latest gene record of a gene's canonical publisher gene.
 
@@ -71,7 +71,7 @@ The read model's shape (one main table with the transcripts, a table of alternat
 
 Plus the catalog projections (assemblies, organisms, annotation files) in Projections.
 
-**Build order: read model first, write model as a fast follow.** v1 (P01) builds `gtf_gene_map` and a per-assembly gene table straight from the GTF and NCBI's GFF3, with no write model behind them. The write model follows, and from then on these tables are rebuilt from it like every other projection. Two things carry over from day one, because they can't be recovered later:
+**Build order: read model first, write model after the contract's v1.** v1 (P01) builds `gtf_gene_map` and a per-assembly gene table straight from the GTF and NCBI's GFF3, with no write model behind them. The write model follows, and from then on these tables are rebuilt from it like every other projection. Two things carry over from day one, because they can't be recovered later:
 
 - **Archived copies** of every GTF and GFF3 read, with `sha256`, `md5` and fetch date, so the write model can be backfilled from them.
 - **`gene_uid`s stay fixed.** Pages use them in URLs from v1, so they're kept in a small saved list (publisher gene key, annotation set + publisher gene ID → `gene_uid`) that the write model adopts as its minted keys.
@@ -284,9 +284,9 @@ Not "species": many listed organisms aren't species-rank (viruses at NCBI rank "
 **Matching a run to a version.**
 
 - **By md5**, the normal case: `annotation_file_version.md5` (UCSC's `md5sum.txt` value) finds the version whatever URL it was fetched from.
-- **By URL and launch date**, when the launch sent no md5: `annotation_file_location` says which slot the URL was, and `assembly_gtf_choice` which slot the catalog offered then; the version live that day narrows it. Launches send no md5 when they predate 2026-01-14, when `md5sum.txt` is missing, fails or takes over 5 seconds, or when the GTF isn't listed in it (see the workflow GTF hash draft issue).
+- **By URL and launch date**, when the launch sent no md5: `annotation_file_location` says which slot the URL was, and `assembly_gtf_choice` which slot the catalog offered then; the version live that day narrows it. Launches send no md5 when they predate 2026-01-14, when `md5sum.txt` is missing, fails or takes over 5 seconds, or when the GTF isn't listed in it (a fix is drafted but not yet filed as an issue).
 
-**`assembly_gtf_choice` records which GTF the catalog offers each assembly**, today's `geneModelUrl`, recomputed every build with no history. It is derived (which slots exist plus the ranking rule), but stored, because the ranking rule itself changes: the VEuPathDB ranking fix (draft issue) moves 16 of 51 assemblies off augustus now and the other 35 after #1830 (VEuPathDB sequence names), and recomputing January's choice with April's rule would rewrite history.
+**`assembly_gtf_choice` records which GTF the catalog offers each assembly**, today's `geneModelUrl`, recomputed every build with no history. It is derived (which slots exist plus the ranking rule), but stored, because the ranking rule itself changes: a VEuPathDB ranking fix (drafted, not yet filed) moves 16 of 51 assemblies off augustus now and the other 35 after #1830 (VEuPathDB sequence names), and recomputing January's choice with April's rule would rewrite history.
 
 ### Genes
 
@@ -737,7 +737,7 @@ Rebuilt after each refresh and written as Parquet files; what the site, the sear
 - [x] **One `gene_record` per gene per annotation set version that reads genes, or only on change?** **Only on change, per publisher gene** (see Genes): at 100k assemblies, rewriting every gene on any content change is mostly copies. `genes_from_version` is dropped.
 - [ ] **`publisher_check` volume.** One row per assembly × publisher × refresh. Fine at weekly refreshes; revisit if refreshes run daily.
 - [x] **`locus_ids` on `gene_version` repeats what its records say.** **Derived:** a gene's publisher gene IDs are its active `gene_membership` rows, so a rename is a membership change, not a gene version.
-- [x] **Projection storage.** **Superseded for serving (2026-10-26):** the projections ship as one DuckDB snapshot file per build, following #1783 (gene catalog: serving architecture) and [gene-catalog-contract.md](gene-catalog-contract.md); the rest of this item describes the earlier decision. **Only the Parquet export**, no Postgres views or tables. Each run materializes the projections as Parquet files; the site, the search API (#1783) and the assistant read them with DuckDB. The previous run's files are the input the incremental rebuild merges into, so no separate current-state table is kept. Keep the last few runs' files: they give a rollback if a run publishes something wrong, and an exact copy of what the site served (use case 5). SQL views over the insert-only tables stay for ad hoc history questions only.
+- [x] **Projection storage.** **Decided 2026-10-26:** the projections ship as one DuckDB snapshot file per build, following #1783 (gene catalog: serving architecture) and [gene-catalog-contract.md](gene-catalog-contract.md) section 5, with no Postgres views or tables. Where this doc says the projections are Parquet exports, read: the tables in that snapshot. Snapshots are kept for rollback, and they are the exact copy of what the site served (use case 5). SQL views over the insert-only tables stay for ad hoc history questions only.
 - [ ] **Where do the insert-only tables live?** **Leaning: Postgres, managed with Alembic**, with DuckDB only building the Parquet projections (it reads Postgres through its `postgres` extension). Why:
   - **Migrations come with it.** The backend API already runs Postgres through SQLAlchemy with Alembic migrations and a test that they apply (`backend/api`); the vault would use the same tooling.
   - **Keys are enforced.** Primary keys, uniqueness and foreign keys catch loader bugs that Parquet would store silently.
