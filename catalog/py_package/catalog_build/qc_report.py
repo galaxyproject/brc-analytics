@@ -92,6 +92,19 @@ class QcResultDbtTest(QcReportElement):
 
 
 class QcResultDbtTestResults(QcReportKeyedList[QcResultDbtTest]):
+    def derive_diff_result(
+        self, field_results: Mapping[str, QcDiffResult]
+    ) -> QcDiffResult:
+        # Only count failed tests in the diff
+        failed_tests = {
+            k: test_result
+            for k, test_result in field_results["data"].diff.items()
+            if not test_result.success
+        }
+        return super().derive_diff_result(
+            {"data": QcDiffResult(failed_tests, has_content=bool(failed_tests))}
+        )
+
     def format_markdown(self, context) -> List[str]:
         unsuccessful = [result for result in self.data.values() if not result.success]
         lines = [
@@ -318,7 +331,7 @@ class QcResultDataReport(QcReportElement):
             "",
         ]
         for k in sections_order:
-            lines += getattr(self, k).format_markdown()
+            lines += getattr(self, k).format_markdown(context)
         return lines
 
 
