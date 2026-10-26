@@ -17,6 +17,7 @@ class QcDiffResult[T]:
 @dataclass
 class QcReportRenderContext:
     is_diff: bool
+    containing_section_level: int = 0
 
     def get_empty_list_text(self):
         return "No new items" if self.is_diff else "None"
@@ -84,7 +85,9 @@ class QcResultDbtTest(QcReportElement):
             else ""
         )
         return [
-            f"### `{self.test_name}` — status `{self.status}`{count_text}",
+            format_heading(
+                f"`{self.test_name}` — status `{self.status}`{count_text}", 3, context
+            ),
             "",
             *([self.message, ""] if self.message else []),
             *(self.failures.format_markdown(context) if self.failures else []),
@@ -108,7 +111,7 @@ class QcResultDbtTestResults(QcReportKeyedList[QcResultDbtTest]):
     def format_markdown(self, context) -> List[str]:
         unsuccessful = [result for result in self.data.values() if not result.success]
         lines = [
-            "## Unsuccessful dbt tests",
+            format_heading("Unsuccessful dbt tests", 2, context),
             "",
         ]
         if not unsuccessful:
@@ -122,7 +125,9 @@ class QcResultDbtTestResults(QcReportKeyedList[QcResultDbtTest]):
 class QcResultGcaWithPairedGcf(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## GenBank assemblies with paired RefSeq accessions",
+            format_heading(
+                "GenBank assemblies with paired RefSeq accessions", 2, context
+            ),
             [f"{gca} (paired RefSeq: {gcf})" for gca, gcf in self.data],
             context,
         )
@@ -131,7 +136,9 @@ class QcResultGcaWithPairedGcf(QcReportList[tuple[Any, Any]]):
 class QcResultInconsistentTaxonomyIds(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Species and strain combinations with multiple taxonomy IDs",
+            format_heading(
+                "Species and strain combinations with multiple taxonomy IDs", 2, context
+            ),
             [f"{taxon}: {ids}" for taxon, ids in self.data],
             context,
         )
@@ -140,28 +147,36 @@ class QcResultInconsistentTaxonomyIds(QcReportList[tuple[Any, Any]]):
 class QcResultMissingDatacacheUrls(QcReportList):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies with datacache URLs not found", self.data, context
+            format_heading("Assemblies with datacache URLs not found", 2, context),
+            self.data,
+            context,
         )
 
 
 class QcResultMissingGeneModelUrls(QcReportList):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies with gene model URLs not found", self.data, context
+            format_heading("Assemblies with gene model URLs not found", 2, context),
+            self.data,
+            context,
         )
 
 
 class QcResultMissingNcbiAssemblies(QcReportList):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies not found on NCBI", self.data, context
+            format_heading("Assemblies not found on NCBI", 2, context),
+            self.data,
+            context,
         )
 
 
 class QcResultMissingOutbreakDescendants(QcReportList):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Outbreak descendant taxonomy IDs not found in genomes data",
+            format_heading(
+                "Outbreak descendant taxonomy IDs not found in genomes data", 2, context
+            ),
             self.data,
             context,
         )
@@ -170,7 +185,7 @@ class QcResultMissingOutbreakDescendants(QcReportList):
 class QcResultMissingPloidyAssemblies(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies without ploidy information",
+            format_heading("Assemblies without ploidy information", 2, context),
             [
                 f"{accession} (speciesTaxonomyId: {tax_id})"
                 for accession, tax_id in self.data
@@ -182,14 +197,16 @@ class QcResultMissingPloidyAssemblies(QcReportList[tuple[Any, Any]]):
 class QcResultMissingUcscAssemblies(QcReportList):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Assemblies not found in UCSC list", self.data, context
+            format_heading("Assemblies not found in UCSC list", 2, context),
+            self.data,
+            context,
         )
 
 
 class QcResultOrganismsNotSpeciesRank(QcReportList[tuple[Any, Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Organisms not at species rank",
+            format_heading("Organisms not at species rank", 2, context),
             [f"{tax_id}: {name} (rank: {rank})" for tax_id, name, rank in self.data],
             context,
         )
@@ -198,7 +215,7 @@ class QcResultOrganismsNotSpeciesRank(QcReportList[tuple[Any, Any, Any]]):
 class QcResultOrganismsWithoutAssemblies(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Organisms not matched to any assembly",
+            format_heading("Organisms not matched to any assembly", 2, context),
             [f"{tax_id}: {name}" for tax_id, name in self.data],
             context,
         )
@@ -207,7 +224,11 @@ class QcResultOrganismsWithoutAssemblies(QcReportList[tuple[Any, Any]]):
 class QcResultOutbreakTaxonomyIssues(QcReportList[tuple[Any, Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
+            format_heading(
+                "Outbreak primary taxonomy ID issues (not in catalog or below species rank)",
+                2,
+                context,
+            ),
             [f"{tax_id}: {name} ({reason})" for tax_id, name, reason in self.data],
             context,
         )
@@ -216,7 +237,7 @@ class QcResultOutbreakTaxonomyIssues(QcReportList[tuple[Any, Any, Any]]):
 class QcResultOutdatedAccessions(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Outdated assembly accessions",
+            format_heading("Outdated assembly accessions", 2, context),
             [f"{acc} (current: {curr_acc})" for acc, curr_acc in self.data],
             context,
         )
@@ -225,7 +246,7 @@ class QcResultOutdatedAccessions(QcReportList[tuple[Any, Any]]):
 class QcResultSupressedGenomes(QcReportList[tuple[Any, Any]]):
     def format_markdown(self, context) -> List[str]:
         return format_list_section(
-            "## Suppressed or retired genomes",
+            format_heading("Suppressed or retired genomes", 2, context),
             [f"{acc} (status: {status})" for acc, status in self.data],
             context,
         )
@@ -254,7 +275,7 @@ class QcResultTaxonomyTreeChecks(QcReportElement):
 
     def format_markdown(self, context) -> List[str]:
         return [
-            "## Taxonomy tree",
+            format_heading("Taxonomy tree", 2, context),
             "",
             "Assembly count mismatch: "
             + (
@@ -327,7 +348,7 @@ class QcResultDataReport(QcReportElement):
                 k for k in sections_order if k in self.diff_content_fields
             ]
         lines = [
-            "# Catalog Data QC report",
+            format_heading("Catalog Data QC report", 1, context),
             "",
         ]
         for k in sections_order:
@@ -415,8 +436,12 @@ def format_inline_list(
     return ", ".join(items) if items else context.get_empty_list_text()
 
 
-def section_header(title: str) -> List[str]:
-    return [title, ""]
+def format_heading(title: str, level: int, context: QcReportRenderContext) -> str:
+    return ("#" * (context.containing_section_level + level)) + " " + title
+
+
+def section_header(heading: str) -> List[str]:
+    return [heading, ""]
 
 
 def format_list_section(
