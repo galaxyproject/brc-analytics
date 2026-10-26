@@ -9,16 +9,17 @@ import {
 } from "@repo/shared/components/layout/AppProviders/appProviders";
 import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
+import { type EntityLoads } from "@repo/shared/services/workflows/hooks/UseEntities/types";
 import { useMemo, type JSX } from "react";
 
 setFeatureFlags([FEATURE_FLAGS.LOGAN_FILTERS]);
 
 /**
  * The site has no catalog, so there is nothing to load before a page renders.
- * @returns a resolved promise.
+ * @returns no loads.
  */
-function ensureEntitiesLoaded(): Promise<void> {
-  return Promise.resolve();
+function ensureEntitiesLoaded(): EntityLoads {
+  return {};
 }
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {

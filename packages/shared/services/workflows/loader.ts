@@ -4,26 +4,35 @@ import type {
 } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { indexWorkflowsById } from "@repo/shared/workflow/utils";
-import { type EntitiesLoader } from "./hooks/UseEntities/types";
+import {
+  type EntitiesLoader,
+  type EntityLoads,
+} from "./hooks/UseEntities/types";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
 
 /**
  * Creates a single-flight entities loader: concurrent and repeat calls share
- * one in-flight load, and a rejected load is dropped from the memo so a later
- * call re-attempts instead of returning the cached failure forever.
- * @param load - Loader that resolves once the site's entities and workflows are loaded.
+ * one set of in-flight loads, and when any list's load rejects the set is
+ * dropped from the memo, so a later call re-attempts instead of returning the
+ * cached failure forever. Lists that finished loading are already in the
+ * store, so a re-attempt skips them.
+ * @param load - Loader that starts the site's entity and workflow loads.
  * @returns Memoized loader.
  */
 export function createEntitiesLoader(load: EntitiesLoader): EntitiesLoader {
-  let loadPromise: Promise<void> | null = null;
-  return (config: SiteConfig): Promise<void> => {
-    loadPromise ??= load(config).catch((error) => {
-      loadPromise = null;
-      throw error;
-    });
-    return loadPromise;
+  let loads: EntityLoads | null = null;
+  return (config: SiteConfig): EntityLoads => {
+    if (loads) return loads;
+    const current = load(config);
+    loads = current;
+    for (const entityLoad of Object.values(current)) {
+      entityLoad.catch(() => {
+        if (loads === current) loads = null;
+      });
+    }
+    return current;
   };
 }
 
@@ -45,22 +54,21 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
  * @param route - Route.
  * @returns True if the route is an entity route; false otherwise.
  */
-function isEntityRoute(route: string): route is EntityRoute {
+export function isEntityRoute(route: string): route is EntityRoute {
   return Object.hasOwn(API, route);
 }
 
 /**
- * Loads the entities store with entities from the API, fetching the entity
- * lists in parallel. Skips routes not in the API, workflows (which
- * `loadWorkflows` loads), lists already loaded, and entity configs with no
- * getId.
+ * Starts loading the entities store with entities from the API, fetching the
+ * entity lists in parallel. Skips routes not in the API, workflows (which
+ * `loadWorkflows` loads), and entity configs with no getId. A list already
+ * loaded gets a resolved promise rather than a refetch.
  * @param config - Site config.
- * @returns Promise that resolves once every entity list is loaded, or rejects
- * as soon as any fetch fails, with that failure. Lists that load are stored
- * as they arrive.
+ * @returns Load promise per entity list, each resolving once that list is
+ * stored, or rejecting with its fetch failure.
  */
-export async function loadEntities(config: SiteConfig): Promise<void> {
-  const loads: Promise<void>[] = [];
+export function loadEntities(config: SiteConfig): EntityLoads {
+  const loads: EntityLoads = {};
   for (const { getId, route } of config.entities) {
     if (!isEntityRoute(route)) continue;
 
@@ -68,15 +76,18 @@ export async function loadEntities(config: SiteConfig): Promise<void> {
     // categories, not entities keyed by getId.
     if (route === "workflows") continue;
 
-    // Entities are already loaded; skip.
-    if (getEntitiesById().has(route)) continue;
+    // Entities are already loaded; nothing to fetch.
+    if (getEntitiesById().has(route)) {
+      loads[route] = Promise.resolve();
+      continue;
+    }
 
     // Get id function is not configured; entities are excluded from preloading.
     if (!getId) continue;
 
-    loads.push(loadEntityList(route, getId));
+    loads[route] = loadEntityList(route, getId);
   }
-  await Promise.all(loads);
+  return loads;
 }
 
 /**

@@ -9,7 +9,8 @@ import type { Props } from "./types";
  * scope, entity fit and feature-flag gating. Renders `children` for a
  * workflow that passes and `fallback` otherwise, letting the page decide how a
  * stale, unknown, incompatible or gated workflow URL is surfaced. Rendered
- * below EntityDataGate, which loads the workflows and entities the check reads.
+ * below EntityDataGate, which waits for the workflows and entities the check
+ * reads.
  * @param props - Component props.
  * @param props.children - Content to render when the workflow is available.
  * @param props.entityId - ID of the entity the page configures a workflow for; absent on a page with no entity.

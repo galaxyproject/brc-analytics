@@ -25,12 +25,15 @@ const TWO_ROUTE_CONFIG = {
 describe("createEntitiesLoader", () => {
   const CONFIG = {} as SiteConfig;
 
-  test("shares a single in-flight load across calls", async () => {
-    const load = jest.fn().mockResolvedValue(undefined);
+  test("shares a single set of in-flight loads across calls", async () => {
+    const load = jest.fn().mockReturnValue({ assemblies: Promise.resolve() });
     const ensureLoaded = createEntitiesLoader(load);
 
-    await Promise.all([ensureLoaded(CONFIG), ensureLoaded(CONFIG)]);
-    await ensureLoaded(CONFIG);
+    await Promise.all([
+      ensureLoaded(CONFIG).assemblies,
+      ensureLoaded(CONFIG).assemblies,
+    ]);
+    await ensureLoaded(CONFIG).assemblies;
 
     expect(load).toHaveBeenCalledTimes(1);
   });
@@ -38,12 +41,16 @@ describe("createEntitiesLoader", () => {
   test("drops a rejected load so a later call re-attempts", async () => {
     const load = jest
       .fn()
-      .mockRejectedValueOnce(new Error("fetch failed"))
-      .mockResolvedValueOnce(undefined);
+      .mockReturnValueOnce({
+        assemblies: Promise.reject(new Error("fetch failed")),
+      })
+      .mockReturnValueOnce({ assemblies: Promise.resolve() });
     const ensureLoaded = createEntitiesLoader(load);
 
-    await expect(ensureLoaded(CONFIG)).rejects.toThrow("fetch failed");
-    await expect(ensureLoaded(CONFIG)).resolves.toBeUndefined();
+    await expect(ensureLoaded(CONFIG).assemblies).rejects.toThrow(
+      "fetch failed"
+    );
+    await expect(ensureLoaded(CONFIG).assemblies).resolves.toBeUndefined();
 
     expect(load).toHaveBeenCalledTimes(2);
   });
@@ -64,10 +71,11 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse());
 
-      await loadEntities({
+      const loads = loadEntities({
         entities: [{ getId, route: "not-a-valid-route" }],
       } as SiteConfig);
 
+      expect(loads).toEqual({});
       expect(fetchMock).not.toHaveBeenCalled();
       expect(getEntitiesById().size).toBe(0);
       expect(getEntitiesByType().size).toBe(0);
@@ -77,10 +85,11 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse());
 
-      await loadEntities({
+      const loads = loadEntities({
         entities: [{ getId, route: "workflows" }],
       } as SiteConfig);
 
+      expect(loads).toEqual({});
       expect(fetchMock).not.toHaveBeenCalled();
       expect(getEntitiesById().has("workflows")).toBe(false);
       expect(getEntitiesByType().has("workflows")).toBe(false);
@@ -90,8 +99,11 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse());
 
-      await loadEntities({ entities: [{ route: "assemblies" }] } as SiteConfig);
+      const loads = loadEntities({
+        entities: [{ route: "assemblies" }],
+      } as SiteConfig);
 
+      expect(loads).toEqual({});
       expect(fetchMock).not.toHaveBeenCalled();
       expect(getEntitiesById().has("assemblies")).toBe(false);
     });
@@ -106,9 +118,9 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse(payload));
 
-      await loadEntities(CONFIG);
+      // Resolves without re-fetching or overwriting existing entries.
+      await expect(loadEntities(CONFIG).assemblies).resolves.toBeUndefined();
 
-      // Should not re-fetch or overwrite existing entries.
       expect(fetchMock).not.toHaveBeenCalled();
 
       const byId = getEntitiesById().get("assemblies");
@@ -122,7 +134,7 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse(payload));
 
-      await loadEntities(CONFIG);
+      await loadEntities(CONFIG).assemblies;
 
       expect(fetchMock).toHaveBeenCalledWith(API.assemblies);
 
@@ -138,7 +150,7 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse([], false));
 
-      await expect(loadEntities(CONFIG)).rejects.toThrow(
+      await expect(loadEntities(CONFIG).assemblies).rejects.toThrow(
         `Failed to fetch: ${API.assemblies}`
       );
     });
@@ -147,7 +159,7 @@ describe("workflows loader", () => {
       const fetchMock = global.fetch as jest.Mock;
       fetchMock.mockResolvedValue(mockFetchResponse());
 
-      const loading = loadEntities(TWO_ROUTE_CONFIG);
+      const loads = loadEntities(TWO_ROUTE_CONFIG);
 
       // Both fetches start before either resolves: a sequential load would
       // start the second only after awaiting the first.
@@ -155,7 +167,7 @@ describe("workflows loader", () => {
       expect(fetchMock).toHaveBeenCalledWith(API.organisms);
       expect(fetchMock).toHaveBeenCalledWith(API.assemblies);
 
-      await loading;
+      await Promise.all(Object.values(loads));
 
       expect(getEntitiesById().has("organisms")).toBe(true);
       expect(getEntitiesById().has("assemblies")).toBe(true);
@@ -167,10 +179,10 @@ describe("workflows loader", () => {
         .mockResolvedValueOnce(mockFetchResponse([], false))
         .mockResolvedValueOnce(mockFetchResponse());
 
-      await expect(loadEntities(CONFIG)).rejects.toThrow(
+      await expect(loadEntities(CONFIG).assemblies).rejects.toThrow(
         `Failed to fetch: ${API.assemblies}`
       );
-      await loadEntities(CONFIG);
+      await loadEntities(CONFIG).assemblies;
 
       expect(fetchMock).toHaveBeenCalledTimes(2);
       expect(getEntitiesById().get("assemblies")?.has("1")).toBe(true);

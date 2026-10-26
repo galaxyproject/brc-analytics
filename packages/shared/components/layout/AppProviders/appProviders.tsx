@@ -101,8 +101,8 @@ export interface AppProvidersProps {
  * @param props.defaultDescription - Fallback OG description for the site.
  * @param props.defaultEntityListType - Entity list type for pages that don't
  * name one; "" for a site with no entity lists.
- * @param props.ensureEntitiesLoaded - Loader that resolves once the site's
- * entities and workflows are loaded.
+ * @param props.ensureEntitiesLoaded - Loader that starts the site's entity and
+ * workflow loads, returning a load promise per list.
  * @returns the application shell.
  */
 export function AppProviders({

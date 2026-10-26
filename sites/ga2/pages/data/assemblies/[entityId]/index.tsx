@@ -15,7 +15,7 @@ const ENTITY_LIST_TYPE = "assemblies";
 
 const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={[ENTITY_LIST_TYPE]}>
       <AssemblyView SideComponent={GA2Side} entityId={entityId} />
     </EntityDataGate>
   );

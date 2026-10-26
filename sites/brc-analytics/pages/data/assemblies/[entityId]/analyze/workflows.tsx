@@ -37,7 +37,7 @@ const Page = ({ entityId }: EntityPageProps<never>): JSX.Element => {
   if (!isReady) return <></>;
 
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={[ENTITY_LIST_TYPE, "workflows"]}>
       {trsId ? (
         <WorkflowGate
           entityId={entityId}

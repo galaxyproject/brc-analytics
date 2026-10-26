@@ -3,8 +3,9 @@ import { useContext } from "react";
 import { EntitiesContext } from "./context";
 
 /**
- * Reads the workflows-entity-cache load state from context.
- * @returns Entity cache load state: loaded flag, and error when the load failed.
+ * Reads the entity cache load state from context.
+ * @returns Whether the loader has run, and the load state per entity list:
+ * loaded flag, and error when that list's load failed.
  */
 export function useEntitiesState(): UseEntities {
   return useContext(EntitiesContext);

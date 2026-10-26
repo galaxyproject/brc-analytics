@@ -18,7 +18,7 @@ interface Props extends Partial<PageMeta> {
 
 const Page = (props: Props): JSX.Element => {
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={[ENTITY_LIST_TYPE, "workflows"]}>
       <WorkflowInputsView {...props} />
     </EntityDataGate>
   );

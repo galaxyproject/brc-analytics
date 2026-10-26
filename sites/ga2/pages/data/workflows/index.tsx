@@ -9,7 +9,7 @@ const ENTITY_LIST_TYPE = "workflows";
 
 const Page = (): JSX.Element => {
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={["organisms", ENTITY_LIST_TYPE]}>
       <WorkflowsView />
     </EntityDataGate>
   );
