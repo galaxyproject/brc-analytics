@@ -105,6 +105,22 @@ jobs:
         # Validate the catalog_build package's Poetry configuration (pyproject.toml).
         run: poetry check -P catalog/py_package/
 
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Jest unit tests
+        # --ci fails on a missing snapshot instead of quietly writing a new one;
+        # overriding --passWithNoTests stops broken test discovery passing as green.
+        run: npm run test -- --ci --passWithNoTests=false
+
   api-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
