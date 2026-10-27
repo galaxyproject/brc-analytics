@@ -1,8 +1,8 @@
 import {
   RECENT_SEARCHES_KEY,
   type RecentSearch,
-} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
-import { useRecentSearches } from "@brc/components/LoganSearch/LoganSearchHistory/useRecentSearches";
+} from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
 import { act, renderHook } from "@testing-library/react";
 
 /**

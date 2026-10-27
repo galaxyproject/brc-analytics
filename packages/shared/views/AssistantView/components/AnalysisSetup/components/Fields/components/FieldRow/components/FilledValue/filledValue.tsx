@@ -23,6 +23,8 @@ import { getFieldLabel, getRemoveLabel, isClearableField } from "./utils";
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
  * @param props.onClearField - Clears a field without asking the assistant.
+ * @param props.onKeyboardClear - Moves focus off the chip when it's cleared
+ * from the keyboard, before it is disabled and unmounts.
  * @returns The filled value element.
  */
 export const FilledValue = ({
@@ -30,8 +32,14 @@ export const FilledValue = ({
   fieldKey,
   loading,
   onClearField,
+  onKeyboardClear,
 }: FilledValueProps): JSX.Element => {
-  const { onClear, onKeyDown } = useClearField(fieldKey, loading, onClearField);
+  const { onClear, onKeyDown } = useClearField(
+    fieldKey,
+    loading,
+    onClearField,
+    onKeyboardClear
+  );
   const clearable = isClearableField(fieldKey);
   const label = getFieldLabel(fieldKey, field);
   const { ref, title } = useChipTooltipTitle(label);

@@ -1,6 +1,7 @@
 """Galaxy API integration service using BioBLEND."""
 
 import asyncio
+import base64
 import hashlib
 import json
 import logging
@@ -9,7 +10,7 @@ import re
 import tempfile
 import zipfile
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple
 
@@ -33,6 +34,9 @@ from app.models.galaxy import (
     KmindexHit,
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueHistory,
+    KmindexQueueHistoryRow,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
     KmindexSummary,
@@ -92,12 +96,28 @@ class KmindexFiltersUnavailable(Exception):
 
 
 class GalaxySubmitNotStarted(Exception):
-    """A submission failed before the tool was asked to run.
+    """A submission failed before Galaxy queued anything.
 
-    So no job can exist for it, and the caller is free to try again. Anything
-    that fails from the run_tool call on is ambiguous -- Galaxy may have queued
-    the job and lost the reply -- and is raised as a plain Exception instead.
+    So no job can exist for it, and the caller is free to try again: Galaxy
+    refused the tool request outright, or failed it before creating a job.
+    Anything after a request Galaxy may have accepted is ambiguous -- it may
+    have queued the job and lost the reply -- and is raised as a plain
+    Exception instead.
     """
+
+
+class ToolRequestUnconfirmed(Exception):
+    """A tool request went out and its answer never came back."""
+
+
+def _normalized_fasta(sequence: str) -> str:
+    """The query as Galaxy should see it: one line ending, no trailing blanks.
+
+    The job cache matches on the input's hash, so a paste that differs only in
+    CRLFs or a trailing newline would otherwise run the whole search again.
+    """
+    lines = sequence.replace("\r\n", "\n").replace("\r", "\n").strip().split("\n")
+    return "\n".join(line.rstrip() for line in lines) + "\n"
 
 
 def _is_missing_history_error(e: BaseException) -> bool:
@@ -124,8 +144,8 @@ def _is_missing_history_error(e: BaseException) -> bool:
 class KmindexUnknownIndex(GalaxySubmitNotStarted):
     """The submission names an index the pinned tool doesn't offer.
 
-    Caught before anything is uploaded: Galaxy would only reject it at run_tool,
-    after the query had already landed in the history.
+    Caught before anything is sent: Galaxy would only reject it once the tool
+    request was queued, after the query had already landed in the history.
     """
 
 
@@ -333,6 +353,47 @@ KMINDEX_INDEX_COOLDOWN_SECONDS = 60
 # second, so half a minute is already far past "slow".
 KMINDEX_INDEX_READ_TIMEOUT = 30.0
 
+# The queue snapshot. One Galaxy job listing plus a metrics read per newly
+# finished job, shared by every caller for a minute: logan-search.org and the
+# results page both ask while a job waits, and the answer moves on the scale of
+# Vista's queue, not seconds.
+KMINDEX_QUEUE_PREFIX = "galaxy:kmindex_queue:v1"
+KMINDEX_QUEUE_TTL = 60
+# A finished job's wait and run time never change, so they're read from
+# Galaxy once.
+KMINDEX_QUEUE_TIMING_PREFIX = "galaxy:kmindex_timing:v1"
+KMINDEX_QUEUE_METRIC_CONCURRENCY = 4
+KMINDEX_QUEUE_WINDOW_MINUTES = 120
+KMINDEX_QUEUE_LISTING_LIMIT = 500
+# Bounds the metrics reads one rebuild can make; anything past it is left for
+# the next rebuild rather than holding this one up.
+KMINDEX_QUEUE_METRIC_READS = 40
+KMINDEX_QUEUE_READ_TIMEOUT = 30.0
+# When Galaxy doesn't answer: hold off re-reading for a bit, and serve the last
+# snapshot that worked for up to an hour, its as_of showing its age.
+KMINDEX_QUEUE_COOLDOWN_PREFIX = "galaxy:kmindex_queue_cooldown:v1"
+KMINDEX_QUEUE_COOLDOWN_SECONDS = 30
+
+# The service account's own Galaxy user id, by Galaxy URL. Galaxy narrows a job
+# listing to the caller's own jobs only for a non-admin; an admin key would list
+# every user's kmindex jobs, so the queue readers name the account explicitly.
+# A key can't change under a running process, so one read each is enough.
+_SERVICE_USER_IDS: Dict[str, str] = {}
+
+KMINDEX_QUEUE_LAST_GOOD_PREFIX = "galaxy:kmindex_queue_last_good:v1"
+KMINDEX_QUEUE_LAST_GOOD_TTL = CacheTTL.ONE_HOUR
+# The 24-hour view behind the unlisted stats page. Its first build reads every
+# finished job's metrics, so it gets a bigger budget and a longer timeout, and
+# its answer is kept for a few minutes -- it's for looking back, not polling.
+KMINDEX_HISTORY_PREFIX = "galaxy:kmindex_queue_history:v1"
+KMINDEX_HISTORY_TTL = 5 * 60
+KMINDEX_HISTORY_MAX_HOURS = 72
+KMINDEX_HISTORY_LISTING_LIMIT = 2000
+KMINDEX_HISTORY_METRIC_READS = 400
+KMINDEX_HISTORY_READ_TIMEOUT = 90.0
+_KMINDEX_WAITING_STATES = frozenset({"new", "queued", "waiting", "resubmitted"})
+_KMINDEX_FINISHED_STATES = frozenset({"ok", "error"})
+
 # bioblend sets no socket timeout by default. We set a global request timeout
 # here because requests' timeout is connect + inter-byte read, not total transfer
 # time. This means a download that is actually progressing will never trip it,
@@ -340,15 +401,41 @@ KMINDEX_INDEX_READ_TIMEOUT = 30.0
 # call site, both short RPCs and long dataset downloads.
 GALAXY_REQUEST_TIMEOUT = 30.0
 
-# Aggregation is serialized per lane: it is I/O bound against a service that
-# rate-limits us, so overlapping runs make each other slower and can each end up
-# with a different partial view of the same job. There are two lanes rather than
-# one lock so that partner traffic, which searches every index and so merges
-# thousands of shards a job, never parks a BRC user's results behind it.
+# /api/jobs queues a tool request and creates the job in a background task, so a
+# submit polls for the job id. It showed up in about 2 s on
+# test.galaxyproject.org, but a class submitting at once backs up the Celery
+# queue that creates it. Two minutes stays well inside the proxy's 300 s, and
+# past it the request may still turn into a job, so giving up is ambiguous.
+KMINDEX_TOOL_REQUEST_TIMEOUT = 120.0
+KMINDEX_TOOL_REQUEST_POLL = 1.0
+
+# A job-cache copy can itself be copied; following a few links is plenty, and
+# the cap keeps a cycle from spinning.
+KMINDEX_COPY_HOPS = 5
+# Copy -> original. Immutable once known, so it's kept long, and every results
+# page and export for a copy reads it instead of two job statuses -- which
+# also keeps a copy's export findable while Galaxy is down. v2 because v1 could
+# hold a link that stopped short at another copy when a read failed mid-walk.
+KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v2"
+
+# Galaxy's job cache also requires the input datasets' names to match, so every
+# query goes in under this one rather than whatever filename the caller sent.
+KMINDEX_QUERY_DATASET_NAME = "query.fasta"
+
+# Cold merges are capped per lane. There are two lanes so that partner traffic,
+# which searches every index and so merges thousands of shards a job, never parks
+# a BRC user's results behind it. The partner lane used to be one at a time too,
+# back when Galaxy rate-limited our downloads; from TACC it no longer does, and
+# an all-index merge is mostly waiting on its one collection download (11-16 s
+# on brc-dev, with the backend's memory flat), so a classroom's distinct queries
+# can overlap. Each running merge still holds its whole hit list -- ~500 MB at
+# peak for a million-hit conserved query -- and the host has ~3 GB to spare, so
+# two partner merges plus a native one is as far as this goes.
 AggregationLane = Literal["native", "partner"]
-_AGGREGATION_LOCKS: dict[str, asyncio.Lock] = {
-    "native": asyncio.Lock(),
-    "partner": asyncio.Lock(),
+KMINDEX_PARTNER_MERGES = 2
+_AGGREGATION_LANES: dict[str, asyncio.Semaphore] = {
+    "native": asyncio.Semaphore(1),
+    "partner": asyncio.Semaphore(KMINDEX_PARTNER_MERGES),
 }
 
 # How long a merged aggregate and its sort orders sit in Redis, for every job.
@@ -376,6 +463,7 @@ _HISTORY_LOCKS = defaultdict(asyncio.Lock)
 # Keyed by Galaxy URL, account and history name (see _history_cache_key).
 _HISTORY_IDS: Dict[str, str] = {}
 HISTORY_ID_CACHE_PREFIX = "galaxy:history_id:v1"
+
 # A user's history is one long-lived history in their own account; a gone one
 # is caught on use (_is_missing_history_error), so the TTL only bounds staleness.
 HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
@@ -384,9 +472,42 @@ HISTORY_ID_TTL = CacheTTL.THIRTY_DAYS
 SERVICE_HISTORY_ID_TTL = 2 * CacheTTL.ONE_DAY
 
 
+# The service account's history changes name every UTC day, and each name gets
+# its own lock and id-cache entry above. This records the day of each one --
+# keyed by its lock account or its id-cache key -- so a passed day's entries can
+# be dropped instead of accumulating for as long as the process runs. A user's
+# entries are one per user and stay.
+_SERVICE_HISTORY_DAYS: Dict[object, str] = {}
+
+
 def _today() -> str:
     """Today's UTC date, which names the day's service history."""
     return datetime.now(timezone.utc).date().isoformat()
+
+
+def _forget_past_service_histories(today: str) -> None:
+    """Drop past days' service-history locks and cached ids from this process.
+
+    Redis keeps its own copies under a TTL, so this only stops the in-process
+    maps growing. A held lock is kept and tried again on a later call. That is
+    not a promise nobody is waiting on it: locked() reads False between a
+    release and the woken waiter running, so a lock can go with a waiter still
+    queued on it. That waiter re-reads the id, which Redis still has, so the
+    cost is a repeated lookup rather than a second history.
+
+    @param today: the UTC date whose entries are still in use.
+    """
+    for entry, day in list(_SERVICE_HISTORY_DAYS.items()):
+        if day == today:
+            continue
+        if isinstance(entry, tuple):
+            lock = _HISTORY_LOCKS.get(entry)
+            if lock is not None and lock.locked():
+                continue
+            _HISTORY_LOCKS.pop(entry, None)
+        else:
+            _HISTORY_IDS.pop(entry, None)
+        del _SERVICE_HISTORY_DAYS[entry]
 
 
 # One Galaxy read per cold cache, process-wide, rather than one per miss. The
@@ -397,6 +518,23 @@ def _today() -> str:
 # share a slot. Holding the task here is also what keeps it from being garbage
 # collected mid-read, since the request that started it does not wait for it.
 _INDEX_REFRESHES: Dict[str, asyncio.Task] = {}
+
+
+# Concurrent misses wait for one rebuild rather than each listing Galaxy's jobs.
+_QUEUE_READ_LOCK = asyncio.Lock()
+_HISTORY_READ_LOCK = asyncio.Lock()
+
+
+def _galaxy_time(value: str) -> datetime:
+    """Galaxy's timestamps are naive UTC."""
+    return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
+
+
+def _percentile(values: List[float], fraction: float) -> float:
+    """Nearest-rank percentile of a non-empty list."""
+    ordered = sorted(values)
+    rank = max(1, -(-len(ordered) * fraction // 1))
+    return ordered[int(rank) - 1]
 
 
 def _forget_index_refresh(key: str, task: asyncio.Task) -> None:
@@ -475,6 +613,79 @@ def _decode_tool_param(value: object) -> object:
         except json.JSONDecodeError:
             return value
     return value
+
+
+def _merge_shard_hits(
+    shards: List[Optional[dict]], threshold: Optional[float]
+) -> Tuple[List[dict], Optional[str], int, int, int]:
+    """
+    Flatten downloaded shards into one ranked hit list.
+
+    Pure CPU -- a conserved query is over a million hits -- so the caller
+    runs it off the event loop, where it would otherwise stall every status
+    poll for as long as it takes.
+
+    @param shards: one parsed shard per output, None where it failed.
+    @param threshold: the job's threshold, re-applied to corrected scores.
+    @returns: hits, query name, shards with hits, shards failed, and how
+        many hits the false-positive correction dropped.
+    """
+    hits: List[dict] = []
+    query_name = None
+    shards_with_hits = 0
+    shards_failed = 0
+    corrected_out = 0
+    for shard in shards:
+        if not shard:
+            shards_failed += 1
+            continue
+        # Shape is {shard_name: {query_name: {accession: score}}}.
+        shard_had_hits = False
+        for shard_name, queries in shard.items():
+            for name, accessions in (queries or {}).items():
+                query_name = query_name or name
+                for accession, raw_score in (accessions or {}).items():
+                    # Logan's own site subtracts a false-positive baseline
+                    # for 227 saturated samples and re-applies the
+                    # threshold to what is left. kmindex applied it to the
+                    # raw ratio, so a hit that only cleared it because its
+                    # Bloom filter matches everything is dropped here.
+                    score, baseline = correct_score(accession, raw_score)
+                    hit = {
+                        "accession": accession,
+                        "score": score,
+                        "shard": shard_name,
+                    }
+                    if baseline is not None:
+                        if threshold is not None and score < threshold:
+                            corrected_out += 1
+                            continue
+                        hit["fp_correction"] = baseline
+                    # Count the shard, not the (shard, query) pair -- the
+                    # latter can exceed shards_searched. Counted on the
+                    # kept hit, so a shard whose only matches were dropped
+                    # saturated samples reports no hits rather than one.
+                    shard_had_hits = True
+                    hits.append(hit)
+        if shard_had_hits:
+            shards_with_hits += 1
+
+    # Sort on more than score: ties are common, and shards land in completion
+    # order, so score alone leaves equal-scoring hits free to reshuffle
+    # between aggregations and make paged offsets incoherent.
+    #
+    # The second key has to be a hash rather than the accession itself. Ties
+    # are not a rare edge here -- a conserved query returns them by the
+    # hundred thousand (a 16S fragment at threshold 0.5 gave 305,061 hits
+    # scoring exactly 1.0 against a 50,000 cap), so the cap boundary sits
+    # inside one tie band and the tie-break alone decides the whole result
+    # set. Accession order is archive-prefix order, and the prefix predicts
+    # the submitting country: DRR is DDBJ, ERR is ENA, SRR is NCBI. Sorting
+    # by accession returned zero SRR rows out of a true 65.1%, so the
+    # country column reported a distribution manufactured by the sort.
+    # md5 reproduces the real composition to within 0.2 points.
+    hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
+    return hits, query_name, shards_with_hits, shards_failed, corrected_out
 
 
 def _default_order(sort: str) -> str:
@@ -829,7 +1040,7 @@ class GalaxyService:
     async def submit_kmindex_query(
         self, submission: KmindexQuerySubmission
     ) -> GalaxyJobResponse:
-        """Upload a FASTA query and run kmindex against a Logan index."""
+        """Run kmindex against Logan indexes for a FASTA query."""
         if not self.is_available():
             raise Exception(
                 "Galaxy service not available - check API key configuration"
@@ -854,36 +1065,27 @@ class GalaxyService:
         try:
             history_id = await self._get_or_create_shared_history()
             try:
-                upload_dataset_id = await self._upload_fasta(
-                    submission.sequence, submission.filename, history_id
+                tool_request_id = await self._request_kmindex_job(
+                    submission, history_id
                 )
             except Exception as e:
                 if not _is_missing_history_error(e):
                     raise
-                # Nothing has run yet, so one more go against a freshly
-                # resolved history is safe.
+                # Galaxy refused it over the history, so nothing was queued and
+                # one more go against a freshly resolved history is safe.
                 logger.warning(
                     "Cached history %s is gone; resolving it again", history_id
                 )
                 await self._forget_shared_history()
                 history_id = await self._get_or_create_shared_history()
-                upload_dataset_id = await self._upload_fasta(
-                    submission.sequence, submission.filename, history_id
+                tool_request_id = await self._request_kmindex_job(
+                    submission, history_id
                 )
             tool_requested = True
-            try:
-                job_id = await self._run_kmindex_query(
-                    upload_dataset_id, submission, history_id
-                )
-            except Exception as e:
-                # Not retried: the job may exist. Just stop handing out the id.
-                if _is_missing_history_error(e):
-                    await self._forget_shared_history()
-                raise
+            job_id = await self._job_for_tool_request(tool_request_id)
 
             return GalaxyJobResponse(
                 job_id=job_id,
-                upload_dataset_id=upload_dataset_id,
                 status="submitted",
                 identity=self.credential.kind if self.credential else None,
                 message=(
@@ -908,11 +1110,129 @@ class GalaxyService:
                 if is_unlinked_account_error(e):
                     raise GalaxyAccountNotLinkedError(self.galaxy_login_url()) from e
             logger.error(f"Failed to submit kmindex query: {str(e)}")
-            if not tool_requested:
+            if isinstance(e, GalaxySubmitNotStarted):
+                raise
+            # A request Galaxy answered with an error queued nothing; one whose
+            # answer never arrived may have.
+            if not tool_requested and not isinstance(e, ToolRequestUnconfirmed):
                 raise GalaxySubmitNotStarted(
                     f"kmindex query submission failed: {str(e)}"
                 ) from e
             raise Exception(f"kmindex query submission failed: {str(e)}") from e
+
+    async def _request_kmindex_job(
+        self, submission: KmindexQuerySubmission, history_id: str
+    ) -> str:
+        """
+        Ask Galaxy to run kmindex_query, returning the tool request's id.
+
+        The query goes in as a base64:// URL carrying its SHA-256 rather than as
+        a pasted upload. Galaxy materializes it before creating the job and
+        reuses an existing dataset with the same source and hash, so a repeat of
+        a query arrives as the same input, and use_cached_jobs can hand back the
+        finished job as a copy instead of queueing another whole Vista node. A
+        pasted upload is a new dataset every time and never matches. Probed on
+        test.galaxyproject.org on 2026-10-14: a hit within a history and across
+        histories of the same account. A repeat sent while the first job is
+        still running isn't matched; only finished jobs are.
+
+        @param submission: the validated query.
+        @param history_id: where the job should land.
+        @returns: the tool request id, to poll for the job.
+        @raises ToolRequestUnconfirmed: the request went out and no answer came
+            back, so Galaxy may or may not have queued it.
+        """
+        content = _normalized_fasta(submission.sequence).encode("utf-8")
+        payload = {
+            "history_id": history_id,
+            # Nested state: the tool request API validates against the tool's
+            # parameter model, so the legacy flat "cond|param" keys don't apply.
+            "inputs": {
+                "db_opts": {
+                    "db_opts_selector": "db",
+                    # Sorted so the order a caller lists indexes in can't make
+                    # an otherwise identical search miss the cache.
+                    "kmindex": sorted(submission.indexes),
+                },
+                "fastx": {
+                    "ext": "fasta",
+                    "hashes": [
+                        {
+                            "hash_function": "SHA-256",
+                            "hash_value": hashlib.sha256(content).hexdigest(),
+                        }
+                    ],
+                    "name": KMINDEX_QUERY_DATASET_NAME,
+                    "src": "url",
+                    "url": "base64://" + base64.b64encode(content).decode("ascii"),
+                },
+                "format": "json",
+                "threshold": submission.threshold,
+                "zvalue": submission.zvalue,
+            },
+            "tool_id": self.settings.GALAXY_KMINDEX_TOOL_ID,
+            "use_cached_jobs": self.settings.KMINDEX_USE_CACHED_JOBS,
+        }
+        try:
+            response = await asyncio.to_thread(
+                self.gi.make_post_request, f"{self.gi.url}/jobs", payload=payload
+            )
+        except BioblendConnectionError as e:
+            # Only a 4xx is Galaxy refusing the request. A 5xx can come from a
+            # proxy after Galaxy queued it, and bioblend also raises on a 200
+            # whose body won't decode.
+            status = getattr(e, "status_code", None)
+            if status is None or not 400 <= status < 500:
+                raise ToolRequestUnconfirmed(str(e)) from e
+            raise
+        except Exception as e:
+            raise ToolRequestUnconfirmed(str(e)) from e
+        tool_request_id = (
+            response.get("tool_request_id") if isinstance(response, dict) else None
+        )
+        if not tool_request_id:
+            raise ToolRequestUnconfirmed(f"No tool request id in {response!r:.200}")
+        return tool_request_id
+
+    async def _job_for_tool_request(self, tool_request_id: str) -> str:
+        """
+        Wait for Galaxy to create the job a tool request asked for.
+
+        @param tool_request_id: from _request_kmindex_job.
+        @returns: the job id.
+        @raises GalaxySubmitNotStarted: Galaxy failed the request, so no job
+            exists.
+        @raises Exception: no job within KMINDEX_TOOL_REQUEST_TIMEOUT. The
+            request may still become one, so this is ambiguous.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + KMINDEX_TOOL_REQUEST_TIMEOUT
+        while True:
+            try:
+                response = await asyncio.to_thread(
+                    self.gi.make_get_request,
+                    f"{self.gi.url}/tool_requests/{tool_request_id}",
+                )
+                detail = response.json() if response.status_code == 200 else {}
+            except Exception as e:
+                logger.warning(f"Reading tool request {tool_request_id} failed: {e}")
+                detail = {}
+            jobs = detail.get("jobs") or []
+            if jobs:
+                return jobs[0]["id"]
+            if detail.get("state") == "failed":
+                message = detail.get("state_message") or {}
+                if isinstance(message, dict):
+                    message = message.get("err_msg")
+                raise GalaxySubmitNotStarted(
+                    f"Galaxy could not queue the kmindex query: {message}"
+                )
+            if loop.time() >= deadline:
+                raise Exception(
+                    f"Galaxy accepted tool request {tool_request_id} but created no "
+                    f"job within {KMINDEX_TOOL_REQUEST_TIMEOUT:.0f}s"
+                )
+            await asyncio.sleep(KMINDEX_TOOL_REQUEST_POLL)
 
     def _fetch_shard(self, dataset_id: str) -> bytes:
         """
@@ -972,19 +1292,19 @@ class GalaxyService:
     ) -> KmindexResults:
         """Merge a kmindex job's per-shard outputs into one ranked hit list.
 
-        @param lane: whose aggregation lock a cold merge takes. The native lane
+        @param lane: whose merge slots a cold merge takes. The native lane
             waits its turn, as it always has; the partner lane answers
-            GalaxyJobAggregating instead of waiting, because its callers poll
-            and a connection parked behind another partner merge is one the
-            proxy will cut anyway.
+            GalaxyJobAggregating when all its slots are taken instead of
+            waiting, because its callers poll and a connection parked behind
+            other partner merges is one the proxy will cut anyway.
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        aggregate = await self._load_aggregate(job_id, lane)
+        aggregate, source_job_id = await self._load_aggregate(job_id, lane)
 
         ordering, sort, order = await self._ordering_for(
-            aggregate, job_id, sort, order or _default_order(sort)
+            aggregate, source_job_id, sort, order or _default_order(sort)
         )
         # Single exit, so a cache hit can't skip annotation -- an earlier
         # version returned straight from the pre-lock hit and silently served
@@ -998,12 +1318,13 @@ class GalaxyService:
                 ordering=ordering,
                 sort=sort,
                 order=order,
+                export_job_id=source_job_id,
             )
         )
 
     async def _load_aggregate(
         self, job_id: str, lane: AggregationLane = "native"
-    ) -> dict:
+    ) -> Tuple[dict, str]:
         """The job's cached aggregate, merging its shards first on a miss.
 
         Shared by the listing and the filtered reads, so a filtered link opened
@@ -1012,10 +1333,23 @@ class GalaxyService:
 
         @param job_id: the kmindex job.
         @param lane: whose aggregation lock a cold merge takes.
-        @returns: the aggregate.
+        @returns: the aggregate, and the job it lives under: job_id's job-cache
+            original when job_id is a copy, else job_id itself. The export file
+            is written under that job too.
         """
+        requested_job_id = job_id
         cache_key = self._agg_cache_key(job_id)
         aggregate = await self.cache.get(cache_key)
+        source_status: Optional[GalaxyJobStatus] = None
+        if aggregate is None:
+            # A job-cache copy shares its original's outputs, so every copy
+            # reads one aggregate instead of re-merging thousands of shards
+            # each. The status is handed on, so a cold read still makes one
+            # show_job, not two.
+            job_id, source_status = await self._resolve_source(job_id)
+            if job_id != requested_job_id:
+                cache_key = self._agg_cache_key(job_id)
+                aggregate = await self.cache.get(cache_key)
 
         if aggregate is None:
             # Someone else is already merging this job. Say so rather than
@@ -1025,32 +1359,30 @@ class GalaxyService:
             marker_key = self._aggregating_key(job_id)
             if await self.cache.get(marker_key):
                 raise GalaxyJobAggregating(
-                    f"Results for job {job_id} are still being merged"
+                    f"Results for job {requested_job_id} are still being merged"
                 )
 
-            # Serialize aggregation within the lane. Without this, several
-            # callers landing on a cold cache each pull every shard at once,
-            # which multiplies the load Galaxy is already rate-limiting and
-            # leaves them racing to overwrite the same cache entry with partial
-            # results.
-            lock = _AGGREGATION_LOCKS[lane]
+            # Cap cold merges within the lane: each one holds every hit in
+            # memory until it is ranked and capped. Two readers of the same job
+            # never both merge -- that is the claim below, not this.
+            slots = _AGGREGATION_LANES[lane]
             # No await between this check and the acquire below, so on one event
-            # loop a free lock is still free when async-with takes it.
-            if lane == "partner" and lock.locked():
+            # loop a free slot is still free when async-with takes it.
+            if lane == "partner" and slots.locked():
                 raise GalaxyJobAggregating(
-                    f"Results for job {job_id} are queued behind another merge"
+                    f"Results for job {requested_job_id} are queued behind other merges"
                 )
-            async with lock:
+            async with slots:
                 # Re-check: whoever held the lock may have just built it.
                 aggregate = await self.cache.get(cache_key)
                 if aggregate is None:
-                    # The lane lock only serializes its own lane, and the check
-                    # above races, so the job itself is claimed atomically: one
+                    # The lane only caps its own merges, and the check above
+                    # races, so the job itself is claimed atomically: one
                     # merge per job across both lanes, and whoever loses is told
                     # to come back rather than merging it a second time.
                     if not await self.cache.claim(marker_key, CacheTTL.ONE_HOUR):
                         raise GalaxyJobAggregating(
-                            f"Results for job {job_id} are still being merged"
+                            f"Results for job {requested_job_id} are still being merged"
                         )
                     try:
                         # Re-check once more under the claim: the other lane can
@@ -1061,10 +1393,12 @@ class GalaxyService:
                         # partial one.
                         aggregate = await self.cache.get(cache_key)
                         if aggregate is None:
-                            aggregate = await self._aggregate_shards(job_id)
+                            aggregate = await self._aggregate_shards(
+                                job_id, source_status
+                            )
                     finally:
                         await self.cache.delete(marker_key)
-        return aggregate
+        return aggregate, job_id
 
     async def _filterable_export(self, aggregate: dict, job_id: str) -> Path:
         """The export a filtered read runs over, or why there is none.
@@ -1123,8 +1457,8 @@ class GalaxyService:
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
-        aggregate = await self._load_aggregate(job_id)
-        path = await self._filterable_export(aggregate, job_id)
+        aggregate, source_job_id = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, source_job_id)
         order = order or _default_order(sort)
         page = await asyncio.to_thread(
             kmindex_filters.subset_page,
@@ -1137,7 +1471,7 @@ class GalaxyService:
             KMINDEX_MAX_HITS,
         )
         matched = page["matched"]
-        export = self._export_state(aggregate, job_id)
+        export = self._export_state(aggregate, source_job_id)
         hits = [KmindexHit(**h) for h in page["hits"]]
         await self._fill_biosample(hits)
         return KmindexResults(
@@ -1181,8 +1515,8 @@ class GalaxyService:
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
-        aggregate = await self._load_aggregate(job_id)
-        path = await self._filterable_export(aggregate, job_id)
+        aggregate, source_job_id = await self._load_aggregate(job_id)
+        path = await self._filterable_export(aggregate, source_job_id)
         summary = await asyncio.to_thread(kmindex_filters.subset_summary, path, filters)
         return KmindexSummary(
             cohort=summary["cohort"],
@@ -1197,21 +1531,106 @@ class GalaxyService:
         """Page a job's aggregate if -- and only if -- it is already cached.
 
         The assistant's read path. get_kmindex_results builds the aggregate on
-        a miss, which pulls every shard from Galaxy under the process-wide
-        lock and takes over a minute cold; a chat turn has 110 seconds and a
+        a miss, which pulls every shard from Galaxy in a capped merge lane and
+        can take over a minute cold; a chat turn has 110 seconds and a
         tool call far less. So this never aggregates: a miss is None and the
         caller sends the user to the results page, which does.
 
         Needs no Galaxy connection -- paging a cached aggregate is Redis plus
         the mirror -- so it is deliberately not gated on is_available().
         """
-        cache_key = self._agg_cache_key(job_id)
-        aggregate = await self.cache.get(cache_key)
+        export_job_id = job_id
+        aggregate = await self.cache.get(self._agg_cache_key(job_id))
+        if aggregate is None:
+            # A job-cache copy's aggregate lives under its original. Only the
+            # cached status is consulted, so this still never touches Galaxy.
+            source = await self._cached_copied_from(job_id)
+            if source:
+                aggregate = await self.cache.get(self._agg_cache_key(source))
+                export_job_id = source
         if aggregate is None:
             return None
         return await self._annotate_with_sra(
-            self._page_kmindex(aggregate, job_id, limit, offset)
+            self._page_kmindex(
+                aggregate, job_id, limit, offset, export_job_id=export_job_id
+            )
         )
+
+    async def source_job_id(self, job_id: str) -> str:
+        """
+        The job whose outputs this one shares: its job-cache original, if any.
+
+        Galaxy answers a repeated query with a copy of the finished job, under a
+        new id. The copy's outputs are the original's datasets, so results and
+        the export are built once, under the original, and every copy reads
+        them. Anything that keeps a link from being followed -- Galaxy down, the
+        original purged -- stops at the last job that answered, which still has
+        the outputs to merge.
+
+        @param job_id: the job asked about.
+        @returns: the original job's id, or job_id if it isn't a copy.
+        """
+        return (await self._resolve_source(job_id))[0]
+
+    async def _resolve_source(
+        self, job_id: str
+    ) -> Tuple[str, Optional[GalaxyJobStatus]]:
+        """source_job_id, plus the source's status when it was read.
+
+        @param job_id: the job asked about.
+        @returns: the source job's id, and its status, or None if reading it
+            failed.
+        """
+        known = await self._known_copy_of(job_id)
+        if known:
+            return known, None
+        answered: Tuple[str, Optional[GalaxyJobStatus]] = (job_id, None)
+        current, seen = job_id, {job_id}
+        for _ in range(KMINDEX_COPY_HOPS):
+            try:
+                status = await self.get_job_status(current)
+            except Exception as e:
+                logger.info(f"Could not read job {current} following copy links: {e}")
+                break
+            answered = (current, status)
+            parent = status.copied_from_job_id
+            if not isinstance(parent, str) or not parent or parent in seen:
+                break
+            seen.add(parent)
+            current = parent
+        source, status = answered
+        # Only a walk that reached a job which isn't itself a copy is worth
+        # remembering for a month. One cut short by a failed read stops at a
+        # copy, and caching that would keep this job merging there rather than
+        # sharing the original's aggregate once Galaxy answers again.
+        if source != job_id and status is not None and not status.copied_from_job_id:
+            await self.cache.set(
+                self._copy_of_key(job_id), source, CacheTTL.THIRTY_DAYS
+            )
+        return answered
+
+    def _copy_of_key(self, job_id: str) -> str:
+        return self.cache.make_key(KMINDEX_COPY_OF_PREFIX, {"job_id": job_id})
+
+    async def _known_copy_of(self, job_id: str) -> Optional[str]:
+        """The original a copy was already resolved to, from Redis alone."""
+        known = await self.cache.get(self._copy_of_key(job_id))
+        return known if isinstance(known, str) and known else None
+
+    async def _cached_copied_from(self, job_id: str) -> Optional[str]:
+        """The job-cache original, read from the status cache alone.
+
+        @param job_id: the job asked about.
+        @returns: the original's id, or None when it isn't a copy or its
+            status isn't cached.
+        """
+        known = await self._known_copy_of(job_id)
+        if known:
+            return known
+        cached = await self.cache.get(
+            self.cache.make_key("galaxy:job_status", {"job_id": job_id})
+        )
+        return (cached or {}).get("copied_from_job_id")
 
     def _agg_cache_key(self, job_id: str) -> str:
         """Where a job's aggregate lives, for the mirror we are serving from.
@@ -1492,8 +1911,8 @@ class GalaxyService:
         Same window and the same reason as _cohort_for: the pre-cap list is
         alive here and nowhere else. Once aggregation returns, the aggregate
         holds 50,000 hits with no metadata on them, so rebuilding the full
-        enriched set would mean re-downloading every shard from a rate-limited
-        Galaxy behind the process-wide lock.
+        enriched set would mean re-downloading every shard and taking another
+        merge slot.
 
         Additive, so it cannot cost anyone their search: a write that fails
         leaves the results correct and simply without a download. Returns
@@ -1652,11 +2071,18 @@ class GalaxyService:
 
         return shards
 
-    async def _aggregate_shards(self, job_id: str) -> dict:
-        """Download and merge every shard for a completed kmindex job."""
+    async def _aggregate_shards(
+        self, job_id: str, status: Optional[GalaxyJobStatus] = None
+    ) -> dict:
+        """Download and merge every shard for a completed kmindex job.
+
+        @param job_id: the job to merge.
+        @param status: its status, when the caller just read it.
+        """
         cache_key = self._agg_cache_key(job_id)
 
-        status = await self.get_job_status(job_id)
+        if status is None:
+            status = await self.get_job_status(job_id)
         if not status.is_complete:
             raise GalaxyJobNotComplete(
                 f"Job {job_id} is not yet complete (state: {status.state})"
@@ -1687,45 +2113,13 @@ class GalaxyService:
         if shards is None:
             shards = await self._download_each_shard(job_id, status)
 
-        hits: List[dict] = []
-        query_name = None
-        shards_with_hits = 0
-        shards_failed = 0
-        corrected_out = 0
-        for shard in shards:
-            if not shard:
-                shards_failed += 1
-                continue
-            # Shape is {shard_name: {query_name: {accession: score}}}.
-            shard_had_hits = False
-            for shard_name, queries in shard.items():
-                for name, accessions in (queries or {}).items():
-                    query_name = query_name or name
-                    for accession, raw_score in (accessions or {}).items():
-                        # Logan's own site subtracts a false-positive baseline
-                        # for 227 saturated samples and re-applies the
-                        # threshold to what is left. kmindex applied it to the
-                        # raw ratio, so a hit that only cleared it because its
-                        # Bloom filter matches everything is dropped here.
-                        score, baseline = correct_score(accession, raw_score)
-                        hit = {
-                            "accession": accession,
-                            "score": score,
-                            "shard": shard_name,
-                        }
-                        if baseline is not None:
-                            if threshold is not None and score < threshold:
-                                corrected_out += 1
-                                continue
-                            hit["fp_correction"] = baseline
-                        # Count the shard, not the (shard, query) pair -- the
-                        # latter can exceed shards_searched. Counted on the
-                        # kept hit, so a shard whose only matches were dropped
-                        # saturated samples reports no hits rather than one.
-                        shard_had_hits = True
-                        hits.append(hit)
-            if shard_had_hits:
-                shards_with_hits += 1
+        (
+            hits,
+            query_name,
+            shards_with_hits,
+            shards_failed,
+            corrected_out,
+        ) = await asyncio.to_thread(_merge_shard_hits, shards, threshold)
 
         if corrected_out:
             logger.info(
@@ -1733,22 +2127,6 @@ class GalaxyService:
                 f"under the {threshold} threshold once their false-positive "
                 "baseline was subtracted"
             )
-
-        # Sort on more than score: ties are common, and shards land in completion
-        # order, so score alone leaves equal-scoring hits free to reshuffle
-        # between aggregations and make paged offsets incoherent.
-        #
-        # The second key has to be a hash rather than the accession itself. Ties
-        # are not a rare edge here -- a conserved query returns them by the
-        # hundred thousand (a 16S fragment at threshold 0.5 gave 305,061 hits
-        # scoring exactly 1.0 against a 50,000 cap), so the cap boundary sits
-        # inside one tie band and the tie-break alone decides the whole result
-        # set. Accession order is archive-prefix order, and the prefix predicts
-        # the submitting country: DRR is DDBJ, ERR is ENA, SRR is NCBI. Sorting
-        # by accession returned zero SRR rows out of a true 65.1%, so the
-        # country column reported a distribution manufactured by the sort.
-        # md5 reproduces the real composition to within 0.2 points.
-        hits.sort(key=lambda h: (-h["score"], _tie_break(h["accession"])))
 
         # Count before capping. The true match count is the number the caller
         # needs to judge the answer -- a 16S fragment matched 1,133,516
@@ -1852,8 +2230,8 @@ class GalaxyService:
             # refusal above is about the hit list itself being wrong; the
             # cohort is an optional enrichment over a hit list that is correct,
             # and letting it block the cache inverts the cost. Re-aggregation
-            # is 84-280 shard downloads from a rate-limited Galaxy behind a
-            # process-wide lock, and the failure need not be transient.
+            # is 84-280 shard downloads and a merge slot, and the failure need
+            # not be transient.
             #
             # The cause that produced this TTL -- a mirror on an older schema
             # reporting available and raising on every call, so every results
@@ -1992,14 +2370,20 @@ class GalaxyService:
         ordering: Optional[List[int]] = None,
         sort: KmindexSort = "score",
         order: KmindexOrder = "desc",
+        export_job_id: Optional[str] = None,
     ) -> KmindexResults:
-        """Slice a cached aggregate into a page of results, in the given order."""
+        """Slice a cached aggregate into a page of results, in the given order.
+
+        @param job_id: the job the caller asked for, which the page names.
+        @param export_job_id: the job the export file was written under, when
+            that's a job-cache original rather than job_id.
+        """
         hits = aggregate["hits"]
         if ordering is None:
             page = hits[offset : offset + limit]
         else:
             page = [hits[i] for i in ordering[offset : offset + limit]]
-        export = self._export_state(aggregate, job_id)
+        export = self._export_state(aggregate, export_job_id or job_id)
         return KmindexResults(
             job_id=job_id,
             query_name=aggregate.get("query_name"),
@@ -2030,6 +2414,307 @@ class GalaxyService:
             sort=sort,
             order=order,
             hits=[KmindexHit(**h) for h in page],
+        )
+
+    async def get_kmindex_queue(self) -> KmindexQueueStatus:
+        """How many searches are waiting, and how long recent ones waited.
+
+        Read as whoever this service is -- callers hand in the service account,
+        whose jobs are the ones worth counting. Cached for a minute.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+
+        key = self._index_cache_key(KMINDEX_QUEUE_PREFIX)
+        cached = await self.cache.get(key)
+        if cached:
+            return KmindexQueueStatus(**cached)
+        async with _QUEUE_READ_LOCK:
+            cached = await self.cache.get(key)
+            if cached:
+                return KmindexQueueStatus(**cached)
+            last_good_key = self._index_cache_key(KMINDEX_QUEUE_LAST_GOOD_PREFIX)
+            cooldown_key = self._index_cache_key(KMINDEX_QUEUE_COOLDOWN_PREFIX)
+            # A read that just failed isn't retried by every caller in turn --
+            # each would wait out its own timeout behind the lock.
+            if not await self.cache.get(cooldown_key):
+                try:
+                    status = await asyncio.wait_for(
+                        self._read_kmindex_queue(), KMINDEX_QUEUE_READ_TIMEOUT
+                    )
+                except Exception as e:
+                    logger.error(f"kmindex queue read failed: {e}")
+                    await self.cache.set(
+                        cooldown_key, True, KMINDEX_QUEUE_COOLDOWN_SECONDS
+                    )
+                else:
+                    snapshot = status.model_dump()
+                    await self.cache.set(key, snapshot, KMINDEX_QUEUE_TTL)
+                    await self.cache.set(
+                        last_good_key, snapshot, KMINDEX_QUEUE_LAST_GOOD_TTL
+                    )
+                    return status
+            # Galaxy didn't answer. An older snapshot, with its as_of saying
+            # how old, beats an error for something polled to show a person.
+            last_good = await self.cache.get(last_good_key)
+            if last_good:
+                return KmindexQueueStatus(**last_good)
+            raise Exception("Galaxy did not answer for the kmindex queue")
+
+    async def _service_user_id(self) -> str:
+        """The service account's Galaxy user id, so a listing is its jobs only.
+
+        Raises rather than returning nothing: listing without a user_id would
+        count every user's searches on an admin key, and a failed read here
+        then takes the same path as any failed queue read -- a cooldown and
+        the last good snapshot.
+
+        @returns: the encoded id.
+        @raises Exception: when this isn't the service account, or Galaxy
+            didn't say who it is.
+        """
+        if self.credential is not None and self.credential.kind != "service":
+            raise Exception("The kmindex queue is read as the service account")
+        url = self.settings.GALAXY_API_URL
+        if url in _SERVICE_USER_IDS:
+            return _SERVICE_USER_IDS[url]
+        user = await asyncio.to_thread(self.gi.users.get_current_user)
+        user_id = user.get("id") if isinstance(user, dict) else None
+        if not isinstance(user_id, str) or not user_id:
+            raise Exception("Galaxy did not say which user the service key is")
+        _SERVICE_USER_IDS[url] = user_id
+        return user_id
+
+    async def _read_kmindex_queue(self) -> KmindexQueueStatus:
+        now = datetime.now(timezone.utc)
+        tool_id = self.settings.GALAXY_KMINDEX_TOOL_ID
+        user_id = await self._service_user_id()
+        # Unfinished jobs get a listing of their own. Galaxy lists newest
+        # update first, and a queued job's update_time stops moving once it is
+        # queued, so in one shared listing the longest waits are the first to
+        # fall off the end.
+        active = await asyncio.to_thread(
+            self.gi.jobs.get_jobs,
+            state=sorted(_KMINDEX_WAITING_STATES | {"running"}),
+            tool_id=tool_id,
+            user_id=user_id,
+            limit=KMINDEX_QUEUE_LISTING_LIMIT,
+        )
+        waiting = [j for j in active if j.get("state") in _KMINDEX_WAITING_STATES]
+        running = sum(1 for j in active if j.get("state") == "running")
+        oldest = min((_galaxy_time(j["create_time"]) for j in waiting), default=None)
+
+        since = now - timedelta(minutes=KMINDEX_QUEUE_WINDOW_MINUTES)
+        # date_range_min is a date, matched against update_time.
+        recent = await asyncio.to_thread(
+            self.gi.jobs.get_jobs,
+            state=sorted(_KMINDEX_FINISHED_STATES),
+            tool_id=tool_id,
+            user_id=user_id,
+            date_range_min=since.date().isoformat(),
+            limit=KMINDEX_QUEUE_LISTING_LIMIT,
+            order_by="update_time",
+        )
+        finished = [
+            j
+            for j in recent
+            if j.get("state") in _KMINDEX_FINISHED_STATES
+            and _galaxy_time(j["update_time"]) >= since
+        ]
+        finished.sort(key=lambda j: j["update_time"], reverse=True)
+
+        timings = await self._job_timings(finished, KMINDEX_QUEUE_METRIC_READS)
+        waits = [
+            t["wait"]
+            for t in (timings.get(j["id"]) for j in finished)
+            if t and t.get("wait") is not None
+        ]
+
+        def minutes(seconds: Optional[float]) -> Optional[float]:
+            return None if seconds is None else round(seconds / 60, 1)
+
+        return KmindexQueueStatus(
+            as_of=now.isoformat(timespec="seconds"),
+            oldest_waiting_minutes=minutes(
+                (now - oldest).total_seconds() if oldest else None
+            ),
+            recent_searches=len(waits),
+            recent_wait_minutes=minutes(_percentile(waits, 0.5) if waits else None),
+            recent_wait_p90_minutes=minutes(_percentile(waits, 0.9) if waits else None),
+            running=running,
+            waiting=len(waiting),
+            window_minutes=KMINDEX_QUEUE_WINDOW_MINUTES,
+        )
+
+    async def _job_timings(self, jobs: List[dict], max_reads: int) -> Dict[str, dict]:
+        """Each finished job's wait and run time, from cache or its metrics.
+
+        Reads at most max_reads jobs' metrics from Galaxy, in list order, so a
+        list sorted newest first fills in the newest. A failed read is left
+        out and not cached, so the next build tries it again.
+        @returns: job id -> {"wait", "run", "copy"}, for the jobs it has.
+        """
+        timings: Dict[str, dict] = {}
+        missing: List[Tuple[dict, str]] = []
+        for job in jobs:
+            key = self.cache.make_key(
+                KMINDEX_QUEUE_TIMING_PREFIX,
+                {"job": job["id"], "url": self.settings.GALAXY_API_URL},
+            )
+            entry = await self.cache.get(key)
+            if entry is None:
+                missing.append((job, key))
+            else:
+                timings[job["id"]] = entry
+
+        slots = asyncio.Semaphore(KMINDEX_QUEUE_METRIC_CONCURRENCY)
+
+        async def read(job: dict, key: str) -> None:
+            async with slots:
+                try:
+                    entry = await self._job_timing(job)
+                except Exception as e:
+                    logger.warning(
+                        f"kmindex queue: no metrics for job {job['id']}: {e}"
+                    )
+                    return
+            await self.cache.set(key, entry, CacheTTL.THIRTY_DAYS)
+            timings[job["id"]] = entry
+
+        await asyncio.gather(*(read(job, key) for job, key in missing[:max_reads]))
+        return timings
+
+    async def _job_timing(self, job: dict) -> dict:
+        """A finished job's seconds waiting to start and running.
+
+        A job-cache copy never queued or ran: Galaxy copies the original's
+        metrics onto it, so its start lands before its own submit. It comes
+        back as a copy with neither figure. A job that finished without a
+        start time has neither too.
+
+        The metrics are stamped by the compute node's clock and create_time by
+        Galaxy's, so a node running behind can put a real job's start before
+        its submit too. Galaxy only reuses finished jobs, so a copy's end is
+        before its submit as well; a real job's end is after it, by its whole
+        run.
+        """
+        metrics = await asyncio.to_thread(self.gi.jobs.get_metrics, job["id"])
+        raw = {m.get("name"): m.get("raw_value") for m in metrics}
+        if raw.get("start_epoch") is None:
+            return {"copy": False, "run": None, "wait": None}
+        start = float(raw["start_epoch"])
+        created = _galaxy_time(job["create_time"]).timestamp()
+        wait = start - created
+        end = float(raw["end_epoch"]) if raw.get("end_epoch") is not None else None
+        if wait < 0 and (end is None or end < created):
+            return {"copy": True, "run": None, "wait": None}
+        run = end - start if end is not None else None
+        # A skewed clock that hides the wait means it was shorter than the skew.
+        return {"copy": False, "run": run, "wait": max(wait, 0.0)}
+
+    async def get_kmindex_queue_history(self, hours: int = 24) -> KmindexQueueHistory:
+        """Every search submitted in the last `hours`, with how long it waited.
+
+        Timestamps and durations only -- no job ids or queries -- because the
+        page that shows this is public, just unlisted. Cached for five minutes.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        hours = max(1, min(hours, KMINDEX_HISTORY_MAX_HOURS))
+        key = self.cache.make_key(
+            KMINDEX_HISTORY_PREFIX,
+            {
+                "hours": hours,
+                "tool": self.settings.GALAXY_KMINDEX_TOOL_ID,
+                "url": self.settings.GALAXY_API_URL,
+            },
+        )
+        cached = await self.cache.get(key)
+        if cached:
+            return KmindexQueueHistory(**cached)
+        async with _HISTORY_READ_LOCK:
+            cached = await self.cache.get(key)
+            if cached:
+                return KmindexQueueHistory(**cached)
+            history = await asyncio.wait_for(
+                self._read_kmindex_history(hours), KMINDEX_HISTORY_READ_TIMEOUT
+            )
+            await self.cache.set(key, history.model_dump(), KMINDEX_HISTORY_TTL)
+            return history
+
+    async def _read_kmindex_history(self, hours: int) -> KmindexQueueHistory:
+        now = datetime.now(timezone.utc)
+        since = now - timedelta(hours=hours)
+        user_id = await self._service_user_id()
+        # date_range_min is a date matched against update_time, and a job
+        # submitted in the window was updated in it too, so this covers it.
+        jobs = await asyncio.to_thread(
+            self.gi.jobs.get_jobs,
+            tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
+            user_id=user_id,
+            date_range_min=since.date().isoformat(),
+            limit=KMINDEX_HISTORY_LISTING_LIMIT,
+            order_by="create_time",
+        )
+        truncated = len(jobs) >= KMINDEX_HISTORY_LISTING_LIMIT
+        jobs = sorted(
+            (j for j in jobs if _galaxy_time(j["create_time"]) >= since),
+            key=lambda j: j["create_time"],
+        )
+        finished = [j for j in jobs if j.get("state") in _KMINDEX_FINISHED_STATES]
+        timings = await self._job_timings(
+            sorted(finished, key=lambda j: j["create_time"], reverse=True),
+            KMINDEX_HISTORY_METRIC_READS,
+        )
+
+        def minutes(seconds: Optional[float]) -> Optional[float]:
+            return None if seconds is None else round(seconds / 60, 1)
+
+        rows: List[KmindexQueueHistoryRow] = []
+        for job in jobs:
+            state = job.get("state", "")
+            created = _galaxy_time(job["create_time"])
+            wait = run = None
+            cached = waiting = False
+            if state in _KMINDEX_FINISHED_STATES:
+                timing = timings.get(job["id"]) or {}
+                cached = bool(timing.get("copy"))
+                wait, run = timing.get("wait"), timing.get("run")
+            elif state == "running":
+                # Metrics only land when a job ends; Galaxy last touched a
+                # running job when it started, which is close enough.
+                wait = (_galaxy_time(job["update_time"]) - created).total_seconds()
+            elif state in _KMINDEX_WAITING_STATES:
+                waiting = True
+                wait = (now - created).total_seconds()
+            rows.append(
+                KmindexQueueHistoryRow(
+                    cached=cached,
+                    run_minutes=minutes(run),
+                    state=state,
+                    still_waiting=waiting,
+                    submitted=created.isoformat(timespec="seconds"),
+                    wait_minutes=minutes(wait),
+                )
+            )
+
+        waits = [
+            r.wait_minutes
+            for r in rows
+            if r.wait_minutes is not None and not r.still_waiting
+        ]
+        runs = [r.run_minutes for r in rows if r.run_minutes is not None]
+        return KmindexQueueHistory(
+            as_of=now.isoformat(timespec="seconds"),
+            cache_hits=sum(1 for r in rows if r.cached),
+            hours=hours,
+            rows=rows,
+            run_p50_minutes=_percentile(runs, 0.5) if runs else None,
+            searches=len(rows),
+            truncated=truncated,
+            wait_max_minutes=max(waits) if waits else None,
+            wait_p50_minutes=_percentile(waits, 0.5) if waits else None,
+            wait_p90_minutes=_percentile(waits, 0.9) if waits else None,
         )
 
     async def get_job_status(self, job_id: str) -> GalaxyJobStatus:
@@ -2066,6 +2751,7 @@ class GalaxyService:
                 stdout=job_data.get("stdout"),
                 stderr=job_data.get("stderr"),
                 exit_code=job_data.get("exit_code"),
+                copied_from_job_id=job_data.get("copied_from_job_id"),
                 # Carried for in-process callers (see the field's comment);
                 # excluded from both the response and the cached model_dump.
                 params=job_data.get("params"),
@@ -2191,70 +2877,6 @@ class GalaxyService:
             logger.error(f"BioBLEND upload failed: {e}")
             raise Exception(f"Failed to upload data using BioBLEND: {str(e)}") from e
 
-    async def _upload_fasta(self, sequence: str, filename: str, history_id: str) -> str:
-        """Upload a FASTA query sequence and return the dataset ID."""
-        try:
-            upload_result = await asyncio.to_thread(
-                self.gi.tools.paste_content,
-                content=sequence,
-                history_id=history_id,
-                file_name=filename,
-                file_type="fasta",
-            )
-
-            outputs = upload_result.get("outputs", [])
-            if not outputs:
-                raise Exception("No outputs returned from FASTA upload")
-
-            dataset_id = outputs[0]["id"]
-            logger.info(f"Uploaded FASTA query to dataset: {dataset_id}")
-            return dataset_id
-
-        except Exception as e:
-            logger.error(f"FASTA upload failed: {e}")
-            raise Exception(f"Failed to upload FASTA query: {str(e)}") from e
-
-    async def _run_kmindex_query(
-        self, input_dataset_id: str, submission: KmindexQuerySubmission, history_id: str
-    ) -> str:
-        """Run kmindex_query against one or more Logan indexes, returning the job ID."""
-        try:
-            # Conditional params must use flattened "cond|param" keys. The nested
-            # dict form is accepted but silently drops the inner select, which
-            # runs kmindex with --index '' and fails on the node.
-            tool_inputs = {
-                "db_opts|db_opts_selector": "db",
-                # multiple="true" on the tool's select, so this takes the list as-is;
-                # a bare string would be read as a single index name.
-                "db_opts|kmindex": submission.indexes,
-                "fastx": {"src": "hda", "id": input_dataset_id},
-                "format": "json",
-                "threshold": submission.threshold,
-                "zvalue": submission.zvalue,
-            }
-
-            tool_response = await asyncio.to_thread(
-                self.gi.tools.run_tool,
-                history_id=history_id,
-                tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
-                tool_inputs=tool_inputs,
-            )
-
-            jobs = tool_response.get("jobs", [])
-            if not jobs:
-                raise Exception("No jobs returned from kmindex tool execution")
-
-            job_id = jobs[0]["id"]
-            logger.info(
-                f"Started kmindex query job {job_id} against "
-                f"{', '.join(submission.indexes)}"
-            )
-            return job_id
-
-        except Exception as e:
-            logger.error(f"kmindex tool execution failed: {e}")
-            raise Exception(f"Failed to run kmindex query: {str(e)}") from e
-
     async def _run_random_lines_tool(
         self, input_dataset_id: str, num_lines: int, history_id: str
     ) -> str:
@@ -2345,8 +2967,11 @@ class GalaxyService:
             logger.error(f"BioBLEND error getting dataset content: {e}")
             return f"Error retrieving dataset content: {str(e)}"
 
-    def _history_target(self) -> Tuple[str, object, int]:
+    def _history_target(self, today: str) -> Tuple[str, object, int]:
         """The history jobs land in: its name, its lock's account, its TTL.
+
+        @param today: the UTC date that names a service history, read once by
+            the caller so the name and the day it's filed under agree.
 
         Service-account jobs go to a "BRC ANALYTICS JOBS - <UTC date>" history
         (or history_name's, if the service was built with one); a signed-in
@@ -2360,7 +2985,7 @@ class GalaxyService:
         """
         if self.credential is not None and self.credential.kind == "user":
             return "BRC Logan Search", self.credential.user_sub, HISTORY_ID_TTL
-        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {_today()}"
+        name = f"{self.history_name or 'BRC ANALYTICS JOBS'} - {today}"
         # Keyed by name too: two service histories on one account are separate
         # find-or-creates, and must not wait on each other.
         return name, ("service", name), SERVICE_HISTORY_ID_TTL
@@ -2390,9 +3015,15 @@ class GalaxyService:
         before anything ran, so the submit is safe to retry, and a timestamped
         stray per failure only made the account's history list longer.
         """
-        name, account, ttl = self._history_target()
+        today = _today()
+        name, account, ttl = self._history_target(today)
         key = self._history_cache_key(account, name)
         self._history_key = key
+        if isinstance(account, tuple):
+            _forget_past_service_histories(today)
+            _SERVICE_HISTORY_DAYS[account] = today
+            if key:
+                _SERVICE_HISTORY_DAYS[key] = today
 
         cached = await self._cached_history_id(key)
         if cached:

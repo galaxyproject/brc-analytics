@@ -512,11 +512,76 @@ class KmindexSummary(BaseModel):
     total_matches: int = Field(..., description="Rows of the whole match set")
 
 
+class KmindexQueueStatus(BaseModel):
+    """
+    How backed up Logan searches are right now, from Galaxy's view.
+
+    Covers searches on the BRC service account -- every partner search and
+    anonymous site search, not ones signed-in users run as themselves. Galaxy
+    can't see the rest of the cluster's queue, so this says how our own jobs
+    are faring rather than predicting a start time.
+    """
+
+    waiting: int = Field(..., description="Searches submitted but not started")
+    running: int
+    oldest_waiting_minutes: Optional[float] = Field(
+        None, description="How long the longest-waiting search has waited so far"
+    )
+    recent_wait_minutes: Optional[float] = Field(
+        None,
+        description="Median wait from submit to start, over searches that "
+        "finished within window_minutes; None when there were none",
+    )
+    recent_wait_p90_minutes: Optional[float] = None
+    recent_searches: int = Field(
+        ..., description="Searches the recent figures are drawn from"
+    )
+    window_minutes: int
+    as_of: str = Field(..., description="When Galaxy was read, UTC ISO 8601")
+
+
+class KmindexQueueHistoryRow(BaseModel):
+    """One search, as far as timing goes. Deliberately no job id or query."""
+
+    submitted: str = Field(..., description="UTC ISO 8601")
+    state: str
+    cached: bool = Field(
+        ..., description="Answered from Galaxy's job cache; never queued"
+    )
+    still_waiting: bool = Field(
+        ..., description="Not started yet; wait_minutes is the wait so far"
+    )
+    wait_minutes: Optional[float] = None
+    run_minutes: Optional[float] = None
+
+
+class KmindexQueueHistory(BaseModel):
+    """Searches submitted over the last `hours`, for the unlisted stats page."""
+
+    as_of: str
+    hours: int
+    searches: int
+    cache_hits: int
+    wait_p50_minutes: Optional[float] = Field(
+        None, description="Over searches that started, excluding cache hits"
+    )
+    wait_p90_minutes: Optional[float] = None
+    wait_max_minutes: Optional[float] = None
+    run_p50_minutes: Optional[float] = None
+    truncated: bool = Field(
+        ..., description="Galaxy's listing hit its limit, so older rows are missing"
+    )
+    rows: List[KmindexQueueHistoryRow]
+
+
 class GalaxyJobResponse(BaseModel):
     """Response model for job submission."""
 
     job_id: str = Field(..., description="Galaxy job ID for tracking")
-    upload_dataset_id: str = Field(..., description="ID of the uploaded dataset")
+    upload_dataset_id: Optional[str] = Field(
+        default=None,
+        description="ID of the uploaded dataset, for tools that upload one first",
+    )
     status: str = Field(default="submitted", description="Initial job status")
     message: str = Field(default="Job submitted successfully")
     identity: Optional[str] = Field(
@@ -595,6 +660,9 @@ class GalaxyJobStatus(BaseModel):
     stdout: Optional[str] = None
     stderr: Optional[str] = None
     exit_code: Optional[int] = None
+    # Set when Galaxy answered the request from its job cache: this job is a
+    # copy of that one and shares its outputs.
+    copied_from_job_id: Optional[str] = None
     # The job's tool parameters, carried in-process so callers that need them
     # don't have to re-fetch a job dict this status was already built from.
     # excluded, so it reaches neither the HTTP response (this is a public

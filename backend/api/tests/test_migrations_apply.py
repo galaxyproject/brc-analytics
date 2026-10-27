@@ -31,11 +31,11 @@ GALAXY_JOBS_COLUMNS = {
 
 @contextmanager
 def _logging_restored():
-    """Undo alembic env.py's logging.fileConfig side effects.
+    """Undo any logger-disabling side effect of running alembic's env.py.
 
-    fileConfig defaults to disable_existing_loggers=True, so running a
-    migration switches off every logger the ini doesn't name -- which silently
-    empties caplog for whatever test runs next.
+    env.py passes disable_existing_loggers=False now, but if that regresses,
+    every logger the ini doesn't name switches off -- which would silently
+    empty caplog for whatever test runs next, not just fail the test below.
     """
     before = {
         name: logger.disabled
@@ -67,6 +67,27 @@ def migrated_db(tmp_path, monkeypatch):
 
     yield f"sqlite:///{db_path}"
     get_settings.cache_clear()
+
+
+def test_upgrade_leaves_app_loggers_enabled(tmp_path, monkeypatch):
+    """Startup migrations must not switch off the app's own logging.
+
+    The backend runs `alembic upgrade head` in-process after its modules have
+    created their loggers, so a fileConfig that disables existing loggers
+    silences every app warning for the life of the process.
+    """
+    app_logger = logging.getLogger("app.services.galaxy_service")
+    db_path = tmp_path / "logging.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{db_path}")
+    get_settings.cache_clear()
+    cfg = Config(str(_alembic_ini_path()))
+    cfg.set_main_option("sqlalchemy.url", f"sqlite+aiosqlite:///{db_path}")
+    try:
+        with _logging_restored():
+            command.upgrade(cfg, "head")
+            assert not app_logger.disabled
+    finally:
+        get_settings.cache_clear()
 
 
 KMINDEX_SUBMISSIONS_COLUMNS = {

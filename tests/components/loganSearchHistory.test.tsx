@@ -1,4 +1,4 @@
-import { LoganSearchHistory } from "@brc/components/LoganSearch/LoganSearchHistory/loganSearchHistory";
+import { LoganSearchHistory } from "@repo/shared/components/LoganSearch/LoganSearchHistory/loganSearchHistory";
 import {
   clearRecentSearches,
   MAX_RECENT_SEARCHES,
@@ -8,9 +8,16 @@ import {
   type RecentSearch,
   withRecentSearch,
   writeRecentSearches,
-} from "@brc/components/LoganSearch/LoganSearchHistory/recentSearches";
+} from "@repo/shared/components/LoganSearch/LoganSearchHistory/recentSearches";
+import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react";
 
 /**
  * A stored search.
@@ -91,6 +98,22 @@ describe("recent searches storage", () => {
     ]);
   });
 
+  test("keeps a stored query, and still reads entries saved without one", () => {
+    writeRecentSearches([
+      entry("new", { sequence: ">q1\nACGT\n" }),
+      entry("old"),
+      { ...entry("bad"), sequence: 42 } as unknown as RecentSearch,
+    ]);
+    const read = readRecentSearches();
+    expect(read.status === "ok" && read.searches.map((e) => e.jobId)).toEqual([
+      "new",
+      "old",
+    ]);
+    expect(read.status === "ok" && read.searches[0].sequence).toBe(
+      ">q1\nACGT\n"
+    );
+  });
+
   test("reports unavailable, and keeps working, when storage throws", () => {
     jest.spyOn(Storage.prototype, "getItem").mockImplementation((): never => {
       throw new Error("SecurityError");
@@ -122,6 +145,7 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId={null}
         onClear={jest.fn()}
+        searchPath="/logan-search"
         searches={[]}
       />
     );
@@ -133,6 +157,7 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId="current"
         onClear={jest.fn()}
+        searchPath="/logan-search"
         searches={[
           entry("current"),
           entry("older", {
@@ -159,10 +184,45 @@ describe("LoganSearchHistory", () => {
       <LoganSearchHistory
         currentJobId={null}
         onClear={onClear}
+        searchPath="/logan-search"
         searches={[entry("a")]}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     expect(onClear).toHaveBeenCalledTimes(1);
+  });
+
+  test("links back to wherever the search is mounted", () => {
+    // The Logan Search site mounts the search at its root.
+    render(
+      <LoganSearchHistory
+        currentJobId={null}
+        onClear={jest.fn()}
+        searchPath="/"
+        searches={[entry("older", { queryName: null })]}
+      />
+    );
+
+    const link = screen.getByRole("link", { name: "Job older" });
+    expect(link.getAttribute("href")).toBe("/?job=older");
+  });
+});
+
+describe("useRecentSearches", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  test("follows a search recorded elsewhere in the same tab", () => {
+    // The header's count and the form each hold their own copy of the list.
+    const header = renderHook(() => useRecentSearches());
+    const form = renderHook(() => useRecentSearches());
+
+    act(() => form.result.current.record(entry("a")));
+    expect(header.result.current.searches.map((e) => e.jobId)).toEqual(["a"]);
+
+    act(() => form.result.current.noteMatches("a", 42));
+    expect(header.result.current.searches[0].totalMatches).toBe(42);
+
+    act(() => form.result.current.clear());
+    expect(header.result.current.searches).toEqual([]);
   });
 });

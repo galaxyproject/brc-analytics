@@ -5,6 +5,10 @@ const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
 const EXAMPLE_CATEGORY = "Assemblies";
 const EXAMPLE_QUESTION = "What assemblies do you have for Plasmodium vivax?";
 
+// Timeout for the assistant to render after the URL changes to it. On a loaded
+// CI runner this has taken longer than the 5s default, in Firefox especially.
+const ASSISTANT_LOAD_TIMEOUT = 15000;
+
 test.describe("BRC Analytics - Home Assistant Prompt", () => {
   test("the send button waits for a question to send", async ({ page }) => {
     await page.goto("/");
@@ -33,8 +37,12 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
 
     await page.waitForURL(/\/assistant/);
     // Sent as the first message of the conversation. The reply needs a backend
-    // this suite doesn't run, so only the question itself is asserted.
-    await expect(page.getByText(QUESTION).first()).toBeVisible();
+    // this suite doesn't run, so only the question itself is asserted. Not a
+    // textarea: the hero's prompt still holds the question until the assistant
+    // replaces the page.
+    await expect(
+      page.getByText(QUESTION).and(page.locator(":not(textarea)")).first()
+    ).toBeVisible({ timeout: ASSISTANT_LOAD_TIMEOUT });
   });
 
   test("an example question opens the assistant with it", async ({ page }) => {
@@ -61,6 +69,10 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     await prompt.press("Enter");
 
     await page.waitForURL(/\/assistant/);
-    await expect(page).not.toHaveURL(/[?&]q=/);
+    // Given the render's timeout. The router changes the URL before it renders
+    // the assistant, and only the rendered assistant drops ?q=.
+    await expect(page).not.toHaveURL(/[?&]q=/, {
+      timeout: ASSISTANT_LOAD_TIMEOUT,
+    });
   });
 });

@@ -256,6 +256,12 @@ class Settings:
             "GALAXY_KMINDEX_TOOL_ID",
             "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0",
         )
+        # Let Galaxy answer a repeated query with its finished job. A switch so
+        # it can be turned off without a deploy if the cache ever hands back
+        # something it shouldn't.
+        self.KMINDEX_USE_CACHED_JOBS: bool = os.getenv(
+            "KMINDEX_USE_CACHED_JOBS", "true"
+        ).lower() in ("1", "true", "yes")
 
         # Which Galaxy OIDC backend links accounts (the provider name in Galaxy's
         # oidc_backends_config.xml). Used to build the connect-your-account URL.
