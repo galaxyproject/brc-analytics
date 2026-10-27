@@ -112,6 +112,7 @@ export function labelFits(
   depth: number,
   fontSize: number
 ): boolean {
+  if (Math.min(coords.y1, depth) <= coords.y0) return false;
   const midRadius =
     ((Math.min(coords.y0, depth) + Math.min(coords.y1, depth)) / 2) * ringWidth;
   return (coords.x1 - coords.x0) * midRadius >= fontSize * 1.2;

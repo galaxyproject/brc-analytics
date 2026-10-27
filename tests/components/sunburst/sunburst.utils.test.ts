@@ -187,9 +187,8 @@ describe("labelFits", () => {
   });
 
   it("treats rings beyond the visible depth as zero thickness", () => {
-    expect(labelFits({ x0: 0, x1: 0.01, y0: 4, y1: 5 }, 100, 4, 11)).toBe(
-      false
-    );
+    // Wide enough to pass on angle alone, were the ring drawn.
+    expect(labelFits({ x0: 0, x1: 1, y0: 4, y1: 5 }, 100, 4, 11)).toBe(false);
   });
 });
 

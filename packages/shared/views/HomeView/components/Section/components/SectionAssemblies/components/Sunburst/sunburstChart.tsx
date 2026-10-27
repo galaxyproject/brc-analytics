@@ -120,9 +120,11 @@ export const SunburstChart = ({
             Math.max(LABEL_FONT_SIZE, (MIN_SCREEN_LABEL_PX * WIDTH) / rendered)
           )
         : LABEL_FONT_SIZE;
-      const changed = Math.abs(next - fontSize) > 0.5;
+      // Compare against the size labels were last drawn at, so a slow resize
+      // can't creep past the threshold in steps too small to notice.
+      if (Math.abs(next - fontSize) <= 0.5) return false;
       fontSize = next;
-      return changed;
+      return true;
     };
     updateFontSize();
 
@@ -268,7 +270,17 @@ export const SunburstChart = ({
       const label = labelLayer
         .selectAll<SVGTextElement, TreeNode>("text")
         .data(labelNodes, keyOf)
-        .join((enter) => enter.append("text").attr("dy", "0.35em"))
+        .join((enter) =>
+          enter
+            .append("text")
+            .attr("dy", "0.35em")
+            // Placed and hidden from the start: the transition only takes
+            // over on its first tick, a frame after this paints.
+            .attr("transform", (d) =>
+              labelTransform(d, from?.get(d) ?? d.target, center)
+            )
+            .attr("fill-opacity", from && duration > 0 ? 0 : 1)
+        )
         .attr("fill", (d) => getLabelColor(colorOf(d), LABEL_DARK, LABEL_LIGHT))
         .text((d) =>
           truncateLabel(
@@ -278,7 +290,9 @@ export const SunburstChart = ({
           )
         );
       if (!from || duration === 0) {
-        label.attr("transform", (d) => labelTransform(d, d.target, center));
+        label
+          .attr("transform", (d) => labelTransform(d, d.target, center))
+          .attr("fill-opacity", 1);
         return;
       }
       label
@@ -287,7 +301,8 @@ export const SunburstChart = ({
         .attrTween("transform", (d) => {
           const i = interpolate(from.get(d) ?? d.current, d.target);
           return (t: number): string => labelTransform(d, i(t), center);
-        });
+        })
+        .attr("fill-opacity", 1);
     }
 
     // Only the arcs visible before or after a zoom are in the DOM: a few

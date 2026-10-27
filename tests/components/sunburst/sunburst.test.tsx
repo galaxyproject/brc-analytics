@@ -236,4 +236,21 @@ describe("Sunburst", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back to All taxa" }));
     expect(document.activeElement).toBe(heading);
   });
+
+  it("places labels arriving in a zoom before the animation starts", async () => {
+    const { container } = renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    fireEvent.click(await panelRow("Beta"));
+    const labels = Array.from(
+      container.querySelector("svg")?.querySelectorAll("text") ?? []
+    ).filter((text) => text.textContent?.startsWith("c-"));
+    expect(labels.length).toBeGreaterThan(0);
+    for (const text of labels) {
+      expect(text.getAttribute("transform")).toMatch(/^rotate\(/);
+    }
+  });
 });
