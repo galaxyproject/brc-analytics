@@ -1,4 +1,3 @@
-import taxaTree from "@catalog/output/ncbi-taxa-tree.json";
 import { Sunburst } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/sunburst";
 import { type TaxonomyNode } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/types";
 import {
@@ -7,6 +6,15 @@ import {
 } from "@repo/shared/views/HomeView/components/Section/section.styles";
 import { type JSX } from "react";
 import { Headline, Section, SectionLayout } from "./sectionAssemblies.styles";
+
+/**
+ * Loads the catalog's taxonomy tree as its own chunk.
+ * @returns The taxonomy tree.
+ */
+const loadTaxaTree = (): Promise<TaxonomyNode> =>
+  import("@catalog/output/ncbi-taxa-tree.json").then(
+    (module) => module.default as TaxonomyNode
+  );
 
 export const SectionAssemblies = (): JSX.Element => {
   return (
@@ -18,7 +26,7 @@ export const SectionAssemblies = (): JSX.Element => {
             Browse assemblies by taxonomic lineage.
           </SectionSubtitle>
         </Headline>
-        <Sunburst data={taxaTree as TaxonomyNode} logoPath="/logo/brc.svg" />
+        <Sunburst loadData={loadTaxaTree} logoPath="/logo/brc.svg" />
       </SectionLayout>
     </Section>
   );

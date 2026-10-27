@@ -1,92 +1,18 @@
 import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
-import {
-  Link as DXLink,
-  type LinkProps,
-} from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
+import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import {
   ArrowBackRounded,
   ChevronRightRounded,
   ViewListOutlined,
 } from "@mui/icons-material";
-import { type HierarchyNode } from "d3";
 import React, { type JSX } from "react";
-import { type TaxonomyNode } from "./types";
-
-// Define additional properties used by D3 during transitions
-interface D3TransitionNode {
-  current: {
-    x0: number;
-    x1: number;
-    y0: number;
-    y1: number;
-  };
-  target: {
-    x0: number;
-    x1: number;
-    y0: number;
-    y1: number;
-  };
-  x0: number;
-  x1: number;
-  y0: number;
-  y1: number;
-}
-
-// Define a type that represents a d3 hierarchy node with taxonomy data
-// and additional properties used during transitions
-export type TreeNode = HierarchyNode<TaxonomyNode> & D3TransitionNode;
+import { type TreeNode } from "./types";
+import { createFilterUrl } from "./utils";
 
 interface NodeDetailsProps {
   node: TreeNode;
   onClose?: () => void;
   onNodeClick?: (node: TreeNode) => void;
-}
-
-// Helper function to create a filter URL based on taxonomic level and name
-function createFilterUrl(rank?: string, name?: string): LinkProps["url"] {
-  // If rank or name is missing, we can't create a filter
-  if (!rank || !name) {
-    return "";
-  }
-
-  /* eslint-disable sort-keys -- Keep these in natural order of hierarchy */
-  // Convert rank to the expected format for the filter
-  const rankMap: Record<string, string> = {
-    isolate: "taxonomicLevelIsolate",
-    serotype: "taxonomicLevelSerotype",
-    strain: "taxonomicLevelStrain",
-    species: "taxonomicLevelSpecies",
-    genus: "taxonomicLevelGenus",
-    family: "taxonomicLevelFamily",
-    order: "taxonomicLevelOrder",
-    class: "taxonomicLevelClass",
-    phylum: "taxonomicLevelPhylum",
-    kingdom: "taxonomicLevelKingdom",
-    domain: "taxonomicLevelDomain",
-    realm: "taxonomicLevelRealm",
-  };
-  /* eslint-enable sort-keys -- re-enable sort keys */
-
-  const categoryKey = rankMap[rank.toLowerCase()] || null;
-
-  // If we couldn't map the rank, we can't create a filter
-  if (!categoryKey) {
-    return "";
-  }
-
-  // Create the filter object
-  const filter = [
-    {
-      categoryKey,
-      value: [name],
-    },
-  ];
-
-  // Return a Link URL object with href and query parameters
-  return {
-    href: "/data/assemblies",
-    query: encodeURIComponent(JSON.stringify({ filter })),
-  };
 }
 
 export const NodeDetails: React.FC<NodeDetailsProps> = ({
@@ -166,7 +92,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
                 onClick={() => {
                   // Navigate to parent node
                   if (node.parent && onNodeClick) {
-                    onNodeClick(node.parent);
+                    onNodeClick(node.parent as TreeNode);
                   } else if (onClose) {
                     // Fallback to onClose if parent is not available
                     onClose();
@@ -185,7 +111,7 @@ export const NodeDetails: React.FC<NodeDetailsProps> = ({
           </div>
 
           <div>
-            {firstLevelChildren.map((child, index) => (
+            {(firstLevelChildren as TreeNode[]).map((child, index) => (
               <div
                 key={index}
                 onClick={() => onNodeClick && onNodeClick(child)}

@@ -1,4 +1,3 @@
-import taxaTree from "@catalog/ga2/output/ncbi-taxa-tree.json";
 import { Sunburst } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/sunburst";
 import { type TaxonomyNode } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/types";
 import {
@@ -7,6 +6,15 @@ import {
 } from "@repo/shared/views/HomeView/components/Section/section.styles";
 import { type JSX } from "react";
 import { Headline, Section, SectionLayout } from "./sectionAssemblies.styles";
+
+/**
+ * Loads the catalog's taxonomy tree as its own chunk.
+ * @returns The taxonomy tree.
+ */
+const loadTaxaTree = (): Promise<TaxonomyNode> =>
+  import("@catalog/ga2/output/ncbi-taxa-tree.json").then(
+    (module) => module.default as TaxonomyNode
+  );
 
 export const SectionAssemblies = (): JSX.Element => {
   return (
@@ -19,7 +27,7 @@ export const SectionAssemblies = (): JSX.Element => {
           </SectionSubtitle>
         </Headline>
         <Sunburst
-          data={taxaTree as TaxonomyNode}
+          loadData={loadTaxaTree}
           logoPath="/logo/genomeark2.svg"
           startingNode="Metazoa"
         />
