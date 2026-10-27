@@ -16,8 +16,8 @@ import { getFooterClearanceStyle } from "./utils";
  */
 export const useFooterClearance = (): UseFooterClearance => {
   const ref = useRef<HTMLDivElement>(null);
-  // TODO: once findable-ui releases useLayoutHeight (Layout/hooks/UseLayoutHeight,
-  // on its main branch) and this app upgrades, switch to it: it writes the
+  // Once findable-ui releases useLayoutHeight (Layout/hooks/UseLayoutHeight, on
+  // its main branch) and this app upgrades, switch to it: it writes the
   // measured height to a custom property without re-rendering.
   const { height } = useResizeObserver(ref, getBorderBoxSizeHeight) ?? {};
   return { ref, style: getFooterClearanceStyle(height) };
