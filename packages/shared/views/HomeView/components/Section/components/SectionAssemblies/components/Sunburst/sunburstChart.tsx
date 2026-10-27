@@ -31,6 +31,7 @@ const LABEL_LIGHT = "#FFFFFF";
 const WIDTH = 800;
 const RADIUS = (WIDTH - 10) / 2;
 const LABEL_FONT_SIZE = 11;
+const MIN_SCREEN_LABEL_PX = 9;
 const LOGO_SIZE = 140;
 const ZOOM_MS = 750;
 
@@ -108,17 +109,15 @@ export const SunburstChart = ({
       .outerRadius((d) => Math.max(0, Math.min(d.y1, DEPTH) * ringWidth - 1));
 
     // Labels are sized in viewBox units, so on a small screen the chart's
-    // scale-down would shrink them past reading. Counter it, up to a point.
+    // scale-down would shrink them past reading. Keep them at least
+    // MIN_SCREEN_LABEL_PX on screen, capped so a phone still gets some.
     let fontSize = LABEL_FONT_SIZE;
     const updateFontSize = (): boolean => {
       const rendered = svgNode.getBoundingClientRect().width;
       const next = rendered
         ? Math.min(
-            20,
-            Math.max(
-              LABEL_FONT_SIZE,
-              (LABEL_FONT_SIZE * WIDTH) / rendered / 1.6
-            )
+            22,
+            Math.max(LABEL_FONT_SIZE, (MIN_SCREEN_LABEL_PX * WIDTH) / rendered)
           )
         : LABEL_FONT_SIZE;
       const changed = Math.abs(next - fontSize) > 0.5;
@@ -227,6 +226,8 @@ export const SunburstChart = ({
 
     function updateCenter(p: TreeNode): void {
       const isRoot = p.depth === 0;
+      const parentName =
+        p.depth === 1 ? "All taxa" : (p.parent as TreeNode | null)?.data.name;
       logoImage.style("opacity", isRoot ? 1 : 0);
       centerName.text(
         isRoot ? "" : truncateLabel(p.data.name, 2 * ringWidth - 24, 18)
@@ -237,10 +238,7 @@ export const SunburstChart = ({
         .style("cursor", isRoot ? "default" : "pointer")
         .attr("tabindex", isRoot ? null : 0)
         .attr("role", isRoot ? null : "button")
-        .attr(
-          "aria-label",
-          isRoot ? null : `Zoom out to ${(p.parent as TreeNode).data.name}`
-        );
+        .attr("aria-label", isRoot ? null : `Zoom out to ${parentName}`);
       svg.attr(
         "aria-label",
         isRoot
@@ -392,7 +390,7 @@ export const SunburstChart = ({
     zoomRef.current = zoomTo;
     zoomTo(root, false);
     const start = findNodeByName(root, startingNode);
-    if (start !== root) zoomTo(start);
+    if (start !== root) zoomTo(start, false);
 
     const resizeObserver =
       typeof ResizeObserver === "undefined"

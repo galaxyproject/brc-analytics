@@ -92,6 +92,17 @@ export const LoadMessage = styled.p`
   text-align: center;
 `;
 
+// A pale ring where the chart will be, so the space doesn't read as broken
+// while the chart and tree download.
+export const Placeholder = styled.div`
+  border: 24px solid ${PALETTE.SMOKE_MAIN};
+  border-radius: 50%;
+  box-sizing: border-box;
+  height: 100%;
+  opacity: 0.6;
+  width: 100%;
+`;
+
 export const Panel = styled.div`
   display: grid;
   gap: 12px;

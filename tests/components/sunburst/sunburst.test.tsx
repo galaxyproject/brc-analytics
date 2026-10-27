@@ -2,6 +2,7 @@ import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
 import { ThemeProvider } from "@mui/material";
 import { Sunburst } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/sunburst";
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -132,7 +133,7 @@ describe("Sunburst", () => {
       "Assemblies by taxonomic lineage, centred on Beta"
     );
     const zoomOut = within(chart).getByRole("button", {
-      name: "Zoom out to root",
+      name: "Zoom out to All taxa",
     });
     expect(document.activeElement).toBe(zoomOut);
     await waitFor(() => expect(arcs(container)).toHaveLength(3), {
@@ -159,5 +160,64 @@ describe("Sunburst", () => {
         .map((button) => button.textContent)
     ).toEqual(["All taxa", "Beta"]);
     expect(screen.getByRole("heading", { name: "c-0" })).toBeTruthy();
+  });
+
+  describe("with IntersectionObserver", () => {
+    let trigger: (() => void) | null = null;
+    const original = window.IntersectionObserver;
+
+    beforeEach(() => {
+      trigger = null;
+      window.IntersectionObserver = class {
+        constructor(callback: IntersectionObserverCallback) {
+          trigger = (): void =>
+            callback(
+              [{ isIntersecting: true } as IntersectionObserverEntry],
+              this as unknown as IntersectionObserver
+            );
+        }
+        disconnect(): void {}
+        observe(): void {}
+      } as unknown as typeof IntersectionObserver;
+    });
+
+    afterEach(() => {
+      window.IntersectionObserver = original;
+    });
+
+    it("waits for the section to near the viewport before loading", async () => {
+      const loadData = jest.fn(() => Promise.resolve(sampleTree()));
+      const { container } = renderThemed(
+        <Sunburst loadData={loadData} logoPath="/logo.svg" />
+      );
+      expect(loadData).not.toHaveBeenCalled();
+      expect(container.querySelector("[aria-busy=true]")).toBeTruthy();
+      act(() => trigger?.());
+      expect(loadData).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(arcs(container)).toHaveLength(11));
+    });
+  });
+
+  it("zooms without animating when the user prefers reduced motion", async () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes("reduce"),
+    })) as unknown as typeof window.matchMedia;
+    try {
+      const { container } = renderThemed(
+        <Sunburst
+          loadData={() => Promise.resolve(sampleTree())}
+          logoPath="/logo.svg"
+        />
+      );
+      const chart = await screen.findByRole("group");
+      fireEvent.keyDown(within(chart).getByRole("button", { name: /^Beta/ }), {
+        key: "Enter",
+      });
+      // No transition to wait out: the leaving arcs are already gone.
+      expect(arcs(container)).toHaveLength(3);
+    } finally {
+      window.matchMedia = original;
+    }
   });
 });

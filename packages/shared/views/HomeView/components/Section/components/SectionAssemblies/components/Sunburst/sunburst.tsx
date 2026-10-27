@@ -1,14 +1,20 @@
 import { type JSX, useEffect, useRef, useState } from "react";
-import { ChartFrame, Layout, LoadMessage } from "./sunburst.styles";
+import {
+  ChartFrame,
+  Layout,
+  LoadMessage,
+  Placeholder,
+} from "./sunburst.styles";
 import { type SunburstChartProps } from "./sunburstChart";
 import { type TaxonomyNode } from "./types";
 
 type SunburstProps = {
   depth?: number;
   /**
-   * Fetches the taxonomy tree; keep its identity stable (define it at module
-   * scope), since a new one reloads. Called once the chart is about to scroll
-   * into view, so the tree (several hundred kB) stays out of the home page bundle.
+   * Fetches the taxonomy tree. Called once the chart is about to scroll into
+   * view, so the tree (several hundred kB) stays out of the home page bundle.
+   * Define it at module scope: a new identity before loading restarts the
+   * wait, and one after loading is ignored.
    */
   loadData: () => Promise<TaxonomyNode>;
   logoPath: string;
@@ -92,9 +98,11 @@ export const Sunburst = ({
   }
   return (
     <Layout ref={containerRef}>
-      <ChartFrame>
-        {failed && (
+      <ChartFrame aria-busy={!failed}>
+        {failed ? (
           <LoadMessage>The taxonomy chart could not be loaded.</LoadMessage>
+        ) : (
+          <Placeholder />
         )}
       </ChartFrame>
     </Layout>
