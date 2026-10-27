@@ -1,6 +1,9 @@
 import type { ConversationProps } from "@repo/shared/views/AssistantView/components/Conversation/types";
+import type { RefObject } from "react";
 
-export type MessagesProps = Pick<
+export interface MessagesProps extends Pick<
   ConversationProps,
-  "error" | "introText" | "isRestoring" | "loading" | "messages"
->;
+  "introText" | "isRestoring" | "loading" | "messages"
+> {
+  logRef: RefObject<HTMLDivElement | null>;
+}

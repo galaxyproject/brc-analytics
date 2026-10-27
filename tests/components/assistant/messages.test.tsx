@@ -3,7 +3,7 @@ import { ThemeProvider } from "@mui/material";
 import { Messages } from "@repo/shared/views/AssistantView/components/Conversation/components/Messages/messages";
 import type { ChatMessageDisplay } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import { render, screen, within } from "@testing-library/react";
-import { type ComponentType, type JSX, type ReactNode } from "react";
+import { type ComponentType, createRef, type JSX, type ReactNode } from "react";
 // jest-dom matchers aren't registered globally in this repo's jest config; opt
 // in locally as the sibling suites do.
 import "@testing-library/jest-dom";
@@ -77,10 +77,10 @@ function renderMessages(
   render(
     <ThemeProvider theme={createAppTheme()}>
       <Messages
-        error={null}
         introText="Welcome"
         isRestoring={isRestoring}
         loading={loading}
+        logRef={createRef()}
         messages={messages}
       />
     </ThemeProvider>
@@ -105,16 +105,6 @@ function expectStatusAfterMessages(log: HTMLElement, label: string): void {
 }
 
 describe("Messages", () => {
-  // jsdom has no layout engine and doesn't define scrollTo; the list pins
-  // itself to the newest message on every change.
-  beforeAll(() => {
-    Element.prototype.scrollTo = jest.fn();
-  });
-
-  afterAll(() => {
-    delete (Element.prototype as Partial<Element>).scrollTo;
-  });
-
   test("renders a table in an assistant reply in a labelled, focusable scroll region", () => {
     renderMessages([{ content: ASSISTANT_REPLY, role: "assistant" }]);
 
