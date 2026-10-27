@@ -1,163 +1,136 @@
-import { RoundedPaper } from "@databiosphere/findable-ui/lib/components/common/Paper/paper.styles";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import {
   ArrowBackRounded,
   ChevronRightRounded,
   ViewListOutlined,
 } from "@mui/icons-material";
-import React, { type JSX } from "react";
+import { IconButton } from "@mui/material";
+import { type JSX } from "react";
+import {
+  Hint,
+  Lineage,
+  LinkRow,
+  List,
+  ListHeader,
+  Meta,
+  Panel,
+  PanelHeader,
+  PanelPaper,
+  RowButton,
+  TextButton,
+  Title,
+} from "./sunburst.styles";
 import { type TreeNode } from "./types";
-import { createFilterUrl } from "./utils";
+import { createFilterUrl, formatAssemblyCount } from "./utils";
 
 interface NodeDetailsProps {
   node: TreeNode;
-  onClose?: () => void;
-  onNodeClick?: (node: TreeNode) => void;
+  onNodeClick: (node: TreeNode) => void;
 }
 
-export const NodeDetails: React.FC<NodeDetailsProps> = ({
+/**
+ * Display name for a node; the tree's root is literally named "root".
+ * @param node - Node to name.
+ * @returns Its display name.
+ */
+function displayName(node: TreeNode): string {
+  return node.depth === 0 ? "All taxa" : node.data.name;
+}
+
+/**
+ * Details panel beside the sunburst: where the center sits in the lineage,
+ * a link to its assemblies, and its children to zoom into.
+ * @param props - Component props.
+ * @param props.node - Node the chart is centred on.
+ * @param props.onNodeClick - Zooms the chart to a node.
+ * @returns The panel.
+ */
+export const NodeDetails = ({
   node,
-  onClose,
   onNodeClick,
-}): JSX.Element => {
-  const isRoot = node?.depth === 0;
+}: NodeDetailsProps): JSX.Element => {
+  const isRoot = node.depth === 0;
+  const nodeName = node.data.name;
+  const children = (node.children ?? []) as TreeNode[];
+  const lineage = (node.ancestors() as TreeNode[]).slice(1).reverse();
+  const parent = node.parent as TreeNode | null;
 
-  // Get node name and rank safely
-  const nodeName = node?.data?.name || "Unknown";
-  const nodeRank = node?.data?.rank || "Unknown";
-
-  // Get first-level children for navigation
-  const firstLevelChildren = node?.children || [];
-
-  // Create the filter URL for this node if possible
-  const filterUrl = createFilterUrl(nodeRank, nodeName);
-  // Fallback URL to the main assemblies page
-  const linkUrl = filterUrl || "/data/assemblies";
-
-  // Create the appropriate display text based on node type
-  let filterLinkText = "Browse All Assemblies";
+  const linkUrl =
+    createFilterUrl(node.data.rank, nodeName) || "/data/assemblies";
+  let linkText = "Browse All Assemblies";
   if (!isRoot) {
-    const assemblyCount = node.data.assembly_count;
-    const assemblySuffix = assemblyCount > 1 ? "ies" : "y";
-    filterLinkText = `View ${assemblyCount} Assembl${assemblySuffix} for ${nodeName}`;
+    const count = node.data.assembly_count;
+    linkText = `View ${count} Assembl${count > 1 ? "ies" : "y"} for ${nodeName}`;
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        position: "relative",
-      }}
-    >
-      <div style={{ flex: "1", marginTop: "20px" }}>
-        <RoundedPaper>
-          <div
-            style={{
-              alignItems: "center",
-              borderBottom: "1px solid #e0e0e0",
-              borderTopLeftRadius: "8px",
-              borderTopRightRadius: "8px",
-              display: "flex",
-              padding: "12px 16px",
-            }}
-          >
-            <ViewListOutlined style={{ marginRight: "8px" }} />
-            <DXLink label={filterLinkText} url={linkUrl} />
-          </div>
-
-          <div
-            style={{
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "16px 16px 8px 16px",
-            }}
-          >
-            <h4
-              style={{
-                color: "#000",
-                fontFamily: "'Inter Tight', sans-serif",
-                fontSize: "20px",
-                fontWeight: 500,
-                margin: 0,
-              }}
+    <Panel>
+      <PanelPaper>
+        {!isRoot && (
+          <PanelHeader>
+            <nav aria-label="Lineage">
+              <Lineage>
+                {lineage.map((ancestor) => (
+                  <li key={ancestor.data.ncbi_tax_id || ancestor.data.name}>
+                    <TextButton
+                      onClick={() => onNodeClick(ancestor)}
+                      type="button"
+                    >
+                      {displayName(ancestor)}
+                    </TextButton>
+                  </li>
+                ))}
+              </Lineage>
+            </nav>
+            <Title>{nodeName}</Title>
+            <Meta>
+              {node.data.rank ? `${node.data.rank} · ` : ""}
+              {formatAssemblyCount(node.data.assembly_count)}
+            </Meta>
+          </PanelHeader>
+        )}
+        <LinkRow>
+          <ViewListOutlined fontSize="small" />
+          <DXLink label={linkText} url={linkUrl} />
+        </LinkRow>
+        <ListHeader>
+          <h4>Subcategories</h4>
+          {parent && (
+            <IconButton
+              aria-label={`Back to ${displayName(parent)}`}
+              onClick={() => onNodeClick(parent)}
+              size="small"
             >
-              Subcategories
-            </h4>
-
-            {!isRoot && (onNodeClick || onClose) && (
-              <div
-                onClick={() => {
-                  // Navigate to parent node
-                  if (node.parent && onNodeClick) {
-                    onNodeClick(node.parent as TreeNode);
-                  } else if (onClose) {
-                    // Fallback to onClose if parent is not available
-                    onClose();
-                  }
-                }}
-                style={{
-                  alignItems: "center",
-                  cursor: "pointer",
-                  display: "flex",
-                  padding: "4px",
-                }}
-              >
-                <ArrowBackRounded style={{ color: "#666" }} fontSize="small" />
-              </div>
-            )}
-          </div>
-
-          <div>
-            {(firstLevelChildren as TreeNode[]).map((child, index) => (
-              <div
-                key={index}
-                onClick={() => onNodeClick && onNodeClick(child)}
-                style={{
-                  alignItems: "center",
-                  borderTop: "1px solid #eee",
-                  color: "#000",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "10px 16px",
-                }}
-              >
-                <div>
-                  <span style={{ fontWeight: 500 }}>{child.data.name}</span>
-                  <span
-                    style={{
-                      color: "#666",
-                      fontSize: "0.9em",
-                      marginLeft: "8px",
-                    }}
-                  >
-                    ({child.data.assembly_count})
+              <ArrowBackRounded fontSize="small" />
+            </IconButton>
+          )}
+        </ListHeader>
+        {children.length > 0 ? (
+          <List>
+            {children.map((child) => (
+              <li key={child.data.ncbi_tax_id || child.data.name}>
+                <RowButton onClick={() => onNodeClick(child)} type="button">
+                  <span>
+                    <span className="name">{child.data.name}</span>
+                    <span className="count">({child.data.assembly_count})</span>
                   </span>
-                </div>
-                <ChevronRightRounded style={{ color: "#666" }} />
-              </div>
+                  <ChevronRightRounded />
+                </RowButton>
+              </li>
             ))}
-          </div>
-        </RoundedPaper>
-      </div>
-
+          </List>
+        ) : (
+          <Hint style={{ padding: "0 16px 16px" }}>
+            No further subcategories.
+          </Hint>
+        )}
+      </PanelPaper>
       {isRoot && (
-        <p
-          style={{
-            color: "#666",
-            fontSize: "0.9em",
-            fontStyle: "italic",
-            marginTop: "auto",
-            textAlign: "right",
-          }}
-        >
+        <Hint>
           Click the visualization to explore available assemblies, or make a
           selection above.
-        </p>
+        </Hint>
       )}
-    </div>
+    </Panel>
   );
 };

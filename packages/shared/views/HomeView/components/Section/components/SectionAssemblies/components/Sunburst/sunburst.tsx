@@ -1,4 +1,5 @@
 import { type JSX, useEffect, useRef, useState } from "react";
+import { ChartFrame, Layout, LoadMessage } from "./sunburst.styles";
 import { type SunburstChartProps } from "./sunburstChart";
 import { type TaxonomyNode } from "./types";
 
@@ -90,24 +91,12 @@ export const Sunburst = ({
     );
   }
   return (
-    <div
-      ref={containerRef}
-      style={{
-        display: "flex",
-        margin: "0 auto",
-        maxWidth: "1136px",
-        width: "100%",
-      }}
-    >
-      <div
-        style={{
-          aspectRatio: "1",
-          maxWidth: "800px",
-          width: "70%",
-        }}
-      >
-        {failed && <p>The taxonomy chart could not be loaded.</p>}
-      </div>
-    </div>
+    <Layout ref={containerRef}>
+      <ChartFrame>
+        {failed && (
+          <LoadMessage>The taxonomy chart could not be loaded.</LoadMessage>
+        )}
+      </ChartFrame>
+    </Layout>
   );
 };

@@ -1,5 +1,5 @@
 import { type LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { hsl } from "d3-color";
+import { hsl, rgb } from "d3-color";
 import { interpolateRgb, piecewise } from "d3-interpolate";
 import { type ArcCoords, type TreeNode } from "./types";
 
@@ -32,7 +32,9 @@ export function getEquidistantColors(
 /**
  * Colour of a node's arc when the chart is centred on `center`. Each child
  * of the center takes its own colour by sibling position; deeper nodes take
- * their center-child ancestor's, lightened and desaturated a step per ring.
+ * their center-child ancestor's, lightened and desaturated a step per ring,
+ * with every other sibling a shade darker so neighbouring arcs in the pale
+ * outer rings stay distinguishable.
  * @param node - A descendant of `center`.
  * @param center - Node the chart is centred on.
  * @param childColors - One colour per child of `center`, in order.
@@ -52,11 +54,96 @@ export function getNodeColor(
   const steps = node.depth - center.depth - 1;
   if (steps === 0) return childColors[index];
   const base = hsl(childColors[index]);
+  const siblingIndex = node.parent?.children?.indexOf(node) ?? 0;
+  const shade = siblingIndex % 2 === 1 ? -0.05 : 0;
   return hsl(
     base.h,
-    Math.max(0, base.s - 0.1 * steps),
-    Math.min(1, base.l + 0.05 * steps)
+    Math.max(0, base.s - 0.08 * steps),
+    Math.min(0.92, base.l + 0.06 * steps + shade)
   ).toString();
+}
+
+/**
+ * Relative luminance of an sRGB colour (WCAG 2).
+ * @param color - CSS colour.
+ * @returns Luminance from 0 (black) to 1 (white).
+ */
+function luminance(color: string): number {
+  const { b, g, r } = rgb(color);
+  const channel = (c: number): number => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+}
+
+/**
+ * Picks dark or light label text, whichever contrasts more with the fill.
+ * @param fill - Arc fill colour.
+ * @param dark - Dark text colour.
+ * @param light - Light text colour.
+ * @returns The text colour to use.
+ */
+export function getLabelColor(
+  fill: string,
+  dark: string,
+  light: string
+): string {
+  const contrast = (a: number, b: number): number =>
+    (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  const l = luminance(fill);
+  return contrast(l, luminance(dark)) >= contrast(l, luminance(light))
+    ? dark
+    : light;
+}
+
+/**
+ * Whether a label fits across its arc: radial labels need the arc to be at
+ * least a line of text wide where the label sits.
+ * @param coords - Arc coordinates.
+ * @param ringWidth - Radial thickness of one ring, in px.
+ * @param depth - Rings including the center disc.
+ * @param fontSize - Label font size, in px.
+ * @returns True if the label fits.
+ */
+export function labelFits(
+  coords: ArcCoords,
+  ringWidth: number,
+  depth: number,
+  fontSize: number
+): boolean {
+  const midRadius =
+    ((Math.min(coords.y0, depth) + Math.min(coords.y1, depth)) / 2) * ringWidth;
+  return (coords.x1 - coords.x0) * midRadius >= fontSize * 1.2;
+}
+
+/**
+ * Shortens a label to fit a length, ending it with an ellipsis. Widths are
+ * estimated from an average glyph width, since SVG text can't be measured
+ * before it is laid out (and jsdom can't measure it at all).
+ * @param text - Label text.
+ * @param maxWidth - Available length, in px.
+ * @param fontSize - Font size, in px.
+ * @returns The label, shortened if needed.
+ */
+export function truncateLabel(
+  text: string,
+  maxWidth: number,
+  fontSize: number
+): string {
+  const maxChars = Math.floor(maxWidth / (fontSize * 0.56));
+  if (text.length <= maxChars) return text;
+  if (maxChars <= 1) return "";
+  return text.slice(0, maxChars - 1).trimEnd() + "\u2026";
+}
+
+/**
+ * "1 assembly", "12 assemblies".
+ * @param count - Number of assemblies.
+ * @returns The count with its noun.
+ */
+export function formatAssemblyCount(count: number): string {
+  return `${count.toLocaleString()} ${count === 1 ? "assembly" : "assemblies"}`;
 }
 
 /**
@@ -99,16 +186,6 @@ export function getVisibleNodes(center: TreeNode, depth: number): TreeNode[] {
   };
   walk(center, 0);
   return visible;
-}
-
-/**
- * Whether an arc spans at least 1% of the circle, the threshold for
- * drawing its label.
- * @param coords - Arc coordinates.
- * @returns True if the arc is wide enough for a label.
- */
-export function isLargeEnoughForLabel(coords: ArcCoords): boolean {
-  return (coords.x1 - coords.x0) / TAU >= 0.01;
 }
 
 /**

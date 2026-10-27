@@ -1,6 +1,14 @@
+import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
+import { ThemeProvider } from "@mui/material";
 import { Sunburst } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/sunburst";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { type JSX } from "react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { type JSX, type ReactElement } from "react";
 import { sampleTree } from "./fixtures";
 
 // The real link validates its URL against the explore state the app
@@ -11,6 +19,15 @@ jest.mock(
     Link: ({ label }: { label: string }): JSX.Element => <a>{label}</a>,
   })
 );
+
+/**
+ * Renders inside the app theme, which the layout's breakpoints read.
+ * @param ui - Element to render.
+ * @returns The render result.
+ */
+function renderThemed(ui: ReactElement): ReturnType<typeof render> {
+  return render(<ThemeProvider theme={createAppTheme()}>{ui}</ThemeProvider>);
+}
 
 /**
  * Arcs currently drawn in the chart (the first svg; the panel's icons are
@@ -41,7 +58,7 @@ function panelRow(name: string): Promise<HTMLElement> {
 
 describe("Sunburst", () => {
   it("draws only the arcs in view, not the whole tree", async () => {
-    const { container } = render(
+    const { container } = renderThemed(
       <Sunburst
         loadData={() => Promise.resolve(sampleTree())}
         logoPath="/logo.svg"
@@ -53,7 +70,7 @@ describe("Sunburst", () => {
   });
 
   it("swaps the drawn arcs for the new subtree when zooming in", async () => {
-    const { container } = render(
+    const { container } = renderThemed(
       <Sunburst
         loadData={() => Promise.resolve(sampleTree())}
         logoPath="/logo.svg"
@@ -68,7 +85,7 @@ describe("Sunburst", () => {
   });
 
   it("says so if the chart can't be loaded", async () => {
-    render(
+    renderThemed(
       <Sunburst
         loadData={() => Promise.reject(new Error("offline"))}
         logoPath="/logo.svg"
@@ -77,5 +94,70 @@ describe("Sunburst", () => {
     expect(
       await screen.findByText("The taxonomy chart could not be loaded.")
     ).toBeTruthy();
+  });
+
+  it("offers the panel's subcategories as buttons", async () => {
+    renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    // The chart's first-ring arcs are buttons too; this wants the panel's.
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole("button", { name: /^Alpha/ })
+          .some((element) => element.tagName === "BUTTON")
+      ).toBe(true)
+    );
+  });
+
+  it("lets the keyboard zoom in on a first-ring arc and back out", async () => {
+    const { container } = renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    const chart = await screen.findByRole("group", {
+      name: "Assemblies by taxonomic lineage",
+    });
+    const beta = within(chart).getByRole("button", {
+      name: "Beta, domain · 1 assembly",
+    });
+    expect(beta.getAttribute("tabindex")).toBe("0");
+    fireEvent.keyDown(beta, { key: "Enter" });
+    expect(chart.getAttribute("aria-label")).toBe(
+      "Assemblies by taxonomic lineage, centred on Beta"
+    );
+    const zoomOut = within(chart).getByRole("button", {
+      name: "Zoom out to root",
+    });
+    expect(document.activeElement).toBe(zoomOut);
+    await waitFor(() => expect(arcs(container)).toHaveLength(3), {
+      timeout: 3000,
+    });
+    fireEvent.keyDown(zoomOut, { key: " " });
+    expect(chart.getAttribute("aria-label")).toBe(
+      "Assemblies by taxonomic lineage"
+    );
+  });
+
+  it("shows the lineage of the centred taxon with links back up it", async () => {
+    renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+        startingNode="c-0"
+      />
+    );
+    const lineage = await screen.findByRole("navigation", { name: "Lineage" });
+    expect(
+      within(lineage)
+        .getAllByRole("button")
+        .map((button) => button.textContent)
+    ).toEqual(["All taxa", "Beta"]);
+    expect(screen.getByRole("heading", { name: "c-0" })).toBeTruthy();
   });
 });

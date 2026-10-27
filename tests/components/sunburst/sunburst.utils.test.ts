@@ -5,10 +5,14 @@ import {
 import {
   createFilterUrl,
   findNodeByName,
+  formatAssemblyCount,
   getEquidistantColors,
+  getLabelColor,
   getNodeColor,
   getVisibleNodes,
+  labelFits,
   layoutRelativeTo,
+  truncateLabel,
 } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/utils";
 import { hsl } from "d3-color";
 import { hierarchy, partition } from "d3-hierarchy";
@@ -116,6 +120,16 @@ describe("getNodeColor", () => {
     expect(forward).toEqual(backward);
   });
 
+  it("shades every other sibling so neighbouring arcs differ", () => {
+    const root = layout(sampleTree());
+    const colors = getEquidistantColors(PALETTE, 3);
+    // a-0 and b-0 are adjacent children of Alpha, so they share a base.
+    const first = getNodeColor(findNodeByName(root, "a-0"), root, colors);
+    const second = getNodeColor(findNodeByName(root, "b-0"), root, colors);
+    expect(first).not.toBe(second);
+    expect(hsl(second).l).toBeLessThan(hsl(first).l);
+  });
+
   it("lightens deeper rings from their center-child's colour", () => {
     const root = layout(sampleTree());
     const colors = getEquidistantColors(PALETTE, 3);
@@ -152,5 +166,48 @@ describe("createFilterUrl", () => {
   it("returns an empty URL for ranks with no filter", () => {
     expect(createFilterUrl("no rank", "root")).toBe("");
     expect(createFilterUrl(undefined, "root")).toBe("");
+  });
+});
+
+describe("getLabelColor", () => {
+  it("uses light text on dark arcs and dark text on light ones", () => {
+    expect(getLabelColor("#604c81", "#212B36", "#FFFFFF")).toBe("#FFFFFF");
+    expect(getLabelColor("#d5db9a", "#212B36", "#FFFFFF")).toBe("#212B36");
+  });
+});
+
+describe("labelFits", () => {
+  it("needs the arc to be a line of text wide at the label", () => {
+    const ring = 100;
+    // Mid-radius 150px: 0.1 rad is 15px across, 0.05 rad is 7.5px.
+    expect(labelFits({ x0: 0, x1: 0.1, y0: 1, y1: 2 }, ring, 4, 11)).toBe(true);
+    expect(labelFits({ x0: 0, x1: 0.05, y0: 1, y1: 2 }, ring, 4, 11)).toBe(
+      false
+    );
+  });
+
+  it("treats rings beyond the visible depth as zero thickness", () => {
+    expect(labelFits({ x0: 0, x1: 0.01, y0: 4, y1: 5 }, 100, 4, 11)).toBe(
+      false
+    );
+  });
+});
+
+describe("truncateLabel", () => {
+  it("leaves labels that fit alone", () => {
+    expect(truncateLabel("Fungi", 90, 11)).toBe("Fungi");
+  });
+
+  it("shortens long labels with an ellipsis", () => {
+    const label = truncateLabel("Peronosporomycetes", 60, 11);
+    expect(label.endsWith("…")).toBe(true);
+    expect(label.length).toBeLessThanOrEqual(Math.floor(60 / (11 * 0.56)));
+  });
+});
+
+describe("formatAssemblyCount", () => {
+  it("pluralises", () => {
+    expect(formatAssemblyCount(1)).toBe("1 assembly");
+    expect(formatAssemblyCount(1234)).toBe("1,234 assemblies");
   });
 });
