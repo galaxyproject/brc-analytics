@@ -220,4 +220,20 @@ describe("Sunburst", () => {
       window.matchMedia = original;
     }
   });
+
+  it("keeps keyboard focus in the panel when its controls navigate", async () => {
+    renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    const alpha = await panelRow("Alpha");
+    fireEvent.click(alpha);
+    const heading = screen.getByRole("heading", { name: "Subcategories" });
+    expect(document.activeElement).toBe(heading);
+    // Back to the root, where the back button itself goes away.
+    fireEvent.click(screen.getByRole("button", { name: "Back to All taxa" }));
+    expect(document.activeElement).toBe(heading);
+  });
 });

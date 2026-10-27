@@ -5,7 +5,7 @@ import {
   ViewListOutlined,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { type JSX } from "react";
+import { type JSX, useRef } from "react";
 import {
   Hint,
   Lineage,
@@ -54,6 +54,15 @@ export const NodeDetails = ({
   const children = (node.children ?? []) as TreeNode[];
   const lineage = (node.ancestors() as TreeNode[]).slice(1).reverse();
   const parent = node.parent as TreeNode | null;
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // The control just used is replaced (or, for the back button at the root,
+  // removed) when the panel re-renders for the new node, which would drop
+  // keyboard focus to the page. The heading stays put, so focus moves there.
+  const navigate = (target: TreeNode): void => {
+    onNodeClick(target);
+    headingRef.current?.focus();
+  };
 
   const linkUrl =
     createFilterUrl(node.data.rank, nodeName) || "/data/assemblies";
@@ -73,7 +82,7 @@ export const NodeDetails = ({
                 {lineage.map((ancestor) => (
                   <li key={ancestor.data.ncbi_tax_id || ancestor.data.name}>
                     <TextButton
-                      onClick={() => onNodeClick(ancestor)}
+                      onClick={() => navigate(ancestor)}
                       type="button"
                     >
                       {displayName(ancestor)}
@@ -94,11 +103,13 @@ export const NodeDetails = ({
           <DXLink label={linkText} url={linkUrl} />
         </LinkRow>
         <ListHeader>
-          <h4>Subcategories</h4>
+          <h4 ref={headingRef} tabIndex={-1}>
+            Subcategories
+          </h4>
           {parent && (
             <IconButton
               aria-label={`Back to ${displayName(parent)}`}
-              onClick={() => onNodeClick(parent)}
+              onClick={() => navigate(parent)}
               size="small"
             >
               <ArrowBackRounded fontSize="small" />
@@ -109,7 +120,7 @@ export const NodeDetails = ({
           <List>
             {children.map((child) => (
               <li key={child.data.ncbi_tax_id || child.data.name}>
-                <RowButton onClick={() => onNodeClick(child)} type="button">
+                <RowButton onClick={() => navigate(child)} type="button">
                   <span>
                     <span className="name">{child.data.name}</span>
                     <span className="count">({child.data.assembly_count})</span>

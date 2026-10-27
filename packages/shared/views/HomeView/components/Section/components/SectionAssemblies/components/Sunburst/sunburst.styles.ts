@@ -202,6 +202,7 @@ export const ListHeader = styled.div`
     color: ${PALETTE.INK_MAIN};
     font: ${FONT.BODY_LARGE_500};
     margin: 0;
+    outline: none;
   }
 `;
 
