@@ -1,3 +1,6 @@
-import type { RefObject } from "react";
+import type { CSSProperties, RefObject } from "react";
 
-export type UseFooterClearance = RefObject<HTMLDivElement | null>;
+export interface UseFooterClearance {
+  ref: RefObject<HTMLDivElement | null>;
+  style: CSSProperties | undefined;
+}

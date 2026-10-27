@@ -1,18 +1,19 @@
-import { FOOTER_CLEARANCE_PROPERTY } from "@repo/shared/views/AssistantView/components/Conversation/constants";
+import {
+  FOOTER_CLEARANCE_PROPERTY,
+  GAP,
+} from "@repo/shared/views/AssistantView/components/Conversation/constants";
+import type { CSSProperties } from "react";
 
 /**
- * Sets the space that whatever is brought into view in the conversation keeps
- * clear of the pinned footer.
- * @param conversation - Conversation element.
- * @param clearance - Space to keep clear, in pixels, or null to clear it.
+ * Builds the conversation's style that keeps whatever is brought into view
+ * clear of the pinned footer: its height and the gap it paints over.
+ * @param height - Footer's height, in pixels, or undefined until it is measured.
+ * @returns Conversation style, or undefined until the footer is measured.
  */
-export function setFooterClearance(
-  conversation: HTMLElement,
-  clearance: number | null
-): void {
-  if (clearance === null) {
-    conversation.style.removeProperty(FOOTER_CLEARANCE_PROPERTY);
-    return;
-  }
-  conversation.style.setProperty(FOOTER_CLEARANCE_PROPERTY, `${clearance}px`);
+export function getFooterClearanceStyle(
+  height: number | undefined
+): CSSProperties | undefined {
+  if (height === undefined) return;
+  // A custom property, which React's style type doesn't list.
+  return { [FOOTER_CLEARANCE_PROPERTY]: `${height + GAP}px` } as CSSProperties;
 }

@@ -53,9 +53,9 @@ export const Conversation = ({
   const { inputRef, onFocusComposer } = useComposerFocus();
   const { logRef, onFocusLog } = useLogFocus();
   const ref = useRevealLatest([error, isRestoring, loading, messages]);
-  const footerRef = useFooterClearance(ref);
+  const { ref: footerRef, style: clearanceStyle } = useFooterClearance();
   return (
-    <StyledStack ref={ref}>
+    <StyledStack ref={ref} style={clearanceStyle}>
       <Messages
         introText={introText}
         isRestoring={isRestoring}

@@ -1,30 +1,27 @@
 import { GAP } from "@repo/shared/views/AssistantView/components/Conversation/constants";
 import { useFooterClearance } from "@repo/shared/views/AssistantView/components/Conversation/hooks/UseFooterClearance/hook";
 import { act, render } from "@testing-library/react";
-import { type JSX, useRef } from "react";
+import { type JSX } from "react";
 
 interface ObserverMock {
   callback: ResizeObserverCallback;
-  disconnect: jest.Mock;
   observe: jest.Mock;
+  unobserve: jest.Mock;
 }
 
 const FOOTER_HEIGHT = 114;
 
 const observers: ObserverMock[] = [];
 
-let footerHeight: number;
-
 /**
  * A conversation with a footer, as the chat renders it.
  * @returns The conversation element.
  */
 function Conversation(): JSX.Element {
-  const ref = useRef<HTMLDivElement>(null);
-  const footerRef = useFooterClearance(ref);
+  const { ref, style } = useFooterClearance();
   return (
-    <div data-testid="conversation" ref={ref}>
-      <div ref={footerRef} />
+    <div data-testid="conversation" style={style}>
+      <div ref={ref} />
     </div>
   );
 }
@@ -39,13 +36,17 @@ function getClearance(conversation: HTMLElement): string {
 }
 
 /**
- * Reports a resize to the footer's observer, as the browser does when it
+ * Reports the footer's height to its observer, as the browser does when it
  * starts observing and when the footer's size changes.
+ * @param height - Footer's border-box height, in pixels.
  */
-function resize(): void {
+function resize(height: number): void {
+  const entry = {
+    borderBoxSize: [{ blockSize: height, inlineSize: 0 }],
+  } as unknown as ResizeObserverEntry;
   act(() =>
     observers[observers.length - 1].callback(
-      [],
+      [entry],
       {} as unknown as ResizeObserver
     )
   );
@@ -53,26 +54,22 @@ function resize(): void {
 
 beforeEach(() => {
   observers.length = 0;
-  footerHeight = FOOTER_HEIGHT;
-  // jsdom has no layout, so the footer reports whatever height is set here.
-  jest
-    .spyOn(HTMLElement.prototype, "offsetHeight", "get")
-    .mockImplementation(() => footerHeight);
   global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
-    const observer = { callback, disconnect: jest.fn(), observe: jest.fn() };
+    const observer = { callback, observe: jest.fn(), unobserve: jest.fn() };
     observers.push(observer);
     return observer;
   }) as unknown as typeof ResizeObserver;
 });
 
-afterEach(() => {
-  jest.restoreAllMocks();
-});
-
 describe("useFooterClearance", () => {
+  test("keeps nothing clear until the footer is measured", () => {
+    const { getByTestId } = render(<Conversation />);
+    expect(getClearance(getByTestId("conversation"))).toBe("");
+  });
+
   test("keeps the footer's height and the gap above it clear", () => {
     const { getByTestId } = render(<Conversation />);
-    resize();
+    resize(FOOTER_HEIGHT);
     expect(getClearance(getByTestId("conversation"))).toBe(
       `${FOOTER_HEIGHT + GAP}px`
     );
@@ -80,20 +77,16 @@ describe("useFooterClearance", () => {
 
   test("follows the footer as it resizes", () => {
     const { getByTestId } = render(<Conversation />);
-    resize();
-    footerHeight = FOOTER_HEIGHT + 60;
-    resize();
+    resize(FOOTER_HEIGHT);
+    resize(FOOTER_HEIGHT + 60);
     expect(getClearance(getByTestId("conversation"))).toBe(
       `${FOOTER_HEIGHT + 60 + GAP}px`
     );
   });
 
-  test("clears it when the conversation goes", () => {
-    const { getByTestId, unmount } = render(<Conversation />);
-    const conversation = getByTestId("conversation");
-    resize();
+  test("stops watching the footer when the conversation goes", () => {
+    const { unmount } = render(<Conversation />);
     unmount();
-    expect(observers[0].disconnect).toHaveBeenCalled();
-    expect(getClearance(conversation)).toBe("");
+    expect(observers[0].unobserve).toHaveBeenCalled();
   });
 });

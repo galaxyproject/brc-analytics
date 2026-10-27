@@ -20,6 +20,7 @@ interface ObserverMock {
   callback: ResizeObserverCallback;
   disconnect: jest.Mock;
   observe: jest.Mock;
+  unobserve: jest.Mock;
 }
 
 const observers: ObserverMock[] = [];
@@ -89,7 +90,12 @@ beforeEach(() => {
   scrollIntoView = jest.fn();
   Element.prototype.scrollIntoView = scrollIntoView;
   global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
-    const observer = { callback, disconnect: jest.fn(), observe: jest.fn() };
+    const observer = {
+      callback,
+      disconnect: jest.fn(),
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+    };
     observers.push(observer);
     return observer;
   }) as unknown as typeof ResizeObserver;
