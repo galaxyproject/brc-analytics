@@ -188,9 +188,9 @@ function describeRestIndexes(rest: KmindexIndexSummary[]): string | null {
 function describeCorrection(hit: KmindexHit): string {
   const raw = hit.score + (hit.fp_correction ?? 0);
   return (
-    `kmindex reported ${raw.toFixed(4)}. This run matches about ` +
-    `${(hit.fp_correction ?? 0).toFixed(4)} of any query's k-mers, so that ` +
-    `much is subtracted.`
+    `kmindex reported ${raw.toFixed(4)}. This run's index is saturated and ` +
+    `matches about ${(hit.fp_correction ?? 0).toFixed(4)} of any query's ` +
+    `k-mers, so that much is subtracted.`
   );
 }
 
@@ -719,10 +719,10 @@ export const LoganSearchResults = ({
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="body2">
                   Only the highest-scoring runs are listed. Raising the
-                  threshold won&apos;t change them until it passes the lowest
-                  score here, and a conserved query can have more perfect
-                  matches than the list holds. To see the rest, search fewer
-                  indexes or download the full set from the summary.
+                  threshold only drops runs from the bottom of this list, and a
+                  conserved query can have more perfect matches than the list
+                  holds. To see the rest, search fewer indexes or download the
+                  full set from the summary.
                 </Typography>
                 {showPerIndex && (
                   <>
@@ -788,7 +788,7 @@ export const LoganSearchResults = ({
                   column="score"
                   label="k-mer coverage"
                   onSort={setSort}
-                  title="Fraction of the query's 31-mers found in the run, corrected for the 227 saturated runs Logan flags"
+                  title="Fraction of the query's 31-mers found in the run, less a baseline for the 227 saturated runs Logan flags"
                 />
                 {/* ANI is monotone in the score, so sorting the coverage
                     column sorts this one too and a second control would only

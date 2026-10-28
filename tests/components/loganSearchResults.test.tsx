@@ -286,7 +286,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     openWhy();
 
     expect(container.textContent).toContain(
-      "Raising the threshold won't change them until it passes the lowest score here"
+      "Raising the threshold only drops runs from the bottom of this list"
     );
     // The shipped copy claimed the opposite; at 0.5 through 1.0 the real job
     // returned the same 50,000 accessions in the same order.
@@ -658,6 +658,9 @@ describe("coverage and ANI columns", () => {
     fireEvent.mouseOver(chip as HTMLElement);
     const tooltip = await screen.findByRole("tooltip");
     expect(tooltip.textContent).toContain("kmindex reported 0.9900");
+    // The baseline is a property of the saturated index, not of the run's
+    // reads, so the tooltip has to say which.
+    expect(tooltip.textContent).toContain("This run's index is saturated");
     expect(tooltip.textContent).toContain("0.6910");
     expect(chip?.getAttribute("aria-describedby")).toBe(tooltip.id);
   });
