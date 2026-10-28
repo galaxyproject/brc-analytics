@@ -469,8 +469,8 @@ function ShardWarning({
   return (
     <Alert severity="warning" sx={{ mb: 2 }}>
       {`${results.shards_failed} of ${results.shards_searched} index shards ` +
-        `couldn't be read, so this ${noun} is incomplete. Reopen this page ` +
-        `in an hour to retry them.`}
+        `couldn't be read, so this ${noun} is incomplete. Reload in an hour ` +
+        `to retry.`}
     </Alert>
   );
 }
@@ -719,10 +719,9 @@ export const LoganSearchResults = ({
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="body2">
                   Only the highest-scoring runs are listed. Raising the
-                  threshold only drops runs from the bottom of this list, and a
-                  conserved query can have more perfect matches than the list
-                  holds. To see the rest, search fewer indexes or download the
-                  full set from the summary.
+                  threshold won&apos;t bring in the missing runs. It only trims
+                  the bottom of this list. To see the rest, search fewer indexes
+                  or download the full set from the summary.
                 </Typography>
                 {showPerIndex && (
                   <>
@@ -758,9 +757,9 @@ export const LoganSearchResults = ({
                     one score; one index over a viral spike gave 87 distinct
                     scores. */}
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                  Scores often tie, and a conserved query can put the whole list
-                  on one score. Runs tied at the cutoff are picked by a hash of
-                  the accession, so the list is the same on every reload.
+                  Scores often tie, and a conserved query can give every listed
+                  run the same score. Ties at the cutoff are broken by a hash of
+                  the accession, so the list stays the same when you reload.
                 </Typography>
               </Alert>
             </Collapse>

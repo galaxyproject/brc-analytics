@@ -28,9 +28,9 @@ const CAP = 50000;
 // Asserted from both branches: how wide the tie band is depends on the query,
 // not on how many indexes were searched.
 const TIE_BAND_COPY =
-  "Scores often tie, and a conserved query can put the whole list on one " +
-  "score. Runs tied at the cutoff are picked by a hash of the accession, so " +
-  "the list is the same on every reload.";
+  "Scores often tie, and a conserved query can give every listed run the " +
+  "same score. Ties at the cutoff are broken by a hash of the accession, so " +
+  "the list stays the same when you reload.";
 
 /**
  * A hit as the API sends one, defaulting to an unannotated perfect match.
@@ -286,7 +286,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     openWhy();
 
     expect(container.textContent).toContain(
-      "Raising the threshold only drops runs from the bottom of this list"
+      "Raising the threshold won't bring in the missing runs. It only trims the bottom of this list."
     );
     // The shipped copy claimed the opposite; at 0.5 through 1.0 the real job
     // returned the same 50,000 accessions in the same order.
@@ -527,7 +527,7 @@ describe("shards that could not be read", () => {
 
     expect(screen.getByRole("alert").textContent).toContain(
       "3 of 35 index shards couldn't be read, so this list is incomplete. " +
-        "Reopen this page in an hour to retry them."
+        "Reload in an hour to retry."
     );
   });
 
@@ -549,7 +549,7 @@ describe("shards that could not be read", () => {
     // state names the search instead.
     expect(alerts[0].textContent).toContain(
       "3 of 35 index shards couldn't be read, so this search is incomplete. " +
-        "Reopen this page in an hour to retry them."
+        "Reload in an hour to retry."
     );
     expect(alerts[1].textContent).toContain("No accessions matched");
   });
