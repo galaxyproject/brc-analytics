@@ -1,6 +1,6 @@
 # Gene Annotation Schema
 
-Draft, 2026-10-08; updated 2026-10-26. Related: #1776 (gene pages), #1777 (gene list prototype), #1783 (gene search API). **Where this differs from [gene-catalog-contract.md](gene-catalog-contract.md), the contract wins** (terms, table columns, field names, scope). Its "v1 (P01)" predates the contract's scope: the contract's v0 is gene pages from the publisher's files, and its v1 adds linking workflow runs through their GTFs.
+Draft, 2026-10-08; updated 2026-10-27. Related: #1776 (gene pages), #1777 (gene list prototype), #1783 (gene search API). **Where this differs from [gene-catalog-contract.md](gene-catalog-contract.md), the contract wins** (terms, table columns, field names, scope). Its "v1 (P01)" predates the contract's scope: the contract's v0 is gene pages from the publisher's files, and its v1 adds linking workflow runs through their GTFs.
 
 The tables that hold what [gene-provenance-spec.md](gene-provenance-spec.md) requires. The spec is the background and requirements; this doc is the database design. Terms (annotation set, annotation file, gene record, canonical record) are defined in the spec's Key terms. This doc refines two: an **annotation file** is a slot ("UCSC's augustus GTF for this assembly"), not a URL; the **canonical record** is the latest gene record of a gene's canonical publisher gene.
 
@@ -71,10 +71,10 @@ The read model's shape (one main table with the transcripts, a table of alternat
 
 Plus the catalog projections (assemblies, organisms, annotation files) in Projections.
 
-**Build order: read model first, write model after the contract's v1.** v1 (P01) builds `gtf_gene_map` and a per-assembly gene table straight from the GTF and NCBI's GFF3, with no write model behind them. The write model follows, and from then on these tables are rebuilt from it like every other projection. Two things carry over from day one, because they can't be recovered later:
+**Build order: the write model starts in the contract's v0, with eight tables.** v0 writes `annotation_set`, `annotation_set_version`, `annotation_file`, `annotation_file_location`, `annotation_file_version`, `publisher_gene`, `gene` and `gene_membership`, in this doc's names and keys, so that later work only adds tables (the contract's "provenance database", section 4). v0 stores no gene records: the gene page snapshot reads genes straight from the archived files. The rest of the write model (`gene_record`, `gene_version`, transcripts, links and the assembly and taxon tables) follows after the contract's v1, as new tables, and from then on the snapshot is rebuilt from it. Two things carry over from day one, because they can't be recovered later:
 
 - **Archived copies** of every GTF and GFF3 read, with `sha256`, `md5` and fetch date, so the write model can be backfilled from them.
-- **`gene_uid`s stay fixed.** Pages use them in URLs from v1, so they're kept in a small saved list (publisher gene key, annotation set + publisher gene ID → `gene_uid`) that the write model adopts as its minted keys.
+- **`gene_uid`s stay fixed.** Pages use them in URLs from v0, and they are minted into `gene` and linked by `gene_membership` from the first update.
 
 **History is optional to show, not to record.** If the write model doesn't capture a change at the refresh that sees it, it can be added later only from files we archived, because publishers overwrite their files. VEuPathDB is the exception: it keeps every release back to release 24, so its past changes can be rebuilt (`gene-history-findings.md`). Change-only rows make recording cheap; `gene_change` can wait until someone wants it on a page.
 
@@ -401,26 +401,28 @@ What a refresh can find, and what it does. Gene outcomes (event 8) follow from e
 
 ## Atomicity and restarts
 
-**The atom is one assembly in one run**, or a GCA and GCF together when NCBI pairs them as identical. Gene regrouping (event 8) needs every publisher's records for an assembly at once, and nothing needs more than one assembly, so this is the smallest unit that is always consistent. One transaction per run would be far too large; one per assembly is an ordinary Postgres transaction, as long as it only inserts rows that are already computed.
+**Decided 2026-10-27: the insert-only tables are append-only Parquet files in the gene data store, committed by manifest** (see Open questions, and the contract's sections 4 and 5). There is no database server, so atomicity comes from the manifest, not from transactions.
 
-**A run has two stages:**
+**The atom is one update.** An update is one refresh run: `run_uid` is the update's number and `load_date` its start time. Its rows become visible only when its manifest is committed and `HEAD` moves to it, so a reader sees all of an update or none of it. Files no manifest lists are never read.
 
-1. **Stage, with no database writes.** For each assembly: fetch and archive every file, recording its `sha256`; parse each file into a staging Parquet file named by its `sha256`; write the run's input manifest (assembly → the exact file versions this run uses) to the archive. Running this twice is harmless: a file named by its `sha256` is parsed once.
-2. **Commit, one transaction per assembly.** Write the annotation file versions, annotation set versions, gene records, identifiers, transcripts, links and the regrouping, loaded with `COPY`. The transaction's last row is an `assembly_load` row. Either all of it commits or none of it does.
+**An update has two stages:**
 
-**Keep each transaction short.** No downloading or parsing inside it: a transaction open for minutes holds back vacuum. A first load of a large eukaryote (about 20,000 genes from three publishers) is an estimated half a million rows, seconds by `COPY`; a typical refresh writes a few rows or none. Not measured: the prototype should time the catalog's largest assembly.
+1. **Stage, locally, with nothing shared.** For each assembly: fetch and archive every file, recording its `sha256`; parse each file into a staging Parquet file named by its `sha256`; write the update's input manifest (assembly → the exact file versions it uses). Then compute the update's new rows, one Parquet file per table, sorted by assembly, and run the checks. Running this twice is harmless: a file named by its `sha256` is parsed once.
+2. **Commit.** Upload the table files, then the manifest, then move `HEAD` to the update, only if `HEAD` still names its predecessor; otherwise the update is refused and staged again from the new head.
 
-**Restarting** reuses the same `run_uid`. Assemblies with an `assembly_load` row for the run are skipped; the rest start again from their staging files. An assembly that crashed mid-transaction left nothing, because the transaction rolled back.
+**The unit of consistency inside an update is still one assembly,** or a GCA and GCF together when NCBI pairs them as identical: gene regrouping (event 8) needs every publisher's records for an assembly at once, and nothing needs more than one. An assembly that fails a check writes no rows in the update and keeps its previous state; the manifest lists it as held back.
 
-**Inputs are pinned.** A restart reads the archived bytes the manifest names, never a fresh download, so one run reads one snapshot of every source and its `load_date` stays true. A file that changed between attempts is picked up by the next run.
+**Restarting** an update that never committed means staging it again. Staging files named by `sha256` are reused, so only unfinished work is redone.
 
-**No partial reads.** The site, the search API and the assistant read Parquet projections, rebuilt only after a run ends with outcome `completed`, so they never see a run in progress. In the write model every committed row belongs to a whole assembly, so a failed run's committed assemblies are complete and true, and as-of queries need no filter on run outcome.
+**Inputs are pinned.** A restart reads the archived bytes the input manifest names, never a fresh download, so one update reads one snapshot of every source and its `load_date` stays true. A file that changed between attempts is picked up by the next update.
 
-**Other sources have their own small atoms:** one transaction per assembly per source for NCBI assembly state, UCSC hub presence, Galaxy indexes and catalog requests, and one per taxonomy load.
+**No partial reads.** The site, the search API and the assistant read the gene page snapshot, built from a committed update, so they never see an update in progress. In the write model every committed row belongs to a whole assembly, so as-of queries need no filter on update outcome.
+
+**Other sources have their own small atoms:** per assembly per source for NCBI assembly state, UCSC hub presence, Galaxy indexes and catalog requests, and per taxonomy load, held back the same way.
 
 ## Tables
 
-Draft: revisit once the entities and events above are agreed. Each hub never changes; its satellites only get new rows. Every row records the refresh run that wrote it: `run_uid`, or `load_date` (the run's `started_at`) on satellites keyed by load date.
+Draft: revisit once the entities and events above are agreed. Each hub never changes; its satellites only get new rows. Every row records the refresh run that wrote it: `run_uid`, or `load_date` (the run's `started_at`) on satellites keyed by load date. A run is an update in the contract's terms, and since the tables are Parquet files committed by manifest (see Atomicity and restarts), `refresh_run`, `refresh_run_end` and `assembly_load` below are kept in the update's manifest rather than as tables; the DDL is written as tables for readability, and `PK` and `FK` are enforced by the update's checks, not by a database.
 
 ```
 refresh_run                  one row per refresh, written when it starts
@@ -435,7 +437,7 @@ refresh_run_end              one row when a run stops; kept apart so refresh_run
   outcome                    completed, failed. Only a completed run rebuilds the projections
   error                      for failed runs
 
-assembly_load                one row per assembly per run, the last row of that assembly's transaction
+assembly_load                one row per assembly per run, kept in the update's manifest
   run_uid               PK, FK
   assembly_version_uid  PK, FK
   manifest_hash              of the run's input manifest entry for this assembly (exact file versions read)
@@ -709,11 +711,11 @@ A publisher gene as of an annotation set version is its latest `gene_record` fro
 
 ## Projections
 
-Rebuilt after each refresh and written as Parquet files; what the site, the search API and the assistant read, with DuckDB. They are the current view: no separate current-state table is kept.
+Rebuilt after each refresh into the gene page snapshot (see Open questions: Projection storage); what the site, the search API and the assistant read, with DuckDB. They are the current view: no separate current-state table is kept.
 
 - **From and to dates live here, not in the insert-only tables.** Writing a to-date into a version or state row would mean updating it. A history projection has `valid_from` (the row's run) and `valid_to` (the next row's run, null while current), so "what was true on date T" is a range filter. Projections are disposable: they can be dropped and rebuilt from the insert-only tables, so overwriting them breaks nothing.
 - **Rebuild only what changed.** A run updates projection rows only for the entities that got new rows in that run: a few thousand assemblies, not 100k. A full rebuild is needed only when projection logic changes.
-- **Lay out by assembly.** If each run writes its new rows as Parquet files sorted by assembly, the insert-only tables are append-only by construction, and DuckDB reads only the files holding the assembly asked for.
+- **Lay out by assembly.** Each update writes its new rows as Parquet files sorted by assembly, so the insert-only tables are append-only by construction, and DuckDB reads only the parts of files holding the assembly asked for.
 
 | Projection                 | One row per                   | From                                                                                                                                                                                                                                                          |
 | -------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -738,12 +740,12 @@ Rebuilt after each refresh and written as Parquet files; what the site, the sear
 - [ ] **`publisher_check` volume.** One row per assembly × publisher × refresh. Fine at weekly refreshes; revisit if refreshes run daily.
 - [x] **`locus_ids` on `gene_version` repeats what its records say.** **Derived:** a gene's publisher gene IDs are its active `gene_membership` rows, so a rename is a membership change, not a gene version.
 - [x] **Projection storage.** **Decided 2026-10-26:** the projections ship as one DuckDB snapshot file per build, following #1783 (gene catalog: serving architecture) and [gene-catalog-contract.md](gene-catalog-contract.md) section 5, with no Postgres views or tables. Where this doc says the projections are Parquet exports, read: the tables in that snapshot. Snapshots are kept for rollback, and they are the exact copy of what the site served (use case 5). SQL views over the insert-only tables stay for ad hoc history questions only.
-- [ ] **Where do the insert-only tables live?** **Leaning: Postgres, managed with Alembic**, with DuckDB only building the Parquet projections (it reads Postgres through its `postgres` extension). Why:
-  - **Migrations come with it.** The backend API already runs Postgres through SQLAlchemy with Alembic migrations and a test that they apply (`backend/api`); the vault would use the same tooling.
-  - **Keys are enforced.** Primary keys, uniqueness and foreign keys catch loader bugs that Parquet would store silently.
-  - **Durability.** Postgres's backups and point-in-time recovery, instead of a single file.
-  - **The alternatives fall short.** Append-only Parquet enforces nothing, and renaming or retyping a column means rewriting every file. A DuckDB file has `ALTER` and keys, but no ready migration tool: dbt rebuilds models, and its snapshots update a `valid_to` column, which breaks insert-only; Alembic's DuckDB support is unofficial.
-  - Hundreds of millions of rows is ordinary for Postgres with the right indexes. Still to decide: the backend's database or a separate one.
+- [x] **Where do the insert-only tables live?** **Decided 2026-10-27: append-only Parquet files in the gene data store (an S3 bucket to start), committed by manifest, with no database server** (the contract's sections 4 and 5). This reverses the earlier lean towards Postgres with Alembic. The writes are batches, not transactions from many users: each update is built and checked on a developer machine before anything is shared, so what a database server adds is either not needed or done another way:
+  - **Migrations:** files are never edited. A new column or table needs no rewrite (older files read with it empty); a restructure is a migration update that writes the rows in the new layout as new files, keeping the old ones. Snapshots built before and after a migration must be identical.
+  - **Keys:** primary keys, uniqueness and references are checked by every update before it commits, and a failure stops the commit.
+  - **Durability:** a versioned bucket with object lock, and a copy in a second account after each commit. Because files never change, copying is just adding new ones.
+  - **What it saves:** no database server to run, back up, migrate in place or make reachable from the build, and nothing stateful on the live server; the build and its debugging run locally against the same files.
+  - Still to decide: DuckLake or our own manifests (the contract's open decisions).
 - [ ] **Does a gene keep its `gene_uid` across assembly versions in a series?** Gene IDs such as `PF3D7_0910200` usually carry over from `.2` to `.3`, but annotation sets are keyed on the versioned accession, so moving the catalog to `.3` starts new annotation sets. Update events puts linking across assembly versions out of v1, but a gene page surviving an assembly upgrade needs it.
 - [x] **What replaces pull request review for adding assemblies?** **Nothing yet: the YAML files stay, loaded as one source**, so adding an assembly is still a reviewed pull request (see Lifecycle).
 - [ ] **Track every version in a series, or only those the catalog lists?** Every version shows what the catalog is missing; only listed ones is smaller.
