@@ -15,7 +15,7 @@ from uuid import UUID
 
 import duckdb
 
-from app.models.genes import Gene, GeneSnapshotInfo, GeneTranscript
+from app.models.genes import Gene, GeneSnapshotInfo
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,7 @@ _ALIAS_TYPE_ORDER = (
 )
 
 # Alias types that are a gene's former IDs rather than its current ones.
-_FORMER_ALIAS_TYPES = ("old_locus_tag",)
-_FORMER_ALIAS_TYPES_SQL = ", ".join(f"'{t}'" for t in _FORMER_ALIAS_TYPES)
+_FORMER_ALIAS_TYPES_SQL = "'old_locus_tag'"
 
 # Alias types left out of a gene's aliases: they are fields of the gene itself.
 _OWN_ALIAS_TYPES_SQL = "'locus_tag', 'name'"
@@ -40,7 +39,7 @@ _OWN_ALIAS_TYPES_SQL = "'locus_tag', 'name'"
 _LOCATION = 'struct_pack(seq_name, start, "end", strand) AS location'
 
 _GENE_SQL = """
-SELECT g.locus_tag, g.name, g.symbol, g.product, g.biotype, g.assembly_accession,
+SELECT g.locus_tag, g.name, g.symbol, g.biotype, g.assembly_accession,
        struct_pack(name := a.organism_name, taxonomy_id := a.taxonomy_id)
            AS organism,
        struct_pack(g.seq_name, g.start, g."end", g.strand) AS location,
@@ -59,7 +58,8 @@ LIMIT 1
 """
 
 _TRANSCRIPTS_SQL = f"""
-SELECT transcript_id, protein_accession, product, {_LOCATION}
+SELECT transcript_id, transcript_product, protein_accession, protein_product,
+       {_LOCATION}
 FROM transcript
 WHERE gene_uid = ? AND asv_id = ?
 ORDER BY start, transcript_id, gff3_row_id
@@ -153,20 +153,11 @@ class GeneCatalogService:
         provenance["retrieved_at"] = provenance["retrieved_at"].replace(
             tzinfo=timezone.utc
         )
-        transcript_models = [GeneTranscript.model_validate(t) for t in transcripts]
         return Gene.model_validate(
             {
                 **gene,
                 "gene_uid": gene_uid,
-                "protein_accession": next(
-                    (
-                        t.protein_accession
-                        for t in transcript_models
-                        if t.protein_accession
-                    ),
-                    None,
-                ),
-                "transcripts": transcript_models,
+                "transcripts": transcripts,
                 "aliases": aliases,
                 # The row read is the gene's last present one; it is the latest
                 # unless a newer annotation set version dropped the gene.

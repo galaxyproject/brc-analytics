@@ -1,22 +1,21 @@
+import { BackPageView } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
-export const SearchSection = styled(GridPaperSection)`
-  && {
-    align-self: stretch;
-    margin: 0 auto;
-    max-width: 1200px;
-    padding: 32px 20px;
-    width: 100%;
-  }
+// findable-ui's back page grid, as the assembly and organism pages use, with
+// its rows kept to their content's height.
+export const GenesBackPageView = styled(BackPageView)`
+  align-content: start;
 `;
 
-export const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
+export const GenesPanel = styled(GridPaperSection)`
+  && {
+    display: grid;
+    gap: 24px;
+    grid-column: 1 / -1;
+    padding: 20px;
+  }
 `;
 
 export const ResultsTable = styled.table`

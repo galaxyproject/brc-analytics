@@ -18,11 +18,13 @@ are any, or 2 if the reader refuses the GFF3.
 
 import argparse
 import gzip
+import io
 import re
 import sys
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 import requests
 
@@ -38,10 +40,9 @@ EXAMPLES = 5
 @dataclass
 class GtfTranscript:
     transcript_id: str
+    transcript_product: Optional[str] = None
     protein_accession: Optional[str] = None
-    # The transcript row's product, and its first CDS's; the CDS's wins.
-    row_product: Optional[str] = None
-    cds_product: Optional[str] = None
+    protein_product: Optional[str] = None
 
 
 @dataclass
@@ -93,9 +94,9 @@ def read_ncbi_gtf(lines: Iterable[str]) -> List[GtfGene]:
         )
         product = _first(attributes, "product")
         if row_type == "transcript":
-            transcript.row_product = transcript.row_product or product
+            transcript.transcript_product = transcript.transcript_product or product
         elif row_type == "CDS":
-            transcript.cds_product = transcript.cds_product or product
+            transcript.protein_product = transcript.protein_product or product
             transcript.protein_accession = transcript.protein_accession or _first(
                 attributes, "protein_id"
             )
@@ -113,7 +114,12 @@ def _gff3_facts(gene: Gene) -> Dict[str, object]:
         "proteins": sorted(
             t.protein_accession for t in gene.transcripts if t.protein_accession
         ),
-        "products": sorted(t.product for t in gene.transcripts if t.product),
+        "transcript_products": sorted(
+            t.transcript_product for t in gene.transcripts if t.transcript_product
+        ),
+        "protein_products": sorted(
+            t.protein_product for t in gene.transcripts if t.protein_product
+        ),
     }
 
 
@@ -142,8 +148,11 @@ def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
         "proteins": sorted(
             t.protein_accession for t in transcripts if t.protein_accession
         ),
-        "products": sorted(
-            p for t in transcripts if (p := t.cds_product or t.row_product)
+        "transcript_products": sorted(
+            t.transcript_product for t in transcripts if t.transcript_product
+        ),
+        "protein_products": sorted(
+            t.protein_product for t in transcripts if t.protein_product
         ),
     }
 
@@ -191,24 +200,41 @@ def describe(differences: Dict[str, List[str]]) -> List[str]:
 
 def gtf_next_to(gff3: str) -> str:
     """Where NCBI puts the GTF beside a GFF3: `_genomic.gff.gz` → `_genomic.gtf.gz`."""
-    return re.sub(r"\.gff3?(\.gz)?$", r".gtf\1", gff3)
+    gtf = re.sub(r"\.gff3?(\.gz)?$", r".gtf\1", gff3)
+    if gtf == gff3:
+        raise ValueError(f"No GTF name for {gff3}: give the GTF's address")
+    return gtf
 
 
-def _decode(fh: Any, name: str) -> Iterator[str]:
-    stream: Iterable[bytes] = gzip.GzipFile(fileobj=fh) if name.endswith(".gz") else fh
-    for line in stream:
-        yield line.decode("utf-8")
+def is_url(source: str) -> bool:
+    return re.match(r"^https?://", source) is not None
+
+
+def _gunzipped(fh: io.BufferedReader) -> io.BufferedIOBase:
+    if fh.peek(2)[:2] == b"\x1f\x8b":
+        return gzip.GzipFile(fileobj=fh)
+    return fh
+
+
+@contextmanager
+def open_source(source: str) -> Iterator[io.BufferedIOBase]:
+    """A file at a URL or path as bytes, gunzipped if its first bytes are gzip's."""
+    if is_url(source):
+        with requests.get(source, stream=True, timeout=120) as response:
+            response.raise_for_status()
+            # urllib3 closes the body at its last byte, but gzip reads once more.
+            response.raw.auto_close = False
+            yield _gunzipped(io.BufferedReader(response.raw))
+    else:
+        with open(source, "rb") as fh:
+            yield _gunzipped(fh)
 
 
 def text_lines(source: str) -> Iterator[str]:
-    """The lines of a file at a URL or path, gunzipped if it ends in `.gz`."""
-    if re.match(r"^https?://", source):
-        with requests.get(source, stream=True, timeout=120) as response:
-            response.raise_for_status()
-            yield from _decode(response.raw, source)
-    else:
-        with open(source, "rb") as fh:
-            yield from _decode(fh, source)
+    """The lines of a file at a URL or path, gunzipped if it's gzip."""
+    with open_source(source) as stream:
+        for line in stream:
+            yield line.decode("utf-8")
 
 
 def main(argv: Optional[List[str]] = None) -> int:

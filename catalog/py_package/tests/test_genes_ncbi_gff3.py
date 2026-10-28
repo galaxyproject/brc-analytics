@@ -50,15 +50,15 @@ def test_protein_coding_gene():
     assert ama1.symbol == "AMA1"
     assert ama1.ncbi_gene_id == "810891"
     assert ama1.biotype == "protein_coding"
-    assert ama1.product == "apical membrane antigen 1"
     assert ama1.location == Location("NC_037282.1", 1292966, 1296696, "+")
     assert ama1.old_locus_tags == []
     [transcript] = ama1.transcripts
     assert transcript.row_id == "rna-XM_001347979.2"
     assert transcript.transcript_id == "XM_001347979.2"
     assert transcript.biotype == "mRNA"
+    assert transcript.transcript_product == "apical membrane antigen 1"
     assert transcript.protein_accession == "XP_001348015.1"
-    assert transcript.product == "apical membrane antigen 1"
+    assert transcript.protein_product == "apical membrane antigen 1"
 
 
 def test_gene_without_a_symbol_is_named_by_its_locus_tag():
@@ -99,16 +99,26 @@ def test_rna_row_without_a_transcript_id_is_a_transcript_with_no_id():
     assert transcript.protein_accession is None
 
 
-def test_pseudogene_takes_its_transcript_rows_product():
+def test_pseudogene_transcript_has_a_product_and_no_protein():
     _, genes = read_3d7()
     pseudogene = genes["PF3D7_0100500"]
     assert pseudogene.biotype == "transcribed_pseudogene"
-    assert pseudogene.product == (
-        "erythrocyte membrane protein 1 (PfEMP1), exon 1, pseudogene"
-    )
     [transcript] = pseudogene.transcripts
     assert transcript.row_id == "rna-mrna.PF3D7_0100500-RA"
     assert transcript.transcript_id is None
+    assert transcript.transcript_product == (
+        "erythrocyte membrane protein 1 (PfEMP1), exon 1, pseudogene"
+    )
+    assert (transcript.protein_accession, transcript.protein_product) == (None, None)
+
+
+def test_transcript_and_protein_products_are_read_separately():
+    # 3D7's PSH1 (PF3D7_0103600): its mRNA and its CDS name different products.
+    [gene] = read_case("pfalciparum_3d7_products_differ").genes
+    [transcript] = gene.transcripts
+    assert transcript.transcript_product == "ATP-dependent DNA/RNA helicase PSH1"
+    assert transcript.protein_accession == "XP_024328879.1"
+    assert transcript.protein_product == "putative ATP-dependent RNA helicase"
 
 
 @pytest.mark.parametrize(
@@ -171,3 +181,27 @@ def test_the_specs_fixtures_are_the_fixtures():
         for name in re.findall(r"`([a-z0-9_]+)`", row.rstrip("|").rsplit("|", 1)[1])
     }
     assert named == {path.stem for path in CASES.glob("*.gff3")}
+
+
+def test_transcript_with_two_gene_parents_fails():
+    # Made up: two genes and one tRNA row under both.
+    rows = [
+        "NC_1.1\tRefSeq\tgene\t1\t90\t.\t+\t.\tID=gene-A;locus_tag=A",
+        "NC_1.1\tRefSeq\tgene\t1\t90\t.\t+\t.\tID=gene-B;locus_tag=B",
+        "NC_1.1\tRefSeq\ttRNA\t1\t90\t.\t+\t.\tID=rna-A;Parent=gene-A,gene-B",
+    ]
+    with pytest.raises(ValueError, match="more than one gene parent"):
+        read_ncbi_gff3(rows)
+
+
+def test_row_before_its_parent_fails():
+    # Made up, from AMA1's rows in the 3D7 fixture: its CDS row moved above
+    # its mRNA row.
+    rows = [
+        line
+        for line in (CASES / "pfalciparum_3d7.gff3").read_text().splitlines()
+        if "PF3D7_1133400" in line and "\texon\t" not in line
+    ]
+    gene, mrna, cds = rows
+    with pytest.raises(ValueError, match="CDS row comes before its parent rna-XM"):
+        read_ncbi_gff3([gene, cds, mrna])

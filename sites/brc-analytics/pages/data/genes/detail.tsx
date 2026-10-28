@@ -4,10 +4,9 @@ import {
   GeneStatusView,
 } from "@brc/views/GeneDetailView/geneDetailView";
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
-import { StyledPagesMain } from "@repo/shared/components/layout/Main/main.styles";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { useGene } from "@repo/shared/hooks/useGene";
-import { geneLabel, geneSymbol } from "@repo/shared/services/genes/label";
+import { geneTitle } from "@repo/shared/services/genes/label";
 import { type GetStaticProps } from "next";
 import Error from "next/error";
 import Head from "next/head";
@@ -34,14 +33,12 @@ const Page = (): JSX.Element => {
       <GeneStatusView message="Gene data is unavailable right now. Please try again later." />
     );
   const { gene } = result;
-  const symbol = geneSymbol(gene);
-  const title = symbol ? `${geneLabel(gene)} (${symbol})` : geneLabel(gene);
   return (
     <>
       <Head>
-        <title>{title}</title>
+        <title>{geneTitle(gene)}</title>
       </Head>
-      <GeneDetailView gene={gene} title={title} />
+      <GeneDetailView gene={gene} />
     </>
   );
 };
@@ -55,5 +52,3 @@ export const getStaticProps: GetStaticProps<GeneDetailProps> = () => {
 };
 
 export default Page;
-
-Page.Main = StyledPagesMain;

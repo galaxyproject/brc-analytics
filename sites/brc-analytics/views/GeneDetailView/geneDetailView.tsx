@@ -1,26 +1,30 @@
 import { GENES_BREADCRUMBS } from "@brc/views/GenesView/constants";
+import {
+  GenesBackPageView,
+  GenesPanel,
+  ResultsTable,
+} from "@brc/views/GenesView/genesView.styles";
+import { BackPageHero as BackPageHeroLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
-import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { geneLabel, geneSymbol } from "@repo/shared/services/genes/label";
+import {
+  geneLabel,
+  geneSymbol,
+  geneTitle,
+} from "@repo/shared/services/genes/label";
 import {
   type Gene,
   type GeneLocation,
 } from "@repo/shared/services/genes/types";
 import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import Link from "next/link";
-import { Fragment, type JSX } from "react";
-import {
-  DetailSection,
-  FieldLabel,
-  FieldList,
-  FieldValue,
-} from "./geneDetailView.styles";
+import { type JSX } from "react";
+import { FieldLabel, FieldList, FieldValue } from "./geneDetailView.styles";
 
 interface GeneDetailViewProps {
   gene: Gene;
-  title: string;
 }
 
 /**
@@ -33,10 +37,7 @@ function formatLocation(location: GeneLocation): string {
   return `${seqName}:${formatNumber(start)}-${formatNumber(end)} (${strand})`;
 }
 
-export const GeneDetailView = ({
-  gene,
-  title,
-}: GeneDetailViewProps): JSX.Element => {
+export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
@@ -44,20 +45,16 @@ export const GeneDetailView = ({
   const breadcrumbs = [...GENES_BREADCRUMBS, { path: "", text: label }];
 
   return (
-    <Fragment>
-      <SectionHero
-        breadcrumbs={breadcrumbs}
-        head={title}
-        subHead={gene.product ?? undefined}
-      />
-      <DetailSection>
+    <GenesBackPageView>
+      <BackPageHeroLayout>
+        <BackPageHero breadcrumbs={breadcrumbs} title={geneTitle(gene)} />
+      </BackPageHeroLayout>
+      <GenesPanel>
         <FieldList>
           <FieldLabel>Gene ID</FieldLabel>
           <FieldValue>{label}</FieldValue>
           <FieldLabel>Symbol</FieldLabel>
           <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
-          <FieldLabel>Product</FieldLabel>
-          <FieldValue>{gene.product ?? "—"}</FieldValue>
           <FieldLabel>Organism</FieldLabel>
           <FieldValue>{gene.organism.name}</FieldValue>
           <FieldLabel>Assembly</FieldLabel>
@@ -67,8 +64,28 @@ export const GeneDetailView = ({
           <FieldLabel>Location</FieldLabel>
           <FieldValue>{formatLocation(gene.location)}</FieldValue>
         </FieldList>
-      </DetailSection>
-    </Fragment>
+        <ResultsTable>
+          <thead>
+            <tr>
+              <th scope="col">Transcript</th>
+              <th scope="col">Transcript product</th>
+              <th scope="col">Protein</th>
+              <th scope="col">Protein product</th>
+            </tr>
+          </thead>
+          <tbody>
+            {gene.transcripts.map((transcript, i) => (
+              <tr key={i}>
+                <td>{transcript.transcriptId ?? "—"}</td>
+                <td>{transcript.transcriptProduct ?? "—"}</td>
+                <td>{transcript.proteinAccession ?? "—"}</td>
+                <td>{transcript.proteinProduct ?? "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </ResultsTable>
+      </GenesPanel>
+    </GenesBackPageView>
   );
 };
 
@@ -84,10 +101,11 @@ export const GeneStatusView = ({
   message: string;
 }): JSX.Element => {
   return (
-    <SectionHero
-      breadcrumbs={GENES_BREADCRUMBS}
-      head="Gene"
-      subHead={message}
-    />
+    <GenesBackPageView>
+      <BackPageHeroLayout>
+        <BackPageHero breadcrumbs={GENES_BREADCRUMBS} title="Gene" />
+      </BackPageHeroLayout>
+      <GenesPanel>{message}</GenesPanel>
+    </GenesBackPageView>
   );
 };

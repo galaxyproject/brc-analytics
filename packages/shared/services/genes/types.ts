@@ -22,11 +22,14 @@ export interface GeneOrganism {
 
 export interface GeneTranscript {
   location: GeneLocation;
-  product: string | null;
   proteinAccession: string | null;
+  // The CDS's product: the protein's name.
+  proteinProduct: string | null;
   // Null when the annotation gives none, as for tRNAs and pseudogene
   // transcripts in NCBI's files.
   transcriptId: string | null;
+  // The transcript row's product.
+  transcriptProduct: string | null;
 }
 
 export interface GeneAlias {
@@ -59,8 +62,6 @@ export interface Gene {
   name: string | null;
   organism: GeneOrganism;
   pageUrl: string;
-  product: string | null;
-  proteinAccession: string | null;
   provenance: GeneProvenance;
   status: "current" | "not_in_latest";
   symbol: string | null;

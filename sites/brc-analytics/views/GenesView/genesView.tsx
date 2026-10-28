@@ -1,12 +1,13 @@
-import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
+import { BackPageHero as BackPageHeroLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
+import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
-import { Fragment, type JSX } from "react";
+import { type JSX } from "react";
 import { GENES_BREADCRUMBS } from "./constants";
 import {
-  ContentContainer,
+  GenesBackPageView,
+  GenesPanel,
   ResultsTable,
-  SearchSection,
 } from "./genesView.styles";
 
 interface ExampleGene {
@@ -63,42 +64,66 @@ const EXAMPLE_GENES: ExampleGene[] = [
     note: "A transcribed pseudogene",
     symbol: null,
   },
+  {
+    geneUid: "7b3c7733-2509-5585-995f-694be505af1c",
+    locusTag: "PF3D7_0103600",
+    note: "Transcript and protein products differ",
+    symbol: "PSH1",
+  },
+  {
+    geneUid: "26701dae-095d-55c0-9551-adfd5ea8174f",
+    locusTag: "PF3D7_0205700",
+    note: "Two transcripts whose proteins have different products",
+    symbol: null,
+  },
+  {
+    geneUid: "4747203f-fa09-562d-9f2b-21b204dd662c",
+    locusTag: "PF3D7_0112300",
+    note: "A ribosomal RNA",
+    symbol: null,
+  },
+  {
+    geneUid: "542eba05-f671-5495-94fd-f01e7083c05b",
+    locusTag: "PF3D7_0115050",
+    note: "A snoRNA",
+    symbol: null,
+  },
 ];
 
 export const GenesView = (): JSX.Element => {
   return (
-    <Fragment>
-      <SectionHero
-        breadcrumbs={GENES_BREADCRUMBS}
-        head="Genes"
-        subHead="Example genes from Plasmodium falciparum 3D7 (GCF_000002765.6). Gene search is coming."
-      />
-      <SearchSection>
-        <ContentContainer>
-          <ResultsTable>
-            <thead>
-              <tr>
-                <th scope="col">Gene ID</th>
-                <th scope="col">Symbol</th>
-                <th scope="col">Example of</th>
+    <GenesBackPageView>
+      <BackPageHeroLayout>
+        <BackPageHero
+          breadcrumbs={GENES_BREADCRUMBS}
+          subTitle="Example genes from Plasmodium falciparum 3D7 (GCF_000002765.6). Gene search is coming."
+          title="Genes"
+        />
+      </BackPageHeroLayout>
+      <GenesPanel>
+        <ResultsTable>
+          <thead>
+            <tr>
+              <th scope="col">Gene ID</th>
+              <th scope="col">Symbol</th>
+              <th scope="col">Example of</th>
+            </tr>
+          </thead>
+          <tbody>
+            {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
+              <tr key={geneUid}>
+                <td>
+                  <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
+                    {locusTag}
+                  </Link>
+                </td>
+                <td>{symbol ?? "—"}</td>
+                <td>{note}</td>
               </tr>
-            </thead>
-            <tbody>
-              {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
-                <tr key={geneUid}>
-                  <td>
-                    <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
-                      {locusTag}
-                    </Link>
-                  </td>
-                  <td>{symbol ?? "—"}</td>
-                  <td>{note}</td>
-                </tr>
-              ))}
-            </tbody>
-          </ResultsTable>
-        </ContentContainer>
-      </SearchSection>
-    </Fragment>
+            ))}
+          </tbody>
+        </ResultsTable>
+      </GenesPanel>
+    </GenesBackPageView>
   );
 };

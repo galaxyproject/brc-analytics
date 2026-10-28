@@ -206,3 +206,18 @@ def test_gff3_for_another_assembly_fails(tmp_path):
         bgs.build_gene_snapshot(
             "GCF_999999999.1", str(EXCERPT), tmp_path / "genes.duckdb", catalog
         )
+
+
+def test_gff3_that_does_not_name_its_assembly_fails(tmp_path, catalog):
+    gff3 = tmp_path / "x_genomic.gff3"
+    gff3.write_text(
+        "".join(
+            line
+            for line in EXCERPT.read_text().splitlines(keepends=True)
+            if not line.startswith("#!genome-build-accession")
+        )
+    )
+    with pytest.raises(ValueError, match="doesn't name its assembly"):
+        bgs.build_gene_snapshot(
+            "GCF_000002765.6", str(gff3), tmp_path / "genes.duckdb", catalog
+        )

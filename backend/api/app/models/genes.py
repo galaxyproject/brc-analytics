@@ -37,8 +37,11 @@ class GeneTranscript(_CamelModel):
     # Null when the annotation gives none, as for tRNAs and pseudogene
     # transcripts in NCBI's files.
     transcript_id: Optional[str]
+    # The transcript row's product, and its CDS's (naming the protein), each
+    # as the annotation writes them.
+    transcript_product: Optional[str]
     protein_accession: Optional[str]
-    product: Optional[str]
+    protein_product: Optional[str]
     location: GeneLocation
 
 
@@ -67,12 +70,10 @@ class Gene(_CamelModel):
     locus_tag: Optional[str]
     name: Optional[str]
     symbol: Optional[str]
-    product: Optional[str]
     biotype: Optional[str]
     assembly_accession: str
     organism: GeneOrganism
     location: GeneLocation
-    protein_accession: Optional[str]
     transcripts: List[GeneTranscript]
     aliases: List[GeneAlias]
     status: Literal["current", "not_in_latest"]

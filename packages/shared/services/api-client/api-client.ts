@@ -69,7 +69,7 @@ export const apiClient = {
     geneUid: string,
     signal?: AbortSignal
   ): Promise<GeneResponse> => {
-    // No retries: an unavailable gene snapshot stays unavailable.
+    // ky doesn't retry; useGene's query does, before showing "unavailable".
     return httpClient
       .get(`genes/${encodeURIComponent(geneUid)}`, { retry: 0, signal })
       .json();

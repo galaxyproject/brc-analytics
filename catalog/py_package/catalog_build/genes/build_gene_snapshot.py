@@ -27,12 +27,12 @@ null. Two shortcuts follow from that:
 
 import argparse
 import datetime
-import gzip
 import hashlib
 import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import uuid
@@ -44,7 +44,15 @@ import duckdb
 import pandas as pd
 import requests
 
-from .check_against_ncbi_gtf import compare, describe, gtf_next_to, read_ncbi_gtf
+from .check_against_ncbi_gtf import (
+    compare,
+    describe,
+    gtf_next_to,
+    is_url,
+    open_source,
+    read_ncbi_gtf,
+    text_lines,
+)
 from .ncbi_gff3 import Annotation, read_ncbi_gff3
 
 SCHEMA_VERSION = 1
@@ -119,7 +127,6 @@ CREATE TABLE gene (
     locus_tag VARCHAR,
     name VARCHAR,
     symbol VARCHAR,
-    product VARCHAR,
     biotype VARCHAR,
     seq_name VARCHAR NOT NULL,
     start BIGINT NOT NULL,
@@ -133,8 +140,9 @@ CREATE TABLE transcript (
     asv_id VARCHAR NOT NULL,
     gff3_row_id VARCHAR NOT NULL,
     transcript_id VARCHAR,
+    transcript_product VARCHAR,
     protein_accession VARCHAR,
-    product VARCHAR,
+    protein_product VARCHAR,
     biotype VARCHAR,
     seq_name VARCHAR NOT NULL,
     start BIGINT NOT NULL,
@@ -183,13 +191,6 @@ def _utc_now() -> datetime.datetime:
     )
 
 
-def _open(path: Path, uncompressed: bool = True) -> io.BufferedIOBase:
-    """Open a file as bytes, through gzip when it's gzipped and `uncompressed`."""
-    with open(path, "rb") as fh:
-        gzipped = fh.read(2) == b"\x1f\x8b"
-    return gzip.open(path, "rb") if gzipped and uncompressed else open(path, "rb")
-
-
 def _digests(fh: io.BufferedIOBase) -> Tuple[str, str]:
     sha256, md5 = hashlib.sha256(), hashlib.md5()
     for chunk in iter(lambda: fh.read(1 << 20), b""):
@@ -199,9 +200,9 @@ def _digests(fh: io.BufferedIOBase) -> Tuple[str, str]:
 
 
 def _hash_file(path: Path, url: str) -> FileVersion:
-    with _open(path, uncompressed=False) as fh:
+    with open(path, "rb") as fh:
         sha256, md5 = _digests(fh)
-    with _open(path) as fh:
+    with open_source(str(path)) as fh:
         sha256_uncompressed, md5_uncompressed = _digests(fh)
     return FileVersion(
         path=path,
@@ -217,14 +218,14 @@ def _hash_file(path: Path, url: str) -> FileVersion:
 
 def _download(source: str, workdir: Path) -> Path:
     """Download the file at a URL into `workdir`, or take a local path as is."""
-    if not re.match(r"^https?://", source):
+    if not is_url(source):
         return Path(source)
     path = workdir / source.rsplit("/", 1)[-1]
     with requests.get(source, stream=True, timeout=120) as response:
         response.raise_for_status()
+        # The raw bytes, so the file's checksums are the publisher's.
         with open(path, "wb") as fh:
-            for chunk in response.iter_content(1 << 20):
-                fh.write(chunk)
+            shutil.copyfileobj(response.raw, fh, 1 << 20)
     return path
 
 
@@ -340,7 +341,6 @@ def snapshot_rows(
                 "locus_tag": gene.locus_tag,
                 "name": gene.name,
                 "symbol": gene.symbol,
-                "product": gene.product,
                 "biotype": gene.biotype,
                 "seq_name": gene.location.seq_name,
                 "start": gene.location.start,
@@ -348,17 +348,12 @@ def snapshot_rows(
                 "strand": gene.location.strand,
             }
         )
-        aliases: List[Tuple[str, str]] = [
-            (value, alias_type)
-            for value, alias_type in [
-                (gene.locus_tag, "locus_tag"),
-                (gene.name, "name"),
-                (gene.symbol, "symbol"),
-            ]
-            if value is not None
+        aliases: List[Tuple[Optional[str], str]] = [
+            (gene.locus_tag, "locus_tag"),
+            (gene.name, "name"),
+            (gene.symbol, "symbol"),
+            (gene.ncbi_gene_id, "ncbi_gene_id"),
         ]
-        if gene.ncbi_gene_id:
-            aliases.append((gene.ncbi_gene_id, "ncbi_gene_id"))
         for transcript in gene.transcripts:
             rows["transcript"].append(
                 {
@@ -366,8 +361,9 @@ def snapshot_rows(
                     "asv_id": asv_id,
                     "gff3_row_id": transcript.row_id,
                     "transcript_id": transcript.transcript_id,
+                    "transcript_product": transcript.transcript_product,
                     "protein_accession": transcript.protein_accession,
-                    "product": transcript.product,
+                    "protein_product": transcript.protein_product,
                     "biotype": transcript.biotype,
                     "seq_name": transcript.location.seq_name,
                     "start": transcript.location.start,
@@ -376,12 +372,12 @@ def snapshot_rows(
                     "latest": True,
                 }
             )
-            if transcript.transcript_id:
-                aliases.append((transcript.transcript_id, "transcript_id"))
-            if transcript.protein_accession:
-                aliases.append((transcript.protein_accession, "protein_accession"))
+            aliases.append((transcript.transcript_id, "transcript_id"))
+            aliases.append((transcript.protein_accession, "protein_accession"))
         aliases.extend((tag, "old_locus_tag") for tag in gene.old_locus_tags)
         for value, alias_type in dict.fromkeys(aliases):
+            if not value:
+                continue
             value_lower = value.lower()
             rows["alt_id"].append(
                 {
@@ -449,14 +445,15 @@ def build_gene_snapshot(
     assembly = assembly_row(catalog, accession)
     with tempfile.TemporaryDirectory() as workdir:
         file_version = fetch_gff3(gff3, Path(workdir))
-        gtf_path = _download(gtf or gtf_next_to(gff3), Path(workdir))
-        with _open(file_version.path) as fh:
-            annotation = read_ncbi_gff3(line.decode("utf-8") for line in fh)
-        with _open(gtf_path) as fh:
-            gtf_genes = read_ncbi_gtf(line.decode("utf-8") for line in fh)
+        annotation = read_ncbi_gff3(text_lines(str(file_version.path)))
     stated = annotation.header.genome_build_accession
-    if stated and stated != accession:
+    if stated is None:
+        raise ValueError(
+            "The GFF3 doesn't name its assembly (#!genome-build-accession)"
+        )
+    if stated != accession:
         raise ValueError(f"The GFF3 is for {stated}, not {accession}")
+    gtf_genes = read_ncbi_gtf(text_lines(gtf or gtf_next_to(gff3)))
     differences = compare(annotation.genes, gtf_genes)
     if differences:
         raise ValueError(

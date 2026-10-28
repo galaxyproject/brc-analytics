@@ -7,7 +7,7 @@ beside this file.
 import datetime
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Set
 from urllib.parse import unquote
 
 GENE_TYPES = {"gene", "pseudogene"}
@@ -46,14 +46,11 @@ class Transcript:
     transcript_id: Optional[str]
     biotype: str
     location: Location
+    # The `product` of the transcript row, and of its first CDS row (naming
+    # the protein), each as written; neither stands in for the other.
+    transcript_product: Optional[str] = None
     protein_accession: Optional[str] = None
-    # The transcript row's own product, and its first CDS's; the CDS's wins.
-    row_product: Optional[str] = None
-    cds_product: Optional[str] = None
-
-    @property
-    def product(self) -> Optional[str]:
-        return self.cds_product or self.row_product
+    protein_product: Optional[str] = None
 
 
 @dataclass
@@ -71,7 +68,6 @@ class Gene:
     location: Location
     ncbi_gene_id: Optional[str]
     old_locus_tags: List[str]
-    description: Optional[str]
     transcripts: List[Transcript] = field(default_factory=list)
 
     @property
@@ -80,15 +76,6 @@ class Gene:
         label = self.locus_tag or self.name
         assert label is not None  # _new_gene requires one of them
         return label
-
-    @property
-    def product(self) -> Optional[str]:
-        # The first coding sequence's product, else the first transcript row's.
-        return (
-            next((t.cds_product for t in self.transcripts if t.cds_product), None)
-            or next((t.row_product for t in self.transcripts if t.row_product), None)
-            or self.description
-        )
 
 
 @dataclass
@@ -158,7 +145,6 @@ def _new_gene(row_id: str, attributes: Dict[str, List[str]], location: Location)
             for value in attributes.get("old_locus_tag", [])
             for tag in value.split(",")
         ],
-        description=_first(attributes, "description"),
     )
 
 
@@ -168,6 +154,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
     # Keyed by GFF3 row ID.
     genes: Dict[str, Gene] = {}
     transcripts: Dict[str, Transcript] = {}
+    # Every row ID read so far, so a row before its parent is caught.
+    row_ids: Set[str] = set()
 
     for raw in lines:
         line = raw.rstrip("\n")
@@ -182,6 +170,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
         seq_name, _, row_type, start, end, _, strand, _, attribute_text = columns
         attributes = _parse_attributes(attribute_text)
         row_id = _first(attributes, "ID")
+        if row_id:
+            row_ids.add(row_id)
         location = Location(seq_name, int(start), int(end), strand)
 
         if row_type in GENE_TYPES:
@@ -205,7 +195,13 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                 gene.location.end = max(gene.location.end, location.end)
             continue
 
-        for parent in attributes.get("Parent", []):
+        parents = attributes.get("Parent", [])
+        for parent in parents:
+            if parent not in row_ids:
+                raise ValueError(f"A {row_type} row comes before its parent {parent}")
+        if len(parents) > 1 and any(parent in genes for parent in parents):
+            raise ValueError(f"A {row_type} row has more than one gene parent: {line}")
+        for parent in parents:
             if parent in genes:
                 gene = genes[parent]
                 if row_type not in TRANSCRIPT_TYPES:
@@ -221,7 +217,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                     transcript_id=_first(attributes, "transcript_id"),
                     biotype=row_type,
                     location=location,
-                    row_product=_first(attributes, "product"),
+                    transcript_product=_first(attributes, "product"),
                 )
                 gene.transcripts.append(transcripts[row_id])
             elif row_type == "CDS" and parent in transcripts:
@@ -229,7 +225,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                 transcript.protein_accession = transcript.protein_accession or _first(
                     attributes, "protein_id"
                 )
-                transcript.cds_product = transcript.cds_product or _first(
+                transcript.protein_product = transcript.protein_product or _first(
                     attributes, "product"
                 )
 

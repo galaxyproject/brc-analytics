@@ -20,3 +20,15 @@ export function geneSymbol(
 ): string | null {
   return gene.symbol && gene.symbol !== geneLabel(gene) ? gene.symbol : null;
 }
+
+/**
+ * A gene's page title: its label, then its symbol in brackets if it has one.
+ * @param gene - The gene.
+ * @returns E.g. "PF3D7_1133400 (AMA1)".
+ */
+export function geneTitle(
+  gene: Pick<Gene, "locusTag" | "name" | "symbol">
+): string {
+  const symbol = geneSymbol(gene);
+  return symbol ? `${geneLabel(gene)} (${symbol})` : geneLabel(gene);
+}

@@ -68,7 +68,6 @@ def test_gene(client, gene_uid):
         "locusTag": "PF3D7_1133400",
         "name": "AMA1",
         "symbol": "AMA1",
-        "product": "apical membrane antigen 1",
         "biotype": "protein_coding",
         "assemblyAccession": "GCF_000002765.6",
         "organism": {"name": "Plasmodium falciparum 3D7", "taxonomyId": "36329"},
@@ -78,12 +77,12 @@ def test_gene(client, gene_uid):
             "end": 1296696,
             "strand": "+",
         },
-        "proteinAccession": "XP_001348015.1",
         "transcripts": [
             {
                 "transcriptId": "XM_001347979.2",
+                "transcriptProduct": "apical membrane antigen 1",
                 "proteinAccession": "XP_001348015.1",
-                "product": "apical membrane antigen 1",
+                "proteinProduct": "apical membrane antigen 1",
                 "location": {
                     "seqName": "NC_037282.1",
                     "start": 1292966,
@@ -133,8 +132,9 @@ def test_transcript_without_an_id(client, gene_uid):
     response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0203500')}")
     gene = response.json()["gene"]
     assert gene["biotype"] == "tRNA"
-    assert gene["proteinAccession"] is None
-    assert [t["transcriptId"] for t in gene["transcripts"]] == [None]
+    assert [
+        (t["transcriptId"], t["proteinAccession"]) for t in gene["transcripts"]
+    ] == [(None, None)]
     assert all(a["type"] != "transcript_id" for a in gene["aliases"])
 
 
@@ -154,3 +154,10 @@ def test_missing_snapshot_is_503(tmp_path, gene_uid):
     response = make_client(service).get(f"/api/v1/genes/{gene_uid('PF3D7_1133400')}")
     assert response.status_code == 503
     assert response.json() == {"detail": "Gene data is unavailable"}
+
+
+def test_transcript_and_protein_products_differ(client, gene_uid):
+    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0103600')}")
+    [transcript] = response.json()["gene"]["transcripts"]
+    assert transcript["transcriptProduct"] == "ATP-dependent DNA/RNA helicase PSH1"
+    assert transcript["proteinProduct"] == "putative ATP-dependent RNA helicase"
