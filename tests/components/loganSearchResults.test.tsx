@@ -350,6 +350,15 @@ describe("LoganSearchResults truncation disclosure", () => {
     expect(alert.textContent).not.toContain("METAGENOMIC_UNKNOWN");
   });
 
+  test("names a single leftover index in the singular", () => {
+    renderResults(truncatedResults(TWELVE_INDEXES.slice(0, 11)));
+    openWhy();
+
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toContain("1 more index: 900 matched, 0 listed.");
+    expect(alert.textContent).not.toContain("1 more indexes");
+  });
+
   test("lists all ten when ten is all there is", () => {
     renderResults(truncatedResults(TWELVE_INDEXES.slice(0, 10)));
     openWhy();

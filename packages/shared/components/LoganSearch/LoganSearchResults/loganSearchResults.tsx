@@ -175,7 +175,7 @@ function describeRestIndexes(rest: KmindexIndexSummary[]): string | null {
   const matched = rest.reduce((total, one) => total + one.hits_before_cap, 0);
   const listed = rest.reduce((total, one) => total + one.hits_after_cap, 0);
   return (
-    `${rest.length.toLocaleString()} more indexes: ` +
+    `${rest.length.toLocaleString()} more ${rest.length === 1 ? "index" : "indexes"}: ` +
     `${matched.toLocaleString()} matched, ${listed.toLocaleString()} listed.`
   );
 }
