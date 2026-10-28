@@ -1,6 +1,7 @@
 """Tests for the gene API, against the checked-in 3D7 gene snapshot (#1904)."""
 
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from fastapi import FastAPI
@@ -161,3 +162,11 @@ def test_transcript_and_protein_products_differ(client, gene_uid):
     [transcript] = response.json()["gene"]["transcripts"]
     assert transcript["transcriptProduct"] == "ATP-dependent DNA/RNA helicase PSH1"
     assert transcript["proteinProduct"] == "putative ATP-dependent RNA helicase"
+
+
+def test_concurrent_requests(service, gene_uid):
+    # Each request makes its own cursor from the shared connection.
+    uids = [gene_uid(lt) for lt in ["PF3D7_1133400", "PF3D7_0105400"]] * 50
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        genes = list(pool.map(service.get_gene, uids))
+    assert [g.locus_tag for g in genes] == ["PF3D7_1133400", "PF3D7_0105400"] * 50

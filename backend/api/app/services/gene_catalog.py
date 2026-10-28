@@ -8,6 +8,7 @@ version, so every row is the latest.
 
 import logging
 import tempfile
+import threading
 from datetime import timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -86,6 +87,9 @@ class GeneCatalogService:
         self.snapshot_path = snapshot_path
         self.frontend_url = frontend_url.rstrip("/")
         self._con: Optional[duckdb.DuckDBPyConnection] = None
+        # Held only while a request's cursor is made from the shared
+        # connection, as SRAMirrorService does; the queries run unlocked.
+        self._cursor_lock = threading.Lock()
         self.snapshot: Optional[GeneSnapshotInfo] = None
         self._open()
 
@@ -133,8 +137,10 @@ class GeneCatalogService:
         if self._con is None:
             raise RuntimeError("Gene snapshot is unavailable")
         # One cursor per call: FastAPI runs sync routes on a thread pool, and
-        # a DuckDB connection isn't safe to share across threads.
-        cur = self._con.cursor()
+        # a DuckDB connection isn't safe to share across threads. A cursor is
+        # an independent connection onto the open database.
+        with self._cursor_lock:
+            cur = self._con.cursor()
         try:
             genes = _records(cur.execute(_GENE_SQL, [gene_uid]))
             if not genes:
