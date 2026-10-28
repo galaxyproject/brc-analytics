@@ -7,6 +7,8 @@ import loganLocal from "@site-config/logan-search/local/config";
 import loganProd from "@site-config/logan-search/prod/config";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
+import { existsSync } from "fs";
+import path from "path";
 
 // jsdom has no ResizeObserver; the footer observes its own height with one.
 beforeAll(() => {
@@ -36,7 +38,12 @@ describe("Logan footer", () => {
     );
   });
 
-  test("the route constant is the page's path", () => {
-    expect(ROUTES.QUEUE).toBe("/queue");
+  test("the route constant points at a real page", () => {
+    // Otherwise moving the page would leave the footer linking to a 404.
+    expect(
+      existsSync(
+        path.join(__dirname, "../../sites/logan-search/pages", ROUTES.QUEUE)
+      )
+    ).toBe(true);
   });
 });
