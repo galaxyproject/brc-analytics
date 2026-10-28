@@ -6,7 +6,8 @@ import { type GetStaticProps } from "next";
 import Head from "next/head";
 import { type JSX } from "react";
 
-// Unlisted: nothing links here, and search engines are asked not to index it.
+// Linked only from the footer; it's an operational view, so search engines
+// are asked not to index it.
 const Page = (): JSX.Element => {
   return (
     <>
