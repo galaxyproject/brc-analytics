@@ -22,11 +22,10 @@ describe("Logan Search site config", () => {
     ]);
   });
 
-  test("still marks every credit as a placeholder", () => {
-    // Nothing here is agreed wording yet. Once an entry is, this test has to
-    // change with it, which is the point.
+  test("shows no placeholder credits", () => {
+    // These render in the footer of every page.
     for (const credit of Object.values(ATTRIBUTION)) {
-      expect(credit).toMatch(/^\[ATTRIBUTION TBD: .+\]$/);
+      expect(credit).not.toMatch(/TBD|^\[/);
     }
   });
 });

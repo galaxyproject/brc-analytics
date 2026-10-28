@@ -3,8 +3,8 @@ import { ATTRIBUTION } from "@site-config/logan-search/local/attribution";
 import { type JSX } from "react";
 import { Credit, Credits } from "./branding.styles";
 
-// Order is a placeholder too; it follows whatever the agreed wording ends up
-// saying.
+// The data and the index come first; who runs the searches and the site
+// follows.
 const CREDITS = [
   ATTRIBUTION.LOGAN_CITATION,
   ATTRIBUTION.KMINDEX,
@@ -13,7 +13,7 @@ const CREDITS = [
 ];
 
 /**
- * The footer's credits block. Every line is still a bracketed placeholder.
+ * The footer's credits block.
  * @returns the credits.
  */
 export const Branding = (): JSX.Element => {
