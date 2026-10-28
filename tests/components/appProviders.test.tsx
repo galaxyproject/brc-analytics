@@ -4,7 +4,6 @@ import {
   type AppPropsWithComponent,
 } from "@repo/shared/components/layout/AppProviders/appProviders";
 import { type AppSiteConfig } from "@repo/shared/config/types";
-import { type EntityLoads } from "@repo/shared/services/workflows/hooks/UseEntities/types";
 import { render, screen } from "@testing-library/react";
 import { type JSX, type ReactNode } from "react";
 
@@ -99,7 +98,6 @@ describe("AppProviders on a site with no entity lists", () => {
         appTheme={createAppTheme()}
         defaultDescription="No entities here."
         defaultEntityListType=""
-        ensureEntitiesLoaded={(): EntityLoads => ({})}
       />
     );
 

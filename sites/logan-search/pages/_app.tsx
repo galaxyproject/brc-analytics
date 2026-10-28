@@ -9,18 +9,9 @@ import {
 } from "@repo/shared/components/layout/AppProviders/appProviders";
 import { useRecentSearches } from "@repo/shared/components/LoganSearch/LoganSearchHistory/useRecentSearches";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
-import { type EntityLoads } from "@repo/shared/services/workflows/hooks/UseEntities/types";
 import { useMemo, type JSX } from "react";
 
 setFeatureFlags([FEATURE_FLAGS.LOGAN_FILTERS]);
-
-/**
- * The site has no catalog, so there is nothing to load before a page renders.
- * @returns no loads.
- */
-function ensureEntitiesLoaded(): EntityLoads {
-  return {};
-}
 
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   // Read after mount, so the static render and the first client render both
@@ -37,7 +28,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
       appTheme={createLoganTheme(props.pageProps.themeOptions)}
       defaultDescription={LOGAN_DEFAULT_DESCRIPTION}
       defaultEntityListType=""
-      ensureEntitiesLoaded={ensureEntitiesLoaded}
     />
   );
 }
