@@ -1,4 +1,3 @@
-import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
@@ -36,5 +35,3 @@ export const getStaticPaths = makeEntitiesStaticPaths(
 export const getStaticProps = makeEntitiesStaticProps(ENTITY_LIST_META);
 
 export default Page;
-
-Page.Main = DXMain;

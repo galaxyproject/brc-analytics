@@ -5,7 +5,6 @@ import {
 } from "@databiosphere/findable-ui/lib/components/common/StatusIcon/statusIcon";
 import { FilterButton } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/controls/FilterButton/filterButton";
 import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
-import { useLayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/hook";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
 import { type JSX } from "react";
@@ -24,11 +23,10 @@ import {
  * @returns Workflows grid.
  */
 export const Workflows = ({ table }: Props): JSX.Element => {
-  const { spacing } = useLayoutSpacing();
   const { getRowModel } = table;
   const { rows } = getRowModel();
   return (
-    <StyledContainer maxWidth={false} {...spacing}>
+    <StyledContainer maxWidth={false}>
       <StyledStack useFlexGap>
         <Title />
         <FilterButton />

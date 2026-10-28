@@ -49,9 +49,10 @@ export const ThresholdControl = styled.div`
 `;
 
 /* The job card and then the summary that replaces it: where the page scrolls
-   to on Search. The margin keeps it clear of the site header. */
+   to on Search. The page's scroll padding clears the site header; the margin
+   leaves a gap below it. */
 export const SearchProgress = styled.div`
-  scroll-margin-top: 88px;
+  scroll-margin-top: 32px;
 `;
 
 /* The Indexes heading and the info icon that explains what's missing. */

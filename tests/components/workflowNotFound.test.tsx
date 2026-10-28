@@ -1,4 +1,3 @@
-import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { createAppTheme } from "@databiosphere/findable-ui/lib/theme/theme";
 import { ThemeProvider } from "@mui/material";
 import { WorkflowNotFound } from "@repo/shared/components/workflow/WorkflowNotFound/workflowNotFound";
@@ -6,16 +5,11 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 
 /**
- * Renders the element under the app theme and layout-dimensions provider the
- * error layout reads from.
+ * Renders the element under the app theme the error layout reads from.
  * @param element - Element to render.
  */
 function renderThemed(element: ReactElement): void {
-  render(
-    <ThemeProvider theme={createAppTheme()}>
-      <LayoutDimensionsProvider>{element}</LayoutDimensionsProvider>
-    </ThemeProvider>
-  );
+  render(<ThemeProvider theme={createAppTheme()}>{element}</ThemeProvider>);
 }
 
 describe("WorkflowNotFound", () => {

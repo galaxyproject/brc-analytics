@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
 
 export const StyledSectionTitle = styled(SectionTitle)`
-  scroll-margin-top: 72px;
+  scroll-margin-top: 16px;
 
   ${bpDownSm} {
     padding: 0 16px;

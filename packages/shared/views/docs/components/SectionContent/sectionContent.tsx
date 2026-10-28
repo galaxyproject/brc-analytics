@@ -27,20 +27,16 @@ export const SectionContent = ({
         hasNavigation={false}
         panelColor={PANEL_BACKGROUND_COLOR.DEFAULT}
       >
-        <ContentGrid
-          headerHeight={0}
-          panelColor={PANEL_BACKGROUND_COLOR.DEFAULT}
-        >
+        <ContentGrid panelColor={PANEL_BACKGROUND_COLOR.DEFAULT}>
           <StyledContent contentType={contentType}>{content}</StyledContent>
         </ContentGrid>
         {outline && (
           <StyledOutlineGrid
             key={slug.join("")}
             contentType={contentType}
-            headerHeight={0}
             panelColor={PANEL_BACKGROUND_COLOR.DEFAULT}
           >
-            <StyledPositioner headerHeight={0}>
+            <StyledPositioner>
               <StyledOutline>{outline}</StyledOutline>
             </StyledPositioner>
           </StyledOutlineGrid>

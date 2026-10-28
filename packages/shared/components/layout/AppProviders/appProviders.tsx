@@ -7,7 +7,6 @@ import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/La
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
@@ -135,39 +134,35 @@ export function AppProviders({
                 <SystemStatusProvider>
                   <AuthProvider loginEnabled={appConfig.loginEnabled}>
                     <FavoritesProvider>
-                      <LayoutDimensionsProvider>
-                        <AppLayout>
-                          <DXHeader {...header} />
-                          <ExploreState entityListType={entityListType}>
-                            <WorkflowHandoffProvider>
-                              <Main>
-                                <ErrorBoundary
-                                  fallbackRender={({
-                                    error,
-                                    reset,
-                                  }: {
-                                    error: DataExplorerError;
-                                    reset: () => void;
-                                  }): JSX.Element => (
-                                    <Error
-                                      errorMessage={error.message}
-                                      requestUrlMessage={
-                                        error.requestUrlMessage
-                                      }
-                                      rootPath={redirectRootToPath}
-                                      onReset={reset}
-                                    />
-                                  )}
-                                >
-                                  <Component {...pageProps} />
-                                  <Floating {...floating} />
-                                </ErrorBoundary>
-                              </Main>
-                            </WorkflowHandoffProvider>
-                          </ExploreState>
-                          <StyledFooter {...footer} />
-                        </AppLayout>
-                      </LayoutDimensionsProvider>
+                      <AppLayout>
+                        <DXHeader {...header} />
+                        <ExploreState entityListType={entityListType}>
+                          <WorkflowHandoffProvider>
+                            <Main>
+                              <ErrorBoundary
+                                fallbackRender={({
+                                  error,
+                                  reset,
+                                }: {
+                                  error: DataExplorerError;
+                                  reset: () => void;
+                                }): JSX.Element => (
+                                  <Error
+                                    errorMessage={error.message}
+                                    requestUrlMessage={error.requestUrlMessage}
+                                    rootPath={redirectRootToPath}
+                                    onReset={reset}
+                                  />
+                                )}
+                              >
+                                <Component {...pageProps} />
+                                <Floating {...floating} />
+                              </ErrorBoundary>
+                            </Main>
+                          </WorkflowHandoffProvider>
+                        </ExploreState>
+                        <StyledFooter {...footer} />
+                      </AppLayout>
                     </FavoritesProvider>
                   </AuthProvider>
                 </SystemStatusProvider>
