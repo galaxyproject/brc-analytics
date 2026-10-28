@@ -32,6 +32,7 @@ from app.core.partner_keys import Partner, sunset_header
 from app.models.galaxy import (
     KmindexOrder,
     KmindexQuerySubmission,
+    KmindexQueueStatus,
     KmindexResults,
     KmindexSort,
 )
@@ -64,7 +65,7 @@ RESULTS_RETRY_AFTER = "15"
 
 # A claim with no job recorded yet is held for the whole day, like a recorded
 # job. A submit normally fills it in within seconds; one that never does died
-# somewhere around run_tool, which is as ambiguous as a submit that failed
+# somewhere around the tool request, which is as ambiguous as a submit that failed
 # there, and letting the claim lapse would let a retry start a second search.
 #
 # These records sit in the cache Redis (allkeys-lru), so the guarantee holds
@@ -173,6 +174,19 @@ async def list_indexes(galaxy: GalaxyService = Depends(get_partner_galaxy_servic
     return {"count": len(indexes), "indexes": indexes}
 
 
+@router.get("/queue", response_model=KmindexQueueStatus)
+async def queue(galaxy: GalaxyService = Depends(get_partner_galaxy_service)):
+    """How many searches are waiting to start, and how long recent ones waited."""
+    _require_galaxy(galaxy)
+    try:
+        return await galaxy.get_kmindex_queue()
+    except Exception as e:
+        logger.error(f"Partner queue read failed: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to read the search queue"
+        ) from e
+
+
 @router.post("/jobs", response_model=PartnerJobCreated, status_code=202)
 async def submit_job(
     request: Request,
@@ -243,7 +257,7 @@ async def submit_job(
             await cache.delete(idem_key)
         raise HTTPException(status_code=400, detail=str(e)) from e
     except GalaxySubmitNotStarted as e:
-        # Nothing reached run_tool, so no job exists and a retry is safe.
+        # Galaxy queued nothing, so no job exists and a retry is safe.
         if idem_key is not None:
             await cache.delete(idem_key)
         logger.error(f"Partner {partner.partner_id} submit failed: {e}")
@@ -366,6 +380,7 @@ async def job_results(
 async def job_export(
     job_id: str = JobId,
     format: str = Query(default="tsv", pattern="^(parquet|tsv)$"),
+    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
 ) -> Response:
     """
     Every hit the search matched, not just the pages results serves.
@@ -373,7 +388,7 @@ async def job_export(
     Written when the results are first merged, so read results once before
     this. Kept for about a day at most, and sooner under disk pressure.
     """
-    return await serve_kmindex_export(job_id, format)
+    return await serve_kmindex_export(job_id, format, galaxy)
 
 
 async def add_sunset_header(request: Request, call_next):

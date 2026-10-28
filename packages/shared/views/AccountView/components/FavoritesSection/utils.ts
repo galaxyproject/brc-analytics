@@ -2,9 +2,12 @@ import { ENTITY_TYPE } from "@repo/shared/providers/favorites/constants";
 import type { FavoriteEntityType } from "@repo/shared/providers/favorites/types";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { findEntity } from "@repo/shared/services/workflows/query";
+import type { EntityRoute } from "@repo/shared/services/workflows/types";
 
 interface EntityTypeDisplay {
   emptyState: string;
+  // The entity lists getFavoriteLabel reads to label this type's favorites.
+  labelRoutes: EntityRoute[];
   // The detail route this entity type links to, from ROUTES rather than
   // rebuilt here: renaming one there has to reach the workspace too.
   route: string;
@@ -20,6 +23,7 @@ export const ENTITY_TYPE_DISPLAY: Record<
   [ENTITY_TYPE.ASSEMBLY]: {
     emptyState:
       "Save an assembly from its page or from the assemblies list to keep it here.",
+    labelRoutes: [],
     route: ROUTES.GENOME,
     sectionId: "assemblies",
     title: "Saved assemblies",
@@ -27,6 +31,7 @@ export const ENTITY_TYPE_DISPLAY: Record<
   [ENTITY_TYPE.ORGANISM]: {
     emptyState:
       "Save an organism from its page or from the organisms list to keep it here.",
+    labelRoutes: ["organisms"],
     route: ROUTES.ORGANISM,
     sectionId: "organisms",
     title: "Saved organisms",

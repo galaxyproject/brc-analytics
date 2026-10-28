@@ -1,4 +1,3 @@
-import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { config } from "@ga2/config/config";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
@@ -6,6 +5,7 @@ import { type PageMeta } from "@repo/shared/meta/types";
 import { makeEntitiesStaticPaths } from "@repo/shared/services/staticGeneration/entities/staticPaths";
 import { makeEntitiesStaticProps } from "@repo/shared/services/staticGeneration/entities/staticProps";
 import { type EntitiesPageProps } from "@repo/shared/services/staticGeneration/entities/types";
+import { isEntityRoute } from "@repo/shared/services/workflows/loader";
 import { EntitiesView } from "@repo/shared/views/EntitiesView/entitiesView";
 import { type JSX } from "react";
 
@@ -15,10 +15,10 @@ const ENTITY_LIST_META: Record<string, PageMeta> = {
 };
 
 const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
-  if (!entityListType) return <></>;
+  if (!entityListType || !isEntityRoute(entityListType)) return <></>;
 
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={[entityListType]}>
       <EntitiesView entityListType={entityListType} {...props} />
     </EntityDataGate>
   );
@@ -35,5 +35,3 @@ export const getStaticPaths = makeEntitiesStaticPaths(
 export const getStaticProps = makeEntitiesStaticProps(ENTITY_LIST_META);
 
 export default Page;
-
-Page.Main = DXMain;

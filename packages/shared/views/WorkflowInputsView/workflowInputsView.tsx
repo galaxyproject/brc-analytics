@@ -6,10 +6,7 @@ import {
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { ENTITY_KEYS } from "@repo/shared/providers/workflowHandoff/constants";
 import { HandoffStatusContext } from "@repo/shared/providers/workflowHandoff/contexts/HandoffStatus/context";
-import {
-  getAssembly,
-  getWorkflow,
-} from "@repo/shared/services/workflows/entities";
+import { getWorkflow } from "@repo/shared/services/workflows/entities";
 import { type StepConfig } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { useStepper } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
@@ -27,7 +24,7 @@ import { useConfigureInputs } from "./hooks/UseConfigureInputs/useConfigureInput
 import { useHandoffRehydrate } from "./hooks/UseHandoffRehydrate/useHandoffRehydrate";
 import { useHandoffSync } from "./hooks/UseHandoffSync/useHandoffSync";
 import { SEQUENCING_STEP_KEYS } from "./sequencing/constants";
-import { type Assembly, type Props } from "./types";
+import { type Props } from "./types";
 import { mapAssemblyToOrganism } from "./utils";
 import { StyledBackPageContentMainColumn } from "./workflowInputsView.styles";
 
@@ -39,11 +36,11 @@ function findFirstDataStep(steps: StepConfig[]): number | undefined {
 }
 
 export const WorkflowInputsView = ({
+  assembly,
   entityId,
   organismBuilder,
   trsId,
 }: Props): JSX.Element => {
-  const genome = getAssembly<Assembly>(entityId);
   const workflow = getWorkflow(trsId);
 
   // Before the reads below: restores the handoff cell when the page was opened
@@ -76,19 +73,19 @@ export const WorkflowInputsView = ({
   const { hasSidePanel } = configuredSteps[activeStep] || {};
 
   const workflowEntityValue = useMemo(
-    () => buildWorkflowEntityValue(genome),
-    [genome]
+    () => buildWorkflowEntityValue(assembly),
+    [assembly]
   );
 
-  const organism = useMemo(() => mapAssemblyToOrganism(genome), [genome]);
+  const organism = useMemo(() => mapAssemblyToOrganism(assembly), [assembly]);
 
   return (
     <WorkflowEntityContext.Provider value={workflowEntityValue}>
-      <AssemblyContext.Provider value={genome}>
+      <AssemblyContext.Provider value={assembly}>
         <HandoffStatusContext.Provider value={handoff}>
           <BackPageView>
             <BackPageHero>
-              <Top entityId={entityId} genome={genome} workflow={workflow} />
+              <Top entityId={entityId} genome={assembly} workflow={workflow} />
             </BackPageHero>
             <BackPageContent>
               <StyledBackPageContentMainColumn hasSidePanel={hasSidePanel}>

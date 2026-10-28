@@ -20,6 +20,7 @@ interface ObserverMock {
   callback: ResizeObserverCallback;
   disconnect: jest.Mock;
   observe: jest.Mock;
+  unobserve: jest.Mock;
 }
 
 const observers: ObserverMock[] = [];
@@ -28,7 +29,8 @@ let scrollIntoView: jest.Mock;
 
 /**
  * Sets whether media queries match, standing in for the screen width: the
- * hook acts only on narrow screens.
+ * page scrolls the conversation on narrow screens, and the chat column on
+ * wider ones.
  * @param matches - Whether the narrow-screen query matches.
  */
 function setNarrow(matches: boolean): void {
@@ -87,10 +89,13 @@ beforeEach(() => {
   observers.length = 0;
   scrollIntoView = jest.fn();
   Element.prototype.scrollIntoView = scrollIntoView;
-  // The messages' own pinning scrolls them with scrollTo, which jsdom lacks.
-  Element.prototype.scrollTo = jest.fn();
   global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
-    const observer = { callback, disconnect: jest.fn(), observe: jest.fn() };
+    const observer = {
+      callback,
+      disconnect: jest.fn(),
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+    };
     observers.push(observer);
     return observer;
   }) as unknown as typeof ResizeObserver;
@@ -146,12 +151,14 @@ describe("useRevealLatest", () => {
     );
   });
 
-  // The messages pin themselves there.
-  test("does nothing on wider screens", () => {
+  // The chat column scrolls the conversation there, rather than the page.
+  test("brings the end into view on wider screens too", () => {
     setNarrow(false);
-    render(<Conversation messages={["Hello"]} />, { wrapper });
-    expect(scrollIntoView).not.toHaveBeenCalled();
-    expect(observers).toHaveLength(0);
+    const { getByText } = render(<Conversation messages={["Hello"]} />, {
+      wrapper,
+    });
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "end" });
+    expect(latestObserver().observe).toHaveBeenCalledWith(getByText("Hello"));
   });
 
   // The hook finds the newest message by structure: the last child of the
@@ -176,7 +183,7 @@ describe("useRevealLatest", () => {
       />,
       { wrapper }
     );
-    // The messages pin themselves with an observer of their own; this hook's
+    // Other parts of the chat may observe their own size; this hook's observer
     // is the one that reveals the end.
     const revealing = observers.find(({ callback }) => {
       scrollIntoView.mockClear();

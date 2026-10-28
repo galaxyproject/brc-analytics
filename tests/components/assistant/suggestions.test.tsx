@@ -23,9 +23,10 @@ const SUGGESTIONS: SuggestionChip[] = [
 ];
 
 interface RenderOptions {
-  disabled?: boolean;
+  isBusy?: boolean;
   isSetupComplete?: boolean;
   onFocusComposer?: jest.Mock;
+  onFocusLog?: jest.Mock;
   onSend?: jest.Mock;
   suggestions?: SuggestionChip[];
 }
@@ -34,25 +35,28 @@ interface RenderOptions {
  * Renders the suggested next steps, under the app theme its narrow-screen
  * styles read breakpoints from.
  * @param options - Props to override.
- * @param options.disabled - Whether the assistant is busy.
+ * @param options.isBusy - Whether the assistant is busy.
  * @param options.isSetupComplete - Whether the setup is complete and ready to hand off.
  * @param options.onFocusComposer - Moves focus to the composer.
+ * @param options.onFocusLog - Moves focus to the messages' log.
  * @param options.onSend - Sends a message to the assistant.
  * @param options.suggestions - Suggested next steps.
  * @returns The render's container.
  */
 function renderSuggestions({
-  disabled = false,
+  isBusy = false,
   isSetupComplete = false,
   onFocusComposer = jest.fn(),
+  onFocusLog = jest.fn(),
   onSend = jest.fn(),
   suggestions = SUGGESTIONS,
 }: RenderOptions = {}): HTMLElement {
   const { container } = render(
     <Suggestions
-      disabled={disabled}
+      isBusy={isBusy}
       isSetupComplete={isSetupComplete}
       onFocusComposer={onFocusComposer}
+      onFocusLog={onFocusLog}
       onSend={onSend}
       suggestions={suggestions}
     />,
@@ -123,20 +127,11 @@ describe("Suggestions", () => {
     expect(onSend).not.toHaveBeenCalled();
   });
 
-  // MUI blocks pointer clicks on a disabled row with CSS, which jsdom doesn't
-  // apply, so this checks each row is marked disabled and out of the tab order
-  // rather than clicking it.
-  test("disables every row while the assistant is busy", () => {
-    renderSuggestions({ disabled: true });
+  // Until the assistant's reply arrives, the suggestions belong to the one
+  // before it.
+  test("renders nothing while the assistant is busy", () => {
+    const container = renderSuggestions({ isBusy: true });
 
-    for (const label of [
-      "Explore assemblies",
-      "Browse workflows",
-      TYPE_SOMETHING_ELSE,
-    ]) {
-      const row = getRow(label);
-      expect(row).toHaveAttribute("aria-disabled", "true");
-      expect(row).toHaveAttribute("tabindex", "-1");
-    }
+    expect(container).toBeEmptyDOMElement();
   });
 });

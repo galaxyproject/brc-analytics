@@ -1,4 +1,5 @@
-import type { LayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/types";
+import { FOOTER_HEIGHT_VAR } from "@databiosphere/findable-ui/lib/components/Layout/components/Footer/common/constants";
+import { HEADER_HEIGHT_VAR } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/constants";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { bpDownMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
@@ -10,12 +11,10 @@ import styled from "@emotion/styled";
 // it. The layout fills at least the viewport below the header, so a short tab
 // doesn't pull the footer up. The small viewport height keeps it from resizing
 // as the browser's toolbar shows and hides.
-export const StyledLayout = styled("div", {
-  shouldForwardProp: (prop) => prop !== "bottom" && prop !== "top",
-})<LayoutSpacing>`
+export const StyledLayout = styled("div")`
   display: grid;
   grid-template-columns: 328px minmax(0, 1fr) 360px;
-  height: calc(100dvh - ${({ bottom, top }) => top + bottom}px);
+  height: calc(100dvh - ${HEADER_HEIGHT_VAR} - ${FOOTER_HEIGHT_VAR});
   width: 100%;
 
   ${bpDownMd} {
@@ -23,6 +22,6 @@ export const StyledLayout = styled("div", {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     height: auto;
-    min-height: calc(100svh - ${({ top }) => top}px);
+    min-height: calc(100svh - ${HEADER_HEIGHT_VAR});
   }
 `;

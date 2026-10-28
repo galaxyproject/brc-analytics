@@ -6,7 +6,6 @@ import { ROW_POSITION } from "@databiosphere/findable-ui/lib/components/Table/fe
 import { ROW_PREVIEW } from "@databiosphere/findable-ui/lib/components/Table/features/RowPreview/constants";
 import { TABLE_DOWNLOAD } from "@databiosphere/findable-ui/lib/components/Table/features/TableDownload/constants";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { getEntities } from "@repo/shared/services/workflows/query";
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -20,12 +19,10 @@ import { CATEGORY_GROUPS } from "./categoryGroups";
 import { columns } from "./columnDef";
 import { COLUMN_VISIBILITY, SORTING } from "./constants";
 import { type Assembly, type UseTable } from "./types";
-import { getInitialColumnFilters, renderSummary } from "./utils";
+import { getInitialColumnFilters, getTableData, renderSummary } from "./utils";
 
-export const useTable = (workflow: Workflow): UseTable => {
-  const assemblies = getEntities<Assembly>("assemblies");
-
-  const data = useMemo(() => assemblies, [assemblies]);
+export const useTable = (workflow: Workflow, isEnabled: boolean): UseTable => {
+  const data = useMemo(() => getTableData(isEnabled), [isEnabled]);
 
   const columnFilters = useMemo(
     () => getInitialColumnFilters(workflow),

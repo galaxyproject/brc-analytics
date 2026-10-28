@@ -1,4 +1,3 @@
-import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { GA2_PAGE_META } from "@ga2/meta/constants";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { WorkflowsView } from "@repo/shared/views/WorkflowsView/workflowsView";
@@ -9,7 +8,7 @@ const ENTITY_LIST_TYPE = "workflows";
 
 const Page = (): JSX.Element => {
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={["organisms", ENTITY_LIST_TYPE]}>
       <WorkflowsView />
     </EntityDataGate>
   );
@@ -25,5 +24,3 @@ export const getStaticProps: GetStaticProps = () => {
 };
 
 export default Page;
-
-Page.Main = DXMain;

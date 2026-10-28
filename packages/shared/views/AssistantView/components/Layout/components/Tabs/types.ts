@@ -2,10 +2,6 @@ import type { UseLayoutTab } from "@repo/shared/views/AssistantView/components/L
 import type { LayoutTab } from "@repo/shared/views/AssistantView/components/Layout/types";
 import type { ReactNode } from "react";
 
-export interface StyledTabBarProps {
-  top: number;
-}
-
 /**
  * A column's tab.
  */
@@ -14,7 +10,7 @@ export interface Tab {
   value: LayoutTab;
 }
 
-export interface TabsProps extends StyledTabBarProps {
+export interface TabsProps {
   baseId: string;
   onTabChange: UseLayoutTab["onTabChange"];
   tabs: Tab[];

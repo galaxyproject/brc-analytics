@@ -1,19 +1,17 @@
+import { HEADER_HEIGHT_VAR } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/constants";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import { bpUpMd } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
+import { pinned } from "@databiosphere/findable-ui/lib/styles/common/mixins/pinned";
 import styled from "@emotion/styled";
 import { Tabs } from "@mui/material";
-import type { StyledTabBarProps } from "./types";
 
-// Pinned beneath the fixed header while the page scrolls the active tab, and
+// Pinned beneath the header while the page scrolls the active tab, and
 // hidden on wider screens, where the columns sit side by side.
-export const StyledTabBar = styled("div", {
-  shouldForwardProp: (prop) => prop !== "top",
-})<StyledTabBarProps>`
+export const StyledTabBar = styled("div")`
   background-color: ${PALETTE.COMMON_WHITE};
   padding: 16px;
-  position: sticky;
-  top: ${({ top }) => top}px;
+  ${pinned(HEADER_HEIGHT_VAR)};
   z-index: 1;
 
   ${bpUpMd} {

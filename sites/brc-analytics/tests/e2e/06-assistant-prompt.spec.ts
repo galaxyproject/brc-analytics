@@ -2,6 +2,8 @@ import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/co
 import { expect, test } from "./utils/fixtures";
 
 const QUESTION = "Which assemblies exist for Plasmodium falciparum?";
+const EXAMPLE_CATEGORY = "Assemblies";
+const EXAMPLE_QUESTION = "What assemblies do you have for Plasmodium vivax?";
 
 // Timeout for the assistant to render after the URL changes to it. On a loaded
 // CI runner this has taken longer than the 5s default, in Firefox especially.
@@ -41,6 +43,17 @@ test.describe("BRC Analytics - Home Assistant Prompt", () => {
     await expect(
       page.getByText(QUESTION).and(page.locator(":not(textarea)")).first()
     ).toBeVisible({ timeout: ASSISTANT_LOAD_TIMEOUT });
+  });
+
+  test("an example question opens the assistant with it", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: EXAMPLE_CATEGORY }).click();
+    await Promise.all([
+      page.waitForURL(/\/assistant/),
+      page.getByRole("menuitem", { name: EXAMPLE_QUESTION }).click(),
+    ]);
+    await expect(page.getByText(EXAMPLE_QUESTION).first()).toBeVisible();
   });
 
   test("the question doesn't linger in the URL to be asked twice", async ({

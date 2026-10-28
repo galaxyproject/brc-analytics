@@ -44,7 +44,7 @@ export const ReferenceAssemblyStep = ({
 }: StepProps): JSX.Element => {
   const assembly = useAssembly();
   const { accession } = assembly || {};
-  const { table } = useTable(workflow);
+  const { table } = useTable(workflow, !disabled);
 
   const contextValue = useMemo(
     () => ({ onConfigure, onContinue, stepKey }),
