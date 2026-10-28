@@ -27,6 +27,8 @@ title: "How Logan Search works"
 
 The threshold is the minimum fraction of the query's k-mers a run must contain to count as a hit. It runs from 0.25 to 1 and defaults to 0.5. Lower values return more runs and take longer to merge; below about a quarter the hit list is mostly noise.
 
+A longer query isn't a more specific one. The score is the fraction of the query's k-mers a run shares, so extending a query into conserved flanking sequence raises that fraction in unrelated runs too. In one test, a 2,090-base 18S query matched more runs than the 500-base window inside it. To narrow a search, raise the threshold or pick a less conserved stretch of sequence.
+
 ## Indexes and presets
 
 The archive is split into 109 indexes, each one organism group crossed with one library type: `GENOMIC_BCT` is genomic runs of bacteria, `METATRANSCRIPTOMIC_ENV` is metatranscriptomes from environmental samples, and so on. The matrix shows them all at once, organism groups down and library types across: click a cell to add or drop one index, click a row or column label to take the whole line, or drag across cells to paint several. Gaps in the grid are pairs with no index, such as environmental samples, which only have a metagenomic one. The count and sentence beside the Search button say exactly which indexes the search will cover.
