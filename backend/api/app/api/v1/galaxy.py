@@ -339,7 +339,7 @@ async def kmindex_queue(
     try:
         return await galaxy_service.get_kmindex_queue()
     except Exception as e:
-        logger.error(f"Failed to read the kmindex queue: {e}")
+        logger.exception("Failed to read the kmindex queue")
         raise HTTPException(
             status_code=502, detail="Failed to read the search queue"
         ) from e
@@ -357,7 +357,7 @@ async def kmindex_queue_history(
     try:
         return await galaxy_service.get_kmindex_queue_history(hours)
     except Exception as e:
-        logger.error(f"Failed to read the kmindex queue history: {e}")
+        logger.exception("Failed to read the kmindex queue history")
         raise HTTPException(
             status_code=502, detail="Failed to read the search queue history"
         ) from e
