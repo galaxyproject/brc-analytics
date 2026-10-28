@@ -1,139 +1,104 @@
-import { Button } from "@mui/material";
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { EXAMPLE_GENE_IDS } from "@repo/shared/services/genes/fixture";
-import { searchGenes } from "@repo/shared/services/genes/searchGenes";
-import { type GeneSearchResult } from "@repo/shared/services/genes/types";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { Fragment, type JSX, useMemo } from "react";
+import { Fragment, type JSX } from "react";
+import { GENES_BREADCRUMBS } from "./constants";
 import {
-  AliasNote,
   ContentContainer,
-  ExampleGenes,
-  NoResults,
   ResultsTable,
   SearchSection,
 } from "./genesView.styles";
 
-const BREADCRUMBS = [
-  { path: "/", text: "Home" },
-  { path: ROUTES.GENES, text: "Genes" },
-];
+interface ExampleGene {
+  geneUid: string;
+  locusTag: string;
+  note: string;
+  symbol: string | null;
+}
 
-const SUPPORTED_ID_TYPES = [
-  "NCBI gene ID (locus tag)",
-  "gene symbol",
-  "VEuPathDB ID",
-  "previous gene ID (alias)",
+// Genes of P. falciparum 3D7 (GCF_000002765.6) in the temporary gene snapshot
+// (#1904), until search (#1905) replaces this list. Gene UIDs are UUID5s of the
+// assembly accession and the gene's GFF3 row ID, so they don't change when the
+// snapshot is regenerated from the same release.
+const EXAMPLE_GENES: ExampleGene[] = [
+  {
+    geneUid: "d9049485-ed74-5455-98c2-5dc13eef544a",
+    locusTag: "PF3D7_1133400",
+    note: "Apical membrane antigen 1",
+    symbol: "AMA1",
+  },
+  {
+    geneUid: "f493ed2a-23d9-5f55-90e1-310c3680d495",
+    locusTag: "PF3D7_0831800",
+    note: "Histidine-rich protein II",
+    symbol: "HRP2",
+  },
+  {
+    geneUid: "091bb705-4cc0-5416-8f65-6711ad8248db",
+    locusTag: "PF3D7_0930300",
+    note: "Merozoite surface protein 1",
+    symbol: "MSP1",
+  },
+  {
+    geneUid: "86dfe185-cc1f-577e-991d-100ff28d1c86",
+    locusTag: "PF3D7_0304600",
+    note: "Circumsporozoite protein",
+    symbol: "CSP",
+  },
+  {
+    geneUid: "9ef15f58-60fc-5de4-98b8-7c8cb0169013",
+    locusTag: "PF3D7_0105400",
+    note: "No symbol; two transcripts and two old locus tags",
+    symbol: null,
+  },
+  {
+    geneUid: "c309de32-b052-5136-8696-0e8e599b7cef",
+    locusTag: "PF3D7_0203500",
+    note: "A tRNA, with no product and no transcript ID",
+    symbol: null,
+  },
+  {
+    geneUid: "340d7c74-6ca0-5b0d-a0ed-7d3beefb4f41",
+    locusTag: "PF3D7_0100500",
+    note: "A transcribed pseudogene",
+    symbol: null,
+  },
 ];
 
 export const GenesView = (): JSX.Element => {
-  const router = useRouter();
-  const rawQuery = typeof router.query.q === "string" ? router.query.q : "";
-  const query = rawQuery.trim();
-  const results = useMemo(() => searchGenes(query), [query]);
-
-  const handleExampleClick = (geneId: string): void => {
-    router
-      .push({ pathname: ROUTES.GENES, query: { ...router.query, q: geneId } })
-      .catch(() => undefined);
-  };
-
   return (
     <Fragment>
       <SectionHero
-        breadcrumbs={BREADCRUMBS}
+        breadcrumbs={GENES_BREADCRUMBS}
         head="Genes"
-        subHead="Search for genes across all catalog assemblies by identifier, symbol, or alias"
+        subHead="Example genes from Plasmodium falciparum 3D7 (GCF_000002765.6). Gene search is coming."
       />
       <SearchSection>
         <ContentContainer>
-          {query ? (
-            <Results query={query} results={results} />
-          ) : (
-            <ExampleGenesPanel onExampleClick={handleExampleClick} />
-          )}
+          <ResultsTable>
+            <thead>
+              <tr>
+                <th scope="col">Gene ID</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Example of</th>
+              </tr>
+            </thead>
+            <tbody>
+              {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
+                <tr key={geneUid}>
+                  <td>
+                    <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
+                      {locusTag}
+                    </Link>
+                  </td>
+                  <td>{symbol ?? "—"}</td>
+                  <td>{note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </ResultsTable>
         </ContentContainer>
       </SearchSection>
     </Fragment>
   );
 };
-
-function ExampleGenesPanel({
-  onExampleClick,
-}: {
-  onExampleClick: (geneId: string) => void;
-}): JSX.Element {
-  return (
-    <div>
-      <p>Try searching for one of these example genes:</p>
-      <ExampleGenes>
-        {EXAMPLE_GENE_IDS.map((geneId) => (
-          <Button
-            key={geneId}
-            onClick={() => onExampleClick(geneId)}
-            size="small"
-            variant="outlined"
-          >
-            {geneId}
-          </Button>
-        ))}
-      </ExampleGenes>
-    </div>
-  );
-}
-
-function Results({
-  query,
-  results,
-}: {
-  query: string;
-  results: GeneSearchResult[];
-}): JSX.Element {
-  if (results.length === 0) {
-    return (
-      <NoResults>
-        <p>No genes found for &ldquo;{query}&rdquo;.</p>
-        <p>Supported identifier types: {SUPPORTED_ID_TYPES.join(", ")}.</p>
-      </NoResults>
-    );
-  }
-
-  return (
-    <ResultsTable>
-      <thead>
-        <tr>
-          <th scope="col">Gene ID</th>
-          <th scope="col">Symbol</th>
-          <th scope="col">Product</th>
-          <th scope="col">Organism</th>
-          <th scope="col">Assembly</th>
-        </tr>
-      </thead>
-      <tbody>
-        {results.map(({ gene, matchedAlias }) => (
-          <tr key={gene.geneUid}>
-            <td>
-              <Link href={`/data/genes/detail?uid=${gene.geneUid}`}>
-                {gene.geneId}
-              </Link>
-              {matchedAlias && (
-                <>
-                  {" "}
-                  <AliasNote>
-                    matched previous ID &ldquo;{matchedAlias}&rdquo;
-                  </AliasNote>
-                </>
-              )}
-            </td>
-            <td>{gene.symbol || "—"}</td>
-            <td>{gene.product}</td>
-            <td>{gene.organism}</td>
-            <td>{gene.assemblyAccession}</td>
-          </tr>
-        ))}
-      </tbody>
-    </ResultsTable>
-  );
-}

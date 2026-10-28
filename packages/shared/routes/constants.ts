@@ -5,6 +5,7 @@ export const ROUTES = {
   CONFIGURE_ORGANISM_WORKFLOW: "/data/organisms/{entityId}/analyze/workflows",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/analyze/workflows",
   GENES: "/data/genes",
+  GENE_DETAIL: "/data/genes/detail",
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
   ORGANISM: "/data/organisms/{entityId}",

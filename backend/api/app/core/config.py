@@ -1,6 +1,7 @@
 import os
 import secrets
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
@@ -18,6 +19,10 @@ DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
 # Assistant session cookie name. Module-level constant (not env-driven)
 # so importing it doesn't drag the full Settings instantiation along.
 SESSION_COOKIE_NAME = "brc_assistant_session"
+
+DEFAULT_GENE_SNAPSHOT_PATH = (
+    Path(__file__).resolve().parents[1] / "data" / "genes" / "genes-3d7.duckdb"
+)
 
 
 class Settings:
@@ -221,6 +226,12 @@ class Settings:
 
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
+
+        # Gene snapshot the gene API reads. Defaults to the temporary 3D7 file
+        # checked in with the app (#1904); the real snapshot will be mounted.
+        self.GENE_SNAPSHOT_PATH: str = os.getenv(
+            "GENE_SNAPSHOT_PATH", str(DEFAULT_GENE_SNAPSHOT_PATH)
+        )
 
         # Where a kmindex search's full, mirror-enriched match set is written
         # so it can be downloaded afterwards. Empty path disables the export

@@ -1,0 +1,13 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+#!genome-build AaegL5.0
+#!genome-build-accession NCBI_Assembly:GCF_002204515.2
+#!annotation-source NCBI Aedes aegypti Annotation Release 101
+# Rows copied verbatim from GCF_002204515.2_AaegL5.0_genomic.gff.gz
+NC_035107.1	tRNAscan-SE	gene	59034192	59034263	.	-	.	ID=gene-Trnaa-ggc;Dbxref=GeneID:110674942;Name=Trnaa-ggc;gbkey=Gene;gene=Trnaa-ggc;gene_biotype=tRNA
+NC_035107.1	tRNAscan-SE	tRNA	59034192	59034263	.	-	.	ID=rna-Trnaa-ggc;Parent=gene-Trnaa-ggc;Dbxref=GeneID:110674942;Note=transfer RNA alanine (anticodon GGC);anticodon=(pos:complement(59034228..59034230));gbkey=tRNA;gene=Trnaa-ggc;inference=COORDINATES: profile:tRNAscan-SE:1.23;product=tRNA-Ala
+NC_035107.1	tRNAscan-SE	exon	59034192	59034263	.	-	.	ID=exon-Trnaa-ggc-1;Parent=rna-Trnaa-ggc;Dbxref=GeneID:110674942;Note=transfer RNA alanine (anticodon GGC);anticodon=(pos:complement(59034228..59034230));gbkey=tRNA;gene=Trnaa-ggc;inference=COORDINATES: profile:tRNAscan-SE:1.23;product=tRNA-Ala
+NC_035107.1	tRNAscan-SE	gene	59487046	59487117	.	+	.	ID=gene-Trnaa-ggc-2;Dbxref=GeneID:110674901;Name=Trnaa-ggc;gbkey=Gene;gene=Trnaa-ggc;gene_biotype=tRNA
+NC_035107.1	tRNAscan-SE	tRNA	59487046	59487117	.	+	.	ID=rna-Trnaa-ggc-2;Parent=gene-Trnaa-ggc-2;Dbxref=GeneID:110674901;Note=transfer RNA alanine (anticodon GGC);anticodon=(pos:59487079..59487081);gbkey=tRNA;gene=Trnaa-ggc;inference=COORDINATES: profile:tRNAscan-SE:1.23;product=tRNA-Ala
+NC_035107.1	tRNAscan-SE	exon	59487046	59487117	.	+	.	ID=exon-Trnaa-ggc-2-1;Parent=rna-Trnaa-ggc-2;Dbxref=GeneID:110674901;Note=transfer RNA alanine (anticodon GGC);anticodon=(pos:59487079..59487081);gbkey=tRNA;gene=Trnaa-ggc;inference=COORDINATES: profile:tRNAscan-SE:1.23;product=tRNA-Ala

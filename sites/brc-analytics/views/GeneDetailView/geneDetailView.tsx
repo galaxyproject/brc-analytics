@@ -1,8 +1,14 @@
+import { GENES_BREADCRUMBS } from "@brc/views/GenesView/constants";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { SectionHero } from "@repo/shared/components/layout/SectionHero/sectionHero";
 import { ROUTES } from "@repo/shared/routes/constants";
-import { type GeneRecord } from "@repo/shared/services/genes/types";
+import { geneLabel, geneSymbol } from "@repo/shared/services/genes/label";
+import {
+  type Gene,
+  type GeneLocation,
+} from "@repo/shared/services/genes/types";
+import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import Link from "next/link";
 import { Fragment, type JSX } from "react";
 import {
@@ -13,8 +19,18 @@ import {
 } from "./geneDetailView.styles";
 
 interface GeneDetailViewProps {
-  gene: GeneRecord;
+  gene: Gene;
   title: string;
+}
+
+/**
+ * Format a genome location as the stub page shows it.
+ * @param location - Genome location.
+ * @returns E.g. "NC_037282.1:1,292,966-1,296,696 (+)".
+ */
+function formatLocation(location: GeneLocation): string {
+  const { end, seqName, start, strand } = location;
+  return `${seqName}:${formatNumber(start)}-${formatNumber(end)} (${strand})`;
 }
 
 export const GeneDetailView = ({
@@ -24,37 +40,54 @@ export const GeneDetailView = ({
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
-  const breadcrumbs = [
-    { path: "/", text: "Home" },
-    { path: ROUTES.GENES, text: "Genes" },
-    { path: "", text: gene.geneId },
-  ];
+  const label = geneLabel(gene);
+  const breadcrumbs = [...GENES_BREADCRUMBS, { path: "", text: label }];
 
   return (
     <Fragment>
       <SectionHero
         breadcrumbs={breadcrumbs}
         head={title}
-        subHead={gene.product}
+        subHead={gene.product ?? undefined}
       />
       <DetailSection>
         <FieldList>
           <FieldLabel>Gene ID</FieldLabel>
-          <FieldValue>{gene.geneId}</FieldValue>
+          <FieldValue>{label}</FieldValue>
           <FieldLabel>Symbol</FieldLabel>
-          <FieldValue>{gene.symbol || "—"}</FieldValue>
+          <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
           <FieldLabel>Product</FieldLabel>
-          <FieldValue>{gene.product}</FieldValue>
+          <FieldValue>{gene.product ?? "—"}</FieldValue>
           <FieldLabel>Organism</FieldLabel>
-          <FieldValue>{gene.organism}</FieldValue>
+          <FieldValue>{gene.organism.name}</FieldValue>
           <FieldLabel>Assembly</FieldLabel>
           <FieldValue>
             <Link href={assemblyHref}>{gene.assemblyAccession}</Link>
           </FieldValue>
           <FieldLabel>Location</FieldLabel>
-          <FieldValue>{gene.location}</FieldValue>
+          <FieldValue>{formatLocation(gene.location)}</FieldValue>
         </FieldList>
       </DetailSection>
     </Fragment>
+  );
+};
+
+/**
+ * The gene page while its gene is loading, or when gene data is unavailable.
+ * @param props - Component props.
+ * @param props.message - What to tell the reader.
+ * @returns The page.
+ */
+export const GeneStatusView = ({
+  message,
+}: {
+  message: string;
+}): JSX.Element => {
+  return (
+    <SectionHero
+      breadcrumbs={GENES_BREADCRUMBS}
+      head="Gene"
+      subHead={message}
+    />
   );
 };

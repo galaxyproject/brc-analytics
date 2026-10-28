@@ -1,0 +1,15 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+#!genome-build Vbrassicaformis
+#!genome-build-accession NCBI_Assembly:GCA_001179505.1
+# Rows copied verbatim from GCA_001179505.1_Vbrassicaformis_genomic.gff.gz
+CDMY01000002.1	EMBL	gene	3437	4649	.	+	.	ID=gene-Vbra_92;Name=Vbra_92;gbkey=Gene;gene_biotype=protein_coding;locus_tag=Vbra_92
+CDMY01000002.1	EMBL	CDS	3446	3535	.	+	0	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	CDS	3608	3730	.	+	0	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	CDS	3812	3911	.	+	0	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	CDS	4016	4092	.	+	2	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	CDS	4165	4255	.	+	0	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	CDS	4332	4402	.	+	2	ID=cds-CEL91579.1;Parent=gene-Vbra_92;Dbxref=NCBI_GP:CEL91579.1;Name=CEL91579.1;gbkey=CDS;locus_tag=Vbra_92;product=CEL91579.1;protein_id=CEL91579.1
+CDMY01000002.1	EMBL	mRNA	3437	4649	.	+	.	ID=rna-Vbra_92;Parent=gene-Vbra_92;gbkey=mRNA;locus_tag=Vbra_92
+CDMY01000002.1	EMBL	exon	3437	4649	.	+	.	ID=exon-Vbra_92-1;Parent=rna-Vbra_92;gbkey=mRNA;locus_tag=Vbra_92

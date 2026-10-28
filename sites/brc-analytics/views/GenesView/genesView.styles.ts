@@ -19,12 +19,6 @@ export const ContentContainer = styled.div`
   width: 100%;
 `;
 
-export const ExampleGenes = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
 export const ResultsTable = styled.table`
   border-collapse: collapse;
   width: 100%;
@@ -41,15 +35,4 @@ export const ResultsTable = styled.table`
     font-weight: 500;
     text-transform: uppercase;
   }
-`;
-
-export const AliasNote = styled.span`
-  color: ${PALETTE.INK_LIGHT};
-  font-size: 13px;
-  font-style: italic;
-`;
-
-export const NoResults = styled.div`
-  color: ${PALETTE.INK_LIGHT};
-  padding: 24px 0;
 `;
