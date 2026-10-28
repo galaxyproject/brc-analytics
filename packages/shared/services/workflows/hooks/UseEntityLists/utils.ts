@@ -17,9 +17,9 @@ import { type EntityListsState } from "./types";
 export function combineEntityLists(
   results: UseQueryResult<null>[]
 ): EntityListsState {
-  const error = results.find((result) => result.error)?.error;
+  const failed = results.find((result) => result.isError);
   return {
-    error: error ? toDataExplorerError(error) : undefined,
+    error: failed ? toDataExplorerError(failed.error) : undefined,
     isLoaded: results.every((result) => result.isSuccess),
   };
 }
@@ -46,7 +46,9 @@ async function fetchEntityList(route: EntityRoute): Promise<null> {
  * fetched once and kept for the session: it never goes stale and is never
  * garbage collected, so returning to a page that reads it doesn't download it
  * again. A failed load isn't retried, so the page shows the error straight
- * away; it is loaded again the next time a page that reads it mounts.
+ * away. A failed list is loaded again the next time a page that reads it
+ * mounts, or, while one is showing, when the window regains focus or the
+ * network reconnects, so a page that failed while offline recovers on its own.
  * @param route - Entity list.
  * @returns Query options for the entity list.
  */

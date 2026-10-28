@@ -77,6 +77,15 @@ describe("EntityDataGate", () => {
     expect(screen.queryByText("content")).toBeNull();
   });
 
+  test("renders the error page for a load that fails with no error value", async () => {
+    loadLists({ assemblies: Promise.reject(undefined) });
+
+    renderGate(queryClient);
+
+    expect(await screen.findByText(/^error page:/)).toBeTruthy();
+    expect(screen.queryByText("content")).toBeNull();
+  });
+
   test("loads only the lists the page reads", async () => {
     loadLists({ assemblies: Promise.resolve() });
 
