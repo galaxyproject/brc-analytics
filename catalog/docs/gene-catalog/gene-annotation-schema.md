@@ -401,13 +401,13 @@ What a refresh can find, and what it does. Gene outcomes (event 8) follow from e
 
 ## Atomicity and restarts
 
-**Decided 2026-10-27: the insert-only tables are append-only Parquet files in the gene data store, committed by manifest** (see Open questions, and the contract's sections 4 and 5). There is no database server, so atomicity comes from the manifest, not from transactions.
+**Decided 2026-10-27: the insert-only tables are append-only Parquet files in the gene data store, committed by manifest** (see Open questions, and the contract's sections 4 and 5). There is no database server, so atomicity comes from the manifest, not from transactions; keys are enforced by DuckDB while the update is staged.
 
 **The atom is one update.** An update is one refresh run: `run_uid` is the update's number and `load_date` its start time. Its rows become visible only when its manifest is committed and `HEAD` moves to it, so a reader sees all of an update or none of it. Files no manifest lists are never read.
 
 **An update has two stages:**
 
-1. **Stage, locally, with nothing shared.** For each assembly: fetch and archive every file, recording its `sha256`; parse each file into a staging Parquet file named by its `sha256`; write the update's input manifest (assembly → the exact file versions it uses). Then compute the update's new rows, one Parquet file per table, sorted by assembly, and run the checks. Running this twice is harmless: a file named by its `sha256` is parsed once.
+1. **Stage, locally, with nothing shared.** For each assembly: fetch and archive every file, recording its `sha256`; parse each file into a staging Parquet file named by its `sha256`; write the update's input manifest (assembly → the exact file versions it uses). Then insert the update's new rows into a local DuckDB file loaded with the head's rows, whose tables declare their primary and foreign keys, so DuckDB rejects a duplicate key or a reference that doesn't resolve. Each assembly's rows go in as one transaction, so a rejected insert holds back that assembly, like a failed check. Run the checks, then write the new rows out, one Parquet file per table, sorted by assembly. Running this twice is harmless: a file named by its `sha256` is parsed once.
 2. **Commit.** Upload the table files, then the manifest, then move `HEAD` to the update, only if `HEAD` still names its predecessor; otherwise the update is refused and staged again from the new head.
 
 **The unit of consistency inside an update is still one assembly,** or a GCA and GCF together when NCBI pairs them as identical: gene regrouping (event 8) needs every publisher's records for an assembly at once, and nothing needs more than one. An assembly that fails a check writes no rows in the update and keeps its previous state; the manifest lists it as held back.
@@ -422,7 +422,7 @@ What a refresh can find, and what it does. Gene outcomes (event 8) follow from e
 
 ## Tables
 
-Draft: revisit once the entities and events above are agreed. Each hub never changes; its satellites only get new rows. Every row records the refresh run that wrote it: `run_uid`, or `load_date` (the run's `started_at`) on satellites keyed by load date. A run is an update in the contract's terms, and since the tables are Parquet files committed by manifest (see Atomicity and restarts), `refresh_run`, `refresh_run_end` and `assembly_load` below are kept in the update's manifest rather than as tables; the DDL is written as tables for readability, and `PK` and `FK` are enforced by the update's checks, not by a database.
+Draft: revisit once the entities and events above are agreed. Each hub never changes; its satellites only get new rows. Every row records the refresh run that wrote it: `run_uid`, or `load_date` (the run's `started_at`) on satellites keyed by load date. A run is an update in the contract's terms, and since the tables are Parquet files committed by manifest (see Atomicity and restarts), `refresh_run`, `refresh_run_end` and `assembly_load` below are kept in the update's manifest rather than as tables; the DDL is written as tables for readability, and `PK` and `FK` are declared in the update's local DuckDB file, which enforces them as rows are inserted.
 
 ```
 refresh_run                  one row per refresh, written when it starts
@@ -565,6 +565,9 @@ annotation_file_version      one row each time the slot's bytes change (a revert
   version               PK   cited; sha256 is the exact file's name
   sha256                     computed when we download
   md5                        what launches send Galaxy: UCSC's md5sum.txt, NCBI's md5checksums.txt; computed otherwise
+  sha256_uncompressed, md5_uncompressed
+                             of the uncompressed bytes, when the file is gzipped; all four are computed by BRC
+                             from its own copy, and a run's md5 is matched against md5 and md5_uncompressed
   size, last_modified        from the server; the monthly check reads md5sum.txt (UCSC) and annotation_hashes.txt (NCBI) first, HEAD otherwise
   core_hash, gene_core_hash, content_hash
                              this version's own; a UCSC copy's content hash never matches its original's
@@ -742,7 +745,7 @@ Rebuilt after each refresh into the gene page snapshot (see Open questions: Proj
 - [x] **Projection storage.** **Decided 2026-10-26:** the projections ship as one DuckDB snapshot file per build, following #1783 (gene catalog: serving architecture) and [gene-catalog-contract.md](gene-catalog-contract.md) section 5, with no Postgres views or tables. Where this doc says the projections are Parquet exports, read: the tables in that snapshot. Snapshots are kept for rollback, and they are the exact copy of what the site served (use case 5). SQL views over the insert-only tables stay for ad hoc history questions only.
 - [x] **Where do the insert-only tables live?** **Decided 2026-10-27: append-only Parquet files in the gene data store (an S3 bucket to start), committed by manifest, with no database server** (the contract's sections 4 and 5). This reverses the earlier lean towards Postgres with Alembic. The writes are batches, not transactions from many users: each update is built and checked on a developer machine before anything is shared, so what a database server adds is either not needed or done another way:
   - **Migrations:** files are never edited. A new column or table needs no rewrite (older files read with it empty); a restructure is a migration update that writes the rows in the new layout as new files, keeping the old ones. Snapshots built before and after a migration must be identical.
-  - **Keys:** primary keys, uniqueness and references are checked by every update before it commits, and a failure stops the commit.
+  - **Keys:** DuckDB enforces them. Each update is staged in a local DuckDB file whose tables declare their primary and foreign keys, so a duplicate key or a reference that doesn't resolve fails the insert, and Parquet is written only from that file. Checks cover what constraints can't, such as no `gene_uid` lost. (Parquet itself carries no constraints, and DuckLake doesn't support primary or foreign keys.)
   - **Durability:** a versioned bucket with object lock, and a copy in a second account after each commit. Because files never change, copying is just adding new ones.
   - **What it saves:** no database server to run, back up, migrate in place or make reachable from the build, and nothing stateful on the live server; the build and its debugging run locally against the same files.
   - Still to decide: DuckLake or our own manifests (the contract's open decisions).
