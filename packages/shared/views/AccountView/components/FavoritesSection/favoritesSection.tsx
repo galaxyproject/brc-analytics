@@ -6,6 +6,7 @@ import {
   useFavorites,
 } from "@repo/shared/providers/favorites/provider";
 import type { FavoriteEntityType } from "@repo/shared/providers/favorites/types";
+import { useEntityLists } from "@repo/shared/services/workflows/hooks/UseEntityLists/hook";
 import { AccountCard } from "@repo/shared/views/AccountView/components/AccountCard/accountCard";
 import { AccountSection } from "@repo/shared/views/AccountView/components/AccountSection/accountSection";
 import Link from "next/link";
@@ -25,13 +26,17 @@ export function FavoritesSection({ entityType }: Props): JSX.Element {
   // AccountSection's own error prop (that would render a second alert here).
   const { error, favorites, isLoading, toggleFavorite, togglingKeys } =
     useFavorites();
-  const { emptyState, route, sectionId, title } =
+  const { emptyState, labelRoutes, route, sectionId, title } =
     ENTITY_TYPE_DISPLAY[entityType];
 
   const items = useMemo(
     () => favorites.filter((favorite) => favorite.entity_type === entityType),
     [entityType, favorites]
   );
+
+  // Loads the lists the labels read, only when there is something to label;
+  // until they arrive, a favorite is labelled with its id.
+  useEntityLists(items.length > 0 ? labelRoutes : []);
 
   return (
     <AccountSection

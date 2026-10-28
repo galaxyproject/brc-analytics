@@ -1,46 +1,28 @@
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
 import { type ReactNode } from "react";
 
-interface BaseProps {
+export interface Props {
   children: ReactNode;
   fallback: ReactNode;
+  isWorkflowAvailable: WorkflowAvailability;
   trsId: string;
 }
 
 /**
- * Props for a page that configures a workflow for an entity, so its check
- * always receives the entity ID.
+ * Determines whether a workflow is one an entity's listing offers.
  */
-export interface EntityProps extends BaseProps {
-  entityId: string;
-  isWorkflowAvailable: EntityWorkflowAvailability;
-}
-
-/**
- * Props for a page with no entity, whose check reads the TRS ID alone.
- */
-export interface ListedProps extends BaseProps {
-  entityId?: never;
-  isWorkflowAvailable: ListedWorkflowAvailability;
-}
-
-/**
- * Determines whether the TRS ID from a URL names a workflow the entity's page
- * may open.
- */
-export type EntityWorkflowAvailability = (
-  trsId: string,
-  workflowGates: WorkflowGates,
-  entityId: string
-) => boolean;
-
-/**
- * Determines whether the TRS ID from a URL names a workflow a page with no
- * entity may open.
- */
-export type ListedWorkflowAvailability = (
-  trsId: string,
+export type EntityWorkflowListing<T> = (
+  workflow: Workflow,
+  entity: T,
+  allWorkflowCategories: WorkflowCategory[],
   workflowGates: WorkflowGates
 ) => boolean;
 
-export type Props = EntityProps | ListedProps;
+/**
+ * Determines whether the TRS ID from a URL names a workflow the page may open.
+ */
+export type WorkflowAvailability = (
+  trsId: string,
+  workflowGates: WorkflowGates
+) => boolean;

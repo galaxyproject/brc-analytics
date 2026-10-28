@@ -6,17 +6,6 @@ import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { findEntities, findEntity, getEntities, getEntity } from "./query";
 
 /**
- * Finds an assembly by entity id, returning undefined when there is no match.
- * @param entityId - Entity id.
- * @returns Assembly, or undefined when not found.
- */
-export function findAssembly<T extends AssemblyContract>(
-  entityId: string
-): T | undefined {
-  return findEntity<T>("assemblies", entityId);
-}
-
-/**
  * Finds an organism by entity id, returning undefined when there is no match.
  * @param entityId - Entity id.
  * @returns Organism, or undefined when not found.

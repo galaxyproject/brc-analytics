@@ -20,7 +20,7 @@ export const genomeEntityConfig: AppEntityConfig<GA2AssemblyEntity> = {
   },
   detail: {
     detailOverviews: [],
-    staticLoad: false,
+    staticLoad: true,
     tabs: [],
   },
   exploreMode: EXPLORE_MODE.CS_FETCH_CS_FILTERING,

@@ -6,6 +6,7 @@ import { type PageMeta } from "@repo/shared/meta/types";
 import { makeEntitiesStaticPaths } from "@repo/shared/services/staticGeneration/entities/staticPaths";
 import { makeEntitiesStaticProps } from "@repo/shared/services/staticGeneration/entities/staticProps";
 import { type EntitiesPageProps } from "@repo/shared/services/staticGeneration/entities/types";
+import { isEntityRoute } from "@repo/shared/services/workflows/loader";
 import { EntitiesView } from "@repo/shared/views/EntitiesView/entitiesView";
 import { type JSX } from "react";
 
@@ -15,10 +16,10 @@ const ENTITY_LIST_META: Record<string, PageMeta> = {
 };
 
 const Page = ({ entityListType, ...props }: EntitiesPageProps): JSX.Element => {
-  if (!entityListType) return <></>;
+  if (!entityListType || !isEntityRoute(entityListType)) return <></>;
 
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={[entityListType]}>
       <EntitiesView entityListType={entityListType} {...props} />
     </EntityDataGate>
   );

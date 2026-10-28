@@ -8,17 +8,16 @@ import type {
   AssemblyContract,
   OrganismContract,
 } from "@repo/shared/apis/types";
-import type { EntityWorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
+import type { WorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
 import {
-  isAssemblyWorkflowAvailable,
+  getAssemblyWorkflowAvailability,
+  getOrganismWorkflowAvailability,
   isListedWorkflowAvailable,
-  isOrganismWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
 import {
   getEntitiesById,
   getEntitiesByType,
-  setEntitiesById,
 } from "@repo/shared/services/workflows/store";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
@@ -39,9 +38,6 @@ jest.mock(
   () => ({ useFeatureFlag: (): boolean => mockUseFeatureFlag() })
 );
 
-const ASSEMBLY_ID = "GCF_000000001_1";
-const CACHED_ASSEMBLY_ID = "GCF_000000002_1";
-const ORGANISM_ID = "999";
 const TAXONOMY_ID = "999";
 
 const ASSEMBLY_TRS_ID =
@@ -88,17 +84,17 @@ function renderDetailGate(trsId: string): void {
 /**
  * Renders the gate for the given URL TRS ID.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
- * @param isWorkflowAvailable - The page's availability check.
- * @param entityId - ID of the entity the page configures a workflow for.
+ * @param isWorkflowAvailable - The page's availability check; defaults to the
+ * assembly configure page's, for an assembly with no datacache.
  */
 function renderGate(
   trsId: string,
-  isWorkflowAvailable: EntityWorkflowAvailability = isAssemblyWorkflowAvailable,
-  entityId = ASSEMBLY_ID
+  isWorkflowAvailable: WorkflowAvailability = getAssemblyWorkflowAvailability(
+    buildAssembly(null)
+  )
 ): void {
   render(
     <WorkflowGate
-      entityId={entityId}
       fallback={<div>not found</div>}
       isWorkflowAvailable={isWorkflowAvailable}
       trsId={trsId}
@@ -113,7 +109,12 @@ function renderGate(
  * @param trsId - Workflow TRS ID, as it appears in the URL.
  */
 function renderOrganismGate(trsId: string): void {
-  renderGate(trsId, isOrganismWorkflowAvailable, ORGANISM_ID);
+  renderGate(
+    trsId,
+    getOrganismWorkflowAvailability({
+      genomes: [{ lineageTaxonomyIds: ["1", TAXONOMY_ID] }],
+    } as OrganismContract)
+  );
 }
 
 /**
@@ -172,24 +173,6 @@ describe("WorkflowGate", () => {
       ],
       [DIFFERENTIAL_EXPRESSION_ANALYSIS, LOGAN_SEARCH]
     );
-    setEntitiesById(
-      "assemblies",
-      new Map([
-        [ASSEMBLY_ID, buildAssembly(null)],
-        [CACHED_ASSEMBLY_ID, buildAssembly("https://datacache.example")],
-      ])
-    );
-    setEntitiesById(
-      "organisms",
-      new Map<string, OrganismContract>([
-        [
-          ORGANISM_ID,
-          {
-            genomes: [{ lineageTaxonomyIds: ["1", TAXONOMY_ID] }],
-          } as OrganismContract,
-        ],
-      ])
-    );
   });
 
   describe("on the assembly configure page", () => {
@@ -245,8 +228,9 @@ describe("WorkflowGate", () => {
     test("renders children for an assembly-ID workflow on an assembly with a datacache", () => {
       renderGate(
         formatTrsId(NEEDS_DATACACHE_TRS_ID),
-        isAssemblyWorkflowAvailable,
-        CACHED_ASSEMBLY_ID
+        getAssemblyWorkflowAvailability(
+          buildAssembly("https://datacache.example")
+        )
       );
       expectContent();
     });
@@ -260,15 +244,6 @@ describe("WorkflowGate", () => {
       // Logan Search is configured on its own page, never here.
       mockUseFeatureFlag.mockReturnValue(true);
       renderGate(formatTrsId(LOGAN_SEARCH.trsId));
-      expectFallback();
-    });
-
-    test("renders the fallback for an unknown assembly", () => {
-      renderGate(
-        formatTrsId(UNGATED_TRS_ID),
-        isAssemblyWorkflowAvailable,
-        "unknown-assembly"
-      );
       expectFallback();
     });
 
@@ -320,15 +295,6 @@ describe("WorkflowGate", () => {
 
     test("renders the fallback for a workflow outside the organism's taxon", () => {
       renderOrganismGate(formatTrsId(OFF_TAXON_ORGANISM_TRS_ID));
-      expectFallback();
-    });
-
-    test("renders the fallback for an unknown organism", () => {
-      renderGate(
-        formatTrsId(ORGANISM_TRS_ID),
-        isOrganismWorkflowAvailable,
-        "unknown-organism"
-      );
       expectFallback();
     });
   });

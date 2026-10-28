@@ -13,14 +13,6 @@ import { useMemo, type JSX } from "react";
 
 setFeatureFlags([FEATURE_FLAGS.LOGAN_FILTERS]);
 
-/**
- * The site has no catalog, so there is nothing to load before a page renders.
- * @returns a resolved promise.
- */
-function ensureEntitiesLoaded(): Promise<void> {
-  return Promise.resolve();
-}
-
 function MyApp(props: AppPropsWithComponent): JSX.Element {
   // Read after mount, so the static render and the first client render both
   // leave My searches out of the header.
@@ -36,7 +28,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
       appTheme={createLoganTheme(props.pageProps.themeOptions)}
       defaultDescription={LOGAN_DEFAULT_DESCRIPTION}
       defaultEntityListType=""
-      ensureEntitiesLoaded={ensureEntitiesLoaded}
     />
   );
 }

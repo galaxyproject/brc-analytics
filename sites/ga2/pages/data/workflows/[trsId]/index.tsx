@@ -23,7 +23,7 @@ import { type JSX } from "react";
  */
 const Page = (props: WorkflowPageProps): JSX.Element => {
   return (
-    <EntityDataGate>
+    <EntityDataGate routes={["assemblies", "organisms", "workflows"]}>
       <WorkflowGate
         fallback={<WorkflowNotFound href={ROUTES.WORKFLOWS} />}
         isWorkflowAvailable={isListedWorkflowAvailable}
