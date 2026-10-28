@@ -2,13 +2,12 @@ import {
   BREAKPOINT_FN_NAME,
   useBreakpointHelper,
 } from "@databiosphere/findable-ui/lib/hooks/useBreakpointHelper";
-import { useLayoutSpacing } from "@databiosphere/findable-ui/lib/hooks/UseLayoutSpacing/hook";
 import { type JSX, useId } from "react";
 import { Chat } from "./components/Chat/chat";
 import { History } from "./components/History/history";
 import { Setup } from "./components/Setup/setup";
 import { Tabs } from "./components/Tabs/tabs";
-import { DEFAULT_HEIGHT, LAYOUT_TAB } from "./constants";
+import { LAYOUT_TAB } from "./constants";
 import { SelectTabContext } from "./context";
 import { useLayoutTab } from "./hooks/UseLayoutTab/hook";
 import { StyledLayout } from "./layout.styles";
@@ -33,23 +32,20 @@ export const Layout = ({
   conversationKey,
   slotProps,
 }: LayoutProps): JSX.Element => {
-  const { spacing } = useLayoutSpacing();
   const isTabbed = useBreakpointHelper(BREAKPOINT_FN_NAME.DOWN, "md");
   const baseId = useId();
   const { onSelectTab, onTabChange, tab } = useLayoutTab(
     conversationKey,
     baseId
   );
-  const top = spacing.top || DEFAULT_HEIGHT.TOP;
 
   return (
     <SelectTabContext.Provider value={onSelectTab}>
-      <StyledLayout bottom={spacing.bottom || DEFAULT_HEIGHT.BOTTOM} top={top}>
+      <StyledLayout>
         <Tabs
           baseId={baseId}
           onTabChange={onTabChange}
           tabs={buildTabs(slotProps)}
-          top={top}
           value={tab}
         />
         <History

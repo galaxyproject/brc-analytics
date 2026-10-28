@@ -1,15 +1,16 @@
 import { Title } from "@databiosphere/findable-ui/lib/components/Index/components/EntityView/components/layout/Title/title";
-import { StyledGridEntityView } from "@databiosphere/findable-ui/lib/components/Index/indexView.styles";
 import {
   bpDownSm,
   bpUpSm,
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 
-export const StyledGrid = styled(StyledGridEntityView)`
+export const StyledGrid = styled("div")`
+  align-content: flex-start;
+  display: grid;
+  flex: 1;
   grid-template-columns: 1fr;
-  max-height: unset; /* remove the max-height limitation inherited from StyledGridEntityView */
-  overflow: unset; /* remove the overflow limitation inherited from StyledGridEntityView */
+  min-width: 0;
   padding-bottom: 24px;
 
   ${bpUpSm} {

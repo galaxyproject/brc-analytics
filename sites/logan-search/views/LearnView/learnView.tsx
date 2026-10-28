@@ -2,7 +2,7 @@ import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/co
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
 import { LoganHero } from "@logan/components/layout/LoganHero/loganHero";
 import { type Props } from "@repo/shared/views/docs/ContentView/types";
-import { Content } from "@repo/shared/views/docs/components/Content/content";
+import { StyledContent } from "@repo/shared/views/docs/components/Content/content.styles";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
 import { MDXRemote } from "next-mdx-remote";
 import { Fragment, type JSX } from "react";
@@ -29,9 +29,9 @@ export const LearnView = ({
       <LoganHero breadcrumbs={breadcrumbs} head={title} variant="article" />
       <SectionContent
         content={
-          <Content>
+          <StyledContent>
             <MDXRemote {...mdxSource} components={components} />
-          </Content>
+          </StyledContent>
         }
         frontmatter={frontmatter}
         outline={

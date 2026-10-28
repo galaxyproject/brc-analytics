@@ -1,6 +1,5 @@
 import { config } from "@brc/config/config";
 import { BRC_PAGE_META } from "@brc/meta/constants";
-import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main.styles";
 import { EntityDataGate } from "@repo/shared/components/EntityDataGate/entityDataGate";
 import { type PageMeta } from "@repo/shared/meta/types";
 import { makeEntitiesStaticPaths } from "@repo/shared/services/staticGeneration/entities/staticPaths";
@@ -36,5 +35,3 @@ export const getStaticPaths = makeEntitiesStaticPaths(
 export const getStaticProps = makeEntitiesStaticProps(ENTITY_LIST_META);
 
 export default Page;
-
-Page.Main = DXMain;

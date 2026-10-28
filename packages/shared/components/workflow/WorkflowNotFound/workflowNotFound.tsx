@@ -11,7 +11,6 @@ import {
   SectionContent,
   Error as StyledError,
 } from "@databiosphere/findable-ui/lib/components/Error/error.styles";
-import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Typography } from "@mui/material";
 import Link from "next/link";
@@ -32,9 +31,8 @@ export const WorkflowNotFound = ({
   entityContext,
   href,
 }: Props): JSX.Element => {
-  const { dimensions } = useLayoutDimensions();
   return (
-    <ErrorLayout offset={dimensions.header.height}>
+    <ErrorLayout>
       <StyledError>
         <ErrorSection>
           <StatusIcon priority={PRIORITY.MEDIUM} StatusIcon={AlertIcon} />
