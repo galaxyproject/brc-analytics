@@ -252,6 +252,10 @@ CDS_A = "NC_1.1\tRefSeq\tCDS\t1\t90\t.\t+\t0\tID=cds-A;Parent=rna-A"
         ([GENE_A + ";pseudo", MRNA_A], "attribute without a value"),
         ([GENE_A + ";locus_tag=B", MRNA_A], "attribute given twice"),
         (
+            [GENE_A, MRNA_A, CDS_A + ";protein_id=XP_1.1,XP_2.1"],
+            "more than one value: protein_id",
+        ),
+        (
             [GENE_A, GENE_A.replace("locus_tag=A", "locus_tag=B"), MRNA_A],
             "rows give different attributes",
         ),

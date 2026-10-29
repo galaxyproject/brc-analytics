@@ -111,9 +111,17 @@ def _parse_attributes(text: str) -> Dict[str, List[str]]:
     return attributes
 
 
-def _first(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
+def one_value(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
+    """An attribute read as one value: None if absent, an error if it has several.
+
+    Parent, Dbxref and old_locus_tag are lists, and are read as lists.
+    """
     values = attributes.get(key)
-    return values[0] if values else None
+    if not values:
+        return None
+    if len(values) > 1:
+        raise ValueError(f"An attribute with more than one value: {key}={values}")
+    return values[0]
 
 
 # A CDS row's protein_id and product.
@@ -148,8 +156,8 @@ def read_header_line(line: str, header: Header) -> None:
 
 
 def _new_gene(row_id: str, attributes: Dict[str, List[str]], location: Location):
-    locus_tag = _first(attributes, "locus_tag")
-    name = _first(attributes, "Name")
+    locus_tag = one_value(attributes, "locus_tag")
+    name = one_value(attributes, "Name")
     if locus_tag is None and name is None:
         raise ValueError(f"Gene row {row_id} has no locus_tag or Name")
     ncbi_gene_id = next(
@@ -164,8 +172,8 @@ def _new_gene(row_id: str, attributes: Dict[str, List[str]], location: Location)
         row_id=row_id,
         locus_tag=locus_tag,
         name=name,
-        symbol=_first(attributes, "gene"),
-        biotype=_first(attributes, "gene_biotype"),
+        symbol=one_value(attributes, "gene"),
+        biotype=one_value(attributes, "gene_biotype"),
         location=location,
         ncbi_gene_id=ncbi_gene_id,
         # NCBI encodes the commas between old locus tags (`%2C`), so they
@@ -205,7 +213,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
         if strand not in ("+", "-"):
             raise ValueError(f"A row whose strand isn't + or -: {line}")
         attributes = _parse_attributes(attribute_text)
-        row_id = _first(attributes, "ID")
+        row_id = one_value(attributes, "ID")
         if row_id:
             row_ids.add(row_id)
         location = Location(seq_name, int(start), int(end), strand)
@@ -255,16 +263,19 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                     raise ValueError(f"Transcript {row_id} is written as several rows")
                 transcripts[row_id] = Transcript(
                     row_id=row_id,
-                    transcript_id=_first(attributes, "transcript_id"),
+                    transcript_id=one_value(attributes, "transcript_id"),
                     biotype=row_type,
                     location=location,
-                    transcript_product=_first(attributes, "product"),
-                    orig_transcript_id=_first(attributes, "orig_transcript_id"),
+                    transcript_product=one_value(attributes, "product"),
+                    orig_transcript_id=one_value(attributes, "orig_transcript_id"),
                 )
                 gene.transcripts.append(transcripts[row_id])
             elif row_type == "CDS" and parent in transcripts:
                 cds.setdefault(parent, set()).add(
-                    (_first(attributes, "protein_id"), _first(attributes, "product"))
+                    (
+                        one_value(attributes, "protein_id"),
+                        one_value(attributes, "product"),
+                    )
                 )
 
     if not genes:

@@ -95,6 +95,14 @@ def test_gtf_cds_rows_naming_different_proteins_fail():
         read_ncbi_gtf([*gtf.splitlines(keepends=True), changed + "\n"])
 
 
+def test_gtf_attribute_given_twice_fails():
+    gtf = (CASES / "pfalciparum_3d7.gtf").read_text(encoding="utf-8")
+    first_cds = next(line for line in gtf.splitlines() if "\tCDS\t" in line)
+    changed = first_cds + ' protein_id "XP_WRONG.1";'
+    with pytest.raises(ValueError, match="more than one value: protein_id"):
+        read_ncbi_gtf([*gtf.splitlines(keepends=True), changed + "\n"])
+
+
 def test_main_reports_a_gff3_the_reader_refuses(capsys):
     name = CASES / "giardia_gene_on_two_strands"
     assert main([f"{name}.gff3", "--gtf", f"{name}.gtf"]) == 2

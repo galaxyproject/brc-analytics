@@ -36,6 +36,7 @@ from .ncbi_gff3 import (
     Location,
     Transcript,
     one_cds_pair,
+    one_value,
     read_header_line,
     read_ncbi_gff3,
 )
@@ -86,11 +87,6 @@ def _gtf_attributes(text: str) -> Dict[str, List[str]]:
     return attributes
 
 
-def _first(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
-    values = attributes.get(key)
-    return values[0] if values else None
-
-
 def read_ncbi_gtf(lines: Iterable[str]) -> GtfAnnotation:
     """Read an NCBI GTF's header, genes and transcripts, in file order."""
     header = Header()
@@ -108,7 +104,9 @@ def read_ncbi_gtf(lines: Iterable[str]) -> GtfAnnotation:
             raise ValueError(f"A GTF row without 9 columns: {raw.rstrip()}")
         seq_name, _, row_type, start, end, _, strand, _, text = columns
         attributes = _gtf_attributes(text)
-        gene_id = attributes["gene_id"][0]
+        gene_id = one_value(attributes, "gene_id")
+        if gene_id is None:
+            raise ValueError(f"A GTF row without a gene_id: {raw.rstrip()}")
         location = Location(seq_name, int(start), int(end), strand)
         gene = genes.get(gene_id)
         if row_type == "gene":
@@ -120,18 +118,20 @@ def read_ncbi_gtf(lines: Iterable[str]) -> GtfAnnotation:
             continue
         if gene is None:
             raise ValueError(f"GTF row for {gene_id} comes before its gene row")
-        transcript_id = attributes["transcript_id"][0]
+        transcript_id = one_value(attributes, "transcript_id")
+        if transcript_id is None:
+            raise ValueError(f"A GTF row without a transcript_id: {raw.rstrip()}")
         transcript = gene.transcripts.setdefault(
             transcript_id, GtfTranscript(transcript_id)
         )
-        product = _first(attributes, "product")
+        product = one_value(attributes, "product")
         if row_type == "transcript":
-            transcript.biotype = _first(attributes, "transcript_biotype")
+            transcript.biotype = one_value(attributes, "transcript_biotype")
             transcript.location = location
             transcript.transcript_product = transcript.transcript_product or product
         elif row_type == "CDS":
             cds[(gene_id, transcript_id)].add(
-                (_first(attributes, "protein_id"), product)
+                (one_value(attributes, "protein_id"), product)
             )
     for (gene_id, transcript_id), pairs in cds.items():
         transcript = genes[gene_id].transcripts[transcript_id]
@@ -162,10 +162,10 @@ def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
         None,
     )
     return {
-        "locus_tag": _first(attributes, "locus_tag"),
-        "symbol": _first(attributes, "gene"),
+        "locus_tag": one_value(attributes, "locus_tag"),
+        "symbol": one_value(attributes, "gene"),
         "ncbi_gene_id": ncbi_gene_id,
-        "biotype": _first(attributes, "gene_biotype"),
+        "biotype": one_value(attributes, "gene_biotype"),
         "old_locus_tags": [
             tag
             for value in attributes.get("old_locus_tag", [])
