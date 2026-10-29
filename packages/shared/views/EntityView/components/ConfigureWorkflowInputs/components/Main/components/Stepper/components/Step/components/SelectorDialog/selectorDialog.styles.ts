@@ -32,5 +32,9 @@ export const StyledDialog = styled(Dialog)`
       grid-template-columns: 264px 1fr;
       padding: 0;
     }
+
+    .MuiDialogActions-root {
+      background-color: ${PALETTE.COMMON_WHITE};
+    }
   }
 `;

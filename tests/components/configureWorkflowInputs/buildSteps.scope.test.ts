@@ -5,6 +5,7 @@ jest.mock(
     STEP: {
       ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
+      FASTA_COLLECTION: { key: "fastaCollection" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
       SANGER_READ_RUN_FORWARD_FILE: { key: "readRunPairedFile" },
       SANGER_READ_RUN_PAIRED: { key: "SANGER_READ_RUN_PAIRED" },
@@ -108,6 +109,57 @@ describe("buildSteps - scope handling", () => {
       const steps = buildSteps(workflow);
 
       expect(steps.map((s) => s.key)).toEqual(["SANGER_READ_RUN_PAIRED"]);
+    });
+
+    test("returns the assemblies step for ORGANISM scope workflow with a FASTA collection parameter", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        assemblyCountMax: null,
+        assemblyCountMin: 2,
+        parameters: [
+          {
+            key: "Reference genome",
+            variable: WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL,
+          },
+          {
+            key: "Gene model",
+            variable: WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
+          },
+          {
+            key: "Unaligned sequences",
+            variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual(["fastaCollection"]);
+    });
+
+    test("orders the assemblies step before the sequencing steps", () => {
+      const workflow: Workflow = {
+        ...BASE_WORKFLOW,
+        parameters: [
+          {
+            key: "Sequenced paired-end data",
+            variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+          },
+          {
+            key: "Unaligned sequences",
+            variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+          },
+        ],
+        scope: WORKFLOW_SCOPE.ORGANISM,
+      };
+
+      const steps = buildSteps(workflow);
+
+      expect(steps.map((s) => s.key)).toEqual([
+        "fastaCollection",
+        "SANGER_READ_RUN_PAIRED",
+      ]);
     });
 
     test("returns empty steps for ORGANISM scope workflow with no read parameters", () => {

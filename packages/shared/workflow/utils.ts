@@ -33,6 +33,20 @@ export function formatTrsId(trsId: string): string {
 }
 
 /**
+ * Returns the smallest number of assemblies a workflow that takes assemblies
+ * runs with: its minimum, and never fewer than one. Unlike
+ * workflowMeetsAssemblyMinimum, where a minimum of 0 means no requirement, an
+ * assembly input with no assemblies can't run, so it needs at least one.
+ * @param workflow - Workflow.
+ * @returns The required number of assemblies.
+ */
+export function getRequiredAssemblyCount(
+  workflow: Pick<Workflow, "assemblyCountMin">
+): number {
+  return Math.max(workflow.assemblyCountMin, 1);
+}
+
+/**
  * Resolves the selected workflow TRS ID from a router query, treating an empty
  * value as absent.
  * @param query - Router query.
@@ -115,6 +129,20 @@ export function workflowPloidyMatchesOrganismPloidy(
 }
 
 /**
+ * Determines whether a workflow's maximum assembly limit has been reached by
+ * the given number of selected assemblies.
+ * @param assemblyCountMax - Maximum assemblies allowed (null = no limit).
+ * @param selectedAssemblyCount - Number of assemblies selected.
+ * @returns True if no further assembly can be selected.
+ */
+export function workflowReachesAssemblyMaximum(
+  assemblyCountMax: number | null,
+  selectedAssemblyCount: number
+): boolean {
+  return assemblyCountMax !== null && selectedAssemblyCount >= assemblyCountMax;
+}
+
+/**
  * Checks if a workflow requires the ASSEMBLY_ID parameter.
  * Workflows with ASSEMBLY_ID depend on Galaxy having pre-built indexes (dbkey) for the assembly.
  * @param workflow - The workflow to check.
@@ -123,5 +151,16 @@ export function workflowPloidyMatchesOrganismPloidy(
 export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
   return workflow.parameters.some(
     (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
+  );
+}
+
+/**
+ * Checks if a workflow requires the FASTA_COLLECTION parameter.
+ * @param workflow - The workflow to check.
+ * @returns True if the workflow has a parameter with FASTA_COLLECTION variable, false otherwise.
+ */
+export function workflowRequiresFastaCollection(workflow: Workflow): boolean {
+  return workflow.parameters.some(
+    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION
   );
 }
