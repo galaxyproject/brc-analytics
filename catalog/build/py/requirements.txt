@@ -8,7 +8,7 @@ babel==2.18.0
 beautifulsoup4==4.13.3
 build==1.5.0
 CacheControl==0.14.4
-certifi==2024.8.30
+certifi==2026.10.23
 cffi==2.0.0
 CFGraph==0.2.1
 chardet==5.2.0
@@ -77,7 +77,7 @@ MarkupSafe==3.0.2
 mashumaro==3.14
 mdurl==0.1.2
 more-itertools==10.8.0
-msgpack==1.2.1
+msgpack==1.2.4
 mypy==1.19.1
 mypy_extensions==1.1.0
 networkx==3.6.1
