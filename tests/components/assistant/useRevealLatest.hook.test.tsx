@@ -183,11 +183,14 @@ describe("useRevealLatest", () => {
       />,
       { wrapper }
     );
-    // Other parts of the chat may observe their own size; this hook's observer
-    // is the one that reveals the end.
+    // Other parts of the chat may observe their own size, and read the entry's
+    // size; this hook's observer is the one that reveals the end.
+    const entry = {
+      borderBoxSize: [{ blockSize: 0, inlineSize: 0 }],
+    } as unknown as ResizeObserverEntry;
     const revealing = observers.find(({ callback }) => {
       scrollIntoView.mockClear();
-      callback([], {} as unknown as ResizeObserver);
+      act(() => callback([entry], {} as unknown as ResizeObserver));
       return scrollIntoView.mock.calls.length > 0;
     });
     const observed: Element = revealing?.observe.mock.calls[0][0];
