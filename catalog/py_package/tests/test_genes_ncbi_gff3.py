@@ -273,10 +273,30 @@ CDS_A = "NC_1.1\tRefSeq\tCDS\t1\t90\t.\t+\t0\tID=cds-A;Parent=rna-A"
             [GENE_A, MRNA_A, CDS_A + ";product=one", CDS_A + ";product=two"],
             "CDS rows name different products",
         ),
-        ([GENE_A + ";Name=B", MRNA_A], "neither its symbol nor its locus tag"),
-        ([GENE_A + ";Name=A;gene=sym", MRNA_A], "neither its symbol nor its locus tag"),
+        ([GENE_A, MRNA_A.replace("\t+\t", "\t-\t")], "outside its gene"),
+        ([GENE_A], "has no transcript rows"),
+        (
+            [
+                GENE_A,
+                MRNA_A,
+                "NC_1.1\tRefSeq\ttRNA\t1\t90\t.\t+\t.\tID=rna-B;Parent=gene-A,rna-A",
+            ],
+            "more than one gene parent",
+        ),
+        ([GENE_A + ";Name=B", MRNA_A], "Name B isn't its locus tag"),
+        ([GENE_A + ";Name=A;gene=sym", MRNA_A], "Name A isn't its symbol"),
     ],
 )
 def test_rejected_cases(rows, reason):
     with pytest.raises(ValueError, match=reason):
         read_ncbi_gff3(rows)
+
+
+def test_rna_row_without_a_product_has_none():
+    # Not the gene's symbol or anything else: no product is made up.
+    rows = [
+        GENE_A + ";Name=sym;gene=sym",
+        "NC_1.1\tRefSeq\ttRNA\t1\t90\t.\t+\t.\tID=rna-A;Parent=gene-A",
+    ]
+    (gene,) = read_ncbi_gff3(rows).genes
+    assert gene.transcripts[0].transcript_product is None

@@ -1,4 +1,5 @@
 import copy
+import dataclasses
 import gzip
 import io
 from contextlib import contextmanager
@@ -100,6 +101,13 @@ def test_main_reports_a_gff3_the_reader_refuses(capsys):
     assert "reader refused the GFF3" in capsys.readouterr().out
 
 
+def test_main_exits_1_when_the_files_differ(capsys):
+    gff3 = CASES / "pfalciparum_3d7.gff3"
+    gtf = CASES / "pfalciparum_3d7_products_differ.gtf"
+    assert main([str(gff3), "--gtf", str(gtf)]) == 1
+    assert "only in the GFF3" in capsys.readouterr().out
+
+
 def test_main_finds_the_gtf_next_to_the_gff3(capsys):
     assert main([str(CASES / "aedes_genes_sharing_a_name.gff3")]) == 0
     assert capsys.readouterr().out == "2 genes in the GFF3, 2 in the GTF\n"
@@ -186,6 +194,21 @@ PLANTED_BUGS = {
     and _set(g.transcripts[0], "transcript_id", "XM_WRONG.1"),
     "transcript ID dropped": lambda g: g.transcripts[0].transcript_id is not None
     and _set(g.transcripts[0], "transcript_id", None),
+    "symbol dropped": lambda g: bool(g.symbol) and _set(g, "symbol", None),
+    "locus tag dropped": lambda g: bool(g.locus_tag and g.name)
+    and _set(g, "locus_tag", None),
+    "NCBI Gene ID dropped": lambda g: bool(g.ncbi_gene_id)
+    and _set(g, "ncbi_gene_id", None),
+    "transcript invented": lambda g: g.transcripts.append(
+        dataclasses.replace(
+            g.transcripts[0], row_id="rna-NEW", transcript_id="XM_NEW.1"
+        )
+    )
+    or True,
+    "transcript loses both its IDs": lambda g: g.transcripts[0].transcript_id
+    is not None
+    and _set(g.transcripts[0], "transcript_id", None)
+    and _set(g.transcripts[0], "orig_transcript_id", None),
     "transcript biotype changed": lambda g: _set(
         g.transcripts[0], "biotype", "misc_RNA"
     ),

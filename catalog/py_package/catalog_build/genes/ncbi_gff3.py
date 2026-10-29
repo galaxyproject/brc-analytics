@@ -289,10 +289,10 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                     f"Transcript {transcript.row_id} is outside its gene {gene.row_id}"
                 )
         # NCBI's convention: the Name is the symbol, else the locus tag.
+        expected = "symbol" if gene.symbol else "locus tag"
         if gene.name is not None and gene.name != (gene.symbol or gene.locus_tag):
             raise ValueError(
-                f"Gene {gene.row_id}'s Name {gene.name} is neither its symbol "
-                "nor its locus tag"
+                f"Gene {gene.row_id}'s Name {gene.name} isn't its {expected}"
             )
 
     return Annotation(header=header, genes=list(genes.values()))

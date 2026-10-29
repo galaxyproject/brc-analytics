@@ -106,6 +106,14 @@ describe("useGene", () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 
+  it("is not found when the API doesn't have the gene", async () => {
+    mockGet.mockReturnValue(fails(new MockHTTPError(404)));
+    const { result } = renderUseGene(UID);
+    await waitFor(() =>
+      expect(result.current).toEqual({ status: "not_found" })
+    );
+  });
+
   it("is unavailable when the first load fails", async () => {
     mockGet.mockReturnValue(fails(new MockHTTPError(503)));
     const { result } = renderUseGene(UID);

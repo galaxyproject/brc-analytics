@@ -192,3 +192,20 @@ def test_snapshot_of_another_shape_is_unavailable(tmp_path, change):
     assert not service.is_available()
     response = make_client(service).get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 503
+
+
+def test_the_app_serves_genes_from_its_default_snapshot(app_with_stubbed_agent):
+    # Through create_app's own route and service, not this module's overrides.
+    response = TestClient(app_with_stubbed_agent).get(
+        "/api/v1/genes/d9049485-ed74-5455-98c2-5dc13eef544a"
+    )
+    assert response.status_code == 200
+    assert response.json()["gene"]["locusTag"] == "PF3D7_1133400"
+
+
+def test_transcripts_are_in_genome_order(client, gene_uid):
+    gene = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
+    assert [t["transcriptId"] for t in gene["transcripts"]] == [
+        "XM_001350949.2",
+        "XM_024473365.1",
+    ]

@@ -119,6 +119,75 @@ def test_aliases(snapshot):
     ]
 
 
+def test_old_locus_tags_keep_their_versions(snapshot):
+    # Only accessions lose their version: PF3D7_0105400.1 is a former locus
+    # tag of its own, not a version of PF3D7_0105400.
+    con, _ = snapshot
+    assert con.execute(
+        "SELECT value_unversioned FROM alt_id WHERE type = 'old_locus_tag'"
+        " ORDER BY value"
+    ).fetchall() == [("pf3d7_0105400.1",), ("pf3d7_0105400.2",)]
+
+
+def test_gene_and_transcript_rows_are_stored_as_read(snapshot):
+    con, _ = snapshot
+    assert con.execute(
+        'SELECT locus_tag, name, symbol, biotype, seq_name, start, "end", strand,'
+        " present, latest FROM gene WHERE gene_uid = ?",
+        [AMA1_UID],
+    ).fetchone() == (
+        "PF3D7_1133400",
+        "AMA1",
+        "AMA1",
+        "protein_coding",
+        "NC_037282.1",
+        1292966,
+        1296696,
+        "+",
+        True,
+        True,
+    )
+    # A gene with no symbol: its Name is its locus tag.
+    assert con.execute(
+        "SELECT name, symbol FROM gene WHERE locus_tag = 'PF3D7_0105400'"
+    ).fetchone() == ("PF3D7_0105400", None)
+    # PF3D7_0105400's shorter transcript, whose span isn't the gene's.
+    assert con.execute(
+        "SELECT transcript_id, transcript_product, protein_accession,"
+        ' protein_product, biotype, seq_name, start, "end", strand, latest'
+        " FROM transcript WHERE gff3_row_id = 'rna-XM_024473365.1'"
+    ).fetchone() == (
+        "XM_024473365.1",
+        "uncharacterized protein",
+        "XP_024328984.1",
+        "uncharacterized protein",
+        "mRNA",
+        "NC_004325.2",
+        226681,
+        227285,
+        "-",
+        True,
+    )
+
+
+def test_transcript_and_protein_products_are_stored_apart(tmp_path, catalog):
+    out = tmp_path / "genes.duckdb"
+    gff3 = EXCERPT.with_name("pfalciparum_3d7_products_differ.gff3")
+    bgs.build_gene_snapshot("GCF_000002765.6", str(gff3), out, catalog)
+    con = duckdb.connect(str(out), read_only=True)
+    try:
+        assert con.execute(
+            "SELECT transcript_product, protein_product FROM transcript"
+        ).fetchall() == [
+            (
+                "ATP-dependent DNA/RNA helicase PSH1",
+                "putative ATP-dependent RNA helicase",
+            )
+        ]
+    finally:
+        con.close()
+
+
 def test_transcripts_without_an_id_have_no_alias(snapshot):
     con, _ = snapshot
     assert con.execute(
@@ -205,6 +274,42 @@ def test_gff3_for_another_assembly_fails(tmp_path):
     with pytest.raises(ValueError, match="is for GCF_000002765.6"):
         bgs.build_gene_snapshot(
             "GCF_999999999.1", str(EXCERPT), tmp_path / "genes.duckdb", catalog
+        )
+
+
+def test_gff3_for_another_version_of_the_assembly_fails(tmp_path):
+    catalog = tmp_path / "assemblies.json"
+    catalog.write_text(json.dumps([{**CATALOG[0], "accession": "GCF_000002765.5"}]))
+    with pytest.raises(ValueError, match="is for GCF_000002765.6"):
+        bgs.build_gene_snapshot(
+            "GCF_000002765.5", str(EXCERPT), tmp_path / "genes.duckdb", catalog
+        )
+
+
+@pytest.mark.parametrize(
+    "header_line, changed",
+    [
+        (
+            "#!genome-build-accession NCBI_Assembly:GCF_000002765.6",
+            "#!genome-build-accession NCBI_Assembly:GCF_000002765.5",
+        ),
+        ("#!annotation-date 09/18/2026", ""),
+    ],
+)
+def test_gtf_of_another_release_rejects_the_assembly(
+    tmp_path, catalog, header_line, changed
+):
+    gtf = tmp_path / "other.gtf"
+    gtf.write_text(
+        EXCERPT.with_suffix(".gtf").read_text().replace(header_line, changed)
+    )
+    with pytest.raises(ValueError, match="rejected(.|\n)*header"):
+        bgs.build_gene_snapshot(
+            "GCF_000002765.6",
+            str(EXCERPT),
+            tmp_path / "genes.duckdb",
+            catalog,
+            gtf=str(gtf),
         )
 
 
