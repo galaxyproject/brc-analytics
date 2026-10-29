@@ -64,7 +64,7 @@ v0 stands either way. Without bet 1, v1 isn't built: R1 goes, and sections 2–4
 
 The contract is written for more than v1, so later publishers and assemblies add rows, not redesigns. What v0 and v1 build of each section is marked **v0** or **v1**.
 
-**Later:** VEuPathDB as a publisher (which brings _P. falciparum_ 3D7's current genes), GTFs that don't match the publisher's file, previous IDs, gene history on pages, site-wide search, the on-site assistant's gene tools, genes predicted by software rather than published (UCSC's augustus and xenoRefGene tracks).
+**Later:** VEuPathDB as a publisher (which brings _P. falciparum_ 3D7's current genes), GTFs that don't match the publisher's file, previous IDs, gene history on pages, site-wide search, the on-site assistant's gene tools, genes predicted by software rather than published (UCSC's augustus and xenoRefGene tracks), and facts about genes from supplementary sources such as GO terms (section 4).
 
 ## Terms
 
@@ -78,6 +78,7 @@ The contract is written for more than v1, so later publishers and assemblies add
 - **Annotation file version:** one exact GFF3 or GTF file, identified by its bytes (`sha256`, `md5`): the publisher's original or, from v1, a UCSC copy. Several annotation file versions can hold the same annotation set version.
 - **Core hash:** a fingerprint of an annotation file's coding sequences (each one's sequence name, strand, start and end), leaving out IDs and names. A UCSC copy has the same core hash as its publisher's original when they hold the same coding sequences.
 - **Content hash:** a fingerprint of everything else read from the file about its genes: exon and UTR positions, non-coding genes, gene IDs, symbols, biotypes, products and cross-references. With the core hash, it identifies an annotation set version. It compares versions of one publisher's file, never a UCSC copy with its original.
+- **Supplementary source:** a published file of facts about genes that isn't an annotation file, read alongside the annotations, e.g. NCBI's `gene2go.gz` for GO terms. It has its own versions and release schedule (section 4). Later.
 
 **Genes**
 
@@ -139,6 +140,7 @@ Every answer (page, API response, MCP tool result, download row) names the **ann
 - **Each annotation set version records** its assembly, publisher, provider and release label; where known, its release date and the date its genes last changed ("genes as of"; NCBI gives it in `annotation_hashes.txt`); and the publisher's file its genes were read from. NCBI changed P01's genes on 2020-06-17 but still dates the annotation 2019-08-01, so one date covers two sets of genes. We have seen only the later one.
 - **Each annotation file version records** its URL, its checksums (`md5` and `sha256` of the bytes as served, and of the uncompressed bytes when the file is gzipped, all computed by BRC from its own copy), retrieval time, our archived copy, and the annotation set version it holds. Publishers overwrite their files, so we keep every file we read from day one, in the gene data store.
 - **Both are rows in the provenance database** (section 4), written by the update that first saw them.
+- **Facts from a supplementary source name their own source** (later), not the annotation's: GO terms shown beside a gene say "from NCBI gene2go, retrieved …". A source and an annotation are released on different schedules, so neither is treated as part of the other (section 4).
 - **The provenance line** reads, for P01: "From NCBI GenBank's annotation of `GCA_900093555.2` (submitted by WTSI, 2019-08-01; genes as of 2020-06-17), retrieved …". "Retrieved" is when we fetched the publisher's file the genes were read from.
 
 **v1 adds UCSC's GTFs:**
@@ -165,7 +167,7 @@ A snapshot is one DuckDB file, `genes-<build>.duckdb`. It is derived, not the so
 
 Sequence names are the ones UCSC's genome browser uses for the assembly, so a location opens there as given. For NCBI annotations they are the publisher's own names: the build checks that every sequence carrying a gene in the publisher's file is in UCSC's list of sequence names for the assembly, and an assembly that fails is held back (section 5). A sample of 31 catalog assemblies (2026-10-26) matched in all 31; in one, _Anopheles gambiae_ `GCF_000005575.2`, 49 small unplaced scaffolds are missing from UCSC, but none carries a gene, which is why the check looks only at sequences with genes. Later, for VEuPathDB, the build converts names with a sequence-name map, built from UCSC's `chromAlias.txt` or by matching sequence digests, not by hand.
 
-**Later tables:** `gene_change` (new, modified, renamed, merged, split, retired, each with its date and release), and one table per data type (e.g. protein domains).
+**Later tables:** `gene_change` (new, modified, renamed, merged, split, retired, each with its date and release), and one table per supplementary source's facts (e.g. GO terms, protein domains), each row naming the source file version it was read from. The `snapshot` row then also lists the file version of each supplementary source it holds (section 4).
 
 ## 4. Build inputs and the provenance database
 
@@ -209,6 +211,16 @@ snapshots/genes-<build>.duckdb                                  each snapshot, w
 - **DuckDB enforces the keys.** An update is written in a local DuckDB file loaded with the head's rows, whose tables declare their primary keys and the references between them. A duplicate key or a reference that doesn't resolve fails the insert. Each assembly's rows go in as one transaction, so a failure holds back that assembly, as a failed check does (section 5). The update's Parquet files are written only from that file. Checks before commit cover what constraints can't: no `gene_uid` or membership is lost or changed. A file uploaded to the bucket some other way would bypass all this; the bucket's rules below prevent that.
 - **Schema changes never edit files.** A new column or table: older files are read with the column empty (DuckDB's `union_by_name`). A value for old rows: new rows saying so, as of the update that learned it. A restructure: a migration update writes the same rows in the new layout as new files, keeping each row's original update, and its manifest lists only the new files. The old files and manifests stay, so the state before a migration is always kept and rolling back moves `HEAD`. A migration changes shape, not facts: snapshots built from the heads before and after it must be identical. Each manifest records its `schema_version`.
 - **The bucket's rules:** versioning on, with no lifecycle rule that expires old versions; object lock on `archive/` and `provenance/tables/`; after each commit, new files copied to a second account; write access only for whoever commits updates, read-only for the servers.
+
+**Adding a supplementary source (later).** Facts about genes that the annotation doesn't carry, such as GO terms, come from other published files. Every source is added the same way, so a new one is a parser and its tables, not a redesign. GO terms are the worked example: the GFF3s we read have none, but NCBI publishes them by NCBI GeneID in `gene2go.gz` (`https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2go.gz`, 1.4 GB, rebuilt daily), one row per GeneID, GO term and evidence code. For species on NCBI's curated list it imports the GO Consortium's annotation files; for others NCBI computes the terms with InterProScan. On 2026-10-29 it gave AMA1 (GeneID `810891`) six terms, e.g. microneme (`GO:0020009`, evidence IDA). How many catalog genes have GO terms there isn't measured.
+
+- **A source is a file like any other.** It gets a file slot, with no assembly when one file covers every assembly as `gene2go.gz` does, and each download we read is archived and recorded as a file version with its checksums and retrieval time (section 2).
+- **A source is read whole, when we update.** An update that refreshes a source reads the whole file, compares what it states with the head, and writes only the differences: a row for each fact that appears, and a row marking each fact the source no longer states, as of that update. Nothing is deleted. A download whose contents haven't changed writes nothing, so NCBI's daily rebuilds of `gene2go.gz` don't each become rows; we read it on our schedule, not theirs.
+- **Facts attach to the publisher gene the source names.** `gene2go.gz` names genes by NCBI GeneID, which NCBI's GFF3 states in `Dbxref=GeneID:`, so the join is on an ID a publisher states, not an inference. The facts hang off `publisher_gene`, kept apart from what we conclude (R6). A GeneID that matches no publisher gene we read is skipped and counted in the check report.
+- **A fact with many values per gene is a link.** A gene has many GO terms, so GO terms get a hub (one row per GO term), a link (publisher gene × GO term), and a satellite on the link holding its evidence (evidence code, qualifier, PubMed IDs) and whether the source still states it. A fact with one value per gene is a satellite of `publisher_gene`.
+- **Every source's tables carry the same standard columns:** the update that wrote the row, the source file version it was read from, and a hash of the row's content. So one loader handles every source: parse, compare with the head, write the changes. The provenance database grows by a few tables per source, not one per field, and a handful of sources is expected; splitting satellites by source is what lets each be loaded on its own.
+- **Sources update independently.** An update can refresh one source and leave the annotations and the other sources as they are. Updates still form one chain (section 5), and each manifest says which sources it refreshed.
+- **Each source's version is named separately (decided 2026-10-29).** A snapshot holds each source as of its update and records each source's file version (section 3), and an answer names the source and its retrieval date beside the annotation's (section 2). An annotation release and a `gene2go.gz` download are made at different times by different processes, so tying them together would claim a link that isn't there.
 
 ## 5. Updating, building and publishing
 
