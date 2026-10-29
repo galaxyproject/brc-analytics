@@ -36,6 +36,7 @@ export const AssembliesData = ({
         onClose={dialog.onClose}
         onConfigure={onConfigure}
         open={dialog.open}
+        referenceAssembly={configuredInput.referenceAssembly}
         stepKey={stepKey}
         table={table}
         workflow={workflow}

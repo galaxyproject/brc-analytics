@@ -14,16 +14,18 @@ import { type Assembly } from "./hooks/UseTable/types";
  * Configures the selected assemblies, then closes the dialog.
  * @param table - Table instance.
  * @param stepKey - Key identifying the configured input field.
+ * @param referenceAssembly - Configured reference assembly accession, if any.
  * @param onConfigure - Callback to configure workflow input.
  * @param onClose - Callback to close the dialog.
  */
 export function addSelection(
   table: Table<Assembly>,
   stepKey: string,
+  referenceAssembly: ConfiguredInput["referenceAssembly"],
   onConfigure: OnConfigure,
   onClose: () => void
 ): void {
-  onConfigure(getFastaCollectionData(table, stepKey));
+  onConfigure(getFastaCollectionData(table, stepKey, referenceAssembly));
   onClose();
 }
 
@@ -54,16 +56,27 @@ export function getAddSelectionValidation(
 }
 
 /**
- * Returns the selected assemblies as configured input.
+ * Returns the selected assemblies as configured input. The reference assembly
+ * is chosen from the selected assemblies, so when the selection no longer
+ * includes it, the reference and its gene model are cleared.
  * @param table - Table instance.
  * @param stepKey - Key identifying the configured input field.
+ * @param referenceAssembly - Configured reference assembly accession, if any.
  * @returns Partial configured input with the selected assembly accessions.
  */
 export function getFastaCollectionData(
   table: Table<Assembly>,
-  stepKey: string
+  stepKey: string,
+  referenceAssembly: ConfiguredInput["referenceAssembly"]
 ): Partial<ConfiguredInput> {
-  return { [stepKey]: table.getSelectedRowModel().rows.map(({ id }) => id) };
+  const accessions = table.getSelectedRowModel().rows.map(({ id }) => id);
+  if (!referenceAssembly || accessions.includes(referenceAssembly))
+    return { [stepKey]: accessions };
+  return {
+    geneModelUrl: undefined,
+    referenceAssembly: undefined,
+    [stepKey]: accessions,
+  };
 }
 
 /**

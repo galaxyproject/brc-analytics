@@ -5,6 +5,7 @@ import { STEP as FASTA_COLLECTION_STEP } from "@repo/shared/views/EntityView/com
 import { STEP as GTF_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/step";
 import { STEP as PRIMARY_CONTRASTS_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/step";
 import { STEP as REFERENCE_ASSEMBLY_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/step";
+import { STEP as REFERENCE_FASTA_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceFastaStep/step";
 import { RELATED_TRACKS_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/RelatedTracksStep/step";
 import { STEP as SAMPLE_SHEET_CLASSIFICATION_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetClassificationStep/step";
 import { STEP as SAMPLE_SHEET_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SampleSheetStep/step";
@@ -44,7 +45,7 @@ export const STEP: Record<
   | "STRANDEDNESS",
   StepConfig | null
 > = {
-  [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL]: null,
+  [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL]: REFERENCE_FASTA_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID]: REFERENCE_ASSEMBLY_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION]: FASTA_COLLECTION_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL]: GTF_STEP,

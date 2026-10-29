@@ -81,4 +81,32 @@ describe("slimOrganismGenomes", () => {
       organism
     );
   });
+
+  test("keeps the genomes in full when a compatible workflow takes a reference assembly", () => {
+    const organism = {
+      genomes: [
+        { accession: "GCF_000864005.1", lineageTaxonomyIds: ["1", "10239"] },
+      ],
+      ncbiTaxonomyId: "3431196",
+      taxonomicLevelSpecies: "Norovirus norwalkense",
+    } as unknown as OrganismContract;
+    const organismWorkflowCategories = [
+      {
+        workflows: [
+          {
+            parameters: [
+              {
+                key: "reference Fasta",
+                variable: WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL,
+              },
+            ],
+          },
+        ],
+      },
+    ] as unknown as WorkflowCategory[];
+
+    expect(slimOrganismGenomes(organism, organismWorkflowCategories)).toBe(
+      organism
+    );
+  });
 });

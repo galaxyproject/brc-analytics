@@ -1,6 +1,7 @@
 import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import type { OrganismContract } from "@repo/shared/apis/types";
-import type { WorkflowCategory } from "@repo/shared/apis/workflow";
+import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
 import { makeWorkflowCategoriesAugmenter } from "@repo/shared/services/staticGeneration/workflows/utils";
 import { workflowRequiresFastaCollection } from "@repo/shared/workflow/utils";
 
@@ -28,8 +29,9 @@ export function makeSlimOrganismGenomes(
  * embed the organism record but never render its genomes. A full genome record
  * is roughly forty fields, so an organism with many assemblies would otherwise
  * embed hundreds of kilobytes it doesn't use. Genomes are kept in full when a
- * workflow compatible with the organism takes a collection of its assemblies,
- * since that workflow's configure page lists them for the user to pick from.
+ * workflow compatible with the organism takes a collection of its assemblies
+ * or a reference assembly, since that workflow's configure page lists them for
+ * the user to pick from.
  * @param organism - Organism record.
  * @param organismWorkflowCategories - Workflow categories compatible with the organism.
  * @returns The organism, with each genome reduced to its lineage taxonomy IDs
@@ -42,7 +44,7 @@ export function slimOrganismGenomes(
   if (!organism.genomes) return organism;
   if (
     organismWorkflowCategories.some(({ workflows }) =>
-      workflows.some(workflowRequiresFastaCollection)
+      workflows.some(workflowListsOrganismAssemblies)
     )
   )
     return organism;
@@ -52,4 +54,21 @@ export function slimOrganismGenomes(
       lineageTaxonomyIds,
     })),
   };
+}
+
+/**
+ * Determines whether an organism-scoped workflow's configure page lists the
+ * organism's assemblies for the user to pick from: it takes a collection of
+ * them, or a reference assembly.
+ * @param workflow - Workflow.
+ * @returns True when the workflow lists the organism's assemblies.
+ */
+function workflowListsOrganismAssemblies(workflow: Workflow): boolean {
+  return (
+    workflowRequiresFastaCollection(workflow) ||
+    workflow.parameters.some(
+      ({ variable }) =>
+        variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL
+    )
+  );
 }
