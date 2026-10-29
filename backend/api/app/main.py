@@ -99,6 +99,10 @@ def create_app() -> FastAPI:
             release=settings.APP_VERSION,
             traces_sample_rate=1.0,
             before_send=before_send,
+            # Search queries are users' sequences, some unpublished, and they
+            # sit in frame locals and request bodies; keep both out of events.
+            include_local_variables=False,
+            max_request_body_size="never",
         )
 
     mcp = create_mcp_server(
