@@ -29,7 +29,7 @@ export const DataSelector = ({
   onOpen,
   workflow,
 }: Props): JSX.Element | null => {
-  const { taxonomicLevelSpecies } = useWorkflowEntity() ?? {};
+  const taxonomicLevelSpecies = useWorkflowEntity()?.taxonomicLevelSpecies;
   if (configuredInput.fastaCollection?.length) return null;
   const isEnough = hasEnoughAssemblies(assemblyCount, workflow);
   return (
@@ -51,12 +51,8 @@ export const DataSelector = ({
             <>
               This workflow needs at least{" "}
               {formatAssemblyCount(getRequiredAssemblyCount(workflow))}, and{" "}
-              {taxonomicLevelSpecies ? (
-                <ScientificName>{taxonomicLevelSpecies}</ScientificName>
-              ) : (
-                "this organism"
-              )}{" "}
-              has {assemblyCount}. Choose another organism.
+              <ScientificName>{taxonomicLevelSpecies}</ScientificName> has{" "}
+              {assemblyCount}.
             </>
           )}
         </Typography>
