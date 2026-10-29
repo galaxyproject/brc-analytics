@@ -60,6 +60,34 @@ The 285 gone IDs:
 
 So VEuPathDB's statements and position overlap agree wherever both can be checked. Overlap adds 3 candidate links that VEuPathDB doesn't state.
 
+## NCBI: a declared old ID that names another current gene
+
+Checked 2026-10-28, while building #1904 (serve 3D7's genes from a temporary checked-in DuckDB file through the gene API). In 3D7's RefSeq GFF3 (`GCF_000002765.6`, `RS_2026_09`), 100 genes have an `old_locus_tag`. 98 are `.1`/`.2` versions of the gene's own tag. The other 2 are not:
+
+| Gene                                   | Its `old_locus_tag` | What that old tag is today                                              |
+| -------------------------------------- | ------------------- | ----------------------------------------------------------------------- |
+| `PF3D7_1440200` (SPP, GeneID `811964`) | `PF3D7_1440300`     | The current locus tag of a different gene, PBGS                         |
+| `PF3D7_0809250` (GeneID `54778396`)    | `PF3D7_0809300`     | No current gene: an ncRNA NCBI withdrew (GeneID `36312509`, 2020-05-11) |
+
+**SPP and PBGS were never one gene.** Both have their own pre-2012 IDs in PlasmoDB: SPP is `PF14_0382` and PBGS `PF14_0381`. Both PlasmoDB and NCBI draw SPP's model from PBGS's first base, on the same strand (1,638,717–1,647,251 and 1,638,717–1,641,760 on chromosome 14); PlasmoDB already gave them a shared start at release 24 (1,639,477). What NCBI did, from `gene_history` and NCBI Gene:
+
+| When       | NCBI                                                                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Original   | PBGS is GeneID `811963`, SPP is GeneID `811964`                                                                                  |
+| 2018-04-06 | `gene_history`: `811963` (PBGS) withdrawn, with no replacement                                                                   |
+| Then       | GeneID `811964` is the only gene there and carries `PF3D7_1440300` (inferred: `811964` still lists it as an alias)               |
+| Later      | PBGS is back as a new GeneID, `314888234`, with locus tag `PF3D7_1440300`; `811964` keeps `PF3D7_1440300` as its `old_locus_tag` |
+
+When `314888234` was created wasn't checked.
+
+What this shows:
+
+- **A declared link can be wrong.** Read as a link, SPP's `old_locus_tag` says SPP was once PBGS. PlasmoDB says they have always been separate genes. NCBI's `old_locus_tag` here looks like a leftover of its own temporary merge.
+- **An NCBI GeneID can change while the gene stays the same.** PBGS went from `811963` to `314888234`. `gene_history` lists `811963` as withdrawn with no replacement, so nothing NCBI publishes links the two GeneIDs; only the locus tag and position do. Someone with `811963` from before 2018 can't find PBGS by it.
+- **One file shows the shape, not the event.** From one GFF3, an `old_locus_tag` that is another current gene's tag can be found (1 in 3D7), as can one shared by two genes (a split's shape: 0 in 3D7). What happened needs a second release, `gene_history` or VEuPathDB's previous IDs.
+
+For gene search, the shared value finds both genes: PBGS on its current locus tag first, SPP on the old one, labelled as a former ID (#1905, prefix gene search over the temporary 3D7 DuckDB file).
+
 ## Caching the history files
 
 From VEuPathDB's file list (sizes uncompressed unless stated):
@@ -107,6 +135,11 @@ Made 2026-10-24:
 - **Old IDs** stays as is: successors still come from the publisher. Position overlap is a check, and its extra links fall under "Deferred: inferring changes the publisher didn't declare", stored with evidence `inferred`.
 - **Open questions**: the storage-cost question now includes releases 24–64, so only NCBI's GFF3s are unsized.
 
+Made 2026-10-28, from the NCBI section above:
+
+- **Gene identifiers**, NCBI GeneID: usually stable, but a gene can lose its GeneID and come back under a new one, with nothing linking the two.
+- **Links between names**: a declared `old_locus_tag` that is another current gene's locus tag isn't used as a link until decided (contract, Open decisions).
+
 ## Files
 
 In the local prototype directory `catalog/prototypes/genes/output/findings-2026-10-24/` (not in this repo):
@@ -114,3 +147,5 @@ In the local prototype directory `catalog/prototypes/genes/output/findings-2026-
 - `scripts/fetch_3d7.sh`: downloads the 3D7 alias files (releases 24, 50, 70, 71), extracts gene tables from the release 24 and 71 GFF3s, and filters NCBI's `gene_history` to Plasmodium. Needs `VIEWPATH_API_KEY` in `catalog/.env`.
 - `scripts/gene_history.py`: classifies gone IDs between two releases.
 - `results/`: the inputs above and `gene_history_3d7_r24_r71.txt`, the script's output.
+
+The NCBI section's GeneIDs were read from NCBI Gene's E-utilities (`esummary`), and the PlasmoDB names and locations from PlasmoDB's web service, both on 2026-10-28.
