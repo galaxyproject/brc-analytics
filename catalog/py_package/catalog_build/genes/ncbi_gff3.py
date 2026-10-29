@@ -51,6 +51,10 @@ class Transcript:
     transcript_product: Optional[str] = None
     protein_accession: Optional[str] = None
     protein_product: Optional[str] = None
+    # The submitter's ID (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA`),
+    # which NCBI's GTF names a transcript after when it has no transcript_id.
+    # Read for the GTF check only; not stored.
+    orig_transcript_id: Optional[str] = None
 
 
 @dataclass
@@ -218,6 +222,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                     biotype=row_type,
                     location=location,
                     transcript_product=_first(attributes, "product"),
+                    orig_transcript_id=_first(attributes, "orig_transcript_id"),
                 )
                 gene.transcripts.append(transcripts[row_id])
             elif row_type == "CDS" and parent in transcripts:

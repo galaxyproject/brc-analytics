@@ -6,10 +6,9 @@
 NCBI publishes each annotation as a GFF3 and as a GTF, converting between them
 with its own code. So where both files say something about a gene, reading the
 GFF3 with ncbi_gff3 should give what the GTF says: the gene's location, locus
-tag, symbol, NCBI Gene ID, biotype and old locus tags, and its transcripts'
-IDs, proteins and products. The GTF's own IDs aren't compared: it makes
-repeated gene names unique (`Trnaa-ggc_1`) and numbers transcripts that have
-no ID (`unassigned_transcript_1`).
+tag, symbol, NCBI Gene ID, biotype and old locus tags, and each of its
+transcripts' ID, location, protein and products. The GTF's gene IDs aren't
+compared: it makes repeated gene names unique (`Trnaa-ggc_1`).
 
 The GTF defaults to the GFF3's address with `.gff.gz` replaced by `.gtf.gz`.
 Prints each kind of difference with a count and examples, and exits 1 if there
@@ -40,6 +39,7 @@ EXAMPLES = 5
 @dataclass
 class GtfTranscript:
     transcript_id: str
+    location: Optional[Location] = None
     transcript_product: Optional[str] = None
     protein_accession: Optional[str] = None
     protein_product: Optional[str] = None
@@ -94,6 +94,7 @@ def read_ncbi_gtf(lines: Iterable[str]) -> List[GtfGene]:
         )
         product = _first(attributes, "product")
         if row_type == "transcript":
+            transcript.location = location
             transcript.transcript_product = transcript.transcript_product or product
         elif row_type == "CDS":
             transcript.protein_product = transcript.protein_product or product
@@ -139,40 +140,65 @@ def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
     }
 
 
-TranscriptRecord = Tuple[str, str, str]
+def _key(location: Location) -> Tuple[str, int, int, str]:
+    return (location.seq_name, location.start, location.end, location.strand)
+
+
+# NCBI's GTF numbers the transcripts that have neither a transcript_id nor an
+# orig_transcript_id in the GFF3.
+_UNASSIGNED = re.compile(r"^unassigned_transcript_\d+$")
+
+TranscriptRecord = Tuple[Optional[Tuple[str, int, int, str]], str, str, str]
 
 
 def _record(t: Union[Transcript, GtfTranscript]) -> TranscriptRecord:
-    """A transcript's protein and products, compared as one unit."""
+    """A transcript's location, protein and products, compared as one unit."""
     return (
+        _key(t.location) if t.location else None,
         t.protein_accession or "",
         t.transcript_product or "",
         t.protein_product or "",
     )
 
 
-def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:
-    """Whether each transcript has the same protein and products in both files.
+def _gtf_name(transcript: Transcript) -> Optional[str]:
+    """The ID NCBI's GTF gives a transcript, where the GFF3 implies one.
 
-    A transcript with a transcript ID is matched to the GTF's of that ID. The
-    rest are matched as a whole against the GTF transcripts whose IDs the
-    GFF3 doesn't state, which the GTF named itself (from orig_transcript_id,
-    or as unassigned_transcript_N).
+    Its transcript_id; else the last part of its orig_transcript_id
+    (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA` → `mrna.PF3D7_0100500-RA`);
+    else none: the GTF numbers it as unassigned_transcript_N.
     """
-    stated = {t.transcript_id: t for t in gene.transcripts if t.transcript_id}
-    for transcript_id, transcript in stated.items():
-        gtf_transcript = gtf_gene.transcripts.get(transcript_id)
+    if transcript.transcript_id:
+        return transcript.transcript_id
+    if transcript.orig_transcript_id:
+        return transcript.orig_transcript_id.rpartition("|")[2]
+    return None
+
+
+def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:
+    """Whether each transcript has the same location, protein and products.
+
+    A transcript is matched to the GTF transcript of the ID the GFF3 implies
+    for it (_gtf_name). The ones with none are matched as a whole against the
+    GTF's unassigned_transcript_N. Any GTF transcript left over is a
+    difference, so a transcript ID the reader drops can't pass.
+    """
+    named = {}
+    for transcript in gene.transcripts:
+        name = _gtf_name(transcript)
+        if name is not None:
+            if name in named:
+                return False
+            named[name] = transcript
+    for name, transcript in named.items():
+        gtf_transcript = gtf_gene.transcripts.get(name)
         if gtf_transcript is None or _record(gtf_transcript) != _record(transcript):
             return False
-    without_ids = sorted(_record(t) for t in gene.transcripts if not t.transcript_id)
-    gtf_rest = sorted(
-        _record(t) for i, t in gtf_gene.transcripts.items() if i not in stated
-    )
-    return without_ids == gtf_rest
-
-
-def _key(location: Location) -> Tuple[str, int, int, str]:
-    return (location.seq_name, location.start, location.end, location.strand)
+    rest = [i for i in gtf_gene.transcripts if i not in named]
+    if not all(_UNASSIGNED.match(i) for i in rest):
+        return False
+    unnamed = sorted(_record(t) for t in gene.transcripts if _gtf_name(t) is None)
+    return unnamed == sorted(_record(gtf_gene.transcripts[i]) for i in rest)
 
 
 def compare(genes: List[Gene], gtf_genes: List[GtfGene]) -> Dict[str, List[str]]:

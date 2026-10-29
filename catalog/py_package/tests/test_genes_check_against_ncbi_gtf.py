@@ -160,6 +160,11 @@ PLANTED_BUGS = {
     ),
     "transcript ID changed": lambda g: g.transcripts[0].transcript_id is not None
     and _set(g.transcripts[0], "transcript_id", "XM_WRONG.1"),
+    "transcript ID dropped": lambda g: g.transcripts[0].transcript_id is not None
+    and _set(g.transcripts[0], "transcript_id", None),
+    "transcript location shifted": lambda g: _set(
+        g.transcripts[0].location, "start", g.transcripts[0].location.start + 1
+    ),
 }
 
 READABLE_CASES = [

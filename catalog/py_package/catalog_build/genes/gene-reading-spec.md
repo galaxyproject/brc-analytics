@@ -87,14 +87,21 @@ The build fails with the reason shown, and nothing is written. Counts come from 
 NCBI publishes each annotation as GFF3 and GTF, converting with its own code, so where both files describe a gene they should agree. Every build downloads the GTF beside the GFF3 (`_genomic.gff.gz` → `_genomic.gtf.gz`) and compares them gene by gene. Any difference rejects the assembly.
 
 - **Pairing:** genes are paired by location (sequence, start, end, strand); genes at the same location pair in file order.
-- **Compared:** locus tag, symbol, NCBI Gene ID, biotype, old locus tags, number of transcripts, proteins, transcript products and protein products. Every transcript ID the GFF3 states must be in the GTF.
-- **Not compared, because the GTF makes them up or changes them:** its `gene_id` (it adds `_1`, `_2` to repeated names), its transcript IDs for transcripts the GFF3 gives none (`unassigned_transcript_1`, or the submitter's `orig_transcript_id`), and CDS coordinates (its CDS rows leave out the stop codon).
+- **Compared for each gene:** locus tag, symbol, NCBI Gene ID, biotype, old locus tags and number of transcripts.
+- **Compared for each transcript:** location, protein accession, transcript product and protein product. Each transcript is matched to the GTF transcript of the ID the GFF3 implies for it:
+  - its `transcript_id` (`XM_001347979.2`);
+  - else the last part of its `orig_transcript_id`, which NCBI's GTF uses as the ID (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA` → `mrna.PF3D7_0100500-RA`; 3D7's 158 pseudogene transcripts);
+  - else none: the GTF numbers it `unassigned_transcript_N` (3D7's 45 tRNAs), so these are matched as a group against the GTF's `unassigned_transcript_N` transcripts.
+
+  A GTF transcript left over is a difference, so a transcript ID the reader drops can't pass.
+
+- **Not compared, because the GTF makes them up or changes them:** its `gene_id` (it adds `_1`, `_2` to repeated names), the numbers in `unassigned_transcript_N`, and CDS coordinates (its CDS rows leave out the stop codon).
 
 The check also runs by hand: `python -m catalog_build.genes.check_against_ncbi_gtf <GFF3 URL or path>`.
 
 ## 6. Open
 
-- **Pseudogene transcripts' `orig_transcript_id`** (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA`) isn't stored.
+- **Pseudogene transcripts' `orig_transcript_id`** (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA`) is read for the GTF check but isn't stored, so it doesn't find the gene.
 - **Skipping unchanged assemblies.** NCBI's `md5checksums.txt` in each assembly folder gives each file's md5 without downloading it. An assembly needs rebuilding and rechecking when its GFF3's md5 changes or when the reader or check changes.
 
 ## Appendix: design decisions
