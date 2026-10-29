@@ -28,14 +28,11 @@ import {
 import { useAssembly } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { Fragment, type JSX, useEffect } from "react";
 import { StyledGrid } from "./gtfStep.styles";
+import { useConfigureGeneModel } from "./hooks/UseConfigureGeneModel/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useQuery } from "./query/hook";
 import { STEP } from "./step";
-import {
-  configureGTFStep,
-  getGeneModelLabel,
-  isGeneModelCleared,
-} from "./utils";
+import { getGeneModelLabel, isGeneModelCleared } from "./utils";
 
 export const GTFStep = ({
   active,
@@ -62,9 +59,7 @@ export const GTFStep = ({
   // showing the previous reference's gene model.
   const value = isGeneModelCleared(configuredInput) ? "" : rawValue;
 
-  useEffect(() => {
-    configureGTFStep(data, onConfigure, onValueChange);
-  }, [data, onConfigure, onValueChange]);
+  useConfigureGeneModel(assembly?.accession, data, onConfigure, onValueChange);
 
   // Auto-configure step with empty string if there's an error
   // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays
