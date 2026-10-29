@@ -7,7 +7,7 @@ babel==2.18.0
 beautifulsoup4==4.13.3
 boto3==1.40.57
 botocore==1.40.76
-certifi==2024.8.30
+certifi==2026.10.23
 CFGraph==0.2.1
 chardet==5.2.0
 charset-normalizer==3.3.2
@@ -62,7 +62,7 @@ MarkupSafe==3.0.2
 mashumaro==3.14
 mdurl==0.1.2
 more-itertools==10.8.0
-msgpack==1.2.1
+msgpack==1.2.4
 networkx==3.6.1
 numpy==2.1.0
 openpyxl==3.1.5
