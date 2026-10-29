@@ -199,15 +199,16 @@ def _record(t: Union[Transcript, GtfTranscript]) -> TranscriptRecord:
 def _gtf_name(transcript: Transcript) -> Optional[str]:
     """The ID NCBI's GTF gives a transcript, where the GFF3 implies one.
 
-    Its transcript_id; else the last part of its orig_transcript_id
-    (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA` → `mrna.PF3D7_0100500-RA`);
-    else none: the GTF numbers it as unassigned_transcript_N.
+    Its transcript_id, else its orig_transcript_id, with a `gnl|…|` prefix
+    dropped (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA` →
+    `mrna.PF3D7_0100500-RA`); else none: the GTF numbers it as
+    unassigned_transcript_N. As NCBI's GTF writer does (gene-reading-spec.md,
+    "What NCBI's writers do").
     """
-    if transcript.transcript_id:
-        return transcript.transcript_id
-    if transcript.orig_transcript_id:
-        return transcript.orig_transcript_id.rpartition("|")[2]
-    return None
+    name = transcript.transcript_id or transcript.orig_transcript_id
+    if name and name.startswith("gnl|"):
+        return name.rpartition("|")[2]
+    return name
 
 
 def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:

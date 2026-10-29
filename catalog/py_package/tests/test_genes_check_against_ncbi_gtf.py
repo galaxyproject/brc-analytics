@@ -15,7 +15,7 @@ from catalog_build.genes.check_against_ncbi_gtf import (
     main,
     read_ncbi_gtf,
 )
-from catalog_build.genes.ncbi_gff3 import read_ncbi_gff3
+from catalog_build.genes.ncbi_gff3 import Location, Transcript, read_ncbi_gff3
 
 CASES = Path(__file__).parent / "data" / "ncbi_cases"
 
@@ -78,6 +78,28 @@ def test_products_swapped_between_transcripts_without_ids_are_a_difference():
     genes, gtf_genes = read_pair("aedes_genes_sharing_a_name")
     genes[0].transcripts[0].transcript_product = "tRNA-Xyz"
     assert compare(genes, gtf_genes) == {"transcripts": ["Trnaa-ggc"]}
+
+
+@pytest.mark.parametrize(
+    "transcript_id, orig_transcript_id, gtf_name",
+    [
+        ("XM_001347979.2", None, "XM_001347979.2"),
+        (None, "gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA", "mrna.PF3D7_0100500-RA"),
+        ("gnl|WGS:ABCD|mrna.X-RA", None, "mrna.X-RA"),
+        (None, "mrna|X-RA", "mrna|X-RA"),
+        (None, None, None),
+    ],
+)
+def test_gtf_name_drops_only_a_gnl_prefix(transcript_id, orig_transcript_id, gtf_name):
+    # As NCBI's GTF writer names transcripts (gtf_write_data.cpp).
+    transcript = Transcript(
+        row_id="rna-1",
+        transcript_id=transcript_id,
+        biotype="mRNA",
+        location=Location("NC_004325.2", 1, 2, "+"),
+        orig_transcript_id=orig_transcript_id,
+    )
+    assert check._gtf_name(transcript) == gtf_name
 
 
 def test_headers_naming_another_release_are_a_difference():
