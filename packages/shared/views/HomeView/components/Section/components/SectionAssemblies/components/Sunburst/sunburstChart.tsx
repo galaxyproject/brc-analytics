@@ -12,10 +12,12 @@ import { type ArcCoords, type TaxonomyNode, type TreeNode } from "./types";
 import {
   findNodeByName,
   formatAssemblyCount,
+  getArcStroke,
   getEquidistantColors,
   getLabelColor,
   getNodeColor,
   getVisibleNodes,
+  isInLineage,
   labelFits,
   layoutRelativeTo,
   truncateLabel,
@@ -34,6 +36,8 @@ const LABEL_FONT_SIZE = 11;
 const MIN_SCREEN_LABEL_PX = 9;
 const LOGO_SIZE = 140;
 const ZOOM_MS = 750;
+// Opacity of arcs and labels outside the hovered arc's lineage.
+const DIMMED_OPACITY = 0.3;
 
 export type SunburstChartProps = {
   data: TaxonomyNode;
@@ -103,7 +107,8 @@ export const SunburstChart = ({
     const arc = d3Arc<ArcCoords>()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
-      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.004))
+      .cornerRadius(3)
+      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.006))
       .padRadius(RADIUS)
       .innerRadius((d) => Math.min(d.y0, DEPTH) * ringWidth)
       .outerRadius((d) => Math.max(0, Math.min(d.y1, DEPTH) * ringWidth - 1));
@@ -162,28 +167,50 @@ export const SunburstChart = ({
       .attr("height", LOGO_SIZE)
       .attr("href", LOGO_PATH)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // Zoomed in, the center leads with the taxon's assembly count.
     const centerName = centerGroup
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("y", -4)
+      .attr("y", -30)
       .attr("fill", LABEL_DARK)
-      .style("font-size", "18px")
-      .style("font-weight", 500);
+      .style("font-size", "16px")
+      .style("font-weight", 600);
+    const centerCount = centerGroup
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("y", 8)
+      .attr("fill", LABEL_DARK)
+      .style("font-size", "30px")
+      .style("font-weight", 700);
     const centerDetail = centerGroup
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("y", 18)
+      .attr("y", 28)
       .attr("fill", PALETTE.INK_LIGHT)
       .style("font-size", "13px");
     const centerHint = centerGroup
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("y", 40)
+      .attr("y", 54)
       .attr("fill", PALETTE.INK_LIGHT)
       .style("font-size", "11px")
-      .text("Click to zoom out");
+      .text("\u2191 Zoom out");
 
     let currentRoot = root;
+
+    // Hovering (or focusing) an arc dims everything outside its lineage, so
+    // the path from the center out to it and on to its descendants stands
+    // out.
+    function highlight(focus: TreeNode | null): void {
+      const opacity = (d: TreeNode): number | null =>
+        !focus || isInLineage(d, focus) ? null : DIMMED_OPACITY;
+      arcLayer
+        .selectAll<SVGPathElement, TreeNode>("path")
+        .attr("opacity", opacity);
+      labelLayer
+        .selectAll<SVGTextElement, TreeNode>("text")
+        .attr("opacity", opacity);
+    }
 
     function hideTooltip(): void {
       tooltip.style("opacity", 0);
@@ -231,10 +258,18 @@ export const SunburstChart = ({
       const parentName =
         p.depth === 1 ? "All taxa" : (p.parent as TreeNode | null)?.data.name;
       logoImage.style("opacity", isRoot ? 1 : 0);
+      const count = p.data.assembly_count;
       centerName.text(
-        isRoot ? "" : truncateLabel(p.data.name, 2 * ringWidth - 24, 18)
+        isRoot ? "" : truncateLabel(p.data.name, 2 * ringWidth - 24, 16)
       );
-      centerDetail.text(isRoot ? "" : describe(p));
+      centerCount.text(isRoot ? "" : count.toLocaleString());
+      centerDetail.text(
+        isRoot
+          ? ""
+          : [count === 1 ? "assembly" : "assemblies", p.data.rank]
+              .filter(Boolean)
+              .join(" · ")
+      );
       centerHint.style("opacity", isRoot ? 0 : 1);
       zoomOut
         .style("cursor", isRoot ? "default" : "pointer")
@@ -324,6 +359,7 @@ export const SunburstChart = ({
       }
       currentRoot = center;
       const colorOf = colorsFor(center);
+      const strokeOf = (d: TreeNode): string => getArcStroke(colorOf(d));
 
       const path = arcLayer
         .selectAll<SVGPathElement, TreeNode>("path")
@@ -332,10 +368,11 @@ export const SunburstChart = ({
           enter
             .append("path")
             .attr("d", (d) => arc(d.current))
-            .attr("stroke", PALETTE.COMMON_WHITE)
             .attr("stroke-width", 1)
             .on("mousemove", showTooltip)
             .on("mouseleave", hideTooltip)
+            .on("mouseenter.lineage focus", (_event, d) => highlight(d))
+            .on("mouseleave.lineage blur", () => highlight(null))
             .on("click", (_event, d) => zoomTo(d))
             .on("keydown", (event: KeyboardEvent, d) => {
               if (event.key !== "Enter" && event.key !== " ") return;
@@ -357,7 +394,8 @@ export const SunburstChart = ({
       // center to take one from.
       path
         .filter((d) => nextSet.has(d) && (!animate || !rendered.has(d)))
-        .attr("fill", colorOf);
+        .attr("fill", colorOf)
+        .attr("stroke", strokeOf);
 
       // Snapshot start positions: the path tweens rewrite d.current as they
       // run, and the label tweens must start from the same place.
@@ -366,6 +404,7 @@ export const SunburstChart = ({
         path
           .filter((d) => nextSet.has(d))
           .attr("fill", colorOf)
+          .attr("stroke", strokeOf)
           .attr("d", (d) => arc(d.target))
           .each((d) => {
             d.current = d.target;
@@ -378,7 +417,8 @@ export const SunburstChart = ({
         .filter((d) => nextSet.has(d) && rendered.has(d))
         .transition("fill")
         .duration(duration)
-        .attr("fill", colorOf);
+        .attr("fill", colorOf)
+        .attr("stroke", strokeOf);
       path
         .transition()
         .duration(duration)
@@ -397,6 +437,7 @@ export const SunburstChart = ({
 
     function zoomTo(p: TreeNode, animate = true): void {
       hideTooltip();
+      highlight(null);
       updateCenter(p);
       setSelectedNode(p);
       render(p, animate);

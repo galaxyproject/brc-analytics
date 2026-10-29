@@ -36,13 +36,20 @@ export const ChartFrame = styled.div`
     width: 100%;
   }
 
-  path {
-    cursor: pointer;
+  path,
+  text {
     transition: opacity 150ms ease;
   }
 
-  path:hover {
-    opacity: 0.82;
+  path {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    path,
+    text {
+      transition: none;
+    }
   }
 
   path:focus,

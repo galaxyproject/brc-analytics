@@ -6,10 +6,12 @@ import {
   createFilterUrl,
   findNodeByName,
   formatAssemblyCount,
+  getArcStroke,
   getEquidistantColors,
   getLabelColor,
   getNodeColor,
   getVisibleNodes,
+  isInLineage,
   labelFits,
   layoutRelativeTo,
   truncateLabel,
@@ -138,6 +140,37 @@ describe("getNodeColor", () => {
     expect(hsl(getNodeColor(deeper, root, colors)).l).toBeGreaterThan(
       hsl(getNodeColor(beta, root, colors)).l
     );
+  });
+
+  it("keeps the outer rings close to their center-child's saturation", () => {
+    const root = layout(sampleTree());
+    const colors = getEquidistantColors(PALETTE, 3);
+    const beta = hsl(getNodeColor(findNodeByName(root, "Beta"), root, colors));
+    // Two rings out from Beta.
+    const outer = hsl(getNodeColor(findNodeByName(root, "c-1"), root, colors));
+    expect(outer.s).toBeGreaterThanOrEqual(beta.s - 0.1);
+  });
+});
+
+describe("getArcStroke", () => {
+  it("outlines an arc in a darker shade of its own fill", () => {
+    for (const fill of PALETTE) {
+      const stroke = hsl(getArcStroke(fill));
+      expect(stroke.l).toBeLessThan(hsl(fill).l);
+      expect(stroke.h).toBeCloseTo(hsl(fill).h, 0);
+    }
+  });
+});
+
+describe("isInLineage", () => {
+  it("includes the node, its ancestors and its descendants only", () => {
+    const root = layout(sampleTree());
+    const alpha = findNodeByName(root, "Alpha");
+    expect(isInLineage(alpha, alpha)).toBe(true);
+    expect(isInLineage(root, alpha)).toBe(true);
+    expect(isInLineage(findNodeByName(root, "a-2"), alpha)).toBe(true);
+    expect(isInLineage(findNodeByName(root, "Beta"), alpha)).toBe(false);
+    expect(isInLineage(findNodeByName(root, "c-0"), alpha)).toBe(false);
   });
 });
 

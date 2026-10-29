@@ -9,8 +9,11 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
+import { hsl } from "d3-color";
 import { type JSX, type ReactElement } from "react";
 import { sampleTree } from "./fixtures";
+
+const DIMMED = "0.3";
 
 // The real link validates its URL against the explore state the app
 // provides, which these tests don't set up.
@@ -111,6 +114,66 @@ describe("Sunburst", () => {
           .getAllByRole("button", { name: /^Alpha/ })
           .some((element) => element.tagName === "BUTTON")
       ).toBe(true)
+    );
+  });
+
+  it("highlights the hovered arc's lineage and dims the rest", async () => {
+    const { container } = renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    const chart = await screen.findByRole("group", {
+      name: "Assemblies by taxonomic lineage",
+    });
+    const alpha = within(chart).getByRole("button", { name: /^Alpha,/ });
+    const beta = within(chart).getByRole("button", { name: /^Beta,/ });
+    fireEvent.mouseEnter(alpha);
+    // Alpha's subtree is a, b chains: its arcs plus four descendants stay lit.
+    const lit = arcs(container).filter(
+      (path) => path.getAttribute("opacity") !== DIMMED
+    );
+    expect(lit).toHaveLength(5);
+    expect(lit).toContain(alpha);
+    expect(beta.getAttribute("opacity")).toBe(DIMMED);
+    fireEvent.mouseLeave(alpha);
+    expect(
+      arcs(container).every((path) => path.getAttribute("opacity") === null)
+    ).toBe(true);
+  });
+
+  it("outlines each arc in a darker shade of its fill", async () => {
+    const { container } = renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    await waitFor(() => expect(arcs(container)).toHaveLength(11));
+    for (const path of arcs(container)) {
+      const fill = path.getAttribute("fill") ?? "";
+      const stroke = path.getAttribute("stroke") ?? "";
+      expect(hsl(stroke).l).toBeLessThan(hsl(fill).l);
+    }
+  });
+
+  it("leads the zoomed center with the assembly count", async () => {
+    renderThemed(
+      <Sunburst
+        loadData={() => Promise.resolve(sampleTree())}
+        logoPath="/logo.svg"
+      />
+    );
+    fireEvent.click(await panelRow("Alpha"));
+    const chart = await screen.findByRole("group", {
+      name: "Assemblies by taxonomic lineage, centred on Alpha",
+    });
+    const texts = Array.from(chart.querySelectorAll("text")).map(
+      (text) => text.textContent
+    );
+    expect(texts).toEqual(
+      expect.arrayContaining(["Alpha", "2", "assemblies · domain"])
     );
   });
 

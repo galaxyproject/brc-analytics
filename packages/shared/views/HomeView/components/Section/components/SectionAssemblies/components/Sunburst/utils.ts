@@ -32,9 +32,9 @@ export function getEquidistantColors(
 /**
  * Colour of a node's arc when the chart is centred on `center`. Each child
  * of the center takes its own colour by sibling position; deeper nodes take
- * their center-child ancestor's, lightened and desaturated a step per ring,
- * with every other sibling a shade darker so neighbouring arcs in the pale
- * outer rings stay distinguishable.
+ * their center-child ancestor's, lightened a little per ring but kept
+ * close to its saturation so the outer rings don't wash out, with every
+ * other sibling a shade darker so neighbouring arcs stay distinguishable.
  * @param node - A descendant of `center`.
  * @param center - Node the chart is centred on.
  * @param childColors - One colour per child of `center`, in order.
@@ -58,9 +58,30 @@ export function getNodeColor(
   const shade = siblingIndex % 2 === 1 ? -0.05 : 0;
   return hsl(
     base.h,
-    Math.max(0, base.s - 0.08 * steps),
-    Math.min(0.92, base.l + 0.06 * steps + shade)
+    Math.max(0, base.s - 0.03 * steps),
+    Math.min(0.85, base.l + 0.045 * steps + shade)
   ).toString();
+}
+
+/**
+ * Outline for an arc: a darker shade of its own fill, which separates
+ * neighbouring arcs without drawing a uniform web over the chart.
+ * @param fill - Arc fill colour.
+ * @returns A CSS colour.
+ */
+export function getArcStroke(fill: string): string {
+  return hsl(fill).darker(0.9).toString();
+}
+
+/**
+ * Whether `node` is `focus` itself, one of its ancestors or one of its
+ * descendants -- the arcs left lit when `focus` is hovered.
+ * @param node - Node to test.
+ * @param focus - Hovered node.
+ * @returns True if `node` is in `focus`'s lineage.
+ */
+export function isInLineage(node: TreeNode, focus: TreeNode): boolean {
+  return focus.ancestors().includes(node) || node.ancestors().includes(focus);
 }
 
 /**
