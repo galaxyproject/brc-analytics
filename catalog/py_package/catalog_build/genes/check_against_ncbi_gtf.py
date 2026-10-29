@@ -13,7 +13,7 @@ compared: it makes repeated gene names unique (`Trnaa-ggc_1`).
 
 The GTF defaults to the GFF3's address with `.gff.gz` replaced by `.gtf.gz`.
 Prints each kind of difference with a count and examples, and exits 1 if there
-are any, or 2 if the reader refuses the GFF3.
+are any, or 2 if the GFF3 or the GTF can't be read.
 """
 
 import argparse
@@ -24,11 +24,21 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, Iterator, List, Optional, Tuple, Union
+from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 
 import requests
 
-from .ncbi_gff3 import Annotation, Gene, Location, Transcript, read_ncbi_gff3
+from .ncbi_gff3 import (
+    Annotation,
+    CdsPair,
+    Gene,
+    Header,
+    Location,
+    Transcript,
+    one_cds_pair,
+    read_header_line,
+    read_ncbi_gff3,
+)
 
 # `gene_id "PF3D7_1133400"; db_xref "GeneID:810891";`
 _GTF_ATTRIBUTE = re.compile(r'(\S+) "([^"]*)";')
@@ -65,8 +75,7 @@ class GtfGene:
 
 @dataclass
 class GtfAnnotation:
-    # Every `#!` line, key to value as written.
-    header: Dict[str, str]
+    header: Header
     genes: List[GtfGene]
 
 
@@ -84,14 +93,13 @@ def _first(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
 
 def read_ncbi_gtf(lines: Iterable[str]) -> GtfAnnotation:
     """Read an NCBI GTF's header, genes and transcripts, in file order."""
-    header: Dict[str, str] = {}
+    header = Header()
     genes: Dict[str, GtfGene] = {}
-    # What each transcript's CDS rows say, which must be one value each.
-    cds: Dict[Tuple[str, str], set] = defaultdict(set)
+    # The protein and product each transcript's CDS rows name.
+    cds: Dict[Tuple[str, str], Set[CdsPair]] = defaultdict(set)
     for raw in lines:
         if raw.startswith("#!"):
-            key, _, value = raw[2:].rstrip("\n").partition(" ")
-            header[key] = value.strip()
+            read_header_line(raw.rstrip("\n"), header)
             continue
         if raw.startswith("#") or not raw.strip():
             continue
@@ -125,15 +133,11 @@ def read_ncbi_gtf(lines: Iterable[str]) -> GtfAnnotation:
             cds[(gene_id, transcript_id)].add(
                 (_first(attributes, "protein_id"), product)
             )
-            transcript.protein_accession, transcript.protein_product = next(
-                iter(cds[(gene_id, transcript_id)])
-            )
-    for (_, transcript_id), values in cds.items():
-        if len(values) > 1:
-            raise ValueError(
-                f"GTF transcript {transcript_id}'s CDS rows name different "
-                "proteins or products"
-            )
+    for (gene_id, transcript_id), pairs in cds.items():
+        transcript = genes[gene_id].transcripts[transcript_id]
+        transcript.protein_accession, transcript.protein_product = one_cds_pair(
+            transcript_id, pairs
+        )
     return GtfAnnotation(header, list(genes.values()))
 
 
@@ -144,13 +148,11 @@ def _gff3_facts(gene: Gene) -> Dict[str, object]:
         "ncbi_gene_id": gene.ncbi_gene_id,
         "biotype": gene.biotype,
         "old_locus_tags": gene.old_locus_tags,
-        "transcript_count": len(gene.transcripts),
     }
 
 
 def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
     attributes = gene.attributes
-    transcripts = list(gene.transcripts.values())
     ncbi_gene_id = next(
         (
             xref.partition(":")[2]
@@ -169,7 +171,6 @@ def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
             for value in attributes.get("old_locus_tag", [])
             for tag in value.split(",")
         ],
-        "transcript_count": len(transcripts),
     }
 
 
@@ -217,12 +218,15 @@ def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:
     GTF's unassigned_transcript_N. Any GTF transcript left over is a
     difference, so a transcript ID the reader drops can't pass.
     """
-    named = {}
+    named: Dict[str, Transcript] = {}
+    unnamed: List[TranscriptRecord] = []
     for transcript in gene.transcripts:
         name = _gtf_name(transcript)
-        if name is not None:
-            if name in named:
-                return False
+        if name is None:
+            unnamed.append(_record(transcript))
+        elif name in named:
+            return False
+        else:
             named[name] = transcript
     for name, transcript in named.items():
         gtf_transcript = gtf_gene.transcripts.get(name)
@@ -231,8 +235,7 @@ def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:
     rest = [i for i in gtf_gene.transcripts if i not in named]
     if not all(_UNASSIGNED.match(i) for i in rest):
         return False
-    unnamed = sorted(_record(t) for t in gene.transcripts if _gtf_name(t) is None)
-    return unnamed == sorted(_record(gtf_gene.transcripts[i]) for i in rest)
+    return sorted(unnamed) == sorted(_record(gtf_gene.transcripts[i]) for i in rest)
 
 
 def compare(genes: List[Gene], gtf_genes: List[GtfGene]) -> Dict[str, List[str]]:
@@ -266,7 +269,7 @@ def compare_files(annotation: Annotation, gtf: GtfAnnotation) -> Dict[str, List[
     header = [
         key
         for key in RELEASE_HEADER_KEYS
-        if annotation.header.lines.get(key) != gtf.header.get(key)
+        if annotation.header.lines.get(key) != gtf.header.lines.get(key)
     ]
     if header:
         differences["header"] = header
@@ -335,7 +338,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     except ValueError as exc:
         print(f"reader refused the GFF3: {exc}")
         return 2
-    gtf_annotation = read_ncbi_gtf(text_lines(gtf))
+    try:
+        gtf_annotation = read_ncbi_gtf(text_lines(gtf))
+    except ValueError as exc:
+        print(f"reader refused the GTF: {exc}")
+        return 2
     differences = compare_files(annotation, gtf_annotation)
     print(
         f"{len(annotation.genes)} genes in the GFF3, "

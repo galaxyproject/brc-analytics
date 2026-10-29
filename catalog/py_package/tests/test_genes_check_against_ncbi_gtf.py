@@ -19,12 +19,14 @@ from catalog_build.genes.ncbi_gff3 import read_ncbi_gff3
 CASES = Path(__file__).parent / "data" / "ncbi_cases"
 
 
-def read_pair(name):
-    with open(CASES / f"{name}.gff3", encoding="utf-8") as fh:
-        genes = read_ncbi_gff3(fh).genes
-    with open(CASES / f"{name}.gtf", encoding="utf-8") as fh:
-        gtf_genes = read_ncbi_gtf(fh).genes
-    return genes, gtf_genes
+# The fixtures the reader reads (spec section 3); the rest it rejects.
+READABLE_CASES = [
+    "pfalciparum_3d7",
+    "pfalciparum_3d7_products_differ",
+    "pfalciparum_3d7_three_transcripts",
+    "pfalciparum_3d7_transcripts_differ",
+    "aedes_genes_sharing_a_name",
+]
 
 
 def read_files(name):
@@ -34,16 +36,12 @@ def read_files(name):
         return annotation, read_ncbi_gtf(fh)
 
 
-@pytest.mark.parametrize(
-    "name",
-    [
-        "pfalciparum_3d7",
-        "pfalciparum_3d7_products_differ",
-        "pfalciparum_3d7_three_transcripts",
-        "pfalciparum_3d7_transcripts_differ",
-        "aedes_genes_sharing_a_name",
-    ],
-)
+def read_pair(name):
+    annotation, gtf = read_files(name)
+    return annotation.genes, gtf.genes
+
+
+@pytest.mark.parametrize("name", READABLE_CASES)
 def test_reader_agrees_with_ncbi_gtf(name):
     genes, gtf_genes = read_pair(name)
     assert len(genes) == len(gtf_genes)
@@ -56,7 +54,6 @@ def test_differences_are_reported():
     genes[1].transcripts.pop()
     genes[0].location.end += 1
     assert compare(genes, gtf_genes) == {
-        "transcript_count": ["PF3D7_0105400"],
         "transcripts": ["PF3D7_0105400"],
         "symbol": ["PF3D7_1133400"],
         "only in the GFF3": ["PF3D7_0100500"],
@@ -85,7 +82,7 @@ def test_products_swapped_between_transcripts_without_ids_are_a_difference():
 def test_headers_naming_another_release_are_a_difference():
     annotation, gtf = read_files("pfalciparum_3d7")
     assert compare_files(annotation, gtf) == {}
-    gtf.header["annotation-date"] = "09/19/2026"
+    gtf.header.lines["annotation-date"] = "09/19/2026"
     assert compare_files(annotation, gtf) == {"header": ["annotation-date"]}
 
 
@@ -93,7 +90,7 @@ def test_gtf_cds_rows_naming_different_proteins_fail():
     gtf = (CASES / "pfalciparum_3d7.gtf").read_text(encoding="utf-8")
     first_cds = next(line for line in gtf.splitlines() if "\tCDS\t" in line)
     changed = first_cds.replace('protein_id "', 'protein_id "WRONG')
-    with pytest.raises(ValueError, match="different proteins or products"):
+    with pytest.raises(ValueError, match="CDS rows name different proteins"):
         read_ncbi_gtf([*gtf.splitlines(keepends=True), changed + "\n"])
 
 
@@ -196,14 +193,6 @@ PLANTED_BUGS = {
         g.transcripts[0].location, "start", g.transcripts[0].location.start + 1
     ),
 }
-
-READABLE_CASES = [
-    "pfalciparum_3d7",
-    "pfalciparum_3d7_products_differ",
-    "pfalciparum_3d7_three_transcripts",
-    "pfalciparum_3d7_transcripts_differ",
-    "aedes_genes_sharing_a_name",
-]
 
 
 @pytest.mark.parametrize("bug", PLANTED_BUGS)

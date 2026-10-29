@@ -96,7 +96,7 @@ NCBI publishes each annotation as GFF3 and GTF, converting with its own code, so
 
 - **Headers:** `#!genome-build`, `#!genome-build-accession`, `#!annotation-source` and `#!annotation-date` must be the same in both files, so the GTF is the same release as the GFF3.
 - **Pairing:** genes are paired by location (sequence, start, end, strand); genes at the same location pair in file order.
-- **Compared for each gene:** locus tag, symbol, NCBI Gene ID, biotype, old locus tags and number of transcripts.
+- **Compared for each gene:** locus tag, symbol, NCBI Gene ID, biotype and old locus tags.
 - **Compared for each transcript:** biotype (the GFF3 row type and the GTF's `transcript_biotype`), location, protein accession, transcript product and protein product. Each transcript is matched to the GTF transcript of the ID the GFF3 implies for it:
   - its `transcript_id` (`XM_001347979.2`);
   - else the last part of its `orig_transcript_id`, which NCBI's GTF uses as the ID (`gnl|ASM:GCA_000002765|mrna.PF3D7_0100500-RA` → `mrna.PF3D7_0100500-RA`; 3D7's 158 pseudogene transcripts);

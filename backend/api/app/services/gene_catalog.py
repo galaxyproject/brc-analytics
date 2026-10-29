@@ -24,17 +24,6 @@ logger = logging.getLogger(__name__)
 # SCHEMA_VERSION); a file of another version is reported unavailable.
 SCHEMA_VERSION = 1
 
-# The tables the queries below read.
-_TABLES = {
-    "snapshot",
-    "assembly",
-    "annotation_set_version",
-    "annotation_file_version",
-    "gene",
-    "transcript",
-    "alt_id",
-}
-
 # The order aliases are listed in on a gene.
 _ALIAS_TYPE_ORDER = (
     "symbol",
@@ -124,12 +113,6 @@ class GeneCatalogService:
                 read_only=True,
                 config={"temp_directory": tempfile.gettempdir()},
             )
-            tables = {name for (name,) in con.execute("SHOW TABLES").fetchall()}
-            missing = _TABLES - tables
-            if missing:
-                raise duckdb.InvalidInputException(
-                    f"it has no {', '.join(sorted(missing))} table"
-                )
             row = con.execute(
                 'SELECT build_id, "update", schema_version FROM snapshot'
             ).fetchone()
@@ -140,6 +123,15 @@ class GeneCatalogService:
                 raise duckdb.InvalidInputException(
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
                 )
+            # Run each query once, so a missing table or column fails here
+            # rather than on every request.
+            nil = UUID(int=0)
+            for sql, params in (
+                (_GENE_SQL, [nil]),
+                (_TRANSCRIPTS_SQL, [nil, ""]),
+                (_ALIASES_SQL, [nil, ""]),
+            ):
+                con.execute(sql, params).fetchall()
         except duckdb.Error as exc:
             logger.error(
                 "Could not open gene snapshot at %s: %s", self.snapshot_path, exc

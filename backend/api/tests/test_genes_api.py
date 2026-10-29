@@ -179,6 +179,7 @@ def test_concurrent_requests(service, gene_uid):
     [
         "UPDATE snapshot SET schema_version = 2",
         "DROP TABLE alt_id",
+        "ALTER TABLE transcript DROP COLUMN protein_product",
     ],
 )
 def test_snapshot_of_another_shape_is_unavailable(tmp_path, change):

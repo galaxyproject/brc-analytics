@@ -7,7 +7,7 @@ beside this file.
 import datetime
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 from urllib.parse import unquote
 
 GENE_TYPES = {"gene", "pseudogene"}
@@ -116,7 +116,21 @@ def _first(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
     return values[0] if values else None
 
 
-def _read_header_line(line: str, header: Header) -> None:
+# A CDS row's protein_id and product.
+CdsPair = Tuple[Optional[str], Optional[str]]
+
+
+def one_cds_pair(transcript: str, pairs: Set[CdsPair]) -> CdsPair:
+    """The protein and product a transcript's CDS rows all name."""
+    if len({protein for protein, _ in pairs}) > 1:
+        raise ValueError(f"Transcript {transcript}'s CDS rows name different proteins")
+    if len(pairs) > 1:
+        raise ValueError(f"Transcript {transcript}'s CDS rows name different products")
+    return next(iter(pairs))
+
+
+def read_header_line(line: str, header: Header) -> None:
+    """Read one `#!` line, as NCBI's GFF3 and GTF both write them, into header."""
     key, _, value = line[2:].partition(" ")
     value = value.strip()
     header.lines[key] = value
@@ -174,14 +188,13 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
     row_ids: Set[str] = set()
     # The attributes of each gene's first row, which its other rows must repeat.
     gene_attribute_text: Dict[str, str] = {}
-    # What each transcript's CDS rows say, which must be one value each.
-    cds_proteins: Dict[str, Set[Optional[str]]] = {}
-    cds_products: Dict[str, Set[Optional[str]]] = {}
+    # The protein and product each transcript's CDS rows name.
+    cds: Dict[str, Set[CdsPair]] = {}
 
     for raw in lines:
         line = raw.rstrip("\n")
         if line.startswith("#!"):
-            _read_header_line(line, header)
+            read_header_line(line, header)
             continue
         if not line or line.startswith("#"):
             continue
@@ -250,23 +263,17 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                 )
                 gene.transcripts.append(transcripts[row_id])
             elif row_type == "CDS" and parent in transcripts:
-                cds_proteins.setdefault(parent, set()).add(
-                    _first(attributes, "protein_id")
-                )
-                cds_products.setdefault(parent, set()).add(
-                    _first(attributes, "product")
+                cds.setdefault(parent, set()).add(
+                    (_first(attributes, "protein_id"), _first(attributes, "product"))
                 )
 
     if not genes:
         raise ValueError("The GFF3 has no genes")
-    for row_id, proteins in cds_proteins.items():
-        products = cds_products[row_id]
-        if len(proteins) > 1:
-            raise ValueError(f"Transcript {row_id}'s CDS rows name different proteins")
-        if len(products) > 1:
-            raise ValueError(f"Transcript {row_id}'s CDS rows name different products")
-        transcripts[row_id].protein_accession = next(iter(proteins))
-        transcripts[row_id].protein_product = next(iter(products))
+    for row_id, pairs in cds.items():
+        transcript = transcripts[row_id]
+        transcript.protein_accession, transcript.protein_product = one_cds_pair(
+            row_id, pairs
+        )
     for gene in genes.values():
         if not gene.transcripts:
             raise ValueError(f"Gene {gene.row_id} has no transcript rows")
