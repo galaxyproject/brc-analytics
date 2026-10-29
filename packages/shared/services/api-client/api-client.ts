@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
+import { type GeneResponse } from "@repo/shared/services/genes/types";
 import ky, { type HTTPError } from "ky";
 import type {
   FavoriteResponse,
@@ -61,6 +62,16 @@ export const apiClient = {
       .get("favorites", {
         searchParams: entity_type ? { entity_type } : undefined,
       })
+      .json();
+  },
+
+  getGene: async (
+    geneUid: string,
+    signal?: AbortSignal
+  ): Promise<GeneResponse> => {
+    // ky doesn't retry; useGene's query does, before showing "unavailable".
+    return httpClient
+      .get(`genes/${encodeURIComponent(geneUid)}`, { retry: 0, signal })
       .json();
   },
 

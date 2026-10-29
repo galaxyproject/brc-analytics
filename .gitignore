@@ -80,3 +80,7 @@ taxdump/
 *.dmp
 *.duckdb
 *.duckdb.new
+# Temporary (#1904): the 3D7 gene snapshot is checked in until the real
+# snapshot is built off the server and mounted. Remove with the file.
+!backend/api/app/data/genes/genes-3d7.duckdb
+*.duckdb.partial

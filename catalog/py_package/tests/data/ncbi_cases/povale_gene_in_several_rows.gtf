@@ -1,0 +1,18 @@
+#gtf-version 2.2
+#!genome-build Pow2
+#!genome-build-accession NCBI_Assembly:GCA_900088545.1
+# Rows copied verbatim from GCA_900088545.1_Pow2_genomic.gtf.gz
+FLRE01000001.1	EMBL	gene	8494	8538	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "1"; 
+FLRE01000001.1	EMBL	gene	7667	8357	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "2"; 
+FLRE01000001.1	EMBL	gene	7441	7487	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "3"; 
+FLRE01000001.1	EMBL	gene	6513	7289	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "4"; 
+FLRE01000001.1	EMBL	gene	5498	6370	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "5"; 
+FLRE01000001.1	EMBL	gene	5215	5370	.	-	.	gene_id "POVWA2_000020"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; is_ordered "true"; locus_tag "POVWA2_000020"; part "6"; 
+FLRE01000001.1	EMBL	CDS	8494	8538	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "1"; 
+FLRE01000001.1	EMBL	CDS	7667	8357	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "2"; 
+FLRE01000001.1	EMBL	CDS	7441	7487	.	-	2	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "3"; 
+FLRE01000001.1	EMBL	CDS	6513	7289	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "4"; 
+FLRE01000001.1	EMBL	CDS	5498	6370	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "5"; 
+FLRE01000001.1	EMBL	CDS	5218	5370	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "6"; 
+FLRE01000001.1	EMBL	start_codon	8536	8538	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "1"; 
+FLRE01000001.1	EMBL	stop_codon	5215	5217	.	-	0	gene_id "POVWA2_000020"; transcript_id "unassigned_transcript_2"; db_xref "NCBI_GP:SBT30650.1"; gbkey "CDS"; locus_tag "POVWA2_000020"; product "PIR Superfamily Protein"; protein_id "SBT30650.1"; exon_number "6"; 
