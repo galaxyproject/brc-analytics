@@ -1,38 +1,51 @@
-import { GAP } from "@repo/shared/views/AssistantView/components/Conversation/constants";
+import { FOOTER_HEIGHT_PROPERTY } from "@repo/shared/views/AssistantView/components/Conversation/constants";
 import { useFooterClearance } from "@repo/shared/views/AssistantView/components/Conversation/hooks/UseFooterClearance/hook";
 import { act, render } from "@testing-library/react";
 import { type JSX } from "react";
 
 interface ObserverMock {
   callback: ResizeObserverCallback;
+  disconnect: jest.Mock;
   observe: jest.Mock;
-  unobserve: jest.Mock;
 }
 
 const FOOTER_HEIGHT = 114;
 
 const observers: ObserverMock[] = [];
 
+let renders = 0;
+
 /**
  * A conversation with a footer, as the chat renders it.
  * @returns The conversation element.
  */
 function Conversation(): JSX.Element {
-  const { ref, style } = useFooterClearance();
+  const { ref } = useFooterClearance();
   return (
-    <div data-testid="conversation" style={style}>
+    <div>
+      <Messages />
       <div ref={ref} />
     </div>
   );
 }
 
 /**
- * The space kept clear of the footer, as set on the conversation.
- * @param conversation - Conversation element.
+ * The conversation's messages, counting their renders.
+ * @returns Nothing.
+ */
+function Messages(): null {
+  renders++;
+  return null;
+}
+
+/**
+ * The footer's height, as set on the HTML element.
  * @returns The custom property's value.
  */
-function getClearance(conversation: HTMLElement): string {
-  return conversation.style.getPropertyValue("--footer-clearance");
+function getFooterHeight(): string {
+  return document.documentElement.style.getPropertyValue(
+    FOOTER_HEIGHT_PROPERTY
+  );
 }
 
 /**
@@ -54,39 +67,47 @@ function resize(height: number): void {
 
 beforeEach(() => {
   observers.length = 0;
+  renders = 0;
   global.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
-    const observer = { callback, observe: jest.fn(), unobserve: jest.fn() };
+    const observer = { callback, disconnect: jest.fn(), observe: jest.fn() };
     observers.push(observer);
     return observer;
   }) as unknown as typeof ResizeObserver;
 });
 
 describe("useFooterClearance", () => {
-  test("keeps nothing clear until the footer is measured", () => {
-    const { getByTestId } = render(<Conversation />);
-    expect(getClearance(getByTestId("conversation"))).toBe("");
+  test("sets no height until the footer is measured", () => {
+    render(<Conversation />);
+    expect(getFooterHeight()).toBe("");
   });
 
-  test("keeps the footer's height and the gap above it clear", () => {
-    const { getByTestId } = render(<Conversation />);
+  test("sets the footer's height on the HTML element", () => {
+    render(<Conversation />);
     resize(FOOTER_HEIGHT);
-    expect(getClearance(getByTestId("conversation"))).toBe(
-      `${FOOTER_HEIGHT + GAP}px`
-    );
+    expect(getFooterHeight()).toBe(`${FOOTER_HEIGHT}px`);
   });
 
   test("follows the footer as it resizes", () => {
-    const { getByTestId } = render(<Conversation />);
+    render(<Conversation />);
     resize(FOOTER_HEIGHT);
     resize(FOOTER_HEIGHT + 60);
-    expect(getClearance(getByTestId("conversation"))).toBe(
-      `${FOOTER_HEIGHT + 60 + GAP}px`
-    );
+    expect(getFooterHeight()).toBe(`${FOOTER_HEIGHT + 60}px`);
   });
 
-  test("stops watching the footer when the conversation goes", () => {
+  test("doesn't re-render the conversation's contents as the footer resizes", () => {
+    render(<Conversation />);
+    resize(FOOTER_HEIGHT);
+    const measured = renders;
+    resize(FOOTER_HEIGHT + 60);
+    resize(FOOTER_HEIGHT + 120);
+    expect(renders).toBe(measured);
+  });
+
+  test("stops watching the footer and removes its height when the conversation goes", () => {
     const { unmount } = render(<Conversation />);
+    resize(FOOTER_HEIGHT);
     unmount();
-    expect(observers[0].unobserve).toHaveBeenCalled();
+    expect(observers[0].disconnect).toHaveBeenCalled();
+    expect(getFooterHeight()).toBe("");
   });
 });

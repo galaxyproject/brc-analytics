@@ -1,8 +1,9 @@
 /**
- * Custom property holding the space, in pixels, that whatever is brought into
- * view in the conversation keeps clear of the footer pinned beneath it.
+ * Custom property, set on the HTML element, holding the measured height of the
+ * footer pinned beneath the conversation. Named apart from the page footer's
+ * `--footer-height`.
  */
-export const FOOTER_CLEARANCE_PROPERTY = "--footer-clearance";
+export const FOOTER_HEIGHT_PROPERTY = "--conversation-footer-height";
 
 /**
  * Space, in pixels, between the conversation's parts. The pinned footer paints

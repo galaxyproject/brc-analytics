@@ -5,7 +5,7 @@ import {
 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
-import { FOOTER_CLEARANCE_PROPERTY, GAP } from "./constants";
+import { FOOTER_HEIGHT_PROPERTY, GAP } from "./constants";
 
 // The suggestions, any error and the composer, at the end of the conversation.
 // On narrow screens they are kept together at its foot, and a short
@@ -61,10 +61,13 @@ export const StyledStack = styled(Stack)`
   }
 
   // On wider screens whatever is brought into view, such as a link focused
-  // from the keyboard, is kept clear of the footer pinned beneath it.
+  // from the keyboard, is kept clear of the footer pinned beneath it: its
+  // height and the gap its shadow paints over. Until the footer is measured the
+  // margin is invalid and falls back to its initial 0, so nothing is kept
+  // clear; a fallback height would keep the gap clear instead.
   ${bpUpMd} {
     * {
-      scroll-margin-bottom: var(${FOOTER_CLEARANCE_PROPERTY}, 0px);
+      scroll-margin-bottom: calc(var(${FOOTER_HEIGHT_PROPERTY}) + ${GAP}px);
     }
   }
 `;
