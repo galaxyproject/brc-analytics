@@ -1,3 +1,4 @@
+import copy
 import gzip
 import io
 from contextlib import contextmanager
@@ -26,6 +27,8 @@ def read_pair(name):
     [
         "pfalciparum_3d7",
         "pfalciparum_3d7_products_differ",
+        "pfalciparum_3d7_three_transcripts",
+        "pfalciparum_3d7_transcripts_differ",
         "aedes_genes_sharing_a_name",
     ],
 )
@@ -41,14 +44,30 @@ def test_differences_are_reported():
     genes[1].transcripts.pop()
     genes[0].location.end += 1
     assert compare(genes, gtf_genes) == {
-        "proteins": ["PF3D7_0105400"],
-        "transcript_products": ["PF3D7_0105400"],
-        "protein_products": ["PF3D7_0105400"],
         "transcript_count": ["PF3D7_0105400"],
+        "transcripts": ["PF3D7_0105400"],
         "symbol": ["PF3D7_1133400"],
         "only in the GFF3": ["PF3D7_0100500"],
         "only in the GTF": ["PF3D7_0100500"],
     }
+
+
+def test_proteins_swapped_between_transcripts_are_a_difference():
+    # PF3D7_0105400's two mRNAs, each given the other's protein.
+    genes, gtf_genes = read_pair("pfalciparum_3d7")
+    first, second = genes[1].transcripts
+    first.protein_accession, second.protein_accession = (
+        second.protein_accession,
+        first.protein_accession,
+    )
+    assert compare(genes, gtf_genes) == {"transcripts": ["PF3D7_0105400"]}
+
+
+def test_products_swapped_between_transcripts_without_ids_are_a_difference():
+    # The Aedes tRNAs have no transcript IDs, so they're matched as a set.
+    genes, gtf_genes = read_pair("aedes_genes_sharing_a_name")
+    genes[0].transcripts[0].transcript_product = "tRNA-Xyz"
+    assert compare(genes, gtf_genes) == {"transcripts": ["Trnaa-ggc"]}
 
 
 def test_main_reports_a_gff3_the_reader_refuses(capsys):
@@ -85,3 +104,85 @@ def test_gtf_next_to_needs_a_gff3_name():
     assert check.gtf_next_to("x_genomic.gff.gz") == "x_genomic.gtf.gz"
     with pytest.raises(ValueError, match="No GTF name"):
         check.gtf_next_to("x_genomic.gff.gz?download=1")
+
+
+# Planted bugs: each breaks one gene's reading in one way, as a reader bug
+# would. Each returns False when it can't apply to the gene.
+def _swap(transcripts, field):
+    pair = [t for t in transcripts if getattr(t, field)]
+    if len(pair) < 2 or getattr(pair[0], field) == getattr(pair[1], field):
+        return False
+    a, b = getattr(pair[0], field), getattr(pair[1], field)
+    setattr(pair[0], field, b)
+    setattr(pair[1], field, a)
+    return True
+
+
+def _set(obj, field, value):
+    if getattr(obj, field) == value:
+        return False
+    setattr(obj, field, value)
+    return True
+
+
+def _swap_products(transcripts):
+    for t in transcripts:
+        if t.transcript_product != t.protein_product:
+            t.transcript_product, t.protein_product = (
+                t.protein_product,
+                t.transcript_product,
+            )
+            return True
+    return False
+
+
+PLANTED_BUGS = {
+    "locus tag changed": lambda g: _set(g, "locus_tag", "WRONG_1"),
+    "symbol changed": lambda g: _set(g, "symbol", "WRONG"),
+    "biotype changed": lambda g: _set(g, "biotype", "misc_RNA"),
+    "NCBI Gene ID changed": lambda g: _set(g, "ncbi_gene_id", "1"),
+    "old locus tag added": lambda g: g.old_locus_tags.append("WRONG.1") or True,
+    "location shifted": lambda g: _set(g.location, "end", g.location.end + 1),
+    "transcript dropped": lambda g: bool(g.transcripts.pop()),
+    "transcript duplicated": lambda g: g.transcripts.append(
+        copy.deepcopy(g.transcripts[0])
+    )
+    or True,
+    "proteins swapped": lambda g: _swap(g.transcripts, "protein_accession"),
+    "transcript products swapped": lambda g: _swap(g.transcripts, "transcript_product"),
+    "protein products swapped": lambda g: _swap(g.transcripts, "protein_product"),
+    "a transcript's two products swapped": lambda g: _swap_products(g.transcripts),
+    "protein changed": lambda g: _set(
+        g.transcripts[0], "protein_accession", "XP_WRONG.1"
+    ),
+    "transcript product changed": lambda g: _set(
+        g.transcripts[0], "transcript_product", "wrong"
+    ),
+    "transcript ID changed": lambda g: g.transcripts[0].transcript_id is not None
+    and _set(g.transcripts[0], "transcript_id", "XM_WRONG.1"),
+}
+
+READABLE_CASES = [
+    "pfalciparum_3d7",
+    "pfalciparum_3d7_products_differ",
+    "pfalciparum_3d7_three_transcripts",
+    "pfalciparum_3d7_transcripts_differ",
+    "aedes_genes_sharing_a_name",
+]
+
+
+@pytest.mark.parametrize("bug", PLANTED_BUGS)
+def test_check_catches_each_planted_bug_in_every_gene(bug):
+    # Every gene of every readable fixture, where the bug can apply.
+    planted, missed = 0, []
+    for name in READABLE_CASES:
+        count = len(read_pair(name)[0])
+        for i in range(count):
+            genes, gtf_genes = read_pair(name)
+            if not PLANTED_BUGS[bug](genes[i]):
+                continue
+            planted += 1
+            if not compare(genes, gtf_genes):
+                missed.append(f"{name}: {genes[i].label}")
+    assert planted > 0
+    assert missed == []

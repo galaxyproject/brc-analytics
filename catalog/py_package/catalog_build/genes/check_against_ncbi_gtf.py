@@ -24,11 +24,11 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 import requests
 
-from .ncbi_gff3 import Gene, Location, read_ncbi_gff3
+from .ncbi_gff3 import Gene, Location, Transcript, read_ncbi_gff3
 
 # `gene_id "PF3D7_1133400"; db_xref "GeneID:810891";`
 _GTF_ATTRIBUTE = re.compile(r'(\S+) "([^"]*)";')
@@ -69,11 +69,11 @@ def read_ncbi_gtf(lines: Iterable[str]) -> List[GtfGene]:
     """Read an NCBI GTF's genes and transcripts, in file order."""
     genes: Dict[str, GtfGene] = {}
     for raw in lines:
-        if raw.startswith("#"):
+        if raw.startswith("#") or not raw.strip():
             continue
         columns = raw.rstrip("\n").split("\t")
         if len(columns) != 9:
-            continue
+            raise ValueError(f"A GTF row without 9 columns: {raw.rstrip()}")
         seq_name, _, row_type, start, end, _, strand, _, text = columns
         attributes = _gtf_attributes(text)
         gene_id = attributes["gene_id"][0]
@@ -111,15 +111,6 @@ def _gff3_facts(gene: Gene) -> Dict[str, object]:
         "biotype": gene.biotype,
         "old_locus_tags": gene.old_locus_tags,
         "transcript_count": len(gene.transcripts),
-        "proteins": sorted(
-            t.protein_accession for t in gene.transcripts if t.protein_accession
-        ),
-        "transcript_products": sorted(
-            t.transcript_product for t in gene.transcripts if t.transcript_product
-        ),
-        "protein_products": sorted(
-            t.protein_product for t in gene.transcripts if t.protein_product
-        ),
     }
 
 
@@ -145,16 +136,39 @@ def _gtf_facts(gene: GtfGene) -> Dict[str, object]:
             for tag in value.split(",")
         ],
         "transcript_count": len(transcripts),
-        "proteins": sorted(
-            t.protein_accession for t in transcripts if t.protein_accession
-        ),
-        "transcript_products": sorted(
-            t.transcript_product for t in transcripts if t.transcript_product
-        ),
-        "protein_products": sorted(
-            t.protein_product for t in transcripts if t.protein_product
-        ),
     }
+
+
+TranscriptRecord = Tuple[str, str, str]
+
+
+def _record(t: Union[Transcript, GtfTranscript]) -> TranscriptRecord:
+    """A transcript's protein and products, compared as one unit."""
+    return (
+        t.protein_accession or "",
+        t.transcript_product or "",
+        t.protein_product or "",
+    )
+
+
+def _transcripts_agree(gene: Gene, gtf_gene: GtfGene) -> bool:
+    """Whether each transcript has the same protein and products in both files.
+
+    A transcript with a transcript ID is matched to the GTF's of that ID. The
+    rest are matched as a whole against the GTF transcripts whose IDs the
+    GFF3 doesn't state, which the GTF named itself (from orig_transcript_id,
+    or as unassigned_transcript_N).
+    """
+    stated = {t.transcript_id: t for t in gene.transcripts if t.transcript_id}
+    for transcript_id, transcript in stated.items():
+        gtf_transcript = gtf_gene.transcripts.get(transcript_id)
+        if gtf_transcript is None or _record(gtf_transcript) != _record(transcript):
+            return False
+    without_ids = sorted(_record(t) for t in gene.transcripts if not t.transcript_id)
+    gtf_rest = sorted(
+        _record(t) for i, t in gtf_gene.transcripts.items() if i not in stated
+    )
+    return without_ids == gtf_rest
 
 
 def _key(location: Location) -> Tuple[str, int, int, str]:
@@ -176,12 +190,8 @@ def compare(genes: List[Gene], gtf_genes: List[GtfGene]) -> Dict[str, List[str]]
         gtf_gene = candidates.pop(0)
         ours, theirs = _gff3_facts(gene), _gtf_facts(gtf_gene)
         differences_here = [fact for fact in ours if ours[fact] != theirs[fact]]
-        # Every transcript ID the GFF3 states is in the GTF. The GTF also
-        # names the transcripts the GFF3 leaves without one, from their
-        # orig_transcript_id or as unassigned_transcript_N.
-        stated = {t.transcript_id for t in gene.transcripts if t.transcript_id}
-        if not stated <= set(gtf_gene.transcripts):
-            differences_here.append("transcript_ids")
+        if not _transcripts_agree(gene, gtf_gene):
+            differences_here.append("transcripts")
         for fact in differences_here:
             differences[fact].append(gene.label)
     unpaired = [g.gene_id for remaining in by_location.values() for g in remaining]

@@ -1,8 +1,10 @@
 """Tests for the gene API, against the checked-in 3D7 gene snapshot (#1904)."""
 
+import shutil
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 
+import duckdb
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -170,3 +172,22 @@ def test_concurrent_requests(service, gene_uid):
     with ThreadPoolExecutor(max_workers=16) as pool:
         genes = list(pool.map(service.get_gene, uids))
     assert [g.locus_tag for g in genes] == ["PF3D7_1133400", "PF3D7_0105400"] * 50
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "UPDATE snapshot SET schema_version = 2",
+        "DROP TABLE alt_id",
+    ],
+)
+def test_snapshot_of_another_shape_is_unavailable(tmp_path, change):
+    path = tmp_path / "genes.duckdb"
+    shutil.copy(DEFAULT_GENE_SNAPSHOT_PATH, path)
+    con = duckdb.connect(str(path))
+    con.execute(change)
+    con.close()
+    service = GeneCatalogService(str(path), "")
+    assert not service.is_available()
+    response = make_client(service).get(f"/api/v1/genes/{uuid.uuid4()}")
+    assert response.status_code == 503

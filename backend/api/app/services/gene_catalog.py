@@ -20,6 +20,21 @@ from app.models.genes import Gene, GeneSnapshotInfo
 
 logger = logging.getLogger(__name__)
 
+# The snapshot schema this service reads (build_gene_snapshot's
+# SCHEMA_VERSION); a file of another version is reported unavailable.
+SCHEMA_VERSION = 1
+
+# The tables the queries below read.
+_TABLES = {
+    "snapshot",
+    "assembly",
+    "annotation_set_version",
+    "annotation_file_version",
+    "gene",
+    "transcript",
+    "alt_id",
+}
+
 # The order aliases are listed in on a gene.
 _ALIAS_TYPE_ORDER = (
     "symbol",
@@ -77,7 +92,7 @@ ORDER BY list_position({list(_ALIAS_TYPE_ORDER)}, type) NULLS LAST, type, value
 
 def _records(cur: duckdb.DuckDBPyConnection) -> List[Dict[str, Any]]:
     columns = [d[0] for d in cur.description]
-    return [dict(zip(columns, row)) for row in cur.fetchall()]
+    return [dict(zip(columns, row, strict=True)) for row in cur.fetchall()]
 
 
 class GeneCatalogService:
@@ -109,10 +124,22 @@ class GeneCatalogService:
                 read_only=True,
                 config={"temp_directory": tempfile.gettempdir()},
             )
-            row = con.execute('SELECT build_id, "update" FROM snapshot').fetchone()
+            tables = {name for (name,) in con.execute("SHOW TABLES").fetchall()}
+            missing = _TABLES - tables
+            if missing:
+                raise duckdb.InvalidInputException(
+                    f"it has no {', '.join(sorted(missing))} table"
+                )
+            row = con.execute(
+                'SELECT build_id, "update", schema_version FROM snapshot'
+            ).fetchone()
             if row is None:
                 raise duckdb.InvalidInputException("its snapshot table is empty")
-            build_id, update = row
+            build_id, update, schema_version = row
+            if schema_version != SCHEMA_VERSION:
+                raise duckdb.InvalidInputException(
+                    f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
+                )
         except duckdb.Error as exc:
             logger.error(
                 "Could not open gene snapshot at %s: %s", self.snapshot_path, exc

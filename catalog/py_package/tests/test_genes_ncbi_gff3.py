@@ -205,3 +205,49 @@ def test_row_before_its_parent_fails():
     gene, mrna, cds = rows
     with pytest.raises(ValueError, match="CDS row comes before its parent rna-XM"):
         read_ncbi_gff3([gene, cds, mrna])
+
+
+def test_three_transcripts_each_with_its_own_protein():
+    # 3D7's PF3D7_0613000: three mRNAs sharing one product, so only their
+    # protein accessions tell them apart.
+    [gene] = read_case("pfalciparum_3d7_three_transcripts").genes
+    assert [(t.transcript_id, t.protein_accession) for t in gene.transcripts] == [
+        ("XM_961024.3", "XP_966117.2"),
+        ("XM_024473108.1", "XP_024329002.1"),
+        ("XM_024473109.1", "XP_024329003.1"),
+    ]
+    assert {t.protein_product for t in gene.transcripts} == {"uncharacterized protein"}
+
+
+# Made-up rows for the rejected cases no sampled file has, or that need only
+# one row to show (spec section 4).
+GENE_A = "NC_1.1\tRefSeq\tgene\t1\t90\t.\t+\t.\tID=gene-A;locus_tag=A"
+MRNA_A = "NC_1.1\tRefSeq\tmRNA\t1\t90\t.\t+\t.\tID=rna-A;Parent=gene-A"
+
+
+@pytest.mark.parametrize(
+    "rows, reason",
+    [
+        ([GENE_A, "NC_1.1\tRefSeq\tgene\t1\t90"], "row without 9 columns"),
+        (
+            ["##gff-version 3", "NC_1.1\tRefSeq\tregion\t1\t90\t.\t+\t.\tID=r"],
+            "no genes",
+        ),
+        (
+            [GENE_A, "NC_1.1\tRefSeq\texon\t1\t90\t.\t+\t.\tID=e;Parent=gene-A"],
+            "exon row straight under it",
+        ),
+        (
+            [GENE_A, MRNA_A, MRNA_A.replace("\t1\t90", "\t100\t190")],
+            "written as several rows",
+        ),
+        (["NC_1.1\tRefSeq\tgene\t1\t90\t.\t+\t.\tlocus_tag=A"], "gene row has no ID"),
+        (
+            [GENE_A, "NC_1.1\tRefSeq\tmRNA\t1\t90\t.\t+\t.\tParent=gene-A"],
+            "mRNA row of gene-A has no ID",
+        ),
+    ],
+)
+def test_rejected_cases(rows, reason):
+    with pytest.raises(ValueError, match=reason):
+        read_ncbi_gff3(rows)

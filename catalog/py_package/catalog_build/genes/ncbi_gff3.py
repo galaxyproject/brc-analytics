@@ -166,7 +166,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
             continue
         columns = line.split("\t")
         if len(columns) != 9:
-            continue
+            raise ValueError(f"A row without 9 columns: {line}")
         seq_name, _, row_type, start, end, _, strand, _, attribute_text = columns
         attributes = _parse_attributes(attribute_text)
         row_id = _first(attributes, "ID")
@@ -229,6 +229,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                     attributes, "product"
                 )
 
+    if not genes:
+        raise ValueError("The GFF3 has no genes")
     for gene in genes.values():
         if not gene.transcripts:
             raise ValueError(f"Gene {gene.row_id} has no transcript rows")
