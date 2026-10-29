@@ -223,6 +223,7 @@ def test_three_transcripts_each_with_its_own_protein():
 # one row to show (spec section 4).
 GENE_A = "NC_1.1\tRefSeq\tgene\t1\t90\t.\t+\t.\tID=gene-A;locus_tag=A"
 MRNA_A = "NC_1.1\tRefSeq\tmRNA\t1\t90\t.\t+\t.\tID=rna-A;Parent=gene-A"
+CDS_A = "NC_1.1\tRefSeq\tCDS\t1\t90\t.\t+\t0\tID=cds-A;Parent=rna-A"
 
 
 @pytest.mark.parametrize(
@@ -246,6 +247,34 @@ MRNA_A = "NC_1.1\tRefSeq\tmRNA\t1\t90\t.\t+\t.\tID=rna-A;Parent=gene-A"
             [GENE_A, "NC_1.1\tRefSeq\tmRNA\t1\t90\t.\t+\t.\tParent=gene-A"],
             "mRNA row of gene-A has no ID",
         ),
+        ([GENE_A, MRNA_A.replace(";Parent=gene-A", "")], "mRNA row has no gene parent"),
+        ([GENE_A.replace("\t+\t", "\t.\t"), MRNA_A], "strand isn't"),
+        ([GENE_A + ";pseudo", MRNA_A], "attribute without a value"),
+        ([GENE_A + ";locus_tag=B", MRNA_A], "attribute given twice"),
+        (
+            [GENE_A, GENE_A.replace("locus_tag=A", "locus_tag=B"), MRNA_A],
+            "rows give different attributes",
+        ),
+        ([GENE_A, MRNA_A.replace("\t1\t90", "\t1\t91")], "outside its gene"),
+        (
+            [
+                GENE_A,
+                MRNA_A,
+                CDS_A + ";protein_id=XP_1.1",
+                CDS_A + ";protein_id=XP_2.1",
+            ],
+            "CDS rows name different proteins",
+        ),
+        (
+            [GENE_A, MRNA_A, CDS_A + ";protein_id=XP_1.1", CDS_A],
+            "CDS rows name different proteins",
+        ),
+        (
+            [GENE_A, MRNA_A, CDS_A + ";product=one", CDS_A + ";product=two"],
+            "CDS rows name different products",
+        ),
+        ([GENE_A + ";Name=B", MRNA_A], "neither its symbol nor its locus tag"),
+        ([GENE_A + ";Name=A;gene=sym", MRNA_A], "neither its symbol nor its locus tag"),
     ],
 )
 def test_rejected_cases(rows, reason):

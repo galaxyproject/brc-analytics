@@ -45,7 +45,7 @@ import pandas as pd
 import requests
 
 from .check_against_ncbi_gtf import (
-    compare,
+    compare_files,
     describe,
     gtf_next_to,
     is_url,
@@ -453,8 +453,15 @@ def build_gene_snapshot(
         )
     if stated != accession:
         raise ValueError(f"The GFF3 is for {stated}, not {accession}")
-    gtf_genes = read_ncbi_gtf(text_lines(gtf or gtf_next_to(gff3)))
-    differences = compare(annotation.genes, gtf_genes)
+    if (
+        annotation.header.release_label is None
+        or annotation.header.release_date is None
+    ):
+        raise ValueError(
+            "The GFF3 doesn't give its release (#!annotation-source, #!annotation-date)"
+        )
+    gtf_annotation = read_ncbi_gtf(text_lines(gtf or gtf_next_to(gff3)))
+    differences = compare_files(annotation, gtf_annotation)
     if differences:
         raise ValueError(
             f"{accession} rejected: its GFF3 and NCBI's GTF disagree\n"

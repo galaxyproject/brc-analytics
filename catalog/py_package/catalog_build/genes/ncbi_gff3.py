@@ -12,6 +12,10 @@ from urllib.parse import unquote
 
 GENE_TYPES = {"gene", "pseudogene"}
 
+# Rows read with no parent besides genes: 3D7's. Any other top-level row
+# rejects the file, so a transcript or CDS outside a gene can't be dropped.
+OTHER_TOP_LEVEL_TYPES = {"region"}
+
 # Rows read as a gene's transcripts: the types 3D7's genes have. Any other row
 # straight under a gene rejects the file (spec: "Cases we reject").
 TRANSCRIPT_TYPES = {"mRNA", "transcript", "ncRNA", "tRNA", "rRNA", "snRNA", "snoRNA"}
@@ -24,6 +28,8 @@ _ANNOTATION_SOURCE = re.compile(
 
 @dataclass
 class Header:
+    # Every `#!` line, key to value as written, for the GTF check.
+    lines: Dict[str, str] = field(default_factory=dict)
     genome_build_accession: Optional[str] = None
     provider: Optional[str] = None
     release_label: Optional[str] = None
@@ -46,8 +52,9 @@ class Transcript:
     transcript_id: Optional[str]
     biotype: str
     location: Location
-    # The `product` of the transcript row, and of its first CDS row (naming
-    # the protein), each as written; neither stands in for the other.
+    # The `product` of the transcript row, and of its CDS rows (naming the
+    # protein, the same on each), each as written; neither stands in for the
+    # other.
     transcript_product: Optional[str] = None
     protein_accession: Optional[str] = None
     protein_product: Optional[str] = None
@@ -93,9 +100,13 @@ def _parse_attributes(text: str) -> Dict[str, List[str]]:
     # product stays part of its value.
     attributes: Dict[str, List[str]] = {}
     for pair in text.strip().split(";"):
-        if "=" not in pair:
+        if not pair:
             continue
+        if "=" not in pair:
+            raise ValueError(f"An attribute without a value: {pair}")
         key, value = pair.split("=", 1)
+        if key in attributes:
+            raise ValueError(f"An attribute given twice in one row: {key}")
         attributes[key] = [unquote(v) for v in value.split(",")]
     return attributes
 
@@ -108,6 +119,7 @@ def _first(attributes: Dict[str, List[str]], key: str) -> Optional[str]:
 def _read_header_line(line: str, header: Header) -> None:
     key, _, value = line[2:].partition(" ")
     value = value.strip()
+    header.lines[key] = value
     if key == "genome-build-accession":
         header.genome_build_accession = value.rpartition(":")[2] or None
     elif key == "annotation-source":
@@ -160,6 +172,11 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
     transcripts: Dict[str, Transcript] = {}
     # Every row ID read so far, so a row before its parent is caught.
     row_ids: Set[str] = set()
+    # The attributes of each gene's first row, which its other rows must repeat.
+    gene_attribute_text: Dict[str, str] = {}
+    # What each transcript's CDS rows say, which must be one value each.
+    cds_proteins: Dict[str, Set[Optional[str]]] = {}
+    cds_products: Dict[str, Set[Optional[str]]] = {}
 
     for raw in lines:
         line = raw.rstrip("\n")
@@ -172,6 +189,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
         if len(columns) != 9:
             raise ValueError(f"A row without 9 columns: {line}")
         seq_name, _, row_type, start, end, _, strand, _, attribute_text = columns
+        if strand not in ("+", "-"):
+            raise ValueError(f"A row whose strand isn't + or -: {line}")
         attributes = _parse_attributes(attribute_text)
         row_id = _first(attributes, "ID")
         if row_id:
@@ -184,6 +203,7 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
             gene = genes.get(row_id)
             if gene is None:
                 genes[row_id] = _new_gene(row_id, attributes, location)
+                gene_attribute_text[row_id] = attribute_text
             elif (gene.location.seq_name, gene.location.strand) != (
                 location.seq_name,
                 location.strand,
@@ -191,6 +211,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                 raise ValueError(
                     f"Gene {row_id} has rows on more than one sequence or strand"
                 )
+            elif attribute_text != gene_attribute_text[row_id]:
+                raise ValueError(f"Gene {row_id}'s rows give different attributes")
             else:
                 # One gene written as several rows, one per piece (NCBI marks
                 # it is_ordered): its location runs from the first piece to
@@ -200,6 +222,8 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
             continue
 
         parents = attributes.get("Parent", [])
+        if not parents and row_type not in OTHER_TOP_LEVEL_TYPES:
+            raise ValueError(f"A {row_type} row has no gene parent: {line}")
         for parent in parents:
             if parent not in row_ids:
                 raise ValueError(f"A {row_type} row comes before its parent {parent}")
@@ -226,18 +250,42 @@ def read_ncbi_gff3(lines: Iterable[str]) -> Annotation:
                 )
                 gene.transcripts.append(transcripts[row_id])
             elif row_type == "CDS" and parent in transcripts:
-                transcript = transcripts[parent]
-                transcript.protein_accession = transcript.protein_accession or _first(
-                    attributes, "protein_id"
+                cds_proteins.setdefault(parent, set()).add(
+                    _first(attributes, "protein_id")
                 )
-                transcript.protein_product = transcript.protein_product or _first(
-                    attributes, "product"
+                cds_products.setdefault(parent, set()).add(
+                    _first(attributes, "product")
                 )
 
     if not genes:
         raise ValueError("The GFF3 has no genes")
+    for row_id, proteins in cds_proteins.items():
+        products = cds_products[row_id]
+        if len(proteins) > 1:
+            raise ValueError(f"Transcript {row_id}'s CDS rows name different proteins")
+        if len(products) > 1:
+            raise ValueError(f"Transcript {row_id}'s CDS rows name different products")
+        transcripts[row_id].protein_accession = next(iter(proteins))
+        transcripts[row_id].protein_product = next(iter(products))
     for gene in genes.values():
         if not gene.transcripts:
             raise ValueError(f"Gene {gene.row_id} has no transcript rows")
+        for transcript in gene.transcripts:
+            inside = (
+                transcript.location.seq_name == gene.location.seq_name
+                and transcript.location.strand == gene.location.strand
+                and gene.location.start <= transcript.location.start
+                and transcript.location.end <= gene.location.end
+            )
+            if not inside:
+                raise ValueError(
+                    f"Transcript {transcript.row_id} is outside its gene {gene.row_id}"
+                )
+        # NCBI's convention: the Name is the symbol, else the locus tag.
+        if gene.name is not None and gene.name != (gene.symbol or gene.locus_tag):
+            raise ValueError(
+                f"Gene {gene.row_id}'s Name {gene.name} is neither its symbol "
+                "nor its locus tag"
+            )
 
     return Annotation(header=header, genes=list(genes.values()))

@@ -8,7 +8,12 @@ from types import SimpleNamespace
 import pytest
 import urllib3
 from catalog_build.genes import check_against_ncbi_gtf as check
-from catalog_build.genes.check_against_ncbi_gtf import compare, main, read_ncbi_gtf
+from catalog_build.genes.check_against_ncbi_gtf import (
+    compare,
+    compare_files,
+    main,
+    read_ncbi_gtf,
+)
 from catalog_build.genes.ncbi_gff3 import read_ncbi_gff3
 
 CASES = Path(__file__).parent / "data" / "ncbi_cases"
@@ -18,8 +23,15 @@ def read_pair(name):
     with open(CASES / f"{name}.gff3", encoding="utf-8") as fh:
         genes = read_ncbi_gff3(fh).genes
     with open(CASES / f"{name}.gtf", encoding="utf-8") as fh:
-        gtf_genes = read_ncbi_gtf(fh)
+        gtf_genes = read_ncbi_gtf(fh).genes
     return genes, gtf_genes
+
+
+def read_files(name):
+    with open(CASES / f"{name}.gff3", encoding="utf-8") as fh:
+        annotation = read_ncbi_gff3(fh)
+    with open(CASES / f"{name}.gtf", encoding="utf-8") as fh:
+        return annotation, read_ncbi_gtf(fh)
 
 
 @pytest.mark.parametrize(
@@ -68,6 +80,21 @@ def test_products_swapped_between_transcripts_without_ids_are_a_difference():
     genes, gtf_genes = read_pair("aedes_genes_sharing_a_name")
     genes[0].transcripts[0].transcript_product = "tRNA-Xyz"
     assert compare(genes, gtf_genes) == {"transcripts": ["Trnaa-ggc"]}
+
+
+def test_headers_naming_another_release_are_a_difference():
+    annotation, gtf = read_files("pfalciparum_3d7")
+    assert compare_files(annotation, gtf) == {}
+    gtf.header["annotation-date"] = "09/19/2026"
+    assert compare_files(annotation, gtf) == {"header": ["annotation-date"]}
+
+
+def test_gtf_cds_rows_naming_different_proteins_fail():
+    gtf = (CASES / "pfalciparum_3d7.gtf").read_text(encoding="utf-8")
+    first_cds = next(line for line in gtf.splitlines() if "\tCDS\t" in line)
+    changed = first_cds.replace('protein_id "', 'protein_id "WRONG')
+    with pytest.raises(ValueError, match="different proteins or products"):
+        read_ncbi_gtf([*gtf.splitlines(keepends=True), changed + "\n"])
 
 
 def test_main_reports_a_gff3_the_reader_refuses(capsys):
@@ -162,6 +189,9 @@ PLANTED_BUGS = {
     and _set(g.transcripts[0], "transcript_id", "XM_WRONG.1"),
     "transcript ID dropped": lambda g: g.transcripts[0].transcript_id is not None
     and _set(g.transcripts[0], "transcript_id", None),
+    "transcript biotype changed": lambda g: _set(
+        g.transcripts[0], "biotype", "misc_RNA"
+    ),
     "transcript location shifted": lambda g: _set(
         g.transcripts[0].location, "start", g.transcripts[0].location.start + 1
     ),

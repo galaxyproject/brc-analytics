@@ -221,3 +221,17 @@ def test_gff3_that_does_not_name_its_assembly_fails(tmp_path, catalog):
         bgs.build_gene_snapshot(
             "GCF_000002765.6", str(gff3), tmp_path / "genes.duckdb", catalog
         )
+
+
+def test_gff3_that_does_not_give_its_release_fails(tmp_path, catalog):
+    gff3 = tmp_path / "x_genomic.gff3"
+    gff3.write_text(
+        EXCERPT.read_text().replace(
+            "#!annotation-source Community Annotation GCF_000002765.6-RS_2026_09",
+            "#!annotation-source Community Annotation",
+        )
+    )
+    with pytest.raises(ValueError, match="doesn't give its release"):
+        bgs.build_gene_snapshot(
+            "GCF_000002765.6", str(gff3), tmp_path / "genes.duckdb", catalog
+        )
