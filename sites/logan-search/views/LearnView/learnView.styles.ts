@@ -1,3 +1,4 @@
+import { HEADER_HEIGHT_VAR } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/constants";
 import styled from "@emotion/styled";
 
 // Past this the contents list fits beside a full-width article.
@@ -33,7 +34,7 @@ export const OutlineSlot = styled.aside`
   align-self: start;
   display: none;
   position: sticky;
-  top: 80px;
+  top: calc(${HEADER_HEIGHT_VAR} + 16px);
 
   @media (min-width: ${OUTLINE_MIN_WIDTH}px) {
     display: block;
