@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import copy
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
+import duckdb
 import pytest
 from fastapi.testclient import TestClient
 
@@ -23,6 +25,28 @@ from app.models.assistant import (
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
+
+# Four of 3D7's genes, exported from a snapshot as text so the fixture can be
+# reviewed: AMA1 (PF3D7_1133400), PF3D7_0105400 with two transcripts and old
+# locus tags, the tRNA PF3D7_0203500, and PF3D7_0103600, whose transcript and
+# protein products differ.
+GENE_SNAPSHOT_EXPORT = Path(__file__).parent / "data" / "gene_snapshot"
+
+
+@pytest.fixture(scope="session")
+def gene_snapshot_path(tmp_path_factory) -> Path:
+    """The test gene snapshot, imported from GENE_SNAPSHOT_EXPORT."""
+    path = tmp_path_factory.mktemp("genes") / "genes.duckdb"
+    con = duckdb.connect(str(path))
+    con.execute(f"IMPORT DATABASE '{GENE_SNAPSHOT_EXPORT}'")
+    con.close()
+    return path
+
+
+@pytest.fixture(autouse=True)
+def _local_gene_snapshot(gene_snapshot_path, monkeypatch):
+    """Serve the test snapshot, so no test downloads the pinned one."""
+    monkeypatch.setenv("GENE_SNAPSHOT_PATH", str(gene_snapshot_path))
 
 
 @pytest.fixture(autouse=True)

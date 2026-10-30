@@ -1,0 +1,25 @@
+value,type,gene_uid,asv_id,value_lower,value_unversioned,publisher,via,latest
+PSH1,symbol,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,psh1,psh1,NCBI RefSeq,,true
+XP_024328879.1,protein_accession,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,xp_024328879.1,xp_024328879,NCBI RefSeq,,true
+XM_024473254.2,transcript_id,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,xm_024473254.2,xm_024473254,NCBI RefSeq,,true
+813173,ncbi_gene_id,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,813173,813173,NCBI RefSeq,,true
+PSH1,name,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,psh1,psh1,NCBI RefSeq,,true
+PF3D7_0103600,locus_tag,7b3c7733-2509-5585-995f-694be505af1c,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0103600,pf3d7_0103600,NCBI RefSeq,,true
+PF3D7_0105400,locus_tag,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0105400,pf3d7_0105400,NCBI RefSeq,,true
+PF3D7_0105400,name,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0105400,pf3d7_0105400,NCBI RefSeq,,true
+813190,ncbi_gene_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,813190,813190,NCBI RefSeq,,true
+XM_001350949.2,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,xm_001350949.2,xm_001350949,NCBI RefSeq,,true
+XP_001350985.1,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,xp_001350985.1,xp_001350985,NCBI RefSeq,,true
+XM_024473365.1,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,xm_024473365.1,xm_024473365,NCBI RefSeq,,true
+XP_024328984.1,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,xp_024328984.1,xp_024328984,NCBI RefSeq,,true
+PF3D7_0105400.1,old_locus_tag,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0105400.1,pf3d7_0105400.1,NCBI RefSeq,,true
+PF3D7_0105400.2,old_locus_tag,9ef15f58-60fc-5de4-98b8-7c8cb0169013,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0105400.2,pf3d7_0105400.2,NCBI RefSeq,,true
+PF3D7_0203500,locus_tag,c309de32-b052-5136-8696-0e8e599b7cef,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0203500,pf3d7_0203500,NCBI RefSeq,,true
+PF3D7_0203500,name,c309de32-b052-5136-8696-0e8e599b7cef,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_0203500,pf3d7_0203500,NCBI RefSeq,,true
+8445015,ncbi_gene_id,c309de32-b052-5136-8696-0e8e599b7cef,ncbi-refseq-GCF_000002765.6-6ebba335,8445015,8445015,NCBI RefSeq,,true
+PF3D7_1133400,locus_tag,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,pf3d7_1133400,pf3d7_1133400,NCBI RefSeq,,true
+AMA1,symbol,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,ama1,ama1,NCBI RefSeq,,true
+810891,ncbi_gene_id,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,810891,810891,NCBI RefSeq,,true
+XP_001348015.1,protein_accession,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,xp_001348015.1,xp_001348015,NCBI RefSeq,,true
+XM_001347979.2,transcript_id,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,xm_001347979.2,xm_001347979,NCBI RefSeq,,true
+AMA1,name,d9049485-ed74-5455-98c2-5dc13eef544a,ncbi-refseq-GCF_000002765.6-6ebba335,ama1,ama1,NCBI RefSeq,,true

@@ -1,0 +1,2 @@
+asv_id,assembly_accession,publisher,provider,release_label,release_date,genes_as_of,version,core_hash,content_hash,publisher_file_sha256,first_seen,latest
+ncbi-refseq-GCF_000002765.6-6ebba335,GCF_000002765.6,NCBI RefSeq,Community Annotation,RS_2026_09,2026-09-18,,1,,,6ebba335abc68759b2b762c20a508d226e2d80bff062aee30eb08977909254fb,2026-10-28 21:23:48,true

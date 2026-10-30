@@ -1,22 +1,27 @@
 """Read-only access to the gene snapshot, the DuckDB file the gene API reads.
 
-The file is written by catalog_build.genes.build_gene_snapshot. Until the
-real snapshot exists it is the temporary 3D7 file checked in at
-app/data/genes/genes-3d7.duckdb (#1904), which holds one annotation set
-version, so every row is the latest.
+The file is written by catalog_build.genes.build_gene_snapshot. On the servers
+it is the snapshot the release's pin names, downloaded at startup (see
+app/services/gene_snapshot.py); on a developer's machine it is a local file
+named by GENE_SNAPSHOT_PATH. Each snapshot holds one annotation set version
+per assembly for now, so every row is the latest.
 """
 
+import atexit
 import logging
+import shutil
 import tempfile
 import threading
 from datetime import timezone
+from functools import lru_cache, partial
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 from uuid import UUID
 
 import duckdb
 
 from app.models.genes import Gene, GeneSnapshotInfo
+from app.services.gene_snapshot import DownloadStopped, fetch_pinned_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +43,44 @@ _FORMER_ALIAS_TYPES_SQL = "'old_locus_tag'"
 
 # Alias types left out of a gene's aliases: they are fields of the gene itself.
 _OWN_ALIAS_TYPES_SQL = "'locus_tag', 'name'"
+
+# A snapshot is read-only data from outside the app: it can't reach any file
+# but its own, the network or an extension, and its settings can't be
+# changed once open.
+_DUCKDB_CONFIG = {
+    "enable_external_access": False,
+    "autoinstall_known_extensions": False,
+    "autoload_known_extensions": False,
+    "memory_limit": "1GB",
+    "lock_configuration": True,
+}
+
+
+@lru_cache(maxsize=1)
+def _duckdb_temp_dir() -> str:
+    """An empty temp directory for snapshot connections, one per process.
+
+    DuckDB lets a connection without external access use everything under its
+    temp directory, so it gets its own rather than the system's. One per
+    process, not per connection: DuckDB refuses a second connection to a file
+    open with a different configuration. Removed when the process exits.
+    """
+    path = tempfile.mkdtemp(prefix="gene-snapshot-")
+    atexit.register(shutil.rmtree, path, ignore_errors=True)
+    return path
+
+
+GeneDataStatus = Literal["loading", "ready", "unavailable"]
+GeneDataSource = Literal["local", "pinned"]
+
+# Finds the snapshot file to open: its path, and the build it must be (None
+# for a local file). Stops early when the event is set.
+FindSnapshot = Callable[[threading.Event], Tuple[Path, Optional[str]]]
+
+_LOCAL_HINT = (
+    "Build one with catalog_build.genes.build_gene_snapshot (see "
+    "catalog/docs/gene-catalog/gene-snapshot-release-design.md)."
+)
 
 # Each query returns rows shaped like the response models: column names are
 # the models' fields and structs are their nested models.
@@ -85,34 +128,84 @@ def _records(cur: duckdb.DuckDBPyConnection) -> List[Dict[str, Any]]:
 
 
 class GeneCatalogService:
-    """Read-only access to one gene snapshot file."""
+    """Read-only access to one gene snapshot file.
 
-    def __init__(self, snapshot_path: str, frontend_url: str):
-        self.snapshot_path = snapshot_path
+    Made with local(), which opens its file at once, or pinned(), which
+    starts "loading" and downloads its snapshot in the background once
+    start() is called. Gene requests are answered only when it is "ready".
+    """
+
+    def __init__(
+        self, frontend_url: str, source: GeneDataSource, find_snapshot: FindSnapshot
+    ):
         self.frontend_url = frontend_url.rstrip("/")
+        self.source = source
+        self.status: GeneDataStatus = "loading"
+        self.snapshot: Optional[GeneSnapshotInfo] = None
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         # Held only while a request's cursor is made from the shared
         # connection, as SRAMirrorService does; the queries run unlocked.
         self._cursor_lock = threading.Lock()
-        self.snapshot: Optional[GeneSnapshotInfo] = None
-        self._open()
+        self._find_snapshot = find_snapshot
+        self._loader: Optional[threading.Thread] = None
+        self._stop = threading.Event()
 
-    def _open(self) -> None:
-        if not self.snapshot_path or not Path(self.snapshot_path).is_file():
-            logger.warning(
-                "Gene snapshot not found at %r -- gene API will report unavailable",
-                self.snapshot_path,
-            )
+    @classmethod
+    def local(cls, path: str, frontend_url: str) -> "GeneCatalogService":
+        """Serve a file on this machine, for local development."""
+        service = cls(frontend_url, "local", lambda _stop: (Path(path), None))
+        service._load()
+        return service
+
+    @classmethod
+    def pinned(
+        cls, pin_path: Path, download_dir: Path, frontend_url: str
+    ) -> "GeneCatalogService":
+        """Serve the snapshot the release's pin names, once start() fetches it."""
+        find = partial(
+            fetch_pinned_snapshot,
+            pin_path,
+            download_dir,
+            schema_version=SCHEMA_VERSION,
+        )
+        return cls(frontend_url, "pinned", find)
+
+    def start(self) -> None:
+        """Load the snapshot in the background, unless it already is loaded."""
+        if self.status != "loading" or self._loader is not None:
             return
-        con: Optional[duckdb.DuckDBPyConnection] = None
+        self._loader = threading.Thread(
+            target=self._load, name="gene-snapshot", daemon=True
+        )
+        self._loader.start()
+
+    def _load(self) -> None:
         try:
-            # Spill to the system temp directory, not next to the file, which
-            # may be on a read-only mount (as with the SRA mirror).
-            con = duckdb.connect(
-                self.snapshot_path,
-                read_only=True,
-                config={"temp_directory": tempfile.gettempdir()},
-            )
+            path, pinned_build_id = self._find_snapshot(self._stop)
+            self._open(path, pinned_build_id)
+        except DownloadStopped:
+            return
+        except Exception as exc:
+            # Only the gene features go: the rest of the app keeps serving.
+            self.status = "unavailable"
+            hint = f" {_LOCAL_HINT}" if self.source == "local" else ""
+            logger.error("Gene data is unavailable: %s.%s", exc, hint)
+
+    def _open(self, path: Path, pinned_build_id: Optional[str] = None) -> None:
+        """Open the snapshot at path and check it is one this service reads.
+
+        A pinned snapshot must also be the build its pin names: the checksum
+        proves the file is the one published, and this that the pin, which
+        could be edited by hand, describes it.
+        """
+        if not path.is_file():
+            raise FileNotFoundError(f"no file at {path}")
+        con = duckdb.connect(
+            str(path),
+            read_only=True,
+            config={**_DUCKDB_CONFIG, "temp_directory": _duckdb_temp_dir()},
+        )
+        try:
             row = con.execute(
                 'SELECT build_id, "update", schema_version FROM snapshot'
             ).fetchone()
@@ -123,6 +216,10 @@ class GeneCatalogService:
                 raise duckdb.InvalidInputException(
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
                 )
+            if pinned_build_id is not None and build_id != pinned_build_id:
+                raise duckdb.InvalidInputException(
+                    f"it is build {build_id}, not the pinned {pinned_build_id}"
+                )
             # Run each query once, so a missing table or column fails here
             # rather than on every request.
             nil = UUID(int=0)
@@ -132,16 +229,22 @@ class GeneCatalogService:
                 (_ALIASES_SQL, [nil, ""]),
             ):
                 con.execute(sql, params).fetchall()
-        except duckdb.Error as exc:
-            logger.error(
-                "Could not open gene snapshot at %s: %s", self.snapshot_path, exc
-            )
-            if con is not None:
-                con.close()
-            return
+            snapshot = GeneSnapshotInfo(build_id=build_id, update=update)
+        except BaseException:
+            con.close()
+            raise
         self._con = con
-        self.snapshot = GeneSnapshotInfo(build_id=build_id, update=update)
-        logger.info("Gene snapshot loaded: build %s", build_id)
+        self.snapshot = snapshot
+        self.status = "ready"
+        logger.info("Gene snapshot loaded (%s): build %s", self.source, build_id)
+
+    def health(self) -> Dict[str, Optional[str]]:
+        """The short status the health check reports; reasons go to the log."""
+        return {
+            "status": self.status,
+            "source": self.source,
+            "build_id": self.snapshot.build_id if self.snapshot else None,
+        }
 
     def is_available(self) -> bool:
         return self.snapshot is not None
@@ -192,6 +295,7 @@ class GeneCatalogService:
         )
 
     def close(self) -> None:
+        self._stop.set()
         if self._con is not None:
             self._con.close()
             self._con = None
