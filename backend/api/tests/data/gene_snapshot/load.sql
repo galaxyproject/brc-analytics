@@ -1,0 +1,7 @@
+COPY assembly FROM 'tests/data/gene_snapshot/assembly.csv' (FORMAT 'csv', force_not_null ('organism_name', 'taxonomy_id', 'is_ref', 'accession'), quote '"', delimiter ',', header 1);
+COPY "snapshot" FROM 'tests/data/gene_snapshot/snapshot.csv' (FORMAT 'csv', force_not_null ('schema_version', 'built_at', 'build_id'), quote '"', delimiter ',', header 1);
+COPY annotation_set_version FROM 'tests/data/gene_snapshot/annotation_set_version.csv' (FORMAT 'csv', force_not_null ('assembly_accession', 'publisher', 'version', 'publisher_file_sha256', 'first_seen', 'latest', 'asv_id'), quote '"', delimiter ',', header 1);
+COPY gene FROM 'tests/data/gene_snapshot/gene.csv' (FORMAT 'csv', force_not_null ('gene_uid', 'asv_id', 'present', 'latest', 'assembly_accession', 'seq_name', 'start', 'end', 'strand'), quote '"', delimiter ',', header 1);
+COPY transcript FROM 'tests/data/gene_snapshot/transcript.csv' (FORMAT 'csv', force_not_null ('gene_uid', 'asv_id', 'gff3_row_id', 'seq_name', 'start', 'end', 'strand', 'latest'), quote '"', delimiter ',', header 1);
+COPY alt_id FROM 'tests/data/gene_snapshot/alt_id.csv' (FORMAT 'csv', force_not_null ('value', 'type', 'gene_uid', 'asv_id', 'value_lower', 'value_unversioned', 'publisher', 'latest'), quote '"', delimiter ',', header 1);
+COPY annotation_file_version FROM 'tests/data/gene_snapshot/annotation_file_version.csv' (FORMAT 'csv', force_not_null ('md5', 'sha256_uncompressed', 'md5_uncompressed', 'size', 'url', 'retrieved_at', 'asv_id', 'sha256'), quote '"', delimiter ',', header 1);
