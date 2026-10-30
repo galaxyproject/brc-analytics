@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" font-family="Helvetica, Arial, sans-serif" font-size="13">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="20" y="28" font-size="16" font-weight="bold">P. vivax P01 GAPDH (PVP01_1244000), LT635623.1:1,801,500–1,805,450, minus strand</text>
+<text x="20" y="70" font-weight="bold">NCBI GFF3</text>
+<text x="20" y="86" fill="#555">one CDS ID, two lines, parent = gene</text>
+<line x1="536.1" y1="75" x2="595.9" y2="75" stroke="#333" stroke-width="1.5"/>
+<rect x="385.5" y="67.0" width="150.5" height="16" fill="#1f77b4"/>
+<rect x="595.9" y="67.0" width="13.4" height="16" fill="#1f77b4"/>
+<text x="385.5" y="61" fill="#1f77b4">cds-VUZ97717.1</text>
+<text x="20" y="145" font-weight="bold">UCSC veupathGenes</text>
+<text x="20" y="161" fill="#555">one transcript, two exons</text>
+<line x1="536.1" y1="150" x2="595.9" y2="150" stroke="#333" stroke-width="1.5"/>
+<rect x="243.4" y="146.0" width="292.6" height="8" fill="#2ca02c"/>
+<rect x="595.9" y="146.0" width="264.3" height="8" fill="#2ca02c"/>
+<rect x="385.5" y="142.0" width="150.5" height="16" fill="#2ca02c"/>
+<rect x="595.9" y="142.0" width="13.4" height="16" fill="#2ca02c"/>
+<text x="243.4" y="136" fill="#2ca02c">PVP01_1244000.1</text>
+<text x="20" y="215" font-weight="bold">UCSC ncbiGene GTF</text>
+<text x="20" y="231" fill="#555">two transcripts, one exon each</text>
+<rect x="385.5" y="212.0" width="150.5" height="16" fill="#d62728"/>
+<text x="385.5" y="206" fill="#d62728">VUZ97717.1</text>
+<rect x="595.9" y="240.0" width="13.4" height="16" fill="#d62728"/>
+<text x="615.3" y="253" fill="#d62728">VUZ97717.1_2</text>
+<line x1="536.1" y1="234" x2="595.9" y2="234" stroke="#d62728" stroke-width="1.5" stroke-dasharray="4,4"/>
+<text x="566.0" y="250" text-anchor="middle" fill="#d62728">no intron</text>
+<line x1="536.2" y1="45" x2="536.2" y2="270" stroke="#bbb" stroke-dasharray="2,3"/>
+<line x1="595.7" y1="45" x2="595.7" y2="270" stroke="#bbb" stroke-dasharray="2,3"/>
+<text x="20" y="300" font-weight="bold">RNA-seq reads at the intron (SRR19882863, rnaseq-pe on usegalaxy.org)</text>
+<text x="20" y="334">STAR given the UCSC ncbiGene GTF</text>
+<rect x="380" y="321" width="180" height="14" fill="#d62728"/>
+<text x="566" y="333">240 spliced across it · 57 cut short at the exon edge</text>
+<text x="20" y="379">STAR given a GTF that keeps the exons together</text>
+<rect x="380" y="366" width="222" height="14" fill="#2ca02c"/>
+<text x="608" y="378">296 spliced across it · 5 cut short at the exon edge</text>
+<text x="20" y="415" fill="#555">Gene count from featureCounts: 2,739 with the UCSC GTF, 2,737 with the other. Reads cut short still overlap the gene.</text>
+</svg>
