@@ -1,0 +1,258 @@
+import {
+  type TaxonomyNode,
+  type TreeNode,
+} from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/types";
+import {
+  createFilterUrl,
+  findNodeByName,
+  formatAssemblyCount,
+  getArcStroke,
+  getChildColors,
+  getLabelColor,
+  getNodeColor,
+  getVisibleNodes,
+  isInLineage,
+  labelFits,
+  layoutRelativeTo,
+  truncateLabel,
+} from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/utils";
+import { hcl, hsl } from "d3-color";
+import { hierarchy, partition } from "d3-hierarchy";
+import { sampleTree, taxon } from "./fixtures";
+
+/**
+ * Partitions a taxonomy the way the chart does.
+ * @param data - Taxonomy tree.
+ * @returns The partitioned root.
+ */
+function layout(data: TaxonomyNode): TreeNode {
+  const root = hierarchy(data)
+    .sum((d) => (d.children.length === 0 ? 1 : 0))
+    .sort((a, b) => (a.data.name < b.data.name ? -1 : 1));
+  return partition<TaxonomyNode>().size([2 * Math.PI, root.height + 1])(
+    root
+  ) as TreeNode;
+}
+
+const PALETTE = ["#ff0000", "#00ff00", "#0000ff", "#ffff00"];
+
+describe("getChildColors", () => {
+  it("hands out colours largest child first, whatever the names", () => {
+    // Zed has three leaves, so it outranks the alphabetically earlier Ann.
+    const root = layout(
+      taxon("root", [
+        taxon("Ann", [taxon("a1")]),
+        taxon("Zed", [taxon("z1"), taxon("z2"), taxon("z3")]),
+      ])
+    );
+    expect(getChildColors(root, PALETTE)).toEqual(["#00ff00", "#ff0000"]);
+  });
+
+  it("keeps tree order among children of the same size", () => {
+    const root = layout(sampleTree());
+    // Alpha has two leaves; Beta and Gamma tie on one.
+    expect(getChildColors(root, PALETTE)).toEqual(PALETTE.slice(0, 3));
+  });
+
+  it("cycles the colours when the children outnumber them", () => {
+    const root = layout(
+      taxon(
+        "root",
+        ["a", "b", "c", "d", "e"].map((name) => taxon(name))
+      )
+    );
+    expect(getChildColors(root, PALETTE)).toEqual([...PALETTE, PALETTE[0]]);
+  });
+});
+
+describe("getVisibleNodes", () => {
+  it("returns the rings around the center, not the center or deeper", () => {
+    const root = layout(sampleTree());
+    const visible = getVisibleNodes(root, 4);
+    expect(visible.every((d) => d.depth >= 1 && d.depth <= 3)).toBe(true);
+    expect(visible).toHaveLength(
+      root.descendants().filter((d) => d.depth >= 1 && d.depth <= 3).length
+    );
+  });
+
+  it("returns only the center's subtree when zoomed in", () => {
+    const root = layout(sampleTree());
+    const beta = findNodeByName(root, "Beta");
+    const visible = getVisibleNodes(beta, 4);
+    expect(visible.map((d) => d.data.name)).toEqual(["c-0", "c-1", "c-2"]);
+  });
+});
+
+describe("layoutRelativeTo", () => {
+  it("stretches the center's span to the full circle", () => {
+    const root = layout(sampleTree());
+    const alpha = findNodeByName(root, "Alpha");
+    const coords = layoutRelativeTo(alpha, alpha);
+    expect(coords.x0).toBeCloseTo(0);
+    expect(coords.x1).toBeCloseTo(2 * Math.PI);
+    expect(coords.y0).toBe(0);
+    expect(coords.y1).toBe(1);
+  });
+
+  it("collapses nodes outside the center's subtree to zero angle", () => {
+    const root = layout(sampleTree());
+    const alpha = findNodeByName(root, "Alpha");
+    const gamma = findNodeByName(root, "Gamma");
+    const coords = layoutRelativeTo(gamma, alpha);
+    expect(coords.x1 - coords.x0).toBe(0);
+  });
+});
+
+describe("getNodeColor", () => {
+  it("gives each child of the center its own colour", () => {
+    const root = layout(sampleTree());
+    const colors = getChildColors(root, PALETTE);
+    const names = ["Alpha", "Beta", "Gamma"];
+    expect(
+      names.map((name) =>
+        getNodeColor(findNodeByName(root, name), root, colors)
+      )
+    ).toEqual(colors);
+  });
+
+  it("gives the same answer whatever order nodes are coloured in", () => {
+    // The old chart coloured through a d3 ordinal scale whose domain grew in
+    // whatever order nodes were first asked about, so the same view could
+    // come out differently depending on what had been drawn before.
+    const root = layout(sampleTree());
+    const alpha = findNodeByName(root, "Alpha");
+    const colors = getChildColors(alpha, PALETTE);
+    const nodes = getVisibleNodes(alpha, 4);
+    const forward = nodes.map((d) => getNodeColor(d, alpha, colors));
+    const backward = [...nodes]
+      .reverse()
+      .map((d) => getNodeColor(d, alpha, colors))
+      .reverse();
+    expect(forward).toEqual(backward);
+  });
+
+  it("gives siblings their own hue near their branch's colour", () => {
+    const root = layout(sampleTree());
+    const colors = getChildColors(root, PALETTE);
+    const branch = hcl(colors[0]).h;
+    // a-0 and b-0 are adjacent children of Alpha.
+    const first = hcl(getNodeColor(findNodeByName(root, "a-0"), root, colors));
+    const second = hcl(getNodeColor(findNodeByName(root, "b-0"), root, colors));
+    expect(Math.abs(first.h - second.h)).toBeGreaterThan(10);
+    for (const { h } of [first, second]) {
+      const diff = ((h - branch + 540) % 360) - 180;
+      expect(Math.abs(diff)).toBeLessThanOrEqual(25);
+    }
+  });
+
+  it("lightens deeper rings from their center-child's colour", () => {
+    const root = layout(sampleTree());
+    const colors = getChildColors(root, PALETTE);
+    const beta = findNodeByName(root, "Beta");
+    const deeper = findNodeByName(root, "c-0");
+    expect(hsl(getNodeColor(deeper, root, colors)).l).toBeGreaterThan(
+      hsl(getNodeColor(beta, root, colors)).l
+    );
+  });
+
+  it("keeps the outer rings close to their center-child's saturation", () => {
+    const root = layout(sampleTree());
+    const colors = getChildColors(root, PALETTE);
+    const beta = hsl(getNodeColor(findNodeByName(root, "Beta"), root, colors));
+    // Two rings out from Beta.
+    const outer = hsl(getNodeColor(findNodeByName(root, "c-1"), root, colors));
+    expect(outer.s).toBeGreaterThanOrEqual(beta.s - 0.1);
+  });
+});
+
+describe("getArcStroke", () => {
+  it("outlines an arc in a darker shade of its own fill", () => {
+    for (const fill of PALETTE) {
+      const stroke = hsl(getArcStroke(fill));
+      expect(stroke.l).toBeLessThan(hsl(fill).l);
+      expect(stroke.h).toBeCloseTo(hsl(fill).h, 0);
+    }
+  });
+});
+
+describe("isInLineage", () => {
+  it("includes the node, its ancestors and its descendants only", () => {
+    const root = layout(sampleTree());
+    const alpha = findNodeByName(root, "Alpha");
+    expect(isInLineage(alpha, alpha)).toBe(true);
+    expect(isInLineage(root, alpha)).toBe(true);
+    expect(isInLineage(findNodeByName(root, "a-2"), alpha)).toBe(true);
+    expect(isInLineage(findNodeByName(root, "Beta"), alpha)).toBe(false);
+    expect(isInLineage(findNodeByName(root, "c-0"), alpha)).toBe(false);
+  });
+});
+
+describe("findNodeByName", () => {
+  it("falls back to the root for an unknown name", () => {
+    const root = layout(taxon("root", [taxon("Only")]));
+    expect(findNodeByName(root, "Missing")).toBe(root);
+    expect(findNodeByName(root, "Only").data.name).toBe("Only");
+  });
+});
+
+describe("createFilterUrl", () => {
+  it("filters the assemblies table by rank", () => {
+    expect(createFilterUrl("Genus", "Plasmodium")).toEqual({
+      href: "/data/assemblies",
+      query: encodeURIComponent(
+        JSON.stringify({
+          filter: [
+            { categoryKey: "taxonomicLevelGenus", value: ["Plasmodium"] },
+          ],
+        })
+      ),
+    });
+  });
+
+  it("returns an empty URL for ranks with no filter", () => {
+    expect(createFilterUrl("no rank", "root")).toBe("");
+    expect(createFilterUrl(undefined, "root")).toBe("");
+  });
+});
+
+describe("getLabelColor", () => {
+  it("uses light text on dark arcs and dark text on light ones", () => {
+    expect(getLabelColor("#604c81", "#212B36", "#FFFFFF")).toBe("#FFFFFF");
+    expect(getLabelColor("#d5db9a", "#212B36", "#FFFFFF")).toBe("#212B36");
+  });
+});
+
+describe("labelFits", () => {
+  it("needs the arc to be a line of text wide at the label", () => {
+    const ring = 100;
+    // Mid-radius 150px: 0.1 rad is 15px across, 0.05 rad is 7.5px.
+    expect(labelFits({ x0: 0, x1: 0.1, y0: 1, y1: 2 }, ring, 4, 11)).toBe(true);
+    expect(labelFits({ x0: 0, x1: 0.05, y0: 1, y1: 2 }, ring, 4, 11)).toBe(
+      false
+    );
+  });
+
+  it("treats rings beyond the visible depth as zero thickness", () => {
+    // Wide enough to pass on angle alone, were the ring drawn.
+    expect(labelFits({ x0: 0, x1: 1, y0: 4, y1: 5 }, 100, 4, 11)).toBe(false);
+  });
+});
+
+describe("truncateLabel", () => {
+  it("leaves labels that fit alone", () => {
+    expect(truncateLabel("Fungi", 90, 11)).toBe("Fungi");
+  });
+
+  it("shortens long labels with an ellipsis", () => {
+    const label = truncateLabel("Peronosporomycetes", 60, 11);
+    expect(label.endsWith("…")).toBe(true);
+    expect(label.length).toBeLessThanOrEqual(Math.floor(60 / (11 * 0.56)));
+  });
+});
+
+describe("formatAssemblyCount", () => {
+  it("pluralises", () => {
+    expect(formatAssemblyCount(1)).toBe("1 assembly");
+    expect(formatAssemblyCount(1234)).toBe("1,234 assemblies");
+  });
+});
