@@ -1,12 +1,15 @@
-// Every credit this site shows lives here, and none of it is agreed yet: the
-// Logan citation, the kmindex credit and the compute credit all wait on the
-// Logan team and on how Galaxy and TACC like to be credited. Each one renders
-// bracketed so nobody reads a placeholder as settled wording. Replace a whole
-// entry, brackets included, once its wording is decided.
+// Every credit this site shows lives here. The wording is our own best guess
+// rather than anything the Logan team, Galaxy or TACC signed off on, so expect
+// edits once they've had a look. Logan is cited as its bioRxiv preprint until
+// a journal version is out. Each line is kept short enough that a DOI never
+// wraps mid-token in the footer's narrow credits column.
 export const ATTRIBUTION = {
   COMPUTE:
-    "[ATTRIBUTION TBD: compute credit for Galaxy, TACC and BRC Analytics]",
-  KMINDEX: "[ATTRIBUTION TBD: kmindex credit]",
-  LOGAN_CITATION: "[ATTRIBUTION TBD: Logan citation]",
-  OPERATOR: "[ATTRIBUTION TBD: who runs this site]",
+    "Searches run on Galaxy, on compute at the Texas Advanced Computing Center.",
+  KMINDEX:
+    "kmindex: Lemane T, et al. Nat Comput Sci (2024). doi:10.1038/s43588-024-00596-6",
+  LOGAN_CITATION:
+    "Logan: Chikhi R, et al. bioRxiv (2024). doi:10.1101/2024.07.30.605881",
+  OPERATOR:
+    "This Logan Search website and query service is operated by the BRC Analytics team, part of the Galaxy Project.",
 } as const;

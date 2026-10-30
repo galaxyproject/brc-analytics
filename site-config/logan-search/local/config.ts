@@ -35,6 +35,7 @@ export function makeConfig(
     layout: {
       footer: {
         Branding: Branding(),
+        navLinks: [{ label: "Search queue", url: ROUTES.QUEUE }],
         versionInfo: true,
       },
       header: {
