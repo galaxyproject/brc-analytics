@@ -37,21 +37,12 @@ export const HeroLayout = styled("div", {
   flex-direction: column;
   gap: 8px;
   margin: 0 auto;
+  /* Every page's title starts where the home page's does, on the same
+     1200px frame as the page sections below it. */
+  max-width: 1200px;
+  padding: 40px 20px
+    ${({ variant }) => (variant === "home" ? 40 + HERO_OVERLAP : 40)}px;
   position: relative; /* positions the home page's lens */
-
-  ${({ variant }) =>
-    variant === "home"
-      ? css`
-          max-width: 1200px;
-          padding: 40px 20px ${40 + HERO_OVERLAP}px;
-        `
-      : css`
-          /* Lines the title up with the article column below it, as the shared
-             docs hero does. */
-          box-sizing: content-box;
-          max-width: 756px;
-          padding: 48px 16px 56px;
-        `}
 `;
 
 export const Head = styled("h1", {
