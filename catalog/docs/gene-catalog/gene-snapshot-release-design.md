@@ -50,7 +50,7 @@ CI runs `test_the_committed_pin_is_one_this_release_reads` in the backend tests,
 
 The backend chooses its mode from one setting:
 
-- **`GENE_SNAPSHOT_PATH` unset: pinned mode.** The servers and CI run this way. It is never set in `backend/api/.env.example`, which `docker-compose.yml` loads on the servers too; a test checks that.
+- **`GENE_SNAPSHOT_PATH` unset: pinned mode.** The servers run this way, as does the Docker stack in CI; the backend's unit tests use local mode. It is never set in `backend/api/.env.example`, which `docker-compose.yml` loads on the servers too; a test checks that.
 - **`GENE_SNAPSHOT_PATH` set: local mode.** The API opens that file and checks only its `schema_version`. Never set it on a server.
 
 `ENVIRONMENT` doesn't choose the mode: it defaults to `development` when unset, and the dev server's value is in the same group as a laptop's, so a misconfigured server would look local.

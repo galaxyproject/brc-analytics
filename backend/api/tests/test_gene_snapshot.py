@@ -123,6 +123,22 @@ def test_a_file_that_is_not_the_pinned_one_is_refused(
     assert os.listdir(tmp_path / "genes") == []
 
 
+def test_an_oversized_download_is_stopped_early(tmp_path, store, snapshot_bytes):
+    # The store sends far more than the pin's size: reading stops just past
+    # it rather than filling the disk.
+    sent = []
+
+    def endless():
+        while len(sent) < 1000:
+            sent.append(1)
+            yield b"x" * len(snapshot_bytes)
+
+    store.responses.append(httpx.Response(200, content=endless()))
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "unavailable"
+    assert len(sent) <= 2
+
+
 def test_a_failed_attempt_is_retried(tmp_path, store, snapshot_bytes):
     store.responses.extend(
         [httpx.ConnectError("unreachable"), httpx.Response(200, content=snapshot_bytes)]
@@ -336,6 +352,10 @@ def test_gene_data_failing_leaves_the_app_healthy(app_with_stubbed_agent, store)
         "SELECT * FROM 'https://genes.test/x.csv'",
         "LOAD httpfs",
         "SET enable_external_access = true",
+        # Refused only because the file is opened read-only.
+        "CREATE TABLE other (i INTEGER)",
+        # Refused only because the configuration is locked.
+        "SET memory_limit = '8GB'",
     ],
 )
 def test_a_snapshot_cannot_reach_beyond_its_own_file(gene_snapshot_path, tmp_path, sql):
