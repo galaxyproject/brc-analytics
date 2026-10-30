@@ -98,7 +98,8 @@ The servers read `snapshots/` without credentials, so no key reaches the servers
 - **Read:** a bucket policy allowing `s3:GetObject` on `snapshots/*` only from `aws:SourceIp` `129.114.0.0/16`, the TACC block the BRC servers are in (prod 129.114.102.29, dev 129.114.102.31).
 - **No listing:** the policy grants no `s3:ListBucket`.
 - **Write:** only the publishers' credentials.
-- **Versioning on,** as a backstop to `IfNoneMatch`.
+- **Versioning on,** so a deleted snapshot can be restored by hand.
+- **Never delete a published snapshot.** `IfNoneMatch` stops an overwrite but not a delete followed by a new upload under the same build ID, and every release pinning that ID, including rollback targets, would then fail its checksum and serve no gene data. To withdraw a snapshot, publish a new build and release a new pin.
 - **Server access logging on.** Refused requests are logged with their source address, so the servers' real outbound address can be confirmed without logging in to them, and the allowlist narrowed to it.
 
 The snapshots hold only public NCBI data; the allowlist keeps anonymous traffic, and the transfer cost it brings, off the bucket. Moving to the Jetstream2 bucket is a new pin pointing at the new URL, released like any other; the publish command's `snapshot_url` is the one AWS-specific part to change (its docstring says how).
