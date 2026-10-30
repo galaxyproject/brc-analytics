@@ -5,15 +5,15 @@ import { pointer, select } from "d3-selection";
 import { arc as d3Arc } from "d3-shape";
 import "d3-transition";
 import { type JSX, useEffect, useRef, useState } from "react";
-import { roma_cyclic } from "./crameri";
 import { NodeDetails } from "./nodeDetails";
 import { ChartFrame, Layout, Tooltip } from "./sunburst.styles";
 import { type ArcCoords, type TaxonomyNode, type TreeNode } from "./types";
 import {
+  FIRST_RING_COLORS,
   findNodeByName,
   formatAssemblyCount,
   getArcStroke,
-  getEquidistantColors,
+  getChildColors,
   getLabelColor,
   getNodeColor,
   getVisibleNodes,
@@ -22,8 +22,6 @@ import {
   layoutRelativeTo,
   truncateLabel,
 } from "./utils";
-
-const REVERSED_ROMA_CYCLIC = [...roma_cyclic].reverse();
 
 // Hex rather than the theme's CSS variables: label colours are picked by
 // computing contrast against the arc fill.
@@ -285,10 +283,7 @@ export const SunburstChart = ({
     }
 
     function colorsFor(center: TreeNode): (d: TreeNode) => string {
-      const childColors = getEquidistantColors(
-        REVERSED_ROMA_CYCLIC,
-        center.children?.length ?? 0
-      );
+      const childColors = getChildColors(center, FIRST_RING_COLORS);
       return (d) => getNodeColor(d, center, childColors);
     }
 

@@ -7,7 +7,7 @@ import {
   findNodeByName,
   formatAssemblyCount,
   getArcStroke,
-  getEquidistantColors,
+  getChildColors,
   getLabelColor,
   getNodeColor,
   getVisibleNodes,
@@ -16,7 +16,7 @@ import {
   layoutRelativeTo,
   truncateLabel,
 } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/utils";
-import { hsl } from "d3-color";
+import { hcl, hsl } from "d3-color";
 import { hierarchy, partition } from "d3-hierarchy";
 import { sampleTree, taxon } from "./fixtures";
 
@@ -36,23 +36,32 @@ function layout(data: TaxonomyNode): TreeNode {
 
 const PALETTE = ["#ff0000", "#00ff00", "#0000ff", "#ffff00"];
 
-describe("getEquidistantColors", () => {
-  it("returns nothing for no colours and the first colour for one", () => {
-    expect(getEquidistantColors(PALETTE, 0)).toEqual([]);
-    expect(getEquidistantColors(PALETTE, 1)).toEqual(["#ff0000"]);
+describe("getChildColors", () => {
+  it("hands out colours largest child first, whatever the names", () => {
+    // Zed has three leaves, so it outranks the alphabetically earlier Ann.
+    const root = layout(
+      taxon("root", [
+        taxon("Ann", [taxon("a1")]),
+        taxon("Zed", [taxon("z1"), taxon("z2"), taxon("z3")]),
+      ])
+    );
+    expect(getChildColors(root, PALETTE)).toEqual(["#00ff00", "#ff0000"]);
   });
 
-  it("samples evenly when the map has enough colours", () => {
-    expect(getEquidistantColors(PALETTE, 2)).toEqual(["#ff0000", "#0000ff"]);
-    expect(getEquidistantColors(PALETTE, 4)).toEqual(PALETTE);
+  it("keeps tree order among children of the same size", () => {
+    const root = layout(sampleTree());
+    // Alpha has two leaves; Beta and Gamma tie on one.
+    expect(getChildColors(root, PALETTE)).toEqual(PALETTE.slice(0, 3));
   });
 
-  it("interpolates when more colours are wanted than the map holds", () => {
-    const colors = getEquidistantColors(PALETTE, 7);
-    expect(colors).toHaveLength(7);
-    expect(new Set(colors).size).toBe(7);
-    expect(hsl(colors[0]).formatHex()).toBe("#ff0000");
-    expect(hsl(colors[6]).formatHex()).toBe("#ffff00");
+  it("cycles the colours when the children outnumber them", () => {
+    const root = layout(
+      taxon(
+        "root",
+        ["a", "b", "c", "d", "e"].map((name) => taxon(name))
+      )
+    );
+    expect(getChildColors(root, PALETTE)).toEqual([...PALETTE, PALETTE[0]]);
   });
 });
 
@@ -95,9 +104,9 @@ describe("layoutRelativeTo", () => {
 });
 
 describe("getNodeColor", () => {
-  it("gives each child of the center its own colour by position", () => {
+  it("gives each child of the center its own colour", () => {
     const root = layout(sampleTree());
-    const colors = getEquidistantColors(PALETTE, 3);
+    const colors = getChildColors(root, PALETTE);
     const names = ["Alpha", "Beta", "Gamma"];
     expect(
       names.map((name) =>
@@ -112,7 +121,7 @@ describe("getNodeColor", () => {
     // come out differently depending on what had been drawn before.
     const root = layout(sampleTree());
     const alpha = findNodeByName(root, "Alpha");
-    const colors = getEquidistantColors(PALETTE, alpha.children?.length ?? 0);
+    const colors = getChildColors(alpha, PALETTE);
     const nodes = getVisibleNodes(alpha, 4);
     const forward = nodes.map((d) => getNodeColor(d, alpha, colors));
     const backward = [...nodes]
@@ -122,19 +131,23 @@ describe("getNodeColor", () => {
     expect(forward).toEqual(backward);
   });
 
-  it("shades every other sibling so neighbouring arcs differ", () => {
+  it("gives siblings their own hue near their branch's colour", () => {
     const root = layout(sampleTree());
-    const colors = getEquidistantColors(PALETTE, 3);
-    // a-0 and b-0 are adjacent children of Alpha, so they share a base.
-    const first = getNodeColor(findNodeByName(root, "a-0"), root, colors);
-    const second = getNodeColor(findNodeByName(root, "b-0"), root, colors);
-    expect(first).not.toBe(second);
-    expect(hsl(second).l).toBeLessThan(hsl(first).l);
+    const colors = getChildColors(root, PALETTE);
+    const branch = hcl(colors[0]).h;
+    // a-0 and b-0 are adjacent children of Alpha.
+    const first = hcl(getNodeColor(findNodeByName(root, "a-0"), root, colors));
+    const second = hcl(getNodeColor(findNodeByName(root, "b-0"), root, colors));
+    expect(Math.abs(first.h - second.h)).toBeGreaterThan(10);
+    for (const { h } of [first, second]) {
+      const diff = ((h - branch + 540) % 360) - 180;
+      expect(Math.abs(diff)).toBeLessThanOrEqual(25);
+    }
   });
 
   it("lightens deeper rings from their center-child's colour", () => {
     const root = layout(sampleTree());
-    const colors = getEquidistantColors(PALETTE, 3);
+    const colors = getChildColors(root, PALETTE);
     const beta = findNodeByName(root, "Beta");
     const deeper = findNodeByName(root, "c-0");
     expect(hsl(getNodeColor(deeper, root, colors)).l).toBeGreaterThan(
@@ -144,7 +157,7 @@ describe("getNodeColor", () => {
 
   it("keeps the outer rings close to their center-child's saturation", () => {
     const root = layout(sampleTree());
-    const colors = getEquidistantColors(PALETTE, 3);
+    const colors = getChildColors(root, PALETTE);
     const beta = hsl(getNodeColor(findNodeByName(root, "Beta"), root, colors));
     // Two rings out from Beta.
     const outer = hsl(getNodeColor(findNodeByName(root, "c-1"), root, colors));

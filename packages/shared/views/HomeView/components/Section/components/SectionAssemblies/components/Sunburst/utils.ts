@@ -1,40 +1,84 @@
 import { type LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { hsl, rgb } from "d3-color";
-import { interpolateRgb, piecewise } from "d3-interpolate";
+import { hcl, hsl, rgb } from "d3-color";
 import { type ArcCoords, type TreeNode } from "./types";
 
 const TAU = 2 * Math.PI;
 
 /**
- * Picks `count` colours spread evenly around a colour map, interpolating
- * (gamma-corrected RGB) when more are asked for than the map holds.
- * @param colorMap - Colours to sample from.
- * @param count - Number of colours wanted.
- * @returns The sampled colours.
+ * First-ring colours, handed out largest arc first: muted natural tones,
+ * with lightness spread so neighbouring ranks stay apart under red-green
+ * and blue-yellow colour blindness.
  */
-export function getEquidistantColors(
-  colorMap: string[],
-  count: number
-): string[] {
-  if (count <= 0) return [];
-  if (count === 1) return [colorMap[0]];
-  if (count <= colorMap.length) {
-    const step = colorMap.length / count;
-    return Array.from(
-      { length: count },
-      (_, i) => colorMap[Math.floor(i * step)]
-    );
+export const FIRST_RING_COLORS = [
+  "#3F6E8C",
+  "#C08040",
+  "#5E9A74",
+  "#8F3F3F",
+  "#B98DB3",
+  "#66702F",
+  "#9CC2B4",
+  "#D9B65E",
+];
+
+// Width of the hue band, in degrees, that a first-ring arc's descendants
+// spread across around its colour.
+const HUE_BAND = 50;
+
+/**
+ * Colours for the children of the chart's center, assigned by size so the
+ * biggest arcs get the most distinct colours whatever their names.
+ * @param center - Node the chart is centred on.
+ * @param colors - Colours to hand out, best first; cycled if outnumbered.
+ * @returns One colour per child of `center`, in child order.
+ */
+export function getChildColors(center: TreeNode, colors: string[]): string[] {
+  const children = center.children ?? [];
+  const bySize = children
+    .map((child, i) => ({ i, value: child.value ?? 0 }))
+    .sort((a, b) => b.value - a.value || a.i - b.i);
+  const result: string[] = new Array(children.length);
+  bySize.forEach(({ i }, rank) => {
+    result[i] = colors[rank % colors.length];
+  });
+  return result;
+}
+
+/**
+ * Hue offset of `node` within a band, Tree Colors style (Tennekes & de
+ * Jonge, 2014): each node's slice of the band is split among its children,
+ * with a gap between slices so siblings stay apart, and interleaved so
+ * neighbouring arcs come from opposite halves of their parent's slice.
+ * @param node - A descendant of `from`.
+ * @param from - Node that owns the whole band.
+ * @param band - Band width, in degrees.
+ * @returns Offset from the start of the band, in degrees.
+ */
+function getHueOffset(node: TreeNode, from: TreeNode, band: number): number {
+  const path = node
+    .ancestors()
+    .slice(0, node.depth - from.depth)
+    .reverse();
+  let start = 0;
+  let end = band;
+  for (const step of path) {
+    const siblings = step.parent?.children ?? [step];
+    const n = siblings.length;
+    const i = siblings.indexOf(step);
+    const slot = i % 2 === 0 ? i / 2 : Math.ceil(n / 2) + (i - 1) / 2;
+    const width = (end - start) / n;
+    const mid = start + width * (slot + 0.5);
+    start = mid - width * 0.4;
+    end = mid + width * 0.4;
   }
-  const scale = piecewise(interpolateRgb.gamma(2.2), colorMap);
-  return Array.from({ length: count }, (_, i) => scale(i / (count - 1)));
+  return (start + end) / 2;
 }
 
 /**
  * Colour of a node's arc when the chart is centred on `center`. Each child
- * of the center takes its own colour by sibling position; deeper nodes take
- * their center-child ancestor's, lightened a little per ring but kept
- * close to its saturation so the outer rings don't wash out, with every
- * other sibling a shade darker so neighbouring arcs stay distinguishable.
+ * of the center takes its own colour; deeper nodes take a hue near their
+ * center-child ancestor's, picked by their place in the tree so siblings and
+ * cousins differ, lightened a little per ring but kept close to its
+ * saturation so the outer rings don't wash out.
  * @param node - A descendant of `center`.
  * @param center - Node the chart is centred on.
  * @param childColors - One colour per child of `center`, in order.
@@ -53,13 +97,14 @@ export function getNodeColor(
   if (index < 0) return "#ccc";
   const steps = node.depth - center.depth - 1;
   if (steps === 0) return childColors[index];
-  const base = hsl(childColors[index]);
-  const siblingIndex = node.parent?.children?.indexOf(node) ?? 0;
-  const shade = siblingIndex % 2 === 1 ? -0.05 : 0;
+  // Shift the hue in HCL so it moves without changing perceived lightness.
+  const base = hcl(childColors[index]);
+  const hue = base.h - HUE_BAND / 2 + getHueOffset(node, centerChild, HUE_BAND);
+  const shifted = hsl(hcl(hue, base.c, base.l).rgb());
   return hsl(
-    base.h,
-    Math.max(0, base.s - 0.03 * steps),
-    Math.min(0.85, base.l + 0.045 * steps + shade)
+    shifted.h,
+    Math.max(0, shifted.s - 0.03 * steps),
+    Math.min(0.85, shifted.l + 0.045 * steps)
   ).toString();
 }
 
