@@ -3,7 +3,7 @@
     python -m catalog_build.genes.build_gene_snapshot \\
         --assembly GCF_000002765.6 \\
         --gff3 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/765/GCF_000002765.6_GCA_000002765/GCF_000002765.6_GCA_000002765_genomic.gff.gz \\
-        --out ../../backend/api/app/data/genes/genes-3d7.duckdb
+        --out genes-3d7.duckdb
 
 (run from catalog/py_package).
 

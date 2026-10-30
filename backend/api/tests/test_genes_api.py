@@ -1,4 +1,4 @@
-"""Tests for the gene API, against the checked-in 3D7 gene snapshot (#1904)."""
+"""Tests for the gene API, against the test gene snapshot (conftest.py)."""
 
 import shutil
 import uuid
@@ -10,7 +10,6 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api.v1 import genes
-from app.core.config import DEFAULT_GENE_SNAPSHOT_PATH
 from app.core.dependencies import get_gene_catalog_service
 from app.services.gene_catalog import GeneCatalogService
 
@@ -23,9 +22,9 @@ def make_client(service: GeneCatalogService) -> TestClient:
 
 
 @pytest.fixture(scope="module")
-def service():
-    service = GeneCatalogService(
-        str(DEFAULT_GENE_SNAPSHOT_PATH), "https://brc-analytics.org/"
+def service(gene_snapshot_path):
+    service = GeneCatalogService.local(
+        str(gene_snapshot_path), "https://brc-analytics.org/"
     )
     yield service
     service.close()
@@ -53,8 +52,13 @@ def gene_uid(service):
     return lookup
 
 
-def test_checked_in_snapshot_opens(service):
+def test_local_snapshot_opens(service):
     assert service.is_available()
+    assert service.health() == {
+        "status": "ready",
+        "source": "local",
+        "build_id": service.snapshot.build_id,
+    }
     assert service.snapshot.build_id.startswith("temp-GCF_000002765.6-")
 
 
@@ -156,8 +160,9 @@ def test_gene_uid_that_is_not_a_uuid_is_422(client):
 
 
 def test_missing_snapshot_is_503(tmp_path, gene_uid):
-    service = GeneCatalogService(str(tmp_path / "missing.duckdb"), "")
+    service = GeneCatalogService.local(str(tmp_path / "missing.duckdb"), "")
     assert not service.is_available()
+    assert service.status == "unavailable"
     response = make_client(service).get(f"/api/v1/genes/{gene_uid('PF3D7_1133400')}")
     assert response.status_code == 503
     assert response.json() == {"detail": "Gene data is unavailable"}
@@ -186,19 +191,19 @@ def test_concurrent_requests(service, gene_uid):
         "ALTER TABLE transcript DROP COLUMN protein_product",
     ],
 )
-def test_snapshot_of_another_shape_is_unavailable(tmp_path, change):
+def test_snapshot_of_another_shape_is_unavailable(tmp_path, gene_snapshot_path, change):
     path = tmp_path / "genes.duckdb"
-    shutil.copy(DEFAULT_GENE_SNAPSHOT_PATH, path)
+    shutil.copy(gene_snapshot_path, path)
     con = duckdb.connect(str(path))
     con.execute(change)
     con.close()
-    service = GeneCatalogService(str(path), "")
+    service = GeneCatalogService.local(str(path), "")
     assert not service.is_available()
     response = make_client(service).get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 503
 
 
-def test_the_app_serves_genes_from_its_default_snapshot(app_with_stubbed_agent):
+def test_the_app_serves_genes_from_its_local_snapshot(app_with_stubbed_agent):
     # Through create_app's own route and service, not this module's overrides.
     response = TestClient(app_with_stubbed_agent).get(
         "/api/v1/genes/d9049485-ed74-5455-98c2-5dc13eef544a"
