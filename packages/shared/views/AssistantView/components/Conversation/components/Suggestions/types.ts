@@ -19,7 +19,8 @@ export interface SuggestionsProps extends Pick<
   ConversationProps,
   "onSend" | "suggestions"
 > {
-  disabled: boolean;
+  isBusy: boolean;
   isSetupComplete: boolean;
   onFocusComposer: () => void;
+  onFocusLog: () => void;
 }

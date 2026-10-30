@@ -20,6 +20,7 @@ from app.services.auth_service import COOKIE_NAME, AuthService
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
+from app.services.gene_catalog import GeneCatalogService
 from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -64,6 +65,12 @@ def get_sra_mirror_service() -> Optional[SRAMirrorService]:
         f"SRA mirror service initialized (singleton), available: {service.is_available()}"
     )
     return service
+
+
+@lru_cache(maxsize=1)
+def get_gene_catalog_service() -> GeneCatalogService:
+    settings = get_settings()
+    return GeneCatalogService(settings.GENE_SNAPSHOT_PATH, settings.FRONTEND_URL)
 
 
 @lru_cache(maxsize=1)
@@ -307,6 +314,7 @@ def reset_all_services() -> None:
     get_catalog_data.cache_clear()
     get_ena_service.cache_clear()
     get_sra_mirror_service.cache_clear()
+    get_gene_catalog_service.cache_clear()
     get_service_galaxy.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()

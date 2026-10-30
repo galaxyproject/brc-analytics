@@ -1,6 +1,7 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import { STEP as ACCESSION_COUNT_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/AccessionCountStep/step";
 import { STEP as DESEQ2_FORMULA_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/DESeq2FormulaStep/step";
+import { STEP as FASTA_COLLECTION_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/step";
 import { STEP as GTF_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/GTFStep/step";
 import { STEP as PRIMARY_CONTRASTS_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/PrimaryContrastsStep/step";
 import { STEP as REFERENCE_ASSEMBLY_STEP } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/step";
@@ -25,6 +26,11 @@ export const SEQUENCING_STEPS: Record<string, StepConfig> = {
   readRunsSingle: SINGLE_END_STEP,
 };
 
+export const ORGANISM_SCOPED_STEPS: Record<string, StepConfig> = {
+  ...SEQUENCING_STEPS,
+  [FASTA_COLLECTION_STEP.key]: FASTA_COLLECTION_STEP,
+};
+
 export const STEP: Record<
   | WORKFLOW_PARAMETER_VARIABLE
   | "ACCESSION_COUNT"
@@ -40,7 +46,7 @@ export const STEP: Record<
 > = {
   [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL]: null,
   [WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID]: REFERENCE_ASSEMBLY_STEP,
-  [WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION]: null,
+  [WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION]: FASTA_COLLECTION_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL]: GTF_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE]: PAIRED_FILE_STEP,
   [WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED]: PAIRED_END_STEP,

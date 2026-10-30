@@ -115,6 +115,20 @@ export function workflowPloidyMatchesOrganismPloidy(
 }
 
 /**
+ * Determines whether a workflow's maximum assembly limit has been reached by
+ * the given number of selected assemblies.
+ * @param assemblyCountMax - Maximum assemblies allowed (null = no limit).
+ * @param selectedAssemblyCount - Number of assemblies selected.
+ * @returns True if no further assembly can be selected.
+ */
+export function workflowReachesAssemblyMaximum(
+  assemblyCountMax: number | null,
+  selectedAssemblyCount: number
+): boolean {
+  return assemblyCountMax !== null && selectedAssemblyCount >= assemblyCountMax;
+}
+
+/**
  * Checks if a workflow requires the ASSEMBLY_ID parameter.
  * Workflows with ASSEMBLY_ID depend on Galaxy having pre-built indexes (dbkey) for the assembly.
  * @param workflow - The workflow to check.
@@ -123,5 +137,16 @@ export function workflowPloidyMatchesOrganismPloidy(
 export function workflowRequiresAssemblyId(workflow: Workflow): boolean {
   return workflow.parameters.some(
     (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_ID
+  );
+}
+
+/**
+ * Checks if a workflow requires the FASTA_COLLECTION parameter.
+ * @param workflow - The workflow to check.
+ * @returns True if the workflow has a parameter with FASTA_COLLECTION variable, false otherwise.
+ */
+export function workflowRequiresFastaCollection(workflow: Workflow): boolean {
+  return workflow.parameters.some(
+    (param) => param.variable === WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION
   );
 }

@@ -1,4 +1,10 @@
-import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
+import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
+import type { Workflow } from "@repo/shared/apis/workflow";
+import {
+  workflowMeetsAssemblyMinimum,
+  workflowReachesAssemblyMaximum,
+  workflowRequiresFastaCollection,
+} from "@repo/shared/workflow/utils";
 
 describe("workflowMeetsAssemblyMinimum", () => {
   test("returns true when assemblyCountMin is 0 (no assembly requirement)", () => {
@@ -17,5 +23,49 @@ describe("workflowMeetsAssemblyMinimum", () => {
     expect(workflowMeetsAssemblyMinimum(1, 0)).toBe(false);
     expect(workflowMeetsAssemblyMinimum(2, 1)).toBe(false);
     expect(workflowMeetsAssemblyMinimum(2, 0)).toBe(false);
+  });
+});
+
+describe("workflowReachesAssemblyMaximum", () => {
+  test("returns false when the workflow has no maximum", () => {
+    expect(workflowReachesAssemblyMaximum(null, 0)).toBe(false);
+    expect(workflowReachesAssemblyMaximum(null, 100)).toBe(false);
+  });
+
+  test("returns false when the selected count is below the maximum", () => {
+    expect(workflowReachesAssemblyMaximum(3, 0)).toBe(false);
+    expect(workflowReachesAssemblyMaximum(3, 2)).toBe(false);
+  });
+
+  test("returns true when the selected count reaches the maximum", () => {
+    expect(workflowReachesAssemblyMaximum(3, 3)).toBe(true);
+    expect(workflowReachesAssemblyMaximum(3, 4)).toBe(true);
+  });
+});
+
+describe("workflowRequiresFastaCollection", () => {
+  test("returns true when the workflow declares a FASTA collection parameter", () => {
+    const workflow = {
+      parameters: [
+        {
+          key: "Unaligned sequences",
+          variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+        },
+      ],
+    } as Workflow;
+    expect(workflowRequiresFastaCollection(workflow)).toBe(true);
+  });
+
+  test("returns false when the workflow declares no FASTA collection parameter", () => {
+    const workflow = {
+      parameters: [
+        {
+          key: "Paired reads",
+          variable: WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
+        },
+        { key: "Free text" },
+      ],
+    } as Workflow;
+    expect(workflowRequiresFastaCollection(workflow)).toBe(false);
   });
 });

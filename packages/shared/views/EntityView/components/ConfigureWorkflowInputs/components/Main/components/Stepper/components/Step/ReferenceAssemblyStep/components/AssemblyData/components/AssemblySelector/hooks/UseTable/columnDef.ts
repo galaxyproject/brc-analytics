@@ -216,8 +216,11 @@ const TAXONOMY_ID: ColumnDef<Assembly> = {
   meta: { width: { max: "0.5fr", min: "144px" } },
 };
 
-export const columns: ColumnDef<Assembly>[] = [
-  ACTION,
+/**
+ * Assembly columns, without a row action, so a selector can pair them with its
+ * own way of selecting rows.
+ */
+export const ASSEMBLY_COLUMNS: ColumnDef<Assembly>[] = [
   ACCESSION,
   TAXONOMIC_LEVEL_SPECIES,
   TAXONOMIC_LEVEL_STRAIN,
@@ -239,3 +242,5 @@ export const columns: ColumnDef<Assembly>[] = [
   LINEAGE_TAXONOMY_IDS,
   GALAXY_DATACACHE_URL,
 ];
+
+export const columns: ColumnDef<Assembly>[] = [ACTION, ...ASSEMBLY_COLUMNS];

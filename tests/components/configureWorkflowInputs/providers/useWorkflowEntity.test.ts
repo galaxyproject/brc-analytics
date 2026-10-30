@@ -12,6 +12,7 @@ describe("useWorkflowEntity", () => {
 
   test("returns context value when used within provider", () => {
     const value = {
+      assemblies: [],
       ncbiTaxonomyId: "123",
       taxonomicLevelSpecies: "Test species",
     };

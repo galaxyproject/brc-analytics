@@ -7,7 +7,6 @@ import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/La
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
 import { ExploreStateProvider } from "@databiosphere/findable-ui/lib/providers/exploreState";
-import { LayoutDimensionsProvider } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/provider";
 import { ServicesProvider } from "@databiosphere/findable-ui/lib/providers/services/provider";
 import { SystemStatusProvider } from "@databiosphere/findable-ui/lib/providers/systemStatus";
 import { type DataExplorerError } from "@databiosphere/findable-ui/lib/types/error";
@@ -24,11 +23,8 @@ import { OgMeta } from "@repo/shared/components/OgMeta/ogMeta";
 import { type AppSiteConfig } from "@repo/shared/config/types";
 import type { PageMeta } from "@repo/shared/meta/types";
 import { AuthProvider } from "@repo/shared/providers/authentication/provider";
-import { EntitiesProvider } from "@repo/shared/providers/entities/provider";
 import { FavoritesProvider } from "@repo/shared/providers/favorites/provider";
 import { WorkflowHandoffProvider } from "@repo/shared/providers/workflowHandoff/provider";
-import { useEntities } from "@repo/shared/services/workflows/hooks/UseEntities/hook";
-import { type EntitiesLoader } from "@repo/shared/services/workflows/hooks/UseEntities/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import type { AppProps } from "next/app";
@@ -86,14 +82,12 @@ export interface AppProvidersProps {
   // The entity list a page belongs to when it doesn't say. A site with no
   // entity lists at all passes "".
   defaultEntityListType?: string;
-  ensureEntitiesLoaded: EntitiesLoader;
 }
 
 /**
  * Site-agnostic application shell: wires up the theme, config, data and layout
- * providers around the active page, and owns the entity cache load lifecycle.
- * Each site resolves its own config, theme, default description and entity
- * loader and passes them in.
+ * providers around the active page. Each site resolves its own config, theme
+ * and default description and passes them in.
  * @param props - Component props.
  * @param props.appConfig - Active site config.
  * @param props.appProps - Next.js app props (Component + pageProps).
@@ -101,8 +95,6 @@ export interface AppProvidersProps {
  * @param props.defaultDescription - Fallback OG description for the site.
  * @param props.defaultEntityListType - Entity list type for pages that don't
  * name one; "" for a site with no entity lists.
- * @param props.ensureEntitiesLoaded - Loader that resolves once the site's
- * entities and workflows are loaded.
  * @returns the application shell.
  */
 export function AppProviders({
@@ -111,9 +103,7 @@ export function AppProviders({
   appTheme,
   defaultDescription,
   defaultEntityListType = DEFAULT_ENTITY_LIST_TYPE,
-  ensureEntitiesLoaded,
 }: AppProvidersProps): JSX.Element {
-  const entities = useEntities(ensureEntitiesLoaded);
   const { Component, pageProps } = appProps;
   const { layout, redirectRootToPath } = appConfig;
   const { floating, footer, header } = layout || {};
@@ -144,41 +134,35 @@ export function AppProviders({
                 <SystemStatusProvider>
                   <AuthProvider loginEnabled={appConfig.loginEnabled}>
                     <FavoritesProvider>
-                      <LayoutDimensionsProvider>
-                        <AppLayout>
-                          <DXHeader {...header} />
-                          <ExploreState entityListType={entityListType}>
-                            <WorkflowHandoffProvider>
-                              <Main>
-                                <ErrorBoundary
-                                  fallbackRender={({
-                                    error,
-                                    reset,
-                                  }: {
-                                    error: DataExplorerError;
-                                    reset: () => void;
-                                  }): JSX.Element => (
-                                    <Error
-                                      errorMessage={error.message}
-                                      requestUrlMessage={
-                                        error.requestUrlMessage
-                                      }
-                                      rootPath={redirectRootToPath}
-                                      onReset={reset}
-                                    />
-                                  )}
-                                >
-                                  <EntitiesProvider value={entities}>
-                                    <Component {...pageProps} />
-                                    <Floating {...floating} />
-                                  </EntitiesProvider>
-                                </ErrorBoundary>
-                              </Main>
-                            </WorkflowHandoffProvider>
-                          </ExploreState>
-                          <StyledFooter {...footer} />
-                        </AppLayout>
-                      </LayoutDimensionsProvider>
+                      <AppLayout>
+                        <DXHeader {...header} />
+                        <ExploreState entityListType={entityListType}>
+                          <WorkflowHandoffProvider>
+                            <Main>
+                              <ErrorBoundary
+                                fallbackRender={({
+                                  error,
+                                  reset,
+                                }: {
+                                  error: DataExplorerError;
+                                  reset: () => void;
+                                }): JSX.Element => (
+                                  <Error
+                                    errorMessage={error.message}
+                                    requestUrlMessage={error.requestUrlMessage}
+                                    rootPath={redirectRootToPath}
+                                    onReset={reset}
+                                  />
+                                )}
+                              >
+                                <Component {...pageProps} />
+                                <Floating {...floating} />
+                              </ErrorBoundary>
+                            </Main>
+                          </WorkflowHandoffProvider>
+                        </ExploreState>
+                        <StyledFooter {...footer} />
+                      </AppLayout>
                     </FavoritesProvider>
                   </AuthProvider>
                 </SystemStatusProvider>

@@ -4,10 +4,9 @@ import {
 } from "@repo/shared/apis/schema-types";
 import type { AssemblyContract } from "@repo/shared/apis/types";
 import {
-  isAssemblyWorkflowAvailable,
+  getAssemblyWorkflowAvailability,
   isListedWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
-import { setEntitiesById } from "@repo/shared/services/workflows/store";
 import { getWorkflows } from "@repo/shared/views/WorkflowsView/utils";
 import { buildAssemblyWorkflows } from "@repo/shared/workflow/assemblyWorkflows";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
@@ -27,7 +26,6 @@ jest.mock("@repo/shared/workflow/differentialExpressionAnalysis", () => ({
   DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY: "ASSEMBLY",
 }));
 
-const ASSEMBLY_ID = "GCF_000000001_1";
 const ASSEMBLY = {
   galaxyDatacacheUrl: null,
   lineageTaxonomyIds: ["1"],
@@ -51,7 +49,6 @@ function includesDea(trsIds: string[]): boolean {
 describe("Differential Expression Analysis under a gated category", () => {
   beforeEach(() => {
     seedWorkflowsStore(CATEGORIES, [DIFFERENTIAL_EXPRESSION_ANALYSIS]);
-    setEntitiesById("assemblies", new Map([[ASSEMBLY_ID, ASSEMBLY]]));
   });
 
   it("is dropped from the workflows list, the assembly's list, its configure page and its detail page with the demo flag off", () => {
@@ -66,7 +63,7 @@ describe("Differential Expression Analysis under a gated category", () => {
         )
       )
     ).toBe(false);
-    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, gates, ASSEMBLY_ID)).toBe(
+    expect(getAssemblyWorkflowAvailability(ASSEMBLY)(DEA_TRS_ID, gates)).toBe(
       false
     );
     expect(isListedWorkflowAvailable(DEA_TRS_ID, gates)).toBe(false);
@@ -84,7 +81,7 @@ describe("Differential Expression Analysis under a gated category", () => {
         )
       )
     ).toBe(true);
-    expect(isAssemblyWorkflowAvailable(DEA_TRS_ID, gates, ASSEMBLY_ID)).toBe(
+    expect(getAssemblyWorkflowAvailability(ASSEMBLY)(DEA_TRS_ID, gates)).toBe(
       true
     );
     expect(isListedWorkflowAvailable(DEA_TRS_ID, gates)).toBe(true);

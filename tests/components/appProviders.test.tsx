@@ -98,7 +98,6 @@ describe("AppProviders on a site with no entity lists", () => {
         appTheme={createAppTheme()}
         defaultDescription="No entities here."
         defaultEntityListType=""
-        ensureEntitiesLoaded={(): Promise<void> => Promise.resolve()}
       />
     );
 

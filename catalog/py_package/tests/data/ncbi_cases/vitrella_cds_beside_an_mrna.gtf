@@ -1,0 +1,15 @@
+#gtf-version 2.2
+#!genome-build Vbrassicaformis
+#!genome-build-accession NCBI_Assembly:GCA_001179505.1
+# Rows copied verbatim from GCA_001179505.1_Vbrassicaformis_genomic.gtf.gz
+CDMY01000002.1	EMBL	gene	3437	4649	.	+	.	gene_id "Vbra_92"; transcript_id ""; gbkey "Gene"; gene_biotype "protein_coding"; locus_tag "Vbra_92"; 
+CDMY01000002.1	EMBL	CDS	3446	3535	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "1"; 
+CDMY01000002.1	EMBL	CDS	3608	3730	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "2"; 
+CDMY01000002.1	EMBL	CDS	3812	3911	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "3"; 
+CDMY01000002.1	EMBL	CDS	4016	4092	.	+	2	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "4"; 
+CDMY01000002.1	EMBL	CDS	4165	4255	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "5"; 
+CDMY01000002.1	EMBL	CDS	4332	4399	.	+	2	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "6"; 
+CDMY01000002.1	EMBL	start_codon	3446	3448	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "1"; 
+CDMY01000002.1	EMBL	stop_codon	4400	4402	.	+	0	gene_id "Vbra_92"; transcript_id "unassigned_transcript_6"; db_xref "NCBI_GP:CEL91579.1"; gbkey "CDS"; locus_tag "Vbra_92"; product "CEL91579.1"; protein_id "CEL91579.1"; exon_number "6"; 
+CDMY01000002.1	EMBL	transcript	3437	4649	.	+	.	gene_id "Vbra_92"; transcript_id "unassigned_transcript_7"; gbkey "mRNA"; locus_tag "Vbra_92"; transcript_biotype "mRNA"; 
+CDMY01000002.1	EMBL	exon	3437	4649	.	+	.	gene_id "Vbra_92"; transcript_id "unassigned_transcript_7"; locus_tag "Vbra_92"; transcript_biotype "mRNA"; exon_number "1"; 

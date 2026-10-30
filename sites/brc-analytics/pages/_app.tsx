@@ -1,6 +1,5 @@
 import { useAppConfig } from "@brc/hooks/UseAppConfig/hook";
 import { BRC_DEFAULT_DESCRIPTION } from "@brc/meta/constants";
-import { ensureEntitiesLoaded } from "@brc/services/workflows/hooks/UseEntities/utils";
 import { createBrcTheme } from "@brc/theme/theme";
 import { setFeatureFlags } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/common/utils";
 import {
@@ -25,7 +24,6 @@ function MyApp(props: AppPropsWithComponent): JSX.Element {
       appProps={props}
       appTheme={createBrcTheme(props.pageProps.themeOptions)}
       defaultDescription={BRC_DEFAULT_DESCRIPTION}
-      ensureEntitiesLoaded={ensureEntitiesLoaded}
     />
   );
 }

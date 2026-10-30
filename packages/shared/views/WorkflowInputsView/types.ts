@@ -4,6 +4,7 @@ import { type OrganismBuilder } from "@repo/shared/views/EntityView/components/C
 export type Assembly = AssemblyContract;
 
 export interface Props {
+  assembly: Assembly;
   entityId: string;
   entityListType?: string;
   organismBuilder?: OrganismBuilder;

@@ -149,13 +149,16 @@ export const Sunburst = ({
       return null;
     }
 
-    // Create a tooltip for interactivity
+    // Create a tooltip for interactivity. It starts at the page origin so the
+    // hidden tooltip doesn't extend the page below the footer.
     const tooltip = d3
       .select("body")
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0)
       .style("position", "absolute")
+      .style("top", "0")
+      .style("left", "0")
       .style("text-align", "center")
       .style("padding", "6px")
       .style("font", "12px 'Inter Tight', sans-serif")

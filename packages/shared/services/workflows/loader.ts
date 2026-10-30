@@ -1,31 +1,11 @@
-import type {
-  EntityConfig,
-  SiteConfig,
-} from "@databiosphere/findable-ui/lib/config/entities";
+import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
 import { indexWorkflowsById } from "@repo/shared/workflow/utils";
-import { type EntitiesLoader } from "./hooks/UseEntities/types";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
-
-/**
- * Creates a single-flight entities loader: concurrent and repeat calls share
- * one in-flight load, and a rejected load is dropped from the memo so a later
- * call re-attempts instead of returning the cached failure forever.
- * @param load - Loader that resolves once the site's entities and workflows are loaded.
- * @returns Memoized loader.
- */
-export function createEntitiesLoader(load: EntitiesLoader): EntitiesLoader {
-  let loadPromise: Promise<void> | null = null;
-  return (config: SiteConfig): Promise<void> => {
-    loadPromise ??= load(config).catch((error) => {
-      loadPromise = null;
-      throw error;
-    });
-    return loadPromise;
-  };
-}
 
 /**
  * Fetches entities from the API.
@@ -45,49 +25,35 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
  * @param route - Route.
  * @returns True if the route is an entity route; false otherwise.
  */
-function isEntityRoute(route: string): route is EntityRoute {
+export function isEntityRoute(route: string): route is EntityRoute {
   return Object.hasOwn(API, route);
 }
 
 /**
- * Loads the entities store with entities from the API, fetching the entity
- * lists in parallel. Skips routes not in the API, workflows (which
- * `loadWorkflows` loads), lists already loaded, and entity configs with no
- * getId.
+ * Loads one entity list into the store, keyed by id and as a list. Workflows
+ * are loaded with the custom and uncataloged workflows added; any other list
+ * is keyed by its entity config's getId. A list already in the store isn't
+ * fetched again.
+ * @param route - Entity list.
  * @param config - Site config.
- * @returns Promise that resolves once every entity list is loaded, or rejects
- * as soon as any fetch fails, with that failure. Lists that load are stored
- * as they arrive.
+ * @throws If the site has no entity config with a getId for the list, or the fetch fails.
  */
-export async function loadEntities(config: SiteConfig): Promise<void> {
-  const loads: Promise<void>[] = [];
-  for (const { getId, route } of config.entities) {
-    if (!isEntityRoute(route)) continue;
-
-    // Workflows are loaded by loadWorkflows: their API payload is workflow
-    // categories, not entities keyed by getId.
-    if (route === "workflows") continue;
-
-    // Entities are already loaded; skip.
-    if (getEntitiesById().has(route)) continue;
-
-    // Get id function is not configured; entities are excluded from preloading.
-    if (!getId) continue;
-
-    loads.push(loadEntityList(route, getId));
-  }
-  await Promise.all(loads);
-}
-
-/**
- * Fetches one entity list and stores it, by id and as a list.
- * @param route - Entity route.
- * @param getId - Returns an entity's id.
- */
-async function loadEntityList(
+export async function loadEntityList(
   route: EntityRoute,
-  getId: NonNullable<EntityConfig["getId"]>
+  config: Pick<SiteConfig, "entities">
 ): Promise<void> {
+  if (getEntitiesById().has(route)) return;
+
+  if (route === "workflows") {
+    await loadWorkflows([CUSTOM_WORKFLOW, ...UNCATALOGED_WORKFLOWS]);
+    return;
+  }
+
+  const getId = config.entities.find(
+    (entityConfig) => entityConfig.route === route
+  )?.getId;
+  if (!getId) throw new Error(`The ${route} list is not configured.`);
+
   const entities = await fetchEntities(API[route]);
 
   const entityById = new Map<string, unknown>();
@@ -106,8 +72,6 @@ async function loadEntityList(
 export async function loadWorkflows(
   extraWorkflows: Workflow[] = []
 ): Promise<void> {
-  if (getEntitiesById().has("workflows")) return;
-
   const workflowCategories = (await fetchEntities(
     API.workflows
   )) as WorkflowCategory[];

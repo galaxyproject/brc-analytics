@@ -38,6 +38,11 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 jest.mock("@repo/shared/services/workflows/query", () => ({
   findEntity: jest.fn(),
 }));
+// Organism labels load the organisms list; findEntity is stubbed above, so the
+// load itself is not under test.
+jest.mock("@repo/shared/services/workflows/hooks/UseEntityLists/hook", () => ({
+  useEntityLists: jest.fn(),
+}));
 let mockLoganSearchEnabled = true;
 jest.mock("@databiosphere/findable-ui/lib/hooks/useConfig", () => ({
   useConfig: (): { config: { loganSearchEnabled: boolean } } => ({

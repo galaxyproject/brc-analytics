@@ -14,6 +14,7 @@ from app.api.v1 import (
     ena,
     favorites,
     galaxy,
+    genes,
     health,
     links,
     partner,
@@ -178,6 +179,7 @@ def create_app() -> FastAPI:
     app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
     app.include_router(version.router, prefix="/api/v1/version", tags=["version"])
     app.include_router(links.router, prefix="/api/v1", tags=["links"])
+    app.include_router(genes.router, prefix="/api/v1/genes", tags=["genes"])
     app.include_router(ena.router, prefix="/api/v1/ena", tags=["ena"])
     app.include_router(galaxy.router, prefix="/api/v1/galaxy", tags=["galaxy"])
     app.include_router(assistant.router, prefix="/api/v1/assistant", tags=["assistant"])

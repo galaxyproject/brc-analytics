@@ -15,6 +15,7 @@ export interface BaselineContrasts {
 
 export interface ConfiguredInput {
   designFormula?: string | null;
+  fastaCollection?: string[] | null;
   geneModelUrl?: string | null;
   numberOfHits?: number;
   organism?: string;

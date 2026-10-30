@@ -1,6 +1,6 @@
 import { ContentsTab } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/components/ContentsTab/contentsTab";
 import { Outline } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/outline";
-import { Content } from "@repo/shared/views/docs/components/Content/content";
+import { StyledContent } from "@repo/shared/views/docs/components/Content/content.styles";
 import { SectionContent } from "@repo/shared/views/docs/components/SectionContent/sectionContent";
 import { HeroImage } from "@repo/shared/views/docs/components/SectionHero/components/HeroImage/heroImage";
 import { StyledSectionHero } from "@repo/shared/views/docs/components/SectionHero/sectionHero.styles";
@@ -30,9 +30,9 @@ export const ContentView = ({
         content={
           <Fragment>
             <HeroImage heroImage={heroImage} />
-            <Content>
+            <StyledContent>
               <MDXRemote {...mdxSource} components={components} />
-            </Content>
+            </StyledContent>
           </Fragment>
         }
         frontmatter={frontmatter}

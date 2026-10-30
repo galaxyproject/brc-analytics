@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Optional
@@ -43,7 +44,21 @@ def _is_mcp_argument_error(exc: BaseException, event: dict) -> bool:
     return trace.get("op") == "mcp.server"
 
 
+# bioblend logs a failed request's final error with the URL and object
+# addresses baked into the message, so every job id opened a fresh issue and
+# one Galaxy outage became dozens. Group on the message with those removed.
+_VOLATILE = re.compile(r"\b[0-9a-f]{16}\b|0x[0-9a-f]+")
+
+
+def _fingerprint_bioblend(event: dict) -> None:
+    if event.get("logger") != "bioblend":
+        return
+    message = (event.get("logentry") or {}).get("message") or ""
+    event["fingerprint"] = ["bioblend", _VOLATILE.sub("<id>", message)[:200]]
+
+
 def before_send(event: dict, hint: dict) -> Optional[dict]:
+    _fingerprint_bioblend(event)
     exc_info: Any = hint.get("exc_info")
     if not exc_info or exc_info[1] is None:
         return event

@@ -61,9 +61,7 @@ export const StyledContent = styled(Content, {
 
 export const StyledOutlineGrid = styled(OutlineGrid, {
   shouldForwardProp: (propName) =>
-    propName !== "contentType" &&
-    propName !== "headerHeight" &&
-    propName !== "panelColor",
+    propName !== "contentType" && propName !== "panelColor",
 })<Pick<FrontmatterProps, "contentType">>`
   ${(props) =>
     props.contentType !== CONTENT_TYPE.ARTICLE &&

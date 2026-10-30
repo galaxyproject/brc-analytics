@@ -1,0 +1,18 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+#!genome-build Pow2
+#!genome-build-accession NCBI_Assembly:GCA_900088545.1
+# Rows copied verbatim from GCA_900088545.1_Pow2_genomic.gff.gz
+FLRE01000001.1	EMBL	gene	8494	8538	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	gene	7667	8357	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	gene	7441	7487	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	gene	6513	7289	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	gene	5498	6370	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	gene	5215	5370	.	-	.	ID=gene-POVWA2_000020;Name=POVWA2_000020;gbkey=Gene;gene_biotype=protein_coding;is_ordered=true;locus_tag=POVWA2_000020
+FLRE01000001.1	EMBL	CDS	8494	8538	.	-	0	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1
+FLRE01000001.1	EMBL	CDS	7667	8357	.	-	0	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1
+FLRE01000001.1	EMBL	CDS	7441	7487	.	-	2	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1
+FLRE01000001.1	EMBL	CDS	6513	7289	.	-	0	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1
+FLRE01000001.1	EMBL	CDS	5498	6370	.	-	0	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1
+FLRE01000001.1	EMBL	CDS	5215	5370	.	-	0	ID=cds-SBT30650.1;Parent=gene-POVWA2_000020;Dbxref=NCBI_GP:SBT30650.1;Name=SBT30650.1;gbkey=CDS;locus_tag=POVWA2_000020;product=PIR Superfamily Protein;protein_id=SBT30650.1

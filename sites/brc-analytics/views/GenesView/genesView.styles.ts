@@ -1,28 +1,21 @@
+import { BackPageView } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
-export const SearchSection = styled(GridPaperSection)`
+// findable-ui's back page grid, as the assembly and organism pages use, with
+// its rows kept to their content's height.
+export const GenesBackPageView = styled(BackPageView)`
+  align-content: start;
+`;
+
+export const GenesPanel = styled(GridPaperSection)`
   && {
-    align-self: stretch;
-    margin: 0 auto;
-    max-width: 1200px;
-    padding: 32px 20px;
-    width: 100%;
+    display: grid;
+    gap: 24px;
+    grid-column: 1 / -1;
+    padding: 20px;
   }
-`;
-
-export const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
-`;
-
-export const ExampleGenes = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 `;
 
 export const ResultsTable = styled.table`
@@ -41,15 +34,4 @@ export const ResultsTable = styled.table`
     font-weight: 500;
     text-transform: uppercase;
   }
-`;
-
-export const AliasNote = styled.span`
-  color: ${PALETTE.INK_LIGHT};
-  font-size: 13px;
-  font-style: italic;
-`;
-
-export const NoResults = styled.div`
-  color: ${PALETTE.INK_LIGHT};
-  padding: 24px 0;
 `;

@@ -16,7 +16,6 @@ import type { TabsProps } from "./types";
  * @param props.baseId - Id unique to the layout, tying each tab to its column.
  * @param props.onTabChange - Switches column.
  * @param props.tabs - Tabs, one per column.
- * @param props.top - Height of the fixed header, beneath which the tabs pin.
  * @param props.value - Column showing.
  * @returns The tabs element.
  */
@@ -24,11 +23,10 @@ export const Tabs = ({
   baseId,
   onTabChange,
   tabs,
-  top,
   value,
 }: TabsProps): JSX.Element => {
   return (
-    <StyledTabBar top={top}>
+    <StyledTabBar>
       <StyledTabs
         aria-label={TABS_LABEL}
         onChange={onTabChange}

@@ -10,7 +10,9 @@ export const StyledStack = styled(StyledGridItem)`
   box-shadow:
     inset 1px 0 0 ${PALETTE.SMOKE_MAIN},
     inset -1px 0 0 ${PALETTE.SMOKE_MAIN};
-  padding: 40px 40px 16px;
+  // No bottom padding: the conversation's composer pins to the column's foot
+  // and keeps its own gap from it.
+  padding: 40px 40px 0;
 
   ${bpDownMd} {
     box-shadow: none;
@@ -18,9 +20,10 @@ export const StyledStack = styled(StyledGridItem)`
   }
 `;
 
+// Fills at least the column, and grows with the conversation so the column
+// scrolls it.
 export const StyledChatInner = styled(Stack)`
-  flex: 1;
+  flex: 1 0 auto;
   max-width: 640px;
-  min-height: 0;
   width: 100%;
 `;

@@ -12,6 +12,7 @@ export const DEFAULT_CONFIGURED_INPUT: {
   [K in keyof Required<ConfiguredInput>]: undefined;
 } = {
   designFormula: undefined,
+  fastaCollection: undefined,
   geneModelUrl: undefined,
   numberOfHits: undefined,
   organism: undefined,
