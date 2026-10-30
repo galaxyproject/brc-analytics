@@ -1,4 +1,7 @@
-import { WORKFLOW_SCOPE } from "@repo/shared/apis/schema-types";
+import {
+  WORKFLOW_PARAMETER_VARIABLE,
+  WORKFLOW_SCOPE,
+} from "@repo/shared/apis/schema-types";
 import { buildWorkflows } from "../../../../catalog/build/ts/build-workflows";
 
 // Mock YAML file reading so we can inject source workflows. Additional relevant exports are mocked/imported as necessary.
@@ -211,5 +214,107 @@ describe("buildWorkflows - assembly count resolution", () => {
     expect(wf.assemblyCountMin).toBe(1);
     expect(wf.assemblyCountMax).toBe(1);
     expect(wf.scope).toBe(WORKFLOW_SCOPE.ASSEMBLY);
+  });
+
+  test("FASTA_COLLECTION workflow with min 0 throws", async () => {
+    mockReadYamlFile.mockImplementation(async (path: string) => {
+      if (path.includes("workflow_categories")) {
+        return {
+          workflow_categories: [
+            {
+              category: "ASSEMBLY",
+              description: "d",
+              name: "n",
+              show_coming_soon: false,
+            },
+          ],
+        };
+      }
+      return {
+        workflows: [
+          {
+            ...BASE_SOURCE_WORKFLOW,
+            assembly_count_min: 0,
+            parameters: [
+              {
+                key: "assemblies",
+                variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+              },
+            ],
+            scope: "ORGANISM",
+          },
+        ],
+      };
+    });
+
+    await expect(buildWorkflows()).rejects.toThrow(
+      /assembly_count_min must be at least 1/
+    );
+  });
+
+  test("ASSEMBLY scope FASTA_COLLECTION workflow with explicit min 0 throws", async () => {
+    mockReadYamlFile.mockImplementation(async (path: string) => {
+      if (path.includes("workflow_categories")) {
+        return {
+          workflow_categories: [
+            {
+              category: "ASSEMBLY",
+              description: "d",
+              name: "n",
+              show_coming_soon: false,
+            },
+          ],
+        };
+      }
+      return {
+        workflows: [
+          {
+            ...BASE_SOURCE_WORKFLOW,
+            assembly_count_min: 0,
+            parameters: [
+              {
+                key: "assemblies",
+                variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+              },
+            ],
+            scope: "ASSEMBLY",
+          },
+        ],
+      };
+    });
+
+    await expect(buildWorkflows()).rejects.toThrow(
+      /assembly_count_min must be at least 1/
+    );
+  });
+
+  test("max below min throws", async () => {
+    mockReadYamlFile.mockImplementation(async (path: string) => {
+      if (path.includes("workflow_categories")) {
+        return {
+          workflow_categories: [
+            {
+              category: "ASSEMBLY",
+              description: "d",
+              name: "n",
+              show_coming_soon: false,
+            },
+          ],
+        };
+      }
+      return {
+        workflows: [
+          {
+            ...BASE_SOURCE_WORKFLOW,
+            assembly_count_min: 2,
+            scope: "ASSEMBLY",
+          },
+        ],
+      };
+    });
+
+    await expect(buildWorkflows()).rejects.toThrow(
+      /assembly_count_max \(1\) must not be less than assembly_count_min \(2\)/
+    );
   });
 });

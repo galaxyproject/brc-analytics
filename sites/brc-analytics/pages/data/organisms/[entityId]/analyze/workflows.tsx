@@ -11,7 +11,7 @@ import { ROUTES } from "@repo/shared/routes/constants";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import { makeEntityStaticProps } from "@repo/shared/services/staticGeneration/entity/staticProps";
 import type { EntityPageProps } from "@repo/shared/services/staticGeneration/entity/types";
-import { slimOrganismGenomes } from "@repo/shared/services/staticGeneration/organism/utils";
+import { makeSlimOrganismGenomes } from "@repo/shared/services/staticGeneration/organism/utils";
 import { useWorkflowRedirect } from "@repo/shared/views/OrganismWorkflowInputsView/hooks/UseWorkflowRedirect/hook";
 import { OrganismWorkflowInputsView } from "@repo/shared/views/OrganismWorkflowInputsView/organismWorkflowInputsView";
 import { type JSX } from "react";
@@ -22,8 +22,9 @@ const ENTITY_LIST_TYPE = "organisms";
  * Organism analyze workflows page. A workflow is always selected via the `trsId`
  * query param; a bare URL (no `trsId`) redirects to the organism detail page,
  * where organism workflows are listed. The organism record arrives via props,
- * its genomes cut down to what the workflow check reads; only the workflows
- * list is loaded.
+ * its genomes cut down to what the workflow check reads unless a workflow takes
+ * a collection of its assemblies, which are then listed for picking; only the
+ * workflows list is loaded.
  * @param props - Page props.
  * @param props.data - Organism.
  * @param props.entityId - Organism entity ID.
@@ -66,7 +67,7 @@ export const getStaticProps = makeEntityStaticProps<OrganismContract>(
   config,
   ENTITY_LIST_TYPE,
   BRC_PAGE_META.ANALYZE_WORKFLOWS,
-  slimOrganismGenomes
+  makeSlimOrganismGenomes(config)
 );
 
 export default Page;

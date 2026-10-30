@@ -8,7 +8,8 @@ jest.mock(
 jest.mock(
   "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants",
   (): Record<string, unknown> => ({
-    SEQUENCING_STEPS: {
+    ORGANISM_SCOPED_STEPS: {
+      fastaCollection: {},
       readRunPairedFile: {},
       readRunSingleFile: {},
       readRunsPaired: {},
@@ -40,6 +41,7 @@ import {
   SPECIES_WORKFLOW,
 } from "../../workflow/cladeFixtures";
 
+const FASTA_COLLECTION_STEP = { key: "fastaCollection" } as StepConfig;
 const SEQUENCING_STEP = { key: "readRunsPaired" } as StepConfig;
 const REFERENCE_ASSEMBLY_STEP = { key: "referenceAssembly" } as StepConfig;
 
@@ -59,7 +61,13 @@ describe("insertOrganismStep", () => {
     ).toEqual(["organism", "readRunsPaired"]);
   });
 
-  test("leaves the steps unchanged for a clade workflow with no read-run step", () => {
+  test("inserts the Organism step first for a clade workflow with an assemblies step", () => {
+    expect(
+      getKeys(insertOrganismStep([FASTA_COLLECTION_STEP], CLADE_WORKFLOW))
+    ).toEqual(["organism", "fastaCollection"]);
+  });
+
+  test("leaves the steps unchanged for a clade workflow with no read-run or assemblies step", () => {
     const steps: StepConfig[] = [];
     expect(insertOrganismStep(steps, CLADE_WORKFLOW)).toBe(steps);
   });

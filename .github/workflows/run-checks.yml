@@ -73,6 +73,8 @@ jobs:
         run: npm run lint
       - name: Type Check
         run: npm run typecheck
+      - name: Unit tests (Jest)
+        run: npm test
 
       - name: Set up Python
         uses: actions/setup-python@v6
