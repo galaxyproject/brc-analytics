@@ -41,7 +41,7 @@ Finding a known gene on such an assembly means placing its sequence there, by al
 
 Agents now do much of the finding and reading. What they need from gene data:
 
-- **Grounding.** A symbol, locus tag or old alias resolves to one gene on one assembly, and a gene that isn't there gets a clear "not found". An agent's usual failure is a gene ID that looks plausible but doesn't exist, or coordinates from a different annotation release.
+- **Grounding.** A symbol, locus tag or old alias resolves to the gene it names on a given assembly. When it names more than one gene there, as some symbols do, the answer lists them all for the agent to choose from, and a gene that isn't there gets a clear "not found". An agent's usual failure is a gene ID that looks plausible but doesn't exist, or coordinates from a different annotation release.
 - **Answers it can cite.** Every answer names its snapshot by build ID, so the same question gets the same answer until new gene data is released.
 - **A path to action.** Gene, then assembly, compatible workflows, workflow inputs and reads. The BRC MCP server already has most of this path (`get_compatible_workflows`, `resolve_workflow_inputs`, `search_ena`); looking up the gene is the missing first step.
 
@@ -49,15 +49,17 @@ People need the same things on a page. The gene API comes first, and the page is
 
 ## Logan
 
-[Logan](https://github.com/IndexThePlanet/Logan) is an assembly of nearly every public run in NCBI's Sequence Read Archive (SRA) up to the end of 2023: tens of millions of runs, each reduced to its contigs and indexed by k-mers. BRC's Logan Search takes a sequence of up to 5,000 bases and returns the runs that contain it. Each run comes with its organism, assay, platform, country, year, BioSample and BioProject.
+[Logan](https://github.com/IndexThePlanet/Logan) is an assembly of nearly every public run in NCBI's Sequence Read Archive (SRA) up to the end of 2023: tens of millions of runs, each reduced to its contigs and indexed by k-mers. BRC's Logan Search takes a sequence of up to 5,000 bases and returns the runs whose contigs share enough of its k-mers, half of them by default. Each run comes with its organism, assay, platform, country, year, BioSample and BioProject.
 
 For gene pages, that takes the comparative question past BRC's own assemblies:
 
-- **Is it in the reads?** Search with the gene and keep the hits from the runs an assembly was built from, which share its BioSample. A hit means the gene is in that strain's sequence, even if the assembly missed it or the annotation never named it.
+- **Is it in the reads?** Search with the gene and keep the hits from the runs an assembly was built from, which share its BioSample. A hit suggests the gene is in that strain's sequence, even if the assembly missed it or the annotation never named it.
 - **Is it in relatives?** Keep the hits from the same organism, or from other strains and isolates, including the many that were sequenced and never assembled.
 - **Where in the world is it?** The hosts, places, years and kinds of sample where the gene turns up. For a pathogen gene, that's a view of its spread.
-- **Is it expressed?** Search with the spliced transcript against transcriptomic runs. A hit says the gene is expressed somewhere, though not how much.
+- **Is it expressed?** Search with the spliced transcript against transcriptomic runs. A hit suggests the gene is expressed somewhere, though not how much.
 - **Into a workflow.** The hits are SRA runs, which BRC's workflows take as input. Gene, then runs that contain it, then variant calling on those runs against the gene's assembly.
+
+A hit is a candidate, not a finding. Logan matches shared k-mers rather than aligning, so a conserved domain or a related gene can match too. Saying a gene is present or expressed takes a check of that gene, such as aligning it to the hit's contigs.
 
 Logan doesn't search the assemblies themselves today. That needs its GenBank and RefSeq index, which BRC's Logan Search hasn't deployed yet. A search also takes minutes, so it's something a researcher or agent asks for, not something a page does when it loads.
 
