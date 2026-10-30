@@ -175,7 +175,7 @@ function describeRestIndexes(rest: KmindexIndexSummary[]): string | null {
   const matched = rest.reduce((total, one) => total + one.hits_before_cap, 0);
   const listed = rest.reduce((total, one) => total + one.hits_after_cap, 0);
   return (
-    `${rest.length.toLocaleString()} more indexes: ` +
+    `${rest.length.toLocaleString()} more ${rest.length === 1 ? "index" : "indexes"}: ` +
     `${matched.toLocaleString()} matched, ${listed.toLocaleString()} listed.`
   );
 }
@@ -190,7 +190,7 @@ function describeCorrection(hit: KmindexHit): string {
   return (
     `kmindex reported ${raw.toFixed(4)}. This run's index is saturated and ` +
     `matches about ${(hit.fp_correction ?? 0).toFixed(4)} of any query's ` +
-    `k-mers, so that baseline is subtracted, as logan-search.org does.`
+    `k-mers, so that much is subtracted.`
   );
 }
 
@@ -468,9 +468,9 @@ function ShardWarning({
   if (results.shards_failed <= 0) return null;
   return (
     <Alert severity="warning" sx={{ mb: 2 }}>
-      {results.shards_failed} of {results.shards_searched} index shards could
-      not be read, so this {noun} is incomplete. Come back in an hour and the
-      missing shards are retried.
+      {`${results.shards_failed} of ${results.shards_searched} index shards ` +
+        `couldn't be read, so this ${noun} is incomplete. Reload in an hour ` +
+        `to retry.`}
     </Alert>
   );
 }
@@ -627,12 +627,12 @@ export const LoganSearchResults = ({
     listWindow = results.filtered
       ? `Listing the ${cap.toLocaleString()} highest-coverage runs that match these filters`
       : `Listing the ${cap.toLocaleString()} highest-coverage hits`;
-    // notListed is 0 only when the match count went missing; "the remaining 0"
+    // notListed is 0 only when the match count went missing; "0 more matched"
     // would be a worse answer than naming the cap and leaving it there.
     capNote =
       notListed > 0
-        ? `The remaining ${notListed.toLocaleString()} cannot be paged to.`
-        : `More accessions matched than can be listed.`;
+        ? `${notListed.toLocaleString()} more matched but aren't listed.`
+        : `More runs matched than fit in the list.`;
     // The filtered download is not capped, so it is the way to the rest.
     if (results.filtered)
       capNote += " Download the filtered runs above for the full set.";
@@ -718,20 +718,16 @@ export const LoganSearchResults = ({
             <Collapse in={whyOpen} unmountOnExit>
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="body2">
-                  Raising the threshold shrinks the underlying match count, but
-                  it does not re-rank what you see: the same accessions come
-                  back in the same order until the threshold rises above the
-                  lowest score listed here. A conserved query can match hundreds
-                  of thousands of runs at a perfect k-mer score, so it may not
-                  clear the cap at all.
+                  Only the highest-scoring runs are listed. Raising the
+                  threshold won&apos;t bring in the missing runs. It only trims
+                  the bottom of this list. To see the rest, search fewer indexes
+                  or download the full set from the summary.
                 </Typography>
                 {showPerIndex && (
                   <>
                     <Typography variant="body2" sx={{ mt: 1 }}>
-                      The cap is one score sort across every index, applied
-                      after the shards merge, so each index keeps only what
-                      ranked highest overall, so an index with few matches can
-                      keep none of them.
+                      The cap ranks all the indexes together, so an index with
+                      few matches can be crowded out.
                     </Typography>
                     {perIndex.slice(0, indexLines).map((summary) => (
                       <Typography
@@ -761,21 +757,9 @@ export const LoganSearchResults = ({
                     one score; one index over a viral spike gave 87 distinct
                     scores. */}
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                  Scores repeat: the score is a fraction of your query&apos;s
-                  k-mers, so ties are common and a conserved query can put every
-                  row listed here on a single one. Where the cut falls inside a
-                  tie, a stable hash of the accession decides which
-                  equally-scoring runs made the list: arbitrary, but the same on
-                  every reload.
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  A longer query is not a more specific one: kmindex scores the
-                  fraction of your query&apos;s k-mers a run shares, so
-                  extending into conserved flanking sequence raises that
-                  fraction in unrelated runs too. A 4x longer version of the
-                  same 18S query matched more runs here, not fewer. The match
-                  set responds to how rare your k-mers are and to the threshold
-                  above, not to query length.
+                  Scores often tie, and a conserved query can give every listed
+                  run the same score. Ties at the cutoff are broken by a hash of
+                  the accession, so the list stays the same when you reload.
                 </Typography>
               </Alert>
             </Collapse>
@@ -803,14 +787,14 @@ export const LoganSearchResults = ({
                   column="score"
                   label="k-mer coverage"
                   onSort={setSort}
-                  title="Fraction of the query's 31-mers found in the run, after subtracting a false-positive baseline for the 227 saturated samples Logan flags"
+                  title="Fraction of the query's 31-mers found in the run, less a baseline for the 227 saturated runs Logan flags"
                 />
                 {/* ANI is monotone in the score, so sorting the coverage
                     column sorts this one too and a second control would only
                     be a second name for it. */}
                 <MetaCell
                   align="right"
-                  title="Average nucleotide identity estimated from k-mer coverage, coverage^(1/31), as on logan-search.org"
+                  title="Average nucleotide identity, estimated as coverage^(1/31)"
                 >
                   ANI est.
                 </MetaCell>

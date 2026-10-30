@@ -28,11 +28,9 @@ const CAP = 50000;
 // Asserted from both branches: how wide the tie band is depends on the query,
 // not on how many indexes were searched.
 const TIE_BAND_COPY =
-  "Scores repeat: the score is a fraction of your query's k-mers, so ties " +
-  "are common and a conserved query can put every row listed here on a " +
-  "single one. Where the cut falls inside a tie, a stable hash of the " +
-  "accession decides which equally-scoring runs made the list: arbitrary, " +
-  "but the same on every reload.";
+  "Scores often tie, and a conserved query can give every listed run the " +
+  "same score. Ties at the cutoff are broken by a hash of the accession, so " +
+  "the list stays the same when you reload.";
 
 /**
  * A hit as the API sends one, defaulting to an unannotated perfect match.
@@ -208,7 +206,7 @@ describe("LoganSearchResults truncation disclosure", () => {
   // digit, so it is not one of these.
   const INDEX_LINE = /^[A-Z_]+: /;
 
-  test("names the window it lists and what cannot be paged to", () => {
+  test("names the window it lists and how many it leaves out", () => {
     const { container } = renderResults(
       truncatedResults([
         summary("GENOMIC_BCT", 1100404, 47089),
@@ -223,7 +221,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     ).toBeTruthy();
     expect(container.textContent).not.toContain("of 1,133,516 matched");
     expect(container.textContent).toContain(
-      "The remaining 1,083,516 cannot be paged to."
+      "1,083,516 more matched but aren't listed."
     );
   });
 
@@ -237,7 +235,7 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     // Four paragraphs of caveat above every result taught readers to scroll
     // past the whole card; behind a toggle they are still one click away.
-    expect(screen.queryByText(/does not re-rank/)).toBeNull();
+    expect(screen.queryByText(/Only the highest-scoring runs/)).toBeNull();
     expect(screen.getByRole("button", { name: "Why?" })).toBeTruthy();
   });
 
@@ -288,7 +286,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     openWhy();
 
     expect(container.textContent).toContain(
-      "Raising the threshold shrinks the underlying match count, but it does not re-rank what you see: the same accessions come back in the same order until the threshold rises above the lowest score listed here."
+      "Raising the threshold won't bring in the missing runs. It only trims the bottom of this list."
     );
     // The shipped copy claimed the opposite; at 0.5 through 1.0 the real job
     // returned the same 50,000 accessions in the same order.
@@ -350,6 +348,15 @@ describe("LoganSearchResults truncation disclosure", () => {
     );
     expect(alert.textContent).not.toContain("METAGENOMIC_PHG");
     expect(alert.textContent).not.toContain("METAGENOMIC_UNKNOWN");
+  });
+
+  test("names a single leftover index in the singular", () => {
+    renderResults(truncatedResults(TWELVE_INDEXES.slice(0, 11)));
+    openWhy();
+
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toContain("1 more index: 900 matched, 0 listed.");
+    expect(alert.textContent).not.toContain("1 more indexes");
   });
 
   test("lists all ten when ten is all there is", () => {
@@ -419,16 +426,25 @@ describe("LoganSearchResults truncation disclosure", () => {
 
     // Measured the other way: the 2,090 bp 18S superset of a 500 bp window
     // matched 18,019 runs against the window's 17,633, same two indexes and
-    // same threshold. Length is not a lever, so the copy cannot offer it.
+    // same threshold. Length is not a lever, so the copy cannot offer it. The
+    // longer explanation lives on the Learn page.
+    expect(container.textContent).not.toMatch(/longer/i);
+    expect(container.textContent).not.toMatch(/query length/i);
+  });
+
+  test("tells the reader how to get past the cap", () => {
+    const { container } = renderResults(
+      truncatedResults([summary("GENOMIC_VRL", 157741, CAP)])
+    );
+    openWhy();
+
+    // The disclosure exists so a capped reader knows what to do next, not to
+    // narrate how the cap is applied.
     expect(container.textContent).toContain(
-      "A longer query is not a more specific one"
+      "To see the rest, search fewer indexes or download the full set from the summary."
     );
-    expect(container.textContent).toContain(
-      "The match set responds to how rare your k-mers are and to the threshold above, not to query length."
-    );
-    expect(container.textContent).not.toContain(
-      "longer, or from a less conserved region"
-    );
+    expect(container.textContent).not.toContain("stable hash");
+    expect(container.textContent).not.toContain("after the shards merge");
   });
 
   test("stays quiet when nothing was truncated", () => {
@@ -448,7 +464,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     // The per-index counts went with the diagnostics chips: an untruncated
     // listing has nothing to explain, and the toolbar names its window only.
     expect(container.textContent).not.toContain("GENOMIC_EUK 17,000");
-    expect(container.textContent).not.toContain("cannot be paged to");
+    expect(container.textContent).not.toContain("aren't listed");
   });
 
   test("renders a truncated result from a backend that sends neither total_matches nor per_index", () => {
@@ -466,7 +482,7 @@ describe("LoganSearchResults truncation disclosure", () => {
       screen.getByText("Listing the 50,000 highest-coverage hits")
     ).toBeTruthy();
     expect(container.textContent).toContain(
-      "More accessions matched than can be listed."
+      "More runs matched than fit in the list."
     );
     openWhy();
     // Degraded, not broken: the card renders, and no arithmetic on the
@@ -474,7 +490,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     expect(screen.getByRole("alert")).toBeTruthy();
     expect(container.textContent).not.toContain("NaN");
     expect(container.textContent).not.toContain("undefined");
-    expect(container.textContent).not.toContain("remaining 0");
+    expect(container.textContent).not.toContain("0 more matched");
   });
 
   test("caps a filtered page against what the filter keeps", () => {
@@ -494,7 +510,7 @@ describe("LoganSearchResults truncation disclosure", () => {
     ).toBeTruthy();
     // 120,000 kept less the 50,000 listed, not the whole match set's gap.
     expect(container.textContent).toContain(
-      "The remaining 70,000 cannot be paged to. Download the filtered runs " +
+      "70,000 more matched but aren't listed. Download the filtered runs " +
         "above for the full set."
     );
   });
@@ -519,8 +535,8 @@ describe("shards that could not be read", () => {
     renderResults({ ...BASE_RESULTS, ...FAILED });
 
     expect(screen.getByRole("alert").textContent).toContain(
-      "3 of 35 index shards could not be read, so this list is incomplete. " +
-        "Come back in an hour and the missing shards are retried."
+      "3 of 35 index shards couldn't be read, so this list is incomplete. " +
+        "Reload in an hour to retry."
     );
   });
 
@@ -541,8 +557,8 @@ describe("shards that could not be read", () => {
     // "this list" would point at a list with no rows in it, so the empty
     // state names the search instead.
     expect(alerts[0].textContent).toContain(
-      "3 of 35 index shards could not be read, so this search is incomplete. " +
-        "Come back in an hour and the missing shards are retried."
+      "3 of 35 index shards couldn't be read, so this search is incomplete. " +
+        "Reload in an hour to retry."
     );
     expect(alerts[1].textContent).toContain("No accessions matched");
   });
@@ -550,7 +566,7 @@ describe("shards that could not be read", () => {
   test("says nothing when every shard answered", () => {
     const { container } = renderResults(BASE_RESULTS);
 
-    expect(container.textContent).not.toContain("could not be read");
+    expect(container.textContent).not.toContain("couldn't be read");
   });
 });
 
@@ -651,6 +667,9 @@ describe("coverage and ANI columns", () => {
     fireEvent.mouseOver(chip as HTMLElement);
     const tooltip = await screen.findByRole("tooltip");
     expect(tooltip.textContent).toContain("kmindex reported 0.9900");
+    // The baseline is a property of the saturated index, not of the run's
+    // reads, so the tooltip has to say which.
+    expect(tooltip.textContent).toContain("This run's index is saturated");
     expect(tooltip.textContent).toContain("0.6910");
     expect(chip?.getAttribute("aria-describedby")).toBe(tooltip.id);
   });
