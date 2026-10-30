@@ -107,13 +107,15 @@ def _download(pin: GeneSnapshotPin, directory: Path, stop: threading.Event) -> P
     if _is_pinned_file(target, pin):
         return target
     directory.mkdir(parents=True, exist_ok=True)
+    partial = target.with_name(target.name + ".partial")
+    # Left only by a process killed mid-download; its space counts as free.
+    partial.unlink(missing_ok=True)
     free = shutil.disk_usage(directory).free
     if free < pin.size:
         raise OSError(
             f"{directory} has {free:,} bytes free; the snapshot is {pin.size:,}"
         )
 
-    partial = target.with_name(target.name + ".partial")
     digest = hashlib.sha256()
     received = 0
     try:

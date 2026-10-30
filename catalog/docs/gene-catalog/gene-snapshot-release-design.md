@@ -5,7 +5,7 @@ How a gene snapshot reaches the servers. The gene catalog contract (#1893, secti
 ## Terms
 
 - **Gene snapshot:** one DuckDB file holding the tables the gene API reads, written by `catalog_build.genes.build_gene_snapshot`. Identified by its build ID, which the file's `snapshot` table holds.
-- **Gene data store:** the S3 bucket holding published snapshots under `snapshots/`. For now a temporary bucket on the Clever Canary AWS account, until the contract's open decision on whose account holds it is made.
+- **Gene data store:** the S3 bucket holding published snapshots under `snapshots/`. For now a temporary AWS bucket on the Clever Canary account, used only until the gene data store's bucket on Jetstream2 is available.
 - **Snapshot pin:** `backend/api/app/data/genes/snapshot-pin.json`, the file in the repo naming the one snapshot a release serves.
 - **Pinned mode:** how the servers run. The API downloads the pinned snapshot at startup and serves it.
 - **Local mode:** how a developer's machine runs. The API serves a snapshot file named by `GENE_SNAPSHOT_PATH`.
@@ -101,7 +101,7 @@ The servers read `snapshots/` without credentials, so no key reaches the servers
 - **Versioning on,** as a backstop to `IfNoneMatch`.
 - **Server access logging on.** Refused requests are logged with their source address, so the servers' real outbound address can be confirmed without logging in to them, and the allowlist narrowed to it.
 
-The snapshots hold only public NCBI data; the allowlist keeps anonymous traffic, and the transfer cost it brings, off the bucket. Moving to the permanent gene data store later is a new pin pointing at the new URL, released like any other.
+The snapshots hold only public NCBI data; the allowlist keeps anonymous traffic, and the transfer cost it brings, off the bucket. Moving to the Jetstream2 bucket is a new pin pointing at the new URL, released like any other; the publish command's `snapshot_url` is the one AWS-specific part to change (its docstring says how).
 
 | Bucket                      | Region      | Account                          | Access logs                                                     |
 | --------------------------- | ----------- | -------------------------------- | --------------------------------------------------------------- |
@@ -129,4 +129,4 @@ The backend's tests read a small gene snapshot kept as text in `backend/api/test
 ## Not yet
 
 - **Older-update check.** The contract's check that a pin never names a snapshot built from an older provenance database update than the one it replaces comes with the real build; the temporary snapshots have no update.
-- **Permanent store.** The bucket above is temporary.
+- **Jetstream2 bucket.** The AWS bucket above is a stand-in until the gene data store's bucket on Jetstream2 exists. Then: create it with the same access rules (Jetstream2's Ceph store supports bucket policies; check `aws:SourceIp`), give the publish command an `--endpoint-url` and a path-style URL in `snapshot_url`, publish, and release the new pin. The AWS buckets can be deleted once no release in use pins them.

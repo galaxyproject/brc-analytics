@@ -237,6 +237,25 @@ def test_not_enough_disk_is_not_downloaded(
     assert store.requests == []
 
 
+def test_a_partial_download_left_by_a_killed_process_is_cleared(
+    tmp_path, store, snapshot_bytes, monkeypatch
+):
+    # Room for the snapshot only once the stale partial file is gone.
+    pin_path = write_pin(tmp_path / "pin.json", snapshot_bytes)
+    (tmp_path / "genes").mkdir()
+    partial = tmp_path / "genes" / f"{read_pin(pin_path).build_id}.duckdb.partial"
+    partial.write_bytes(b"x" * 100)
+    usage = namedtuple("usage", "total used free")
+    size = len(snapshot_bytes)
+    monkeypatch.setattr(
+        gene_snapshot.shutil,
+        "disk_usage",
+        lambda _: usage(0, 0, size - 1 if partial.exists() else size),
+    )
+    store.responses.append(httpx.Response(200, content=snapshot_bytes))
+    assert load(tmp_path, pin_path).status == "ready"
+
+
 def test_an_unwritable_directory_is_not_downloaded_to(tmp_path, store, snapshot_bytes):
     (tmp_path / "genes").mkdir(mode=0o500)
     service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
