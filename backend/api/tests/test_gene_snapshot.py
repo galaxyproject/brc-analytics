@@ -274,12 +274,23 @@ def test_a_file_already_downloaded_is_reused(tmp_path, store, snapshot_bytes):
     assert store.requests == []
 
 
-def test_a_damaged_earlier_download_is_replaced(tmp_path, store, snapshot_bytes):
+def test_a_damaged_earlier_download_is_replaced(
+    tmp_path, store, snapshot_bytes, monkeypatch
+):
     (tmp_path / "genes").mkdir()
     pin_path = write_pin(tmp_path / "pin.json", snapshot_bytes)
     damaged = bytearray(snapshot_bytes)
     damaged[-1] ^= 0xFF
-    (tmp_path / "genes" / f"{read_pin(pin_path).build_id}.duckdb").write_bytes(damaged)
+    cached = tmp_path / "genes" / f"{read_pin(pin_path).build_id}.duckdb"
+    cached.write_bytes(damaged)
+    # Room for one copy only: the damaged one has to go first.
+    usage = namedtuple("usage", "total used free")
+    size = len(snapshot_bytes)
+    monkeypatch.setattr(
+        gene_snapshot.shutil,
+        "disk_usage",
+        lambda _: usage(0, 0, size - 1 if cached.exists() else size),
+    )
     store.responses.append(httpx.Response(200, content=snapshot_bytes))
     assert load(tmp_path, pin_path).status == "ready"
     assert len(store.requests) == 1

@@ -108,7 +108,9 @@ def _download(pin: GeneSnapshotPin, directory: Path, stop: threading.Event) -> P
         return target
     directory.mkdir(parents=True, exist_ok=True)
     partial = target.with_name(target.name + ".partial")
-    # Left only by a process killed mid-download; its space counts as free.
+    # Neither can be served: a target that failed the check above, and a
+    # partial left by a process killed mid-download. Their space counts as free.
+    target.unlink(missing_ok=True)
     partial.unlink(missing_ok=True)
     free = shutil.disk_usage(directory).free
     if free < pin.size:
