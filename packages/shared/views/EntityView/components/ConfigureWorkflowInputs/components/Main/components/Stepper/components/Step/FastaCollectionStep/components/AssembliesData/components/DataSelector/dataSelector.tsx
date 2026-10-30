@@ -8,7 +8,6 @@ import {
   hasEnoughAssemblies,
 } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/utils";
 import { useWorkflowEntity } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/WorkflowEntity/hook";
-import { getRequiredAssemblyCount } from "@repo/shared/workflow/utils";
 import { type JSX } from "react";
 import { type Props } from "./types";
 import { renderAssemblyRequirement } from "./utils";
@@ -50,7 +49,7 @@ export const DataSelector = ({
           ) : (
             <>
               This workflow needs at least{" "}
-              {formatAssemblyCount(getRequiredAssemblyCount(workflow))}, and{" "}
+              {formatAssemblyCount(workflow.assemblyCountMin)}, and{" "}
               <ScientificName>{taxonomicLevelSpecies}</ScientificName> has{" "}
               {assemblyCount}.
             </>

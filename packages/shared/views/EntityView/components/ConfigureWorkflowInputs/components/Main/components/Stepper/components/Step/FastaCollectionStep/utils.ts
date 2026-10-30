@@ -1,6 +1,5 @@
 import type { Workflow } from "@repo/shared/apis/workflow";
 import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { getRequiredAssemblyCount } from "@repo/shared/workflow/utils";
 
 /**
  * Formats a number of assemblies, e.g. "1 assembly" or "3 assemblies".
@@ -34,7 +33,7 @@ export function hasEnoughAssemblies(
   assemblyCount: number,
   workflow: Workflow
 ): boolean {
-  return assemblyCount >= getRequiredAssemblyCount(workflow);
+  return assemblyCount >= workflow.assemblyCountMin;
 }
 
 /**

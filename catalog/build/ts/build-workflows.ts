@@ -239,6 +239,25 @@ function buildWorkflow(
     resolvedMax = assemblyCountMax ?? null;
   }
 
+  // A workflow that takes a collection of assemblies can't run on an empty
+  // one, so a minimum below 1 is a catalog error, not "no requirement".
+  if (
+    variables.includes(WorkflowParameterVariable.FASTA_COLLECTION) &&
+    resolvedMin < 1
+  ) {
+    throw new Error(
+      `Workflow "${workflowName}": assembly_count_min must be at least 1 for a workflow with a FASTA_COLLECTION parameter`
+    );
+  }
+
+  // A maximum below the minimum leaves no number of assemblies the workflow can
+  // run with.
+  if (resolvedMax !== null && resolvedMax < resolvedMin) {
+    throw new Error(
+      `Workflow "${workflowName}": assembly_count_max (${resolvedMax}) must not be less than assembly_count_min (${resolvedMin})`
+    );
+  }
+
   // Get the up-to-date taxonomy ID from the taxonomy mapping, defaulting to the ID from the YAML
   const resolvedStringTaxonomyId =
     taxonomyId === null

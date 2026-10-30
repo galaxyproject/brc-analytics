@@ -7,7 +7,6 @@ import {
   type ConfiguredInput,
   type OnConfigure,
 } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { getRequiredAssemblyCount } from "@repo/shared/workflow/utils";
 import { type RowSelectionState, type Table } from "@tanstack/react-table";
 import { type Assembly } from "./hooks/UseTable/types";
 
@@ -51,7 +50,7 @@ export function getAddSelectionValidation(
   workflow: Workflow
 ): string | undefined {
   if (hasEnoughAssemblies(count, workflow)) return;
-  return `Select at least ${formatAssemblyCount(getRequiredAssemblyCount(workflow))}`;
+  return `Select at least ${formatAssemblyCount(workflow.assemblyCountMin)}`;
 }
 
 /**

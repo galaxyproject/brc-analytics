@@ -44,12 +44,6 @@ describe("hasEnoughAssemblies", () => {
     expect(hasEnoughAssemblies(2, WORKFLOW)).toBe(true);
     expect(hasEnoughAssemblies(5, WORKFLOW)).toBe(true);
   });
-
-  test("requires at least one assembly when the workflow has no minimum", () => {
-    const workflow = { ...WORKFLOW, assemblyCountMin: 0 };
-    expect(hasEnoughAssemblies(0, workflow)).toBe(false);
-    expect(hasEnoughAssemblies(1, workflow)).toBe(true);
-  });
 });
 
 describe("isFastaCollectionConfigured", () => {

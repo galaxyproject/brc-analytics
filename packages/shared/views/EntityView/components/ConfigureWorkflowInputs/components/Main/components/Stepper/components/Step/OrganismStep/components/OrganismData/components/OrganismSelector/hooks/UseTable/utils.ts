@@ -3,10 +3,7 @@ import {
   formatAssemblyCount,
   hasEnoughAssemblies,
 } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/utils";
-import {
-  getRequiredAssemblyCount,
-  workflowRequiresFastaCollection,
-} from "@repo/shared/workflow/utils";
+import { workflowRequiresFastaCollection } from "@repo/shared/workflow/utils";
 import { type Row, type Table } from "@tanstack/react-table";
 import { getOrganismAssemblyCount } from "./accessorFn";
 import { type Organism } from "./types";
@@ -60,7 +57,7 @@ export function getOrganismSelectionValidation(
   workflow: Workflow
 ): string | undefined {
   if (canSelectOrganism(organism, workflow)) return;
-  return `This workflow needs at least ${formatAssemblyCount(getRequiredAssemblyCount(workflow))}; this organism has ${getOrganismAssemblyCount(organism)}.`;
+  return `This workflow needs at least ${formatAssemblyCount(workflow.assemblyCountMin)}; this organism has ${getOrganismAssemblyCount(organism)}.`;
 }
 
 /** Renders the summary row counts for the table.

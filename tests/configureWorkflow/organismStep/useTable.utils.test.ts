@@ -59,15 +59,6 @@ describe("canSelectOrganism", () => {
     ).toBe(false);
   });
 
-  test("blocks an organism with no assemblies when the workflow has no minimum", () => {
-    expect(
-      canSelectOrganism(makeOrganism(0), {
-        ...FASTA_COLLECTION_WORKFLOW,
-        assemblyCountMin: 0,
-      })
-    ).toBe(false);
-  });
-
   test("allows any organism for a workflow that takes no assembly collection", () => {
     expect(canSelectOrganism(makeOrganism(1), READ_RUN_WORKFLOW)).toBe(true);
   });

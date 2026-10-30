@@ -1,7 +1,6 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import {
-  getRequiredAssemblyCount,
   workflowMeetsAssemblyMinimum,
   workflowReachesAssemblyMaximum,
   workflowRequiresFastaCollection,
@@ -68,15 +67,5 @@ describe("workflowRequiresFastaCollection", () => {
       ],
     } as Workflow;
     expect(workflowRequiresFastaCollection(workflow)).toBe(false);
-  });
-});
-
-describe("getRequiredAssemblyCount", () => {
-  test("returns the workflow's minimum", () => {
-    expect(getRequiredAssemblyCount({ assemblyCountMin: 2 })).toBe(2);
-  });
-
-  test("never returns fewer than one", () => {
-    expect(getRequiredAssemblyCount({ assemblyCountMin: 0 })).toBe(1);
   });
 });
