@@ -41,6 +41,9 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
+  const organismHref = replaceParameters(ROUTES.ORGANISM, {
+    entityId: sanitizeEntityId(gene.organism.speciesTaxonomyId),
+  });
   const label = geneLabel(gene);
   const breadcrumbs = [...GENES_BREADCRUMBS, { path: "", text: label }];
 
@@ -56,7 +59,9 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
           <FieldLabel>Symbol</FieldLabel>
           <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
           <FieldLabel>Organism</FieldLabel>
-          <FieldValue>{gene.organism.name}</FieldValue>
+          <FieldValue>
+            <Link href={organismHref}>{gene.organism.name}</Link>
+          </FieldValue>
           <FieldLabel>Assembly</FieldLabel>
           <FieldValue>
             <Link href={assemblyHref}>{gene.assemblyAccession}</Link>

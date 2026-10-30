@@ -17,6 +17,10 @@ export interface GeneLocation {
 
 export interface GeneOrganism {
   name: string;
+  // The species' taxonomy ID, which addresses the organism's page; taxonomyId
+  // is the assembly's own taxon, which may be a strain, an isolate or the
+  // species itself.
+  speciesTaxonomyId: string;
   taxonomyId: string;
 }
 
