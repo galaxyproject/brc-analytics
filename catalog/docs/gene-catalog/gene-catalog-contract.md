@@ -46,7 +46,7 @@ Two bets drive the rest of the design. Most of what is heavier than a plain gene
 | R7  | A gene page belongs to one assembly version. The same gene ID on a newer assembly version gets its own page, linked to the old one (see Open decisions)                                                                                                         | A location, a gene model and a workflow's GTF each refer to one assembly version; a page spanning versions would have to label every fact with its version                                                                                                         | v0                                         | 1       |
 | R8  | The page, search box (ID lookup), MCP tools and, once it exists, the download give the same answer                                                                                                                                                              | They all call one service reading the same data                                                                                                                                                                                                                    | v0                                         | 6       |
 | R9  | A whole counts table is labelled in one call                                                                                                                                                                                                                    | About 7,000 gene IDs for P01; larger genomes have more                                                                                                                                                                                                             | v0                                         | 6       |
-| R10 | Gene data is updated, and rolled back, without a site deploy                                                                                                                                                                                                    | Publishers release on their own schedules                                                                                                                                                                                                                          | v0, with an API restart                    | 5       |
+| R10 | Gene data is updated, and rolled back, without a code change: a reviewed change to the snapshot pin, which deploys like any other change, to dev first and then to production                                                                                   | Publishers release on their own schedules. The pin's history in git records which snapshot was live where and when, and new data is tested on dev before production, as code is                                                                                    | v0                                         | 5       |
 | R11 | Adding an assembly is a source-list entry, not code                                                                                                                                                                                                             | v0 covers every catalog assembly with an NCBI annotation, and new ones join the catalog over time                                                                                                                                                                  | v0                                         | 4, 5    |
 | R12 | Gene data is accurate before it is complete: any inconsistency, or any case the reading rules don't cover, rejects the whole assembly with a named reason. Nothing is guessed, invented or loaded in part                                                       | A wrong gene is worse than a missing one: people act on what a page says, and a wrong ID or product spreads into their results. A rejected assembly is visible and can be fixed later; a silently wrong one isn't                                                  | v0                                         | 4       |
 
@@ -107,7 +107,8 @@ The contract is written for more than v1, so later publishers and assemblies add
 - **Predecessor:** the update that was the head when an update started. Updates form one chain, never branches.
 - **Head:** the latest committed update.
 - **Gene data store:** the bucket holding the archived publisher files, the provenance database and the snapshots (section 4).
-- **Snapshot:** the gene pages' data, built from the provenance database as of one update and the archived files, as a single file that is never edited. It is complete: the API reads nothing else. The **live** snapshot is the one the API serves.
+- **Snapshot:** the gene pages' data, built from the provenance database as of one update and the archived files, as a single file that is never edited. It is complete: the API reads nothing else. The **live** snapshot is the one the API serves: the one the deployed build's snapshot pin names.
+- **Snapshot pin:** the file in the repo naming the snapshot a build serves: its build ID, URL and `sha256` (section 5).
 - **Change history:** the provenance database's record of how each gene changed (the schema doc's `gene_record`, `gene_version` and the tables with them). After v1.
 - **Provenance line:** the line under a gene's name saying which annotation it comes from.
 - **Pinned address:** a gene's address plus an annotation set version, showing the gene as that annotation described it rather than its latest state (section 1). From v1.
@@ -222,9 +223,9 @@ snapshots/genes-<build>.duckdb                                  each snapshot, w
 - **Sources update independently.** An update can refresh one source and leave the annotations and the other sources as they are. Updates still form one chain (section 5), and each manifest says which sources it refreshed.
 - **Each source's version is named separately (decided 2026-10-29).** A snapshot holds each source as of its update and records each source's file version (section 3), and an answer names the source and its retrieval date beside the annotation's (section 2). An annotation release and a `gene2go.gz` download are made at different times by different processes, so tying them together would claim a link that isn't there.
 
-## 5. Updating, building and publishing
+## 5. Updating, building and releasing
 
-Two steps: update the provenance database, then build and publish a snapshot from it. Only publishing touches the live server, and only to download a file.
+Two steps: update the provenance database, then build a snapshot from it and pin it. The servers are touched only by the normal deploy, which carries the pin.
 
 **Step 1, update the provenance database.** In v0 it runs on a developer machine, so a run can be watched and debugged; CI can come later.
 
@@ -233,13 +234,16 @@ Two steps: update the provenance database, then build and publish a snapshot fro
 3. Run the checks below and section 4's, and look at the result locally with DuckDB.
 4. Commit (section 4).
 
-**Step 2, build and publish a snapshot:**
+**Step 2, build, pin and release a snapshot:**
 
 1. **Build** from the head: read its tables and the cached build files, write `genes-<build>.duckdb` with its check report (its tables declare their keys, so DuckDB checks them as it builds), and upload it to `snapshots/`.
-2. **Smoke test:** dev downloads the snapshot and loads it into the app; run the API validation script and look around the pages by hand.
-3. **Publish:** production downloads the same file. Both downloads are a target in the deploy playbook (`galaxyproject/brc-analytics-playbook`), like the organism images' `make fetch-images`: it fetches the snapshot, checks its `sha256`, puts it in the mounted directory, replaces the symlink atomically and restarts the API. The servers pull because nothing outside can reach them (their SSH needs a VPN and MFA). Nothing is built or checked on the live server, apart from the guard below.
+2. **Pin:** a pull request changes the **snapshot pin**, a small file in the repo (`backend/api/gene-snapshot.json`) naming the snapshot's build ID, URL and `sha256`. The pin is the only record of which snapshot a build serves, so its git history says which snapshot was live where and when.
+3. **Dev:** merging the pull request deploys it to dev, as any merge to `main` does. The API downloads the pinned snapshot at startup (Serving, below). Run the API validation script and look around the pages by hand.
+4. **Production:** the next production release carries the same pin, through the normal promotion from dev, so production serves exactly the snapshot tested on dev.
 
-**Both chains are linear.** The commit refuses an update whose predecessor isn't the head (section 4). Publish refuses a snapshot built from an older update than the live one's, so a publish never steps back by accident; rollback is exempt, since going back is its purpose. A snapshot holds nothing the provenance database doesn't, so publishing one can't lose data.
+The servers pull the snapshot because nothing outside can reach them (their SSH needs a VPN and MFA). Every server running a build serves the snapshot its pin names, so servers on the same build can't disagree. Nothing is built or checked on the servers apart from the API's own checks when it opens the file.
+
+**Both chains are linear.** The commit refuses an update whose predecessor isn't the head (section 4). A check on the pin's pull request refuses a snapshot built from an older update than the one it replaces, so a pin never steps back by accident; a rollback is exempt, since going back is its purpose. A snapshot holds nothing the provenance database doesn't, so pinning one can't lose data.
 
 **Checks:**
 
@@ -248,15 +252,15 @@ Two steps: update the provenance database, then build and publish a snapshot fro
   - a sequence carrying a gene in its publisher file isn't one UCSC's genome browser knows for the assembly (section 3);
   - it loses or changes more than a set share of genes or IDs compared with the head, unless `gene-sources.yml` marks the change as expected;
   - (**v1**) a GTF listed for it doesn't match the publisher file `gene-sources.yml` declares: a different core hash, or a GTF gene ID that isn't a gene in that file (all 6,836 of P01's are).
-- **On the whole snapshot,** before publish: its `schema_version` must be one the backend it will be published to can read.
+- **On the whole snapshot,** before it is pinned: its `schema_version` must be one the backend in the same build can read.
 
 **Serving:**
 
-- **One mounted directory,** `/opt/brc-analytics-data/genes/`, read-only in the API container, holding the snapshots and a relative `current.duckdb` symlink to the live one. A directory, not a file, because a single-file mount keeps the old file until the container is recreated.
-- **Rollback:** point the symlink back and restart the API. Keep the last few snapshots on the server; every snapshot stays in the gene data store.
-- **Schema changes go backend first:** a backend release learns to read version N+1 while still reading N, and only then is an N+1 snapshot published.
-- **The backend refuses to start** if `current.duckdb` is missing, with a clear error. The MCP gene tools are always on; the pages are behind the `gene-pages` flag.
-- **Later:** picking up a new snapshot without a restart.
+- **The API downloads the pinned snapshot at startup.** It reads the pin and looks in its cache directory, a volume mounted into the API container. If the cached copy's `sha256` matches the pin, it uses it; otherwise it downloads the file to a temporary name, checks its `sha256` and moves it into place. A restart with the same pin downloads nothing. The URL is any S3-compatible store (AWS S3, Jetstream's object store) or HTTPS. The snapshot is downloaded, not built into the image, because a full v0 snapshot is too large for an image.
+- **If the pinned snapshot can't be downloaded or fails its checks,** the API starts with gene data unavailable: gene requests return 503, the log says why, and the rest of the site is unaffected. It never falls back to a different snapshot than the one pinned.
+- **Rollback:** revert the pin's pull request, or redeploy the previous release. The cache keeps the last few snapshots, so going back usually downloads nothing; every snapshot stays in the gene data store.
+- **Schema changes ship with the backend that reads them:** a pin to a snapshot with a new `schema_version` merges in the same release as, or after, the backend change that reads it. The check above enforces it.
+- **The MCP gene tools are always on;** the pages are behind the `gene-pages` flag.
 
 ## 6. API
 
