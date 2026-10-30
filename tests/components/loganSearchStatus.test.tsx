@@ -74,9 +74,28 @@ describe("formatWait", () => {
 });
 
 describe("describeQueue", () => {
-  test("says how long recent searches waited when demand is high", () => {
+  test("says how long the oldest search has waited when that's the longer", () => {
     expect(describeQueue(BACKED_UP)).toBe(
-      "Demand is quite high right now; recent searches have waited about 2 h 20 min to start."
+      "Demand is quite high right now; the oldest search in line has been waiting about 2 h 20 min."
+    );
+    expect(busyNotice(BACKED_UP)).toBe(
+      "Heads up, demand is quite high right now. The oldest search in line has been waiting about 2 h 20 min."
+    );
+  });
+
+  test("says how long recent searches waited when that's the longer", () => {
+    const drained = { ...BACKED_UP, oldest_waiting_minutes: null, waiting: 0 };
+    expect(describeQueue(drained)).toBe(
+      "Demand is quite high right now; recent searches have waited about 12 min to start."
+    );
+    expect(busyNotice(drained)).toBe(
+      "Heads up, demand is quite high right now. Recent searches have waited about 12 min to start."
+    );
+  });
+
+  test("credits recent searches when the two figures tie", () => {
+    expect(describeQueue({ ...BACKED_UP, oldest_waiting_minutes: 12.4 })).toBe(
+      "Demand is quite high right now; recent searches have waited about 12 min to start."
     );
   });
 

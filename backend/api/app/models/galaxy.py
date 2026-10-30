@@ -525,7 +525,9 @@ class KmindexQueueStatus(BaseModel):
     waiting: int = Field(..., description="Searches submitted but not started")
     running: int
     oldest_waiting_minutes: Optional[float] = Field(
-        None, description="How long the longest-waiting search has waited so far"
+        None,
+        description="How long the longest-waiting search has waited so far, "
+        "leaving out searches that look stuck",
     )
     recent_wait_minutes: Optional[float] = Field(
         None,
@@ -549,7 +551,9 @@ class KmindexQueueHistoryRow(BaseModel):
         ..., description="Answered from Galaxy's job cache; never queued"
     )
     still_waiting: bool = Field(
-        ..., description="Not started yet; wait_minutes is the wait so far"
+        ...,
+        description="Not started yet; wait_minutes is the wait so far, or "
+        "None once the search looks stuck",
     )
     wait_minutes: Optional[float] = None
     run_minutes: Optional[float] = None

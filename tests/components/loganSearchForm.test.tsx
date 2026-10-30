@@ -211,7 +211,7 @@ describe("LoganSearchForm busy notice", () => {
 
     expect(
       screen.getByText(
-        "Heads up, demand is quite high right now. Recent searches have waited about 1 h 40 min to start."
+        "Heads up, demand is quite high right now. The oldest search in line has been waiting about 1 h 40 min."
       )
     ).toBeTruthy();
   });
