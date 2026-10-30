@@ -30,6 +30,9 @@ class GeneLocation(_CamelModel):
 
 class GeneOrganism(_CamelModel):
     name: str
+    # The species' taxonomy ID; taxonomy_id is the assembly's own taxon, which
+    # may be a strain, an isolate or the species itself.
+    species_taxonomy_id: str
     taxonomy_id: str
 
 

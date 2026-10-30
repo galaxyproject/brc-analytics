@@ -73,7 +73,11 @@ def test_gene(client, gene_uid):
         "symbol": "AMA1",
         "biotype": "protein_coding",
         "assemblyAccession": "GCF_000002765.6",
-        "organism": {"name": "Plasmodium falciparum 3D7", "taxonomyId": "36329"},
+        "organism": {
+            "name": "Plasmodium falciparum 3D7",
+            "speciesTaxonomyId": "5833",
+            "taxonomyId": "36329",
+        },
         "location": {
             "seqName": "NC_037282.1",
             "start": 1292966,
