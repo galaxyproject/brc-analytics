@@ -2765,6 +2765,9 @@ class GalaxyService:
                 status.is_successful,
             )
 
+            if state == GalaxyJobState.PAUSED:
+                await self._report_paused_job(job_id, job_data)
+
             # Only a successful job's outputs are ever read. Hand over the job
             # dict already fetched above rather than making _get_job_outputs
             # re-fetch it.
@@ -2783,11 +2786,37 @@ class GalaxyService:
         except BioblendConnectionError as e:
             if is_missing_job_error(e):
                 raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
-            logger.error(f"BioBLEND error getting job status: {e}")
+            logger.error("BioBLEND error getting job status for %s: %s", job_id, e)
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
         except Exception as e:
-            logger.error(f"BioBLEND error getting job status: {e}")
+            logger.error("BioBLEND error getting job status for %s: %s", job_id, e)
             raise Exception(f"Failed to get job status using BioBLEND: {str(e)}") from e
+
+    async def _report_paused_job(self, job_id: str, job_data: dict) -> None:
+        """Log an error, and so a Sentry issue, when a service-account job is paused."""
+        # A user's own quota is theirs to manage; the service account's being
+        # full fails every anonymous and partner search.
+        if self.credential.kind != "service":
+            return
+        # Over quota, every job pauses at once and each is re-polled every few
+        # seconds; once an hour is enough to say the account is stuck.
+        if not await self.cache.claim("galaxy:paused_reported", CacheTTL.ONE_HOUR):
+            return
+
+        quota_percent = None
+        try:
+            user = await asyncio.to_thread(self.gi.users.get_current_user)
+            quota_percent = user.get("quota_percent")
+        except Exception as e:
+            logger.warning(f"Could not read Galaxy quota for paused job {job_id}: {e}")
+
+        logger.error(
+            "Galaxy paused service-account job %s (tool %s, quota used %s%%, info %r)",
+            job_id,
+            job_data.get("tool_id"),
+            quota_percent,
+            job_data.get("info"),
+        )
 
     async def get_job_results(self, job_id: str) -> GalaxyJobResult:
         """Get the complete results from a finished Galaxy job."""

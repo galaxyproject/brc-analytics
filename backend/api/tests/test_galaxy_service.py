@@ -23,6 +23,7 @@ import requests
 from pydantic import ValidationError
 
 from app.core.cache import CacheTTL
+from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     MAX_QUERY_BASES,
     GalaxyJobState,
@@ -261,6 +262,53 @@ class TestJobStatusStates:
 
         assert status.is_complete and status.outputs == []
         service.gi.datasets.show_dataset.assert_not_called()
+
+    async def _paused_poll_errors(self, service, caplog):
+        service.gi.jobs.show_job = MagicMock(return_value=self._job("paused"))
+        with caplog.at_level(logging.ERROR, logger="app.services.galaxy_service"):
+            await service.get_job_status("job1")
+        return [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_is_reported_as_an_error_with_the_quota(
+        self, service, caplog
+    ):
+        # Galaxy pauses an over-quota user's jobs; for the shared service
+        # account that silently fails every search, so it has to reach Sentry.
+        service.gi.users.get_current_user = MagicMock(
+            return_value={"quota_percent": 100.0}
+        )
+
+        errors = await self._paused_poll_errors(service, caplog)
+
+        assert len(errors) == 1
+        assert "paused" in errors[0].getMessage()
+        assert "100.0%" in errors[0].getMessage()
+
+    @pytest.mark.asyncio
+    async def test_a_pause_already_reported_this_hour_is_not_reported_again(
+        self, service, caplog
+    ):
+        service.cache.claim = AsyncMock(return_value=False)
+
+        assert not await self._paused_poll_errors(service, caplog)
+        service.gi.users.get_current_user.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_under_a_user_credential_is_not_reported(
+        self, service, caplog
+    ):
+        service.credential = GalaxyCredential(kind="user", secret="tok")
+
+        assert not await self._paused_poll_errors(service, caplog)
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_is_reported_even_if_the_quota_read_fails(
+        self, service, caplog
+    ):
+        service.gi.users.get_current_user = MagicMock(side_effect=RuntimeError("429"))
+
+        assert await self._paused_poll_errors(service, caplog)
 
     @pytest.mark.asyncio
     async def test_a_status_poll_logs_nothing_at_info(self, service, caplog):
