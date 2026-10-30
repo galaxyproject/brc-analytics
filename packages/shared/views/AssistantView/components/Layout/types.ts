@@ -1,20 +1,54 @@
-import type { Props as ChatProps } from "./components/Chat/types";
-import type { Props as HistoryProps } from "./components/History/types";
-import type { Props as SetupProps } from "./components/Setup/types";
+import type { ChildrenProps } from "@databiosphere/findable-ui/lib/components/types";
+import type { HTMLAttributes, ReactNode } from "react";
+import type { LAYOUT_TAB } from "./constants";
 
 /**
- * Props for an assistant layout. The view builds each slot once so both
- * layouts render the same panels and differ only in where they place them.
+ * Props for a column of the assistant layout.
+ */
+export interface ColumnProps extends ChildrenProps, TabPanelProps {
+  active: boolean;
+}
+
+/**
+ * Props for the assistant-ui layout.
  */
 export interface LayoutProps {
+  conversationKey: number;
   slotProps: LayoutSlotProps;
 }
 
 /**
- * Props for each column of the assistant layout, keyed by column.
+ * Content for one column of the assistant layout, and its tab's label on
+ * narrow screens.
+ */
+export interface LayoutSlot extends ChildrenProps {
+  tabLabel: ReactNode;
+}
+
+/**
+ * Content for each column of the assistant layout, keyed by column.
  */
 export interface LayoutSlotProps {
-  chat: ChatProps;
-  history: HistoryProps;
-  setup: SetupProps;
+  chat: LayoutSlot;
+  history: LayoutSlot;
+  setup: LayoutSlot;
 }
+
+/**
+ * A column of the assistant layout, shown one at a time as tabs on narrow
+ * screens.
+ */
+export type LayoutTab = (typeof LAYOUT_TAB)[keyof typeof LAYOUT_TAB];
+
+/**
+ * Switches the column shown while the columns are tabbed.
+ */
+export type SelectTab = (tab: LayoutTab) => void;
+
+/**
+ * Attributes that tie a column to its tab while the columns are tabbed.
+ */
+export type TabPanelProps = Pick<
+  HTMLAttributes<HTMLElement>,
+  "aria-labelledby" | "id" | "role"
+>;

@@ -130,7 +130,7 @@ Used internally to generate TypeScript definitions.
 
 #### `schema_utils.validate_catalog`
 
-Can be run as a command-line script to validate catalog YAML files. The catalog source files to be validated are assumed to be named in the form `<SCHEMA_NAME>.yml`, where `<SCHEMA_NAME>` is the name of the corresponding schema.
+Can be run as a command-line script to validate catalog YAML files. The catalog source files to be validated are assumed to be named in the form `<SCHEMA_NAME>.yml`, where `<SCHEMA_NAME>` is the name of the corresponding schema. If the `assemblies` source file has no schema errors, it is also checked for accessions listed more than once; each duplicate is reported as an error, with the paths of the entries that list it.
 
 Example:
 

@@ -77,6 +77,7 @@ _ACCESSION_BATCH_SIZE = 500
 # promising a column the file may not have. If you add a column to a query,
 # add it here in the same change.
 CAPABILITY_ANNOTATION = "annotation"
+CAPABILITY_BIOSAMPLE = "biosample"
 CAPABILITY_COHORT = "cohort"
 CAPABILITY_COORDINATES = "coordinates"
 CAPABILITY_EXPORT = "export"
@@ -101,6 +102,12 @@ _RUN_DETAIL_COLUMNS: Tuple[str, ...] = (
 
 _CAPABILITY_COLUMNS: Dict[str, Tuple[str, ...]] = {
     CAPABILITY_ANNOTATION: _RUN_DETAIL_COLUMNS,
+    # Kept out of _RUN_DETAIL_COLUMNS for the reason coordinates are: the
+    # builder has written `biosample` since schema_version 5, but the
+    # schema_version 3 file predates it, and annotating a page must not go
+    # dark there to add one optional field. runs_by_accession asks this
+    # capability and selects NULL when it is closed.
+    CAPABILITY_BIOSAMPLE: ("acc", "biosample"),
     CAPABILITY_COHORT: (
         "acc",
         "assay_type",
@@ -208,9 +215,8 @@ EXPORT_UNAVAILABLE = "unavailable"
 # runs -- so a pathological selection is an order of magnitude past that. 5M
 # is ~3.3x the largest measured probe and holds the artifact to ~75 MB parquet
 # / ~740 MB TSV and the write to ~7s, which matters because the write happens
-# inside the process-wide aggregation lock where it delays every other user's
-# search. Past that a browser download stops being a useful way to move the
-# data anyway.
+# inside a merge slot, holding the full hit list in memory while it runs. Past
+# that a browser download stops being a useful way to move the data anyway.
 EXPORT_MAX_ROWS = 5_000_000
 
 # Retention. Exports are ~16 MB each and nothing else ever deletes them.
@@ -1729,6 +1735,14 @@ class SRAMirrorService:
         if not wanted:
             return {}
 
+        # A constant rather than an interpolated value: the choice is between
+        # two fixed expressions, never anything a caller sent.
+        biosample = (
+            "nullif(biosample, '')"
+            if self.has_capability(CAPABILITY_BIOSAMPLE)
+            else "NULL"
+        )
+
         cache_key = ("runs_by_accession", tuple(wanted))
         if (cached := self._cache_get(cache_key)) is not None:
             return cached
@@ -1742,13 +1756,13 @@ class SRAMirrorService:
             batch = wanted[start : start + _ACCESSION_BATCH_SIZE]
             rows.extend(
                 self._con.execute(
-                    """
+                    f"""
                     SELECT acc, sra_study, bioproject, organism, assay_type,
                            platform,
                            nullif(instrument, 'unspecified'),
                            librarylayout, releasedate,
                            nullif(geo_loc_name_country_calc, 'uncalculated'),
-                           mbases
+                           mbases, {biosample}
                     FROM runs WHERE acc IN (SELECT UNNEST(?))
                     """,
                     [batch],
@@ -1759,6 +1773,7 @@ class SRAMirrorService:
             r[0]: {
                 "assay_type": r[4],
                 "bioproject": r[2],
+                "biosample": r[11],
                 "country": r[9],
                 "instrument": r[6],
                 "library_layout": r[7],
@@ -2093,14 +2108,20 @@ class SRAMirrorService:
         )
         os.close(fd)
         partial = Path(partial_name)
-        with self._lock:
-            cursor = self._con.cursor()
 
         # The staging file is the join's left-hand side and never outlives the
         # call; it carries the rank because the app's md5 tie-break has no SQL
         # equivalent, and the export ships in the order the app ranked it.
+        #
+        # Everything after mkstemp sits inside the try, the cursor and the
+        # rename included: a failure anywhere past that point must take the
+        # partial with it, or the export directory collects empty files that
+        # only the hourly sweep ever removes.
+        cursor = None
         staging = None
         try:
+            with self._lock:
+                cursor = self._con.cursor()
             staging = tempfile.NamedTemporaryFile(
                 "w", suffix=".tsv", prefix="kmindex-export-", delete=False
             )
@@ -2115,6 +2136,7 @@ class SRAMirrorService:
                 _export_sql(self.has_capability(CAPABILITY_COORDINATES)),
                 [staging.name, str(partial)],
             )
+            partial.replace(destination)
         except Exception:
             try:
                 partial.unlink(missing_ok=True)
@@ -2122,12 +2144,12 @@ class SRAMirrorService:
                 pass
             raise
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
             if staging is not None:
                 staging.close()
                 Path(staging.name).unlink(missing_ok=True)
 
-        partial.replace(destination)
         # Count the file, not the input. They agree only while runs.acc happens
         # to be unique -- there is no constraint on it -- and a LEFT JOIN that
         # fanned out would put a row count in the download's filename that the

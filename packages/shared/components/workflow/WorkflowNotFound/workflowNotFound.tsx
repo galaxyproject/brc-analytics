@@ -1,4 +1,4 @@
-import { ButtonPrimary } from "@databiosphere/findable-ui/lib/components/common/Button/components/ButtonPrimary/buttonPrimary";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { AlertIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/AlertIcon/alertIcon";
 import { SectionActions } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
 import {
@@ -11,31 +11,28 @@ import {
   SectionContent,
   Error as StyledError,
 } from "@databiosphere/findable-ui/lib/components/Error/error.styles";
-import { useLayoutDimensions } from "@databiosphere/findable-ui/lib/providers/layoutDimensions/hook";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Link from "next/link";
 import { type JSX } from "react";
 import { type Props } from "./types";
 
 /**
  * Friendly unavailable state for a workflow URL. Rendered in place of the
- * configure-inputs view when the `trsId` query param names a workflow the
- * entity's listing doesn't offer: one that isn't in the catalog, is hidden by a
- * feature flag, or isn't compatible with the entity. Shown instead of the
- * generic error page.
+ * workflow view when the `trsId` names a workflow the user may not see: one
+ * that isn't loaded, is hidden by a feature flag, or isn't compatible with the
+ * entity it was requested for. Shown instead of the generic error page.
  * @param props - Component props.
- * @param props.entityContext - Noun for the entity the workflow was requested for (e.g. "assembly").
- * @param props.href - URL of the entity's available-workflows listing.
+ * @param props.entityContext - Noun for the entity the workflow was requested for (e.g. "assembly"); omitted when the workflow was requested on its own.
+ * @param props.href - URL of the available-workflows listing to return to.
  * @returns Workflow unavailable element.
  */
 export const WorkflowNotFound = ({
   entityContext,
   href,
 }: Props): JSX.Element => {
-  const { dimensions } = useLayoutDimensions();
   return (
-    <ErrorLayout offset={dimensions.header.height}>
+    <ErrorLayout>
       <StyledError>
         <ErrorSection>
           <StatusIcon priority={PRIORITY.MEDIUM} StatusIcon={AlertIcon} />
@@ -47,15 +44,28 @@ export const WorkflowNotFound = ({
               Workflow not available
             </Typography>
             <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_LARGE_400}>
-              The requested workflow isn&apos;t available for this{" "}
-              {entityContext}. It may not be compatible with this{" "}
-              {entityContext}, or the link may be out of date.
+              {entityContext ? (
+                <>
+                  The requested workflow isn&apos;t available for this{" "}
+                  {entityContext}. It may not be compatible with this{" "}
+                  {entityContext}, or the link may be out of date.
+                </>
+              ) : (
+                <>
+                  The requested workflow isn&apos;t available. It may not be
+                  released yet, or the link may be out of date.
+                </>
+              )}
             </Typography>
           </SectionContent>
           <SectionActions>
-            <ButtonPrimary component={Link} href={href}>
+            <Button
+              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              href={href}
+              LinkComponent={Link}
+            >
               View Available Workflows
-            </ButtonPrimary>
+            </Button>
           </SectionActions>
         </ErrorSection>
       </StyledError>

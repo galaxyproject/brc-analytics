@@ -1,7 +1,3 @@
-import { type ReactNode } from "react";
+import type { ColumnProps } from "@repo/shared/views/AssistantView/components/Layout/types";
 
-export interface Props {
-  disclaimer: ReactNode;
-  feedbackButton: ReactNode;
-  newConversationButton: ReactNode;
-}
+export type Props = ColumnProps;

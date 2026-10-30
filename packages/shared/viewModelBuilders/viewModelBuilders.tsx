@@ -168,7 +168,7 @@ export const buildAssemblyResources = (
             {
               imageProps: {
                 alt: GENOME_BROWSER,
-                src: "/analysis-portals/ucsc-genome.png",
+                src: "/analysis-portals/ucsc-genome.webp",
                 width: 20,
               },
               label: GENOME_BROWSER,

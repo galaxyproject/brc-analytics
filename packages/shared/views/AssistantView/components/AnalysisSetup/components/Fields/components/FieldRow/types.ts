@@ -6,8 +6,9 @@ import type {
 
 export interface FieldRowProps extends Pick<
   AnalysisSetupProps,
-  "loading" | "onSend"
+  "loading" | "onClearField"
 > {
   field: SchemaFieldState;
   fieldKey: SchemaFieldKey;
+  optional: boolean;
 }

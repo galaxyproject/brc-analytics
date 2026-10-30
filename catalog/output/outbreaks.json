@@ -51,8 +51,8 @@
       }
     ],
     "taxonomy_id": 2955291,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Alphainfluenzavirus influenzae"
+    "taxonName": "Alphainfluenzavirus influenzae",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -96,8 +96,8 @@
       }
     ],
     "taxonomy_id": 3418604,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Betacoronavirus pandemicum"
+    "taxonName": "Betacoronavirus pandemicum",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -141,8 +141,8 @@
       }
     ],
     "taxonomy_id": 3431483,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Orthopoxvirus monkeypox"
+    "taxonName": "Orthopoxvirus monkeypox",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -171,8 +171,8 @@
       }
     ],
     "taxonomy_id": 1773,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Mycobacterium tuberculosis"
+    "taxonName": "Mycobacterium tuberculosis",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -201,8 +201,8 @@
       }
     ],
     "taxonomy_id": 5833,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Plasmodium falciparum"
+    "taxonName": "Plasmodium falciparum",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -231,8 +231,8 @@
       }
     ],
     "taxonomy_id": 498019,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Candidozyma auris"
+    "taxonName": "Candidozyma auris",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -266,8 +266,8 @@
       }
     ],
     "taxonomy_id": 5207,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Cryptococcus neoformans"
+    "taxonName": "Cryptococcus neoformans",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -296,8 +296,8 @@
       }
     ],
     "taxonomy_id": 199306,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Coccidioides posadasii"
+    "taxonName": "Coccidioides posadasii",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -321,8 +321,8 @@
       }
     ],
     "taxonomy_id": 5037,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Histoplasma capsulatum"
+    "taxonName": "Histoplasma capsulatum",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -346,8 +346,8 @@
       }
     ],
     "taxonomy_id": 5807,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Cryptosporidium parvum"
+    "taxonName": "Cryptosporidium parvum",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -376,8 +376,8 @@
       }
     ],
     "taxonomy_id": 5763,
-    "taxonNameField": "taxonomicLevelSpecies",
-    "taxonName": "Naegleria fowleri"
+    "taxonName": "Naegleria fowleri",
+    "taxonNameField": "taxonomicLevelSpecies"
   },
   {
     "description": {
@@ -386,8 +386,8 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
-      746128,
-      5059
+      5059,
+      746128
     ],
     "name": "Aspergillus",
     "priority": "HIGH",
@@ -404,8 +404,8 @@
       }
     ],
     "taxonomy_id": 5052,
-    "taxonNameField": "taxonomicLevelGenus",
-    "taxonName": "Aspergillus"
+    "taxonName": "Aspergillus",
+    "taxonNameField": "taxonomicLevelGenus"
   },
   {
     "description": {
@@ -432,8 +432,8 @@
       }
     ],
     "taxonomy_id": 38574,
-    "taxonNameField": "otherTaxa",
-    "taxonName": "Leishmania donovani species complex"
+    "taxonName": "Leishmania donovani species complex",
+    "taxonNameField": "otherTaxa"
   },
   {
     "description": {
@@ -442,9 +442,9 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
-      688394,
       42458,
       58291,
+      688394,
       936053
     ],
     "name": "Mucorales",
@@ -462,8 +462,8 @@
       }
     ],
     "taxonomy_id": 4827,
-    "taxonNameField": "taxonomicLevelOrder",
-    "taxonName": "Mucorales"
+    "taxonName": "Mucorales",
+    "taxonNameField": "taxonomicLevelOrder"
   },
   {
     "description": {
@@ -472,9 +472,9 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
+      3052303,
       3052310,
-      3052317,
-      3052303
+      3052317
     ],
     "name": "Arenaviridae",
     "priority": "MODERATE",
@@ -501,8 +501,8 @@
       }
     ],
     "taxonomy_id": 11617,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Arenaviridae"
+    "taxonName": "Arenaviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -544,8 +544,8 @@
       }
     ],
     "taxonomy_id": 1980413,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Hantaviridae"
+    "taxonName": "Hantaviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -581,8 +581,8 @@
       }
     ],
     "taxonomy_id": 1980415,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Nairoviridae"
+    "taxonName": "Nairoviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -591,9 +591,9 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
-      3052429,
+      3052385,
       3052409,
-      3052385
+      3052429
     ],
     "name": "Peribunyaviridae",
     "priority": "MODERATE",
@@ -625,8 +625,8 @@
       }
     ],
     "taxonomy_id": 1980416,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Peribunyaviridae"
+    "taxonName": "Peribunyaviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -668,8 +668,8 @@
       }
     ],
     "taxonomy_id": 1980418,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Phenuiviridae"
+    "taxonName": "Phenuiviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -678,10 +678,10 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
-      3052225,
       3052223,
-      3052599,
-      3052560
+      3052225,
+      3052560,
+      3052599
     ],
     "name": "Paramyxoviridae",
     "priority": "HIGH",
@@ -713,8 +713,8 @@
       }
     ],
     "taxonomy_id": 11158,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Paramyxoviridae"
+    "taxonName": "Paramyxoviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -723,9 +723,9 @@
       "scope": {}
     },
     "highlight_descendant_taxonomy_ids": [
+      3048448,
       3052464,
-      3052465,
-      3048448
+      3052465
     ],
     "name": "Flaviviridae",
     "priority": "HIGH",
@@ -767,8 +767,8 @@
       }
     ],
     "taxonomy_id": 11050,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Flaviviridae"
+    "taxonName": "Flaviviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -815,8 +815,8 @@
       }
     ],
     "taxonomy_id": 11018,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Togaviridae"
+    "taxonName": "Togaviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -827,8 +827,8 @@
     "highlight_descendant_taxonomy_ids": [
       3428500,
       3428502,
-      3428506,
-      3428504
+      3428504,
+      3428506
     ],
     "name": "Picornaviridae",
     "priority": "MODERATE",
@@ -855,8 +855,8 @@
       }
     ],
     "taxonomy_id": 12058,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Picornaviridae"
+    "taxonName": "Picornaviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   },
   {
     "description": {
@@ -898,7 +898,7 @@
       }
     ],
     "taxonomy_id": 11266,
-    "taxonNameField": "taxonomicLevelFamily",
-    "taxonName": "Filoviridae"
+    "taxonName": "Filoviridae",
+    "taxonNameField": "taxonomicLevelFamily"
   }
 ]

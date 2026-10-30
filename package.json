@@ -1,6 +1,6 @@
 {
   "name": "brc-analytics",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -14,11 +14,16 @@
     "build-local:ga2": "./scripts/build.sh ga2 local && ./scripts/set-version.sh \"\" sites/ga2 && ./scripts/sync-api-ga2.sh && next build sites/ga2 --webpack",
     "build-dev:ga2": "./scripts/build.sh ga2 dev && ./scripts/set-version.sh \"\" sites/ga2 && ./scripts/sync-api-ga2.sh && next build sites/ga2 --webpack",
     "build-prod:ga2": "./scripts/build.sh ga2 prod && ./scripts/set-version.sh \"\" sites/ga2 && ./scripts/sync-api-ga2.sh && next build sites/ga2 --webpack",
+    "dev:logan": "./scripts/dev.sh logan-search && ./scripts/set-version.sh dev sites/logan-search && next dev sites/logan-search --webpack",
+    "build-local:logan": "./scripts/build.sh logan-search local && ./scripts/set-version.sh \"\" sites/logan-search && next build sites/logan-search --webpack",
+    "build-dev:logan": "./scripts/build.sh logan-search dev && ./scripts/set-version.sh \"\" sites/logan-search && next build sites/logan-search --webpack",
+    "build-prod:logan": "./scripts/build.sh logan-search prod && ./scripts/set-version.sh \"\" sites/logan-search && next build sites/logan-search --webpack",
     "start:brc": "npx serve sites/brc-analytics/out",
     "clean": "./scripts/clean.sh",
     "start:ga2": "npx serve sites/ga2/out",
+    "start:logan": "npx serve sites/logan-search/out",
     "lint": "eslint .",
-    "typecheck": "next typegen sites/brc-analytics & p1=$!; next typegen sites/ga2 & p2=$!; wait $p1; s1=$?; wait $p2; s2=$?; [ $s1 -eq 0 ] && [ $s2 -eq 0 ] && tsc --noEmit",
+    "typecheck": "next typegen sites/brc-analytics & p1=$!; next typegen sites/ga2 & p2=$!; next typegen sites/logan-search & p3=$!; wait $p1; s1=$?; wait $p2; s2=$?; wait $p3; s3=$?; [ $s1 -eq 0 ] && [ $s2 -eq 0 ] && [ $s3 -eq 0 ] && tsc --noEmit",
     "check-format": "prettier --check .",
     "format": "prettier --write . --cache",
     "format:python": "./scripts/format-python.sh",
@@ -29,8 +34,8 @@
     "test:e2e:api": "npx playwright test --config=playwright.api.config.ts",
     "test:e2e:ga2": "npx playwright test --config=sites/ga2/playwright.config.ts",
     "select-ga2-organism-images": "python3 -m catalog.ga2.build.py.select_images_for_organism",
-    "build-brc-db": "NODE_ENV=production esrun catalog/build/ts/build-catalog.ts",
-    "build-ga2-db": "esrun catalog/ga2/build/ts/build-catalog.ts",
+    "build-brc-db": "NODE_ENV=production ./scripts/run-ts.sh catalog/build/ts/build-catalog.ts",
+    "build-ga2-db": "./scripts/run-ts.sh catalog/ga2/build/ts/build-catalog.ts",
     "build-brc-from-ncbi": "python3 -m catalog.build.py.build_files_from_ncbi",
     "build-ga2-from-ncbi": "python3 -m catalog.ga2.build.py.build_files_from_ncbi",
     "fetch-ga2-organism-images": "python3 catalog/ga2/build/py/fetch_images_from_bucket.py",
@@ -43,7 +48,7 @@
     "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^56.0.0",
+    "@databiosphere/findable-ui": "^58.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11",
     "@emotion/styled": "^11.14.1",
@@ -52,7 +57,8 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@mui/material-nextjs": "^9",
-    "@next/mdx": "^16",
+    "@mui/utils": "^7.3.7",
+    "@next/mdx": "^16.4.2",
     "@observablehq/plot": "^0.6.17",
     "@sentry/nextjs": "^10.27.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
@@ -64,7 +70,7 @@
     "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
     "ky": "^1.7.2",
-    "next": "^16",
+    "next": "^16.4.2",
     "next-mdx-remote": "^6",
     "papaparse": "^5.5.3",
     "react": "^19.2.3",
@@ -85,10 +91,11 @@
     "vega": "^6.2.0",
     "vega-embed": "^7.1.0",
     "vega-lite": "^6.4.1",
+    "yet-another-react-lightbox": "^3.32.2",
     "yup": "^1.7.1"
   },
   "devDependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.3",
     "@babel/core": "^7.17.10",
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
@@ -98,8 +105,8 @@
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
     "@eslint/eslintrc": "^3",
     "@eslint/js": "^9",
-    "@next/eslint-plugin-next": "^16",
-    "@playwright/test": "^1.49.1",
+    "@next/eslint-plugin-next": "^16.4.2",
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.3.1",
     "@types/d3": "^7.4.3",
@@ -113,17 +120,17 @@
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "babel-loader": "^9.2.1",
-    "csv-parse": "^5.6.0",
+    "csv-parse": "^7.0.2",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
-    "eslint-config-next": "^16",
+    "eslint-config-next": "^16.4.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsdoc": "^63",
     "eslint-plugin-perfectionist": "^4",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react-hooks": "^7",
-    "eslint-plugin-sonarjs": "^3.0.7",
+    "eslint-plugin-sonarjs": "^4",
     "eslint-plugin-sort-destructure-keys": "^3",
-    "esrun": "^3.2.26",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
@@ -135,5 +142,10 @@
   },
   "engines": {
     "node": "22.13.0"
+  },
+  "overrides": {
+    "serve": {
+      "compression": "^1.8.2"
+    }
   }
 }

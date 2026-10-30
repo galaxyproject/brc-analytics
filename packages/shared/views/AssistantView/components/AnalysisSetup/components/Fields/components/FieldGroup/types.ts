@@ -14,7 +14,7 @@ export interface FieldGroup {
 
 export interface FieldGroupProps extends Pick<
   AnalysisSetupProps,
-  "loading" | "onSend" | "schema"
+  "loading" | "onClearField" | "schema"
 > {
   group: FieldGroup;
 }

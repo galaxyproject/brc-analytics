@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +12,7 @@ from app.db.models import (
     AssistantTurnLog,
     Favorite,
     GalaxyJob,
+    KmindexSubmission,
     SavedAnalysis,
     User,
     WorkflowRun,
@@ -380,6 +381,57 @@ async def create_galaxy_job(
     session.add(job)
     await session.flush()
     return job
+
+
+async def create_kmindex_submission(
+    session: AsyncSession,
+    *,
+    galaxy_job_id: str,
+    source: str,
+    identity: str,
+    indexes: list[str],
+    query_bases: int,
+    threshold: float,
+    zvalue: int,
+    partner_id: str | None = None,
+    user_id: uuid.UUID | None = None,
+) -> KmindexSubmission:
+    """Record one kmindex search for analytics. Caller commits."""
+    row = KmindexSubmission(
+        galaxy_job_id=galaxy_job_id,
+        identity=identity,
+        indexes=indexes,
+        partner_id=partner_id,
+        query_bases=query_bases,
+        source=source,
+        threshold=threshold,
+        user_id=user_id,
+        zvalue=zvalue,
+    )
+    session.add(row)
+    await session.flush()
+    return row
+
+
+async def list_kmindex_submissions_for_user(
+    session: AsyncSession, user_id: uuid.UUID, *, limit: int, offset: int
+) -> tuple[list[KmindexSubmission], int]:
+    """One page of a user's kmindex searches, newest first, plus their total."""
+    total = await session.scalar(
+        select(func.count())
+        .select_from(KmindexSubmission)
+        .where(KmindexSubmission.user_id == user_id)
+    )
+    result = await session.execute(
+        select(KmindexSubmission)
+        .where(KmindexSubmission.user_id == user_id)
+        # id breaks ties so a page boundary can't split two rows written in
+        # the same instant differently on successive requests.
+        .order_by(KmindexSubmission.created_at.desc(), KmindexSubmission.id.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    return list(result.scalars().all()), int(total or 0)
 
 
 async def purge_assistant_turn_logs_before(

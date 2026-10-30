@@ -19,23 +19,32 @@ const config = [
       "**/node_modules/**",
       "**/out/**",
       "**/.next/**",
-      "**/build/**",
       "**/coverage/**",
       "**/venv/**",
       "**/.venv/**",
       "**/.pytest_cache/**",
       "**/.ruff_cache/**",
+      "**/.mypy_cache/**",
       "**/__pycache__/**",
       "**/generated/**",
       "**/playwright-report/**",
       "**/test-results/**",
       ".github/**",
-      "public/favicons/**",
-      "next-env.d.ts",
-      "next.config.mjs",
+      "**/public/favicons/**",
+      "**/next-env.d.ts",
+      "**/next.config.mjs",
     ],
   },
   ...next,
+  {
+    // Pages live under each site rather than at the repo root, so point
+    // no-html-link-for-pages at sites/*/ — otherwise it warns that no pages
+    // directory exists and checks nothing. Raised to error so an <a> with a
+    // literal href to an internal route fails lint instead of passing with a
+    // warning.
+    rules: { "@next/next/no-html-link-for-pages": "error" },
+    settings: { next: { rootDir: [path.join(__dirname, "sites/*/")] } },
+  },
   sonarjs.configs.recommended,
   ...compat.config({
     extends: [
@@ -86,7 +95,13 @@ const config = [
       "react-hooks/refs": "error",
       "react-hooks/set-state-in-effect": "error",
       "react-hooks/static-components": "error",
+      // Test-style rules new in sonarjs v4 (taken for its minimatch fix); off
+      // until we decide whether to adopt them and update the existing tests.
+      "sonarjs/assertions-in-tests": "off",
       "sonarjs/cognitive-complexity": ["error", 15],
+      "sonarjs/no-fixed-wait-in-tests": "off",
+      "sonarjs/parameterized-tests": "off",
+      "sonarjs/prefer-specific-assertions": "off",
       "sonarjs/todo-tag": "warn",
       "sort-destructure-keys/sort-destructure-keys": [
         "error",
@@ -127,23 +142,6 @@ const config = [
   // (one grep finds every consumer) and stops the rule from depending on how
   // deep a file happens to sit. Uses the typescript-eslint variant so it also
   // catches `import type` specifiers.
-  {
-    files: ["app/**/*.{ts,tsx}"],
-    rules: {
-      "@typescript-eslint/no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["..", "../*", "../**"],
-              message:
-                "Reach outside this directory via the @/… alias; relative imports are for ./ same-dir and descendants only.",
-            },
-          ],
-        },
-      ],
-    },
-  },
   {
     files: ["packages/shared/**/*.{ts,tsx}"],
     rules: {
@@ -196,7 +194,7 @@ const config = [
     },
   },
   {
-    files: ["pages/**/*.{ts,tsx}"],
+    files: ["sites/logan-search/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
@@ -205,7 +203,7 @@ const config = [
             {
               group: ["..", "../*", "../**"],
               message:
-                "Reach outside this directory via an alias (@pages/…, @/…); relative imports are for ./ same-dir and descendants only.",
+                "Reach outside this directory via the @logan/… alias; relative imports are for ./ same-dir and descendants only.",
             },
           ],
         },

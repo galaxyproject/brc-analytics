@@ -1,28 +1,11 @@
-import { type SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
+import type { SiteConfig } from "@databiosphere/findable-ui/lib/config/entities";
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import { formatTrsId } from "@repo/shared/workflow/utils";
-import { type EntitiesLoader } from "./hooks/UseEntities/types";
+import { CUSTOM_WORKFLOW } from "@repo/shared/workflow/custom";
+import { UNCATALOGED_WORKFLOWS } from "@repo/shared/workflow/listedWorkflows";
+import { indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { API } from "./routes";
 import { getEntitiesById, setEntitiesById, setEntitiesByType } from "./store";
 import type { EntityRoute } from "./types";
-
-/**
- * Creates a single-flight entities loader: concurrent and repeat calls share
- * one in-flight load, and a rejected load is dropped from the memo so a later
- * call re-attempts instead of returning the cached failure forever.
- * @param load - Loader that resolves once the site's entities and workflows are loaded.
- * @returns Memoized loader.
- */
-export function createEntitiesLoader(load: EntitiesLoader): EntitiesLoader {
-  let loadPromise: Promise<void> | null = null;
-  return (config: SiteConfig): Promise<void> => {
-    loadPromise ??= load(config).catch((error) => {
-      loadPromise = null;
-      throw error;
-    });
-    return loadPromise;
-  };
-}
 
 /**
  * Fetches entities from the API.
@@ -38,76 +21,57 @@ export async function fetchEntities(url: string): Promise<unknown[]> {
 }
 
 /**
- * Indexes workflows by the id they are looked up under: catalog workflows by
- * their URL-formatted TRS id, extra workflows by their TRS id as given.
- * @param workflowCategories - Catalog workflow categories.
- * @param extraWorkflows - Additional workflows outside the catalog.
- * @returns Map of id to workflow.
- */
-export function indexWorkflowsById(
-  workflowCategories: WorkflowCategory[],
-  extraWorkflows: Workflow[] = []
-): Map<string, Workflow> {
-  const workflowById = new Map<string, Workflow>();
-  for (const { workflows } of workflowCategories) {
-    for (const workflow of workflows) {
-      workflowById.set(formatTrsId(workflow.trsId), workflow);
-    }
-  }
-  for (const workflow of extraWorkflows) {
-    workflowById.set(workflow.trsId, workflow);
-  }
-  return workflowById;
-}
-
-/**
  * Checks if the route is an entity route.
  * @param route - Route.
  * @returns True if the route is an entity route; false otherwise.
  */
-function isEntityRoute(route: string): route is EntityRoute {
+export function isEntityRoute(route: string): route is EntityRoute {
   return Object.hasOwn(API, route);
 }
 
 /**
- * Loads the entities store with entities from the API.
+ * Loads one entity list into the store, keyed by id and as a list. Workflows
+ * are loaded with the custom and uncataloged workflows added; any other list
+ * is keyed by its entity config's getId. A list already in the store isn't
+ * fetched again.
+ * @param route - Entity list.
  * @param config - Site config.
+ * @throws If the site has no entity config with a getId for the list, or the fetch fails.
  */
-export async function loadEntities(config: SiteConfig): Promise<void> {
-  for (const entity of config.entities) {
-    const { getId, route } = entity;
+export async function loadEntityList(
+  route: EntityRoute,
+  config: Pick<SiteConfig, "entities">
+): Promise<void> {
+  if (getEntitiesById().has(route)) return;
 
-    if (!isEntityRoute(route)) continue;
-
-    const apiRoute = API[route];
-
-    // Entities are already loaded; skip.
-    if (getEntitiesById().has(route)) continue;
-
-    // Get id function is not configured; entities are excluded from preloading.
-    if (!getId) continue;
-
-    // Fetch the entities.
-    const entities = await fetchEntities(apiRoute);
-
-    const entityById = new Map<string, unknown>();
-    for (const entity of entities) entityById.set(getId(entity), entity);
-
-    setEntitiesById(route, entityById);
-    setEntitiesByType(route, entities);
+  if (route === "workflows") {
+    await loadWorkflows([CUSTOM_WORKFLOW, ...UNCATALOGED_WORKFLOWS]);
+    return;
   }
+
+  const getId = config.entities.find(
+    (entityConfig) => entityConfig.route === route
+  )?.getId;
+  if (!getId) throw new Error(`The ${route} list is not configured.`);
+
+  const entities = await fetchEntities(API[route]);
+
+  const entityById = new Map<string, unknown>();
+  for (const entity of entities) entityById.set(getId(entity), entity);
+
+  setEntitiesById(route, entityById);
+  setEntitiesByType(route, entities);
 }
 
 /**
  * Loads the workflows store with workflows from the API, plus any additional
  * workflows supplied by the caller.
- * @param extraWorkflows - Additional workflows to add to the store, keyed by their trsId.
+ * @param extraWorkflows - Additional workflows to add to the store, keyed by their URL-formatted trsId.
+ * @throws If two workflows with different trsIds share a URL-formatted trsId.
  */
 export async function loadWorkflows(
   extraWorkflows: Workflow[] = []
 ): Promise<void> {
-  if (getEntitiesById().has("workflows")) return;
-
   const workflowCategories = (await fetchEntities(
     API.workflows
   )) as WorkflowCategory[];

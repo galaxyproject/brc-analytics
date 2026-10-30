@@ -4,6 +4,7 @@ on: [pull_request]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,6 +29,7 @@ jobs:
 
   ga2-smoke-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -56,6 +58,7 @@ jobs:
 
   run-checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -70,17 +73,21 @@ jobs:
         run: npm run lint
       - name: Type Check
         run: npm run typecheck
+      - name: Unit tests (Jest)
+        run: npm test
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.12.4"
+          python-version: "3.12"
           cache: "pip"
           cache-dependency-path: "./catalog/build/py/requirements.txt"
       - name: Install Python dependencies
         run: pip install -r ./catalog/build/py/requirements.txt
       - name: Check Python formatting
         run: npm run format:python -- --check
+      - name: Lint Python
+        run: npm run lint:python
       - name: Run linkml-lint
         # Run linting on the LinkML schemas, to enforce conventions such as in naming, and to catch simple errors.
         run: npm run lint-schema
@@ -93,12 +100,16 @@ jobs:
       - name: Validate GA2 catalog files
         # Validate the GA2 catalog source files.
         run: npm run validate-ga2-catalog
+      - name: Test catalog build package
+        # Run the catalog_build package's unit tests, such as the duplicate-accession check in the catalog validator.
+        run: python -m pytest catalog/py_package/tests
       - name: poetry lint
-        # Validate the GA2 catalog source files.
+        # Validate the catalog_build package's Poetry configuration (pyproject.toml).
         run: poetry check -P catalog/py_package/
 
   api-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
 

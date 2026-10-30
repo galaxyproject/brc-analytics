@@ -1,4 +1,4 @@
-import { LoganSearchCohort } from "@brc/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
+import { LoganSearchCohort } from "@repo/shared/components/LoganSearch/LoganSearchCohort/loganSearchCohort";
 import {
   type KmindexCohort,
   type KmindexFacet,
@@ -494,7 +494,7 @@ describe("LoganSearchCohort", () => {
     expect(container.querySelectorAll("button")).toHaveLength(0);
     expect(container.querySelectorAll("input")).toHaveLength(0);
     expect(container.textContent).toContain(
-      "Counts only. These values are not filters -- narrowing by one would have to run over the whole match set to stay honest."
+      "Counts only. These values are not filters, since narrowing by one would have to run over the whole match set to stay honest."
     );
     // The claim that has to survive is about the breakdowns, not about the
     // card: the download and the assistant live in the summary strip above.
@@ -563,7 +563,7 @@ describe("the geography block", () => {
     // The card's standing contract. Narrowing by a country would have to run
     // over the whole match set to stay honest.
     expect(container.textContent).toContain(
-      "Counts only. These values are not filters -- narrowing by one would have to run over the whole match set to stay honest."
+      "Counts only. These values are not filters, since narrowing by one would have to run over the whole match set to stay honest."
     );
   });
 

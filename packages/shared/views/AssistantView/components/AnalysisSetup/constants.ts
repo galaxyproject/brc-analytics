@@ -3,6 +3,7 @@ import type {
   SchemaFieldState,
 } from "@repo/shared/services/api-client/types";
 import type { FieldGroup } from "./components/Fields/components/FieldGroup/types";
+import type { SchemaFieldKey } from "./types";
 
 /**
  * Setup panel sections, in display order, and the fields each holds.
@@ -38,6 +39,8 @@ export const PLACEHOLDER_FIELD: SchemaFieldState = Object.freeze({
 });
 
 /**
- * Number of fields the panel tracks, the denominator of its "n of N set" count.
+ * Fields a workflow may not need. Once a workflow and an assembly are chosen,
+ * the assistant fills (or flags) one of these when the workflow needs it and
+ * leaves it empty when it doesn't.
  */
-export const TOTAL_FIELDS = FIELD_KEYS.length;
+export const OPTIONAL_FIELDS: readonly SchemaFieldKey[] = ["gene_annotation"];

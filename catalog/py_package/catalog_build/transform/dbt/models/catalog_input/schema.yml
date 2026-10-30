@@ -1,0 +1,91 @@
+version: 2
+
+# Each data test is given an explicit, short `name`. dbt derives the test's
+# node name (reported back by dlt's dbt runner) and its stored-failures table
+# name from this; the default generated names are long enough that dbt
+# truncates and hashes them, which makes both the runner results and the
+# `store_failures` audit tables hard to read and correlate. Keep these unique
+# across the project and comfortably under 63 bytes (for compatibility with
+# Postgres).
+#
+# Tests below don't need their own `enabled` config, even for the optional
+# entity types: a test on a model that's disabled via `enabled` in its
+# `config()` is disabled along with it.
+models:
+  - name: catalog_input_curated_taxa
+    # Only tested when the catalog curates information for individual taxa
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - not_null:
+              name: catalog_curated_taxa_have_tax_ids
+          - unique:
+              name: catalog_curated_taxa_unique_ids
+          - columns_equal:
+              name: curated_taxa_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_curated_taxa_in_lineages
+              arguments:
+                to: ref('taxonomy_lineages')
+                field: tax_id
+  - name: catalog_input_organisms
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique:
+              name: catalog_organisms_unique_tax_ids
+          - not_null:
+              name: catalog_organisms_have_tax_ids
+          - columns_equal:
+              name: organism_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_organism_taxa_in_organism_taxonomy
+              arguments:
+                to: ref('taxonomy_organisms')
+                field: taxonomy_id
+  - name: catalog_input_outbreaks
+    # Only tested when the catalog has outbreaks
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - unique:
+              name: catalog_outbreaks_unique_tax_ids
+          - not_null:
+              name: catalog_outbreaks_have_tax_ids
+          - columns_equal:
+              name: outbreak_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+          - relationships:
+              name: catalog_outbreak_taxa_in_outbreak_taxonomy
+              arguments:
+                to: ref('taxonomy_outbreaks')
+                field: taxonomy_id
+  - name: catalog_input_outbreak_descendants
+    # Only tested when the catalog has outbreaks
+    columns:
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: outbreak_descendant_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id
+  - name: catalog_input_workflows
+    # Only tested when the catalog has workflows
+    columns:
+      - name: trs_id
+        data_tests:
+          - unique:
+              name: catalog_workflows_unique_trs_ids
+          - not_null:
+              name: catalog_workflows_have_trs_ids
+      - name: taxonomy_id
+        data_tests:
+          - columns_equal:
+              name: workflow_tax_ids_are_latest
+              arguments:
+                other_column: source_taxonomy_id

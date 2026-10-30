@@ -4,9 +4,7 @@ import {
   BackPageHero,
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import type { OrganismContract } from "@repo/shared/apis/types";
 import { getWorkflow } from "@repo/shared/services/workflows/entities";
-import { getEntity } from "@repo/shared/services/workflows/query";
 import { useStepper } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/hooks/UseStepper/hook";
 import { SEQUENCING_STEPS } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/constants";
 import { useConfiguredSteps } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/steps/hook";
@@ -26,16 +24,17 @@ import { mapOrganismEntityToOrganism } from "./utils";
  * OrganismWorkflowInputsView displays the workflow configure inputs stepper for organism-scoped workflows.
  * @param props - Component props.
  * @param props.entityId - Organism Entity ID.
+ * @param props.organism - Organism.
  * @param props.organismBuilder - Optional builder for the organism details; defaults to the shared builder.
  * @param props.trsId - Workflow TRS ID.
  * @returns A JSX element representing the OrganismWorkflowInputsView.
  */
 export const OrganismWorkflowInputsView = ({
   entityId,
+  organism,
   organismBuilder,
   trsId,
 }: Props): JSX.Element => {
-  const organism = getEntity<OrganismContract>("organisms", entityId);
   const workflow = getWorkflow(trsId);
 
   const { configuredInput, onConfigure } = useConfigureInputs();

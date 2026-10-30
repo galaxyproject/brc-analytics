@@ -10,19 +10,18 @@ import type {
 } from "@repo/shared/apis/types";
 import type { WorkflowAvailability } from "@repo/shared/components/workflow/WorkflowGate/types";
 import {
-  isAssemblyWorkflowAvailable,
-  isOrganismWorkflowAvailable,
+  getAssemblyWorkflowAvailability,
+  getOrganismWorkflowAvailability,
+  isListedWorkflowAvailable,
 } from "@repo/shared/components/workflow/WorkflowGate/utils";
 import { WorkflowGate } from "@repo/shared/components/workflow/WorkflowGate/workflowGate";
-import { indexWorkflowsById } from "@repo/shared/services/workflows/loader";
 import {
   getEntitiesById,
   getEntitiesByType,
-  setEntitiesById,
 } from "@repo/shared/services/workflows/store";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
-import { formatTrsId } from "@repo/shared/workflow/utils";
+import { formatTrsId, indexWorkflowsById } from "@repo/shared/workflow/utils";
 import { cleanup, render, screen } from "@testing-library/react";
 import {
   buildWorkflow,
@@ -39,9 +38,6 @@ jest.mock(
   () => ({ useFeatureFlag: (): boolean => mockUseFeatureFlag() })
 );
 
-const ASSEMBLY_ID = "GCF_000000001_1";
-const CACHED_ASSEMBLY_ID = "GCF_000000002_1";
-const ORGANISM_ID = "999";
 const TAXONOMY_ID = "999";
 
 const ASSEMBLY_TRS_ID =
@@ -70,19 +66,35 @@ function buildAssembly(galaxyDatacacheUrl: string | null): AssemblyContract {
 }
 
 /**
+ * Renders the gate as the workflow detail page does: with no entity.
+ * @param trsId - Workflow TRS ID, as it appears in the URL.
+ */
+function renderDetailGate(trsId: string): void {
+  render(
+    <WorkflowGate
+      fallback={<div>not found</div>}
+      isWorkflowAvailable={isListedWorkflowAvailable}
+      trsId={trsId}
+    >
+      <div>content</div>
+    </WorkflowGate>
+  );
+}
+
+/**
  * Renders the gate for the given URL TRS ID.
  * @param trsId - Workflow TRS ID, as it appears in the URL.
- * @param isWorkflowAvailable - The page's availability check.
- * @param entityId - ID of the entity the page configures a workflow for.
+ * @param isWorkflowAvailable - The page's availability check; defaults to the
+ * assembly configure page's, for an assembly with no datacache.
  */
 function renderGate(
   trsId: string,
-  isWorkflowAvailable: WorkflowAvailability = isAssemblyWorkflowAvailable,
-  entityId = ASSEMBLY_ID
+  isWorkflowAvailable: WorkflowAvailability = getAssemblyWorkflowAvailability(
+    buildAssembly(null)
+  )
 ): void {
   render(
     <WorkflowGate
-      entityId={entityId}
       fallback={<div>not found</div>}
       isWorkflowAvailable={isWorkflowAvailable}
       trsId={trsId}
@@ -97,7 +109,12 @@ function renderGate(
  * @param trsId - Workflow TRS ID, as it appears in the URL.
  */
 function renderOrganismGate(trsId: string): void {
-  renderGate(trsId, isOrganismWorkflowAvailable, ORGANISM_ID);
+  renderGate(
+    trsId,
+    getOrganismWorkflowAvailability({
+      genomes: [{ lineageTaxonomyIds: ["1", TAXONOMY_ID] }],
+    } as OrganismContract)
+  );
 }
 
 /**
@@ -156,24 +173,6 @@ describe("WorkflowGate", () => {
       ],
       [DIFFERENTIAL_EXPRESSION_ANALYSIS, LOGAN_SEARCH]
     );
-    setEntitiesById(
-      "assemblies",
-      new Map([
-        [ASSEMBLY_ID, buildAssembly(null)],
-        [CACHED_ASSEMBLY_ID, buildAssembly("https://datacache.example")],
-      ])
-    );
-    setEntitiesById(
-      "organisms",
-      new Map<string, OrganismContract>([
-        [
-          ORGANISM_ID,
-          {
-            genomes: [{ lineageTaxonomyIds: ["1", TAXONOMY_ID] }],
-          } as OrganismContract,
-        ],
-      ])
-    );
   });
 
   describe("on the assembly configure page", () => {
@@ -229,30 +228,22 @@ describe("WorkflowGate", () => {
     test("renders children for an assembly-ID workflow on an assembly with a datacache", () => {
       renderGate(
         formatTrsId(NEEDS_DATACACHE_TRS_ID),
-        isAssemblyWorkflowAvailable,
-        CACHED_ASSEMBLY_ID
+        getAssemblyWorkflowAvailability(
+          buildAssembly("https://datacache.example")
+        )
       );
       expectContent();
     });
 
     test("renders children for Differential Expression Analysis, listed outside the catalog", () => {
-      renderGate(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId);
+      renderGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
       expectContent();
     });
 
     test("renders the fallback for a workflow outside the catalog that the assembly's list does not offer", () => {
       // Logan Search is configured on its own page, never here.
       mockUseFeatureFlag.mockReturnValue(true);
-      renderGate(LOGAN_SEARCH.trsId);
-      expectFallback();
-    });
-
-    test("renders the fallback for an unknown assembly", () => {
-      renderGate(
-        formatTrsId(UNGATED_TRS_ID),
-        isAssemblyWorkflowAvailable,
-        "unknown-assembly"
-      );
+      renderGate(formatTrsId(LOGAN_SEARCH.trsId));
       expectFallback();
     });
 
@@ -306,14 +297,55 @@ describe("WorkflowGate", () => {
       renderOrganismGate(formatTrsId(OFF_TAXON_ORGANISM_TRS_ID));
       expectFallback();
     });
+  });
 
-    test("renders the fallback for an unknown organism", () => {
-      renderGate(
-        formatTrsId(ORGANISM_TRS_ID),
-        isOrganismWorkflowAvailable,
-        "unknown-organism"
-      );
+  describe("on the workflow detail page", () => {
+    test("renders children for a workflow the listing offers", () => {
+      renderDetailGate(formatTrsId(UNGATED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders the fallback for an unknown workflow", () => {
+      renderDetailGate("stale-workflow-id");
       expectFallback();
+    });
+
+    test("renders the fallback for a workflow in a gated category", () => {
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders the fallback for a workflow gated in its own right", () => {
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectFallback();
+    });
+
+    test("renders children for a workflow also in an ungated category", () => {
+      renderDetailGate(formatTrsId(SHARED_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for gated workflows when the demo flag is on", () => {
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
+      expectContent();
+      cleanup();
+      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
+      expectContent();
+    });
+
+    test("renders children for a workflow appended outside the catalog", () => {
+      renderDetailGate(formatTrsId(DIFFERENTIAL_EXPRESSION_ANALYSIS.trsId));
+      expectContent();
+    });
+
+    test("gates an appended workflow by its own rule", () => {
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
+      expectFallback();
+      cleanup();
+      mockUseFeatureFlag.mockReturnValue(true);
+      renderDetailGate(formatTrsId(LOGAN_SEARCH.trsId));
+      expectContent();
     });
   });
 });

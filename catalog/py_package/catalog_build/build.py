@@ -1,21 +1,15 @@
 import datetime
-import gzip
-import io
 import json
 import logging
 import os
-import time
 import urllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-import bs4
 import duckdb
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 
-from .load import do_dlt_load
+from .load import LoadParams, do_dlt_load
 from .qc_utils import (
     format_list_section,
     format_markdown_table,
@@ -28,6 +22,11 @@ from .utils import get_db_path
 MAX_NCBI_URL_LENGTH = 2000  # The actual limit seems to be a bit over 4000
 
 log = logging.getLogger(__name__)
+
+
+def save_json_file(path: str | Path, obj, **json_opts):
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(obj, file, **json_opts)
 
 
 def match_taxonomic_group(tax_id, lineage, taxonomic_groups):
@@ -240,32 +239,15 @@ def get_genome_row(genome_info: pd.Series):
     }
 
 
-def get_biosample_data(genome_info: pd.Series):
-    sample_ids = genome_info["assembly_info"]["biosample"]["sample_ids"]
-    if sample_ids is None:
-        sample_ids = []
-    return {
-        "accession": genome_info["accession"],
-        "biosample": genome_info["assembly_info"]["biosample"]["accession"],
-        "sample_ids": ",".join(
-            [
-                f"{sample['db']}:{sample['value']}"
-                for sample in sample_ids
-                if sample["db"] is not None
-            ]
-        ),
-    }
-
-
-def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
+def get_genomes_df(source_ncbi_genomes_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Takes loaded NCBI genomes and creates DataFrames for genomes and biosample data.
+    Takes loaded NCBI genomes and creates a DataFrame for genomes data.
 
     Args:
       source_ncbi_genomes_df: Dataframe of genome metadata loaded via dlt
 
     Returns:
-      Tuple of (genomes_df, biosample_df)
+      Genomes DataFrame
     """
     json_column_names = [
         "annotation_info",
@@ -277,95 +259,75 @@ def get_genomes_and_primarydata_df(source_ncbi_genomes_df: pd.DataFrame):
         lambda v: None if v is None else json.loads(v)
     )
     ncbi_genomes_df = source_ncbi_genomes_df.assign(**parsed_json_columns)
-    ncbi_genomes_having_biosamples_df = ncbi_genomes_df[
-        ncbi_genomes_df["assembly_info"].map(
-            lambda info: isinstance(info, dict) and info["biosample"] is not None
-        )
-    ]
-    return (
-        ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand"),
-        ncbi_genomes_having_biosamples_df.apply(
-            get_biosample_data, axis="columns", result_type="expand"
-        ),
-    )
+    return ncbi_genomes_df.apply(get_genome_row, axis="columns", result_type="expand")
 
 
-def _get_gene_model_urls_from_genark_list():
-    """Download and parse the genArkFileList.txt.gz file to extract GTF URLs.
+def _get_gene_model_urls_from_genark_list(gen_ark_file_list: pd.DataFrame):
+    """Extract GTF URLs from loaded file list.
 
     Returns:
         dict: A dictionary mapping genome assembly IDs to their GTF file URLs
     """
 
-    print("Downloading genArkFileList.txt.gz...")
-    genark_url = "https://hgdownload.soe.ucsc.edu/hubs/genArkFileList.txt.gz"
     download_base_url = "https://hgdownload.soe.ucsc.edu/hubs"
-    response = requests.get(genark_url)
-    response.raise_for_status()
 
     # Dictionary to store the best GTF URL for each assembly ID
     gene_model_urls = {}
 
     # Process the gzipped file content
-    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
-        for line in f:
-            line = line.decode("utf-8").strip()
-            # Filter for GTF files
-            if line.endswith(".gtf.gz"):
-                # Extract assembly ID from the path
-                # Format: GCF/001/559/675/GCF_001559675.1/genes/GCF_001559675.1.ncbiGene.gtf.gz
-                parts = line.split("/")
+    for line in gen_ark_file_list["path"]:
+        # Filter for GTF files
+        if line.endswith(".gtf.gz"):
+            # Extract assembly ID from the path
+            # Format: GCF/001/559/675/GCF_001559675.1/genes/GCF_001559675.1.ncbiGene.gtf.gz
+            parts = line.split("/")
 
-                # We need at least 7 parts to have a valid path with genes directory
-                if len(parts) >= 7:
-                    # Check if the 6th part (index 5) is 'genes'
-                    if parts[5] == "genes":
-                        # The assembly ID is in the 5th position (index 4)
-                        asm_id = parts[4]
+            # We need at least 7 parts to have a valid path with genes directory
+            if len(parts) >= 7:
+                # Check if the 6th part (index 5) is 'genes'
+                if parts[5] == "genes":
+                    # The assembly ID is in the 5th position (index 4)
+                    asm_id = parts[4]
 
-                        if asm_id:
-                            # Apply the same priority logic as before
-                            url = urllib.parse.urljoin(f"{download_base_url}/", line)
+                    if asm_id:
+                        # Apply the same priority logic as before
+                        url = urllib.parse.urljoin(f"{download_base_url}/", line)
 
-                            # If we haven't seen this assembly yet, add it
-                            if asm_id not in gene_model_urls:
+                        # If we haven't seen this assembly yet, add it
+                        if asm_id not in gene_model_urls:
+                            gene_model_urls[asm_id] = url
+                        else:
+                            # Apply priority logic: ncbiRefSeq > ncbiGene > augustus
+                            current_url = gene_model_urls[asm_id]
+
+                            # Replace with higher priority URL if found
+                            if "ncbiRefSeq" in url and "ncbiRefSeq" not in current_url:
                                 gene_model_urls[asm_id] = url
-                            else:
-                                # Apply priority logic: ncbiRefSeq > ncbiGene > augustus
-                                current_url = gene_model_urls[asm_id]
-
-                                # Replace with higher priority URL if found
-                                if (
-                                    "ncbiRefSeq" in url
-                                    and "ncbiRefSeq" not in current_url
-                                ):
-                                    gene_model_urls[asm_id] = url
-                                elif "ncbiGene" in url and not any(
-                                    x in current_url for x in ["ncbiRefSeq"]
-                                ):
-                                    gene_model_urls[asm_id] = url
-                                elif "augustus" in url and not any(
-                                    x in current_url for x in ["ncbiRefSeq", "ncbiGene"]
-                                ):
-                                    gene_model_urls[asm_id] = url
+                            elif "ncbiGene" in url and not any(
+                                x in current_url for x in ["ncbiRefSeq"]
+                            ):
+                                gene_model_urls[asm_id] = url
+                            elif "augustus" in url and not any(
+                                x in current_url for x in ["ncbiRefSeq", "ncbiGene"]
+                            ):
+                                gene_model_urls[asm_id] = url
 
     print(f"Found GTF URLs for {len(gene_model_urls)} assemblies")
     return gene_model_urls
 
 
-def add_gene_model_url(genomes_df: pd.DataFrame):
+def add_gene_model_url(genomes_df: pd.DataFrame, gen_ark_file_list: pd.DataFrame):
     """Add gene model URLs to the genomes DataFrame using the genArkFileList.txt.gz file.
 
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
+        gen_ark_file_list: DataFrame containing file paths loaded from genArkFileList.txt.gz.
 
     Returns:
         DataFrame with added 'geneModelUrl' column
     """
-    print("Fetching gene model URLs from genArkFileList.txt.gz")
-
     # Get all gene model URLs at once
-    gene_model_urls = _get_gene_model_urls_from_genark_list()
+    gene_model_urls = _get_gene_model_urls_from_genark_list(gen_ark_file_list)
 
     # Map accessions to URLs
     gene_model_url_series = genomes_df["accession"].map(gene_model_urls)
@@ -485,263 +447,18 @@ def do_taxonomy_tree_checks(tree, taxonomic_levels, assembly_count):
     }
 
 
-def fetch_sra_metadata(srs_ids, batch_size=20):
-    """
-    Fetches metadata for a list of SRS IDs from the SRA database.
-
-    This function retrieves metadata for a given list of SRS (SRA Sample) IDs by querying the NCBI and EBI databases.
-    It fetches the metadata in batches and handles retries and waiting mechanisms for failed requests. The metadata includes
-    information about the experiment, platform, instrument, library, and associated files.
-
-    Args:
-      srs_ids (list): A list of SRS IDs to fetch metadata for.
-      batch_size (int, optional): The number of SRS IDs to process in each batch. Defaults to 20.
-
-    Returns:
-      dict: A dictionary containing the fetched metadata, organized by sample accession and run accession.
-
-    Raises:
-      Exception: If the data could not be fetched after the specified number of retries or if duplicate entries are found.
-    """
-
-    def fetch_url_data(url, counter=0, counter_limit=2, wait_time=2, num_retry=3):
-        """
-        Fetches data from a given URL with retry and wait mechanisms.
-        Args:
-          url (str): The URL to fetch data from.
-          counter (int, optional): The current retry counter. Defaults to 0.
-          counter_limit (int, optional): The maximum number of retries before waiting. Defaults to 3.
-          wait_time (int, optional): The time to wait before retrying in seconds. Defaults to 5.
-          num_retry (int, optional): The number of retry attempts. Defaults to 3.
-        Returns:
-          tuple: A tuple containing the JSON response and the updated counter.
-        Raises:
-          Exception: If the data could not be fetched after the specified number of retries.
-        """
-        if counter > counter_limit:
-            time.sleep(wait_time)
-            counter = 0
-
-        response = requests.get(url)
-        while num_retry > 0 and response.status_code != 200:
-            time.sleep(wait_time)
-            log.debug(
-                f"Failed to fetch, status: {response.status_code}, url: {url}. Retrying..."
-            )
-            response = requests.get(url)
-            num_retry -= 1
-
-        if num_retry <= 0:
-            raise Exception(
-                f"Failed to fetch, status: {response.status_code}, url: {url} "
-            )
-        log.debug(f"Fetching data from {url}")
-        return response, counter + 1
-
-    if srs_ids is None:
-        return None
-
-    data = {}
-    counter = 0
-    samples_processed = 0
-    for i in range(0, len(srs_ids), batch_size):
-        print(
-            f"Processing metadata for samples: {samples_processed} of {len(srs_ids)}",
-            end="\r",
-        )
-        batch_srs_id = srs_ids[i : i + batch_size]
-        samples_processed += len(batch_srs_id)
-        search_data, counter = fetch_url_data(
-            f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={'+OR+'.join(batch_srs_id)}&retmode=json&retmax=1000",
-            counter,
-        )
-        search_data = search_data.json()
-
-        if int(search_data.get("esearchresult", {}).get("count", 0)) == 0:
-            log.debug(f"No SRR IDs found for SRS {batch_srs_id}")
-            return None
-
-        # Extract SRR IDs
-        srr_ids = search_data.get("esearchresult", {}).get("idlist", [])
-        if srr_ids:
-            for i in range(0, len(srr_ids), batch_size):
-                batch_srr_id = srr_ids[i : i + batch_size]
-                summary_data, counter = fetch_url_data(
-                    f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=sra&id={','.join(batch_srr_id)}&retmode=json&retmax=1000",
-                    counter,
-                )
-                summary_data = summary_data.json()
-                if "result" in summary_data:
-                    for result in summary_data["result"]["uids"]:
-                        exp_soup = BeautifulSoup(
-                            f"<Root>{summary_data['result'][result]['expxml']}</Root>",
-                            "xml",
-                        )
-                        run_soup = BeautifulSoup(
-                            f"<Root>{summary_data['result'][result]['runs']}</Root>",
-                            "xml",
-                        )
-
-                        library_layout = exp_soup.find("LIBRARY_LAYOUT").find().name
-                        title = exp_soup.find("Title").text
-                        platform = exp_soup.find("Platform").text
-                        instrument = exp_soup.find("Platform")["instrument_model"]
-                        organism_name = exp_soup.find("Organism").get(
-                            "ScientificName", ""
-                        )
-                        total_spots = exp_soup.find("Statistics")["total_spots"]
-                        total_bases = exp_soup.find("Statistics")["total_bases"]
-
-                        sra_experiment_acc = exp_soup.find("Experiment")["acc"]
-                        sra_sample_acc = exp_soup.find("Sample")["acc"]
-                        sra_study_acc = exp_soup.find("Study")["acc"]
-                        sra_submitter_acc = exp_soup.find("Submitter")["acc"]
-
-                        library_name = (
-                            exp_soup.find("LIBRARY_NAME").text
-                            if exp_soup.find("LIBRARY_NAME")
-                            else ""
-                        )
-                        library_strategy = (
-                            exp_soup.find("LIBRARY_STRATEGY").text
-                            if exp_soup.find("LIBRARY_STRATEGY")
-                            else ""
-                        )
-                        library_source = (
-                            exp_soup.find("LIBRARY_SOURCE").text
-                            if exp_soup.find("LIBRARY_SOURCE")
-                            else ""
-                        )
-                        library_selection = (
-                            exp_soup.find("LIBRARY_SELECTION").text
-                            if exp_soup.find("LIBRARY_SELECTION")
-                            else ""
-                        )
-                        bioproject_elem = exp_soup.find("Bioproject")
-                        bioproject = bioproject_elem.text if bioproject_elem else ""
-
-                        for run in run_soup.find_all("Run"):
-                            sra_run_acc = run["acc"]
-                            run_total_bases = run["total_bases"]
-                            run_total_spots = run["total_spots"]
-
-                            d = {
-                                "title": title,
-                                "platform": platform,
-                                "instrument": instrument,
-                                "total_spots": total_spots,
-                                "total_bases": total_bases,
-                                "bioproject": bioproject,
-                                "organism_name": organism_name,
-                                "library_name": library_name,
-                                "library_layout": library_layout,
-                                "library_strategy": library_strategy,
-                                "library_source": library_source,
-                                "library_selection": library_selection,
-                                "sra_experiment_acc": sra_experiment_acc,
-                                "sra_run_acc": sra_run_acc,
-                                "sra_sample_acc": sra_sample_acc,
-                                "sra_study_acc": sra_study_acc,
-                                "sra_submitter_acc": sra_submitter_acc,
-                                "run_total_bases": run_total_bases,
-                                "run_total_spots": run_total_spots,
-                            }
-
-                            if sra_sample_acc in data:
-                                if sra_run_acc in data[sra_sample_acc]:
-                                    raise Exception(
-                                        f"Duplicate biosample run_acc {sra_run_acc} found {sra_sample_acc}"
-                                    )
-                                else:
-                                    data[sra_sample_acc][sra_run_acc] = d
-                            else:
-                                data[sra_sample_acc] = {sra_run_acc: d}
-    print(
-        f"Processing metadata for samples: {samples_processed} of {len(srs_ids)}",
-        end="\n",
-    )
-    samples_processed = 0
-    for sample_acc in data:
-        print(f"Adding file urls to : {samples_processed} of {len(data)}", end="\r")
-        samples_processed += 1
-        # Fetch url, file size and md5 for raw/primary data files
-        file_list_data, counter = fetch_url_data(
-            f"https://www.ebi.ac.uk/ena/portal/api/filereport?accession={sample_acc}&result=read_run&format=json&retmax=1000",
-            counter,
-        )
-        file_list_data = file_list_data.json()
-        for result in file_list_data:
-            if result["run_accession"] not in data[sample_acc]:
-                raise Exception(
-                    f"Not metadata found for {result['run_accession']} {sample_acc}"
-                )
-            if "fastq_ftp" in data[sample_acc][result["run_accession"]]:
-                raise Exception(
-                    f"Duplicate file list entry for {result['run_accession']}  {sample_acc}"
-                )
-
-            data[sample_acc][result["run_accession"]]["file_urls"] = result["fastq_ftp"]
-            data[sample_acc][result["run_accession"]]["file_size"] = result[
-                "fastq_bytes"
-            ]
-            data[sample_acc][result["run_accession"]]["file_md5"] = result["fastq_md5"]
-
-            data[sample_acc][result["run_accession"]]["file_urls"] = result["fastq_ftp"]
-            data[sample_acc][result["run_accession"]]["file_size"] = result[
-                "fastq_bytes"
-            ]
-            data[sample_acc][result["run_accession"]]["file_md5"] = result["fastq_md5"]
-
-            if not len(data[sample_acc][result["run_accession"]]["file_urls"]):
-                # Some raw or primary data has been uploaded but not properly processed by SRA.
-                # These files will lack https/ftp URLs and statistics, looks like these are
-                # BAM files that are labeled as FASTQ.
-                # For these, we can retrieve S3 links instead.
-                file_list_data, counter = fetch_url_data(
-                    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&id=SRR25741043&retmode=xml",
-                    counter,
-                )
-                srafile_soup = BeautifulSoup(file_list_data.text, "xml")
-                for file in srafile_soup.findAll("SRAFile"):
-                    if file["supertype"] == "Original":
-                        alternatives = file.find("Alternatives")
-                        data[sample_acc][result["run_accession"]]["file_urls"] = (
-                            alternatives["url"]
-                        )
-                        data[sample_acc][result["run_accession"]]["file_size"] = file[
-                            "size"
-                        ]
-                        data[sample_acc][result["run_accession"]]["file_md5"] = file[
-                            "md5"
-                        ]
-    print(f"Adding file urls to : {samples_processed} of {len(data)}", end="\n")
-    return data
-
-
-def report_missing_ploidy_info(genomes_df, organisms_df):
+def report_missing_ploidy_info(genomes_df: pd.DataFrame):
     """
     Reports assemblies that are missing ploidy information.
 
     Args:
-        genomes_df: DataFrame containing genome information
-        organisms_df: DataFrame containing organism information, including ploidy information
+        genomes_df: DataFrame containing genome information and ploidy information
 
     Returns:
         A list of tuples containing (accession, speciesTaxonomyId) for assemblies without ploidy information
     """
-    # Create a mapping from taxonomy_id to ploidy
-    ploidy_map = organisms_df.set_index("taxonomy_id")["ploidy"].to_dict()
-
-    # Create a DataFrame with just the relevant columns for the check
-    check_df = genomes_df[["accession", "speciesTaxonomyId", "species"]].copy()
-
-    # Check which species tax IDs we have ploidy information for
-    check_df["has_ploidy"] = check_df["speciesTaxonomyId"].apply(
-        lambda tax_id: tax_id in ploidy_map
-    )
-
     # Find assemblies where we have no ploidy information
-    missing_ploidy = check_df[~check_df["has_ploidy"]]
+    missing_ploidy = genomes_df[genomes_df["ploidy"].isna()]
     missing_count = len(missing_ploidy)
 
     if missing_count > 0:
@@ -750,7 +467,13 @@ def report_missing_ploidy_info(genomes_df, organisms_df):
         for _, row in missing_ploidy.iterrows():
             print(f"  {row['accession']}: {row['speciesTaxonomyId']}")
 
-    return list(zip(missing_ploidy["accession"], missing_ploidy["speciesTaxonomyId"]))
+    return list(
+        zip(
+            missing_ploidy["accession"],
+            missing_ploidy["speciesTaxonomyId"],
+            strict=True,
+        )
+    )
 
 
 def check_missing_outbreak_descendants(outbreak_taxonomy_ids, all_taxonomy_ids):
@@ -1161,8 +884,8 @@ def build_taxon_maps(taxonomy_df):
         Tuple of (name_map, rank_map) dicts keyed by taxonomy ID string
     """
     taxon_id_strings = taxonomy_df["taxonomy_id"].astype("string")
-    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"]))
-    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"]))
+    name_map = dict(zip(taxon_id_strings, taxonomy_df["taxon_name"], strict=True))
+    rank_map = dict(zip(taxon_id_strings, taxonomy_df["rank"], strict=True))
     return name_map, rank_map
 
 
@@ -1194,7 +917,6 @@ def get_outbreak_taxonomy_ids(
             # optional per outbreak, so the column may be absent entirely.
             *(
                 source_outbreaks_df["highlight_descendant_taxonomy_ids"]
-                .map(json.loads, na_action="ignore")
                 .explode()
                 .dropna()
                 .astype("string")
@@ -1207,73 +929,80 @@ def get_outbreak_taxonomy_ids(
     )
 
 
-def save_taxonomy_mapping(taxonomy_ids, taxon_name_map, taxon_rank_map, output_path):
+def save_taxonomy_mapping(
+    source_outbreaks_df: pd.DataFrame | None,
+    taxon_name_map: dict[str, str],
+    taxon_rank_map: dict[str, str],
+    output_path: str,
+):
     """
     Create and save a TSV file with taxonomy ID to name and rank mapping.
 
     Args:
-        taxonomy_ids: List of taxonomy IDs to include in the mapping
+        source_outbreaks_df: Outbreak definitions containing resolved taxonomy IDs
+        taxon_name_map: Mapping of taxonomy ID (as string) to name
+        taxon_rank_map: Mapping of taxonomy ID (as string) to rank
         output_path: Path to save the TSV file
     """
-    if not taxonomy_ids:
+    if source_outbreaks_df is None:
         return
 
-    # Create DataFrame with taxonomy ID, name, and rank
-    rows = []
-    for tax_id in taxonomy_ids:
-        if str(tax_id) in taxon_name_map:
-            rows.append(
-                {
-                    "taxonomy_id": tax_id,
-                    "name": taxon_name_map.get(str(tax_id), ""),
-                    "rank": taxon_rank_map.get(str(tax_id), ""),
-                }
-            )
+    taxonomy_mapping_df = source_outbreaks_df[
+        ["source_taxonomy_id", "taxonomy_id", "highlight_descendant_taxonomy_ids"]
+    ]
+    taxonomy_id_strings = taxonomy_mapping_df["taxonomy_id"].astype("string")
+    taxonomy_mapping_df = taxonomy_mapping_df.assign(
+        highlight_descendant_taxonomy_ids=taxonomy_mapping_df[
+            "highlight_descendant_taxonomy_ids"
+        ].map(lambda ids: ",".join([str(id) for id in ids]), na_action="ignore"),
+        name=taxonomy_id_strings.map(taxon_name_map, na_action="ignore"),
+        rank=taxonomy_id_strings.map(taxon_rank_map, na_action="ignore"),
+    )
 
     # Save to TSV file
-    if rows:
-        pd.DataFrame(rows).to_csv(output_path, index=False, sep="\t")
-        print(f"Wrote taxonomy mapping to {output_path}")
+    taxonomy_mapping_df.to_csv(output_path, index=False, sep="\t")
+    print(f"Wrote taxonomy mapping to {output_path}")
 
 
-def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
+def save_workflow_taxonomy_mapping(source_workflows_df: pd.DataFrame, output_path: str):
+    """
+    Save a TSV file of workflows' resolved taxonomy IDs, for the TS build to read.
+
+    Args:
+        source_workflows_df: Workflow definitions containing resolved taxonomy IDs
+        output_path: Path to save the TSV file
+    """
+    source_workflows_df[["source_taxonomy_id", "taxonomy_id"]].dropna().to_csv(
+        output_path, index=False, sep="\t"
+    )
+    print(f"Wrote workflow taxonomy mapping to {output_path}")
+
+
+def add_galaxy_datacache_url(
+    genomes_df, normalized_base_url, directory_listing: pd.DataFrame
+):
     """
     Add Galaxy Datacache URLs to genomes dataframe after validating they exist.
 
-    Fetches the parent directory listing once and checks accession membership
-    against it, rather than issuing a request per accession.
-
     Args:
         genomes_df: DataFrame containing genome information with 'accession' column
-        base_url: Base URL used to construct the datacache link per accession
-        timeout: Timeout in seconds for the listing request (default: 30)
+        normalized_base_url: Base URL used to construct the datacache link per accession. Must end in a slash.
+        directory_listing: DataFrame containing link URLs from the datacache directory listing.
 
     Returns:
         tuple: (updated genomes_df with galaxyDatacacheUrl column, list of missing accessions)
     """
     genomes_df = genomes_df.copy()
 
-    if not base_url:
-        genomes_df["galaxyDatacacheUrl"] = ""
-        return genomes_df, []
-
-    normalized_base_url = base_url if base_url.endswith("/") else f"{base_url}/"
-
     print("Validating Galaxy Datacache URLs...")
 
-    response = requests.get(normalized_base_url, timeout=timeout)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
     available = {
         href[:-1]
-        for link in soup.find_all("a")
-        if isinstance(link, bs4.element.Tag)
-        and isinstance(href := link.get("href"), str)
-        and href.endswith("/")
-        and not href.startswith(("/", ".", "?", "http"))
+        for href in directory_listing["url"]
+        if href.endswith("/") and not href.startswith(("/", ".", "?", "http"))
     }
 
-    # If the response's contents are not as expected, we'd otherwise
+    # If the listing's contents are not as expected, we'd otherwise
     # silently mark every accession as missing. Fail loudly instead.
     if not available:
         raise RuntimeError(
@@ -1286,7 +1015,9 @@ def add_galaxy_datacache_url(genomes_df, base_url, timeout=30):
         f"{normalized_base_url}{accession}/" if accession in available else ""
         for accession in accessions
     ]
-    missing_accessions = [a for a, url in zip(accessions, datacache_urls) if not url]
+    missing_accessions = [
+        a for a, url in zip(accessions, datacache_urls, strict=True) if not url
+    ]
 
     print(
         f"Validated {len(accessions)} datacache URLs against {len(available)}-entry listing, "
@@ -1306,34 +1037,39 @@ class BuildMetadata:
 
 
 def save_build_metadata(path: str, meta: BuildMetadata):
-    meta_dict = asdict(meta)
-    with open(path, mode="w", encoding="utf-8") as fh:
-        json.dump(meta_dict, fh, indent=2)
+    save_json_file(path, asdict(meta), indent=2)
+
+
+@dataclass
+class LoadAndTransformParams(LoadParams):
+    """
+    LoadParams necessary to load catalog data, extended with parameters needed to transform the loaded data.
+
+    Attributes:
+      taxonomic_levels: Taxonomic levels to build columns for during transformation
+    """
+
+    taxonomic_levels: list[str]
 
 
 @dataclass
 class LoadAndTransformResult:
     assemblies_source: pd.DataFrame
     organisms_source: pd.DataFrame
+    workflows_source: pd.DataFrame | None
     outbreaks_source: pd.DataFrame | None
     ncbi_genomes: pd.DataFrame
+    ucsc_assemblies: pd.DataFrame
+    gen_ark_file_list: pd.DataFrame
+    galaxy_datacache_listing: pd.DataFrame
     taxonomy_assemblies: pd.DataFrame
     taxonomy_organisms: pd.DataFrame
-    taxonomy_outbreaks: pd.DataFrame
+    taxonomy_outbreaks: pd.DataFrame | None
     ncbi_taxdump_md5: str
     dbt_test_results: list[DBTTestResult]
 
 
-def load_and_transform(
-    *,
-    temp_folder_path_string: str,
-    dlt_pipeline_prefix: str,
-    taxonomic_levels: list[str],
-    assemblies_path: Path,
-    organisms_path: Path,
-    taxa_path: Path | None,
-    outbreaks_path: Path | None,
-):
+def load_and_transform(params: LoadAndTransformParams):
     """
     Load source data and NCBI taxonomy via dlt, transform it via dbt, and return the results.
 
@@ -1341,19 +1077,13 @@ def load_and_transform(
     so that runs are consistent.
 
     Args:
-      temp_folder_path_string: Path of the temporary folder to hold downloads and the DuckDB database
-      dlt_pipeline_prefix: Catalog-specific prefix applied to dlt pipeline names
-      taxonomic_levels: Taxonomic levels to build columns for during transformation
-      assemblies_path: Path to source assemblies YAML
-      organisms_path: Path to source organisms YAML
-      taxa_path: Path to source curated taxa YAML, or None for catalogs without curated taxa
-      outbreaks_path: Path to source outbreaks YAML, or None for catalogs without outbreaks
+      params: LoadAndTransformParams instance
 
     Returns:
       A LoadAndTransformResult containing the loaded and transformed data (as dataframes), the NCBI
       taxdump MD5, and the dbt test results
     """
-    temp_folder_path = Path(temp_folder_path_string).resolve()
+    temp_folder_path = params.temp_folder_path
 
     print("Loading and transforming data via dlt + dbt")
 
@@ -1364,37 +1094,52 @@ def load_and_transform(
     get_db_path(temp_folder_path).unlink(missing_ok=True)
 
     # Load data via dlt
-    load_result = do_dlt_load(
-        temp_folder_path=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        assemblies_path=assemblies_path,
-        organisms_path=organisms_path,
-        taxa_path=taxa_path,
-        outbreaks_path=outbreaks_path,
-    )
+    load_result = do_dlt_load(params)
+
+    # Determine presence of optional entity types
+    has_curated_taxa = params.taxa_path is not None
+    has_outbreaks = params.outbreaks_path is not None
+    has_workflows = params.workflows_path is not None
 
     # Transform loaded data via dbt
     transform_result = do_dbt_transformations(
         temp_folder_path,
-        taxonomic_levels=taxonomic_levels,
-        has_curated_taxa=taxa_path is not None,
-        has_outbreaks=outbreaks_path is not None,
+        taxonomic_levels=params.taxonomic_levels,
+        has_curated_taxa=has_curated_taxa,
+        has_outbreaks=has_outbreaks,
+        has_workflows=has_workflows,
     )
 
     # Get transformed data and return along with metadata
     with duckdb.connect(get_db_path(temp_folder_path)) as con:
         return LoadAndTransformResult(
             assemblies_source=con.query("select * from catalog_source.assemblies").df(),
-            organisms_source=con.query("select * from catalog_source.organisms").df(),
+            organisms_source=con.query("select * from catalog_input_organisms").df(),
+            workflows_source=(
+                con.query("select * from catalog_input_workflows").df()
+                if has_workflows
+                else None
+            ),
             outbreaks_source=(
-                None
-                if outbreaks_path is None
-                else con.query("select * from catalog_source.outbreaks").df()
+                con.query("select * from catalog_input_outbreaks").df()
+                if has_outbreaks
+                else None
             ),
             ncbi_genomes=con.query("select * from ncbi_api.genomes").df(),
+            ucsc_assemblies=con.query("select * from ucsc.assembly_list").df(),
+            gen_ark_file_list=con.query(
+                "select * from ucsc.gen_ark_file_list order by path"
+            ).df(),
+            galaxy_datacache_listing=con.query(
+                "select * from galaxy.datacache_directory_listing"
+            ).df(),
             taxonomy_assemblies=con.query("select * from taxonomy_assemblies").df(),
             taxonomy_organisms=con.query("select * from taxonomy_organisms").df(),
-            taxonomy_outbreaks=con.query("select * from taxonomy_outbreaks").df(),
+            taxonomy_outbreaks=(
+                con.query("select * from taxonomy_outbreaks").df()
+                if has_outbreaks
+                else None
+            ),
             ncbi_taxdump_md5=load_result.ncbi_taxdump_md5,
             dbt_test_results=transform_result.dbt_test_results,
         )
@@ -1410,18 +1155,17 @@ def build_files(
     temp_folder_path,
     dlt_pipeline_prefix,
     build_meta_output_path,
+    datacache_base_url,
     taxonomic_group_sets=None,
-    do_gene_model_urls=True,
-    extract_primary_data=False,
-    primary_output_path=None,
     qc_report_path=None,
     organisms_path,
     taxa_path=None,
     outbreaks_path=None,
     outbreak_taxonomy_mapping_path=None,
+    workflows_path=None,
+    workflow_taxonomy_mapping_path=None,
     organism_image_path=None,
     organism_image_source_information_path=None,
-    datacache_base_url=None,
 ):
     """
     Build catalog-related data files based on specified input data and data from services such as the NCBI API.
@@ -1433,19 +1177,22 @@ def build_files(
       tree_output_path: Path to save tree of cataloged taxa to
       taxonomic_levels_for_tree: List of lowercase taxonomic ranks, as identified by NCBI, to build tree from; listed from highest to lowest level (with order being insignificant for categories that are at the same level as each other)
       taxonomic_group_sets: Dict describing taxa or groups of taxa to be given specified names in the "taxonomic group" field
-      do_gene_model_urls: Boolean specifying whether to fetch gene model URLs (if False, the `geneModelUrl` column is filled with empty string)
-      extract_primary_data: Boolean specifying whether to fetch and save metadata from SRA
-      primary_output_path: Path to save SRA metadata at
       qc_report_path: Path to save QC report to (if omitted, no report is generated)
       organisms_path: Path of input organisms YAML, used to perform checks
       taxa_path: Path of input curated taxa YAML
       outbreaks_path: Path of input outbreaks YAML
       outbreak_taxonomy_mapping_path: Path to save taxonomic information for outbreaks at
+      workflows_path: Path of input workflows YAML
+      workflow_taxonomy_mapping_path: Path to save taxonomic information for workflows at
       organism_image_path: path to folder containing organism images
       organism_image_source_information_path: path to json file with information about the image source
     """
     if taxonomic_group_sets is None:
         taxonomic_group_sets = {}
+
+    if not datacache_base_url.endswith("/"):
+        datacache_base_url = f"{datacache_base_url}/"
+
     print("Building files")
 
     start_time = datetime.datetime.now(datetime.UTC).isoformat()
@@ -1454,54 +1201,46 @@ def build_files(
 
     # Do database-based loading and transformation
     load_and_transform_result = load_and_transform(
-        temp_folder_path_string=temp_folder_path,
-        dlt_pipeline_prefix=dlt_pipeline_prefix,
-        taxonomic_levels=taxonomic_levels_for_tree,
-        assemblies_path=Path(assemblies_path),
-        organisms_path=Path(organisms_path),
-        taxa_path=None if taxa_path is None else Path(taxa_path),
-        outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+        LoadAndTransformParams(
+            temp_folder_path=Path(temp_folder_path).resolve(),
+            dlt_pipeline_prefix=dlt_pipeline_prefix,
+            taxonomic_levels=taxonomic_levels_for_tree,
+            assemblies_path=Path(assemblies_path),
+            organisms_path=Path(organisms_path),
+            workflows_path=None if workflows_path is None else Path(workflows_path),
+            taxa_path=None if taxa_path is None else Path(taxa_path),
+            outbreaks_path=None if outbreaks_path is None else Path(outbreaks_path),
+            ucsc_assemblies_url=ucsc_assemblies_url,
+            galaxy_datacache_directory_url=datacache_base_url,
+        )
     )
     source_list_df = load_and_transform_result.assemblies_source
-    source_organisms_df = load_and_transform_result.organisms_source.astype(
-        {"taxonomy_id": "string"}
-    )
-    # Outbreaks are optional (only some catalogs use them), so source_outbreaks_df is None when no path is given
+    source_organisms_df = load_and_transform_result.organisms_source.sort_values(
+        by="taxonomy_id"
+    ).astype({"taxonomy_id": "string"})
+    # Outbreaks and workflows are optional (only some catalogs use them), so the corresponding dataframes below are None when no path is given
     source_outbreaks_df = load_and_transform_result.outbreaks_source
+    if source_outbreaks_df is not None:
+        source_outbreaks_df = source_outbreaks_df.sort_values(by="taxonomy_id")
+    source_workflows_df = load_and_transform_result.workflows_source
+    ucsc_assemblies_df = load_and_transform_result.ucsc_assemblies.rename(
+        columns={
+            "ucsc_browser": "ucscBrowser",
+            "gen_bank": "genBank",
+            "ref_seq": "refSeq",
+        }
+    )
     assembly_taxonomy_df = load_and_transform_result.taxonomy_assemblies
     organism_taxonomy_df = load_and_transform_result.taxonomy_organisms
     outbreak_taxonomy_df = load_and_transform_result.taxonomy_outbreaks
     qc_report_params["dbt_test_results"] = load_and_transform_result.dbt_test_results
 
-    base_genomes_df, primarydata_df = get_genomes_and_primarydata_df(
-        load_and_transform_result.ncbi_genomes
-    )
+    if workflow_taxonomy_mapping_path is not None and source_workflows_df is not None:
+        save_workflow_taxonomy_mapping(
+            source_workflows_df, workflow_taxonomy_mapping_path
+        )
 
-    primarydata_df["sra_sample_acc"] = primarydata_df["sample_ids"].str.split(",")
-    primarydata_df = primarydata_df.explode("sra_sample_acc")
-    primarydata_df = primarydata_df[
-        ~primarydata_df["sra_sample_acc"].isnull()
-        & primarydata_df["sra_sample_acc"].str.startswith("SRA")
-    ]
-    primarydata_df["sra_sample_acc"] = primarydata_df["sra_sample_acc"].str.replace(
-        "SRA:", ""
-    )
-    if extract_primary_data:
-        sra_ids_list = primarydata_df["sra_sample_acc"].dropna().unique().tolist()
-        sra_metadata = fetch_sra_metadata(sra_ids_list)
-        sra_metadata_df = pd.DataFrame(
-            [
-                sra_metadata[sra][srr]
-                for sra in sra_metadata
-                for srr in sra_metadata[sra]
-            ]
-        )
-        primarydata_df = primarydata_df.merge(
-            sra_metadata_df,
-            how="left",
-            left_on="sra_sample_acc",
-            right_on="sra_sample_acc",
-        )
+    base_genomes_df = get_genomes_df(load_and_transform_result.ncbi_genomes)
 
     qc_report_params["missing_ncbi_assemblies"] = report_missing_values_from(
         "accessions",
@@ -1584,18 +1323,14 @@ def build_files(
         genomes_with_species_df
     )
 
-    assemblies_df = pd.DataFrame(requests.get(ucsc_assemblies_url).json()["data"])[
-        ["ucscBrowser", "genBank", "refSeq"]
-    ]
-
     # Create a mapping of both GenBank and RefSeq accessions to UCSC browser IDs
     ucsc_mapping = (
         pd.concat(
             [
-                assemblies_df[["ucscBrowser", "genBank"]].rename(
+                ucsc_assemblies_df[["ucscBrowser", "genBank"]].rename(
                     columns={"genBank": "accession"}
                 ),
-                assemblies_df[["ucscBrowser", "refSeq"]].rename(
+                ucsc_assemblies_df[["ucscBrowser", "refSeq"]].rename(
                     columns={"refSeq": "accession"}
                 ),
             ]
@@ -1614,32 +1349,37 @@ def build_files(
         "accessions",
         "matched in assembly list",
         genomes_with_species_df["accession"],
-        assemblies_df["genBank"],
-        assemblies_df["refSeq"],
+        ucsc_assemblies_df["genBank"],
+        ucsc_assemblies_df["refSeq"],
     )
 
-    if do_gene_model_urls:
-        genomes_df = add_gene_model_url(genomes_df)
-        qc_report_params["missing_gene_model_urls"] = report_missing_values(
-            "accessions",
-            "matched with gene model URLs",
-            genomes_df["accession"],
-            genomes_df["geneModelUrl"].notna(),
-        )
-    else:
-        genomes_df["geneModelUrl"] = ""
+    genomes_df = genomes_df.merge(
+        source_organisms_df[["taxonomy_id", "ploidy"]].set_index("taxonomy_id"),
+        how="left",
+        left_on="taxonomicLevelSpeciesId",
+        right_index=True,
+    )
+    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
+        genomes_df
+    )
+    print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
-    if datacache_base_url:
-        genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
-            genomes_df, datacache_base_url
-        )
-        qc_report_params["missing_datacache_urls"] = missing_datacache_urls
-    else:
-        print(
-            "No Galaxy Datacache base URL provided; skipping datacache link generation."
-        )
-        genomes_df["galaxyDatacacheUrl"] = ""
-        qc_report_params["missing_datacache_urls"] = []
+    genomes_df = add_gene_model_url(
+        genomes_df, load_and_transform_result.gen_ark_file_list
+    )
+    qc_report_params["missing_gene_model_urls"] = report_missing_values(
+        "accessions",
+        "matched with gene model URLs",
+        genomes_df["accession"],
+        genomes_df["geneModelUrl"].notna(),
+    )
+
+    genomes_df, missing_datacache_urls = add_galaxy_datacache_url(
+        genomes_df,
+        datacache_base_url,
+        load_and_transform_result.galaxy_datacache_listing,
+    )
+    qc_report_params["missing_datacache_urls"] = missing_datacache_urls
 
     # Find outdated accessions (where accession != currentAccession)
     if qc_report_path:
@@ -1702,56 +1442,19 @@ def build_files(
             species_image_source_link
         )
 
-        if extract_primary_data and primarydata_df is not None:
-            if "organism_name" in primarydata_df.columns:
-                # Map the image paths back to the organism_name
-                primarydata_df["organismImageUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_paths)
-                primarydata_df["organismThumbnailUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_thumbnail_paths)
-                primarydata_df["organismImageCredit"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_credit)
-                primarydata_df["organismImageLicense"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_license)
-                primarydata_df["organismImageSourceName"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_source)
-                primarydata_df["organismImageSourceUrl"] = primarydata_df[
-                    "organism_name"
-                ].map(species_image_source_link)
-            else:
-                print(
-                    "Primary data frame missing 'organism_name' column; skipping image metadata enrichment."
-                )
-
     genomes_df.to_csv(genomes_output_path, index=False, sep="\t")
 
     print(f"Wrote to {genomes_output_path}")
 
-    if extract_primary_data:
-        primarydata_df = primarydata_df.sort_values("accession", kind="stable")
-        primarydata_df.to_csv(primary_output_path, index=False, sep="\t")
-        print(f"Wrote to {primary_output_path}")
-
     if len(taxonomic_levels_for_tree) > 0:
         # Use the assemblies info from genomes_df to build the species tree
         species_tree = get_species_tree(genomes_df, taxonomic_levels_for_tree)
-        with open(tree_output_path, "w") as outfile:
-            # Dump with sorted keys and consistent indentation
-            json.dump(species_tree, outfile, indent=4, sort_keys=True)
+        # Dump with sorted keys and consistent indentation
+        save_json_file(tree_output_path, species_tree, indent=4, sort_keys=True)
         print(f"Wrote to {tree_output_path}")
         qc_report_params["tree_checks"] = do_taxonomy_tree_checks(
             species_tree, taxonomic_levels_for_tree, genomes_df.shape[0]
         )
-
-    qc_report_params["missing_ploidy_assemblies"] = report_missing_ploidy_info(
-        genomes_df, source_organisms_df
-    )
-    print(f"Checked ploidy for {len(genomes_df)} assemblies")
 
     organism_taxon_name_map, organism_taxon_rank_map = build_taxon_maps(
         organism_taxonomy_df
@@ -1779,7 +1482,7 @@ def build_files(
     if outbreak_taxonomy_mapping_path is not None and outbreak_taxonomy_ids:
         print(f"Saving taxonomy mapping to {outbreak_taxonomy_mapping_path}")
         save_taxonomy_mapping(
-            outbreak_taxonomy_ids,
+            source_outbreaks_df,
             outbreak_taxon_name_map,
             outbreak_taxon_rank_map,
             outbreak_taxonomy_mapping_path,

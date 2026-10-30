@@ -33,7 +33,7 @@ class TransformResult:
     dbt_test_results: list[DBTTestResult]
 
 
-def _load_run_results() -> dict:
+def _load_run_results():
     """Read dbt's run_results.json artifact from the most recent dbt invocation."""
     run_results_path = Path(DBT_FOLDER_PATH) / "target" / "run_results.json"
     with open(run_results_path, encoding="utf-8") as file:
@@ -59,7 +59,7 @@ def _fetch_failure_sample(
         f"SELECT * FROM {relation_name} ORDER BY ALL LIMIT {sample_size}"
     )
     columns = relation.columns
-    return [dict(zip(columns, row)) for row in relation.fetchall()]
+    return [dict(zip(columns, row, strict=True)) for row in relation.fetchall()]
 
 
 def _test_status_is_success(status: str) -> bool:
@@ -156,6 +156,7 @@ def do_dbt_transformations(
     taxonomic_levels: list[str],
     has_curated_taxa: bool,
     has_outbreaks: bool,
+    has_workflows: bool,
 ) -> TransformResult:
     """
     Run the dbt transformations against the loaded DuckDB database.
@@ -173,9 +174,9 @@ def do_dbt_transformations(
       A TransformResult containing the dbt test results
     """
     runner = create_runner(
-        None,
-        None,
-        None,
+        None,  # type: ignore  # Mistyped in dlt
+        None,  # type: ignore  # Mistyped in dlt
+        None,  # type: ignore  # Mistyped in dlt
         config=DBTRunnerConfiguration(
             package_location=DBT_FOLDER_PATH,
             package_profiles_dir=DBT_FOLDER_PATH,
@@ -185,6 +186,7 @@ def do_dbt_transformations(
                 "taxonomic_levels": taxonomic_levels,
                 "has_curated_taxa": has_curated_taxa,
                 "has_outbreaks": has_outbreaks,
+                "has_workflows": has_workflows,
             },
         ),
     )

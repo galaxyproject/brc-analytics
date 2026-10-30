@@ -22,6 +22,7 @@ npm-debug.log*
 /.env.production
 /sites/*/.env*
 backend/**/.env
+catalog/**/.env
 
 # typescript
 *.tsbuildinfo
@@ -36,6 +37,7 @@ backend/**/.env
 # favicons
 /sites/ga2/public/favicons/*
 /sites/brc-analytics/public/favicons/*
+/sites/logan-search/public/favicons/*
 
 # catalog build
 /catalog/build/temp
@@ -78,3 +80,7 @@ taxdump/
 *.dmp
 *.duckdb
 *.duckdb.new
+# Temporary (#1904): the 3D7 gene snapshot is checked in until the real
+# snapshot is built off the server and mounted. Remove with the file.
+!backend/api/app/data/genes/genes-3d7.duckdb
+*.duckdb.partial

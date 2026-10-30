@@ -4,17 +4,29 @@ import type {
   WorkflowParameter,
 } from "@repo/shared/apis/workflow";
 import {
-  Workflow as SourceWorkflow,
-  WorkflowCategories as SourceWorkflowCategories,
-  Workflows as SourceWorkflows,
+  type Workflow as SourceWorkflow,
+  type WorkflowCategories as SourceWorkflowCategories,
+  type Workflows as SourceWorkflows,
   WorkflowParameterVariable,
   WorkflowScope,
 } from "../../schema/generated/schema";
-import { readYamlFile } from "./utils";
+import { parseNumber, readValuesFile, readYamlFile } from "./utils";
 
 const SOURCE_PATH_WORKFLOW_CATEGORIES =
   "catalog/source/workflow_categories.yml";
 const SOURCE_PATH_WORKFLOWS = "catalog/source/workflows.yml";
+const SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING =
+  "catalog/build/intermediate/workflow-taxonomy-mapping.tsv";
+
+const WORKFLOW_TAXONOMY_MAPPING_KEYS = [
+  "source_taxonomy_id",
+  "taxonomy_id",
+] as const;
+
+type WorkflowTaxonomyMappingRow = Record<
+  (typeof WORKFLOW_TAXONOMY_MAPPING_KEYS)[number],
+  string
+>;
 
 export async function buildWorkflows(): Promise<WorkflowCategory[]> {
   const sourceWorkflowCategories = await readYamlFile<SourceWorkflowCategories>(
@@ -35,9 +47,22 @@ export async function buildWorkflows(): Promise<WorkflowCategory[]> {
       })
     );
 
+  const taxonomyMapping = new Map(
+    (
+      await readValuesFile<WorkflowTaxonomyMappingRow>(
+        SOURCE_PATH_WORKFLOW_TAXONOMY_MAPPING,
+        undefined,
+        WORKFLOW_TAXONOMY_MAPPING_KEYS
+      )
+    ).map((row) => [
+      parseNumber(row.source_taxonomy_id),
+      parseNumber(row.taxonomy_id),
+    ])
+  );
+
   for (const sourceWorkflow of sourceWorkflows.workflows) {
     if (sourceWorkflow.active) {
-      buildWorkflow(workflowCategories, sourceWorkflow);
+      buildWorkflow(workflowCategories, sourceWorkflow, taxonomyMapping);
     }
   }
 
@@ -92,7 +117,8 @@ function validateUrl(url: string, context: string): void {
 /* eslint-disable-next-line sonarjs/cognitive-complexity -- function handles multiple optional fields */
 function buildWorkflow(
   workflowCategories: WorkflowCategory[],
-  sourceWorkflow: SourceWorkflow
+  sourceWorkflow: SourceWorkflow,
+  taxonomyMapping: Map<number, number>
 ): void {
   const {
     assembly_count_max: assemblyCountMax,
@@ -102,7 +128,7 @@ function buildWorkflow(
     parameters: sourceParameters,
     ploidy,
     scope,
-    taxonomy_id: taxonomyId,
+    taxonomy_id: taxonomyId = null,
     trs_id: trsId,
     workflow_description: workflowDescription,
     workflow_name: workflowName,
@@ -213,6 +239,31 @@ function buildWorkflow(
     resolvedMax = assemblyCountMax ?? null;
   }
 
+  // A workflow that takes a collection of assemblies can't run on an empty
+  // one, so a minimum below 1 is a catalog error, not "no requirement".
+  if (
+    variables.includes(WorkflowParameterVariable.FASTA_COLLECTION) &&
+    resolvedMin < 1
+  ) {
+    throw new Error(
+      `Workflow "${workflowName}": assembly_count_min must be at least 1 for a workflow with a FASTA_COLLECTION parameter`
+    );
+  }
+
+  // A maximum below the minimum leaves no number of assemblies the workflow can
+  // run with.
+  if (resolvedMax !== null && resolvedMax < resolvedMin) {
+    throw new Error(
+      `Workflow "${workflowName}": assembly_count_max (${resolvedMax}) must not be less than assembly_count_min (${resolvedMin})`
+    );
+  }
+
+  // Get the up-to-date taxonomy ID from the taxonomy mapping, defaulting to the ID from the YAML
+  const resolvedStringTaxonomyId =
+    taxonomyId === null
+      ? null
+      : String(taxonomyMapping.get(taxonomyId) ?? taxonomyId);
+
   const workflow: Workflow = {
     assemblyCountMax: resolvedMax,
     assemblyCountMin: resolvedMin,
@@ -220,7 +271,7 @@ function buildWorkflow(
     parameters,
     ploidy,
     scope: resolvedScope,
-    taxonomyId: typeof taxonomyId === "number" ? String(taxonomyId) : null,
+    taxonomyId: resolvedStringTaxonomyId,
     trsId,
     workflowDescription,
     workflowName,

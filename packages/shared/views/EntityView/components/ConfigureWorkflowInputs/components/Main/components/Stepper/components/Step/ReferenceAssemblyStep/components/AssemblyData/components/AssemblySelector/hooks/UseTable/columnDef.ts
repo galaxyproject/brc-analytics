@@ -3,7 +3,7 @@ import {
   renderNTagCell,
 } from "@repo/shared/components/Table/components/TableCell/components/NTagCell/utils";
 import { renderScientificName } from "@repo/shared/components/Table/components/TableCell/components/ScientificName/utils";
-import { SelectCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/ReferenceAssemblyStep/components/AssemblyData/components/AssemblySelector/components/Table/components/TableCell/components/SelectCell/selectCell";
+import { SelectCell } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/components/TableCell/components/SelectCell/selectCell";
 import type { ColumnDef, SortingColumnDef } from "@tanstack/react-table";
 import { getAssemblyIsolate, getAssemblySerotype } from "./accessorFn";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
@@ -216,8 +216,11 @@ const TAXONOMY_ID: ColumnDef<Assembly> = {
   meta: { width: { max: "0.5fr", min: "144px" } },
 };
 
-export const columns: ColumnDef<Assembly>[] = [
-  ACTION,
+/**
+ * Assembly columns, without a row action, so a selector can pair them with its
+ * own way of selecting rows.
+ */
+export const ASSEMBLY_COLUMNS: ColumnDef<Assembly>[] = [
   ACCESSION,
   TAXONOMIC_LEVEL_SPECIES,
   TAXONOMIC_LEVEL_STRAIN,
@@ -239,3 +242,5 @@ export const columns: ColumnDef<Assembly>[] = [
   LINEAGE_TAXONOMY_IDS,
   GALAXY_DATACACHE_URL,
 ];
+
+export const columns: ColumnDef<Assembly>[] = [ACTION, ...ASSEMBLY_COLUMNS];

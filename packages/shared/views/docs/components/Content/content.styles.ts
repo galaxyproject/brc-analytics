@@ -4,10 +4,6 @@ import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { SectionContent } from "@repo/shared/views/docs/content.styles";
 
-interface Props {
-  offset: number;
-}
-
 const code = css`
   code {
     background-color: ${PALETTE.SMOKE_LIGHT};
@@ -17,7 +13,7 @@ const code = css`
   }
 `;
 
-const heading = ({ offset }: Props) => css`
+const heading = css`
   h1,
   h2,
   h3,
@@ -34,25 +30,25 @@ const heading = ({ offset }: Props) => css`
   h1 {
     font: ${FONT.HEADING_LARGE};
     margin: 0 0 8px;
-    scroll-margin-top: ${offset + 24}px;
+    scroll-margin-top: 24px;
   }
 
   h2 {
     font: ${FONT.HEADING};
     margin: 32px 0 16px;
-    scroll-margin-top: ${offset + 32}px;
+    scroll-margin-top: 32px;
   }
 
   h3 {
     font: ${FONT.HEADING_SMALL};
     margin: 32px 0 16px;
-    scroll-margin-top: ${offset + 32}px;
+    scroll-margin-top: 32px;
   }
 
   h4 {
     font: ${FONT.BODY_LARGE_500};
     margin: 24px 0 16px;
-    scroll-margin-top: ${offset + 24}px;
+    scroll-margin-top: 24px;
   }
 `;
 
@@ -109,9 +105,7 @@ const muiAlert = css`
 // See https://github.com/emotion-js/emotion/releases/tag/%40emotion%2Fcache%4011.10.2.
 const ignoreSsrWarning =
   "/* emotion-disable-server-rendering-unsafe-selector-warning-please-do-not-use-this-the-warning-exists-for-a-reason */";
-export const StyledSectionContent = styled(SectionContent, {
-  shouldForwardProp: (prop) => prop !== "offset",
-})<Props>`
+export const StyledContent = styled(SectionContent)`
   margin-top: 0;
   min-width: 0;
 

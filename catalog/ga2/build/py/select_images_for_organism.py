@@ -189,7 +189,7 @@ def select_image_from_options(images_info, scientific_name):
 
     # --- Populate thumbnails ---
     thumbnail_photos = []  # Keep references
-    for i, image_info in enumerate(images_info):
+    for image_info in images_info:
         try:
             response = requests.get(image_info["thumbnail"], headers=headers)
             response.raise_for_status()

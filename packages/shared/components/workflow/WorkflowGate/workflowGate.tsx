@@ -1,33 +1,29 @@
 import { useWorkflowGates } from "@repo/shared/hooks/UseWorkflowGates/hook";
-import { type JSX, useMemo } from "react";
+import { type JSX } from "react";
 import type { Props } from "./types";
 
 /**
  * Gate content on the TRS ID naming a workflow the user may open here: one the
- * entity's own workflow list offers, so the configure page and the listing
- * agree on scope, entity fit and feature-flag gating. Renders `children` for a
+ * page's listing offers (the entity's own workflow list, or the workflows
+ * listing for a page with no entity), so the page and the listing agree on
+ * scope, entity fit and feature-flag gating. Renders `children` for a
  * workflow that passes and `fallback` otherwise, letting the page decide how a
  * stale, unknown, incompatible or gated workflow URL is surfaced. Rendered
- * below EntityDataGate, which loads the workflows and entities the check reads.
+ * below EntityDataGate, which waits for the workflows the check reads.
  * @param props - Component props.
  * @param props.children - Content to render when the workflow is available.
- * @param props.entityId - ID of the entity the page configures a workflow for.
  * @param props.fallback - Content to render for an unavailable TRS ID.
- * @param props.isWorkflowAvailable - The page's availability check.
+ * @param props.isWorkflowAvailable - The page's availability check, bound to
+ * the entity it configures a workflow for, if any.
  * @param props.trsId - Workflow TRS ID.
  * @returns Children when the workflow is available, fallback otherwise.
  */
 export function WorkflowGate({
   children,
-  entityId,
   fallback,
   isWorkflowAvailable,
   trsId,
 }: Props): JSX.Element {
   const workflowGates = useWorkflowGates();
-  const isAvailable = useMemo(
-    () => isWorkflowAvailable(trsId, entityId, workflowGates),
-    [entityId, isWorkflowAvailable, trsId, workflowGates]
-  );
-  return <>{isAvailable ? children : fallback}</>;
+  return <>{isWorkflowAvailable(trsId, workflowGates) ? children : fallback}</>;
 }

@@ -7,15 +7,8 @@ import type {
   WorkflowCategory,
 } from "@repo/shared/apis/workflow";
 import { TAXON_ANY } from "@repo/shared/viewModelBuilders/constants";
-import {
-  DIFFERENTIAL_EXPRESSION_ANALYSIS,
-  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
-} from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
-import {
-  LMLS_WORKFLOW_CATEGORY,
-  LMLS_WORKFLOWS,
-} from "@repo/shared/workflow/lmls";
+import { UNCATALOGED_WORKFLOW_GROUPS } from "@repo/shared/workflow/listedWorkflows";
 import { workflowMeetsAssemblyMinimum } from "@repo/shared/workflow/utils";
 import type { WorkflowAssembly, WorkflowEntity } from "./types";
 
@@ -109,34 +102,26 @@ export function getWorkflows(
     }
   }
 
-  // Add Differential Expression Analysis workflow (interim measure), gated as
-  // a member of the category it is listed under.
-  for (const workflow of workflowGates.filterWorkflows(
-    DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
-    [DIFFERENTIAL_EXPRESSION_ANALYSIS]
-  )) {
-    workflows.push({
-      ...workflow,
-      assembly: mapAssembly(undefined),
-      category: "Transcriptomics",
-      scope: String(workflow.scope),
-      taxonomyId: TAXON_ANY,
-    } as WorkflowEntity);
-  }
-
-  // Sequence Analysis workflows aren't in the catalog, so they're appended
-  // here — through the same gate as every catalog workflow above.
-  for (const workflow of workflowGates.filterWorkflows(
-    LMLS_WORKFLOW_CATEGORY,
-    LMLS_WORKFLOWS
-  )) {
-    workflows.push({
-      ...workflow,
-      assembly: mapAssembly(undefined),
-      category: "Sequence Analysis",
-      scope: String(workflow.scope),
-      taxonomyId: TAXON_ANY,
-    } as WorkflowEntity);
+  // Workflows outside the catalog (Differential Expression Analysis and the
+  // Sequence Analysis workflows) are appended through the same gate as every
+  // catalog workflow above, as members of the category they are listed under.
+  for (const {
+    category,
+    name,
+    workflows: groupWorkflows,
+  } of UNCATALOGED_WORKFLOW_GROUPS) {
+    for (const workflow of workflowGates.filterWorkflows(
+      category,
+      groupWorkflows
+    )) {
+      workflows.push({
+        ...workflow,
+        assembly: mapAssembly(undefined),
+        category: name,
+        scope: String(workflow.scope),
+        taxonomyId: TAXON_ANY,
+      } as WorkflowEntity);
+    }
   }
 
   return workflows;

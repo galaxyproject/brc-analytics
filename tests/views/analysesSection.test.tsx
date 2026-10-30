@@ -17,7 +17,8 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 
 const push = jest.fn().mockResolvedValue(undefined);
 jest.mock("next/router", () => ({
-  useRouter: (): { push: jest.Mock } => ({ push }),
+  __esModule: true,
+  default: { push: (...args: unknown[]): unknown => push(...args) },
 }));
 
 const mockClient = apiClient as jest.Mocked<typeof apiClient>;
@@ -27,7 +28,6 @@ const theme = createTheme();
 const ANALYSIS: SavedAnalysisSummary = {
   created_at: "2026-08-01T00:00:00Z",
   id: "1",
-  source_session: null,
   title: "Plasmodium run",
   updated_at: "2026-08-01T00:00:00Z",
 };

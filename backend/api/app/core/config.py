@@ -1,8 +1,12 @@
 import os
+import secrets
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
+
+from app.core.partner_keys import parse_partner_keys, parse_sunset
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,6 +19,10 @@ DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
 # Assistant session cookie name. Module-level constant (not env-driven)
 # so importing it doesn't drag the full Settings instantiation along.
 SESSION_COOKIE_NAME = "brc_assistant_session"
+
+DEFAULT_GENE_SNAPSHOT_PATH = (
+    Path(__file__).resolve().parents[1] / "data" / "genes" / "genes-3d7.duckdb"
+)
 
 
 class Settings:
@@ -155,6 +163,33 @@ class Settings:
             os.getenv("SUBMIT_RATE_LIMIT_USER_REQUESTS", "20")
         )
 
+        # Partner API, for an external service running Logan searches through
+        # us. Off unless enabled, and refuses to start enabled without keys
+        # or a sunset date: the date is what makes it temporary.
+        self.PARTNER_API_ENABLED: bool = os.getenv(
+            "PARTNER_API_ENABLED", "false"
+        ).lower() in ("1", "true", "yes")
+        self.PARTNER_API_KEYS = parse_partner_keys(os.getenv("PARTNER_API_KEYS", ""))
+        self.PARTNER_API_SUNSET = parse_sunset(os.getenv("PARTNER_API_SUNSET", ""))
+        # Stops new submissions while status and results keep answering, so
+        # jobs already running can be collected.
+        self.PARTNER_SUBMIT_PAUSED: bool = os.getenv(
+            "PARTNER_SUBMIT_PAUSED", "false"
+        ).lower() in ("1", "true", "yes")
+        # Per partner. Submits share SUBMIT_RATE_LIMIT_WINDOW (an hour);
+        # everything else shares RATE_LIMIT_WINDOW (a minute), and is roomier
+        # than the per-IP default because partners poll from one server.
+        self.PARTNER_SUBMIT_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_SUBMIT_RATE_LIMIT_REQUESTS", "60")
+        )
+        self.PARTNER_RATE_LIMIT_REQUESTS: int = int(
+            os.getenv("PARTNER_RATE_LIMIT_REQUESTS", "300")
+        )
+        if self.PARTNER_API_ENABLED and not self.PARTNER_API_KEYS:
+            raise ValueError("PARTNER_API_ENABLED needs at least one PARTNER_API_KEYS")
+        if self.PARTNER_API_ENABLED and self.PARTNER_API_SUNSET is None:
+            raise ValueError("PARTNER_API_ENABLED needs a PARTNER_API_SUNSET date")
+
         # Trust X-Forwarded-For for client identification (rate limiting,
         # etc.). Only enable when behind a proxy that strips/rewrites the
         # header itself -- otherwise clients can spoof IPs.
@@ -162,32 +197,41 @@ class Settings:
             "TRUST_PROXY_HEADERS", "false"
         ).lower() in ("1", "true", "yes")
 
-        # Assistant session cookie. When SESSION_COOKIE_SECRET is set, /chat
-        # issues an httpOnly Same-Site=Strict cookie binding the session_id
-        # to the browser; GET/DELETE /session endpoints require the cookie.
-        # Empty secret = legacy unbound mode (any caller with the session_id
-        # can read/delete) -- fine for local dev, must be set in prod.
+        # Assistant session cookie. /chat issues an httpOnly Same-Site=Strict
+        # cookie binding the session_id to the browser; continuing, reading
+        # or deleting a session requires it.
         self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
         self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
-        # Refuse to silently boot with session-cookie binding disabled in
-        # deployed environments -- empty secret falls back to legacy unbound
-        # mode where any caller with the session_id can read/delete. Mirrors
-        # the CORS wildcard guard above.
+        # Deployed environments must configure the secret: a generated one
+        # changes on every restart, dropping every session's binding.
         if (
             not self.SESSION_COOKIE_SECRET
             and self.ENVIRONMENT.lower() not in DEV_ENVIRONMENTS
         ):
             raise ValueError(
                 f"SESSION_COOKIE_SECRET must be set when ENVIRONMENT={self.ENVIRONMENT!r}; "
-                "empty secret disables session-cookie binding."
+                "a generated one would not survive a restart."
             )
+        # Generated rather than left empty so binding can't be switched off by
+        # omission -- a server that inherited ENVIRONMENT=development used to
+        # run unbound. Fine for one dev process; sessions started before a
+        # restart lose access to their cookie.
+        self.SESSION_COOKIE_SECRET_EPHEMERAL: bool = not self.SESSION_COOKIE_SECRET
+        if self.SESSION_COOKIE_SECRET_EPHEMERAL:
+            self.SESSION_COOKIE_SECRET = secrets.token_urlsafe(48)
 
         # Catalog path
         self.CATALOG_PATH: str = os.getenv("CATALOG_PATH", "/catalog/output")
 
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
+
+        # Gene snapshot the gene API reads. Defaults to the temporary 3D7 file
+        # checked in with the app (#1904); the real snapshot will be mounted.
+        self.GENE_SNAPSHOT_PATH: str = os.getenv(
+            "GENE_SNAPSHOT_PATH", str(DEFAULT_GENE_SNAPSHOT_PATH)
+        )
 
         # Where a kmindex search's full, mirror-enriched match set is written
         # so it can be downloaded afterwards. Empty path disables the export
@@ -207,6 +251,10 @@ class Settings:
         # would also eat an "/api" in the middle of a hostname or path.
         self.GALAXY_BASE_URL: str = self.GALAXY_API_URL.rstrip("/").removesuffix("/api")
         self.GALAXY_API_KEY: str = os.getenv("GALAXY_API_KEY", "")
+        # Partner jobs only ever run on the service account, so without its key
+        # every partner call would 503.
+        if self.PARTNER_API_ENABLED and not self.GALAXY_API_KEY:
+            raise ValueError("PARTNER_API_ENABLED needs GALAXY_API_KEY")
 
         # Galaxy tool IDs
         self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")
@@ -219,6 +267,12 @@ class Settings:
             "GALAXY_KMINDEX_TOOL_ID",
             "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0",
         )
+        # Let Galaxy answer a repeated query with its finished job. A switch so
+        # it can be turned off without a deploy if the cache ever hands back
+        # something it shouldn't.
+        self.KMINDEX_USE_CACHED_JOBS: bool = os.getenv(
+            "KMINDEX_USE_CACHED_JOBS", "true"
+        ).lower() in ("1", "true", "yes")
 
         # Which Galaxy OIDC backend links accounts (the provider name in Galaxy's
         # oidc_backends_config.xml). Used to build the connect-your-account URL.

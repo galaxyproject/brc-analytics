@@ -1,8 +1,10 @@
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import { buildWorkflows } from "../../../../catalog/build/ts/build-workflows";
 
-// Mock YAML file reading so we can inject source workflows.
+// Mock YAML file reading so we can inject source workflows. Additional relevant exports are mocked/imported as necessary.
 jest.mock("../../../../catalog/build/ts/utils", () => ({
+  parseNumber: jest.fn((s: string) => Number(s)),
+  readValuesFile: jest.fn().mockResolvedValue([]),
   readYamlFile: jest.fn(),
   saveJson: jest.fn(),
 }));

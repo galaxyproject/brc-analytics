@@ -15,7 +15,6 @@ import asyncio
 import json
 import logging
 import time
-from collections import defaultdict
 from typing import get_args
 from unittest.mock import AsyncMock, MagicMock, call
 
@@ -24,6 +23,7 @@ import requests
 from pydantic import ValidationError
 
 from app.core.cache import CacheTTL
+from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     MAX_QUERY_BASES,
     GalaxyJobState,
@@ -37,17 +37,22 @@ from app.services.galaxy_service import (
     KMINDEX_AGG_CACHE_PREFIX,
     KMINDEX_AGGREGATING_PREFIX,
     KMINDEX_INDEX_CACHE_PREFIX,
+    KMINDEX_INDEX_COOLDOWN_PREFIX,
+    KMINDEX_INDEX_COOLDOWN_SECONDS,
     KMINDEX_INDEX_LAST_GOOD_PREFIX,
     KMINDEX_ORDER_CACHE_PREFIX,
     KMINDEX_UNATTRIBUTED,
     GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
+    GalaxyJobNotFound,
     GalaxyService,
+    KmindexFiltersUnavailable,
     _default_order,
     _submitted_index_names,
     _submitted_threshold,
 )
+from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
 from app.services.sra_mirror import _SORTABLE_COLUMNS
 
@@ -61,6 +66,7 @@ def service(monkeypatch):
     get_settings.cache_clear()
 
     cache = MagicMock()
+    cache.claim = AsyncMock(return_value=True)
     cache.delete = AsyncMock(return_value=True)
     cache.get = AsyncMock(return_value=None)
     cache.set = AsyncMock(return_value=True)
@@ -167,12 +173,80 @@ class TestJobStatusStates:
         service.gi.jobs.show_job.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_a_paused_job_is_not_cached_because_it_can_be_resumed(self, service):
-        service.gi.jobs.show_job = MagicMock(return_value=self._job("paused"))
+    @pytest.mark.parametrize("state", ["paused", "queued", "running"])
+    async def test_an_unsettled_job_is_cached_only_briefly(self, service, state):
+        # Paused can be resumed and the others are still moving, so none of
+        # them earns the hour a settled state gets -- but every open search
+        # polls, and a few seconds of staleness is what keeps that off Galaxy.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
 
         await service.get_job_status("job1")
 
-        service.cache.set.assert_not_awaited()
+        service.cache.set.assert_awaited_once()
+        assert service.cache.set.await_args.args[2] == (
+            galaxy_service.LIVE_JOB_STATUS_TTL
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_briefly_cached_running_status_is_served_without_galaxy(
+        self, service
+    ):
+        service.cache.get = AsyncMock(
+            return_value={
+                "created_time": "t0",
+                "is_complete": False,
+                "is_successful": False,
+                "job_id": "job1",
+                "state": "running",
+                "updated_time": "t1",
+            }
+        )
+        service.gi.jobs.show_job = MagicMock()
+
+        status = await service.get_job_status("job1")
+
+        assert status.state == "running"
+        service.gi.jobs.show_job.assert_not_called()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "code, body",
+        [
+            (404, '{"err_msg": "Object not found", "err_code": 404001}'),
+            (400, '{"err_msg": "Malformed id", "err_code": 400009}'),
+        ],
+    )
+    async def test_an_id_galaxy_does_not_know_is_not_found(self, service, code, body):
+        from bioblend import ConnectionError as BioblendConnectionError
+
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=BioblendConnectionError("nope", status_code=code, body=body)
+        )
+
+        with pytest.raises(GalaxyJobNotFound):
+            await service.get_job_status("0123456789abcdef")
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "code, body",
+        [
+            (502, "Bad Gateway"),
+            (400, '{"err_msg": "Request validation failed", "err_code": 400008}'),
+        ],
+    )
+    async def test_other_galaxy_errors_are_not_mistaken_for_a_missing_job(
+        self, service, code, body
+    ):
+        from bioblend import ConnectionError as BioblendConnectionError
+
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=BioblendConnectionError("down", status_code=code, body=body)
+        )
+
+        with pytest.raises(Exception) as excinfo:
+            await service.get_job_status("0123456789abcdef")
+
+        assert not isinstance(excinfo.value, GalaxyJobNotFound)
 
     @pytest.mark.asyncio
     async def test_only_a_successful_job_fetches_its_outputs(self, service):
@@ -188,6 +262,53 @@ class TestJobStatusStates:
 
         assert status.is_complete and status.outputs == []
         service.gi.datasets.show_dataset.assert_not_called()
+
+    async def _paused_poll_errors(self, service, caplog):
+        service.gi.jobs.show_job = MagicMock(return_value=self._job("paused"))
+        with caplog.at_level(logging.ERROR, logger="app.services.galaxy_service"):
+            await service.get_job_status("job1")
+        return [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_is_reported_as_an_error_with_the_quota(
+        self, service, caplog
+    ):
+        # Galaxy pauses an over-quota user's jobs; for the shared service
+        # account that silently fails every search, so it has to reach Sentry.
+        service.gi.users.get_current_user = MagicMock(
+            return_value={"quota_percent": 100.0}
+        )
+
+        errors = await self._paused_poll_errors(service, caplog)
+
+        assert len(errors) == 1
+        assert "paused" in errors[0].getMessage()
+        assert "100.0%" in errors[0].getMessage()
+
+    @pytest.mark.asyncio
+    async def test_a_pause_already_reported_this_hour_is_not_reported_again(
+        self, service, caplog
+    ):
+        service.cache.claim = AsyncMock(return_value=False)
+
+        assert not await self._paused_poll_errors(service, caplog)
+        service.gi.users.get_current_user.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_under_a_user_credential_is_not_reported(
+        self, service, caplog
+    ):
+        service.credential = GalaxyCredential(kind="user", secret="tok")
+
+        assert not await self._paused_poll_errors(service, caplog)
+
+    @pytest.mark.asyncio
+    async def test_a_paused_job_is_reported_even_if_the_quota_read_fails(
+        self, service, caplog
+    ):
+        service.gi.users.get_current_user = MagicMock(side_effect=RuntimeError("429"))
+
+        assert await self._paused_poll_errors(service, caplog)
 
     @pytest.mark.asyncio
     async def test_a_status_poll_logs_nothing_at_info(self, service, caplog):
@@ -251,6 +372,30 @@ class TestMergeBookkeeping:
         assert aggregate["shards_with_hits"] <= aggregate["shards_searched"]
 
     @pytest.mark.asyncio
+    async def test_hits_are_merged_off_the_event_loop(self, service, monkeypatch):
+        # A million-hit merge on the loop would stall every status poll while
+        # it ran, and with partner merges overlapping that stall would stack.
+        import threading
+
+        merged_on = []
+        real = galaxy_service._merge_shard_hits
+
+        def _spy(*args):
+            merged_on.append(threading.get_ident())
+            return real(*args)
+
+        monkeypatch.setattr(galaxy_service, "_merge_shard_hits", _spy)
+        service.get_job_status = AsyncMock(return_value=self._status(1))
+        service._download_shard = AsyncMock(
+            return_value={"IDX_1": {"q": {"SRR1": 0.9}}}
+        )
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert aggregate["total_matches"] == 1
+        assert merged_on and merged_on[0] != threading.get_ident()
+
+    @pytest.mark.asyncio
     async def test_equal_scores_order_deterministically(self, service):
         # Same hits, shards arriving in opposite order, must page identically.
         shard_a = {"IDX_1": {"q": {"SRRb": 0.5, "SRRa": 0.5}}}
@@ -311,7 +456,7 @@ class TestQueryLengthCap:
     """The UI enforces the same ceiling, but the UI is not the only caller."""
 
     def test_over_limit_rejected(self):
-        with pytest.raises(ValidationError, match="the limit is 2500"):
+        with pytest.raises(ValidationError, match="the limit is 5000"):
             KmindexQuerySubmission(
                 sequence=">q\n" + "A" * (MAX_QUERY_BASES + 1), indexes=["GENOMIC_BCT"]
             )
@@ -332,6 +477,25 @@ class TestQueryLengthCap:
         """max_length guards against a multi-megabyte body reaching the validators."""
         with pytest.raises(ValidationError):
             KmindexQuerySubmission(sequence="A" * 100_000, indexes=["GENOMIC_BCT"])
+
+
+class TestThreshold:
+    """Range and default follow logan-search.org."""
+
+    def test_default_is_half(self):
+        submission = KmindexQuerySubmission(sequence="ACGT", indexes=["GENOMIC_BCT"])
+        assert submission.threshold == 0.5
+
+    def test_floor_accepted(self):
+        assert KmindexQuerySubmission(
+            sequence="ACGT", indexes=["GENOMIC_BCT"], threshold=0.25
+        )
+
+    def test_below_floor_rejected(self):
+        with pytest.raises(ValidationError):
+            KmindexQuerySubmission(
+                sequence="ACGT", indexes=["GENOMIC_BCT"], threshold=0.2
+            )
 
 
 class TestIndexSelection:
@@ -1162,7 +1326,7 @@ class TestCohortOverTheFullHitSet:
         assert service._page_kmindex(aggregate, "job1", 5, 0).cohort is None
         mirror.cohort_for_accessions.assert_not_called()
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_failed_cohort_read_still_caches_the_correct_hit_list(self, service):
@@ -1196,8 +1360,7 @@ class TestCohortOverTheFullHitSet:
         reaches the query. What that check cannot see remains: a corrupt page,
         a revoked file handle, a duckdb version disagreement. Every results
         poll and every page click would otherwise re-download all 84 shard
-        datasets from a rate-limited Galaxy, serialized against every other
-        kmindex user on the process-wide aggregation lock.
+        datasets from Galaxy, each time taking one of the few merge slots.
         """
         store = {}
         service.cache.make_key = MagicMock(
@@ -1330,7 +1493,7 @@ class TestGeographyInTheAggregationWindow:
         mirror.cohort_for_accessions.assert_called_once()
         # A steady state, so it is cached for a day rather than retried hourly.
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_a_broken_geography_read_shortens_the_ttl_like_the_cohort(
@@ -1367,13 +1530,12 @@ class TestGeographyInTheAggregationWindow:
         """
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -1394,7 +1556,7 @@ class TestGeographyInTheAggregationWindow:
         # Cached for a day, because nothing about it is going to change while
         # this process is up.
         (_key, _value, ttl) = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
         # The mirror is rebuilt and the backend restarts onto it.
         wide = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
@@ -1415,13 +1577,12 @@ class TestGeographyInTheAggregationWindow:
         # change of mirror may cost a re-aggregation.
         store = {}
         service.cache.make_key = MagicMock(
-            # The marker is keyed on the job alone; everything else here hangs
-            # on the mirror fingerprint being in the key, so keep the KeyError
-            # that says so.
+            # Only the aggregate is keyed on the mirror too; keep the KeyError
+            # that says its fingerprint is in the key.
             side_effect=lambda prefix, params: (
-                f"{prefix}:{params['job_id']}"
-                if prefix == KMINDEX_AGGREGATING_PREFIX
-                else f"{prefix}:{params['job_id']}:{params['mirror']}"
+                f"{prefix}:{params['job_id']}:{params['mirror']}"
+                if prefix == KMINDEX_AGG_CACHE_PREFIX
+                else f"{prefix}:{params['job_id']}"
             )
         )
         service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
@@ -1827,7 +1988,7 @@ class TestExportOfTheFullMatchSet:
         assert results.export_status == "too_large"
         assert results.export_rows is None
         _key, _value, ttl = service.cache.set.call_args.args
-        assert ttl == CacheTTL.ONE_DAY
+        assert ttl == galaxy_service.KMINDEX_AGG_TTL
 
     @pytest.mark.asyncio
     async def test_a_swept_file_is_not_advertised_by_the_cached_aggregate(
@@ -1935,19 +2096,21 @@ class TestExportOfTheFullMatchSet:
 class TestExportEndpoint:
     """Serving a materialized export.
 
-    The file is a finished artifact: the endpoint never touches Galaxy and
-    never needs the mirror, so a job whose export exists stays downloadable
-    even while both are down.
+    The file is a finished artifact: the endpoint never needs the mirror, and
+    Galaxy only to follow a job-cache copy to its original, so a job whose
+    export exists stays downloadable even while both are down.
     """
 
     @staticmethod
-    def _client(export_dir, monkeypatch):
+    def _client(export_dir, monkeypatch, galaxy=None):
         """A test client over the galaxy router alone, with the export
         directory configured.
 
         @param export_dir: value for KMINDEX_EXPORT_DIR, or None to leave it
             unset.
         @param monkeypatch: the test's monkeypatch fixture.
+        @param galaxy: the service the endpoint gets; by default one that
+            knows of no copies, so no test here can reach a real Galaxy.
         @returns: a TestClient.
         """
         from fastapi import FastAPI
@@ -1961,10 +2124,27 @@ class TestExportEndpoint:
             monkeypatch.setenv("KMINDEX_EXPORT_DIR", str(export_dir))
         get_settings.cache_clear()
 
+        if galaxy is None:
+            galaxy = MagicMock()
+            galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
         app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: galaxy
         return TestClient(app)
+
+    @staticmethod
+    def _copy_of(original):
+        """A service that knows every job asked about is a copy of original."""
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(return_value=original)
+        return galaxy
+
+    @staticmethod
+    def _never_asked():
+        galaxy = MagicMock()
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("asked Galaxy"))
+        return galaxy
 
     @staticmethod
     def _export(directory, job_id="job1", accessions=("SRR1", "SRR2"), columns=None):
@@ -2039,6 +2219,54 @@ class TestExportEndpoint:
         assert (
             client.get("/galaxy/kmindex/jobs/job1/export?format=tsv").status_code == 404
         )
+
+    def test_a_copy_with_no_file_of_its_own_downloads_its_originals(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig", accessions=("SRR1", "SRR2", "SRR3"))
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+        assert "copy1" in response.headers["content-disposition"]
+
+    def test_a_copys_stale_file_gives_way_to_its_originals(self, tmp_path, monkeypatch):
+        # Written under the copy's own id before copies shared their
+        # original's, and before the score correction. Nothing rewrites it.
+        from app.services.sra_mirror import EXPORT_COLUMNS
+
+        client = self._client(tmp_path, monkeypatch, galaxy=self._copy_of("orig"))
+        self._export(tmp_path, job_id="orig")
+        self._export(
+            tmp_path,
+            job_id="copy1",
+            columns=[c for c in EXPORT_COLUMNS if c not in ("ani", "fp_correction")],
+        )
+
+        response = client.get("/galaxy/kmindex/jobs/copy1/export")
+
+        assert response.status_code == 200
+        assert response.content == (tmp_path / "orig.parquet").read_bytes()
+
+    def test_an_original_with_a_current_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        self._export(tmp_path)
+
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 200
+
+    def test_a_download_that_cannot_name_a_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        client = self._client(tmp_path, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job.1/export").status_code == 404
+
+        monkeypatch.delenv("KMINDEX_EXPORT_DIR", raising=False)
+        client = self._client(None, monkeypatch, galaxy=self._never_asked())
+        assert client.get("/galaxy/kmindex/jobs/job1/export").status_code == 404
 
     def test_a_job_id_that_is_not_an_identifier_404s(self, tmp_path, monkeypatch):
         # It is a filename here, so it never gets to be a path.
@@ -2138,9 +2366,23 @@ class TestKmindexIndexList:
     """
     The index picker's options come off the pinned tool's form, the one Galaxy
     call every visitor's search page makes. Reading it per page view is what got
-    us rate-limited, so it is cached, read once when cold, and still answerable
-    when Galaxy will not answer at all.
+    us rate-limited, and waiting on it per request is what hung the page, so it
+    is cached, refilled in the background when it lapses, and never waited on.
     """
+
+    @pytest.fixture(autouse=True)
+    def _fresh_refresh_slots(self, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "_INDEX_REFRESHES", {})
+
+    @staticmethod
+    async def _settle():
+        """Let any background refresh run to the end."""
+        while galaxy_service._INDEX_REFRESHES:
+            await asyncio.gather(
+                *galaxy_service._INDEX_REFRESHES.values(), return_exceptions=True
+            )
+            # The done callback that frees the slot runs on the next tick.
+            await asyncio.sleep(0)
 
     @staticmethod
     def _store_backed(service, store=None):
@@ -2181,46 +2423,73 @@ class TestKmindexIndexList:
         service.gi.tools.build = MagicMock(side_effect=AssertionError("cold path"))
 
         assert await service.list_kmindex_indexes() == ["A", "B"]
+        assert galaxy_service._INDEX_REFRESHES == {}
 
     @pytest.mark.asyncio
-    async def test_a_cold_read_is_cached_for_a_day_and_kept_far_longer(
-        self, service, monkeypatch
+    async def test_a_miss_answers_from_the_last_good_list_without_waiting(
+        self, service
     ):
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        # The regression this guards: the request awaited Galaxy, and a slow or
+        # 429ing Galaxy hung the search page for everyone queued behind it.
+        store = self._store_backed(service)
+        store[service._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX)] = ["A", "B"]
+        released = asyncio.Event()
+
+        async def slow_galaxy():
+            await released.wait()
+            return ["A", "B", "C"]
+
+        service._build_kmindex_index_list = AsyncMock(side_effect=slow_galaxy)
+
+        indexes = await asyncio.wait_for(service.list_kmindex_indexes(), timeout=1)
+
+        assert indexes == ["A", "B"]
+        assert len(galaxy_service._INDEX_REFRESHES) == 1
+        released.set()
+        await self._settle()
+        assert await service.list_kmindex_indexes() == ["A", "B", "C"]
+
+    @pytest.mark.asyncio
+    async def test_a_cold_cache_answers_with_the_shipped_names(self, service):
+        self._store_backed(service)
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A"]))
+
+        assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+        await self._settle()
+        assert await service.list_kmindex_indexes() == ["A"]
+
+    @pytest.mark.asyncio
+    async def test_a_refresh_is_cached_for_a_day_and_kept_far_longer(self, service):
         store = self._store_backed(service)
         service._get_or_create_shared_history = AsyncMock(return_value="h1")
         service.gi.tools.build = MagicMock(return_value=self._tool_form(["A", "B"]))
 
-        first = await service.list_kmindex_indexes()
-        second = await service.list_kmindex_indexes()
+        await service.list_kmindex_indexes()
+        await self._settle()
 
-        assert first == ["A", "B"] == second
         assert service.gi.tools.build.call_count == 1
         assert [c.args[2] for c in service.cache.set.call_args_list] == [
             CacheTTL.ONE_DAY,
             CacheTTL.THIRTY_DAYS,
         ]
-        assert len(store) == 2
+        assert self._cached_lists(service, store) == [["A", "B"], ["A", "B"]]
 
     @pytest.mark.asyncio
-    async def test_concurrent_cold_reads_make_one_galaxy_call(
-        self, service, monkeypatch
-    ):
-        # A TTL expiry or a deploy puts every open search page on the cold path
-        # at once, and the router builds a service per request, so the requests
-        # that arrive mid-read have to wait for that answer rather than ask
-        # again -- asking again in a burst is what Galaxy answers with 429.
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+    async def test_concurrent_misses_start_one_refresh(self, service):
+        # A TTL expiry or a deploy puts every open search page on the miss path
+        # at once, and the router builds a service per request, so the slot has
+        # to be process-wide -- a burst of reads is what Galaxy answers with 429.
         store = {}
         builds = []
 
         def build(**kwargs):
             builds.append(kwargs)
-            # Widen the gap between the read and the write it decides.
+            # Keep the first refresh in flight while the others arrive.
             time.sleep(0.05)
             return self._tool_form(["A"])
 
-        services = [service, GalaxyService(MagicMock())]
+        services = [service] + [GalaxyService(MagicMock()) for _ in range(4)]
         for svc in services:
             svc.gi = MagicMock()
             svc._galaxy_available = True
@@ -2229,32 +2498,49 @@ class TestKmindexIndexList:
             self._store_backed(svc, store)
 
         lists = await asyncio.gather(*(s.list_kmindex_indexes() for s in services))
+        await self._settle()
 
-        assert lists == [["A"], ["A"]]
+        assert lists == [list(FALLBACK_INDEX_NAMES)] * len(services)
         assert len(builds) == 1
+        assert await service.list_kmindex_indexes() == ["A"]
 
     @pytest.mark.asyncio
-    async def test_a_rate_limited_read_serves_the_last_good_list(
-        self, service, monkeypatch
-    ):
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+    async def test_a_failed_refresh_cools_down_before_another_is_tried(self, service):
+        # The burst that trips the rate limit arrives while it is tripped, so
+        # the misses behind a failure must not each start a read -- on the
+        # service account that also leaves a timestamped stray history behind
+        # per attempt.
         store = self._store_backed(service)
+        store[service._index_cache_key(KMINDEX_INDEX_LAST_GOOD_PREFIX)] = ["A", "B"]
         service._get_or_create_shared_history = AsyncMock(return_value="h1")
-        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A", "B"]))
-        await service.list_kmindex_indexes()
-        # The day-long entry ages out; the long-lived copy is what remains.
-        del store[service._index_cache_key(KMINDEX_INDEX_CACHE_PREFIX)]
         service.gi.tools.build = MagicMock(
             side_effect=Exception("Unexpected HTTP status code: 429")
         )
 
+        for _ in range(3):
+            assert await service.list_kmindex_indexes() == ["A", "B"]
+            await self._settle()
+
+        assert service.gi.tools.build.call_count == 1
+        assert service._get_or_create_shared_history.await_count == 1
+        cooldown_key = service._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX)
+        assert store[cooldown_key] is True
+        assert service.cache.set.call_args_list[-1].args == (
+            cooldown_key,
+            True,
+            KMINDEX_INDEX_COOLDOWN_SECONDS,
+        )
+
+        # Once the marker lapses, the next miss tries again.
+        del store[cooldown_key]
+        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A", "B"]))
+        await service.list_kmindex_indexes()
+        await self._settle()
+        assert service.gi.tools.build.call_count == 1
         assert await service.list_kmindex_indexes() == ["A", "B"]
 
     @pytest.mark.asyncio
-    async def test_a_cold_cache_and_an_unreachable_galaxy_still_draw_the_picker(
-        self, service, monkeypatch
-    ):
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+    async def test_a_failed_refresh_caches_no_answer(self, service):
         store = self._store_backed(service)
         service._get_or_create_shared_history = AsyncMock(return_value="h1")
         service.gi.tools.build = MagicMock(
@@ -2262,37 +2548,15 @@ class TestKmindexIndexList:
         )
 
         assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+        await self._settle()
         assert self._cached_lists(service, store) == []
 
     @pytest.mark.asyncio
-    async def test_a_failing_read_is_not_retried_once_per_request(
+    async def test_a_galaxy_that_never_answers_frees_the_slot(
         self, service, monkeypatch
     ):
-        # The burst that trips the rate limit arrives while it is tripped, so
-        # the requests behind the failure must not each take their turn on the
-        # lock and ask again -- on the service account that also leaves a
-        # timestamped stray history behind per attempt.
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
-        self._store_backed(service)
-        service._get_or_create_shared_history = AsyncMock(return_value="h1")
-        service.gi.tools.build = MagicMock(
-            side_effect=Exception("Unexpected HTTP status code: 429")
-        )
-
-        for _ in range(3):
-            assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
-
-        assert service.gi.tools.build.call_count == 1
-        assert service._get_or_create_shared_history.await_count == 1
-
-    @pytest.mark.asyncio
-    async def test_a_galaxy_that_never_answers_gives_the_lock_back(
-        self, service, monkeypatch
-    ):
-        # bioblend sets no request timeout, and this read holds the lock every
-        # other cold reader waits on, so a silent Galaxy has to end the read
-        # rather than park the index list for the whole process.
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
+        # bioblend sets no request timeout, and a refresh that never ends would
+        # hold the single-flight slot for the life of the process.
         monkeypatch.setattr(galaxy_service, "KMINDEX_INDEX_READ_TIMEOUT", 0.05)
         self._store_backed(service)
 
@@ -2301,25 +2565,68 @@ class TestKmindexIndexList:
 
         service._build_kmindex_index_list = AsyncMock(side_effect=never_answers)
 
-        # The outer bound is the regression guard: without the timeout this
-        # call is the 30 seconds, not the 50 milliseconds.
-        indexes = await asyncio.wait_for(service.list_kmindex_indexes(), timeout=5)
+        await service.list_kmindex_indexes()
+        await asyncio.wait_for(self._settle(), timeout=5)
 
-        assert indexes == list(FALLBACK_INDEX_NAMES)
+        assert galaxy_service._INDEX_REFRESHES == {}
 
     @pytest.mark.asyncio
-    async def test_an_unreadable_tool_form_is_never_cached_as_an_answer(
-        self, service, monkeypatch
-    ):
+    async def test_an_unreadable_tool_form_is_never_cached_as_an_answer(self, service):
         # No options parsed is a failed read, not a search with nothing to
         # search -- caching it would hold the picker empty for a day.
-        monkeypatch.setattr(galaxy_service, "_INDEX_LOCKS", defaultdict(asyncio.Lock))
         store = self._store_backed(service)
         service._get_or_create_shared_history = AsyncMock(return_value="h1")
         service.gi.tools.build = MagicMock(return_value={"inputs": []})
 
         assert await service.list_kmindex_indexes() == list(FALLBACK_INDEX_NAMES)
+        await self._settle()
         assert self._cached_lists(service, store) == []
+        assert service._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX) in store
+
+    @pytest.mark.asyncio
+    async def test_the_warm_refresh_waits_for_the_answer(self, service):
+        # The boot-time warm is the one caller that should wait: it is what
+        # keeps the long-lived copy current across restarts.
+        store = self._store_backed(service)
+        store[service._index_cache_key(KMINDEX_INDEX_COOLDOWN_PREFIX)] = True
+        service._get_or_create_shared_history = AsyncMock(return_value="h1")
+        service.gi.tools.build = MagicMock(return_value=self._tool_form(["A"]))
+
+        assert await service.refresh_kmindex_indexes() == ["A"]
+        assert self._cached_lists(service, store) == [["A"], ["A"]]
+
+    @pytest.mark.asyncio
+    async def test_the_warm_joins_a_refresh_already_in_flight(self, service):
+        self._store_backed(service)
+        released = asyncio.Event()
+
+        async def slow_galaxy():
+            await released.wait()
+            return ["A"]
+
+        service._build_kmindex_index_list = AsyncMock(side_effect=slow_galaxy)
+        await service.list_kmindex_indexes()
+        warm = asyncio.create_task(service.refresh_kmindex_indexes())
+        await asyncio.sleep(0)
+        released.set()
+
+        assert await warm == ["A"]
+        assert service._build_kmindex_index_list.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_shutdown_cancels_a_refresh_still_reading(self, service):
+        self._store_backed(service)
+
+        async def never_answers():
+            await asyncio.sleep(30)
+
+        service._build_kmindex_index_list = AsyncMock(side_effect=never_answers)
+        await service.list_kmindex_indexes()
+        (task,) = galaxy_service._INDEX_REFRESHES.values()
+
+        await asyncio.wait_for(galaxy_service.cancel_kmindex_index_refreshes(), 1)
+
+        assert task.cancelled()
 
 
 class TestSubmittedThreshold:
@@ -2588,7 +2895,7 @@ class TestHitOrdering:
         args = service.sra_mirror.order_hits.call_args.args
         assert args[1:] == ("organism", False)
         service.cache.set.assert_awaited_once_with(
-            "order-key", [2, 0, 1], CacheTTL.ONE_DAY
+            "order-key", [2, 0, 1], galaxy_service.KMINDEX_AGG_TTL
         )
         # The key is scoped to the job, the listing, the mirror and the sort, so
         # a re-aggregated listing, a rebuilt mirror or another column cannot
@@ -2825,8 +3132,8 @@ class TestAggregatingMarker:
         marker_key = self._keyed(service)
         during = {}
 
-        async def _aggregate(_job_id):
-            during["set"] = list(service.cache.set.call_args_list)
+        async def _aggregate(_job_id, *_, **__):
+            during["claimed"] = list(service.cache.claim.call_args_list)
             during["deleted"] = list(service.cache.delete.call_args_list)
             return _listing(3)
 
@@ -2834,9 +3141,24 @@ class TestAggregatingMarker:
 
         await service.get_kmindex_results("job1")
 
-        assert during["set"] == [call(marker_key, "1", CacheTTL.ONE_HOUR)]
+        assert during["claimed"] == [call(marker_key, CacheTTL.ONE_HOUR)]
         assert during["deleted"] == []
         service.cache.delete.assert_awaited_once_with(marker_key)
+
+    @pytest.mark.asyncio
+    async def test_a_lost_claim_is_told_to_come_back_not_merged_again(self, service):
+        # The marker check before the lane lock races, and the two lanes don't
+        # share a lock, so the claim is what stops one job merging twice.
+        marker_key = self._keyed(service)
+        service.cache.claim = AsyncMock(return_value=False)
+        service._aggregate_shards = AsyncMock()
+
+        with pytest.raises(GalaxyJobAggregating, match="still being merged"):
+            await service.get_kmindex_results("job1", lane="partner")
+
+        service._aggregate_shards.assert_not_awaited()
+        # Not ours to clear: the winner is still merging under it.
+        assert call(marker_key) not in service.cache.delete.call_args_list
 
     @pytest.mark.asyncio
     async def test_a_failed_aggregation_still_clears_the_marker(self, service):
@@ -2866,6 +3188,200 @@ class TestAggregatingMarker:
             await service.get_kmindex_results("job1")
 
         service._aggregate_shards.assert_not_awaited()
+
+
+class TestAggregationLanes:
+    """
+    Partner merges and BRC merges take slots in separate lanes.
+
+    A partner search covers every index, so its cold merge can run for
+    minutes; with one process-wide lock, every BRC user's cold read would sit
+    behind it. Partner merges overlap up to KMINDEX_PARTNER_MERGES, and a
+    partner caller polls, so when every slot is taken it is told to come back
+    rather than parked.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _fresh_locks(self, monkeypatch):
+        monkeypatch.setattr(
+            galaxy_service,
+            "_AGGREGATION_LANES",
+            {
+                "native": asyncio.Semaphore(1),
+                "partner": asyncio.Semaphore(galaxy_service.KMINDEX_PARTNER_MERGES),
+            },
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_partner_merge_does_not_hold_up_a_native_read(self, service):
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        release = asyncio.Event()
+        partner_merging = asyncio.Event()
+
+        async def _aggregate(job_id, *_, **__):
+            if job_id == "partner_job":
+                partner_merging.set()
+                await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        partner = asyncio.create_task(
+            service.get_kmindex_results("partner_job", lane="partner")
+        )
+        # Looking up whether the job is a job-cache copy comes first, so the
+        # merge starts a few turns of the loop later, not on the first.
+        await asyncio.wait_for(partner_merging.wait(), timeout=1)
+
+        native = await asyncio.wait_for(
+            service.get_kmindex_results("native_job"), timeout=1
+        )
+
+        assert native.total_hits == 1
+        release.set()
+        await partner
+
+    @pytest.mark.asyncio
+    async def test_a_result_cached_before_the_claim_is_not_merged_again(self, service):
+        # The other lane finished, cached and released the marker between this
+        # request's miss and its claim; the claim succeeds, but merging again
+        # would repeat every download.
+        service.sra_mirror = None
+        landed = _listing(1)
+        reads = iter([None, None, None, landed])
+        service.cache.get = AsyncMock(side_effect=lambda _key: next(reads, None))
+        # Not a job-cache copy; keeps that lookup out of the counted reads.
+        service._resolve_source = AsyncMock(return_value=("job1", None))
+        service._aggregate_shards = AsyncMock()
+
+        results = await service.get_kmindex_results("job1", lane="partner")
+
+        service._aggregate_shards.assert_not_awaited()
+        assert results.total_hits == 1
+
+    @pytest.mark.asyncio
+    async def test_one_job_is_merged_once_across_both_lanes(self, service):
+        # A native reader and a partner reader both miss the aggregate and the
+        # marker, then take their own lane locks. Only one may merge.
+        service.sra_mirror = None
+        claimed: set = set()
+
+        async def _claim(key, _ttl):
+            if key in claimed:
+                return False
+            claimed.add(key)
+            return True
+
+        service.cache.claim = AsyncMock(side_effect=_claim)
+        release = asyncio.Event()
+
+        async def _aggregate(_job_id, *_, **__):
+            await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        native = asyncio.create_task(service.get_kmindex_results("job1"))
+        await asyncio.sleep(0)
+        with pytest.raises(GalaxyJobAggregating):
+            await service.get_kmindex_results("job1", lane="partner")
+        release.set()
+        await native
+
+        service._aggregate_shards.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_a_full_partner_lane_answers_come_back_later(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock()
+        slots = galaxy_service._AGGREGATION_LANES["partner"]
+
+        for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+            await slots.acquire()
+        try:
+            with pytest.raises(GalaxyJobAggregating, match="queued"):
+                await service.get_kmindex_results("job2", lane="partner")
+        finally:
+            for _ in range(galaxy_service.KMINDEX_PARTNER_MERGES):
+                slots.release()
+
+        service._aggregate_shards.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_partner_merges_of_different_jobs_overlap(self, service):
+        # A classroom's distinct queries finish together; they should merge
+        # side by side up to the cap, and only the one past it is turned away.
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service._resolve_source = AsyncMock(side_effect=lambda job_id: (job_id, None))
+        cap = galaxy_service.KMINDEX_PARTNER_MERGES
+        started = 0
+        release = asyncio.Event()
+
+        async def _aggregate(*_, **__):
+            nonlocal started
+            started += 1
+            await release.wait()
+            return _listing(1)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+
+        merges = [
+            asyncio.create_task(service.get_kmindex_results(f"job{i}", lane="partner"))
+            for i in range(cap)
+        ]
+        for _ in range(100):
+            if started == cap:
+                break
+            await asyncio.sleep(0.01)
+        assert started == cap
+
+        with pytest.raises(GalaxyJobAggregating, match="queued"):
+            await service.get_kmindex_results("one_too_many", lane="partner")
+
+        release.set()
+        for merge in merges:
+            assert (await merge).total_hits == 1
+
+    @pytest.mark.asyncio
+    async def test_a_busy_native_lane_still_waits_its_turn(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock(return_value=_listing(1))
+        slots = galaxy_service._AGGREGATION_LANES["native"]
+
+        await slots.acquire()
+        reader = asyncio.create_task(service.get_kmindex_results("job3"))
+        await asyncio.sleep(0.01)
+        assert not reader.done()
+        slots.release()
+
+        assert (await reader).total_hits == 1
+
+
+class TestAggregateTTL:
+    """
+    Every job's aggregate is cached for the same two hours, whichever lane merged it.
+
+    A day of all-index aggregates at the partner submit budget would be ~2 GB of
+    Redis; past the TTL a read just re-merges from the job's outputs.
+    """
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("lane", ["native", "partner"])
+    async def test_both_lanes_cache_for_the_same_ttl(self, service, lane):
+        service.sra_mirror = None
+        TestCohortOverTheFullHitSet._wire(TestCohortOverTheFullHitSet(), service)
+
+        await service.get_kmindex_results("job1", lane=lane)
+
+        ttls = {c.args[2] for c in service.cache.set.call_args_list if c.args[0] == "k"}
+        assert ttls == {galaxy_service.KMINDEX_AGG_TTL}
+        assert galaxy_service.KMINDEX_AGG_TTL == 2 * CacheTTL.ONE_HOUR
 
 
 class TestResultsEndpoint:
@@ -3317,3 +3833,354 @@ class TestCollectionDownload:
         assert aggregate["shards_searched"] == 2
         assert aggregate["shards_failed"] == 0
         assert service._download_shard.await_count == 2
+
+
+def _status_of(job_id, copied_from=None):
+    """A finished job's status, as get_job_status would build it."""
+    return GalaxyJobStatus(
+        copied_from_job_id=copied_from,
+        created_time="t0",
+        is_complete=True,
+        is_successful=True,
+        job_id=job_id,
+        state="ok",
+        updated_time="t1",
+    )
+
+
+class TestJobCacheCopies:
+    """
+    Galaxy answers a repeated query with a copy of the finished job, under a
+    new id. A classroom of copies has to read one aggregate, built once under
+    the original, rather than each re-merging thousands of shards from Galaxy.
+    """
+
+    @pytest.fixture()
+    def wired(self, service):
+        store = {}
+        service.sra_mirror = None
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "copy1": _status_of("copy1", copied_from="orig"),
+            "copy2": _status_of("copy2", copied_from="orig"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        merged = []
+
+        async def _aggregate(job_id, status=None):
+            merged.append(job_id)
+            store[f"{KMINDEX_AGG_CACHE_PREFIX}:{job_id}"] = _listing(2)
+            return _listing(2)
+
+        service._aggregate_shards = AsyncMock(side_effect=_aggregate)
+        service._export_state = MagicMock(
+            return_value={"bytes": None, "rows": None, "status": "unavailable"}
+        )
+        return service, store, merged
+
+    @pytest.mark.asyncio
+    async def test_copies_share_one_merge_under_the_original(self, wired):
+        service, _, merged = wired
+
+        first = await service.get_kmindex_results("copy1")
+        second = await service.get_kmindex_results("copy2")
+
+        assert merged == ["orig"]
+        # Each caller's page still names the job they asked for.
+        assert (first.job_id, second.job_id) == ("copy1", "copy2")
+        assert first.total_hits == second.total_hits == 2
+        # The export file was written under the original, so that's where its
+        # state is read from.
+        assert service._export_state.call_args.args[1] == "orig"
+
+    @pytest.mark.asyncio
+    async def test_a_copys_merge_is_claimed_under_the_original(self, wired):
+        service, _, _ = wired
+
+        await service.get_kmindex_results("copy1")
+
+        claimed = service.cache.claim.call_args.args[0]
+        assert claimed == service._aggregating_key("orig")
+
+    @pytest.mark.asyncio
+    async def test_a_copy_waiting_on_a_merge_hears_its_own_id(self, wired):
+        # The partner API hands this message back as the 202 detail, and the
+        # original's id belongs to whoever ran it first.
+        service, store, _ = wired
+        store[service._aggregating_key("orig")] = True
+
+        with pytest.raises(GalaxyJobAggregating) as raised:
+            await service.get_kmindex_results("copy1")
+
+        assert "copy1" in str(raised.value)
+        assert "orig" not in str(raised.value)
+
+    @pytest.mark.asyncio
+    async def test_a_job_that_isnt_a_copy_is_its_own_source(self, wired):
+        service, _, merged = wired
+
+        assert await service.source_job_id("orig") == "orig"
+        await service.get_kmindex_results("orig")
+        assert merged == ["orig"]
+
+    @pytest.mark.asyncio
+    async def test_an_unreadable_original_stops_at_the_copy(self, service):
+        # The copy's outputs are still the original's datasets, so merging the
+        # copy itself is the right fallback when the link can't be followed.
+        async def _status(job_id):
+            if job_id == "orig":
+                raise GalaxyJobNotFound("purged")
+            return _status_of(job_id, copied_from="orig")
+
+        service.get_job_status = AsyncMock(side_effect=_status)
+        assert await service.source_job_id("copy1") == "copy1"
+
+    @pytest.mark.asyncio
+    async def test_a_copy_cycle_does_not_spin(self, service):
+        statuses = {
+            "a": _status_of("a", copied_from="b"),
+            "b": _status_of("b", copied_from="a"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        assert await service.source_job_id("a") == "b"
+        assert service.get_job_status.await_count == 2
+
+    @pytest.mark.asyncio
+    async def test_the_assistant_read_follows_a_cached_copy_link(self, wired):
+        service, store, _ = wired
+        await service.get_kmindex_results("orig")
+        store["galaxy:job_status:copy1"] = _status_of(
+            "copy1", copied_from="orig"
+        ).model_dump()
+        service.get_job_status = AsyncMock(side_effect=AssertionError("Galaxy"))
+
+        page = await service.get_cached_kmindex_results("copy1")
+
+        assert page is not None
+        assert page.job_id == "copy1"
+        assert page.total_hits == 2
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_page_of_a_copy_reads_the_originals_export(
+        self, wired, monkeypatch, tmp_path
+    ):
+        service, _, merged = wired
+        service._filterable_export = AsyncMock(return_value=tmp_path / "x.parquet")
+        service._fill_biosample = AsyncMock()
+        monkeypatch.setattr(
+            galaxy_service.kmindex_filters,
+            "subset_page",
+            lambda *args: {"hits": [], "matched": 0},
+        )
+
+        page = await service.get_filtered_kmindex_results(
+            "copy1", KmindexFilters(platform=["ILLUMINA"])
+        )
+
+        assert merged == ["orig"]
+        assert service._filterable_export.call_args.args[1] == "orig"
+        assert service._export_state.call_args.args[1] == "orig"
+        assert page.job_id == "copy1"
+        assert page.filtered
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_summary_of_a_copy_reads_the_originals_export(self, wired):
+        service, _, _ = wired
+        service._filterable_export = AsyncMock(
+            side_effect=KmindexFiltersUnavailable("none")
+        )
+
+        with pytest.raises(KmindexFiltersUnavailable):
+            await service.get_filtered_kmindex_summary(
+                "copy1", KmindexFilters(platform=["ILLUMINA"])
+            )
+
+        assert service._filterable_export.call_args.args[1] == "orig"
+
+
+class TestExportOfACopy:
+    """A job-cache copy's export is the file its original wrote."""
+
+    @pytest.mark.asyncio
+    async def test_the_file_is_found_under_the_original_and_named_for_the_copy(
+        self, tmp_path, monkeypatch
+    ):
+        import duckdb
+
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        duckdb.sql(
+            "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+            f"TO '{path}' (FORMAT parquet)"
+        )
+        looked_up = []
+        monkeypatch.setattr(
+            galaxy_module,
+            "export_file_path",
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
+        )
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(return_value="orig")
+
+        response = await galaxy_module.serve_kmindex_export("copy1", "parquet", galaxy)
+
+        assert looked_up == ["copy1", "orig"]
+        assert "copy1" in response.headers["content-disposition"]
+
+    @pytest.mark.asyncio
+    async def test_an_original_with_its_own_file_never_asks_galaxy(
+        self, tmp_path, monkeypatch
+    ):
+        import duckdb
+
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        duckdb.sql(
+            "COPY (SELECT * FROM (VALUES ('SRR1', 0.9)) t(accession, score)) "
+            f"TO '{path}' (FORMAT parquet)"
+        )
+        monkeypatch.setattr(galaxy_module, "export_file_path", lambda _d, _j: path)
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(side_effect=AssertionError("Galaxy"))
+
+        response = await galaxy_module.serve_kmindex_export("orig", "parquet", galaxy)
+
+        assert "orig" in response.headers["content-disposition"]
+        galaxy.source_job_id.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_filtered_download_of_a_copy_is_cut_from_the_originals_file(
+        self, tmp_path, monkeypatch
+    ):
+        from app.api.v1 import galaxy as galaxy_module
+
+        path = tmp_path / "export.parquet"
+        path.write_bytes(b"")
+        looked_up = []
+        monkeypatch.setattr(
+            galaxy_module,
+            "export_file_path",
+            lambda _d, job_id: (
+                looked_up.append(job_id)
+                or (path if job_id == "orig" else tmp_path / "none.parquet")
+            ),
+        )
+        monkeypatch.setattr(galaxy_module, "export_is_current", lambda _p: True)
+        monkeypatch.setattr(galaxy_module, "subset_row_count", lambda _p, _f: 1)
+        monkeypatch.setattr(
+            galaxy_module, "iter_subset_tsv", lambda _p, _f: iter([b"SRR1\t0.9\n"])
+        )
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.source_job_id = AsyncMock(return_value="orig")
+
+        # Through the endpoint, so the filtered branch is held to passing the
+        # service along too.
+        response = await galaxy_module.export_kmindex_results(
+            "copy1",
+            format="tsv",
+            filters=KmindexFilters(platform=["ILLUMINA"]),
+            galaxy_service=galaxy,
+            _rate_limit=None,
+        )
+
+        assert looked_up == ["copy1", "orig"]
+        disposition = response.headers["content-disposition"]
+        assert "copy1" in disposition and "filtered" in disposition
+
+
+class TestCopyLinkIsRemembered:
+    @pytest.mark.asyncio
+    async def test_a_resolved_copy_needs_no_galaxy_afterwards(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "copy1": _status_of("copy1", copied_from="orig"),
+        }
+        service.get_job_status = AsyncMock(side_effect=lambda job_id: statuses[job_id])
+        assert await service.source_job_id("copy1") == "orig"
+
+        # Galaxy goes away: the export link the results page offered still
+        # finds its file under the original.
+        service.get_job_status = AsyncMock(side_effect=RuntimeError("down"))
+        assert await service.source_job_id("copy1") == "orig"
+        service.get_job_status.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_a_remembered_link_resolves_with_galaxy_off(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+        store[service._copy_of_key("copy1")] = "orig"
+        service.gi = None
+
+        assert not service.is_available()
+        assert await service.source_job_id("copy1") == "orig"
+        assert await service.source_job_id("orig") == "orig"
+
+    @pytest.mark.asyncio
+    async def test_a_chain_cut_short_by_a_failed_read_is_not_remembered(self, service):
+        store = {}
+        service.cache.make_key = MagicMock(
+            side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+        )
+        service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+        async def _set(key, value, ttl=None):
+            store[key] = value
+            return True
+
+        service.cache.set = AsyncMock(side_effect=_set)
+        statuses = {
+            "orig": _status_of("orig"),
+            "c1": _status_of("c1", copied_from="orig"),
+            "c2": _status_of("c2", copied_from="c1"),
+        }
+        orig_down = True
+
+        async def _status(job_id):
+            if job_id == "orig" and orig_down:
+                raise RuntimeError("transient")
+            return statuses[job_id]
+
+        service.get_job_status = AsyncMock(side_effect=_status)
+
+        # It stops at the last job that answered, as before, but says nothing
+        # of it for the next read.
+        assert await service.source_job_id("c2") == "c1"
+        assert store == {}
+
+        orig_down = False
+        assert await service.source_job_id("c2") == "orig"
+        assert list(store.values()) == ["orig"]

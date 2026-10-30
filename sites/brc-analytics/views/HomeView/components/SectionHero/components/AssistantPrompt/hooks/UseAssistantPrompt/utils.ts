@@ -1,6 +1,6 @@
-import { ROUTES } from "@brc/routes/constants";
 import { FIELD_NAME } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Form/constants";
 import { getFormValues } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Form/utils";
+import { ROUTES } from "@repo/shared/routes/constants";
 import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
 import type { UrlObject } from "url";
 

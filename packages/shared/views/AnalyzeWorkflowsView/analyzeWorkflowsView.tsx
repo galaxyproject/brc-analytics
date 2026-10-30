@@ -4,7 +4,6 @@ import {
   BackPageView,
 } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { type AssemblyContract } from "@repo/shared/apis/types";
-import { getEntity } from "@repo/shared/services/workflows/query";
 import { type JSX } from "react";
 import { Main } from "./components/Main/main";
 import { Top } from "./components/Top/top";
@@ -15,16 +14,17 @@ import { type Props } from "./types";
  * column supplied by the caller.
  * @param props - Component props.
  * @param props.SideComponent - Side column rendered for the assembly.
+ * @param props.assembly - Assembly.
  * @param props.entityId - Assembly entity ID.
  * @returns A JSX element representing the compatible-workflows view.
  */
 export const AnalyzeWorkflowsView = <
   T extends AssemblyContract = AssemblyContract,
 >({
+  assembly,
   entityId,
   SideComponent,
 }: Props<T>): JSX.Element => {
-  const assembly = getEntity<T>("assemblies", entityId);
   return (
     <BackPageView>
       <BackPageHero>

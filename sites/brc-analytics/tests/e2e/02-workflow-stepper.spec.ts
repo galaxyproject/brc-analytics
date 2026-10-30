@@ -23,12 +23,22 @@ const RNASEQ_PE_TRS_ID =
 const ATACSEQ_TRS_ID =
   "workflow-github-com-iwc-workflows-atacseq-main-versions-v2-1";
 
+// Bacterial Genome Assembly (Shovill): organism-scoped with taxonomyId 2
+// (Bacteria), a clade with catalog organisms, so its stepper starts with the
+// Organism picker. Demo-gated, hence the demo flag.
+const CLADE_WORKFLOW_URL =
+  "/data/workflows/workflow-github-com-iwc-workflows-bacterial-genome-assembly-main-versions-v2-0-1?demo=true";
+
 // Step labels.
 const STEP_LABELS = {
   GTF_FILES: "GTF Files",
+  PAIRED_END_FASTQ: "Paired-End FASTQ Files",
   PAIRED_END_SEQUENCING: "Paired-End Sequencing Data",
   REFERENCE_ASSEMBLY: "Reference Assembly",
 };
+
+// Alert shown when none of the taxon's read runs match the workflow's filters.
+const TAXONOMY_MATCH_ALERT = "No matching read runs found by Taxonomy ID";
 
 // MUI class selectors used to locate step elements.
 const MUI_STEP = ".MuiStep-root";
@@ -77,6 +87,103 @@ async function advancePastGtfStep(page: Page): Promise<Locator> {
   await expect(continueButton).toBeEnabled();
   await continueButton.click();
   return gtfStep;
+}
+
+/**
+ * Builds a fake ENA read run for the given taxon and library layout.
+ * @param taxonomyId - Taxonomy ID of the read run.
+ * @param libraryLayout - Library layout, "PAIRED" or "SINGLE".
+ * @returns ENA read run.
+ */
+function buildReadRun(
+  taxonomyId: string,
+  libraryLayout: string
+): Record<string, string> {
+  return {
+    base_count: "1000",
+    description: "",
+    experiment_accession: `SRX${taxonomyId}`,
+    fastq_aspera: "",
+    fastq_ftp:
+      libraryLayout === "PAIRED"
+        ? "ftp.example.org/r_1.fastq.gz;ftp.example.org/r_2.fastq.gz"
+        : "ftp.example.org/r.fastq.gz",
+    fastq_md5: "",
+    first_created: "2024-01-01",
+    instrument_model: "Illumina NovaSeq 6000",
+    instrument_platform: "ILLUMINA",
+    library_layout: libraryLayout,
+    library_source: "GENOMIC",
+    library_strategy: "WGS",
+    read_count: "10",
+    run_accession: `SRR${taxonomyId}`,
+    sample_accession: `SRS${taxonomyId}`,
+    scientific_name: "",
+    study_accession: `SRP${taxonomyId}`,
+    tax_id: taxonomyId,
+    tax_lineage: "",
+  };
+}
+
+/**
+ * Fakes the ENA read-run count and search endpoints. Each taxon in the map gets
+ * one read run with its library layout; any other taxon gets none.
+ * @param page - The Playwright page.
+ * @param layoutByTaxonomyId - Library layout of each taxon's read run.
+ */
+async function mockEnaReadRuns(
+  page: Page,
+  layoutByTaxonomyId: Map<string, string>
+): Promise<void> {
+  await page.route("**/ena/portal/api/**", (route) => {
+    const url = new URL(route.request().url());
+    const query = url.searchParams.get("query") ?? "";
+    const taxonomyId = /tax_tree\((\d+)\)/.exec(query)?.[1] ?? "";
+    const libraryLayout = layoutByTaxonomyId.get(taxonomyId);
+    if (url.pathname.endsWith("/count")) {
+      return route.fulfill({ json: { count: libraryLayout ? "1" : "0" } });
+    }
+    return route.fulfill({
+      json: libraryLayout ? [buildReadRun(taxonomyId, libraryLayout)] : [],
+    });
+  });
+}
+
+/**
+ * Picks an organism from the open organism picker dialog by row position, first
+ * giving its taxon a faked ENA read run with the given library layout.
+ * @param page - The Playwright page.
+ * @param layoutByTaxonomyId - Faked library layout of each taxon's read run.
+ * @param rowIndex - Zero-based row in the picker's table.
+ * @param libraryLayout - Library layout of the picked organism's read run.
+ */
+async function pickOrganism(
+  page: Page,
+  layoutByTaxonomyId: Map<string, string>,
+  rowIndex: number,
+  libraryLayout: string
+): Promise<void> {
+  const dialog = page.getByRole("dialog");
+  const row = dialog
+    .getByRole("row")
+    .filter({ has: page.getByRole("button", { name: "Select" }) })
+    .nth(rowIndex);
+  // Columns: Action, Species, Taxonomy ID, ...
+  const taxonomyId = (await row.getByRole("cell").nth(2).textContent()) ?? "";
+  layoutByTaxonomyId.set(taxonomyId.trim(), libraryLayout);
+  await row.getByRole("button", { name: "Select" }).click();
+  await expect(dialog).toBeHidden();
+}
+
+/**
+ * Re-opens the organism picker from a completed Organism step.
+ * @param organismStep - The Organism step locator.
+ */
+async function reopenOrganismPicker(organismStep: Locator): Promise<void> {
+  // The step label's Edit makes the step active; the summary's Edit then opens
+  // the picker.
+  await organismStep.getByRole("button", { name: "Edit" }).click();
+  await organismStep.getByRole("button", { name: "Edit" }).click();
 }
 
 test.describe("Workflow Stepper", () => {
@@ -333,5 +440,89 @@ test.describe("Stale workflow URL", () => {
       "href",
       replaceParameters(ROUTES.ORGANISM, { entityId: ORGANISM_ENTITY_ID })
     );
+  });
+});
+
+test.describe("Clade organism picker", () => {
+  /**
+   * Opens the clade workflow with ENA faked by the given map.
+   * @param page - The Playwright page.
+   * @param layoutByTaxonomyId - Faked library layout of each taxon's read run.
+   * @returns The Organism step, the alert and the read-run browse button.
+   */
+  async function openCladeWorkflow(
+    page: Page,
+    layoutByTaxonomyId: Map<string, string>
+  ): Promise<{
+    alert: Locator;
+    browseReadRuns: Locator;
+    organismStep: Locator;
+  }> {
+    await mockEnaReadRuns(page, layoutByTaxonomyId);
+    await page.goto(CLADE_WORKFLOW_URL);
+    const sequencingStep = getStep(page, STEP_LABELS.PAIRED_END_FASTQ);
+    return {
+      alert: sequencingStep.getByText(TAXONOMY_MATCH_ALERT),
+      browseReadRuns: sequencingStep.getByRole("button", {
+        name: "Browse 1 Sequence",
+      }),
+      // The Organism step is the clade workflow's first step.
+      organismStep: page.locator(MUI_STEP).first(),
+    };
+  }
+
+  test("should show the taxonomy-match alert after switching to an organism with no matching read runs", async ({
+    page,
+  }) => {
+    const layoutByTaxonomyId = new Map<string, string>();
+    const { alert, browseReadRuns, organismStep } = await openCladeWorkflow(
+      page,
+      layoutByTaxonomyId
+    );
+
+    // A species is required: Continue stays disabled until one is picked.
+    await expect(
+      organismStep.getByRole("button", { name: "Continue" })
+    ).toBeDisabled();
+
+    // Paired-end read runs match the paired-end workflow: no alert.
+    await organismStep.getByRole("button", { name: "Browse" }).click();
+    await pickOrganism(page, layoutByTaxonomyId, 0, "PAIRED");
+    await expect(browseReadRuns).toBeVisible();
+    await expect(alert).toBeHidden();
+
+    // Back on the Organism step with a species set, Continue is enabled.
+    await organismStep.getByRole("button", { name: "Edit" }).click();
+    await expect(
+      organismStep.getByRole("button", { name: "Continue" })
+    ).toBeEnabled();
+
+    // Single-end read runs don't match: the alert shows.
+    await organismStep.getByRole("button", { name: "Edit" }).click();
+    await pickOrganism(page, layoutByTaxonomyId, 1, "SINGLE");
+    await expect(browseReadRuns).toBeVisible();
+    await expect(alert).toBeVisible();
+  });
+
+  test("should hide the taxonomy-match alert after switching to an organism with matching read runs", async ({
+    page,
+  }) => {
+    const layoutByTaxonomyId = new Map<string, string>();
+    const { alert, browseReadRuns, organismStep } = await openCladeWorkflow(
+      page,
+      layoutByTaxonomyId
+    );
+
+    // Single-end read runs don't match the paired-end workflow: the alert shows.
+    await organismStep.getByRole("button", { name: "Browse" }).click();
+    await pickOrganism(page, layoutByTaxonomyId, 0, "SINGLE");
+    await expect(browseReadRuns).toBeVisible();
+    await expect(alert).toBeVisible();
+
+    // Paired-end read runs match: the alert goes.
+    await reopenOrganismPicker(organismStep);
+    await pickOrganism(page, layoutByTaxonomyId, 1, "PAIRED");
+    await expect(browseReadRuns).toBeVisible();
+    await expect(alert).toBeHidden();
   });
 });

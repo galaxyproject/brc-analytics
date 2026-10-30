@@ -1,9 +1,11 @@
 export const ROUTES = {
   ANALYZE_WORKFLOWS: "/data/assemblies/{entityId}/analyze/workflows",
+  ASSISTANT: "/assistant",
   CONFIGURE_CUSTOM_WORKFLOW: "/data/assemblies/{entityId}/analyze/custom",
   CONFIGURE_ORGANISM_WORKFLOW: "/data/organisms/{entityId}/analyze/workflows",
   CONFIGURE_WORKFLOW: "/data/assemblies/{entityId}/analyze/workflows",
   GENES: "/data/genes",
+  GENE_DETAIL: "/data/genes/detail",
   GENOME: "/data/assemblies/{entityId}",
   GENOMES: "/data/assemblies",
   ORGANISM: "/data/organisms/{entityId}",

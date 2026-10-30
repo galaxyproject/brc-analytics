@@ -17,13 +17,13 @@ export function EmptyWorkspace(): JSX.Element {
       <Typography variant="body1">
         Your workspace collects the assemblies you save, the analyses you work
         on with the assistant, and the workflows you launch into Galaxy. Nothing
-        here yet -- start anywhere.
+        here yet, so start anywhere.
       </Typography>
       <Stack direction={{ sm: "row", xs: "column" }} spacing={2}>
         <Button LinkComponent={Link} href={ROUTES.GENOMES} variant="contained">
           Browse assemblies
         </Button>
-        <Button LinkComponent={Link} href="/assistant" variant="outlined">
+        <Button LinkComponent={Link} href={ROUTES.ASSISTANT} variant="outlined">
           Ask the assistant
         </Button>
         <Button LinkComponent={Link} href={ROUTES.WORKFLOWS} variant="outlined">

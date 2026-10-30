@@ -1,14 +1,4 @@
-/**
- * Builds the message sent to the assistant when the user clears a field.
- * Worded as the user changing their mind rather than an instruction to clear:
- * the assistant treats the analysis state as system-managed and declines a
- * bare "clear", which leaves the field set.
- * @param label - Field label.
- * @returns Clear message.
- */
-export function getClearFieldMessage(label: string): string {
-  return `Let's not use that ${label.toLowerCase()}; I'll choose a different one.`;
-}
+import type { SyntheticEvent } from "react";
 
 /**
  * Whether a key activates a control, as Enter and Space do a button.
@@ -17,4 +7,15 @@ export function getClearFieldMessage(label: string): string {
  */
 export function isActivationKey(key: string): boolean {
   return key === "Enter" || key === " ";
+}
+
+/**
+ * Whether an event came from the keyboard: an Enter or Space key-down, or the
+ * Backspace or Delete key-up on which the chip calls its delete handler, as it
+ * also does on a click of its ×.
+ * @param event - Event that triggered the clear.
+ * @returns True for a key event.
+ */
+export function isKeyboardEvent(event: SyntheticEvent): boolean {
+  return event.type === "keydown" || event.type === "keyup";
 }

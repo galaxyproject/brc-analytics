@@ -1,0 +1,16 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+#!genome-build GCA_000002765
+#!genome-build-accession NCBI_Assembly:GCF_000002765.6
+#!annotation-date 09/18/2026
+#!annotation-source Community Annotation GCF_000002765.6-RS_2026_09
+# Rows copied verbatim from GCF_000002765.6_GCA_000002765_genomic.gff.gz
+NC_004325.2	RefSeq	gene	160673	166273	.	+	.	ID=gene-PF3D7_0103600;Dbxref=GeneID:813173;Name=PSH1;gbkey=Gene;gene=PSH1;gene_biotype=protein_coding;locus_tag=PF3D7_0103600
+NC_004325.2	RefSeq	mRNA	160673	166273	.	+	.	ID=rna-XM_024473254.2;Parent=gene-PF3D7_0103600;Dbxref=GeneID:813173,GenBank:XM_024473254.2;Name=XM_024473254.2;Note=3.6.4.13 (RNA helicase);gbkey=mRNA;gene=PSH1;locus_tag=PF3D7_0103600;orig_protein_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1-p1;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=ATP-dependent DNA/RNA helicase PSH1;transcript_id=XM_024473254.2
+NC_004325.2	RefSeq	exon	160673	165282	.	+	.	ID=exon-XM_024473254.2-1;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XM_024473254.2;Note=3.6.4.13 (RNA helicase);gbkey=mRNA;gene=PSH1;locus_tag=PF3D7_0103600;orig_protein_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1-p1;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=ATP-dependent DNA/RNA helicase PSH1;transcript_id=XM_024473254.2
+NC_004325.2	RefSeq	exon	165553	165808	.	+	.	ID=exon-XM_024473254.2-2;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XM_024473254.2;Note=3.6.4.13 (RNA helicase);gbkey=mRNA;gene=PSH1;locus_tag=PF3D7_0103600;orig_protein_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1-p1;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=ATP-dependent DNA/RNA helicase PSH1;transcript_id=XM_024473254.2
+NC_004325.2	RefSeq	exon	166033	166273	.	+	.	ID=exon-XM_024473254.2-3;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XM_024473254.2;Note=3.6.4.13 (RNA helicase);gbkey=mRNA;gene=PSH1;locus_tag=PF3D7_0103600;orig_protein_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1-p1;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=ATP-dependent DNA/RNA helicase PSH1;transcript_id=XM_024473254.2
+NC_004325.2	RefSeq	CDS	161131	165282	.	+	0	ID=cds-XP_024328879.1;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XP_024328879.1;Name=XP_024328879.1;gbkey=CDS;gene=PSH1;locus_tag=PF3D7_0103600;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=putative ATP-dependent RNA helicase;protein_id=XP_024328879.1
+NC_004325.2	RefSeq	CDS	165553	165808	.	+	0	ID=cds-XP_024328879.1;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XP_024328879.1;Name=XP_024328879.1;gbkey=CDS;gene=PSH1;locus_tag=PF3D7_0103600;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=putative ATP-dependent RNA helicase;protein_id=XP_024328879.1
+NC_004325.2	RefSeq	CDS	166033	166229	.	+	2	ID=cds-XP_024328879.1;Parent=rna-XM_024473254.2;Dbxref=GeneID:813173,GenBank:XP_024328879.1;Name=XP_024328879.1;gbkey=CDS;gene=PSH1;locus_tag=PF3D7_0103600;orig_transcript_id=gnl|ASM:GCA_000002765|PF3D7_0103600.1;product=putative ATP-dependent RNA helicase;protein_id=XP_024328879.1

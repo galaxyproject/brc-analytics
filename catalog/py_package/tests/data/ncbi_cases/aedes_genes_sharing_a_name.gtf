@@ -1,0 +1,12 @@
+#gtf-version 2.2
+#!genome-build AaegL5.0
+#!genome-build-accession NCBI_Assembly:GCF_002204515.2
+#!annotation-source NCBI Aedes aegypti Annotation Release 101
+###
+# Rows copied verbatim from GCF_002204515.2_AaegL5.0_genomic.gtf.gz
+NC_035107.1	tRNAscan-SE	gene	59034192	59034263	.	-	.	gene_id "Trnaa-ggc"; transcript_id ""; db_xref "GeneID:110674942"; gbkey "Gene"; gene "Trnaa-ggc"; gene_biotype "tRNA"; 
+NC_035107.1	tRNAscan-SE	transcript	59034192	59034263	.	-	.	gene_id "Trnaa-ggc"; transcript_id "unassigned_transcript_11"; anticodon "(pos:complement(59034228..59034230))"; db_xref "GeneID:110674942"; gbkey "tRNA"; gene "Trnaa-ggc"; inference "COORDINATES: profile:tRNAscan-SE:1.23"; note "transfer RNA alanine (anticodon GGC)"; product "tRNA-Ala"; transcript_biotype "tRNA"; 
+NC_035107.1	tRNAscan-SE	exon	59034192	59034263	.	-	.	gene_id "Trnaa-ggc"; transcript_id "unassigned_transcript_11"; anticodon "(pos:complement(59034228..59034230))"; db_xref "GeneID:110674942"; gene "Trnaa-ggc"; inference "COORDINATES: profile:tRNAscan-SE:1.23"; note "transfer RNA alanine (anticodon GGC)"; product "tRNA-Ala"; transcript_biotype "tRNA"; exon_number "1"; 
+NC_035107.1	tRNAscan-SE	gene	59487046	59487117	.	+	.	gene_id "Trnaa-ggc_1"; transcript_id ""; db_xref "GeneID:110674901"; gbkey "Gene"; gene "Trnaa-ggc"; gene_biotype "tRNA"; 
+NC_035107.1	tRNAscan-SE	transcript	59487046	59487117	.	+	.	gene_id "Trnaa-ggc_1"; transcript_id "unassigned_transcript_13"; anticodon "(pos:59487079..59487081)"; db_xref "GeneID:110674901"; gbkey "tRNA"; gene "Trnaa-ggc"; inference "COORDINATES: profile:tRNAscan-SE:1.23"; note "transfer RNA alanine (anticodon GGC)"; product "tRNA-Ala"; transcript_biotype "tRNA"; 
+NC_035107.1	tRNAscan-SE	exon	59487046	59487117	.	+	.	gene_id "Trnaa-ggc_1"; transcript_id "unassigned_transcript_13"; anticodon "(pos:59487079..59487081)"; db_xref "GeneID:110674901"; gene "Trnaa-ggc"; inference "COORDINATES: profile:tRNAscan-SE:1.23"; note "transfer RNA alanine (anticodon GGC)"; product "tRNA-Ala"; transcript_biotype "tRNA"; exon_number "1"; 

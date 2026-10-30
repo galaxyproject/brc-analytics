@@ -1,10 +1,14 @@
 import {
   axisOptions,
   describeIndexSelection,
+  describeIndexSet,
   indexDivision,
+  indexPresets,
   joinNaturally,
   selectIndexes,
-} from "@brc/components/LoganSearch/utils";
+  selectionAxes,
+  sortIndexes,
+} from "@repo/shared/components/LoganSearch/utils";
 
 // The registered list as dev returns it: every strategy across every division
 // except ENV, which exists only as METAGENOMIC_ENV. 9 x 12 + 1 = 109.
@@ -316,5 +320,149 @@ describe("describeIndexSelection", () => {
         total: 13000,
       })
     ).toBe("Searching 1,200 of 13,000 indexes: bacteria; every library type.");
+  });
+});
+
+describe("indexPresets", () => {
+  /**
+   * The indexes a named preset selects over a list.
+   * @param indexes - Index names from the API.
+   * @param loganName - The preset's logan-search.org name.
+   * @returns The selected names.
+   */
+  function presetIndexes(indexes: string[], loganName: string): string[] {
+    const preset = indexPresets(indexes).find(
+      (one) => one.loganName === loganName
+    );
+    if (!preset) throw new Error(`no ${loganName} preset`);
+    return selectIndexes(indexes, preset.divisions, preset.strategies);
+  }
+
+  test("offers the five groups we can express, in Logan's order", () => {
+    expect(indexPresets(INDEXES).map((preset) => preset.loganName)).toEqual([
+      "All",
+      "All_No_viral_human",
+      "Transcriptomic",
+      "Metatranscriptomic",
+      "Metagenomic",
+    ]);
+  });
+
+  test("All is the whole registry as an unconstrained selection", () => {
+    const [all] = indexPresets(INDEXES);
+    expect(all.divisions).toEqual([]);
+    expect(all.strategies).toEqual([]);
+    expect(presetIndexes(INDEXES, "All")).toHaveLength(109);
+  });
+
+  test("All_No_viral_human drops the viral, phage and human indexes", () => {
+    const expected = INDEXES.filter(
+      (index) => !/_(VRL|PHG|HUMAN)$/.test(index)
+    );
+    expect(presetIndexes(INDEXES, "All_No_viral_human")).toEqual(expected);
+    // 109 less 9 strategies x 3 divisions.
+    expect(expected).toHaveLength(82);
+  });
+
+  test("Transcriptomic takes bulk and single-cell, and nothing meta", () => {
+    expect(presetIndexes(INDEXES, "Transcriptomic")).toEqual(
+      INDEXES.filter((index) => /^TRANSCRIPTOMIC(SINGLECELL)?_/.test(index))
+    );
+  });
+
+  test("Metatranscriptomic and Metagenomic take their own strategy", () => {
+    expect(presetIndexes(INDEXES, "Metatranscriptomic")).toEqual(
+      INDEXES.filter((index) => index.startsWith("METATRANSCRIPTOMIC_"))
+    );
+    // Thirteen with ENV, which only exists here.
+    expect(presetIndexes(INDEXES, "Metagenomic")).toHaveLength(13);
+  });
+
+  test("follows the live list rather than a written-out one", () => {
+    // A division upstream adds lands in the no-viral-human set unedited.
+    const grown = [...INDEXES, "GENOMIC_NEW"];
+    expect(presetIndexes(grown, "All_No_viral_human")).toContain("GENOMIC_NEW");
+  });
+
+  test("leaves out a group with nothing registered under it", () => {
+    const genomicOnly = INDEXES.filter((index) => index.startsWith("GENOMIC_"));
+    // Not an empty strategy list, which would read as All under another name.
+    expect(indexPresets(genomicOnly).map((preset) => preset.loganName)).toEqual(
+      ["All", "All_No_viral_human"]
+    );
+    expect(indexPresets(["GENOMIC_VRL"]).map((p) => p.loganName)).toEqual([
+      "All",
+    ]);
+  });
+});
+
+describe("selectionAxes", () => {
+  test("reads a product back as its rows and columns", () => {
+    const selected = selectIndexes(INDEXES, ["BCT", "INV"], ["GENOMIC"]);
+
+    expect(selectionAxes(INDEXES, selected)).toEqual({
+      divisions: ["BCT", "INV"],
+      isProduct: true,
+      strategies: ["GENOMIC"],
+    });
+  });
+
+  test("lists touched codes in display order, not pick order", () => {
+    const { divisions } = selectionAxes(INDEXES, [
+      "GENOMIC_HUMAN",
+      "GENOMIC_BCT",
+    ]);
+
+    expect(divisions).toEqual(["BCT", "HUMAN"]);
+  });
+
+  test("knows a diagonal isn't a product", () => {
+    expect(
+      selectionAxes(INDEXES, ["GENOMIC_BCT", "METAGENOMIC_INV"]).isProduct
+    ).toBe(false);
+  });
+
+  test("calls the lone environmental index a product of its row", () => {
+    // ENV has only a metagenomic index, so its row is one cell wide.
+    expect(selectionAxes(INDEXES, ["METAGENOMIC_ENV"]).isProduct).toBe(true);
+  });
+});
+
+describe("describeIndexSet", () => {
+  test("asks for a pick when nothing is chosen", () => {
+    expect(describeIndexSet(INDEXES, [])).toBe(
+      "Pick at least one index to search."
+    );
+  });
+
+  test("names a short set outright", () => {
+    expect(describeIndexSet(INDEXES, ["GENOMIC_BCT", "METAGENOMIC_INV"])).toBe(
+      "Searching 2 of 109 indexes: GENOMIC_BCT, METAGENOMIC_INV."
+    );
+  });
+
+  test("reads a product the way the axes would", () => {
+    const selected = selectIndexes(INDEXES, [], ["METAGENOMIC"]);
+
+    expect(describeIndexSet(INDEXES, selected)).toBe(
+      "Searching 13 of 109 indexes: every organism; metagenomic."
+    );
+  });
+
+  test("says how far a larger custom set reaches", () => {
+    const selected = sortIndexes([
+      ...selectIndexes(INDEXES, ["BCT"], []),
+      "GENOMIC_HUMAN",
+    ]);
+
+    expect(describeIndexSet(INDEXES, selected)).toBe(
+      "Searching 10 of 109 indexes: a custom set across 9 library types and 2 organism groups."
+    );
+  });
+
+  test("calls the whole registry all of it", () => {
+    expect(describeIndexSet(INDEXES, INDEXES)).toBe(
+      "Searching all 109 indexes."
+    );
   });
 });

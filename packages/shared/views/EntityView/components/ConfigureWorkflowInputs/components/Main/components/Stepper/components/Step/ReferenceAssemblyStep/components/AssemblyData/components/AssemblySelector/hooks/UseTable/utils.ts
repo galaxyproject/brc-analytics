@@ -1,5 +1,6 @@
 import { WORKFLOW_PLOIDY } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
+import { getEntities } from "@repo/shared/services/workflows/query";
 import { workflowRequiresAssemblyId } from "@repo/shared/workflow/utils";
 import { type ColumnFiltersState, type Table } from "@tanstack/react-table";
 import { CATEGORY_CONFIGS } from "./categoryConfigs";
@@ -43,6 +44,17 @@ export function getInitialColumnFilters(
   }
 
   return columnFilterState;
+}
+
+/**
+ * Returns the assemblies the selector table lists: the full assemblies list
+ * when the step is enabled, and none when it is disabled. A disabled step's
+ * assembly is fixed by the page, so the list is neither read nor needed.
+ * @param isEnabled - Whether the user can pick the assembly.
+ * @returns Assemblies to list.
+ */
+export function getTableData(isEnabled: boolean): Assembly[] {
+  return isEnabled ? getEntities<Assembly>("assemblies") : [];
 }
 
 /** Renders the summary row counts for the table.

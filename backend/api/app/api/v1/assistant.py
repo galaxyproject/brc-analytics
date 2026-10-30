@@ -86,7 +86,7 @@ async def assistant_chat(
     # it -- possession of the signed session cookie. Session IDs travel in
     # URLs (e.g. the assistantSessionId handoff param), so knowing the id
     # alone must not let a caller continue or mutate a session, anonymous or
-    # owned. No-ops in local/dev where SESSION_COOKIE_SECRET is unset.
+    # owned.
     if request.session_id:
         require_session_cookie(request.session_id, session_cookie)
 
@@ -118,6 +118,7 @@ async def assistant_chat(
             request.session_id,
             current_user.sub if current_user else None,
             turn_id=turn_id,
+            clear_fields=request.clear_fields,
             # The agent records the turn itself, success or failure -- it is
             # the only layer that knows the session it created before a
             # failure. Awaited inline: the insert is milliseconds against a
@@ -196,6 +197,9 @@ async def assistant_chat(
             # reply already succeeded, the one thing auto-save must never do.
             logger.exception("Failed to auto-save session %s", chat_response.session_id)
 
+    # Read after the auto-save, whose stamp teaches the state an id a first save
+    # just minted. Signed out, it is whatever the session already knew.
+    chat_response.saved_analysis_id = turn_state.saved_analysis_id
     set_session_cookie(response, chat_response.session_id)
     return chat_response
 
@@ -334,6 +338,9 @@ async def restore_session(
             and current_user is not None
             and state.owner_keycloak_sub == current_user.sub
         ),
+        # Unlike `saved`, not scoped to the caller: it only names the analysis,
+        # and reading that is still limited to its owner.
+        saved_analysis_id=state.saved_analysis_id,
     )
 
 

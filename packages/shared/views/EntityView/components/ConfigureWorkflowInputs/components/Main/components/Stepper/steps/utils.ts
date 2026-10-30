@@ -38,7 +38,7 @@ export function augmentConfiguredSteps(
  * Builds the steps for the stepper based on the workflow and workflow parameters.
  * Scope-aware: Different workflow scopes determine the steps:
  * - ASSEMBLY: Includes assembly selection, GTF, and sequencing steps
- * - ORGANISM: Includes sequencing steps based on workflow parameters
+ * - ORGANISM: Includes assembly collection and sequencing steps based on workflow parameters
  * - SEQUENCE: Includes sequence FASTA upload and accession count
  * @param workflow - Workflow.
  * @returns Steps.
@@ -100,6 +100,7 @@ export function buildSteps(workflow: Workflow): StepConfig[] {
     case WORKFLOW_SCOPE.ORGANISM:
       return deduplicateSteps(
         [
+          WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
           WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_FORWARD_FILE,
           WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_PAIRED,
           WORKFLOW_PARAMETER_VARIABLE.SANGER_READ_RUN_REVERSE_FILE,

@@ -3,11 +3,12 @@ import { StyledStack } from "./setup.styles";
 import type { Props } from "./types";
 
 /**
- * Right column of the assistant layout, holding the analysis setup.
+ * Right column of the assistant layout, holding the analysis setup. On narrow
+ * screens it is the setup tab.
  * @param props - Setup props.
  * @param props.children - Analysis setup panel.
  * @returns Setup column.
  */
-export const Setup = ({ children }: Props): JSX.Element => {
-  return <StyledStack>{children}</StyledStack>;
+export const Setup = ({ children, ...props }: Props): JSX.Element => {
+  return <StyledStack {...props}>{children}</StyledStack>;
 };

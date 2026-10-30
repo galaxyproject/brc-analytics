@@ -11,22 +11,27 @@ import type { FieldValueSelectorProps } from "./types";
  * Available statuses:
  * - `FILLED`: Displays the value as a chip.
  * - `NEEDS_ATTENTION`: Displays the reason the field needs attention.
- * - `EMPTY`, or any status this panel doesn't know: Displays "Not set". The
- *   backend deploys separately, so a new status degrades to unset rather
- *   than rendering a blank value.
+ * - `EMPTY`, or any status this panel doesn't know: Displays "Optional" for a
+ *   field optional for the chosen workflow, otherwise "Not set". The backend
+ *   deploys separately, so a new status degrades to unset rather than
+ *   rendering a blank value.
  *
  * @param props - Component props.
  * @param props.field - Field state.
  * @param props.fieldKey - Schema field key.
  * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.onSend - Sends a message to the assistant.
+ * @param props.onClearField - Clears a field without asking the assistant.
+ * @param props.onKeyboardClear - Moves focus off a chip cleared from the keyboard.
+ * @param props.optional - Whether the field is optional for the chosen workflow.
  * @returns The selected field value component.
  */
 export const FieldValueSelector = ({
   field,
   fieldKey,
   loading,
-  onSend,
+  onClearField,
+  onKeyboardClear,
+  optional,
 }: FieldValueSelectorProps): JSX.Element => {
   switch (field.status) {
     case FIELD_STATUS.FILLED:
@@ -35,12 +40,13 @@ export const FieldValueSelector = ({
           field={field}
           fieldKey={fieldKey}
           loading={loading}
-          onSend={onSend}
+          onClearField={onClearField}
+          onKeyboardClear={onKeyboardClear}
         />
       );
     case FIELD_STATUS.NEEDS_ATTENTION:
       return <AttentionValue field={field} />;
     default:
-      return <EmptyValue />;
+      return <EmptyValue optional={optional} />;
   }
 };

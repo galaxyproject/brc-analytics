@@ -40,6 +40,15 @@ export const BRC_PAGE_META = {
       "Configure a custom workflow for genome analysis on BRC Analytics.",
     pageTitle: "Custom Workflow",
   },
+  GENES: {
+    pageDescription:
+      "Search for genes across catalog assemblies on BRC Analytics.",
+    pageTitle: "Genes",
+  },
+  GENE_DETAIL: {
+    pageDescription: "View gene details on BRC Analytics.",
+    pageTitle: "Gene",
+  },
   HOME: {
     pageDescription: BRC_DEFAULT_DESCRIPTION,
   },
