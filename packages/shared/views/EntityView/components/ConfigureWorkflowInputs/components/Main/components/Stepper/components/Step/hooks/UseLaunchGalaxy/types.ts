@@ -37,6 +37,8 @@ export interface AssemblyConfiguredValue extends BaseConfiguredValue {
 export interface OrganismConfiguredValue extends BaseConfiguredValue {
   _scope: "ORGANISM";
   fastaCollection: string[] | null;
+  geneModelUrl: string | null;
+  referenceAssembly: string | null;
 }
 
 // SEQUENCE scope: workflows that operate on user-provided sequences
@@ -87,4 +89,11 @@ export interface Props {
 export interface UseLaunchGalaxy {
   onLaunchGalaxy: OnLaunchGalaxy;
   status: Status;
+}
+
+// Reference, gene model and assembly collection sent to the workflow landing
+export interface WorkflowLandingValues {
+  fastaCollection: string[] | null;
+  geneModelUrl: string | null;
+  referenceAssembly: string;
 }

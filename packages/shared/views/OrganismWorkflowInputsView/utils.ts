@@ -1,4 +1,24 @@
-import type { OrganismContract } from "@repo/shared/apis/types";
+import type {
+  AssemblyContract,
+  OrganismContract,
+} from "@repo/shared/apis/types";
+
+/**
+ * Finds the configured reference assembly among the organism's assemblies, so
+ * steps that read the reference (e.g. the GTF step) can use it on a page that
+ * doesn't load the assemblies list.
+ * @param assemblies - The organism's assemblies.
+ * @param referenceAssembly - Configured reference assembly accession, if any.
+ * @returns The reference assembly, or null when none is configured.
+ */
+export function findReferenceAssembly(
+  assemblies: AssemblyContract[] | undefined,
+  referenceAssembly: string | undefined
+): AssemblyContract | null {
+  return (
+    assemblies?.find(({ accession }) => accession === referenceAssembly) ?? null
+  );
+}
 
 /**
  * Projects a concrete organism entity onto the shared organism shape consumed by

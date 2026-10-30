@@ -10,6 +10,7 @@ import {
 import {
   buildRowSelection,
   getAddSelectionValidation,
+  getFastaCollectionData,
   renderButtonText,
 } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/components/AssembliesData/components/AssembliesSelector/utils";
 import { renderAssemblyRequirement } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/components/AssembliesData/components/DataSelector/utils";
@@ -18,7 +19,7 @@ import {
   hasEnoughAssemblies,
   isFastaCollectionConfigured,
 } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/utils";
-import { type Row } from "@tanstack/react-table";
+import { type Row, type Table } from "@tanstack/react-table";
 
 const WORKFLOW = {
   assemblyCountMax: null,
@@ -60,6 +61,15 @@ describe("isFastaCollectionConfigured", () => {
   test("returns false when fewer than the minimum are configured", () => {
     expect(
       isFastaCollectionConfigured({ fastaCollection: ["GCF_1.1"] }, WORKFLOW)
+    ).toBe(false);
+  });
+
+  test("returns false when more than the maximum are configured", () => {
+    expect(
+      isFastaCollectionConfigured(
+        { fastaCollection: ["GCF_1.1", "GCF_2.1", "GCF_3.1"] },
+        { ...WORKFLOW, assemblyCountMax: 2 }
+      )
     ).toBe(false);
   });
 
@@ -188,5 +198,35 @@ describe("getAddSelectionValidation", () => {
 
   test("returns undefined once the minimum is selected", () => {
     expect(getAddSelectionValidation(2, WORKFLOW)).toBeUndefined();
+  });
+});
+
+describe("getFastaCollectionData", () => {
+  const TABLE = {
+    getSelectedRowModel: () => ({
+      rows: [{ id: "GCF_1.1" }, { id: "GCF_2.1" }],
+    }),
+  } as unknown as Table<Assembly>;
+
+  test("configures the selected accessions", () => {
+    expect(getFastaCollectionData(TABLE, "fastaCollection", undefined)).toEqual(
+      { fastaCollection: ["GCF_1.1", "GCF_2.1"] }
+    );
+  });
+
+  test("keeps the reference and gene model when the reference is still selected", () => {
+    expect(getFastaCollectionData(TABLE, "fastaCollection", "GCF_2.1")).toEqual(
+      { fastaCollection: ["GCF_1.1", "GCF_2.1"] }
+    );
+  });
+
+  test("clears the reference and gene model when the reference is no longer selected", () => {
+    expect(getFastaCollectionData(TABLE, "fastaCollection", "GCF_3.1")).toEqual(
+      {
+        fastaCollection: ["GCF_1.1", "GCF_2.1"],
+        geneModelUrl: undefined,
+        referenceAssembly: undefined,
+      }
+    );
   });
 });

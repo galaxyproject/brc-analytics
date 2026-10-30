@@ -4,7 +4,11 @@ import {
   WORKFLOW_SCOPE,
 } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
-import { getConfiguredValues } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
+import {
+  buildWorkflowRunPayload,
+  getConfiguredValues,
+  getWorkflowLandingValues,
+} from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseLaunchGalaxy/utils";
 import type { ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 
 // Mock workflow constants to avoid pulling in unneeded modules
@@ -329,6 +333,238 @@ describe("getConfiguredValues - scope-based logic", () => {
 
       expect(result).toBeDefined();
       expect(result?._scope).toBe("ORGANISM");
+    });
+  });
+
+  describe("ORGANISM scope with an assembly collection", () => {
+    const COLLECTION_WORKFLOW: Workflow = {
+      ...BASE_WORKFLOW,
+      assemblyCountMax: null,
+      assemblyCountMin: 2,
+      parameters: [
+        {
+          key: "reference Fasta",
+          variable: WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL,
+        },
+        {
+          key: "reference GTF",
+          variable: WORKFLOW_PARAMETER_VARIABLE.GENE_MODEL_URL,
+        },
+        {
+          key: "unaligned sequences",
+          variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+        },
+      ],
+      scope: WORKFLOW_SCOPE.ORGANISM,
+    };
+
+    const COMPLETE_INPUT: ConfiguredInput = {
+      ...BASE_CONFIGURED_INPUT,
+      fastaCollection: ["GCF_1.1", "GCF_2.1"],
+      geneModelUrl: "https://example.org/GCF_1.1.ncbiGene.gtf.gz",
+      referenceAssembly: "GCF_1.1",
+    };
+
+    test("returns the collection, reference and gene model when all are configured", () => {
+      const result = getConfiguredValues(COMPLETE_INPUT, COLLECTION_WORKFLOW);
+
+      expect(result).toMatchObject({
+        _scope: "ORGANISM",
+        fastaCollection: ["GCF_1.1", "GCF_2.1"],
+        geneModelUrl: "https://example.org/GCF_1.1.ncbiGene.gtf.gz",
+        referenceAssembly: "GCF_1.1",
+      });
+    });
+
+    test("returns undefined when the collection is missing", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, fastaCollection: undefined },
+          COLLECTION_WORKFLOW
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns undefined when the collection is below the minimum", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, fastaCollection: ["GCF_1.1"] },
+          COLLECTION_WORKFLOW
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns undefined when the collection is above the maximum", () => {
+      expect(
+        getConfiguredValues(
+          {
+            ...COMPLETE_INPUT,
+            fastaCollection: ["GCF_1.1", "GCF_2.1", "GCF_3.1"],
+          },
+          { ...COLLECTION_WORKFLOW, assemblyCountMax: 2 }
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns undefined when the reference is missing", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, referenceAssembly: undefined },
+          COLLECTION_WORKFLOW
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns undefined when the reference is not in the collection", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, referenceAssembly: "GCF_3.1" },
+          COLLECTION_WORKFLOW
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns undefined while the gene model is loading", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, geneModelUrl: undefined },
+          COLLECTION_WORKFLOW
+        )
+      ).toBeUndefined();
+    });
+
+    test("returns value when the reference has no gene model (user upload)", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, geneModelUrl: null },
+          COLLECTION_WORKFLOW
+        )
+      ).toMatchObject({ geneModelUrl: null, referenceAssembly: "GCF_1.1" });
+    });
+
+    test("returns value when the gene model is left for user upload", () => {
+      expect(
+        getConfiguredValues(
+          { ...COMPLETE_INPUT, geneModelUrl: "" },
+          COLLECTION_WORKFLOW
+        )
+      ).toMatchObject({ geneModelUrl: "" });
+    });
+  });
+
+  describe("getWorkflowLandingValues", () => {
+    test("returns an organism-scoped workflow's collection, reference and gene model", () => {
+      expect(
+        getWorkflowLandingValues({
+          _scope: "ORGANISM",
+          fastaCollection: ["GCF_1.1", "GCF_2.1"],
+          geneModelUrl: "https://example.org/GCF_1.1.gtf.gz",
+          readRunPairedFile: null,
+          readRunSingleFile: null,
+          readRunsPaired: null,
+          readRunsSingle: null,
+          referenceAssembly: "GCF_1.1",
+          tracks: null,
+        })
+      ).toEqual({
+        fastaCollection: ["GCF_1.1", "GCF_2.1"],
+        geneModelUrl: "https://example.org/GCF_1.1.gtf.gz",
+        referenceAssembly: "GCF_1.1",
+      });
+    });
+
+    test("returns an empty reference for an organism-scoped workflow without one", () => {
+      expect(
+        getWorkflowLandingValues({
+          _scope: "ORGANISM",
+          fastaCollection: null,
+          geneModelUrl: null,
+          readRunPairedFile: null,
+          readRunSingleFile: null,
+          readRunsPaired: null,
+          readRunsSingle: null,
+          referenceAssembly: null,
+          tracks: null,
+        })
+      ).toEqual({
+        fastaCollection: null,
+        geneModelUrl: null,
+        referenceAssembly: "",
+      });
+    });
+
+    test("returns an assembly-scoped workflow's reference and gene model, and no collection", () => {
+      expect(
+        getWorkflowLandingValues({
+          _scope: "ASSEMBLY",
+          designFormula: null,
+          geneModelUrl: "https://example.org/hg38.gtf.gz",
+          primaryContrasts: null,
+          readRunPairedFile: null,
+          readRunSingleFile: null,
+          readRunsPaired: null,
+          readRunsSingle: null,
+          referenceAssembly: "GCF_000001405.40",
+          sampleSheet: null,
+          sampleSheetClassification: null,
+          strandedness: undefined,
+          tracks: null,
+        })
+      ).toEqual({
+        fastaCollection: null,
+        geneModelUrl: "https://example.org/hg38.gtf.gz",
+        referenceAssembly: "GCF_000001405.40",
+      });
+    });
+  });
+
+  describe("buildWorkflowRunPayload", () => {
+    test("records an organism-scoped workflow's reference and gene model", () => {
+      const payload = buildWorkflowRunPayload({
+        assistantSessionId: null,
+        configuredInput: {},
+        configuredValue: {
+          _scope: "ORGANISM",
+          fastaCollection: ["GCF_1.1", "GCF_2.1"],
+          geneModelUrl: "https://example.org/GCF_1.1.gtf.gz",
+          readRunPairedFile: null,
+          readRunSingleFile: null,
+          readRunsPaired: null,
+          readRunsSingle: null,
+          referenceAssembly: "GCF_1.1",
+          tracks: null,
+        },
+        handoffUrl: "https://galaxy.example.org/landing",
+        workflow: BASE_WORKFLOW,
+      });
+
+      expect(payload.assembly_accession).toBe("GCF_1.1");
+      expect(payload.parameters?.gene_model_url).toBe(
+        "https://example.org/GCF_1.1.gtf.gz"
+      );
+    });
+
+    test("records no reference for an organism-scoped workflow without one", () => {
+      const payload = buildWorkflowRunPayload({
+        assistantSessionId: null,
+        configuredInput: {},
+        configuredValue: {
+          _scope: "ORGANISM",
+          fastaCollection: null,
+          geneModelUrl: null,
+          readRunPairedFile: null,
+          readRunSingleFile: null,
+          readRunsPaired: null,
+          readRunsSingle: null,
+          referenceAssembly: null,
+          tracks: null,
+        },
+        handoffUrl: "https://galaxy.example.org/landing",
+        workflow: BASE_WORKFLOW,
+      });
+
+      expect(payload.assembly_accession).toBeNull();
+      expect(payload.parameters?.gene_model_url).toBeNull();
     });
   });
 

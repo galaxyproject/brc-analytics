@@ -5,12 +5,15 @@ import {
 import { WORKFLOW_PARAMETER_VARIABLE } from "@repo/shared/apis/schema-types";
 import type { Workflow } from "@repo/shared/apis/workflow";
 import type { WorkflowRunCreateRequest } from "@repo/shared/services/api-client/types";
+import { isFastaCollectionConfigured } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/FastaCollectionStep/utils";
 import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import {
   type ConfiguredValue,
   isAssemblyConfiguredValue,
+  isOrganismConfiguredValue,
   isSequenceConfiguredValue,
+  type WorkflowLandingValues,
 } from "./types";
 
 export function getRequiredParameterTypes(
@@ -134,6 +137,32 @@ function getAssemblyScopeConfiguredValues(
 }
 
 /**
+ * Determines whether an organism-scoped workflow's assembly inputs are
+ * configured: the assembly collection, the reference assembly (chosen from the
+ * collection) and the gene model, for those the workflow takes.
+ * @param configuredInput - Configured input.
+ * @param workflow - Workflow to check required parameters.
+ * @returns True when every assembly input the workflow takes is configured.
+ */
+function areOrganismAssemblyInputsConfigured(
+  configuredInput: ConfiguredInput,
+  workflow: Workflow
+): boolean {
+  const { fastaCollection, geneModelUrl, referenceAssembly } = configuredInput;
+  const requiredParams = getRequiredParameterTypes(workflow);
+  if (requiredParams.FASTA_COLLECTION) {
+    if (!isFastaCollectionConfigured(configuredInput, workflow)) return false;
+    // The reference is chosen from the assembly collection.
+    if (referenceAssembly && !fastaCollection?.includes(referenceAssembly))
+      return false;
+  }
+  if (requiredParams.ASSEMBLY_FASTA_URL && !referenceAssembly) return false;
+  // An undefined gene model is still loading. A null gene model (the reference
+  // has no GTF) is valid: the user provides one in Galaxy.
+  return !(requiredParams.GENE_MODEL_URL && geneModelUrl === undefined);
+}
+
+/**
  * Validates and returns configured values for ORGANISM scope workflows.
  * @param configuredInput - Configured input.
  * @param workflow - Workflow to check required parameters.
@@ -144,16 +173,20 @@ function getOrganismScopeConfiguredValues(
   workflow: Workflow
 ): ConfiguredValue | undefined {
   const {
+    fastaCollection,
+    geneModelUrl,
     readRunPairedFile,
     readRunSingleFile,
     readRunsPaired,
     readRunsSingle,
+    referenceAssembly,
   } = configuredInput;
 
   if (!workflow?.parameters) return;
 
   const requiredParams = getRequiredParameterTypes(workflow);
 
+  if (!areOrganismAssemblyInputsConfigured(configuredInput, workflow)) return;
   if (requiredParams.SANGER_READ_RUN_SINGLE && !readRunsSingle) return;
   if (requiredParams.SANGER_READ_RUN_PAIRED && !readRunsPaired) return;
   if (
@@ -170,11 +203,13 @@ function getOrganismScopeConfiguredValues(
 
   return {
     _scope: "ORGANISM",
-    fastaCollection: null,
+    fastaCollection: fastaCollection ?? null,
+    geneModelUrl: geneModelUrl ?? null,
     readRunPairedFile: readRunPairedFile ?? null,
     readRunSingleFile: readRunSingleFile ?? null,
     readRunsPaired: readRunsPaired ?? null,
     readRunsSingle: readRunsSingle ?? null,
+    referenceAssembly: referenceAssembly ?? null,
     tracks: null,
   };
 }
@@ -234,6 +269,31 @@ export function getConfiguredValues(
 }
 
 /**
+ * Returns the reference, gene model and assembly collection sent to the
+ * workflow landing: an assembly-scoped workflow's reference and gene model, or
+ * an organism-scoped workflow's reference, gene model and assembly collection.
+ * @param configuredValue - Configured values for the workflow.
+ * @returns Workflow landing values.
+ */
+export function getWorkflowLandingValues(
+  configuredValue: ConfiguredValue
+): WorkflowLandingValues {
+  if (isAssemblyConfiguredValue(configuredValue))
+    return {
+      fastaCollection: null,
+      geneModelUrl: configuredValue.geneModelUrl,
+      referenceAssembly: configuredValue.referenceAssembly,
+    };
+  if (isOrganismConfiguredValue(configuredValue))
+    return {
+      fastaCollection: configuredValue.fastaCollection,
+      geneModelUrl: configuredValue.geneModelUrl,
+      referenceAssembly: configuredValue.referenceAssembly ?? "",
+    };
+  return { fastaCollection: null, geneModelUrl: null, referenceAssembly: "" };
+}
+
+/**
  * Launches the Galaxy workflow.
  * Creates a hidden anchor element and clicks it to launch the workflow.
  * @param url - Galaxy URL.
@@ -275,9 +335,13 @@ export function buildWorkflowRunPayload({
   // before reading so the tracking payload tolerates any scope.
   const isAssembly = isAssemblyConfiguredValue(configuredValue);
   const isSequence = isSequenceConfiguredValue(configuredValue);
+  // The reference and gene model sent to Galaxy, for assembly- and
+  // organism-scoped workflows alike.
+  const { geneModelUrl, referenceAssembly } =
+    getWorkflowLandingValues(configuredValue);
 
   return {
-    assembly_accession: isAssembly ? configuredValue.referenceAssembly : null,
+    assembly_accession: referenceAssembly || null,
     assistant_session_id: assistantSessionId,
     galaxy_instance_url: galaxyInstanceUrl,
     handoff_url: handoffUrl,
@@ -286,9 +350,7 @@ export function buildWorkflowRunPayload({
       design_formula: isAssembly
         ? (configuredValue.designFormula ?? null)
         : null,
-      gene_model_url: isAssembly
-        ? (configuredValue.geneModelUrl ?? null)
-        : null,
+      gene_model_url: geneModelUrl ?? null,
       number_of_hits: isSequence
         ? (configuredValue.numberOfHits ?? null)
         : null,

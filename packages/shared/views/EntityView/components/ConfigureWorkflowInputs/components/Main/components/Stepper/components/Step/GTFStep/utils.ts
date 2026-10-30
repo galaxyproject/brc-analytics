@@ -1,5 +1,8 @@
 import { type UseRadioGroup } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/types";
-import { type OnConfigure } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
+import {
+  type ConfiguredInput,
+  type OnConfigure,
+} from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
 import { STEP } from "./step";
 
 /**
@@ -80,3 +83,15 @@ export const getPreferredGeneModel = (geneModelUrls: string[]): string => {
   }
   return "";
 };
+
+/**
+ * True when no gene model is configured: cleared or still loading
+ * (`undefined`), none available for the assembly (`null`), or left for upload
+ * in Galaxy (empty string).
+ * @param configuredInput - Configured workflow inputs.
+ * @param configuredInput.geneModelUrl - Configured gene model URL.
+ * @returns True if no gene model is configured.
+ */
+export const isGeneModelCleared = ({
+  geneModelUrl,
+}: ConfiguredInput): boolean => !geneModelUrl;
