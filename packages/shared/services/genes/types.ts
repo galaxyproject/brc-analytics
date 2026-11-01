@@ -25,6 +25,9 @@ export interface GeneOrganism {
 }
 
 export interface GeneTranscript {
+  // The transcript's GFF3 row ID: unique within the gene, and set even when
+  // transcriptId isn't.
+  gff3RowId: string;
   location: GeneLocation;
   proteinAccession: string | null;
   // The CDS's product: the protein's name.

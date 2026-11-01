@@ -1,21 +1,17 @@
-import { BackPageHero as BackPageHeroLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
+import { GenesPanel } from "@brc/components/Genes/genes.styles";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import Link from "next/link";
 import { type JSX } from "react";
-import { GENES_BREADCRUMBS } from "./constants";
-import {
-  GenesBackPageView,
-  GenesPanel,
-  ResultsTable,
-} from "./genesView.styles";
-
-interface ExampleGene {
-  geneUid: string;
-  locusTag: string;
-  note: string;
-  symbol: string | null;
-}
+import { StyledGrid, StyledTitle } from "./genesView.styles";
+import { type ExampleGene } from "./types";
 
 // Genes of P. falciparum 3D7 (GCF_000002765.6) in the temporary gene snapshot
 // (#1904), until search (#1905) replaces this list. Gene UIDs are UUID5s of the
@@ -92,38 +88,34 @@ const EXAMPLE_GENES: ExampleGene[] = [
 
 export const GenesView = (): JSX.Element => {
   return (
-    <GenesBackPageView>
-      <BackPageHeroLayout>
-        <BackPageHero
-          breadcrumbs={GENES_BREADCRUMBS}
-          subTitle="Example genes from Plasmodium falciparum 3D7 (GCF_000002765.6). Gene search is coming."
-          title="Genes"
-        />
-      </BackPageHeroLayout>
+    <StyledGrid>
+      <StyledTitle>Genes</StyledTitle>
       <GenesPanel>
-        <ResultsTable>
-          <thead>
-            <tr>
-              <th scope="col">Gene ID</th>
-              <th scope="col">Symbol</th>
-              <th scope="col">Example of</th>
-            </tr>
-          </thead>
-          <tbody>
-            {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
-              <tr key={geneUid}>
-                <td>
-                  <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
-                    {locusTag}
-                  </Link>
-                </td>
-                <td>{symbol ?? "—"}</td>
-                <td>{note}</td>
-              </tr>
-            ))}
-          </tbody>
-        </ResultsTable>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Gene ID</TableCell>
+                <TableCell>Symbol</TableCell>
+                <TableCell>Example of</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
+                <TableRow key={geneUid}>
+                  <TableCell>
+                    <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
+                      {locusTag}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{symbol ?? "—"}</TableCell>
+                  <TableCell>{note}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </GenesPanel>
-    </GenesBackPageView>
+    </StyledGrid>
   );
 };

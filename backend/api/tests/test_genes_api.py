@@ -86,6 +86,7 @@ def test_gene(client, gene_uid):
         },
         "transcripts": [
             {
+                "gff3RowId": "rna-XM_001347979.2",
                 "transcriptId": "XM_001347979.2",
                 "transcriptProduct": "apical membrane antigen 1",
                 "proteinAccession": "XP_001348015.1",

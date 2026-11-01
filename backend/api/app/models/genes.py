@@ -37,6 +37,9 @@ class GeneOrganism(_CamelModel):
 
 
 class GeneTranscript(_CamelModel):
+    # The transcript's GFF3 row ID: unique within the gene, and set even when
+    # transcript_id isn't.
+    gff3_row_id: str
     # Null when the annotation gives none, as for tRNAs and pseudogene
     # transcripts in NCBI's files.
     transcript_id: Optional[str]
