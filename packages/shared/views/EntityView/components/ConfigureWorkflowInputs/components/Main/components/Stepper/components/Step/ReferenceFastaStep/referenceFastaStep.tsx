@@ -34,7 +34,6 @@ import { configureReference, getReferenceOptions } from "./utils";
  * @param props.onConfigure - Callback to configure workflow input.
  * @param props.onContinue - Callback to continue to the next step.
  * @param props.onEdit - Callback to edit a completed step.
- * @param props.workflow - Workflow entity.
  * @returns Reference assembly step component.
  */
 export const ReferenceFastaStep = ({
@@ -47,11 +46,10 @@ export const ReferenceFastaStep = ({
   onConfigure,
   onContinue,
   onEdit,
-  workflow,
 }: StepProps): JSX.Element => {
   const { assemblies = [] } = useWorkflowEntity() ?? {};
   const { fastaCollection, referenceAssembly } = configuredInput;
-  const options = getReferenceOptions(assemblies, fastaCollection, workflow);
+  const options = getReferenceOptions(assemblies, fastaCollection);
   return (
     <Step active={active} completed={completed} index={index}>
       <StepLabel

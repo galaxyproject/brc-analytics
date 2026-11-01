@@ -1,9 +1,7 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
 import type { AssemblyContract } from "@repo/shared/apis/types";
-import type { Workflow } from "@repo/shared/apis/workflow";
 import { getGenomeStrainText } from "@repo/shared/viewModelBuilders/viewModelBuilders";
 import { type ConfiguredInput } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/types";
-import { workflowRequiresFastaCollection } from "@repo/shared/workflow/utils";
 import { type ReferenceOption } from "./types";
 
 /**
@@ -22,15 +20,12 @@ export function configureReference(
  * Returns the assemblies the reference can be chosen from.
  * @param assemblies - The organism's assemblies.
  * @param fastaCollection - Configured assembly collection accessions.
- * @param workflow - Workflow being configured.
  * @returns Reference candidates.
  */
 function getReferenceCandidates(
   assemblies: AssemblyContract[],
-  fastaCollection: ConfiguredInput["fastaCollection"],
-  workflow: Workflow
+  fastaCollection: ConfiguredInput["fastaCollection"]
 ): AssemblyContract[] {
-  if (!workflowRequiresFastaCollection(workflow)) return assemblies;
   const byAccession = new Map(
     assemblies.map((assembly) => [assembly.accession, assembly])
   );
@@ -41,20 +36,17 @@ function getReferenceCandidates(
 }
 
 /**
- * Returns the assemblies the reference can be chosen from: for a workflow that
- * takes an assembly collection, the assemblies picked for it, in the order
- * they were picked; otherwise every assembly of the organism.
+ * Returns the assemblies the reference can be chosen from: the assemblies
+ * picked for the assembly collection, in the order they were picked.
  * @param assemblies - The organism's assemblies.
  * @param fastaCollection - Configured assembly collection accessions.
- * @param workflow - Workflow being configured.
  * @returns Reference options.
  */
 export function getReferenceOptions(
   assemblies: AssemblyContract[],
-  fastaCollection: ConfiguredInput["fastaCollection"],
-  workflow: Workflow
+  fastaCollection: ConfiguredInput["fastaCollection"]
 ): ReferenceOption[] {
-  return getReferenceCandidates(assemblies, fastaCollection, workflow).map(
+  return getReferenceCandidates(assemblies, fastaCollection).map(
     (assembly) => ({
       description: getGenomeStrainText(assembly, LABEL.UNSPECIFIED),
       value: assembly.accession,

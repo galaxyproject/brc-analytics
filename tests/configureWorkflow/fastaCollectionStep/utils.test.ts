@@ -64,15 +64,6 @@ describe("isFastaCollectionConfigured", () => {
     ).toBe(false);
   });
 
-  test("returns false when more than the maximum are configured", () => {
-    expect(
-      isFastaCollectionConfigured(
-        { fastaCollection: ["GCF_1.1", "GCF_2.1", "GCF_3.1"] },
-        { ...WORKFLOW, assemblyCountMax: 2 }
-      )
-    ).toBe(false);
-  });
-
   test("returns true when the minimum is configured", () => {
     expect(
       isFastaCollectionConfigured(
@@ -209,24 +200,24 @@ describe("getFastaCollectionData", () => {
   } as unknown as Table<Assembly>;
 
   test("configures the selected accessions", () => {
-    expect(getFastaCollectionData(TABLE, "fastaCollection", undefined)).toEqual(
-      { fastaCollection: ["GCF_1.1", "GCF_2.1"] }
-    );
+    expect(
+      getFastaCollectionData(TABLE, "fastaCollection", undefined)
+    ).toStrictEqual({ fastaCollection: ["GCF_1.1", "GCF_2.1"] });
   });
 
   test("keeps the reference and gene model when the reference is still selected", () => {
-    expect(getFastaCollectionData(TABLE, "fastaCollection", "GCF_2.1")).toEqual(
-      { fastaCollection: ["GCF_1.1", "GCF_2.1"] }
-    );
+    expect(
+      getFastaCollectionData(TABLE, "fastaCollection", "GCF_2.1")
+    ).toStrictEqual({ fastaCollection: ["GCF_1.1", "GCF_2.1"] });
   });
 
   test("clears the reference and gene model when the reference is no longer selected", () => {
-    expect(getFastaCollectionData(TABLE, "fastaCollection", "GCF_3.1")).toEqual(
-      {
-        fastaCollection: ["GCF_1.1", "GCF_2.1"],
-        geneModelUrl: undefined,
-        referenceAssembly: undefined,
-      }
-    );
+    expect(
+      getFastaCollectionData(TABLE, "fastaCollection", "GCF_3.1")
+    ).toStrictEqual({
+      fastaCollection: ["GCF_1.1", "GCF_2.1"],
+      geneModelUrl: undefined,
+      referenceAssembly: undefined,
+    });
   });
 });

@@ -37,20 +37,15 @@ export function hasEnoughAssemblies(
 }
 
 /**
- * Determines whether the configured assemblies can run the workflow: at least
- * the required number, and no more than the workflow's maximum.
+ * Determines whether enough assemblies are configured to continue.
  * @param configuredInput - Configured workflow inputs.
  * @param configuredInput.fastaCollection - Configured assembly accessions.
  * @param workflow - Workflow being configured.
- * @returns True when the configured assemblies can run the workflow.
+ * @returns True when the configured assemblies are enough to run the workflow.
  */
 export function isFastaCollectionConfigured(
   { fastaCollection }: ConfiguredInput,
   workflow: Workflow
 ): boolean {
-  const count = fastaCollection?.length ?? 0;
-  if (!hasEnoughAssemblies(count, workflow)) return false;
-  return (
-    workflow.assemblyCountMax === null || count <= workflow.assemblyCountMax
-  );
+  return hasEnoughAssemblies(fastaCollection?.length ?? 0, workflow);
 }

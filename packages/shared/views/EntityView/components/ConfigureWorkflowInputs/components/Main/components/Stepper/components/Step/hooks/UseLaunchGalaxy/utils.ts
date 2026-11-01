@@ -138,8 +138,9 @@ function getAssemblyScopeConfiguredValues(
 
 /**
  * Determines whether an organism-scoped workflow's assembly inputs are
- * configured: the assembly collection, the reference assembly (chosen from the
- * collection) and the gene model, for those the workflow takes.
+ * configured: the assembly collection, the reference assembly and the gene
+ * model, for those the workflow takes. The collection step clears a reference
+ * that leaves the collection, so the reference isn't re-checked against it here.
  * @param configuredInput - Configured input.
  * @param workflow - Workflow to check required parameters.
  * @returns True when every assembly input the workflow takes is configured.
@@ -148,14 +149,13 @@ function areOrganismAssemblyInputsConfigured(
   configuredInput: ConfiguredInput,
   workflow: Workflow
 ): boolean {
-  const { fastaCollection, geneModelUrl, referenceAssembly } = configuredInput;
+  const { geneModelUrl, referenceAssembly } = configuredInput;
   const requiredParams = getRequiredParameterTypes(workflow);
-  if (requiredParams.FASTA_COLLECTION) {
-    if (!isFastaCollectionConfigured(configuredInput, workflow)) return false;
-    // The reference is chosen from the assembly collection.
-    if (referenceAssembly && !fastaCollection?.includes(referenceAssembly))
-      return false;
-  }
+  if (
+    requiredParams.FASTA_COLLECTION &&
+    !isFastaCollectionConfigured(configuredInput, workflow)
+  )
+    return false;
   if (requiredParams.ASSEMBLY_FASTA_URL && !referenceAssembly) return false;
   // An undefined gene model is still loading. A null gene model (the reference
   // has no GTF) is valid: the user provides one in Galaxy.

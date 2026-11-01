@@ -288,6 +288,81 @@ describe("buildWorkflows - assembly count resolution", () => {
     );
   });
 
+  test("ORGANISM scope ASSEMBLY_FASTA_URL workflow without FASTA_COLLECTION throws", async () => {
+    mockReadYamlFile.mockImplementation(async (path: string) => {
+      if (path.includes("workflow_categories")) {
+        return {
+          workflow_categories: [
+            {
+              category: "ASSEMBLY",
+              description: "d",
+              name: "n",
+              show_coming_soon: false,
+            },
+          ],
+        };
+      }
+      return {
+        workflows: [
+          {
+            ...BASE_SOURCE_WORKFLOW,
+            assembly_count_min: 1,
+            parameters: [
+              {
+                key: "reference",
+                variable: WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL,
+              },
+            ],
+            scope: "ORGANISM",
+          },
+        ],
+      };
+    });
+
+    await expect(buildWorkflows()).rejects.toThrow(
+      /must also have a FASTA_COLLECTION parameter/
+    );
+  });
+
+  test("ORGANISM scope ASSEMBLY_FASTA_URL workflow with FASTA_COLLECTION builds", async () => {
+    mockReadYamlFile.mockImplementation(async (path: string) => {
+      if (path.includes("workflow_categories")) {
+        return {
+          workflow_categories: [
+            {
+              category: "ASSEMBLY",
+              description: "d",
+              name: "n",
+              show_coming_soon: false,
+            },
+          ],
+        };
+      }
+      return {
+        workflows: [
+          {
+            ...BASE_SOURCE_WORKFLOW,
+            assembly_count_min: 1,
+            parameters: [
+              {
+                key: "assemblies",
+                variable: WORKFLOW_PARAMETER_VARIABLE.FASTA_COLLECTION,
+              },
+              {
+                key: "reference",
+                variable: WORKFLOW_PARAMETER_VARIABLE.ASSEMBLY_FASTA_URL,
+              },
+            ],
+            scope: "ORGANISM",
+          },
+        ],
+      };
+    });
+
+    const result = await buildWorkflows();
+    expect(result[0].workflows[0].scope).toBe(WORKFLOW_SCOPE.ORGANISM);
+  });
+
   test("max below min throws", async () => {
     mockReadYamlFile.mockImplementation(async (path: string) => {
       if (path.includes("workflow_categories")) {

@@ -258,6 +258,18 @@ function buildWorkflow(
     );
   }
 
+  // An organism-scoped workflow picks its reference FASTA from its assembly
+  // collection, so without a collection there is no reference to choose.
+  if (
+    resolvedScope === WorkflowScope.ORGANISM &&
+    variables.includes(WorkflowParameterVariable.ASSEMBLY_FASTA_URL) &&
+    !variables.includes(WorkflowParameterVariable.FASTA_COLLECTION)
+  ) {
+    throw new Error(
+      `Workflow "${workflowName}": an ORGANISM scope workflow with an ASSEMBLY_FASTA_URL parameter must also have a FASTA_COLLECTION parameter`
+    );
+  }
+
   // Get the up-to-date taxonomy ID from the taxonomy mapping, defaulting to the ID from the YAML
   const resolvedStringTaxonomyId =
     taxonomyId === null

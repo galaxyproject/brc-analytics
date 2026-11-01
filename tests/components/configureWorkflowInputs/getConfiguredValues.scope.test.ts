@@ -394,31 +394,10 @@ describe("getConfiguredValues - scope-based logic", () => {
       ).toBeUndefined();
     });
 
-    test("returns undefined when the collection is above the maximum", () => {
-      expect(
-        getConfiguredValues(
-          {
-            ...COMPLETE_INPUT,
-            fastaCollection: ["GCF_1.1", "GCF_2.1", "GCF_3.1"],
-          },
-          { ...COLLECTION_WORKFLOW, assemblyCountMax: 2 }
-        )
-      ).toBeUndefined();
-    });
-
     test("returns undefined when the reference is missing", () => {
       expect(
         getConfiguredValues(
           { ...COMPLETE_INPUT, referenceAssembly: undefined },
-          COLLECTION_WORKFLOW
-        )
-      ).toBeUndefined();
-    });
-
-    test("returns undefined when the reference is not in the collection", () => {
-      expect(
-        getConfiguredValues(
-          { ...COMPLETE_INPUT, referenceAssembly: "GCF_3.1" },
           COLLECTION_WORKFLOW
         )
       ).toBeUndefined();
