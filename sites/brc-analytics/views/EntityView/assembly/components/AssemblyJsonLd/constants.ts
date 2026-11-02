@@ -1,17 +1,15 @@
 import { BRC_DATA_CATALOG_CATEGORY_LABEL as LABEL } from "@site-config/brc-analytics/category";
 import { type VariableMeasured } from "./types";
 
-// The license the dataset records carry: CC0, as the catalog's metadata comes
-// from NCBI's public records.
-export const DATASET_LICENSE_URL =
-  "https://creativecommons.org/publicdomain/zero/1.0/";
-
 // The locale the description's numbers are written in, so the record reads the
 // same whatever the build machine's or reader's locale.
 export const DESCRIPTION_LOCALE = "en-US";
 
-// The gene model files are gzipped GTF.
+// The gene model files are gzipped GTF, from the UCSC Genome Browser's
+// downloads.
 export const GENE_MODEL_ENCODING_FORMAT = "application/gzip";
+export const GENE_MODEL_NAME =
+  "Gene annotation (GTF), from the UCSC Genome Browser";
 
 // Google Dataset Search reads at most 5000 characters of a description.
 export const MAX_DESCRIPTION_LENGTH = 5000;

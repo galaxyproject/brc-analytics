@@ -5,9 +5,9 @@ import { ENVIRONMENT, getEnvironment } from "@repo/shared/config/environment";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { NCBI_DATASETS_URL } from "@repo/shared/viewModelBuilders/constants";
 import {
-  DATASET_LICENSE_URL,
   DESCRIPTION_LOCALE,
   GENE_MODEL_ENCODING_FORMAT,
+  GENE_MODEL_NAME,
   MAX_DESCRIPTION_LENGTH,
   MISSING_TAXONOMIC_LEVEL,
   VARIABLES_MEASURED,
@@ -16,8 +16,9 @@ import { type SchemaDataset, type SchemaPropertyValue } from "./types";
 
 /**
  * Builds an assembly's schema.org Dataset record, for Google Dataset Search.
- * Optional fields are undefined, and so left out of the JSON, when the
- * assembly has nothing for them.
+ * The download is undefined, and so left out of the JSON, when the assembly
+ * has no gene model. BRC Analytics is named as the provider: the catalog
+ * doesn't record who made the assembly.
  * @param assembly - Assembly.
  * @param browserURL - The site's address.
  * @param appTitle - The site's name.
@@ -32,7 +33,6 @@ export function buildAssemblyJsonLd(
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    creator: { "@type": "Organization", name: appTitle, url: browserURL },
     datePublished: releaseDate,
     description: buildDescription(assembly),
     distribution: geneModelUrl
@@ -41,6 +41,7 @@ export function buildAssemblyJsonLd(
             "@type": "DataDownload",
             contentUrl: geneModelUrl,
             encodingFormat: GENE_MODEL_ENCODING_FORMAT,
+            name: GENE_MODEL_NAME,
           },
         ]
       : undefined,
@@ -51,9 +52,9 @@ export function buildAssemblyJsonLd(
       url: browserURL,
     },
     isAccessibleForFree: true,
-    keywords: nonEmpty(buildKeywords(assembly)),
-    license: DATASET_LICENSE_URL,
+    keywords: buildKeywords(assembly),
     name: buildName(assembly),
+    provider: { "@type": "Organization", name: appTitle, url: browserURL },
     sameAs: [
       `${NCBI_DATASETS_URL}/genome/${accession}`,
       ...(ucscBrowserUrl ? [ucscBrowserUrl] : []),
@@ -61,7 +62,7 @@ export function buildAssemblyJsonLd(
     url: `${browserURL}${replaceParameters(ROUTES.GENOME, {
       entityId: getGenomeId(assembly),
     })}`,
-    variableMeasured: nonEmpty(buildVariableMeasured(assembly)),
+    variableMeasured: buildVariableMeasured(assembly),
     version: parseVersion(accession),
   };
 }
@@ -71,7 +72,7 @@ export function buildAssemblyJsonLd(
  * and length.
  * @param assembly - Assembly.
  * @returns E.g. "Genome assembly GCA_000002825.3 of Trichomonas vaginalis G3,
- * at scaffold level, with 64,769 scaffolds, totalling 176,420,065 bp."
+ * at scaffold level, with 64,769 scaffolds, totaling 176,420,065 bp."
  */
 export function buildDescription(assembly: BRCDataCatalogGenome): string {
   const {
@@ -94,7 +95,7 @@ export function buildDescription(assembly: BRCDataCatalogGenome): string {
     `Genome assembly ${accession} of ${organism}`,
     `at ${level.toLowerCase()} level`,
     ...(counts.length > 0 ? [`with ${counts.join(" and ")}`] : []),
-    `totalling ${length.toLocaleString(DESCRIPTION_LOCALE)} bp.`,
+    `totaling ${length.toLocaleString(DESCRIPTION_LOCALE)} bp.`,
   ].join(", ");
   return truncateDescription(description);
 }
@@ -143,13 +144,13 @@ function buildVariableMeasured(
 ): SchemaPropertyValue[] {
   return VARIABLES_MEASURED.flatMap((variable) => {
     const value = assembly[variable.key];
-    if (value == null || value === "") return [];
+    if (value == null) return [];
     return [
       {
         "@type": "PropertyValue" as const,
         name: variable.name,
         ...("unitText" in variable ? { unitText: variable.unitText } : {}),
-        value: toNumber(value),
+        value: toNumber(value, variable.name),
       },
     ];
   });
@@ -167,21 +168,16 @@ function countOf(count: number | null, noun: string): string | null {
 }
 
 /**
- * A list, or undefined when it is empty, so that an empty field is left out.
- * @param items - List.
- * @returns The list, or undefined.
- */
-function nonEmpty<T>(items: T[]): T[] | undefined {
-  return items.length > 0 ? items : undefined;
-}
-
-/**
- * The version in an assembly accession, e.g. "3" for "GCA_000002825.3".
+ * The version in an assembly accession, e.g. "3" for "GCA_000002825.3". Every
+ * catalog accession has one, so one without fails the build.
  * @param accession - Assembly accession.
- * @returns The version, or undefined if the accession has none.
+ * @returns The version.
  */
-export function parseVersion(accession: string): string | undefined {
-  return accession.match(/\.(\d+)$/)?.[1];
+function parseVersion(accession: string): string {
+  const version = accession.match(/\.(\d+)$/)?.[1];
+  if (!version)
+    throw new Error(`Assembly accession ${accession} has no version`);
+  return version;
 }
 
 /**
@@ -198,15 +194,18 @@ export function serializeJsonLd(jsonLd: SchemaDataset): string {
 }
 
 /**
- * A statistic as a number when it reads as one, as the catalog writes coverage
- * as text (e.g. "7.2").
+ * A statistic as a number. The catalog writes coverage as text (e.g. "7.2"),
+ * always a number, so text that isn't one fails the build.
  * @param value - Statistic.
- * @returns The number, or the text if it isn't one.
+ * @param name - Statistic name, for the error message.
+ * @returns The number.
  */
-function toNumber(value: number | string): number | string {
-  if (typeof value === "number") return value;
+function toNumber(value: number | string, name: string): number {
   const number = Number(value);
-  return Number.isFinite(number) ? number : value;
+  if (!Number.isFinite(number)) {
+    throw new Error(`Assembly statistic ${name} is not a number: "${value}"`);
+  }
+  return number;
 }
 
 /**

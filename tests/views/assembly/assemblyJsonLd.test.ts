@@ -2,7 +2,6 @@ import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import {
   buildAssemblyJsonLd,
   buildDescription,
-  parseVersion,
   serializeJsonLd,
   shouldPublishDatasetRecords,
 } from "@brc/views/EntityView/assembly/components/AssemblyJsonLd/utils";
@@ -82,15 +81,15 @@ describe("buildAssemblyJsonLd", () => {
     expect(build(ASSEMBLY)).toStrictEqual({
       "@context": "https://schema.org",
       "@type": "Dataset",
-      creator: { "@type": "Organization", name: APP_TITLE, url: BROWSER_URL },
       datePublished: "2022-12-02",
       description:
-        "Genome assembly GCA_000002825.3 of Trichomonas vaginalis G3, at scaffold level, with 64,769 scaffolds, totalling 176,420,065 bp.",
+        "Genome assembly GCA_000002825.3 of Trichomonas vaginalis G3, at scaffold level, with 64,769 scaffolds, totaling 176,420,065 bp.",
       distribution: [
         {
           "@type": "DataDownload",
           contentUrl: ASSEMBLY.geneModelUrl,
           encodingFormat: "application/gzip",
+          name: "Gene annotation (GTF), from the UCSC Genome Browser",
         },
       ],
       identifier: "GCA_000002825.3",
@@ -106,8 +105,8 @@ describe("buildAssemblyJsonLd", () => {
         "Trichomonas",
         "Trichomonas vaginalis",
       ],
-      license: "https://creativecommons.org/publicdomain/zero/1.0/",
       name: "Trichomonas vaginalis — G3 (GCA_000002825.3)",
+      provider: { "@type": "Organization", name: APP_TITLE, url: BROWSER_URL },
       sameAs: [
         "https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000002825.3",
         "https://genome.ucsc.edu/h/GCA_000002825.3",
@@ -201,7 +200,7 @@ describe("buildDescription", () => {
         strainName: null,
       })
     ).toBe(
-      "Genome assembly GCA_000002825.3 of Trichomonas vaginalis, at complete genome level, with 1 chromosome and 2 scaffolds, totalling 176,420,065 bp."
+      "Genome assembly GCA_000002825.3 of Trichomonas vaginalis, at complete genome level, with 1 chromosome and 2 scaffolds, totaling 176,420,065 bp."
     );
   });
 
@@ -221,12 +220,6 @@ describe("serializeJsonLd", () => {
     const serialized = serializeJsonLd(jsonLd);
     expect(serialized).toContain('"name":"\\u003c/script\\u003e\\u0026"');
     expect(JSON.parse(serialized)).toStrictEqual(jsonLd);
-  });
-});
-
-describe("parseVersion", () => {
-  it("returns undefined for an accession with no version", () => {
-    expect(parseVersion("GCF_000002765")).toBeUndefined();
   });
 });
 

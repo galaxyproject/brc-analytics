@@ -14,6 +14,7 @@ export interface SchemaDataDownload {
   "@type": "DataDownload";
   contentUrl: string;
   encodingFormat: string;
+  name: string;
 }
 
 /**
@@ -22,20 +23,19 @@ export interface SchemaDataDownload {
 export interface SchemaDataset {
   "@context": "https://schema.org";
   "@type": "Dataset";
-  creator: SchemaOrganization;
   datePublished: string;
   description: string;
   distribution?: SchemaDataDownload[];
   identifier: string;
   includedInDataCatalog: SchemaDataCatalog;
   isAccessibleForFree: boolean;
-  keywords?: string[];
-  license: string;
+  keywords: string[];
   name: string;
+  provider: SchemaOrganization;
   sameAs: string[];
   url: string;
-  variableMeasured?: SchemaPropertyValue[];
-  version?: string;
+  variableMeasured: SchemaPropertyValue[];
+  version: string;
 }
 
 export interface SchemaOrganization {
@@ -48,7 +48,7 @@ export interface SchemaPropertyValue {
   "@type": "PropertyValue";
   name: string;
   unitText?: string;
-  value: number | string;
+  value: number;
 }
 
 export interface VariableMeasured {
