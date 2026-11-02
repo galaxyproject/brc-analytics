@@ -23,6 +23,7 @@ import {
 import {
   buildWorkflowRunPayload,
   getConfiguredValues,
+  getWorkflowLandingValues,
   launchGalaxy,
 } from "./utils";
 
@@ -96,19 +97,17 @@ async function getLandingUrlForWorkflow(
     );
   }
 
+  const { fastaCollection, geneModelUrl, referenceAssembly } =
+    getWorkflowLandingValues(configuredValue);
   return getWorkflowLandingUrl(
     workflow.trsId,
-    isAssemblyConfiguredValue(configuredValue)
-      ? configuredValue.referenceAssembly
-      : "",
-    isAssemblyConfiguredValue(configuredValue)
-      ? configuredValue.geneModelUrl
-      : null,
+    referenceAssembly,
+    geneModelUrl,
     configuredValue.readRunSingleFile,
     configuredValue.readRunsSingle,
     configuredValue.readRunPairedFile,
     configuredValue.readRunsPaired,
-    null,
+    fastaCollection,
     workflow.parameters,
     origin
   );

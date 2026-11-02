@@ -4,6 +4,7 @@ jest.mock(
   (): Record<string, unknown> => ({
     STEP: {
       ACCESSION_COUNT: { key: "numberOfHits", label: "Accessions to Download" },
+      ASSEMBLY_FASTA_URL: { key: "referenceAssembly" },
       ASSEMBLY_ID: { key: "ASSEMBLY_ID" },
       FASTA_COLLECTION: { key: "fastaCollection" },
       GENE_MODEL_URL: { key: "GENE_MODEL_URL" },
@@ -111,7 +112,7 @@ describe("buildSteps - scope handling", () => {
       expect(steps.map((s) => s.key)).toEqual(["SANGER_READ_RUN_PAIRED"]);
     });
 
-    test("returns the assemblies step for ORGANISM scope workflow with a FASTA collection parameter", () => {
+    test("returns the assemblies, reference assembly and GTF steps for ORGANISM scope workflow with a FASTA collection parameter", () => {
       const workflow: Workflow = {
         ...BASE_WORKFLOW,
         assemblyCountMax: null,
@@ -135,7 +136,11 @@ describe("buildSteps - scope handling", () => {
 
       const steps = buildSteps(workflow);
 
-      expect(steps.map((s) => s.key)).toEqual(["fastaCollection"]);
+      expect(steps.map((s) => s.key)).toEqual([
+        "fastaCollection",
+        "referenceAssembly",
+        "GENE_MODEL_URL",
+      ]);
     });
 
     test("orders the assemblies step before the sequencing steps", () => {

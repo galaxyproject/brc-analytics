@@ -25,6 +25,7 @@ import {
  * @param props.onClose - Callback to close the dialog.
  * @param props.onConfigure - Callback to configure workflow input.
  * @param props.open - Whether the dialog is open.
+ * @param props.referenceAssembly - Configured reference assembly accession, if any.
  * @param props.stepKey - Key identifying the configured input field.
  * @param props.table - Assemblies table instance.
  * @param props.workflow - Workflow entity.
@@ -35,6 +36,7 @@ export const AssembliesSelector = ({
   onClose,
   onConfigure,
   open,
+  referenceAssembly,
   stepKey,
   table,
   workflow,
@@ -66,7 +68,15 @@ export const AssembliesSelector = ({
             <Button
               {...BUTTON_PROPS.PRIMARY_CONTAINED}
               disabled={!!addValidation}
-              onClick={() => addSelection(table, stepKey, onConfigure, onClose)}
+              onClick={() =>
+                addSelection(
+                  table,
+                  stepKey,
+                  referenceAssembly,
+                  onConfigure,
+                  onClose
+                )
+              }
             >
               {renderButtonText(count)}
             </Button>
