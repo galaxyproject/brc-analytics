@@ -244,6 +244,20 @@ def test_the_app_serves_genes_from_its_local_snapshot(app_with_stubbed_agent):
     assert response.json()["gene"]["locusTag"] == "PF3D7_1133400"
 
 
+def test_the_app_starts_and_stops_a_local_snapshot(app_with_stubbed_agent):
+    # The lifespan starts every service; a local one is already open, so it
+    # must not start a loader that opens it a second time. Shutdown closes it.
+    with TestClient(app_with_stubbed_agent) as client:
+        service = get_gene_catalog_service()
+        assert service._loader is None
+        assert client.get("/api/v1/health").json()["genes"] == {
+            "status": "ready",
+            "source": "local",
+            "build_id": service.snapshot.build_id,
+        }
+    assert service._con is None
+
+
 def test_transcripts_are_in_genome_order(client, gene_uid):
     gene = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
     assert [t["transcriptId"] for t in gene["transcripts"]] == [
