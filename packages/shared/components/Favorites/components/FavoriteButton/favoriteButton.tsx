@@ -1,12 +1,13 @@
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Button, CircularProgress, Tooltip } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import {
   favoriteKey,
   useFavorites,
 } from "@repo/shared/providers/favorites/provider";
 import { type JSX } from "react";
+import { StyledButton, StyledTooltipAnchor } from "./favoriteButton.styles";
 import type { Props } from "./types";
 
 /**
@@ -46,15 +47,19 @@ export function FavoriteButton({
     // invisible to screen readers and to anyone on a touch device, both of whom
     // would otherwise read this as a save control that silently signs them in.
     return (
-      <Button onClick={login} startIcon={<StarBorderIcon />} variant="outlined">
+      <StyledButton
+        onClick={login}
+        startIcon={<StarBorderIcon />}
+        variant="outlined"
+      >
         Sign in to save
-      </Button>
+      </StyledButton>
     );
   }
 
   const favorited = isFavorited(entityType, entityId);
   const button = (
-    <Button
+    <StyledButton
       // Only this entity's own toggle disables it -- gating on the shared
       // isToggling flag would freeze every control on the page.
       // !hasLoaded is the load-failed case: the set is unknown, so the
@@ -69,7 +74,7 @@ export function FavoriteButton({
       variant={favorited ? "contained" : "outlined"}
     >
       {favorited ? "Saved" : "Save"}
-    </Button>
+    </StyledButton>
   );
 
   // A failed toggle stays clickable -- the next click clears the error and
@@ -84,7 +89,7 @@ export function FavoriteButton({
             : `Could not load your saved items: ${error.message}`
         }
       >
-        <span>{button}</span>
+        <StyledTooltipAnchor>{button}</StyledTooltipAnchor>
       </Tooltip>
     );
   }

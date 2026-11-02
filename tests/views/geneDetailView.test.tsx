@@ -44,20 +44,66 @@ const GENE: Gene = {
 
 const theme = createTheme();
 
+/**
+ * Renders the gene page for the given gene.
+ * @param gene - Gene.
+ */
+function renderGene(gene: Gene): void {
+  render(
+    <ThemeProvider theme={theme}>
+      <EmotionThemeProvider theme={theme}>
+        <GeneDetailView gene={gene} />
+      </EmotionThemeProvider>
+    </ThemeProvider>
+  );
+}
+
 describe("GeneDetailView", () => {
   it("links the organism to its species' organism page", () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <EmotionThemeProvider theme={theme}>
-          <GeneDetailView gene={GENE} />
-        </EmotionThemeProvider>
-      </ThemeProvider>
-    );
+    renderGene(GENE);
     const link = screen.getByRole("link", {
       name: "Plasmodium falciparum 3D7",
     });
     // The species' ID (5833), not the strain's (36329), which has no page.
     expect(link).toHaveAttribute("href", "/data/organisms/5833");
     expect(link).not.toHaveAttribute("target");
+  });
+
+  it("lists each transcript, with a dash for each missing value", () => {
+    const location = GENE.location;
+    renderGene({
+      ...GENE,
+      transcripts: [
+        {
+          gff3RowId: "rna-XM_001347979.2",
+          location,
+          proteinAccession: "XP_001348015.1",
+          proteinProduct: "apical membrane antigen 1",
+          transcriptId: "XM_001347979.2",
+          transcriptProduct: "apical membrane antigen 1",
+        },
+        // A transcript with no transcript ID or protein, as for a tRNA.
+        {
+          gff3RowId: "rna-PF3D7_1133400",
+          location,
+          proteinAccession: null,
+          proteinProduct: null,
+          transcriptId: null,
+          transcriptProduct: "tRNA-Ala",
+        },
+      ],
+    });
+    const [, first, second] = screen.getAllByRole("row");
+    expect(
+      Array.from(first.querySelectorAll("td"), (td) => td.textContent)
+    ).toStrictEqual([
+      "XM_001347979.2",
+      "apical membrane antigen 1",
+      "XP_001348015.1",
+      "apical membrane antigen 1",
+    ]);
+    expect(
+      Array.from(second.querySelectorAll("td"), (td) => td.textContent)
+    ).toStrictEqual(["—", "tRNA-Ala", "—", "—"]);
   });
 });

@@ -66,8 +66,8 @@ LIMIT 1
 """
 
 _TRANSCRIPTS_SQL = f"""
-SELECT transcript_id, transcript_product, protein_accession, protein_product,
-       {_LOCATION}
+SELECT gff3_row_id, transcript_id, transcript_product, protein_accession,
+       protein_product, {_LOCATION}
 FROM transcript
 WHERE gene_uid = ? AND asv_id = ?
 ORDER BY start, transcript_id, gff3_row_id
