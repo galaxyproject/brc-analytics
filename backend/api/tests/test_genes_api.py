@@ -22,6 +22,15 @@ def make_client(service: GeneCatalogService) -> TestClient:
     return TestClient(app)
 
 
+def altered_snapshot(tmp_path, sql: str) -> GeneCatalogService:
+    """A service over a copy of the checked-in snapshot, changed by sql."""
+    path = tmp_path / "genes.duckdb"
+    shutil.copy(DEFAULT_GENE_SNAPSHOT_PATH, path)
+    with duckdb.connect(str(path)) as con:
+        con.execute(sql)
+    return GeneCatalogService(str(path), "")
+
+
 @pytest.fixture(scope="module")
 def service():
     service = GeneCatalogService(
@@ -73,6 +82,7 @@ def test_gene(client, gene_uid):
         "symbol": "AMA1",
         "biotype": "protein_coding",
         "assemblyAccession": "GCF_000002765.6",
+        "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6",
         "organism": {
             "name": "Plasmodium falciparum 3D7",
             "speciesTaxonomyId": "5833",
@@ -146,6 +156,18 @@ def test_transcript_without_an_id(client, gene_uid):
     assert all(a["type"] != "transcript_id" for a in gene["aliases"])
 
 
+def test_assembly_without_a_ucsc_browser(tmp_path, gene_uid):
+    service = altered_snapshot(tmp_path, "UPDATE assembly SET ucsc_browser_url = NULL")
+    try:
+        response = make_client(service).get(
+            f"/api/v1/genes/{gene_uid('PF3D7_1133400')}"
+        )
+    finally:
+        service.close()
+    assert response.status_code == 200
+    assert response.json()["gene"]["ucscBrowserUrl"] is None
+
+
 def test_unknown_gene_is_404(client):
     response = client.get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 404
@@ -188,12 +210,7 @@ def test_concurrent_requests(service, gene_uid):
     ],
 )
 def test_snapshot_of_another_shape_is_unavailable(tmp_path, change):
-    path = tmp_path / "genes.duckdb"
-    shutil.copy(DEFAULT_GENE_SNAPSHOT_PATH, path)
-    con = duckdb.connect(str(path))
-    con.execute(change)
-    con.close()
-    service = GeneCatalogService(str(path), "")
+    service = altered_snapshot(tmp_path, change)
     assert not service.is_available()
     response = make_client(service).get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 503

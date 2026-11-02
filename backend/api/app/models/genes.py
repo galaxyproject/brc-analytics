@@ -78,6 +78,9 @@ class Gene(_CamelModel):
     symbol: Optional[str]
     biotype: Optional[str]
     assembly_accession: str
+    # The assembly's UCSC Genome Browser address; null when UCSC has no browser
+    # for it.
+    ucsc_browser_url: Optional[str]
     organism: GeneOrganism
     location: GeneLocation
     transcripts: List[GeneTranscript]

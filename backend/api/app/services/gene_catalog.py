@@ -45,6 +45,7 @@ _LOCATION = 'struct_pack(seq_name, start, "end", strand) AS location'
 
 _GENE_SQL = """
 SELECT g.locus_tag, g.name, g.symbol, g.biotype, g.assembly_accession,
+       a.ucsc_browser_url,
        struct_pack(
            name := a.organism_name,
            species_taxonomy_id := a.species_taxonomy_id,
