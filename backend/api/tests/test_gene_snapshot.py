@@ -404,3 +404,16 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
     target = genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
     assert target.read_bytes() == snapshot_bytes
     service.close()
+
+
+def test_a_snapshot_found_after_shutdown_is_not_opened(gene_snapshot_path):
+    # The download finished just as the app shut down: the loader must not
+    # open a connection on a service that is already closed.
+    def find_then_shut_down(stop):
+        service.close()
+        return gene_snapshot_path, None
+
+    service = GeneCatalogService("", "pinned", find_then_shut_down)
+    service._load()
+    assert service._con is None
+    assert service.status == "loading"

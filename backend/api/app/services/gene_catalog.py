@@ -153,6 +153,9 @@ class GeneCatalogService:
         self._find_snapshot = find_snapshot
         self._loader: Optional[threading.Thread] = None
         self._stop = threading.Event()
+        # Held while the loader publishes its connection and while close()
+        # takes it down, so a loader finishing at shutdown can't leave one open.
+        self._open_lock = threading.Lock()
 
     @classmethod
     def local(cls, path: str, frontend_url: str) -> "GeneCatalogService":
@@ -237,9 +240,13 @@ class GeneCatalogService:
         except BaseException:
             con.close()
             raise
-        self._con = con
-        self.snapshot = snapshot
-        self.status = "ready"
+        with self._open_lock:
+            if self._stop.is_set():
+                con.close()
+                raise DownloadStopped
+            self._con = con
+            self.snapshot = snapshot
+            self.status = "ready"
         logger.info("Gene snapshot loaded (%s): build %s", self.source, build_id)
 
     def health(self) -> Dict[str, Optional[str]]:
@@ -299,7 +306,8 @@ class GeneCatalogService:
         )
 
     def close(self) -> None:
-        self._stop.set()
-        if self._con is not None:
-            self._con.close()
-            self._con = None
+        with self._open_lock:
+            self._stop.set()
+            if self._con is not None:
+                self._con.close()
+                self._con = None
