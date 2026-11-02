@@ -1,6 +1,7 @@
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { config } from "@brc/config/config";
 import { BRC_PAGE_META } from "@brc/meta/constants";
+import { AssemblyJsonLd } from "@brc/views/EntityView/assembly/components/AssemblyJsonLd/assemblyJsonLd";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import { makeEntityStaticProps } from "@repo/shared/services/staticGeneration/entity/staticProps";
@@ -12,7 +13,8 @@ const ENTITY_LIST_TYPE = "assemblies";
 
 /**
  * Assembly detail page. Prerendered in full: the assembly record arrives via
- * props, so no entity list is loaded.
+ * props, so no entity list is loaded. In production, the page head carries
+ * the assembly's schema.org Dataset record, for Google Dataset Search.
  * @param props - Page props.
  * @param props.data - Assembly.
  * @param props.entityId - Assembly entity ID.
@@ -25,7 +27,14 @@ const Page = ({
   if (!data) return <></>;
 
   return (
-    <AssemblyView SideComponent={BRCSide} assembly={data} entityId={entityId} />
+    <>
+      <AssemblyJsonLd assembly={data} />
+      <AssemblyView
+        SideComponent={BRCSide}
+        assembly={data}
+        entityId={entityId}
+      />
+    </>
   );
 };
 
