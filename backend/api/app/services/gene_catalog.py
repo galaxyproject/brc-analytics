@@ -21,7 +21,11 @@ from uuid import UUID
 import duckdb
 
 from app.models.genes import Gene, GeneSnapshotInfo
-from app.services.gene_snapshot import DownloadStopped, fetch_pinned_snapshot
+from app.services.gene_snapshot import (
+    DownloadStopped,
+    SnapshotRejected,
+    fetch_pinned_snapshot,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +228,7 @@ class GeneCatalogService:
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
                 )
             if pinned_build_id is not None and build_id != pinned_build_id:
-                raise duckdb.InvalidInputException(
+                raise SnapshotRejected(
                     f"it is build {build_id}, not the pinned {pinned_build_id}"
                 )
             # Run each query once, so a missing table or column fails here
