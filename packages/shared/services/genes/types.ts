@@ -73,6 +73,9 @@ export interface Gene {
   status: "current" | "not_in_latest";
   symbol: string | null;
   transcripts: GeneTranscript[];
+  // The assembly's UCSC Genome Browser address; null when UCSC has no browser
+  // for it.
+  ucscBrowserUrl: string | null;
 }
 
 export interface GeneResponse {

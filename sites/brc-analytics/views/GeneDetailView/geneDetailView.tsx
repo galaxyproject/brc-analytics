@@ -19,6 +19,7 @@ import {
 } from "@repo/shared/services/genes/label";
 import Link from "next/link";
 import { type JSX } from "react";
+import { LocationValue } from "./components/LocationValue/locationValue";
 import { GENE_BREADCRUMBS } from "./constants";
 import {
   FieldLabel,
@@ -27,7 +28,6 @@ import {
   GeneBackPageView,
 } from "./geneDetailView.styles";
 import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
-import { formatLocation } from "./utils";
 
 export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
@@ -61,7 +61,12 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
             <Link href={assemblyHref}>{gene.assemblyAccession}</Link>
           </FieldValue>
           <FieldLabel>Location</FieldLabel>
-          <FieldValue>{formatLocation(gene.location)}</FieldValue>
+          <FieldValue>
+            <LocationValue
+              location={gene.location}
+              ucscBrowserUrl={gene.ucscBrowserUrl}
+            />
+          </FieldValue>
         </FieldList>
         <TableContainer>
           <Table>

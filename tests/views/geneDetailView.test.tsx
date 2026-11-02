@@ -2,9 +2,14 @@ import { GeneDetailView } from "@brc/views/GeneDetailView/geneDetailView";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { type Gene } from "@repo/shared/services/genes/types";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
+
+// findable-ui's StaticImage reads the base path from the router.
+jest.mock("next/router", () => ({
+  useRouter: (): { basePath: string } => ({ basePath: "" }),
+}));
 
 // AMA1, as the gene API returns it for the checked-in 3D7 snapshot. Typed in
 // full, not cast, so the type checker sees every GeneOrganism field.
@@ -40,7 +45,10 @@ const GENE: Gene = {
   status: "current",
   symbol: "AMA1",
   transcripts: [],
+  ucscBrowserUrl: "https://genome.ucsc.edu/h/GCF_000002765.6",
 };
+
+const LOCATION_TEXT = "NC_037282.1:1,292,966-1,296,696 (+)";
 
 const theme = createTheme();
 
@@ -67,6 +75,29 @@ describe("GeneDetailView", () => {
     // The species' ID (5833), not the strain's (36329), which has no page.
     expect(link).toHaveAttribute("href", "/data/organisms/5833");
     expect(link).not.toHaveAttribute("target");
+  });
+
+  it("links the location to UCSC at the gene's coordinates, in a new tab", () => {
+    renderGene(GENE);
+    const link = screen.getByRole("link", { name: /NC_037282\.1/ });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://genome.ucsc.edu/h/GCF_000002765.6?position=NC_037282.1:1292966-1296696"
+    );
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link).toHaveTextContent(LOCATION_TEXT);
+    expect(
+      within(link).getByRole("img", { name: "UCSC Genome Browser" })
+    ).toBeInTheDocument();
+  });
+
+  it("shows the location as plain text when the assembly has no UCSC browser", () => {
+    renderGene({ ...GENE, ucscBrowserUrl: null });
+    expect(screen.getByText(LOCATION_TEXT)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /NC_037282\.1/ })
+    ).not.toBeInTheDocument();
   });
 
   it("lists each transcript, with a dash for each missing value", () => {

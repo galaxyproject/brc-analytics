@@ -37,6 +37,7 @@ import {
   ENTITY_DETAIL_LABEL,
   GALAXY_DATACACHE,
   GENOME_BROWSER,
+  GENOME_BROWSER_IMAGE_PROPS,
   NCBI_ASSEMBLY,
   NCBI_DATASETS_URL,
   NCBI_TAXONOMY,
@@ -166,11 +167,7 @@ export const buildAssemblyResources = (
       ...(entity.ucscBrowserUrl
         ? [
             {
-              imageProps: {
-                alt: GENOME_BROWSER,
-                src: "/analysis-portals/ucsc-genome.webp",
-                width: 20,
-              },
+              imageProps: GENOME_BROWSER_IMAGE_PROPS,
               label: GENOME_BROWSER,
               url: entity.ucscBrowserUrl,
             },

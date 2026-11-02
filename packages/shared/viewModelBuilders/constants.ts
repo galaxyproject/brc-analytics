@@ -1,5 +1,12 @@
+import { type StaticImageProps } from "@databiosphere/findable-ui/lib/components/common/StaticImage/staticImage";
+
 export const GALAXY_DATACACHE = "Galaxy Data Cache";
 export const GENOME_BROWSER = "UCSC Genome Browser";
+export const GENOME_BROWSER_IMAGE_PROPS: Readonly<StaticImageProps> = {
+  alt: GENOME_BROWSER,
+  src: "/analysis-portals/ucsc-genome.webp",
+  width: 20,
+};
 export const NCBI_ASSEMBLY = "NCBI Genome Assembly";
 export const NCBI_TAXONOMY = "NCBI Taxonomy";
 export const NCBI_DATASETS_URL = "https://www.ncbi.nlm.nih.gov/datasets";
