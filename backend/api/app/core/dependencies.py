@@ -1,13 +1,14 @@
 import logging
 from datetime import datetime, timezone
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from fastapi import Cookie, Depends, Header, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheService
-from app.core.config import get_settings
+from app.core.config import GENE_SNAPSHOT_PIN_PATH, get_settings
 from app.core.galaxy_credential import GalaxyCredential
 from app.core.partner_keys import Partner, match_partner_key
 from app.core.rate_limit import RateLimiter
@@ -70,7 +71,13 @@ def get_sra_mirror_service() -> Optional[SRAMirrorService]:
 @lru_cache(maxsize=1)
 def get_gene_catalog_service() -> GeneCatalogService:
     settings = get_settings()
-    return GeneCatalogService(settings.GENE_SNAPSHOT_PATH, settings.FRONTEND_URL)
+    if settings.GENE_SNAPSHOT_PATH:
+        return GeneCatalogService.local(
+            settings.GENE_SNAPSHOT_PATH, settings.FRONTEND_URL
+        )
+    return GeneCatalogService.pinned(
+        GENE_SNAPSHOT_PIN_PATH, Path(settings.GENE_SNAPSHOT_DIR), settings.FRONTEND_URL
+    )
 
 
 @lru_cache(maxsize=1)
