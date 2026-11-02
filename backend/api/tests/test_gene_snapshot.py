@@ -257,6 +257,25 @@ def test_not_enough_disk_is_not_downloaded(
     assert store.requests == []
 
 
+def test_a_disk_failure_is_retried(tmp_path, store, snapshot_bytes, monkeypatch):
+    # Disk failures are retried like network ones: here the room appears
+    # before the second attempt.
+    usage = namedtuple("usage", "total used free")
+    checks = []
+
+    def disk_usage(_):
+        checks.append(1)
+        return usage(0, 0, len(snapshot_bytes) - (1 if len(checks) == 1 else 0))
+
+    monkeypatch.setattr(gene_snapshot.shutil, "disk_usage", disk_usage)
+    store.responses.append(httpx.Response(200, content=snapshot_bytes))
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "ready"
+    assert len(checks) == 2
+    assert len(store.requests) == 1
+    service.close()
+
+
 def test_a_partial_download_left_by_a_killed_process_is_cleared(
     tmp_path, store, snapshot_bytes, monkeypatch
 ):
