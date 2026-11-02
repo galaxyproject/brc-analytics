@@ -1,9 +1,9 @@
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import styled from "@emotion/styled";
 
-// The UCSC logo, the location and an off-site icon, inline so that a narrow
-// value column wraps the location's text rather than stacking the three.
-export const UcscLink = styled(Link)`
+// An optional logo, the text and an off-site icon, inline so that a narrow
+// value column wraps the text rather than stacking the three.
+export const StyledLink = styled(Link)`
   img,
   svg {
     vertical-align: middle;

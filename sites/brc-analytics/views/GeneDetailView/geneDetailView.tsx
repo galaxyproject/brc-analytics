@@ -17,9 +17,10 @@ import {
   geneSymbol,
   geneTitle,
 } from "@repo/shared/services/genes/label";
+import { GENOME_BROWSER_IMAGE_PROPS } from "@repo/shared/viewModelBuilders/constants";
 import Link from "next/link";
 import { type JSX } from "react";
-import { LocationValue } from "./components/LocationValue/locationValue";
+import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
 import { GENE_BREADCRUMBS } from "./constants";
 import {
   FieldLabel,
@@ -28,6 +29,7 @@ import {
   GeneBackPageView,
 } from "./geneDetailView.styles";
 import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
+import { formatLocation, getNcbiGeneUrl, getUcscPositionUrl } from "./utils";
 
 export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
@@ -49,7 +51,9 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
       <GenesPanel>
         <FieldList>
           <FieldLabel>Gene ID</FieldLabel>
-          <FieldValue>{label}</FieldValue>
+          <FieldValue>
+            <OffSiteLink text={label} url={getNcbiGeneUrl(gene.aliases)} />
+          </FieldValue>
           <FieldLabel>Symbol</FieldLabel>
           <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
           <FieldLabel>Organism</FieldLabel>
@@ -62,9 +66,10 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
           </FieldValue>
           <FieldLabel>Location</FieldLabel>
           <FieldValue>
-            <LocationValue
-              location={gene.location}
-              ucscBrowserUrl={gene.ucscBrowserUrl}
+            <OffSiteLink
+              imageProps={GENOME_BROWSER_IMAGE_PROPS}
+              text={formatLocation(gene.location)}
+              url={getUcscPositionUrl(gene.ucscBrowserUrl, gene.location)}
             />
           </FieldValue>
         </FieldList>
