@@ -39,7 +39,12 @@ def s3():
 
 
 def expect_upload(
-    stubber, snapshot, stored_size=None, already_published=False, region="us-west-2"
+    stubber,
+    snapshot,
+    stored_size=None,
+    stored_checksum=None,
+    already_published=False,
+    region="us-west-2",
 ):
     content = snapshot.read_bytes()
     checksum = base64.b64encode(hashlib.sha256(content).digest()).decode()
@@ -63,11 +68,11 @@ def expect_upload(
         "head_object",
         {
             "ContentLength": len(content) if stored_size is None else stored_size,
-            "ChecksumSHA256": checksum,
+            "ChecksumSHA256": stored_checksum or checksum,
         },
         {"Bucket": "genes", "Key": KEY, "ChecksumMode": "ENABLED"},
     )
-    if stored_size is None:
+    if stored_size is None and stored_checksum is None:
         stubber.add_response(
             "get_bucket_location",
             {"LocationConstraint": region} if region else {},
@@ -137,6 +142,17 @@ def test_other_upload_errors_stop_publishing(tmp_path, snapshot, s3):
 def test_no_pin_unless_the_store_holds_the_file(tmp_path, snapshot, s3):
     client, stubber = s3
     expect_upload(stubber, snapshot, stored_size=1)
+    pin_path = tmp_path / "snapshot-pin.json"
+    with pytest.raises(RuntimeError, match="doesn't match"):
+        pgs.publish_gene_snapshot(snapshot, "genes", pin_path, client)
+    assert not pin_path.exists()
+
+
+def test_no_pin_when_the_stored_checksum_differs(tmp_path, snapshot, s3):
+    # Same size, other contents: only the checksum tells them apart.
+    client, stubber = s3
+    other = base64.b64encode(hashlib.sha256(b"other").digest()).decode()
+    expect_upload(stubber, snapshot, stored_checksum=other, already_published=True)
     pin_path = tmp_path / "snapshot-pin.json"
     with pytest.raises(RuntimeError, match="doesn't match"):
         pgs.publish_gene_snapshot(snapshot, "genes", pin_path, client)
