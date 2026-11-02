@@ -127,6 +127,17 @@ def test_a_file_that_is_not_the_pinned_one_is_refused(
     assert os.listdir(tmp_path / "genes") == []
 
 
+def test_a_truncated_download_is_refused(tmp_path, store, snapshot_bytes, caplog):
+    # The connection closed early: the size check says so before the
+    # checksum does.
+    store.responses.append(httpx.Response(200, content=snapshot_bytes[:-1]))
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "unavailable"
+    assert len(store.requests) == 1
+    assert f"not the pinned {len(snapshot_bytes):,}" in caplog.text
+    assert os.listdir(tmp_path / "genes") == []
+
+
 def test_an_oversized_download_is_stopped_early(tmp_path, store, snapshot_bytes):
     # The store sends far more than the pin's size: reading stops just past
     # it rather than filling the disk.
