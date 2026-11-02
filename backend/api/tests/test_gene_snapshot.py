@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import shutil
+import threading
 from collections import namedtuple
 
 import duckdb
@@ -27,13 +28,16 @@ URL = "https://genes.test/snapshots/genes.duckdb"
 @pytest.fixture
 def store(monkeypatch):
     """A stand-in gene data store: answers with the queued responses in turn,
-    then with the last one, and records the URLs it was asked for."""
+    then with the last one, and records the URLs it was asked for. A queued
+    callable is called with the request for its answer."""
     responses = []
     requests = []
 
     def handler(request):
         requests.append(str(request.url))
         answer = responses[min(len(requests), len(responses)) - 1]
+        if callable(answer):
+            answer = answer(request)
         if isinstance(answer, Exception):
             raise answer
         return answer
@@ -314,13 +318,24 @@ def test_a_damaged_earlier_download_is_replaced(
 
 def test_shutdown_stops_the_retries(tmp_path, store, snapshot_bytes, monkeypatch):
     monkeypatch.setattr(gene_snapshot, "RETRY_WAITS", (600,))
-    store.responses.append(httpx.Response(403))
+    asked = threading.Event()
+
+    def refuse(request):
+        asked.set()
+        return httpx.Response(403)
+
+    store.responses.append(refuse)
     service = GeneCatalogService.pinned(
         write_pin(tmp_path / "pin.json", snapshot_bytes), tmp_path / "genes", ""
     )
     service.start()
+    # Shut down only once the first attempt has failed, so the loader is in
+    # (or headed for) the 600 second wait before the second.
+    assert asked.wait(timeout=5)
     service.close()
     assert not join_loader(service, timeout=5).is_alive()
+    assert len(store.requests) == 1
+    assert service.status == "loading"
 
 
 @pytest.fixture
