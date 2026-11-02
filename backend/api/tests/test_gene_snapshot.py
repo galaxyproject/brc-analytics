@@ -463,3 +463,27 @@ def test_a_snapshot_found_after_shutdown_is_not_opened(gene_snapshot_path):
     service._load()
     assert service._con is None
     assert service.status == "loading"
+
+
+def test_shutdown_stops_a_download_mid_stream(
+    tmp_path, store, snapshot_bytes, monkeypatch
+):
+    # One byte per chunk, so each byte sent is read as it comes.
+    monkeypatch.setattr(gene_snapshot, "_CHUNK_BYTES", 1)
+    sent = []
+
+    def endless():
+        while len(sent) < 1000:
+            sent.append(1)
+            if len(sent) == 2:
+                service.close()
+            yield b"x"
+
+    store.responses.append(httpx.Response(200, content=endless()))
+    service = GeneCatalogService.pinned(
+        write_pin(tmp_path / "pin.json", snapshot_bytes), tmp_path / "genes", ""
+    )
+    service._load()
+    assert len(sent) <= 3
+    assert service.status == "loading"
+    assert os.listdir(tmp_path / "genes") == []
