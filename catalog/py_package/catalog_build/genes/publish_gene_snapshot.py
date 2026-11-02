@@ -42,7 +42,14 @@ def snapshot_identity(path: Path) -> Dict[str, Any]:
         con.close()
     if row is None:
         raise ValueError(f"{path}: its snapshot table is empty")
-    return {"build_id": row[0], "schema_version": row[1]}
+    build_id, schema_version = row
+    # Checked here, not first by the backend when dev starts up with the pin.
+    if not isinstance(build_id, str) or type(schema_version) is not int:
+        raise ValueError(
+            f"{path}: its snapshot table has build ID {build_id!r} and schema"
+            f" version {schema_version!r}"
+        )
+    return {"build_id": build_id, "schema_version": schema_version}
 
 
 def file_sha256(path: Path) -> bytes:

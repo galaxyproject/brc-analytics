@@ -167,3 +167,27 @@ def test_a_build_id_a_pin_cant_name_is_not_uploaded(tmp_path, s3):
     with pytest.raises(ValueError, match="isn't one a pin can name"):
         pgs.publish_gene_snapshot(snapshot, "genes", pin_path, client)
     assert not pin_path.exists()
+
+
+@pytest.mark.parametrize(
+    "columns, row",
+    [
+        ("build_id VARCHAR, schema_version INTEGER", [None, 1]),
+        ("build_id VARCHAR, schema_version INTEGER", [BUILD_ID, None]),
+        ("build_id VARCHAR, schema_version VARCHAR", [BUILD_ID, "1"]),
+    ],
+    ids=["no build ID", "no schema version", "schema version as text"],
+)
+def test_a_snapshot_table_a_pin_cant_describe_is_not_uploaded(
+    tmp_path, s3, columns, row
+):
+    client, _ = s3
+    snapshot = tmp_path / "genes.duckdb"
+    con = duckdb.connect(str(snapshot))
+    con.execute(f"CREATE TABLE snapshot ({columns})")
+    con.execute("INSERT INTO snapshot VALUES (?, ?)", row)
+    con.close()
+    pin_path = tmp_path / "snapshot-pin.json"
+    with pytest.raises(ValueError, match="snapshot table"):
+        pgs.publish_gene_snapshot(snapshot, "genes", pin_path, client)
+    assert not pin_path.exists()
