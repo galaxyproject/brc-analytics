@@ -374,3 +374,33 @@ def test_the_committed_pin_is_one_this_release_reads():
     pin = read_pin(GENE_SNAPSHOT_PIN_PATH)
     assert pin.schema_version == SCHEMA_VERSION
     assert pin.url.endswith(f"/snapshots/{pin.build_id}.duckdb")
+
+
+def test_a_second_process_downloading_alongside_does_not_break_the_first(
+    tmp_path, store, snapshot_bytes
+):
+    # Another process starting on the same directory mid-download clears any
+    # partial file it finds and begins its own; that must not swap a
+    # half-written file in under this one.
+    genes = tmp_path / "genes"
+
+    def body():
+        yield snapshot_bytes[:100]
+        for stale in genes.glob("*.partial"):
+            stale.unlink()
+        (genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb.partial").write_bytes(
+            b"half-written"
+        )
+        yield snapshot_bytes[100:]
+
+    store.responses.extend(
+        [
+            httpx.Response(200, content=body()),
+            httpx.Response(200, content=snapshot_bytes),
+        ]
+    )
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "ready"
+    target = genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
+    assert target.read_bytes() == snapshot_bytes
+    service.close()

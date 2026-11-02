@@ -61,7 +61,7 @@ At startup the app's lifespan starts a background thread, so the download never 
 
 1. Read the pin, and check its `schema_version` is the backend's.
 2. If `<build_id>.duckdb` is already in the download directory (`GENE_SNAPSHOT_DIR`, `/data/genes` in the container) with the pinned size and SHA-256, as when the same container restarts, open it without downloading.
-3. Check the directory has room for the pinned size. Open `<build_id>.duckdb.partial` there, so a directory that can't be written to fails before any request, then stream the file into it from the pin's URL, hashing as it goes and stopping as soon as it exceeds the pinned size.
+3. Check the directory has room for the pinned size. Open a partial file of this attempt's own there (`<build_id>.duckdb.<random>.partial`, so a second process downloading into the same directory can't rename its half-written file into place under this one), so a directory that can't be written to fails before any request, then stream the file into it from the pin's URL, hashing as it goes and stopping as soon as it exceeds the pinned size.
 4. Check the size and SHA-256 match the pin, then rename the file into place.
 5. Open it, and check its `snapshot` table has the pin's build ID and the backend's `schema_version`. The checksum proves the file is the one published; this proves the pin describes it.
 
