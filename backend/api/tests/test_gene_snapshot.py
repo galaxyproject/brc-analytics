@@ -306,6 +306,7 @@ def test_a_partial_download_left_by_a_killed_process_is_cleared(
     assert load(tmp_path, pin_path).status == "ready"
 
 
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can write anywhere")
 def test_an_unwritable_directory_is_not_downloaded_to(tmp_path, store, snapshot_bytes):
     (tmp_path / "genes").mkdir(mode=0o500)
     service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
