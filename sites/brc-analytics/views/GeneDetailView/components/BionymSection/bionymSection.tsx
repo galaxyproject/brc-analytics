@@ -3,10 +3,6 @@ import { Link } from "@databiosphere/findable-ui/lib/components/Links/components
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Slider, Typography } from "@mui/material";
 import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
-import {
-  type BionymClaim,
-  type BionymSource,
-} from "@repo/shared/services/genes/types";
 import { formatDate } from "@repo/shared/utils/date-fns/utils";
 import { SectionTitle } from "@repo/shared/views/EntityView/ui/SectionTitle/sectionTitle";
 import { parseISO } from "date-fns";
@@ -30,7 +26,11 @@ import {
   DEFAULT_MIN_CONFIDENCE,
   SOURCE_KIND_LABEL,
 } from "./constants";
-import { type BionymSectionProps } from "./types";
+import {
+  type BionymSectionProps,
+  type ClaimItemProps,
+  type SourceListViewProps,
+} from "./types";
 import { countClaims, roundToStep, visibleSources } from "./utils";
 
 /**
@@ -105,6 +105,33 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
 };
 
 /**
+ * One claim, showing its text, with its quote in a tooltip on hover.
+ * Memoized: filtering keeps each claim object, so a slider move renders only
+ * the claims it adds.
+ * @param props - Component props.
+ * @param props.claim - The claim.
+ * @returns The claim.
+ */
+const ClaimItem = memo(function ClaimItem({
+  claim,
+}: ClaimItemProps): JSX.Element {
+  return (
+    <li>
+      {/* describeChild keeps the claim text as the item's accessible name, with
+          the quote as its description, rather than the quote replacing it. */}
+      <Tooltip arrow describeChild title={claim.quote}>
+        <Typography
+          component="span"
+          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
+        >
+          {claim.text}
+        </Typography>
+      </Tooltip>
+    </li>
+  );
+});
+
+/**
  * The sources shown, each with its claims. Memoized, so a slider move doesn't
  * re-render it until the sources shown change.
  * @param props - Component props.
@@ -113,9 +140,7 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
  */
 const SourceListView = memo(function SourceListView({
   sources,
-}: {
-  sources: BionymSource[];
-}): JSX.Element {
+}: SourceListViewProps): JSX.Element {
   return (
     <SourceList>
       {sources.map((source) => (
@@ -144,34 +169,5 @@ const SourceListView = memo(function SourceListView({
         </Source>
       ))}
     </SourceList>
-  );
-});
-
-/**
- * One claim, showing its text, with its quote in a tooltip on hover.
- * Memoized: filtering keeps each claim object, so a slider move renders only
- * the claims it adds.
- * @param props - Component props.
- * @param props.claim - The claim.
- * @returns The claim.
- */
-const ClaimItem = memo(function ClaimItem({
-  claim,
-}: {
-  claim: BionymClaim;
-}): JSX.Element {
-  return (
-    <li>
-      {/* describeChild keeps the claim text as the item's accessible name, with
-          the quote as its description, rather than the quote replacing it. */}
-      <Tooltip arrow describeChild title={claim.quote}>
-        <Typography
-          component="span"
-          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
-        >
-          {claim.text}
-        </Typography>
-      </Tooltip>
-    </li>
   );
 });

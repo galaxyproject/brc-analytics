@@ -1,3 +1,5 @@
+import type { SOURCE_KIND } from "./constants";
+
 /**
  * The gene snapshot an answer was read from.
  */
@@ -93,13 +95,15 @@ export interface BionymClaim {
   text: string;
 }
 
+export type BionymSourceKind = (typeof SOURCE_KIND)[keyof typeof SOURCE_KIND];
+
 /**
  * A paper or dataset BioNym drew claims from.
  */
 export interface BionymSource {
   claims: BionymClaim[];
   id: string;
-  kind: "dataset" | "paper";
+  kind: BionymSourceKind;
   title: string;
   // Null unless the graph gives an https: link.
   url: string | null;

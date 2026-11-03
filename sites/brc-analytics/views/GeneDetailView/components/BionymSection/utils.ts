@@ -11,6 +11,20 @@ export function countClaims(sources: BionymSource[]): number {
 }
 
 /**
+ * Round a slider value to the slider's step. The slider's arrow keys add the
+ * step without rounding, so five steps from 0.8 give 0.8500000000000001, which
+ * would hide the claims at 0.85 while the slider reads 0.85.
+ * @param value - A slider value.
+ * @returns The value, rounded to the step.
+ */
+export function roundToStep(value: number): number {
+  // Divide by the steps per unit (100) rather than multiply by the step (0.01):
+  // 95 * 0.01 is 0.9500000000000001, while 95 / 100 is 0.95.
+  const stepsPerUnit = Math.round(1 / CONFIDENCE_STEP);
+  return Math.round(value * stepsPerUnit) / stepsPerUnit;
+}
+
+/**
  * The sources and claims to show at a minimum confidence: each source's claims
  * at or above it, and the sources that have any, those with the most first.
  * Otherwise the API's order stands: sources by title, and claims by
@@ -35,18 +49,4 @@ export function visibleSources(
       // A stable sort, so sources with as many claims stay in title order.
       .sort((a, b) => b.claims.length - a.claims.length)
   );
-}
-
-/**
- * Round a slider value to the slider's step. The slider's arrow keys add the
- * step without rounding, so five steps from 0.8 give 0.8500000000000001, which
- * would hide the claims at 0.85 while the slider reads 0.85.
- * @param value - A slider value.
- * @returns The value, rounded to the step.
- */
-export function roundToStep(value: number): number {
-  // Divide by the steps per unit (100) rather than multiply by the step (0.01):
-  // 95 * 0.01 is 0.9500000000000001, while 95 / 100 is 0.95.
-  const stepsPerUnit = Math.round(1 / CONFIDENCE_STEP);
-  return Math.round(value * stepsPerUnit) / stepsPerUnit;
 }
