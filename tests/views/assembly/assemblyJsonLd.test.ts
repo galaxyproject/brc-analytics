@@ -87,6 +87,13 @@ describe("buildAssemblyJsonLd", () => {
       distribution: [
         {
           "@type": "DataDownload",
+          contentUrl:
+            "https://hgdownload.soe.ucsc.edu/hubs/GCA/000/002/825/GCA_000002825.3/GCA_000002825.3.fa.gz",
+          encodingFormat: "application/gzip",
+          name: "Genome sequence (FASTA), from the UCSC Genome Browser",
+        },
+        {
+          "@type": "DataDownload",
           contentUrl: ASSEMBLY.geneModelUrl,
           encodingFormat: "application/gzip",
           name: "Gene annotation (GTF), from the UCSC Genome Browser",
@@ -158,7 +165,10 @@ describe("buildAssemblyJsonLd", () => {
       scaffoldN50: null,
       ucscBrowserUrl: null,
     });
-    expect(jsonLd.distribution).toBeUndefined();
+    // The genome sequence is always listed.
+    expect(jsonLd.distribution.map(({ name }) => name)).toStrictEqual([
+      "Genome sequence (FASTA), from the UCSC Genome Browser",
+    ]);
     expect(jsonLd.sameAs).toStrictEqual([
       "https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000002825.3",
     ]);

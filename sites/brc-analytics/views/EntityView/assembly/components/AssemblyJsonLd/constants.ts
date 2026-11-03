@@ -5,11 +5,13 @@ import { type VariableMeasured } from "./types";
 // same whatever the build machine's or reader's locale.
 export const DESCRIPTION_LOCALE = "en-US";
 
-// The gene model files are gzipped GTF, from the UCSC Genome Browser's
-// downloads.
-export const GENE_MODEL_ENCODING_FORMAT = "application/gzip";
+// The downloads, the genome sequence (FASTA) and gene model (GTF), are gzipped
+// files from the UCSC Genome Browser's downloads.
+export const DOWNLOAD_ENCODING_FORMAT = "application/gzip";
 export const GENE_MODEL_NAME =
   "Gene annotation (GTF), from the UCSC Genome Browser";
+export const GENOME_SEQUENCE_NAME =
+  "Genome sequence (FASTA), from the UCSC Genome Browser";
 
 // Google Dataset Search reads at most 5000 characters of a description.
 export const MAX_DESCRIPTION_LENGTH = 5000;

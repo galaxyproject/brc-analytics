@@ -25,7 +25,7 @@ export interface SchemaDataset {
   "@type": "Dataset";
   datePublished: string;
   description: string;
-  distribution?: SchemaDataDownload[];
+  distribution: SchemaDataDownload[];
   identifier: string;
   includedInDataCatalog: SchemaDataCatalog;
   isAccessibleForFree: boolean;

@@ -3,22 +3,27 @@ import { getGenomeId } from "@brc/apis/utils";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ENVIRONMENT, getEnvironment } from "@repo/shared/config/environment";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { buildFastaUrl } from "@repo/shared/utils/galaxy-api/url-utils";
 import { NCBI_DATASETS_URL } from "@repo/shared/viewModelBuilders/constants";
 import {
   DESCRIPTION_LOCALE,
-  GENE_MODEL_ENCODING_FORMAT,
+  DOWNLOAD_ENCODING_FORMAT,
   GENE_MODEL_NAME,
+  GENOME_SEQUENCE_NAME,
   MAX_DESCRIPTION_LENGTH,
   MISSING_TAXONOMIC_LEVEL,
   VARIABLES_MEASURED,
 } from "./constants";
-import { type SchemaDataset, type SchemaPropertyValue } from "./types";
+import {
+  type SchemaDataDownload,
+  type SchemaDataset,
+  type SchemaPropertyValue,
+} from "./types";
 
 /**
  * Builds an assembly's schema.org Dataset record, for Google Dataset Search.
- * The download is undefined, and so left out of the JSON, when the assembly
- * has no gene model. BRC Analytics is named as the provider: the catalog
- * doesn't record who made the assembly.
+ * BRC Analytics is named as the provider: the catalog doesn't record who made
+ * the assembly.
  * @param assembly - Assembly.
  * @param browserURL - The site's address.
  * @param appTitle - The site's name.
@@ -29,22 +34,13 @@ export function buildAssemblyJsonLd(
   browserURL: string,
   appTitle: string
 ): SchemaDataset {
-  const { accession, geneModelUrl, releaseDate, ucscBrowserUrl } = assembly;
+  const { accession, releaseDate, ucscBrowserUrl } = assembly;
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
     datePublished: releaseDate,
     description: buildDescription(assembly),
-    distribution: geneModelUrl
-      ? [
-          {
-            "@type": "DataDownload",
-            contentUrl: geneModelUrl,
-            encodingFormat: GENE_MODEL_ENCODING_FORMAT,
-            name: GENE_MODEL_NAME,
-          },
-        ]
-      : undefined,
+    distribution: buildDistribution(assembly),
     identifier: accession,
     includedInDataCatalog: {
       "@type": "DataCatalog",
@@ -98,6 +94,37 @@ export function buildDescription(assembly: BRCDataCatalogGenome): string {
     `totaling ${length.toLocaleString(DESCRIPTION_LOCALE)} bp.`,
   ].join(", ");
   return truncateDescription(description);
+}
+
+/**
+ * The assembly's downloads: its genome sequence (FASTA), then its gene model
+ * (GTF) when it has one, both from the UCSC Genome Browser's downloads.
+ * @param assembly - Assembly.
+ * @returns The downloads.
+ */
+function buildDistribution(
+  assembly: BRCDataCatalogGenome
+): SchemaDataDownload[] {
+  const { accession, geneModelUrl } = assembly;
+  return [
+    buildDownload(buildFastaUrl(accession), GENOME_SEQUENCE_NAME),
+    ...(geneModelUrl ? [buildDownload(geneModelUrl, GENE_MODEL_NAME)] : []),
+  ];
+}
+
+/**
+ * A gzipped download from the UCSC Genome Browser's downloads.
+ * @param contentUrl - The file's address.
+ * @param name - The download's name.
+ * @returns The download.
+ */
+function buildDownload(contentUrl: string, name: string): SchemaDataDownload {
+  return {
+    "@type": "DataDownload",
+    contentUrl,
+    encodingFormat: DOWNLOAD_ENCODING_FORMAT,
+    name,
+  };
 }
 
 /**
