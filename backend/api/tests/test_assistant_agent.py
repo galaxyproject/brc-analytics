@@ -26,6 +26,7 @@ from app.models.assistant import (
     MessageRole,
     SchemaField,
     SessionState,
+    SuggestionChip,
 )
 from app.models.galaxy import GalaxyJobState
 from app.services.assistant_agent import (
@@ -2594,7 +2595,24 @@ class TestDeriveSuggestions:
         assert "Use the reference assembly" not in labels
         assert "Show me the available assemblies" in labels
 
-    def test_all_filled_offers_handoff(self, agent):
+    def test_ready_to_hand_off_offers_no_suggestions(self, agent):
+        schema = AnalysisSchema(
+            organism=_filled_field("Saccharomyces cerevisiae"),
+            assembly=_filled_field("S288C GCF_000146045.2", "GCF_000146045.2"),
+            analysis_type=_filled_field("Transcriptomics"),
+            workflow=_filled_field(
+                "RNA-Seq PE", "#workflow/github.com/iwc/rnaseq-pe/main"
+            ),
+            data_source=_filled_field("ENA"),
+            data_characteristics=_filled_field("paired-end RNA-seq"),
+        )
+        assert agent.compute_handoff(schema)[0] is True
+        assert agent._derive_suggestions(schema) == []
+
+    def test_all_chosen_but_not_ready_offers_no_suggestions(self, agent):
+        # The user's fields are set, but nothing resolved to an assembly
+        # accession or workflow id, so there is no handoff yet. A chip would
+        # ask the model about a setup the panel shows as complete (#1955).
         schema = AnalysisSchema()
         for name in (
             "organism",
@@ -2604,8 +2622,8 @@ class TestDeriveSuggestions:
             "data_source",
         ):
             setattr(schema, name, SchemaField(value="x", status=FieldStatus.FILLED))
-        chips = agent._derive_suggestions(schema)
-        assert [c.label for c in chips] == ["Continue to workflow setup"]
+        assert agent.compute_handoff(schema)[0] is False
+        assert agent._derive_suggestions(schema) == []
 
 
 LOGAN_META = {
@@ -3243,6 +3261,11 @@ class TestPanelClears:
         # it: nothing changed, so there is nothing for the model to answer.
         state = _filled_session(agent)
         state.schema_state.data_source = SchemaField()
+        # A chip stored under older suggestion rules must not be handed back.
+        stale = SuggestionChip(
+            label="Continue to workflow setup", message="Continue to workflow setup"
+        )
+        state.suggestions = [stale]
         before = list(state.messages)
         resp = await agent.chat(None, session_id="s1", clear_fields=["data_source"])
 
@@ -3250,6 +3273,8 @@ class TestPanelClears:
         assert resp.note is None
         assert resp.reply == ""
         assert resp.schema_state.organism.value == "Plasmodium falciparum"
+        assert stale not in resp.suggestions
+        assert resp.suggestions == agent._derive_suggestions(state.schema_state)
         agent._run_agent_with_retry.assert_not_awaited()
         agent.session_service.save_session.assert_not_awaited()
 

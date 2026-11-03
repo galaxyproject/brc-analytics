@@ -1343,7 +1343,11 @@ class AssistantAgent:
                 session_id=state.session_id,
                 reply="",
                 schema_state=state.schema_state,
-                suggestions=state.suggestions,
+                # Re-derived, not the stored copy, so a session saved under
+                # older suggestion rules doesn't hand them back.
+                suggestions=self._derive_suggestions(
+                    state.schema_state, logan=state.metadata.get("logan")
+                ),
                 is_complete=is_complete,
                 handoff_url=handoff_url,
                 logan=logan_context_from(state.metadata),
@@ -1752,6 +1756,7 @@ class AssistantAgent:
         chips that are always consistent with the tracker. Chips that name a
         specific entity are tagged and validated through _build_suggestion_chips
         (#1297); anything that can't be grounded falls back to generic actions.
+        No chips are offered once every field the user chooses is set.
         Fail-soft: any lookup problem degrades to a generic chip.
         """
 
@@ -1811,7 +1816,12 @@ class AssistantAgent:
                         {"label": "I'll pull data from ENA/SRA"},
                     ]
             else:
-                proposals = [{"label": "Continue to workflow setup"}]
+                # Nothing is suggested: the handoff goes through the Continue
+                # button, which carries the captured inputs, and a chip would
+                # only send its label to the model as a chat message. When the
+                # assembly didn't resolve to an accession there's no Continue
+                # button either; clearing that assembly is the fix (#1955).
+                proposals = []
         except Exception:
             logger.warning(
                 "Suggestion derivation failed; falling back to a generic chip",
