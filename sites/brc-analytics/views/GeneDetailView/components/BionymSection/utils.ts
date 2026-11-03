@@ -10,15 +10,6 @@ export function countClaims(sources: BionymSource[]): number {
 }
 
 /**
- * Format a confidence for display, to two decimal places.
- * @param confidence - A confidence, from 0 to 1.
- * @returns The formatted confidence.
- */
-export function formatConfidence(confidence: number): string {
-  return confidence.toFixed(2);
-}
-
-/**
  * The sources and claims to show at a minimum confidence: each source's claims
  * at or above it, and the sources that have any, those with the most first.
  * Otherwise the API's order stands: sources by title, and claims by

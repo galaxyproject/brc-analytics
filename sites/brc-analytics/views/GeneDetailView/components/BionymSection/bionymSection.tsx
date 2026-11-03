@@ -2,6 +2,7 @@ import { GenesPanel } from "@brc/components/Genes/genes.styles";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Slider, Typography } from "@mui/material";
+import { Tooltip } from "@repo/shared/components/Tooltip/tooltip";
 import {
   type BionymClaim,
   type BionymSource,
@@ -18,10 +19,8 @@ import {
   useState,
 } from "react";
 import {
-  Claim,
   ClaimList,
   ConfidenceControl,
-  Quote,
   Source,
   SourceList,
 } from "./bionymSection.styles";
@@ -31,7 +30,7 @@ import {
   SOURCE_KIND_LABEL,
 } from "./constants";
 import { type BionymSectionProps } from "./types";
-import { countClaims, formatConfidence, visibleSources } from "./utils";
+import { countClaims, visibleSources } from "./utils";
 
 /**
  * The claims BioNym drew about a gene, grouped by source, with a slider that
@@ -70,7 +69,8 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
         language model, and each was scored by{" "}
         <Link label="BioNym" url={BIONYM_URL} /> with a confidence from 0 to 1.
         They are BioNym&apos;s judgments, not facts about the gene. BioNym
-        gathered them on {formatDate(parseISO(bionym.runDate))}.
+        gathered them on {formatDate(parseISO(bionym.runDate))}. Hover over a
+        claim to see the quote it was drawn from.
       </Typography>
       <ConfidenceControl>
         <Typography
@@ -145,8 +145,9 @@ const SourceListView = memo(function SourceListView({
 });
 
 /**
- * One claim, with its confidence and quote. Memoized: filtering keeps each
- * claim object, so a slider move renders only the claims it adds.
+ * One claim, showing its text, with its quote in a tooltip on hover.
+ * Memoized: filtering keeps each claim object, so a slider move renders only
+ * the claims it adds.
  * @param props - Component props.
  * @param props.claim - The claim.
  * @returns The claim.
@@ -157,22 +158,17 @@ const ClaimItem = memo(function ClaimItem({
   claim: BionymClaim;
 }): JSX.Element {
   return (
-    <Claim>
-      <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
-        {claim.text}{" "}
+    <li>
+      {/* describeChild keeps the claim text as the item's accessible name, with
+          the quote as its description, rather than the quote replacing it. */}
+      <Tooltip arrow describeChild title={claim.quote}>
         <Typography
-          color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
           component="span"
-          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}
+          variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}
         >
-          (confidence {formatConfidence(claim.confidence)})
+          {claim.text}
         </Typography>
-      </Typography>
-      <Quote>
-        <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}>
-          {claim.quote}
-        </Typography>
-      </Quote>
-    </Claim>
+      </Tooltip>
+    </li>
   );
 });

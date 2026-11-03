@@ -222,14 +222,15 @@ describe("GeneDetailView's BioNym section", () => {
     ).toHaveAttribute("href", "https://github.com/d-callan/bionym");
   });
 
-  it("shows claims at or above 0.8, by source, with their quotes", () => {
+  it("shows claims at or above 0.8, by source, as their text alone", () => {
     renderGene(GENE, BIONYM);
     const section = getSection();
     expect(section).toHaveTextContent("3 of 4 claims");
     // The source with more claims shown comes first.
     expect(sourceTitles()).toStrictEqual(["B dataset", "A paper"]);
-    expect(section).toHaveTextContent("Claim B1 (confidence 0.99)");
-    expect(within(section).getByText("Quote B1.")).toBeInTheDocument();
+    expect(within(section).getByText("Claim B1")).toBeInTheDocument();
+    expect(section).not.toHaveTextContent("Quote B1.");
+    expect(section).not.toHaveTextContent("0.99");
     expect(within(section).queryByText("Claim A2")).not.toBeInTheDocument();
     expect(
       within(section).getByRole("link", { name: "A paper" })
@@ -249,6 +250,12 @@ describe("GeneDetailView's BioNym section", () => {
     expect(getSection()).toHaveTextContent("4 of 4 claims");
     // Tied on claims shown, the sources are in title order.
     expect(sourceTitles()).toStrictEqual(["A paper", "B dataset"]);
-    expect(within(getSection()).getByText("Quote A2.")).toBeInTheDocument();
+    expect(within(getSection()).getByText("Claim A2")).toBeInTheDocument();
+  });
+
+  it("shows a claim's quote in a tooltip on hover", async () => {
+    renderGene(GENE, BIONYM);
+    fireEvent.mouseOver(within(getSection()).getByText("Claim B1"));
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Quote B1.");
   });
 });

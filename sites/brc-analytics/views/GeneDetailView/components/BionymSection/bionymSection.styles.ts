@@ -1,4 +1,3 @@
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
 // The label, slider and count on one row, wrapping onto more on a narrow
@@ -37,16 +36,4 @@ export const ClaimList = styled.ul`
   gap: 12px;
   margin: 0;
   padding-left: 20px;
-`;
-
-export const Claim = styled.li`
-  display: grid;
-  gap: 4px;
-`;
-
-export const Quote = styled.blockquote`
-  border-left: 3px solid ${PALETTE.SMOKE_MAIN};
-  color: ${PALETTE.INK_LIGHT};
-  margin: 0;
-  padding-left: 12px;
 `;
