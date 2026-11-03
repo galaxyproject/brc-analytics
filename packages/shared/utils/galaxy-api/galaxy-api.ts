@@ -44,7 +44,7 @@ import {
   type WorkflowLandingsBodyRequestState,
   type WorkflowParameterValue,
 } from "./types";
-import { ftpToAscp } from "./url-utils";
+import { buildFastaUrl, ftpToAscp } from "./url-utils";
 
 const DOCKSTORE_API_URL = "https://dockstore.org/api/ga4gh/trs/v2/tools";
 
@@ -599,16 +599,6 @@ function buildReverseReadRunRequestValue(
     identifier: run.runAccession,
     url: reverse.url,
   };
-}
-
-function buildFastaUrl(identifier: string): string {
-  const baseUrl = "https://hgdownload.soe.ucsc.edu/hubs/";
-  const parts = identifier.split("_");
-  const formattedPath = `${parts[0]}/${parts[1].slice(0, 3)}/${parts[1].slice(
-    3,
-    6
-  )}/${parts[1].slice(6, 9)}/${identifier}/${identifier}.fa.gz`;
-  return `${baseUrl}${formattedPath}`;
 }
 
 /**
