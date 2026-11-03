@@ -1343,7 +1343,11 @@ class AssistantAgent:
                 session_id=state.session_id,
                 reply="",
                 schema_state=state.schema_state,
-                suggestions=state.suggestions,
+                # Re-derived, not the stored copy, so a session saved under
+                # older suggestion rules doesn't hand them back.
+                suggestions=self._derive_suggestions(
+                    state.schema_state, logan=state.metadata.get("logan")
+                ),
                 is_complete=is_complete,
                 handoff_url=handoff_url,
                 logan=logan_context_from(state.metadata),
@@ -1752,6 +1756,8 @@ class AssistantAgent:
         chips that are always consistent with the tracker. Chips that name a
         specific entity are tagged and validated through _build_suggestion_chips
         (#1297); anything that can't be grounded falls back to generic actions.
+        No chips are offered once the setup can hand off to workflow setup
+        (compute_handoff), as the Continue button is then the next step.
         Fail-soft: any lookup problem degrades to a generic chip.
         """
 
@@ -1810,8 +1816,17 @@ class AssistantAgent:
                         {"label": "I'll upload my own data"},
                         {"label": "I'll pull data from ENA/SRA"},
                     ]
+            elif self.compute_handoff(schema)[0]:
+                # Ready to hand off, so nothing is suggested: the handoff goes
+                # through the Continue button, which carries the captured
+                # inputs. A chip would only send its label to the model as a
+                # chat message.
+                proposals = []
             else:
-                proposals = [{"label": "Continue to workflow setup"}]
+                # Every field the user chooses is set, but the handoff still
+                # can't be built (e.g. the assembly or workflow didn't resolve
+                # to an id), so there's no Continue button yet.
+                proposals = [{"label": "What's still missing?"}]
         except Exception:
             logger.warning(
                 "Suggestion derivation failed; falling back to a generic chip",

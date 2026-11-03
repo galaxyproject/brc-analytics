@@ -2594,7 +2594,23 @@ class TestDeriveSuggestions:
         assert "Use the reference assembly" not in labels
         assert "Show me the available assemblies" in labels
 
-    def test_all_filled_offers_handoff(self, agent):
+    def test_ready_to_hand_off_offers_no_suggestions(self, agent):
+        schema = AnalysisSchema(
+            organism=_filled_field("Saccharomyces cerevisiae"),
+            assembly=_filled_field("S288C GCF_000146045.2", "GCF_000146045.2"),
+            analysis_type=_filled_field("Transcriptomics"),
+            workflow=_filled_field(
+                "RNA-Seq PE", "#workflow/github.com/iwc/rnaseq-pe/main"
+            ),
+            data_source=_filled_field("ENA"),
+            data_characteristics=_filled_field("paired-end RNA-seq"),
+        )
+        assert agent.compute_handoff(schema)[0] is True
+        assert agent._derive_suggestions(schema) == []
+
+    def test_all_chosen_but_not_ready_asks_what_is_missing(self, agent):
+        # The user's fields are set, but nothing resolved to an assembly
+        # accession or workflow id, so there is no handoff to continue to.
         schema = AnalysisSchema()
         for name in (
             "organism",
@@ -2604,8 +2620,9 @@ class TestDeriveSuggestions:
             "data_source",
         ):
             setattr(schema, name, SchemaField(value="x", status=FieldStatus.FILLED))
+        assert agent.compute_handoff(schema)[0] is False
         chips = agent._derive_suggestions(schema)
-        assert [c.label for c in chips] == ["Continue to workflow setup"]
+        assert [c.label for c in chips] == ["What's still missing?"]
 
 
 LOGAN_META = {
