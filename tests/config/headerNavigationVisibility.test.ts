@@ -102,6 +102,18 @@ describe("header navigation visibility", () => {
     ]);
   });
 
+  test("More holds only Join Us and Contact Us at md", () => {
+    // The primary links are inline at md, so More must not repeat them.
+    const more = getNavigationLinks(centreLinks(), "md").find(
+      (link) => link.label === "More"
+    );
+
+    expect(more?.menuItems?.map((item) => String(item.label))).toEqual([
+      "Join Us",
+      "Contact Us",
+    ]);
+  });
+
   test("the drawer lists the primary links and Contact Us at xs, and no menus", () => {
     // The inline nav does not render at xs, so this is the only surface there.
     // Nothing is collapsed, so "More" must not appear alongside the links it
