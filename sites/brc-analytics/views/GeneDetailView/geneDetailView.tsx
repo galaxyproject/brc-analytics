@@ -19,6 +19,7 @@ import {
 } from "@repo/shared/services/genes/label";
 import Link from "next/link";
 import { type JSX } from "react";
+import { BionymSection } from "./components/BionymSection/bionymSection";
 import { LocationValue } from "./components/LocationValue/locationValue";
 import { GENE_BREADCRUMBS } from "./constants";
 import {
@@ -29,7 +30,10 @@ import {
 } from "./geneDetailView.styles";
 import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
 
-export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
+export const GeneDetailView = ({
+  bionym,
+  gene,
+}: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
@@ -91,6 +95,7 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
           </Table>
         </TableContainer>
       </GenesPanel>
+      {bionym && <BionymSection bionym={bionym} />}
     </GeneBackPageView>
   );
 };

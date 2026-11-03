@@ -1,6 +1,6 @@
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { HTTPError } from "ky";
-import { type Gene } from "./types";
+import { type BionymClaims, type Gene } from "./types";
 
 export type GeneResult =
   | { gene: Gene; status: "found" }
@@ -21,12 +21,38 @@ export async function fetchGene(
     const { gene } = await apiClient.getGene(geneUid, signal);
     return { gene, status: "found" };
   } catch (error) {
-    // 422 is a UID that isn't a UUID: no gene has it either.
-    if (
-      error instanceof HTTPError &&
-      (error.response.status === 404 || error.response.status === 422)
-    )
-      return { status: "not_found" };
+    if (isNotFound(error)) return { status: "not_found" };
     throw error;
   }
+}
+
+/**
+ * Fetch the claims in a gene's BioNym graph.
+ * @param geneUid - The gene's UID.
+ * @param signal - Aborts the request.
+ * @returns The claims, or null when the gene has no BioNym graph.
+ * @throws When the API can't be reached.
+ */
+export async function fetchGeneBionym(
+  geneUid: string,
+  signal?: AbortSignal
+): Promise<BionymClaims | null> {
+  try {
+    return await apiClient.getGeneBionym(geneUid, signal);
+  } catch (error) {
+    if (isNotFound(error)) return null;
+    throw error;
+  }
+}
+
+/**
+ * Whether a gene API request failed because what it asked for doesn't exist.
+ * @param error - The request's error.
+ * @returns True for a 404, or a 422: a UID that isn't a UUID, which no gene has.
+ */
+function isNotFound(error: unknown): boolean {
+  return (
+    error instanceof HTTPError &&
+    (error.response.status === 404 || error.response.status === 422)
+  );
 }

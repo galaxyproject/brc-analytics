@@ -1,5 +1,8 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
-import { type GeneResponse } from "@repo/shared/services/genes/types";
+import {
+  type BionymClaims,
+  type GeneResponse,
+} from "@repo/shared/services/genes/types";
 import ky, { type HTTPError } from "ky";
 import type {
   FavoriteResponse,
@@ -72,6 +75,19 @@ export const apiClient = {
     // ky doesn't retry; useGene's query does, before showing "unavailable".
     return httpClient
       .get(`genes/${encodeURIComponent(geneUid)}`, { retry: 0, signal })
+      .json();
+  },
+
+  getGeneBionym: async (
+    geneUid: string,
+    signal?: AbortSignal
+  ): Promise<BionymClaims> => {
+    // ky doesn't retry; useGeneBionym's query does.
+    return httpClient
+      .get(`genes/${encodeURIComponent(geneUid)}/bionym`, {
+        retry: 0,
+        signal,
+      })
       .json();
   },
 

@@ -6,6 +6,7 @@ import {
 import { useFeatureFlag } from "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag";
 import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { useGene } from "@repo/shared/hooks/useGene";
+import { useGeneBionym } from "@repo/shared/hooks/useGeneBionym";
 import { geneTitle } from "@repo/shared/services/genes/label";
 import { type GetStaticProps } from "next";
 import Error from "next/error";
@@ -22,7 +23,9 @@ const Page = (): JSX.Element => {
   const genePagesEnabled = useFeatureFlag(FEATURE_FLAGS.GENE_PAGES);
   const { isReady, query } = useRouter();
   const geneUid = typeof query.uid === "string" ? query.uid : undefined;
-  const result = useGene(isReady && genePagesEnabled ? geneUid : undefined);
+  const enabledGeneUid = isReady && genePagesEnabled ? geneUid : undefined;
+  const result = useGene(enabledGeneUid);
+  const bionym = useGeneBionym(enabledGeneUid);
   if (!isReady) return <></>;
   if (!genePagesEnabled || !geneUid) return <Error statusCode={404} />;
   if (result.status === "not_found") return <Error statusCode={404} />;
@@ -38,7 +41,7 @@ const Page = (): JSX.Element => {
       <Head>
         <title>{geneTitle(gene)}</title>
       </Head>
-      <GeneDetailView gene={gene} />
+      <GeneDetailView bionym={bionym} gene={gene} />
     </>
   );
 };

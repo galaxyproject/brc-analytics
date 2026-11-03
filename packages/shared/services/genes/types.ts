@@ -82,3 +82,37 @@ export interface GeneResponse {
   gene: Gene;
   snapshot: GeneSnapshotInfo;
 }
+
+/**
+ * One claim BioNym drew from a source: a language model's statement, the quote
+ * it rests on, and BioNym's confidence in it, from 0 to 1.
+ */
+export interface BionymClaim {
+  confidence: number;
+  quote: string;
+  text: string;
+}
+
+/**
+ * A paper or dataset BioNym drew claims from.
+ */
+export interface BionymSource {
+  claims: BionymClaim[];
+  id: string;
+  kind: "dataset" | "paper";
+  title: string;
+  // Null unless the graph gives an https: link.
+  url: string | null;
+}
+
+/**
+ * The claims in a gene's BioNym graph, grouped by source.
+ */
+export interface BionymClaims {
+  geneUid: string;
+  // BioNym's input for the graph: the gene's locus tag.
+  input: string;
+  // The latest date BioNym retrieved evidence on, as YYYY-MM-DD.
+  runDate: string;
+  sources: BionymSource[];
+}
