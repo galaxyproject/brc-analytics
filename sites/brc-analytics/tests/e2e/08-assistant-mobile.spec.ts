@@ -1,4 +1,8 @@
 import { type Page } from "@playwright/test";
+import type {
+  AssistantChatResponse,
+  SchemaFieldState,
+} from "@repo/shared/services/api-client/types";
 import { CONTINUE_LABEL } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/constants";
 import {
   HEADING as COMPLETION_HEADING,
@@ -14,15 +18,20 @@ const QUESTION = "Haploid variant calling on Plasmodium vivax";
 
 const REPLY = "Your analysis is set up.";
 
-const FILLED = { detail: null, status: "filled", value: "Set" };
+const FILLED: SchemaFieldState = {
+  detail: null,
+  status: "filled",
+  value: "Set",
+};
 
 // A reply that completes the analysis setup. The assistant offers no
 // suggestions once the setup is complete: the handoff is the Continue button's.
-const COMPLETE_REPLY = {
+const COMPLETE_REPLY: AssistantChatResponse = {
   handoff_url: "/data/assemblies/GCF_000002415_2/analyze",
   is_complete: true,
   reply: REPLY,
   saved: false,
+  saved_analysis_id: null,
   schema_state: {
     analysis_type: FILLED,
     assembly: FILLED,
@@ -36,10 +45,9 @@ const COMPLETE_REPLY = {
   suggestions: [],
 };
 
-// The same reply carrying a suggestion, as the assistant's fallback when it
-// can't work out its suggestions does ("What's next?"): the completion block
-// must still replace it on a phone.
-const COMPLETE_REPLY_WITH_SUGGESTION = {
+// A completed reply that still carries a suggestion, as the backend's fallback
+// ("What's next?") can: the completion block must still replace it on a phone.
+const COMPLETE_REPLY_WITH_SUGGESTION: AssistantChatResponse = {
   ...COMPLETE_REPLY,
   suggestions: [{ label: "What's next?", message: "What's next?" }],
 };
@@ -51,7 +59,10 @@ const COMPLETE_REPLY_WITH_SUGGESTION = {
  * @param page - The Playwright page.
  * @param reply - The reply that completes the setup.
  */
-async function mockBackend(page: Page, reply: object): Promise<void> {
+async function mockBackend(
+  page: Page,
+  reply: AssistantChatResponse
+): Promise<void> {
   await page.route("**/api/v1/**", (route) =>
     route.fulfill({ json: { detail: "Not authenticated" }, status: 401 })
   );
@@ -71,7 +82,7 @@ async function mockBackend(page: Page, reply: object): Promise<void> {
  */
 async function completeSetup(
   page: Page,
-  reply: object = COMPLETE_REPLY
+  reply: AssistantChatResponse = COMPLETE_REPLY
 ): Promise<void> {
   await mockBackend(page, reply);
   await page.goto(ASSISTANT_URL);
