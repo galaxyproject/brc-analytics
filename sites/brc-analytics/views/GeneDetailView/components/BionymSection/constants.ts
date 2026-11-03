@@ -9,3 +9,6 @@ export const SOURCE_KIND_LABEL = {
   dataset: "Dataset",
   paper: "Paper",
 } as const;
+
+// The slider's step. Confidences are given to two decimal places.
+export const CONFIDENCE_STEP = 0.01;

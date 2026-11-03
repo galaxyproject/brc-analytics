@@ -253,6 +253,19 @@ describe("GeneDetailView's BioNym section", () => {
     expect(within(getSection()).getByText("Claim A2")).toBeInTheDocument();
   });
 
+  it("keeps a claim at the slider's value after arrow-key steps", () => {
+    renderGene(GENE, BIONYM);
+    const slider = within(getSection()).getByRole("slider", {
+      name: "Minimum confidence",
+    });
+    // Five steps of 0.01 from 0.8 sum to 0.8500000000000001 in floating point,
+    // which would hide claim A1 at 0.85.
+    for (let i = 0; i < 5; i++)
+      fireEvent.keyDown(slider, { key: "ArrowRight" });
+    expect(slider).toHaveAttribute("aria-valuenow", "0.85");
+    expect(getSection()).toHaveTextContent("3 of 4 claims");
+  });
+
   it("shows a claim's quote in a tooltip on hover", async () => {
     renderGene(GENE, BIONYM);
     fireEvent.mouseOver(within(getSection()).getByText("Claim B1"));

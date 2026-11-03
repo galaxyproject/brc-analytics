@@ -26,11 +26,12 @@ import {
 } from "./bionymSection.styles";
 import {
   BIONYM_URL,
+  CONFIDENCE_STEP,
   DEFAULT_MIN_CONFIDENCE,
   SOURCE_KIND_LABEL,
 } from "./constants";
 import { type BionymSectionProps } from "./types";
-import { countClaims, visibleSources } from "./utils";
+import { countClaims, roundToStep, visibleSources } from "./utils";
 
 /**
  * The claims BioNym drew about a gene, grouped by source, with a slider that
@@ -83,9 +84,11 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
           aria-labelledby={sliderLabelId}
           max={1}
           min={0}
-          onChange={(_, value): void => setMinConfidence(value as number)}
+          onChange={(_, value): void =>
+            setMinConfidence(roundToStep(value as number))
+          }
           size="small"
-          step={0.01}
+          step={CONFIDENCE_STEP}
           value={minConfidence}
           valueLabelDisplay="auto"
         />
