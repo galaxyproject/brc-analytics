@@ -17,7 +17,7 @@ dependencies = [
     "fastmcp>=3.0.0",
     "httpx>=0.28.1",
     "pydantic>=2.11.7",
-    "pydantic-ai==1.107.6",
+    "pydantic-ai==1.107.7",
     "python-dotenv>=1.1.1",
     "redis>=6.4.0",
     "sqlalchemy[asyncio]>=2.0.36",
