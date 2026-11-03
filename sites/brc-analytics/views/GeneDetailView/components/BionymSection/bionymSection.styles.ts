@@ -1,15 +1,26 @@
 import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
 import styled from "@emotion/styled";
 
+// The label, slider and count on one row, wrapping onto more on a narrow
+// screen rather than overflowing the panel.
 export const ConfidenceControl = styled.div`
   align-items: center;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 4px 16px;
-  grid-template-columns: max-content minmax(160px, 320px) max-content;
+
+  .MuiSlider-root {
+    flex: 1 1 160px;
+    max-width: 320px;
+  }
 `;
 
+// Dataset claims can hold long unbroken names, such as
+// "(29hpi_minus_Shield)_over_(29hpi_plus_Shield)", which would otherwise widen
+// the panel past a narrow screen.
 export const SourceList = styled.ol`
   display: grid;
+  overflow-wrap: anywhere;
   gap: 24px;
   list-style: none;
   margin: 0;
