@@ -15,7 +15,6 @@ import {
 import { BRC_DATA_CATALOG_CATEGORY_KEY } from "@site-config/brc-analytics/category";
 import { createElement } from "react";
 import { SUPPORT_URL } from "./constants";
-import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organismEntityConfig";
 import { priorityPathogensEntityConfig } from "./index/priorityPathogensEntityConfig";
@@ -108,7 +107,6 @@ export function makeConfig(
     filterSort: { sortBy: FILTER_SORT.ALPHA },
     gitHubUrl,
     layout: {
-      floating,
       footer: {
         Branding: Branding(),
         navLinks: [

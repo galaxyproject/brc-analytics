@@ -2,7 +2,6 @@ import { Error } from "@databiosphere/findable-ui/lib/components/Error/error";
 import { ErrorBoundary } from "@databiosphere/findable-ui/lib/components/ErrorBoundary/errorBoundary";
 import { Head } from "@databiosphere/findable-ui/lib/components/Head/head";
 import { AppLayout as DXAppLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/AppLayout/appLayout.styles";
-import { Floating } from "@databiosphere/findable-ui/lib/components/Layout/components/Floating/floating";
 import { Header as DXHeader } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/header";
 import { Main as DXMain } from "@databiosphere/findable-ui/lib/components/Layout/components/Main/main";
 import { ConfigProvider as DXConfigProvider } from "@databiosphere/findable-ui/lib/providers/config";
@@ -106,7 +105,7 @@ export function AppProviders({
 }: AppProvidersProps): JSX.Element {
   const { Component, pageProps } = appProps;
   const { layout, redirectRootToPath } = appConfig;
-  const { floating, footer, header } = layout || {};
+  const { footer, header } = layout || {};
   const {
     entityListType = defaultEntityListType,
     pageDescription,
@@ -156,7 +155,6 @@ export function AppProviders({
                                 )}
                               >
                                 <Component {...pageProps} />
-                                <Floating {...floating} />
                               </ErrorBoundary>
                             </Main>
                           </WorkflowHandoffProvider>
