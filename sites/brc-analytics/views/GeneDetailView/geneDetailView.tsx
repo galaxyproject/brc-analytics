@@ -20,6 +20,7 @@ import {
 import { GENOME_BROWSER_IMAGE_PROPS } from "@repo/shared/viewModelBuilders/constants";
 import Link from "next/link";
 import { type JSX } from "react";
+import { BionymSection } from "./components/BionymSection/bionymSection";
 import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
 import { GENE_BREADCRUMBS } from "./constants";
 import {
@@ -31,7 +32,10 @@ import {
 import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
 import { formatLocation, getNcbiGeneUrl, getUcscPositionUrl } from "./utils";
 
-export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
+export const GeneDetailView = ({
+  bionym,
+  gene,
+}: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
@@ -96,6 +100,7 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
           </Table>
         </TableContainer>
       </GenesPanel>
+      {bionym && <BionymSection bionym={bionym} />}
     </GeneBackPageView>
   );
 };

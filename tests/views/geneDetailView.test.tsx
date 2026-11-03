@@ -1,8 +1,11 @@
 import { GeneDetailView } from "@brc/views/GeneDetailView/geneDetailView";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { createTheme, ThemeProvider } from "@mui/material";
-import { type Gene } from "@repo/shared/services/genes/types";
-import { render, screen, within } from "@testing-library/react";
+import {
+  type BionymClaims,
+  type Gene,
+} from "@repo/shared/services/genes/types";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
 
@@ -60,6 +63,36 @@ const LOCATION_TEXT = "NC_037282.1:1,292,966-1,296,696 (+)";
 
 const theme = createTheme();
 
+// A BioNym graph's claims, as the gene API returns them: sources by title, and
+// each source's claims by confidence, highest first.
+const BIONYM: BionymClaims = {
+  geneUid: GENE.geneUid,
+  input: "PF3D7_1133400",
+  runDate: "2026-11-02",
+  sources: [
+    {
+      claims: [
+        { confidence: 0.85, quote: "Quote A1.", text: "Claim A1" },
+        { confidence: 0.5, quote: "Quote A2.", text: "Claim A2" },
+      ],
+      id: "pubmed:1",
+      kind: "paper",
+      title: "A paper",
+      url: "https://pubmed.ncbi.nlm.nih.gov/1/",
+    },
+    {
+      claims: [
+        { confidence: 0.99, quote: "Quote B1.", text: "Claim B1" },
+        { confidence: 0.9, quote: "Quote B2.", text: "Claim B2" },
+      ],
+      id: "dataset:2",
+      kind: "dataset",
+      title: "B dataset",
+      url: null,
+    },
+  ],
+};
+
 /**
  * The value of one of the gene page's fields.
  * @param label - Field label, e.g. "Gene ID".
@@ -74,12 +107,13 @@ function getFieldValue(label: string): HTMLElement {
 /**
  * Renders the gene page for the given gene.
  * @param gene - Gene.
+ * @param bionym - The claims in the gene's BioNym graph, if it has one.
  */
-function renderGene(gene: Gene): void {
+function renderGene(gene: Gene, bionym: BionymClaims | null = null): void {
   render(
     <ThemeProvider theme={theme}>
       <EmotionThemeProvider theme={theme}>
-        <GeneDetailView gene={gene} />
+        <GeneDetailView bionym={bionym} gene={gene} />
       </EmotionThemeProvider>
     </ThemeProvider>
   );
@@ -192,5 +226,105 @@ describe("GeneDetailView", () => {
     expect(
       Array.from(second.querySelectorAll("td"), (td) => td.textContent)
     ).toStrictEqual(["—", "tRNA-Ala", "—", "—"]);
+  });
+});
+
+describe("GeneDetailView's BioNym section", () => {
+  /**
+   * The section, found by its heading.
+   * @returns The section.
+   */
+  function getSection(): HTMLElement {
+    return screen.getByRole("region", { name: "Evidence gathered by BioNym" });
+  }
+
+  /**
+   * The titles of the sources shown, in order.
+   * @returns The titles.
+   */
+  function sourceTitles(): string[] {
+    return within(getSection())
+      .getAllByRole("heading", { level: 3 })
+      .map((heading) => heading.textContent ?? "");
+  }
+
+  /**
+   * Move the minimum-confidence slider.
+   * @param value - The value to move it to.
+   */
+  function setMinConfidence(value: number): void {
+    fireEvent.change(
+      within(getSection()).getByRole("slider", { name: "Minimum confidence" }),
+      { target: { value } }
+    );
+  }
+
+  it("isn't shown for a gene with no graph", () => {
+    renderGene(GENE);
+    expect(
+      screen.queryByRole("region", { name: "Evidence gathered by BioNym" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("labels the claims as BioNym's scored judgments and links to BioNym", () => {
+    renderGene(GENE, BIONYM);
+    const section = getSection();
+    expect(section).toHaveTextContent(
+      /drawn from papers and datasets by a language model/
+    );
+    expect(section).toHaveTextContent(/November 02, 2026/);
+    expect(
+      within(section).getByRole("link", { name: "BioNym" })
+    ).toHaveAttribute("href", "https://github.com/d-callan/bionym");
+  });
+
+  it("shows claims at or above 0.8, by source, as their text alone", () => {
+    renderGene(GENE, BIONYM);
+    const section = getSection();
+    expect(section).toHaveTextContent("3 of 4 claims");
+    // The source with more claims shown comes first.
+    expect(sourceTitles()).toStrictEqual(["B dataset", "A paper"]);
+    expect(within(section).getByText("Claim B1")).toBeInTheDocument();
+    expect(section).not.toHaveTextContent("Quote B1.");
+    expect(section).not.toHaveTextContent("0.99");
+    expect(within(section).queryByText("Claim A2")).not.toBeInTheDocument();
+    expect(
+      within(section).getByRole("link", { name: "A paper" })
+    ).toHaveAttribute("href", "https://pubmed.ncbi.nlm.nih.gov/1/");
+    // A source with no https: link is shown as text.
+    expect(
+      within(section).queryByRole("link", { name: "B dataset" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides claims below the slider's value and updates the count", () => {
+    renderGene(GENE, BIONYM);
+    setMinConfidence(0.95);
+    expect(getSection()).toHaveTextContent("1 of 4 claims");
+    expect(sourceTitles()).toStrictEqual(["B dataset"]);
+    setMinConfidence(0);
+    expect(getSection()).toHaveTextContent("4 of 4 claims");
+    // Tied on claims shown, the sources are in title order.
+    expect(sourceTitles()).toStrictEqual(["A paper", "B dataset"]);
+    expect(within(getSection()).getByText("Claim A2")).toBeInTheDocument();
+  });
+
+  it("keeps a claim at the slider's value after arrow-key steps", () => {
+    renderGene(GENE, BIONYM);
+    const slider = within(getSection()).getByRole("slider", {
+      name: "Minimum confidence",
+    });
+    // Five steps of 0.01 from 0.8 sum to 0.8500000000000001 in floating point,
+    // which would hide claim A1 at 0.85.
+    for (let i = 0; i < 5; i++)
+      fireEvent.keyDown(slider, { key: "ArrowRight" });
+    expect(slider).toHaveAttribute("aria-valuenow", "0.85");
+    expect(getSection()).toHaveTextContent("3 of 4 claims");
+  });
+
+  it("shows a claim's quote in a tooltip on hover", async () => {
+    renderGene(GENE, BIONYM);
+    fireEvent.mouseOver(within(getSection()).getByText("Claim B1"));
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Quote B1.");
   });
 });

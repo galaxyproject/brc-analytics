@@ -93,3 +93,35 @@ class Gene(_CamelModel):
 class GeneResponse(_CamelModel):
     snapshot: GeneSnapshotInfo
     gene: Gene
+
+
+class BionymClaim(_CamelModel):
+    """One claim BioNym drew from a source: a language model's statement,
+    the quote it rests on, and BioNym's confidence in it, from 0 to 1."""
+
+    text: str
+    quote: str
+    confidence: float
+
+
+class BionymSource(_CamelModel):
+    """A paper or dataset BioNym drew claims from."""
+
+    id: str
+    kind: Literal["paper", "dataset"]
+    title: str
+    # Null unless the graph gives an https: link.
+    url: Optional[str]
+    claims: List[BionymClaim]
+
+
+class BionymClaims(_CamelModel):
+    """The claims in a gene's BioNym graph, grouped by source."""
+
+    gene_uid: UUID
+    # BioNym's input for the graph: the gene's locus tag.
+    input: str
+    # The latest retrieved_at among the graph's evidence; the graph's
+    # metadata carries no run date.
+    run_date: date
+    sources: List[BionymSource]
