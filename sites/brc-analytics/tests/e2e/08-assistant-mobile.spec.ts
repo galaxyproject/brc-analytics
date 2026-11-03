@@ -25,7 +25,8 @@ const FILLED: SchemaFieldState = {
 };
 
 // A reply that completes the analysis setup. The assistant offers no
-// suggestions once the setup is complete: the handoff is the Continue button's.
+// suggestions once the setup is complete: the Continue button handles the
+// handoff.
 const COMPLETE_REPLY: AssistantChatResponse = {
   handoff_url: "/data/assemblies/GCF_000002415_2/analyze",
   is_complete: true,
