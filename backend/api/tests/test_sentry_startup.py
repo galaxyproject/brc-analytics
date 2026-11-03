@@ -1,5 +1,6 @@
 """Regression tests for Sentry startup wiring."""
 
+import base64
 import json
 import logging
 
@@ -79,3 +80,27 @@ def test_sentry_does_not_attach_request_bodies(sentry_events):
     create_app()
 
     assert sentry_sdk.get_client().options["max_request_body_size"] == "never"
+
+
+def test_sentry_events_carry_no_query_url(sentry_events):
+    """Galaxy's error bodies echo the submitted base64:// query URL, and
+    bioblend's str(e) carries the body into logs and exception values."""
+    create_app()
+    sentry_events.clear()  # startup's own catalog errors
+    encoded = base64.b64encode(b">q\n" + b"ACGTTGCA" * 40).decode("ascii")
+    body = f'{{"err_msg": "bad request", "url": "base64://{encoded}"}}'
+    log = logging.getLogger("app.services.galaxy_service")
+    log.warning("Galaxy said: %s", body)  # becomes a breadcrumb
+    log.error(f"Failed to submit kmindex query: {body}")
+    log.error("Failed to submit kmindex query: %s", body)
+    try:
+        raise RuntimeError(f"kmindex query submission failed: {body}")
+    except RuntimeError:
+        log.exception("submit failed")
+    sentry_sdk.capture_message(f"submit failed: {body}")
+    sentry_sdk.flush()
+
+    assert len(sentry_events) == 4
+    dumped = json.dumps(sentry_events)
+    assert encoded not in dumped
+    assert "base64://[Filtered]" in dumped

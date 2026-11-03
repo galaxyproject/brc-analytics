@@ -11,6 +11,12 @@ from app.core.errors import CallerInputError
 
 _APP_DIR = str(Path(__file__).resolve().parent.parent) + os.sep
 
+# A kmindex query goes to Galaxy as a base64:// URL holding the user's
+# sequences. Galaxy echoes the request in its error bodies, and bioblend puts
+# the body in str(e), so a failed submit can carry the query into an event.
+_QUERY_URL = re.compile(r"base64://\S+")
+_QUERY_PLACEHOLDER = "base64://[Filtered]"
+
 
 def _unwrap(exc: BaseException) -> BaseException:
     # fastmcp reports tool/resource failures as `raise ToolError(...) from e`.
@@ -57,12 +63,41 @@ def _fingerprint_bioblend(event: dict) -> None:
     event["fingerprint"] = ["bioblend", _VOLATILE.sub("<id>", message)[:200]]
 
 
+def _scrub(value: Any) -> Any:
+    if isinstance(value, str):
+        return _QUERY_URL.sub(_QUERY_PLACEHOLDER, value)
+    return value
+
+
+def _scrub_query_urls(event: dict) -> None:
+    if "message" in event:
+        event["message"] = _scrub(event["message"])
+    logentry = event.get("logentry")
+    if isinstance(logentry, dict):
+        for key in ("message", "formatted"):
+            if key in logentry:
+                logentry[key] = _scrub(logentry[key])
+        params = logentry.get("params")
+        if isinstance(params, (list, tuple)):
+            logentry["params"] = [_scrub(p) for p in params]
+        elif isinstance(params, dict):
+            logentry["params"] = {k: _scrub(v) for k, v in params.items()}
+    for section, field in (("exception", "value"), ("breadcrumbs", "message")):
+        container = event.get(section)
+        if not isinstance(container, dict):
+            continue
+        for item in container.get("values") or []:
+            if isinstance(item, dict) and field in item:
+                item[field] = _scrub(item[field])
+
+
 def before_send(event: dict, hint: dict) -> Optional[dict]:
+    # Scrub first so the bioblend fingerprint is built from the cleaned message.
+    _scrub_query_urls(event)
     _fingerprint_bioblend(event)
     exc_info: Any = hint.get("exc_info")
-    if not exc_info or exc_info[1] is None:
-        return event
-    exc = _unwrap(exc_info[1])
-    if isinstance(exc, CallerInputError) or _is_mcp_argument_error(exc, event):
-        return None
+    if exc_info and exc_info[1] is not None:
+        exc = _unwrap(exc_info[1])
+        if isinstance(exc, CallerInputError) or _is_mcp_argument_error(exc, event):
+            return None
     return event
