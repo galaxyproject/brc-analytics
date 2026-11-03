@@ -2609,9 +2609,10 @@ class TestDeriveSuggestions:
         assert agent.compute_handoff(schema)[0] is True
         assert agent._derive_suggestions(schema) == []
 
-    def test_all_chosen_but_not_ready_asks_what_is_missing(self, agent):
+    def test_all_chosen_but_not_ready_offers_no_suggestions(self, agent):
         # The user's fields are set, but nothing resolved to an assembly
-        # accession or workflow id, so there is no handoff to continue to.
+        # accession or workflow id, so there is no handoff yet. A chip would
+        # ask the model about a setup the panel shows as complete (#1955).
         schema = AnalysisSchema()
         for name in (
             "organism",
@@ -2622,8 +2623,7 @@ class TestDeriveSuggestions:
         ):
             setattr(schema, name, SchemaField(value="x", status=FieldStatus.FILLED))
         assert agent.compute_handoff(schema)[0] is False
-        chips = agent._derive_suggestions(schema)
-        assert [c.label for c in chips] == ["What's still missing?"]
+        assert agent._derive_suggestions(schema) == []
 
 
 LOGAN_META = {
