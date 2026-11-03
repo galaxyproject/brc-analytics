@@ -58,4 +58,7 @@ export const socialMedia: SocialMedia = {
       Icon: GitHubIcon,
     },
   ],
+  // The header has no room for a socials row; the socials are listed under
+  // "Join Us" instead. The `xs` drawer still renders its own socials row.
+  visible: { lg: false, md: false, sm: false, xs: false },
 };

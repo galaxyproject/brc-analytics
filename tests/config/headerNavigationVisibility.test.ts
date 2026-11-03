@@ -34,13 +34,14 @@ const PRIMARY_LABELS = [
 ];
 
 const CASES: { breakpoint: BreakpointKey; labels: string[] }[] = [
-  // Primary links collapse into "More"; socials arrive as "Join Us", since the
-  // header renders no socials row below `lg`.
-  { breakpoint: "sm", labels: [...PERSISTENT_LABELS, "More", "Join Us"] },
-  // Everything fits, so "More" goes; "Join Us" stays until the socials row does.
-  { breakpoint: "md", labels: [...PRIMARY_LABELS, "Join Us"] },
-  // The header renders its own socials row here, so "Join Us" goes too.
-  { breakpoint: "lg", labels: PRIMARY_LABELS },
+  // Primary links collapse into "More", which also holds "Join Us" and
+  // "Contact Us".
+  { breakpoint: "sm", labels: [...PERSISTENT_LABELS, "More"] },
+  // The primary links fit, but "Join Us" and "Contact Us" don't, so "More"
+  // holds just those two.
+  { breakpoint: "md", labels: [...PRIMARY_LABELS, "More"] },
+  // Everything fits, so "More" goes and its two entries end the nav.
+  { breakpoint: "lg", labels: [...PRIMARY_LABELS, "Join Us", "Contact Us"] },
 ];
 
 /**
@@ -89,30 +90,29 @@ describe("header navigation visibility", () => {
     }
   );
 
-  test("the collapsed links are reachable through More at sm", () => {
+  test("the collapsed links, Join Us and Contact Us are reachable through More at sm", () => {
     const more = getNavigationLinks(centreLinks(), "sm").find(
       (link) => link.label === "More"
     );
 
-    expect(more?.menuItems?.map((item) => String(item.label))).toEqual(
-      COLLAPSED_LABELS
-    );
+    expect(more?.menuItems?.map((item) => String(item.label))).toEqual([
+      ...COLLAPSED_LABELS,
+      "Join Us",
+      "Contact Us",
+    ]);
   });
 
-  test("the drawer lists the primary links at xs, and no menus", () => {
+  test("the drawer lists the primary links and Contact Us at xs, and no menus", () => {
     // The inline nav does not render at xs, so this is the only surface there.
-    // Nothing is collapsed, so "More" and "Join Us" must not appear alongside
-    // the links they would otherwise hold.
-    expect(drawerLabels("xs")).toEqual(PRIMARY_LABELS);
+    // Nothing is collapsed, so "More" must not appear alongside the links it
+    // would otherwise hold, and the drawer renders its own socials row in place
+    // of "Join Us".
+    expect(drawerLabels("xs")).toEqual([...PRIMARY_LABELS, "Contact Us"]);
   });
 
   test("flattening the sm navigation yields the collapsed link set", () => {
     // Coverage of the flattening itself, not of a rendered surface: the drawer
     // is bound to the widths below the inline nav, so it never renders at sm.
-    expect(drawerLabels("sm")).toEqual([
-      ...PERSISTENT_LABELS,
-      "More",
-      "Join Us",
-    ]);
+    expect(drawerLabels("sm")).toEqual([...PERSISTENT_LABELS, "More"]);
   });
 });

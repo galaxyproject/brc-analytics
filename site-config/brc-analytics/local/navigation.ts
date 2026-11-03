@@ -1,8 +1,10 @@
 import { ROUTES as SITE_ROUTES } from "@brc/routes/constants";
 import { type Navigation } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/common/entities";
 import { type NavLinkItem } from "@databiosphere/findable-ui/lib/components/Layout/components/Header/components/Content/components/Navigation/navigation";
+import { ANCHOR_TARGET } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { type BreakpointKey } from "@databiosphere/findable-ui/lib/hooks/useBreakpointHelper";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { SUPPORT_URL } from "./constants";
 import { socialMenuItems } from "./socialMedia";
 
 const BREAKPOINT_KEYS: BreakpointKey[] = ["xs", "sm", "md", "lg"];
@@ -10,14 +12,37 @@ const BREAKPOINT_KEYS: BreakpointKey[] = ["xs", "sm", "md", "lg"];
 /** Primary links collapse into the "More" menu at `sm`. */
 const HIDDEN_AT_SM: NavLinkItem["visible"] = { sm: false };
 
-/** The "More" menu exists only where the primary links are hidden. */
+/** The collapsed primary links are listed in "More" only at `sm`. */
 const VISIBLE_AT_SM = visibleOnly("sm");
 
 /**
- * "Join Us" carries the socials where nothing else does: the header renders its
- * own socials row at `lg`, and the `xs` drawer renders one of its own.
+ * At `sm` and `md` the header has room for neither "Join Us" nor "Contact Us",
+ * so "More" holds them both.
  */
 const VISIBLE_AT_SM_MD = visibleOnly("sm", "md");
+
+/**
+ * "Join Us" carries the socials at `lg`, in place of a socials row. The `xs`
+ * drawer renders a socials row of its own.
+ */
+const VISIBLE_AT_LG = visibleOnly("lg");
+
+/** "Contact Us" ends the nav at `lg`, and is listed in the `xs` drawer. */
+const VISIBLE_AT_XS_LG = visibleOnly("xs", "lg");
+
+/** The support form, opened in a new tab. */
+const CONTACT_US: NavLinkItem = {
+  label: "Contact Us",
+  target: ANCHOR_TARGET.BLANK,
+  url: SUPPORT_URL,
+};
+
+/** The socials menu. */
+const JOIN_US: NavLinkItem = {
+  label: "Join Us",
+  menuItems: socialMenuItems,
+  url: "",
+};
 
 /**
  * Returns the Genes navigation link.
@@ -72,25 +97,25 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
       {
         label: "More",
         menuItems: [
-          { label: "About", url: SITE_ROUTES.ABOUT },
-          { label: "Learn", url: SITE_ROUTES.LEARN },
-          getGenesLink(),
-          { label: "Workflows", url: ROUTES.WORKFLOWS },
-          ...getLoganSearchLinks(loganSearchEnabled),
-          {
-            label: "Priority Pathogens",
-            url: SITE_ROUTES.PRIORITY_PATHOGENS,
-          },
+          ...withVisible(VISIBLE_AT_SM, [
+            { label: "About", url: SITE_ROUTES.ABOUT },
+            { label: "Learn", url: SITE_ROUTES.LEARN },
+            getGenesLink(),
+            { label: "Workflows", url: ROUTES.WORKFLOWS },
+            ...getLoganSearchLinks(loganSearchEnabled),
+            {
+              label: "Priority Pathogens",
+              url: SITE_ROUTES.PRIORITY_PATHOGENS,
+            },
+          ]),
+          JOIN_US,
+          CONTACT_US,
         ],
-        url: "",
-        visible: VISIBLE_AT_SM,
-      },
-      {
-        label: "Join Us",
-        menuItems: socialMenuItems,
         url: "",
         visible: VISIBLE_AT_SM_MD,
       },
+      { ...JOIN_US, visible: VISIBLE_AT_LG },
+      { ...CONTACT_US, visible: VISIBLE_AT_XS_LG },
     ],
     undefined,
   ];
@@ -109,4 +134,17 @@ function visibleOnly(...breakpoints: BreakpointKey[]): NavLinkItem["visible"] {
       breakpoints.includes(key),
     ])
   );
+}
+
+/**
+ * Returns the links, each visible only at the given breakpoints.
+ * @param visible - Breakpoints the links are visible at.
+ * @param links - Links.
+ * @returns links with the visibility applied.
+ */
+function withVisible(
+  visible: NavLinkItem["visible"],
+  links: NavLinkItem[]
+): NavLinkItem[] {
+  return links.map((link) => ({ ...link, visible }));
 }
