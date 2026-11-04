@@ -8,7 +8,17 @@ import logging
 import re
 import time
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Set
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+)
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
@@ -1469,6 +1479,7 @@ class AssistantAgent:
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
         remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
+        workflows = None
         if not message:
             # A clear on its own: the user said nothing they could have
             # committed to, so there is nothing to extract -- and skipping it
@@ -1482,19 +1493,21 @@ class AssistantAgent:
             )
             schema_updates, extract_usage = {}, None
         else:
+            workflows = self._session_workflows(result.all_messages())
             schema_updates, extract_usage = await self._extract_state(
                 state.schema_state,
                 message,
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
                 cleared=cleared,
-                workflows=self._session_workflows(result.all_messages()),
+                workflows=workflows,
             )
         schema_state = self._apply_schema_updates(
             state.schema_state,
             schema_updates,
             logan=state.metadata.get("logan"),
             user_message=message,
+            workflows=workflows,
         )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
@@ -2132,6 +2145,7 @@ class AssistantAgent:
         updates: Dict[str, Optional[str]],
         logan: Optional[dict] = None,
         user_message: Optional[str] = None,
+        workflows: Optional[List[SessionWorkflow]] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -2175,7 +2189,12 @@ class AssistantAgent:
             # falling back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
-                field.detail = self._find_workflow_by_trs_value(workflow_value)
+                # A restated choice keeps its match: the session's lookups,
+                # which the name fallback depends on, change between turns.
+                if workflow_value == current.workflow.value:
+                    field.detail = current.workflow.detail
+                if not field.detail:
+                    field.detail = self._find_workflow_by_trs_value(workflow_value)
                 # Whole tokens, so "rnaseq-pe-main-v2" is not "rnaseq-pe-main".
                 value_tokens = set(_ID_TOKEN_RE.findall(workflow_value))
                 for cat in self.catalog.workflows_by_category:
@@ -2195,7 +2214,7 @@ class AssistantAgent:
                             field.detail = wf.get("trsId") or iwc_id
                             break
                 if not field.detail:
-                    field.detail = self._find_workflow_trs_id(workflow_value)
+                    field.detail = self._find_workflow_trs_id(workflow_value, workflows)
                 if not field.detail:
                     # Named a workflow we can't map to a visible (assembly-scope)
                     # catalog entry. Clear the field rather than commit a phantom
@@ -2503,17 +2522,22 @@ class AssistantAgent:
                     return trs_id
         return None
 
-    def _find_workflow_trs_id(self, value: str) -> Optional[str]:
+    def _find_workflow_trs_id(
+        self, value: str, workflows: Optional[List[SessionWorkflow]] = None
+    ) -> Optional[str]:
         """Fallback: match a workflow by name when iwcId isn't in the value.
 
         Names are compared case-insensitively with every run of punctuation
         and whitespace treated as one space, so "Paired-End" matches the
-        catalog's "Paired end". An exact name wins; otherwise the value must
-        contain, or be contained in, exactly one workflow's name, so a vague
-        label like "RNA Seq" clears rather than commits whichever workflow
-        comes first."""
+        catalog's "Paired end". An exact name wins. Otherwise the names the
+        value contains are preferred to the names it is part of, and the
+        longest wins if it contains the rest ("Capture Hi-C Processing" over
+        "Hi-C Processing"); anything else ambiguous, like "RNA Seq", clears
+        rather than commits whichever workflow comes first. When `workflows`
+        lists the session's lookups, a partial match must be one of them, so a
+        label can't pick a workflow the chat never showed."""
         val_norm = _normalise_name(value)
-        partial: Dict[str, str] = {}
+        partial: Dict[str, Tuple[str, Optional[str]]] = {}
         # An empty value is in every name, so it never matches.
         for cat in self.catalog.workflows_by_category if val_norm else []:
             for wf in cat.get("workflows", []):
@@ -2529,11 +2553,19 @@ class AssistantAgent:
                     logger.info("Workflow fallback matched name '%s'", wf_name)
                     return ref
                 if wf_name in val_norm or val_norm in wf_name:
-                    partial[ref] = wf_name
-        if len(partial) == 1:
-            ref, wf_name = next(iter(partial.items()))
-            logger.info("Workflow fallback matched name '%s'", wf_name)
-            return ref
+                    partial[ref] = (wf_name, wf.get("iwcId"))
+        # Names inside the value first; a name the value is part of counts alone.
+        names = {r: m for r, m in partial.items() if m[0] in val_norm} or (
+            partial if len(partial) == 1 else {}
+        )
+        if names:
+            ref, (wf_name, iwc_id) = max(names.items(), key=lambda i: len(i[1][0]))
+            shown = {wf["iwc_id"] for wf in workflows or []}
+            if all(m[0] in wf_name for m in names.values()) and (
+                not shown or iwc_id in shown
+            ):
+                logger.info("Workflow fallback matched name '%s'", wf_name)
+                return ref
         logger.warning(
             "Workflow fallback found no unique match for '%s' (%d partial)",
             value,
@@ -2572,5 +2604,9 @@ class AssistantAgent:
                     continue
                 trs_id = wf.get("trsId")
                 if iwc_id in tokens or (trs_id and trs_id_key(trs_id) in trs_keys):
-                    found[iwc_id] = {"iwc_id": iwc_id, "name": wf.get("workflowName")}
+                    name = wf.get("workflowName")
+                    found[iwc_id] = {
+                        "iwc_id": iwc_id,
+                        "name": html.unescape(name) if name else name,
+                    }
         return list(found.values())
