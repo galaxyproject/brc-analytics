@@ -22,6 +22,19 @@ uv run uvicorn app.main:create_app --factory --reload
 
 API documentation: http://localhost:8000/api/docs
 
+### Gene data (local)
+
+The gene endpoints read a gene snapshot, a DuckDB file. The servers download the one pinned in `app/data/genes/snapshot-pin.json`, but its bucket only accepts the servers, so on a laptop you build a snapshot from NCBI's public files and point the API at it. From `catalog/py_package`, with `catalog/build/py/requirements.txt` installed on Python 3.12:
+
+```bash
+python -m catalog_build.genes.build_gene_snapshot \
+  --assembly GCF_000002765.6 \
+  --gff3 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/765/GCF_000002765.6_GCA_000002765/GCF_000002765.6_GCA_000002765_genomic.gff.gz \
+  --out ~/genes-3d7.duckdb
+```
+
+Then set `GENE_SNAPSHOT_PATH` to the file's absolute path in `backend/api/.env` and start the API as above. `GET /api/v1/health` shows `"genes": {"status": "ready", "source": "local", …}`. Without it, gene requests return 503 "Gene data is unavailable". See [the gene snapshot release design](../../catalog/docs/gene-catalog/gene-snapshot-release-design.md) for how the servers get theirs.
+
 ### Production (Docker)
 
 Docker Compose orchestration is managed from the parent `/backend` directory.

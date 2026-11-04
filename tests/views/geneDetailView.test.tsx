@@ -45,13 +45,13 @@ const GENE: Gene = {
   pageUrl:
     "http://localhost:3000/data/genes/detail?uid=d9049485-ed74-5455-98c2-5dc13eef544a",
   provenance: {
-    annotationSetVersionId: "asv",
+    annotationSetVersionId: "ncbi-refseq-GCF_000002765.6-6ebba335",
     genesAsOf: null,
-    provider: null,
+    provider: "Community Annotation",
     publisher: "NCBI RefSeq",
-    releaseDate: null,
-    releaseLabel: null,
-    retrievedAt: "2026-10-01T00:00:00Z",
+    releaseDate: "2026-09-18",
+    releaseLabel: "RS_2026_09",
+    retrievedAt: "2026-11-03T01:27:26Z",
   },
   status: "current",
   symbol: "AMA1",
@@ -145,8 +145,129 @@ describe("GeneDetailView", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a protein-coding gene's type by its display name", () => {
+    renderGene(GENE);
+    expect(getFieldValue("Gene type")).toHaveTextContent(/^Protein-coding$/);
+  });
+
+  it("shows a gene type that isn't protein-coding", () => {
+    renderGene({ ...GENE, biotype: "tRNA" });
+    expect(getFieldValue("Gene type")).toHaveTextContent(/^tRNA$/);
+  });
+
+  it("shows a gene type with no display name as written", () => {
+    renderGene({ ...GENE, biotype: "new_biotype" });
+    expect(getFieldValue("Gene type")).toHaveTextContent(/^new_biotype$/);
+  });
+
+  it("shows a dash when the gene has no type", () => {
+    renderGene({ ...GENE, biotype: null });
+    expect(getFieldValue("Gene type")).toHaveTextContent(/^—$/);
+  });
+
+  it("links the NCBI GeneID to its NCBI Gene page, in a new tab", () => {
+    renderGene(GENE);
+    const link = within(getFieldValue("NCBI GeneID")).getByRole("link", {
+      name: /810891/,
+    });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://www.ncbi.nlm.nih.gov/gene/810891"
+    );
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveTextContent("810891");
+  });
+
+  it("leaves out previous IDs when the gene has none", () => {
+    renderGene(GENE);
+    expect(screen.queryByText("Previous IDs")).not.toBeInTheDocument();
+  });
+
+  it("lists each previous ID with its publisher", () => {
+    // TOP6A, which has a previous locus tag.
+    renderGene({
+      ...GENE,
+      aliases: [
+        ...GENE.aliases,
+        {
+          current: false,
+          publisher: "NCBI RefSeq",
+          type: "old_locus_tag",
+          value: "PF3D7_1217100.2",
+          via: null,
+        },
+        {
+          current: false,
+          publisher: "NCBI GenBank",
+          type: "old_locus_tag",
+          value: "PFL0815w",
+          via: null,
+        },
+      ],
+      locusTag: "PF3D7_1217100",
+      name: "TOP6A",
+      symbol: "TOP6A",
+    });
+    expect(
+      Array.from(
+        getFieldValue("Previous IDs").children,
+        (child) => child.textContent
+      )
+    ).toStrictEqual([
+      "PF3D7_1217100.2 (NCBI RefSeq)",
+      "PFL0815w (NCBI GenBank)",
+    ]);
+  });
+
+  it("names the annotation the gene was read from and when it was retrieved", () => {
+    renderGene(GENE);
+    expect(getFieldValue("Annotation")).toHaveTextContent(
+      /^NCBI RefSeq \(Community Annotation, RS_2026_09, released 2026-09-18\), retrieved 2026-11-03$/
+    );
+  });
+
+  it("adds the date the annotation's genes last changed, when known", () => {
+    renderGene({
+      ...GENE,
+      provenance: { ...GENE.provenance, genesAsOf: "2026-10-01" },
+    });
+    expect(getFieldValue("Annotation")).toHaveTextContent(
+      "(Community Annotation, RS_2026_09, released 2026-09-18; genes as of 2026-10-01)"
+    );
+  });
+
+  it("leaves out the annotation fields it doesn't give", () => {
+    renderGene({
+      ...GENE,
+      provenance: {
+        ...GENE.provenance,
+        provider: null,
+        releaseLabel: null,
+      },
+    });
+    expect(getFieldValue("Annotation")).toHaveTextContent(
+      /^NCBI RefSeq \(released 2026-09-18\), retrieved 2026-11-03$/
+    );
+  });
+
+  it("leaves out the brackets when the annotation gives no details", () => {
+    renderGene({
+      ...GENE,
+      provenance: {
+        ...GENE.provenance,
+        provider: null,
+        releaseDate: null,
+        releaseLabel: null,
+      },
+    });
+    expect(getFieldValue("Annotation")).toHaveTextContent(
+      /^NCBI RefSeq, retrieved 2026-11-03$/
+    );
+  });
+
   it("shows the gene ID as plain text when the gene has no NCBI GeneID", () => {
     renderGene({ ...GENE, aliases: [] });
+    expect(getFieldValue("NCBI GeneID")).toHaveTextContent(/^—$/);
     // The title and breadcrumb show the ID too, so read the field's value.
     const value = getFieldValue("Gene ID");
     expect(value).toHaveTextContent("PF3D7_1133400");

@@ -1,9 +1,51 @@
 import {
   type GeneAlias,
   type GeneLocation,
+  type GeneProvenance,
 } from "@repo/shared/services/genes/types";
 import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
-import { NCBI_GENE_ID_ALIAS_TYPE, NCBI_GENE_URL } from "./constants";
+import {
+  GENE_TYPE_NAMES,
+  NCBI_GENE_ID_ALIAS_TYPE,
+  NCBI_GENE_URL,
+} from "./constants";
+
+/**
+ * The gene page's line naming the annotation a gene was read from: its
+ * publisher, provider, release label, release date and the date its genes last
+ * changed, then when we retrieved it. It follows the gene catalog contract's
+ * provenance line (section 2), but leaves out the assembly, which the page's
+ * Assembly row shows, and labels the release date. Fields the annotation
+ * doesn't give are left out, and so are the brackets when it gives none of
+ * them.
+ * @param provenance - The gene's provenance.
+ * @returns E.g. "NCBI RefSeq (Community Annotation, RS_2026_09, released
+ * 2026-09-18), retrieved 2026-11-03".
+ */
+export function formatAnnotation(provenance: GeneProvenance): string {
+  const {
+    genesAsOf,
+    provider,
+    publisher,
+    releaseDate,
+    releaseLabel,
+    retrievedAt,
+  } = provenance;
+  const release = [
+    provider,
+    releaseLabel,
+    releaseDate && `released ${releaseDate}`,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  const details = [release, genesAsOf && `genes as of ${genesAsOf}`]
+    .filter(Boolean)
+    .join("; ");
+  const retrieved = `retrieved ${formatRetrievedDate(retrievedAt)}`;
+  return details
+    ? `${publisher} (${details}), ${retrieved}`
+    : `${publisher}, ${retrieved}`;
+}
 
 /**
  * Format a genome location as the gene page shows it.
@@ -16,16 +58,58 @@ export function formatLocation(location: GeneLocation): string {
 }
 
 /**
- * A gene's NCBI Gene page, from its NCBI GeneID alias.
+ * The date of a retrieval time, in UTC.
+ * @param retrievedAt - An ISO 8601 date and time, e.g. "2026-11-03T01:27:26Z".
+ * @returns E.g. "2026-11-03".
+ */
+function formatRetrievedDate(retrievedAt: string): string {
+  return new Date(retrievedAt).toISOString().slice(0, 10);
+}
+
+/**
+ * A gene type's display name.
+ * @param biotype - The gene's type, as NCBI writes it in `gene_biotype`.
+ * @returns E.g. "Protein-coding" for "protein_coding"; a type with no display
+ * name as written; null when the gene has no type.
+ */
+export function getGeneTypeName(biotype: string | null): string | null {
+  if (!biotype) return null;
+  return Object.hasOwn(GENE_TYPE_NAMES, biotype)
+    ? GENE_TYPE_NAMES[biotype]
+    : biotype;
+}
+
+/**
+ * A gene's NCBI GeneID, from its aliases.
  * @param aliases - The gene's aliases.
+ * @returns E.g. "810891", or null when the gene has none.
+ */
+export function getNcbiGeneId(aliases: GeneAlias[]): string | null {
+  return (
+    aliases.find(({ type }) => type === NCBI_GENE_ID_ALIAS_TYPE)?.value ?? null
+  );
+}
+
+/**
+ * A gene's NCBI Gene page.
+ * @param geneId - The gene's NCBI GeneID, or null.
  * @returns E.g. "https://www.ncbi.nlm.nih.gov/gene/810891", or null when the
  * gene has no NCBI GeneID.
  */
-export function getNcbiGeneUrl(aliases: GeneAlias[]): string | null {
-  const geneId = aliases.find(
-    ({ type }) => type === NCBI_GENE_ID_ALIAS_TYPE
-  )?.value;
+export function getNcbiGeneUrl(geneId: string | null): string | null {
   return geneId ? `${NCBI_GENE_URL}/${encodeURIComponent(geneId)}` : null;
+}
+
+/**
+ * A gene's previous IDs, each with the publisher that gave it: the aliases the
+ * gene API marks as no longer current, such as old locus tags.
+ * @param aliases - The gene's aliases.
+ * @returns E.g. ["PF3D7_1217100.2 (NCBI RefSeq)"]; empty when it has none.
+ */
+export function getPreviousIds(aliases: GeneAlias[]): string[] {
+  return aliases
+    .filter(({ current }) => !current)
+    .map(({ publisher, value }) => `${value} (${publisher})`);
 }
 
 /**
