@@ -14,6 +14,7 @@ from typing import (
     Awaitable,
     Callable,
     Dict,
+    Iterator,
     List,
     Optional,
     Set,
@@ -1883,9 +1884,9 @@ class AssistantAgent:
             else:
                 # Nothing is suggested: the handoff goes through the Continue
                 # button, which carries the captured inputs, and a chip would
-                # only send its label to the model as a chat message. When the
-                # assembly didn't resolve to an accession there's no Continue
-                # button either; clearing that assembly is the fix (#1955).
+                # only send its label to the model as a chat message. An assembly
+                # the handoff can't use is cleared by _reflect_assembly, so the
+                # ladder offers the assembly chips again instead of landing here.
                 proposals = []
         except Exception:
             logger.warning(
@@ -1900,16 +1901,7 @@ class AssistantAgent:
 
         Prefers the organism's stored taxonomy id (its detail); falls back to a
         species-name match. Returns the first genome flagged isRef=Yes."""
-        taxid = organism.detail
-        name = (organism.value or "").lower()
-        for org in self.catalog.organisms:
-            if taxid:
-                if str(org.get("ncbiTaxonomyId")) != str(taxid):
-                    continue
-            else:
-                species = (org.get("taxonomicLevelSpecies") or "").lower()
-                if not (species and species in name):
-                    continue
+        for org in self._catalog_organisms_for(organism):
             for genome in org.get("genomes", []):
                 if genome.get("isRef") == "Yes":
                     return genome.get("accession")
@@ -2184,6 +2176,11 @@ class AssistantAgent:
                     field.detail = acc_match.group(1)
                 else:
                     field.detail = self._find_assembly_accession(str(value), schema)
+                # The extractor sees only the prior value text and may reword a
+                # committed assembly so it no longer resolves; keep the
+                # committed one rather than let _reflect_assembly clear it.
+                if not field.detail and self._usable_assembly(current.assembly):
+                    continue
 
             # For workflow, try a TRS id in the value string, then the iwcId,
             # falling back to a case-insensitive name match against the catalog.
@@ -2239,6 +2236,7 @@ class AssistantAgent:
         # workflow cleared here also clears its derived fields.
         self._clear_stale_dependents(current, schema)
 
+        self._reflect_assembly(schema)
         self._reflect_workflow(schema)
         self._reflect_data_characteristics(schema)
         self._reflect_gene_annotation_requirement(schema)
@@ -2299,6 +2297,30 @@ class AssistantAgent:
         # the old category) stale.
         if changed("analysis_type") and not changed("workflow"):
             schema.workflow = SchemaField()
+
+    def _reflect_assembly(self, schema: AnalysisSchema) -> None:
+        """Drop a FILLED assembly the handoff can't use: one with no accession,
+        or an accession the catalog doesn't have. Without it the tracker could
+        show every field set and still have no Continue button. Runs every
+        call, so a restored session carrying such an assembly is cleared too."""
+        if schema.assembly.status != FieldStatus.FILLED:
+            return
+        if self._usable_assembly(schema.assembly):
+            return
+        logger.warning(
+            "Clearing assembly '%s': accession %s not in the catalog",
+            schema.assembly.value,
+            schema.assembly.detail,
+        )
+        schema.assembly = SchemaField()
+
+    def _usable_assembly(self, assembly: SchemaField) -> bool:
+        """True when the assembly is FILLED with an accession the catalog has."""
+        return (
+            assembly.status == FieldStatus.FILLED
+            and bool(assembly.detail)
+            and bool(self.catalog.get_assembly_details(assembly.detail))
+        )
 
     def _reflect_workflow(self, schema: AnalysisSchema) -> None:
         """Drop a FILLED workflow whose detail no longer maps to a visible
@@ -2474,15 +2496,10 @@ class AssistantAgent:
         """Fallback: search the catalog for an assembly matching the LLM value."""
         val_lower = value.lower()
         # If we already know the organism, narrow the search
-        tax_id = None
-        if schema.organism.detail:
-            tax_id = schema.organism.detail
-        elif schema.organism.status == FieldStatus.FILLED and schema.organism.value:
-            for org in self.catalog.organisms:
-                species = (org.get("taxonomicLevelSpecies") or "").lower()
-                if species and species in schema.organism.value.lower():
-                    tax_id = str(org.get("ncbiTaxonomyId"))
-                    break
+        tax_id = schema.organism.detail
+        if not tax_id and schema.organism.status == FieldStatus.FILLED:
+            organism = next(self._catalog_organisms_for(schema.organism), None)
+            tax_id = str(organism.get("ncbiTaxonomyId")) if organism else None
 
         candidates: list[dict] = []
         for org in self.catalog.organisms:
@@ -2495,8 +2512,12 @@ class AssistantAgent:
                     candidates.append(g)
 
         # If no strain match, don't guess from species alone -- too ambiguous
-        # when an organism has many assemblies.
+        # when an organism has many assemblies. "Reference" wording is the one
+        # exception: it names the assembly the "Use the reference assembly"
+        # chip offers, and that chip sends only its label.
         if not candidates:
+            if "reference" in val_lower:
+                return self._reference_assembly_for(schema.organism)
             logger.warning("Assembly fallback found no match for '%s'", value)
             return None
 
@@ -2511,6 +2532,22 @@ class AssistantAgent:
         accession = candidates[0].get("accession")
         logger.info("Assembly fallback matched '%s'", accession)
         return accession
+
+    def _catalog_organisms_for(self, organism: SchemaField) -> Iterator[Dict[str, Any]]:
+        """The catalog organisms the committed organism names, in catalog
+        order: matched by its taxonomy id (detail) when it has one, else by a
+        catalog species name appearing in its value."""
+        if organism.detail:
+            taxid = str(organism.detail)
+            for org in self.catalog.organisms:
+                if str(org.get("ncbiTaxonomyId")) == taxid:
+                    yield org
+            return
+        name = (organism.value or "").lower()
+        for org in self.catalog.organisms:
+            species = (org.get("taxonomicLevelSpecies") or "").lower()
+            if species and species in name:
+                yield org
 
     def _find_workflow_by_trs_value(self, value: str) -> Optional[str]:
         """The catalog trsId of the visible workflow whose TRS id appears in

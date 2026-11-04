@@ -492,13 +492,13 @@ class TestApplySchemaUpdates:
         )
         assert result.assembly.detail == "GCA_000001405.29"
 
-    def test_assembly_no_accession(self, agent):
+    def test_assembly_no_accession_clears(self, agent):
+        # No accession and no strain name: the handoff couldn't use it (#1955).
         schema = AnalysisSchema()
         result = agent._apply_schema_updates(
             schema, {"assembly": "Some assembly without accession"}
         )
-        assert result.assembly.status == FieldStatus.FILLED
-        assert result.assembly.detail is None
+        assert result.assembly == SchemaField()
 
     def test_invalid_field_name_ignored(self, agent):
         schema = AnalysisSchema()
@@ -3860,3 +3860,86 @@ class TestExtractorLeftWorkflowOut:
         prior.workflow = SchemaField(value="RNA-Seq", status=FieldStatus.FILLED)
         await agent._extract_state(prior, "hi", "reply", workflows=self._CANDIDATES)
         assert "Extractor left the workflow out" not in caplog.text
+
+
+# ---------- _reflect_assembly ----------
+
+_PF_REF = "GCF_000002765.6"
+_PV_REF = "GCF_000002415.2"
+
+
+def _assembly_catalog(agent):
+    """Two species, one reference assembly each, behind a catalog stub."""
+    agent.catalog.organisms = [
+        {
+            "ncbiTaxonomyId": 5833,
+            "taxonomicLevelSpecies": "Plasmodium falciparum",
+            "genomes": [{"accession": _PF_REF, "strainName": "3D7", "isRef": "Yes"}],
+        },
+        {
+            "ncbiTaxonomyId": 5855,
+            "taxonomicLevelSpecies": "Plasmodium vivax",
+            "genomes": [
+                {"accession": _PV_REF, "strainName": "Salvador I", "isRef": "Yes"}
+            ],
+        },
+    ]
+    species = {
+        g["accession"]: org["taxonomicLevelSpecies"]
+        for org in agent.catalog.organisms
+        for g in org["genomes"]
+    }
+    agent.catalog.get_assembly_details.side_effect = lambda acc: (
+        {"accession": acc, "species": species[acc]} if acc in species else None
+    )
+
+
+def _set_assembly(agent, assembly, organism="Plasmodium falciparum"):
+    """Apply an assembly update on top of a committed organism."""
+    schema = AnalysisSchema(organism=_filled_field(organism))
+    return agent._apply_schema_updates(schema, {"assembly": assembly})
+
+
+class TestReflectAssembly:
+    @pytest.fixture(autouse=True)
+    def _catalog(self, agent):
+        _assembly_catalog(agent)
+
+    def test_wording_without_accession_or_strain_clears_and_offers_chips(self, agent):
+        result = _set_assembly(agent, "Plasmodium falciparum")
+        assert result.assembly == SchemaField()
+        labels = [c.label for c in agent._derive_suggestions(result)]
+        assert labels == [
+            "Use the reference assembly",
+            "Show me the available assemblies",
+        ]
+
+    def test_strain_name_resolves(self, agent):
+        assert _set_assembly(agent, "the 3D7 assembly").assembly.detail == _PF_REF
+
+    def test_accession_not_in_catalog_clears(self, agent):
+        assert _set_assembly(agent, "GCA_999999999.1").assembly == SchemaField()
+
+    def test_accession_for_the_organism_is_kept(self, agent):
+        result = _set_assembly(agent, _PF_REF)
+        assert result.assembly.status == FieldStatus.FILLED
+        assert result.assembly.detail == _PF_REF
+
+    def test_reference_wording_resolves_to_the_reference_assembly(self, agent):
+        # The "Use the reference assembly" chip sends only its label.
+        result = _set_assembly(agent, "the reference assembly")
+        assert result.assembly.detail == _PF_REF
+
+    def test_reworded_committed_assembly_is_kept(self, agent):
+        committed = _set_assembly(agent, f"{_PF_REF} (3D7)")
+        result = agent._apply_schema_updates(
+            committed, {"assembly": "P. falciparum genome"}
+        )
+        assert result.assembly == committed.assembly
+
+    def test_restored_session_is_cleared(self, agent):
+        saved = AnalysisSchema(
+            organism=_filled_field("Plasmodium falciparum"),
+            assembly=_filled_field("Pf assembly"),
+        )
+        assert agent.reconcile_schema(saved).assembly == SchemaField()
