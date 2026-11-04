@@ -3930,6 +3930,13 @@ class TestReflectAssembly:
         result = _set_assembly(agent, "the reference assembly")
         assert result.assembly.detail == _PF_REF
 
+    def test_one_letter_strain_does_not_match_inside_a_word(self, agent):
+        # Erysiphe necator has a non-reference strain named "c".
+        genomes = agent.catalog.organisms[0]["genomes"]
+        genomes.insert(0, {"accession": "GCA_000000001.1", "strainName": "c"})
+        result = _set_assembly(agent, "the reference assembly")
+        assert result.assembly.detail == _PF_REF
+
     def test_reworded_committed_assembly_is_kept(self, agent):
         committed = _set_assembly(agent, f"{_PF_REF} (3D7)")
         result = agent._apply_schema_updates(

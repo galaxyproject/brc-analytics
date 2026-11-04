@@ -481,6 +481,12 @@ def build_system_prompt(
 SessionWorkflow = Dict[str, Optional[str]]
 
 
+def _contains_term(text: str, term: str) -> bool:
+    """True when `term` appears in `text` as a whole word, so a one-letter
+    strain such as "c" doesn't match inside "reference"."""
+    return re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])", text) is not None
+
+
 def _normalise_name(name: str) -> str:
     """Lowercase `name` and collapse each run of non-alphanumerics to a space.
 
@@ -2508,7 +2514,7 @@ class AssistantAgent:
                 continue
             for g in org.get("genomes", []):
                 strain = (g.get("strainName") or "").strip().lower()
-                if strain and strain in val_lower:
+                if strain and _contains_term(val_lower, strain):
                     candidates.append(g)
 
         # If no strain match, don't guess from species alone -- too ambiguous
