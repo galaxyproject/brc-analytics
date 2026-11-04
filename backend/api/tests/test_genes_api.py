@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient
 from app.api.v1 import genes
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
 from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
-from app.services.gene_catalog import GeneCatalogService
+from app.services.gene_catalog import SCHEMA_VERSION, GeneCatalogService
 
 
 def make_client(
@@ -172,10 +172,19 @@ def test_transcript_without_an_id(client, gene_uid):
     assert all(a["type"] != "transcript_id" for a in gene["aliases"])
 
 
-def test_assembly_without_a_ucsc_browser(tmp_path, gene_snapshot_path, gene_uid):
-    service = altered_snapshot(
-        tmp_path, gene_snapshot_path, "UPDATE assembly SET ucsc_browser_url = NULL"
-    )
+@pytest.mark.parametrize(
+    "change",
+    [
+        # UCSC has no browser for the assembly.
+        "UPDATE assembly SET ucsc_browser_url = NULL",
+        # As if AMA1 were on the mitochondrion, which UCSC's 3D7 browser lacks.
+        "UPDATE gene SET seq_name = 'NC_037526.1' WHERE locus_tag = 'PF3D7_1133400'",
+    ],
+)
+def test_gene_ucsc_cannot_show_has_no_ucsc_address(
+    tmp_path, gene_snapshot_path, gene_uid, change
+):
+    service = altered_snapshot(tmp_path, gene_snapshot_path, change)
     try:
         response = make_client(service).get(
             f"/api/v1/genes/{gene_uid('PF3D7_1133400')}"
@@ -223,8 +232,9 @@ def test_concurrent_requests(service, gene_uid):
 @pytest.mark.parametrize(
     "change",
     [
-        "UPDATE snapshot SET schema_version = 2",
+        f"UPDATE snapshot SET schema_version = {SCHEMA_VERSION + 1}",
         "DROP TABLE alt_id",
+        "DROP TABLE ucsc_sequence",
         "ALTER TABLE transcript DROP COLUMN protein_product",
     ],
 )
