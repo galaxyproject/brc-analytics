@@ -2,11 +2,11 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
 import { Table } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { type ReadRun } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/SequencingStep/components/ENASequencingData/types";
 import { type Table as TanStackTable } from "@tanstack/react-table";
 import { type JSX } from "react";
-import { StyledDialog } from "./collectionSelector.styles";
 import { type Props } from "./types";
 
 /**
@@ -30,7 +30,7 @@ export const CollectionSelector = ({
 }: Props): JSX.Element => {
   const count = getRowSelectionCount(table);
   return (
-    <StyledDialog
+    <SelectorDialog
       onClose={onCancel}
       onTransitionEnter={onTransitionEnter}
       onTransitionExited={onTransitionExited}
@@ -53,7 +53,7 @@ export const CollectionSelector = ({
           {renderButtonText(count)}
         </Button>
       </DialogActions>
-    </StyledDialog>
+    </SelectorDialog>
   );
 };
 

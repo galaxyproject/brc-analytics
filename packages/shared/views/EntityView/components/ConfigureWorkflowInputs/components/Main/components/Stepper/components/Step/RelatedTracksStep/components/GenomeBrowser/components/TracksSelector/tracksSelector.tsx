@@ -2,10 +2,10 @@ import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/B
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
+import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
 import { type RowSelectionState } from "@tanstack/table-core";
 import { type JSX, useCallback, useState } from "react";
 import { TracksSelectionPanel } from "./components/TracksSelectionPanel/tracksSelectionPanel";
-import { StyledDialog } from "./tracksSelector.styles";
 import { type Props } from "./types";
 import { getTracksData } from "./utils";
 
@@ -29,7 +29,7 @@ export const TracksSelector = ({
   }, [table]);
 
   return (
-    <StyledDialog
+    <SelectorDialog
       onTransitionEnter={onTransitionEnter}
       onClose={onCancel}
       open={open}
@@ -54,7 +54,7 @@ export const TracksSelector = ({
           {renderButtonText(selectedCount)}
         </Button>
       </DialogActions>
-    </StyledDialog>
+    </SelectorDialog>
   );
 };
 
