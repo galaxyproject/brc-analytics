@@ -29,7 +29,7 @@
     "format:python": "./scripts/format-python.sh",
     "lint:python": "./scripts/lint-python.sh",
     "prepare": "husky",
-    "test": "jest --runInBand --passWithNoTests",
+    "test": "jest --runInBand",
     "test:e2e:brc": "npx playwright test --config=sites/brc-analytics/playwright.config.ts",
     "test:e2e:api": "npx playwright test --config=playwright.api.config.ts",
     "test:e2e:ga2": "npx playwright test --config=sites/ga2/playwright.config.ts",
