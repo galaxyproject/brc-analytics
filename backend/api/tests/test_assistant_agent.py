@@ -3376,3 +3376,282 @@ class TestExtractPayloadClears:
         )
         payload = agent._run_agent_once.await_args.args[0]
         assert '["workflow"]' in payload
+
+
+# ---------- workflow named without its IWC id (#1808) ----------
+
+_HAPLOID_TRS = (
+    "#workflow/github.com/iwc-workflows/haploid-variant-calling-wgs-pe/main"
+    "/versions/v0.1"
+)
+_RNASEQ_PE_TRS = "#workflow/github.com/iwc-workflows/rnaseq-pe/main/versions/v1.3"
+
+
+def _workflow_catalog():
+    return [
+        {
+            "category": "VARIANT_CALLING",
+            "workflows": [
+                {
+                    "iwcId": "haploid-variant-calling-wgs-pe-main",
+                    "workflowName": "Paired end variant calling in haploid system",
+                    "trsId": _HAPLOID_TRS,
+                }
+            ],
+        },
+        {
+            "category": "TRANSCRIPTOMICS",
+            "workflows": [
+                {
+                    "iwcId": "rnaseq-pe-main",
+                    "workflowName": (
+                        "RNA-Seq Analysis: Paired-End Read Processing and "
+                        "Quantification"
+                    ),
+                    "trsId": _RNASEQ_PE_TRS,
+                },
+                {
+                    "iwcId": "assembly-with-flye-main",
+                    "workflowName": "Assembly with Flye",
+                    "scope": "ORGANISM",
+                    "trsId": "#workflow/github.com/iwc-workflows/flye/main",
+                },
+            ],
+        },
+    ]
+
+
+def _name_catalog(*names):
+    """One ASSEMBLY-scope workflow per name, with TRS ids trs-0, trs-1, ..."""
+    workflows = [
+        {"iwcId": f"wf-{i}", "workflowName": name, "trsId": f"trs-{i}"}
+        for i, name in enumerate(names)
+    ]
+    return [{"category": "ANY", "workflows": workflows}]
+
+
+def _tool_turn(tool_name, args, content):
+    """One request/response pair: a tool call and its result."""
+    return [
+        ModelResponse(
+            parts=[ToolCallPart(tool_name=tool_name, args=args, tool_call_id="c1")]
+        ),
+        ModelRequest(
+            parts=[
+                ToolReturnPart(tool_name=tool_name, content=content, tool_call_id="c1")
+            ]
+        ),
+    ]
+
+
+class TestWorkflowNameMatch:
+    def test_hyphen_vs_space_resolves(self, agent):
+        # The #1808 repro: the reply's "Paired-End" vs the catalog's "Paired end".
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        result = agent._apply_schema_updates(
+            AnalysisSchema(),
+            {"workflow": "Paired-End Variant Calling in Haploid System"},
+        )
+        assert result.workflow.status == FieldStatus.FILLED
+        assert result.workflow.detail == _HAPLOID_TRS
+
+    def test_unmatched_name_still_clears(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Protein folding with AlphaFold"}
+        )
+        assert result.workflow.status == FieldStatus.EMPTY
+
+    def test_id_inside_a_longer_id_does_not_map(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        result = agent._apply_schema_updates(
+            AnalysisSchema(), {"workflow": "Some workflow (rnaseq-pe-main-v2)"}
+        )
+        assert result.workflow.status == FieldStatus.EMPTY
+
+    def test_exact_name_wins_over_a_longer_name(self, agent):
+        agent.catalog.workflows_by_category = _name_catalog(
+            "Capture Hi-C processing", "Hi-C processing"
+        )
+        assert agent._find_workflow_trs_id("Hi-C Processing") == "trs-1"
+
+    def test_partial_match_must_be_unique(self, agent):
+        # "RNA Seq" is in both names: clear rather than commit the first.
+        agent.catalog.workflows_by_category = _name_catalog(
+            "Single-cell RNA-Seq preprocessing", "RNA-Seq Analysis: Paired-End"
+        )
+        assert agent._find_workflow_trs_id("RNA Seq") is None
+
+    def test_unique_partial_match_resolves(self, agent):
+        agent.catalog.workflows_by_category = _name_catalog(
+            "Single-cell RNA-Seq preprocessing", "RNA-Seq Analysis: Paired-End"
+        )
+        assert agent._find_workflow_trs_id("Single cell RNA-Seq") == "trs-0"
+
+    def test_html_entities_in_catalog_names(self, agent):
+        agent.catalog.workflows_by_category = _name_catalog(
+            "CUT&amp;RUN/CUT&amp;TAG Analysis"
+        )
+        assert agent._find_workflow_trs_id("CUT&RUN/CUT&TAG Analysis") == "trs-0"
+
+    def test_punctuation_only_value_matches_nothing(self, agent):
+        # Normalises to "", which every name contains -- must not pick the first.
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        assert agent._find_workflow_trs_id(" -- ") is None
+
+
+class TestSessionWorkflows:
+    def test_no_tool_traffic(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        messages = [
+            ModelRequest(parts=[UserPromptPart(content="rnaseq-pe-main please")]),
+            ModelResponse(parts=[TextPart(content="Sure, rnaseq-pe-main.")]),
+        ]
+        # Only tool traffic counts; the prose is what the extractor already sees.
+        assert agent._session_workflows(messages) == []
+
+    def test_id_in_tool_result(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        messages = _tool_turn(
+            "get_workflow_details",
+            {"iwc_id": "haploid-variant-calling-wgs-pe-main"},
+            '{"iwc_id": "haploid-variant-calling-wgs-pe-main"}',
+        )
+        assert agent._session_workflows(messages) == [
+            {
+                "iwc_id": "haploid-variant-calling-wgs-pe-main",
+                "name": "Paired end variant calling in haploid system",
+            }
+        ]
+
+    def test_id_only_in_call_args_is_not_a_candidate(self, agent):
+        # A guessed id that came back "not found" was never shown to the user.
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        messages = _tool_turn(
+            "get_workflow_details", {"iwc_id": "rnaseq-pe-main"}, "Workflow not found."
+        )
+        assert agent._session_workflows(messages) == []
+
+    def test_ids_in_tool_results_from_an_earlier_turn(self, agent):
+        # The RNA-Seq repro: the workflows were listed in an earlier turn and
+        # the committing turn made no tool calls.
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        listed = json.dumps(
+            [
+                {"iwc_id": "rnaseq-pe-main", "name": "RNA-Seq Analysis"},
+                {"iwc_id": "assembly-with-flye-main", "name": "Assembly with Flye"},
+            ]
+        )
+        messages = [
+            *_tool_turn(
+                "get_compatible_workflows", {"organism_ploidies": "HAPLOID"}, listed
+            ),
+            ModelResponse(parts=[TextPart(content="Pick one.")]),
+            ModelRequest(parts=[UserPromptPart(content="use RNA-Seq Paired-End")]),
+            ModelResponse(parts=[TextPart(content="Workflow confirmed.")]),
+        ]
+        # ORGANISM-scope workflows are left out: they can't be committed.
+        assert [w["iwc_id"] for w in agent._session_workflows(messages)] == [
+            "rnaseq-pe-main"
+        ]
+
+    def test_trs_id_in_tool_traffic(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        # Any version of the TRS id counts.
+        messages = _tool_turn(
+            "get_compatible_workflows",
+            {},
+            json.dumps([{"trs_id": _RNASEQ_PE_TRS.replace("v1.3", "v9")}]),
+        )
+        assert [w["iwc_id"] for w in agent._session_workflows(messages)] == [
+            "rnaseq-pe-main"
+        ]
+
+    def test_id_inside_a_longer_id_is_not_matched(self, agent):
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        messages = _tool_turn(
+            "get_workflow_details", {}, '{"iwc_id": "rnaseq-pe-main-v2"}'
+        )
+        assert agent._session_workflows(messages) == []
+
+
+class TestExtractPayloadWorkflows:
+    def test_lists_session_workflows(self):
+        workflows = [{"iwc_id": "rnaseq-pe-main", "name": "RNA-Seq Analysis"}]
+        payload = AssistantAgent.build_extract_payload(
+            AnalysisSchema(), "hi", "reply", workflows=workflows
+        )
+        assert (
+            "Workflows looked up this session (JSON): "
+            '[{"iwc_id": "rnaseq-pe-main", "name": "RNA-Seq Analysis"}]'
+        ) in payload
+
+    @pytest.mark.parametrize("workflows", [None, []])
+    def test_no_line_without_workflows(self, workflows):
+        payload = AssistantAgent.build_extract_payload(
+            AnalysisSchema(), "hi", "reply", workflows=workflows
+        )
+        assert "Workflows looked up this session" not in payload
+
+    @pytest.mark.asyncio
+    async def test_extract_state_passes_workflows_through(self, agent):
+        agent.extract_agent = object()
+        agent._run_agent_once = AsyncMock(side_effect=RuntimeError("stop"))
+        await agent._extract_state(
+            AnalysisSchema(),
+            "hi",
+            "reply",
+            workflows=[{"iwc_id": "rnaseq-pe-main", "name": "RNA-Seq"}],
+        )
+        payload = agent._run_agent_once.await_args.args[0]
+        assert "rnaseq-pe-main" in payload
+
+
+class TestExtractorLeftWorkflowOut:
+    _CANDIDATES = [{"iwc_id": "rnaseq-pe-main", "name": "RNA-Seq"}]
+
+    @staticmethod
+    def _extracted(agent, output):
+        agent.extract_agent = object()
+        agent._run_agent_once = AsyncMock(
+            return_value=SimpleNamespace(output=output, usage=lambda: None)
+        )
+
+    @pytest.mark.asyncio
+    async def test_warns_when_left_out_with_candidates(self, agent, caplog):
+        self._extracted(agent, AnalysisStateUpdate(analysis_type="Transcriptomics"))
+        await agent._extract_state(
+            AnalysisSchema(), "hi", "reply", workflows=self._CANDIDATES
+        )
+        assert "Extractor left the workflow out" in caplog.text
+        assert "rnaseq-pe-main" in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_warns_when_written_as_null(self, agent, caplog):
+        self._extracted(agent, AnalysisStateUpdate(workflow=None))
+        await agent._extract_state(
+            AnalysisSchema(), "hi", "reply", workflows=self._CANDIDATES
+        )
+        assert "Extractor left the workflow out" in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_quiet_when_workflow_written(self, agent, caplog):
+        self._extracted(agent, AnalysisStateUpdate(workflow="RNA-Seq (rnaseq-pe-main)"))
+        await agent._extract_state(
+            AnalysisSchema(), "hi", "reply", workflows=self._CANDIDATES
+        )
+        assert "Extractor left the workflow out" not in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_quiet_without_candidates(self, agent, caplog):
+        self._extracted(agent, AnalysisStateUpdate())
+        await agent._extract_state(AnalysisSchema(), "hi", "reply", workflows=[])
+        assert "Extractor left the workflow out" not in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_quiet_when_workflow_already_set(self, agent, caplog):
+        self._extracted(agent, AnalysisStateUpdate())
+        prior = AnalysisSchema()
+        prior.workflow = SchemaField(value="RNA-Seq", status=FieldStatus.FILLED)
+        await agent._extract_state(prior, "hi", "reply", workflows=self._CANDIDATES)
+        assert "Extractor left the workflow out" not in caplog.text
