@@ -2189,10 +2189,14 @@ class AssistantAgent:
             # falling back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
-                # A restated choice keeps its match: the session's lookups,
-                # which the name fallback depends on, change between turns.
-                if workflow_value == current.workflow.value:
-                    field.detail = current.workflow.detail
+                # A restated choice keeps its match while the catalog still has
+                # it: the session's lookups, which the name fallback depends
+                # on, change between turns.
+                prior = current.workflow
+                if workflow_value == prior.value and self._workflow_by_ref(
+                    prior.detail
+                ):
+                    field.detail = prior.detail
                 if not field.detail:
                     field.detail = self._find_workflow_by_trs_value(workflow_value)
                 # Whole tokens, so "rnaseq-pe-main-v2" is not "rnaseq-pe-main".

@@ -3623,6 +3623,20 @@ class TestWorkflowNameMatch:
         )
         assert result.workflow.detail == "trs-0"
 
+    def test_restated_choice_with_a_stale_match_is_matched_again(self, agent):
+        # A saved session's older TRS version is gone from the catalog.
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        value = "RNA-Seq Paired-End (rnaseq-pe-main)"
+        saved = AnalysisSchema(
+            workflow=SchemaField(
+                value=value,
+                status=FieldStatus.FILLED,
+                detail=_RNASEQ_PE_TRS.replace("v1.3", "v1.2"),
+            )
+        )
+        result = agent._apply_schema_updates(saved, {"workflow": value})
+        assert result.workflow.detail == _RNASEQ_PE_TRS
+
     def test_apply_passes_session_workflows_to_name_match(self, agent):
         agent.catalog.workflows_by_category = _name_catalog(
             "Paired end variant calling in haploid system", "Y"
