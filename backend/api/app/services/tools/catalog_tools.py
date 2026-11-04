@@ -101,7 +101,7 @@ def get_workflow_details(deps: AssistantDeps, iwc_id: str) -> str:
     """
     details = deps.catalog.get_workflow_details(iwc_id)
     if not details:
-        return f"Workflow '{iwc_id}' not found."
+        return "Workflow not found in catalog."
     return json.dumps(details, indent=2)
 
 

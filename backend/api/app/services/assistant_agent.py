@@ -1,13 +1,24 @@
 """Analysis assistant agent using pydantic-ai."""
 
 import asyncio
+import html
 import inspect
 import json
 import logging
 import re
 import time
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+)
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
 
@@ -104,6 +115,12 @@ _TOP_N_RE = re.compile(r"\btop\s+(\d{1,3})\b", re.IGNORECASE)
 _RUN_ACCESSION_RE = re.compile(r"\b[ESD]RR\d{6,}\b")
 # A TRS id inside free text, e.g. "RNA-Seq (#workflow/github.com/.../main)".
 _TRS_ID_IN_TEXT = re.compile(r"#?workflow/[^\s()\[\]{},;\"']+", re.IGNORECASE)
+# An id-shaped token (letters, digits, `_` and `-`), so an IWC id like
+# "rnaseq-pe-main" is matched whole, never as part of a longer id.
+_ID_TOKEN_RE = re.compile(r"[\w-]+")
+# Everything that isn't a letter or digit, collapsed when comparing workflow
+# names, so "Paired-End" and "Paired end" compare equal.
+_NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 _UPLOAD_RE = re.compile(r"\b(upload|user|own|local)\b", re.IGNORECASE)
 
 # Either structured-output trailer keyword. Used to bound a malformed marker's
@@ -379,6 +396,11 @@ Rules:
 - For assembly include the accession; for workflow use the display label that \
   includes the IWC id (e.g. 'Haploid variant calling (varcall-haploid)'), not \
   the bare id.
+- You may be given the workflows looked up this session, each with its name \
+  and iwc_id. When the user commits to one of them, even if the reply calls it \
+  something shorter or worded differently, write it as that entry's \
+  '<name> (<iwc_id>)'. Being on that list is not a commitment: the user still \
+  has to pick it.
 - When a high-level choice changes, null any CARRIED-FORWARD downstream field \
   that no longer applies, but KEEP one the user replaced this same turn: a new \
   organism clears a stale assembly and workflow; a new analysis type clears a \
@@ -452,6 +474,22 @@ def build_system_prompt(
         f"{section}{_SRA_PROMPT_ANCHOR}",
         1,
     )
+
+
+# A workflow looked up this session, as the extractor is shown it.
+SessionWorkflow = Dict[str, Optional[str]]
+
+
+def _normalise_name(name: str) -> str:
+    """Lowercase `name` and collapse each run of non-alphanumerics to a space.
+
+    HTML entities are decoded first: the catalog stores "CUT&amp;RUN"."""
+    return _NON_ALNUM_RE.sub(" ", html.unescape(name).lower()).strip()
+
+
+def _trs_keys_in(text: str) -> Set[str]:
+    """The version-free keys of the TRS ids in `text`, minus trailing periods."""
+    return {trs_id_key(m.rstrip(".")) for m in _TRS_ID_IN_TEXT.findall(text)}
 
 
 def _wrap_tool(fn):
@@ -1089,6 +1127,7 @@ class AssistantAgent:
         user_message: str,
         reply: str,
         cleared: Optional[List[str]] = None,
+        workflows: Optional[List[SessionWorkflow]] = None,
     ) -> str:
         """The extractor's input: prior tracker + the exchange, all JSON-encoded.
 
@@ -1097,6 +1136,10 @@ class AssistantAgent:
         payload's structure or inject instructions -- the boundary is
         unambiguous, which closes the prompt-injection surface the raw
         interpolation had.
+
+        `workflows` lists the catalog workflows the chat model looked up this
+        session ({"iwc_id", "name"}), so the extractor can write the IWC id of
+        a workflow the reply names only by a shortened or reworded label.
         """
         prior_state = {name: getattr(prior, name).value for name in _STATE_FIELDS}
         payload = f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
@@ -1106,6 +1149,10 @@ class AssistantAgent:
         if panel_clears:
             payload += (
                 f"Cleared from the setup panel (JSON): {json.dumps(panel_clears)}\n"
+            )
+        if workflows:
+            payload += (
+                f"Workflows looked up this session (JSON): {json.dumps(workflows)}\n"
             )
         return (
             payload + f"User message (JSON string): {json.dumps(user_message)}\n"
@@ -1119,6 +1166,7 @@ class AssistantAgent:
         reply: str,
         timeout: float = EXTRACT_RUN_TIMEOUT_SECONDS,
         cleared: Optional[List[str]] = None,
+        workflows: Optional[List[SessionWorkflow]] = None,
     ) -> tuple[Dict[str, Optional[str]], Any]:
         """Extract the tracker snapshot via the focused second call.
 
@@ -1131,7 +1179,9 @@ class AssistantAgent:
         non-critical -- the user already has their reply -- so on ANY failure we
         carry the prior tracker forward (empty updates) rather than fail the turn.
         """
-        payload = self.build_extract_payload(prior, user_message, reply, cleared)
+        payload = self.build_extract_payload(
+            prior, user_message, reply, cleared, workflows
+        )
         try:
             # No retry: the extractor is the optional last call in the turn, so a
             # transient failure should fail fast and copy forward rather than
@@ -1151,7 +1201,18 @@ class AssistantAgent:
             )
             return {}, None
         tracker: AnalysisStateUpdate = result.output
-        return self._snapshot_to_updates(tracker, prior), result.usage()
+        updates = self._snapshot_to_updates(tracker, prior)
+        # A workflow that fails to reach the panel either was worded so it
+        # can't be mapped (logged by _find_workflow_trs_id) or was left out,
+        # i.e. omitted or written as null. Log the second case while the
+        # session has candidates and none is set; it also fires on turns where
+        # the user is still choosing.
+        if not updates.get("workflow") and workflows and not prior.workflow.value:
+            logger.warning(
+                "Extractor left the workflow out; session candidates: %s",
+                [wf["iwc_id"] for wf in workflows],
+            )
+        return updates, result.usage()
 
     @staticmethod
     def _snapshot_to_updates(
@@ -1418,6 +1479,7 @@ class AssistantAgent:
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
         remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
+        workflows = None
         if not message:
             # A clear on its own: the user said nothing they could have
             # committed to, so there is nothing to extract -- and skipping it
@@ -1431,18 +1493,21 @@ class AssistantAgent:
             )
             schema_updates, extract_usage = {}, None
         else:
+            workflows = self._session_workflows(result.all_messages())
             schema_updates, extract_usage = await self._extract_state(
                 state.schema_state,
                 message,
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
                 cleared=cleared,
+                workflows=workflows,
             )
         schema_state = self._apply_schema_updates(
             state.schema_state,
             schema_updates,
             logan=state.metadata.get("logan"),
             user_message=message,
+            workflows=workflows,
         )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
@@ -2080,6 +2145,7 @@ class AssistantAgent:
         updates: Dict[str, Optional[str]],
         logan: Optional[dict] = None,
         user_message: Optional[str] = None,
+        workflows: Optional[List[SessionWorkflow]] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -2123,7 +2189,18 @@ class AssistantAgent:
             # falling back to a case-insensitive name match against the catalog.
             if key == "workflow":
                 workflow_value = str(value)
-                field.detail = self._find_workflow_by_trs_value(workflow_value)
+                # A restated choice keeps its match while the catalog still has
+                # it: the session's lookups, which the name fallback depends
+                # on, change between turns.
+                prior = current.workflow
+                if workflow_value == prior.value and self._workflow_by_ref(
+                    prior.detail
+                ):
+                    field.detail = prior.detail
+                if not field.detail:
+                    field.detail = self._find_workflow_by_trs_value(workflow_value)
+                # Whole tokens, so "rnaseq-pe-main-v2" is not "rnaseq-pe-main".
+                value_tokens = set(_ID_TOKEN_RE.findall(workflow_value))
                 for cat in self.catalog.workflows_by_category:
                     if field.detail:
                         break
@@ -2134,14 +2211,14 @@ class AssistantAgent:
                         if not _is_assembly_scope(wf):
                             continue
                         iwc_id = wf.get("iwcId")
-                        if iwc_id and iwc_id in workflow_value:
+                        if iwc_id and iwc_id in value_tokens:
                             # `.get("trsId", iwc_id)` would keep a None trsId;
                             # _condense_workflow stores trsId as None when
                             # absent, so default to iwc_id on falsy values.
                             field.detail = wf.get("trsId") or iwc_id
                             break
                 if not field.detail:
-                    field.detail = self._find_workflow_trs_id(workflow_value)
+                    field.detail = self._find_workflow_trs_id(workflow_value, workflows)
                 if not field.detail:
                     # Named a workflow we can't map to a visible (assembly-scope)
                     # catalog entry. Clear the field rather than commit a phantom
@@ -2439,7 +2516,7 @@ class AssistantAgent:
         """The catalog trsId of the visible workflow whose TRS id appears in
         `value`. Tool output shows the model TRS ids, which it restates in any
         version or none, so match on the normalised form."""
-        keys = {trs_id_key(m.rstrip(".")) for m in _TRS_ID_IN_TEXT.findall(value)}
+        keys = _trs_keys_in(value)
         if not keys:
             return None
         for cat in self.catalog.workflows_by_category:
@@ -2449,18 +2526,91 @@ class AssistantAgent:
                     return trs_id
         return None
 
-    def _find_workflow_trs_id(self, value: str) -> Optional[str]:
-        """Fallback: match a workflow by name when iwcId isn't in the value."""
-        val_lower = value.lower()
-        for cat in self.catalog.workflows_by_category:
+    def _find_workflow_trs_id(
+        self, value: str, workflows: Optional[List[SessionWorkflow]] = None
+    ) -> Optional[str]:
+        """Fallback: match a workflow by name when iwcId isn't in the value.
+
+        Names are compared case-insensitively with every run of punctuation
+        and whitespace treated as one space, so "Paired-End" matches the
+        catalog's "Paired end". An exact name wins. Otherwise the names the
+        value contains are preferred to the names it is part of, and the
+        longest wins if it contains the rest ("Capture Hi-C Processing" over
+        "Hi-C Processing"); anything else ambiguous, like "RNA Seq", clears
+        rather than commits whichever workflow comes first. When `workflows`
+        lists the session's lookups, a partial match must be one of them, so a
+        label can't pick a workflow the chat never showed."""
+        val_norm = _normalise_name(value)
+        partial: Dict[str, Tuple[str, Optional[str]]] = {}
+        # An empty value is in every name, so it never matches.
+        for cat in self.catalog.workflows_by_category if val_norm else []:
             for wf in cat.get("workflows", []):
                 if not _is_assembly_scope(wf):
                     continue
-                wf_name = (wf.get("workflowName") or "").lower()
-                if wf_name and (wf_name in val_lower or val_lower in wf_name):
+                wf_name = _normalise_name(wf.get("workflowName") or "")
+                # `or` (not `get(..., default)`) so a None trsId still
+                # falls back to iwcId -- see _condense_workflow.
+                ref = wf.get("trsId") or wf.get("iwcId")
+                if not wf_name or not ref:
+                    continue
+                if wf_name == val_norm:
                     logger.info("Workflow fallback matched name '%s'", wf_name)
-                    # `or` (not `get(..., default)`) so a None trsId still
-                    # falls back to iwcId -- see _condense_workflow.
-                    return wf.get("trsId") or wf.get("iwcId")
-        logger.warning("Workflow fallback found no match for '%s'", value)
+                    return ref
+                if wf_name in val_norm or val_norm in wf_name:
+                    partial[ref] = (wf_name, wf.get("iwcId"))
+        # Names inside the value first; a name the value is part of counts alone.
+        names = {r: m for r, m in partial.items() if m[0] in val_norm} or (
+            partial if len(partial) == 1 else {}
+        )
+        if names:
+            ref, (wf_name, iwc_id) = max(names.items(), key=lambda i: len(i[1][0]))
+            shown = {wf["iwc_id"] for wf in workflows or []}
+            if all(m[0] in wf_name for m in names.values()) and (
+                not shown or iwc_id in shown
+            ):
+                logger.info("Workflow fallback matched name '%s'", wf_name)
+                return ref
+        logger.warning(
+            "Workflow fallback found no unique match for '%s' (%d partial)",
+            value,
+            len(partial),
+        )
         return None
+
+    def _session_workflows(self, messages: List[ModelMessage]) -> List[SessionWorkflow]:
+        """The visible workflows the chat model's tool results named.
+
+        The reply often names a workflow by a shortened label ("RNA-Seq
+        Paired-End") that the catalog name match can't map; the tool results
+        carry its id. Only results count, not call arguments, so a guessed id
+        that came back "not found" is no candidate. The kept history is read,
+        not just this turn, because a workflow is often looked up in one turn
+        and committed to in a later one with no tool call; a lookup older than
+        the history window is missed. Ids are matched against the catalog
+        rather than read from each tool's JSON, so every tool that names a
+        workflow counts, by IWC id or TRS id. Returns {"iwc_id", "name"} per
+        workflow, in catalog order, ASSEMBLY scope only (the rest can't be
+        committed).
+        """
+        texts = []
+        for message in messages:
+            for part in message.parts:
+                if part.part_kind == "tool-return":
+                    texts.append(part.model_response_str())
+        traffic = "\n".join(texts)
+        tokens = set(_ID_TOKEN_RE.findall(traffic))
+        trs_keys = _trs_keys_in(traffic)
+        found: Dict[str, SessionWorkflow] = {}
+        for cat in self.catalog.workflows_by_category:
+            for wf in cat.get("workflows", []):
+                iwc_id = wf.get("iwcId")
+                if not iwc_id or iwc_id in found or not _is_assembly_scope(wf):
+                    continue
+                trs_id = wf.get("trsId")
+                if iwc_id in tokens or (trs_id and trs_id_key(trs_id) in trs_keys):
+                    name = wf.get("workflowName")
+                    found[iwc_id] = {
+                        "iwc_id": iwc_id,
+                        "name": html.unescape(name) if name else name,
+                    }
+        return list(found.values())
