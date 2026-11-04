@@ -265,16 +265,6 @@ describe("GeneDetailView", () => {
     );
   });
 
-  it("shows a retrieval time that doesn't parse as written", () => {
-    renderGene({
-      ...GENE,
-      provenance: { ...GENE.provenance, retrievedAt: "not a date" },
-    });
-    expect(getFieldValue("Annotation")).toHaveTextContent(
-      /, retrieved not a date$/
-    );
-  });
-
   it("shows the gene ID as plain text when the gene has no NCBI GeneID", () => {
     renderGene({ ...GENE, aliases: [] });
     expect(getFieldValue("NCBI GeneID")).toHaveTextContent(/^—$/);

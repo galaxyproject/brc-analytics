@@ -60,13 +60,10 @@ export function formatLocation(location: GeneLocation): string {
 /**
  * The date of a retrieval time, in UTC.
  * @param retrievedAt - An ISO 8601 date and time, e.g. "2026-11-03T01:27:26Z".
- * @returns E.g. "2026-11-03"; the value as written when it doesn't parse, so
- * the rest of the page still renders.
+ * @returns E.g. "2026-11-03".
  */
 function formatRetrievedDate(retrievedAt: string): string {
-  const date = new Date(retrievedAt);
-  if (Number.isNaN(date.getTime())) return retrievedAt;
-  return date.toISOString().slice(0, 10);
+  return new Date(retrievedAt).toISOString().slice(0, 10);
 }
 
 /**
