@@ -39,6 +39,7 @@ from app.services.assistant_agent import (
     LoganJobNotReadyError,
 )
 from app.services.logan_snapshot import build_logan_snapshot
+from app.services.tools.catalog_tools import get_workflow_details
 from tests.test_logan_snapshot import JOB as LOGAN_JOB
 from tests.test_logan_snapshot import results as logan_results
 from tests.test_logan_tools import _galaxy as _logan_galaxy
@@ -3534,9 +3535,14 @@ class TestSessionWorkflows:
     def test_id_only_in_call_args_is_not_a_candidate(self, agent):
         # A guessed id that came back "not found" was never shown to the user.
         agent.catalog.workflows_by_category = _workflow_catalog()
-        messages = _tool_turn(
-            "get_workflow_details", {"iwc_id": "rnaseq-pe-main"}, "Workflow not found."
+        guess = "rnaseq-pe-main/versions/v9"
+        not_found = get_workflow_details(
+            SimpleNamespace(
+                catalog=SimpleNamespace(get_workflow_details=lambda _: None)
+            ),
+            guess,
         )
+        messages = _tool_turn("get_workflow_details", {"iwc_id": guess}, not_found)
         assert agent._session_workflows(messages) == []
 
     def test_id_in_check_compatibility_result(self, agent):
