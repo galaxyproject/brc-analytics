@@ -1829,7 +1829,9 @@ async def test_chat_handoff_url_carries_assistant_session_id(agent):
 @pytest.mark.asyncio
 async def test_chat_passes_session_workflows_to_extractor(agent):
     # The #1808 fix: the ids the chat model's tools returned reach the
-    # extractor, so a reply naming only the workflow's label still maps.
+    # extractor, so a reply naming only the workflow's label still maps. They
+    # also reach the schema update, so a partial name can't commit a workflow
+    # the session never showed.
     state = SessionState(
         session_id="assistant-session-123",
         schema_state=AnalysisSchema(),
@@ -1860,7 +1862,11 @@ async def test_chat_passes_session_workflows_to_extractor(agent):
             new_messages=lambda: history,
         )
     )
-    agent._extract_state = AsyncMock(return_value=({}, None))
+    # A partial name of the catalog's only diploid workflow, which the session
+    # never looked up.
+    agent._extract_state = AsyncMock(
+        return_value=({"workflow": "Diploid variant calling"}, None)
+    )
     agent.catalog.workflows_by_category = [
         {
             "category": "VARIANT_CALLING",
@@ -1869,16 +1875,22 @@ async def test_chat_passes_session_workflows_to_extractor(agent):
                     "iwcId": "varcall-haploid",
                     "workflowName": "Haploid variant calling",
                     "trsId": "#workflow/github.com/iwc/varcall-haploid/main",
-                }
+                },
+                {
+                    "iwcId": "varcall-diploid",
+                    "workflowName": "Diploid variant calling with GATK",
+                    "trsId": "#workflow/github.com/iwc/varcall-diploid/main",
+                },
             ],
         }
     ]
 
-    await agent.chat("Which workflow should I use?")
+    response = await agent.chat("Which workflow should I use?")
 
     assert agent._extract_state.await_args.kwargs["workflows"] == [
         {"iwc_id": "varcall-haploid", "name": "Haploid variant calling"}
     ]
+    assert response.schema_state.workflow.status == FieldStatus.EMPTY
 
 
 # ---------- parser invariants (property-based net) ----------
@@ -3607,6 +3619,17 @@ class TestWorkflowNameMatch:
             "Capture Hi-C Processing: FASTQ to Balanced Cool Files",
         )
         assert agent._find_workflow_trs_id("Hi-C Processing: FASTQ") is None
+
+    def test_two_names_in_the_value_neither_containing_the_other_stay_ambiguous(
+        self, agent
+    ):
+        # The value holds both names, and neither name holds the other, so the
+        # longer one isn't the one meant.
+        agent.catalog.workflows_by_category = _name_catalog(
+            "Hi-C Processing", "RNA-Seq Analysis"
+        )
+        value = "Hi-C Processing then RNA-Seq Analysis"
+        assert agent._find_workflow_trs_id(value) is None
 
     def test_restated_choice_keeps_its_match(self, agent):
         # Matched while the session showed it; later lookups make it ambiguous.
