@@ -11,20 +11,18 @@ import {
 } from "./constants";
 
 /**
- * The line naming the annotation a gene was read from, as the gene catalog
- * contract words it (section 2): the publisher's annotation of the assembly,
- * its provider, release label, release date and the date its genes last
- * changed, then when we retrieved it. Fields the annotation doesn't give are
- * left out, and so are the brackets when it gives none of them.
+ * The gene page's line naming the annotation a gene was read from: its
+ * publisher, provider, release label, release date and the date its genes last
+ * changed, then when we retrieved it. It follows the gene catalog contract's
+ * provenance line (section 2), but leaves out the assembly, which the page's
+ * Assembly row shows, and labels the release date. Fields the annotation
+ * doesn't give are left out, and so are the brackets when it gives none of
+ * them.
  * @param provenance - The gene's provenance.
- * @param assemblyAccession - The gene's assembly.
- * @returns E.g. "NCBI RefSeq's annotation of GCF_000002765.6 (Community
- * Annotation, RS_2026_09, 2026-09-18), retrieved 2026-11-03".
+ * @returns E.g. "NCBI RefSeq (Community Annotation, RS_2026_09, released
+ * 2026-09-18), retrieved 2026-11-03".
  */
-export function formatAnnotation(
-  provenance: GeneProvenance,
-  assemblyAccession: string
-): string {
+export function formatAnnotation(provenance: GeneProvenance): string {
   const {
     genesAsOf,
     provider,
@@ -33,17 +31,20 @@ export function formatAnnotation(
     releaseLabel,
     retrievedAt,
   } = provenance;
-  const release = [provider, releaseLabel, releaseDate]
+  const release = [
+    provider,
+    releaseLabel,
+    releaseDate && `released ${releaseDate}`,
+  ]
     .filter(Boolean)
     .join(", ");
   const details = [release, genesAsOf && `genes as of ${genesAsOf}`]
     .filter(Boolean)
     .join("; ");
-  const annotation = `${publisher}'s annotation of ${assemblyAccession}`;
   const retrieved = `retrieved ${formatRetrievedDate(retrievedAt)}`;
   return details
-    ? `${annotation} (${details}), ${retrieved}`
-    : `${annotation}, ${retrieved}`;
+    ? `${publisher} (${details}), ${retrieved}`
+    : `${publisher}, ${retrieved}`;
 }
 
 /**

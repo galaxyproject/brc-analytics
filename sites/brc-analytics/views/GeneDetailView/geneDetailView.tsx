@@ -106,9 +106,7 @@ export const GeneDetailView = ({
             />
           </FieldValue>
           <FieldLabel>Annotation</FieldLabel>
-          <FieldValue>
-            {formatAnnotation(gene.provenance, gene.assemblyAccession)}
-          </FieldValue>
+          <FieldValue>{formatAnnotation(gene.provenance)}</FieldValue>
         </FieldList>
         <TableContainer>
           <Table>

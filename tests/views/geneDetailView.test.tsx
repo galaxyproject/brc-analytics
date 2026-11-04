@@ -222,7 +222,7 @@ describe("GeneDetailView", () => {
   it("names the annotation the gene was read from and when it was retrieved", () => {
     renderGene(GENE);
     expect(getFieldValue("Annotation")).toHaveTextContent(
-      /^NCBI RefSeq's annotation of GCF_000002765\.6 \(Community Annotation, RS_2026_09, 2026-09-18\), retrieved 2026-11-03$/
+      /^NCBI RefSeq \(Community Annotation, RS_2026_09, released 2026-09-18\), retrieved 2026-11-03$/
     );
   });
 
@@ -232,7 +232,7 @@ describe("GeneDetailView", () => {
       provenance: { ...GENE.provenance, genesAsOf: "2026-10-01" },
     });
     expect(getFieldValue("Annotation")).toHaveTextContent(
-      "(Community Annotation, RS_2026_09, 2026-09-18; genes as of 2026-10-01)"
+      "(Community Annotation, RS_2026_09, released 2026-09-18; genes as of 2026-10-01)"
     );
   });
 
@@ -242,11 +242,11 @@ describe("GeneDetailView", () => {
       provenance: {
         ...GENE.provenance,
         provider: null,
-        releaseDate: null,
+        releaseLabel: null,
       },
     });
     expect(getFieldValue("Annotation")).toHaveTextContent(
-      /^NCBI RefSeq's annotation of GCF_000002765\.6 \(RS_2026_09\), retrieved 2026-11-03$/
+      /^NCBI RefSeq \(released 2026-09-18\), retrieved 2026-11-03$/
     );
   });
 
@@ -261,7 +261,7 @@ describe("GeneDetailView", () => {
       },
     });
     expect(getFieldValue("Annotation")).toHaveTextContent(
-      /^NCBI RefSeq's annotation of GCF_000002765\.6, retrieved 2026-11-03$/
+      /^NCBI RefSeq, retrieved 2026-11-03$/
     );
   });
 
