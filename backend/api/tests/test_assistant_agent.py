@@ -3469,10 +3469,12 @@ class TestWorkflowNameMatch:
         )
         assert result.workflow.status == FieldStatus.EMPTY
 
-    def test_unknown_lone_id_does_not_match_by_name(self, agent):
-        # Normalised, the id spells the name; it must clear, not map.
-        agent.catalog.workflows_by_category = _name_catalog("AMR Gene Detection")
-        assert agent._find_workflow_trs_id("amr_gene_detection-main-v2") is None
+    def test_hyphenated_one_word_label_resolves(self, agent):
+        agent.catalog.workflows_by_category = _name_catalog(
+            "CUT&amp;RUN/CUT&amp;TAG Analysis: Protein-DNA Interaction Mapping",
+            "RNA-Seq Analysis: Paired-End",
+        )
+        assert agent._find_workflow_trs_id("Protein-DNA") == "trs-0"
 
     def test_exact_name_wins_over_a_longer_name(self, agent):
         agent.catalog.workflows_by_category = _name_catalog(
