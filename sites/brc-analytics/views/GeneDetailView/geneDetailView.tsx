@@ -22,7 +22,7 @@ import Link from "next/link";
 import { type JSX } from "react";
 import { BionymSection } from "./components/BionymSection/bionymSection";
 import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
-import { GENE_BREADCRUMBS } from "./constants";
+import { EMPTY_VALUE, GENE_BREADCRUMBS } from "./constants";
 import {
   FieldLabel,
   FieldList,
@@ -30,7 +30,15 @@ import {
   GeneBackPageView,
 } from "./geneDetailView.styles";
 import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
-import { formatLocation, getNcbiGeneUrl, getUcscPositionUrl } from "./utils";
+import {
+  formatAnnotation,
+  formatLocation,
+  getGeneTypeName,
+  getNcbiGeneId,
+  getNcbiGeneUrl,
+  getPreviousIds,
+  getUcscPositionUrl,
+} from "./utils";
 
 export const GeneDetailView = ({
   bionym,
@@ -43,6 +51,9 @@ export const GeneDetailView = ({
     entityId: sanitizeEntityId(gene.organism.speciesTaxonomyId),
   });
   const label = geneLabel(gene);
+  const ncbiGeneId = getNcbiGeneId(gene.aliases);
+  const ncbiGeneUrl = getNcbiGeneUrl(ncbiGeneId);
+  const previousIds = getPreviousIds(gene.aliases);
 
   return (
     <GeneBackPageView>
@@ -56,10 +67,28 @@ export const GeneDetailView = ({
         <FieldList>
           <FieldLabel>Gene ID</FieldLabel>
           <FieldValue>
-            <OffSiteLink text={label} url={getNcbiGeneUrl(gene.aliases)} />
+            <OffSiteLink text={label} url={ncbiGeneUrl} />
           </FieldValue>
           <FieldLabel>Symbol</FieldLabel>
-          <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
+          <FieldValue>{geneSymbol(gene) ?? EMPTY_VALUE}</FieldValue>
+          <FieldLabel>Gene type</FieldLabel>
+          <FieldValue>
+            {getGeneTypeName(gene.biotype) ?? EMPTY_VALUE}
+          </FieldValue>
+          <FieldLabel>NCBI GeneID</FieldLabel>
+          <FieldValue>
+            <OffSiteLink text={ncbiGeneId || EMPTY_VALUE} url={ncbiGeneUrl} />
+          </FieldValue>
+          {previousIds.length > 0 && (
+            <>
+              <FieldLabel>Previous IDs</FieldLabel>
+              <FieldValue>
+                {previousIds.map((previousId) => (
+                  <div key={previousId}>{previousId}</div>
+                ))}
+              </FieldValue>
+            </>
+          )}
           <FieldLabel>Organism</FieldLabel>
           <FieldValue>
             <Link href={organismHref}>{gene.organism.name}</Link>
@@ -76,6 +105,10 @@ export const GeneDetailView = ({
               url={getUcscPositionUrl(gene.ucscBrowserUrl, gene.location)}
             />
           </FieldValue>
+          <FieldLabel>Annotation</FieldLabel>
+          <FieldValue>
+            {formatAnnotation(gene.provenance, gene.assemblyAccession)}
+          </FieldValue>
         </FieldList>
         <TableContainer>
           <Table>
@@ -90,10 +123,18 @@ export const GeneDetailView = ({
             <TableBody>
               {gene.transcripts.map((transcript) => (
                 <TableRow key={transcript.gff3RowId}>
-                  <TableCell>{transcript.transcriptId ?? "—"}</TableCell>
-                  <TableCell>{transcript.transcriptProduct ?? "—"}</TableCell>
-                  <TableCell>{transcript.proteinAccession ?? "—"}</TableCell>
-                  <TableCell>{transcript.proteinProduct ?? "—"}</TableCell>
+                  <TableCell>
+                    {transcript.transcriptId ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.transcriptProduct ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.proteinAccession ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.proteinProduct ?? EMPTY_VALUE}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
