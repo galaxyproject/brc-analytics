@@ -3469,6 +3469,11 @@ class TestWorkflowNameMatch:
         )
         assert result.workflow.status == FieldStatus.EMPTY
 
+    def test_unknown_lone_id_does_not_match_by_name(self, agent):
+        # Normalised, the id spells the name; it must clear, not map.
+        agent.catalog.workflows_by_category = _name_catalog("AMR Gene Detection")
+        assert agent._find_workflow_trs_id("amr_gene_detection-main-v2") is None
+
     def test_exact_name_wins_over_a_longer_name(self, agent):
         agent.catalog.workflows_by_category = _name_catalog(
             "Capture Hi-C processing", "Hi-C processing"
@@ -3531,6 +3536,26 @@ class TestSessionWorkflows:
             "get_workflow_details", {"iwc_id": "rnaseq-pe-main"}, "Workflow not found."
         )
         assert agent._session_workflows(messages) == []
+
+    def test_id_in_check_compatibility_result(self, agent):
+        # The #1808 repro's only lookup: a compatible result names the id.
+        agent.catalog.workflows_by_category = _workflow_catalog()
+        messages = _tool_turn(
+            "check_compatibility",
+            {"iwc_id": "rnaseq-pe-main", "accession": "GCF_1"},
+            json.dumps(
+                {
+                    "compatible": True,
+                    "issues": [],
+                    "workflow": "RNA-Seq Analysis",
+                    "iwc_id": "rnaseq-pe-main",
+                    "assembly": "GCF_1",
+                }
+            ),
+        )
+        assert [w["iwc_id"] for w in agent._session_workflows(messages)] == [
+            "rnaseq-pe-main"
+        ]
 
     def test_ids_in_tool_results_from_an_earlier_turn(self, agent):
         # The RNA-Seq repro: the workflows were listed in an earlier turn and

@@ -391,6 +391,7 @@ class TestCompatibilityCheck:
         )
         assert result["compatible"] is True
         assert result["issues"] == []
+        assert result["iwc_id"] == "varcall-haploid"
 
     def test_ploidy_mismatch(self, catalog):
         result = catalog.check_workflow_assembly_compatibility(

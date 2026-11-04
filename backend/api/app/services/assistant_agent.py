@@ -2512,7 +2512,14 @@ class AssistantAgent:
         contain, or be contained in, exactly one workflow's name, so a vague
         label like "RNA Seq" clears rather than commits whichever workflow
         comes first."""
-        val_norm = _normalise_name(value)
+        # A lone id-shaped token ("amr_gene_detection-main-v2") is an id the
+        # catalog doesn't know, not a name; normalising it would match the
+        # workflow whose name it spells.
+        stripped = value.strip()
+        is_lone_id = _ID_TOKEN_RE.fullmatch(stripped) is not None and (
+            "-" in stripped or "_" in stripped
+        )
+        val_norm = "" if is_lone_id else _normalise_name(value)
         partial: Dict[str, str] = {}
         # An empty value is in every name, so it never matches.
         for cat in self.catalog.workflows_by_category if val_norm else []:
