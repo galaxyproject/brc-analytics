@@ -210,6 +210,15 @@ async def logan_queue(galaxy: GalaxyService) -> dict:
 BUILD_RETRY_AFTER = 15
 STDERR_TAIL = 2000
 
+# A merge that fails is remembered this long, so polls get an answer instead
+# of "building" forever, each one starting the same failing merge again.
+BUILD_FAILURE_TTL = 300
+
+
+def _build_failure_key(job_id: str) -> str:
+    return f"mcp:logan:buildfail:{job_id}"
+
+
 # Strong references to running merges: the event loop only keeps weak ones,
 # and a merge collected mid-flight leaves its claim marker set for an hour.
 _builds: set[asyncio.Task] = set()
@@ -224,7 +233,10 @@ def _start_build(galaxy: GalaxyService, job_id: str, lane: AggregationLane) -> N
         except (GalaxyJobAggregating, GalaxyJobNotComplete):
             pass  # someone else is merging it, or no slot; the next poll retries
         except Exception as e:
-            logger.warning("MCP merge for %s failed: %s", job_id, e)
+            logger.error("MCP merge for %s failed: %s", job_id, e)
+            await galaxy.cache.set(
+                _build_failure_key(job_id), {"failed": True}, BUILD_FAILURE_TTL
+            )
 
     task = asyncio.create_task(build())
     _builds.add(task)
@@ -257,6 +269,14 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
             "status": "failed",
             "job_id": job_id,
             "error": (status.stderr or "")[-STDERR_TAIL:] or None,
+            "results_url": results_url_for(job_id),
+        }
+    if await galaxy.cache.get(_build_failure_key(job_id)):
+        return {
+            "error": "Merging this search's results failed. Try again later.",
+            "status_code": 502,
+            "job_id": job_id,
+            "retry_after_seconds": BUILD_FAILURE_TTL,
             "results_url": results_url_for(job_id),
         }
     _start_build(galaxy, job_id, "partner" if partner is not None else "native")

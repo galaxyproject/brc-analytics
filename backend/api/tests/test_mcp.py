@@ -525,6 +525,7 @@ class TestLoganToolGating:
             return_value=MagicMock(is_complete=True, is_successful=True)
         )
         galaxy.get_kmindex_results = AsyncMock()
+        galaxy.cache = MagicMock(get=AsyncMock(return_value=None))
         mcp = create_mcp_server(_catalog_data(tmp_path), MagicMock(), galaxy=galaxy)
         out = _call_tool(mcp, "logan_cohort", {"job_id": "fe6f66a714dcbec8"})
         assert out["status"] == "building"

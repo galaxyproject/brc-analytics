@@ -416,6 +416,7 @@ class TestRebuild:
             )
         )
         galaxy.get_kmindex_results = AsyncMock()
+        galaxy.cache = FakeCache()
         return galaxy
 
     async def _drain(self):
@@ -476,3 +477,20 @@ class TestRebuild:
         out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
         await self._drain()
         assert out["status"] == "building"
+
+    @pytest.mark.asyncio
+    async def test_failed_merge_is_an_error_not_building_forever(
+        self, env, monkeypatch
+    ):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_results.side_effect = RuntimeError("outputs gone")
+        first = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        await self._drain()
+        again = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        await self._drain()
+        assert first["status"] == "building"
+        assert again["status_code"] == 502
+        assert again["retry_after_seconds"] == logan_mcp.BUILD_FAILURE_TTL
+        # The next poll answers from the marker instead of merging again.
+        assert galaxy.get_kmindex_results.await_count == 1
