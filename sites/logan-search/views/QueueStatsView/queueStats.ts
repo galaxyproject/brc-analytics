@@ -24,13 +24,38 @@ export interface QueueHistory {
   wait_p90_minutes: number | null;
 }
 
-export interface HourBucket {
+// The windows the page offers; the backend serves up to 72 hours.
+export const QUEUE_RANGES = [24, 72] as const;
+export type QueueRange = (typeof QUEUE_RANGES)[number];
+export const DEFAULT_QUEUE_RANGE: QueueRange = 24;
+
+export interface TimeBucket {
   cacheHits: number;
-  // The hour's start, ISO 8601.
-  hour: string;
   longestWait: number | null;
   medianWait: number | null;
   searches: number;
+  // The bucket's start, ISO 8601.
+  start: string;
+}
+
+/**
+ * The window a ?hours= value asks for, falling back to the default for
+ * anything the page doesn't offer.
+ * @param value - The query value, if any.
+ * @returns The window.
+ */
+export function parseQueueRange(value: string | null): QueueRange {
+  const hours = Number(value);
+  return QUEUE_RANGES.find((range) => range === hours) ?? DEFAULT_QUEUE_RANGE;
+}
+
+/**
+ * How many hours each table row covers, so three days still fits on a screen.
+ * @param range - The window.
+ * @returns Hours per bucket.
+ */
+export function bucketHoursFor(range: QueueRange): number {
+  return range > 24 ? 3 : 1;
 }
 
 /**
@@ -44,31 +69,36 @@ function median(values: number[]): number {
 }
 
 /**
- * Group searches by the hour they were submitted in.
+ * Group searches by when they were submitted, in blocks of whole local hours
+ * (3 h blocks start at midnight, 3 am, 6 am...).
  * @param rows - Searches, any order.
- * @returns One bucket per hour that had a search, newest first.
+ * @param bucketHours - Hours per bucket.
+ * @returns One bucket per block that had a search, newest first.
  */
-export function hourlyBuckets(rows: QueueHistoryRow[]): HourBucket[] {
-  const byHour = new Map<string, QueueHistoryRow[]>();
+export function timeBuckets(
+  rows: QueueHistoryRow[],
+  bucketHours = 1
+): TimeBucket[] {
+  const byStart = new Map<string, QueueHistoryRow[]>();
   for (const row of rows) {
     const date = new Date(row.submitted);
     if (Number.isNaN(date.getTime())) continue;
-    date.setMinutes(0, 0, 0);
-    const hour = date.toISOString();
-    byHour.set(hour, [...(byHour.get(hour) ?? []), row]);
+    date.setHours(date.getHours() - (date.getHours() % bucketHours), 0, 0, 0);
+    const start = date.toISOString();
+    byStart.set(start, [...(byStart.get(start) ?? []), row]);
   }
-  return [...byHour.entries()]
+  return [...byStart.entries()]
     .sort(([a], [b]) => b.localeCompare(a))
-    .map(([hour, inHour]) => {
-      const waits = inHour
+    .map(([start, inBucket]) => {
+      const waits = inBucket
         .filter((r) => !r.cached && r.wait_minutes !== null)
         .map((r) => r.wait_minutes as number);
       return {
-        cacheHits: inHour.filter((r) => r.cached).length,
-        hour,
+        cacheHits: inBucket.filter((r) => r.cached).length,
         longestWait: waits.length ? Math.max(...waits) : null,
         medianWait: waits.length ? median(waits) : null,
-        searches: inHour.length,
+        searches: inBucket.length,
+        start,
       };
     });
 }
@@ -103,9 +133,13 @@ function waitLabel(row: QueueHistoryRow): string {
  * Cache hits sit at zero: they never waited, and leaving them off would hide
  * how much of the day they answered.
  * @param rows - Searches.
+ * @param range - The window they cover; past a day the axis names the weekday.
  * @returns A vega-lite spec.
  */
-export function buildWaitSpec(rows: QueueHistoryRow[]): TopLevelSpec {
+export function buildWaitSpec(
+  rows: QueueHistoryRow[],
+  range: QueueRange = DEFAULT_QUEUE_RANGE
+): TopLevelSpec {
   return {
     $schema: "https://vega.github.io/schema/vega-lite/v6.json",
     data: {
@@ -144,7 +178,7 @@ export function buildWaitSpec(rows: QueueHistoryRow[]): TopLevelSpec {
         { field: "group", title: "Status", type: "nominal" },
       ],
       x: {
-        axis: { format: "%H:%M", title: null },
+        axis: { format: range > 24 ? "%a %H:%M" : "%H:%M", title: null },
         field: "submitted",
         type: "temporal",
       },
