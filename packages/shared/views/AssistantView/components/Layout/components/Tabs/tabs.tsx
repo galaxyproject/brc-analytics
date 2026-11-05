@@ -1,17 +1,23 @@
+import { useLayoutHeight } from "@databiosphere/findable-ui/lib/components/Layout/hooks/UseLayoutHeight/hook";
+import { Global } from "@emotion/react";
 import { Tab } from "@mui/material";
-import { TABS_LABEL } from "@repo/shared/views/AssistantView/components/Layout/constants";
+import {
+  TAB_BAR_HEIGHT_PROPERTY,
+  TABS_LABEL,
+} from "@repo/shared/views/AssistantView/components/Layout/constants";
 import {
   getTabId,
   getTabPanelId,
 } from "@repo/shared/views/AssistantView/components/Layout/utils";
 import { type JSX } from "react";
-import { StyledTabBar, StyledTabs } from "./tabs.styles";
+import { StyledTabBar, StyledTabs, tabBarScrollPadding } from "./tabs.styles";
 import type { TabsProps } from "./types";
 
 /**
  * Tabs that switch between the assistant's columns on narrow screens, where
  * only one shows at a time. Pinned beneath the header while the page scrolls,
- * and hidden on wider screens, where the columns sit side by side.
+ * with its measured height added to the page's scroll padding, and hidden on
+ * wider screens, where the columns sit side by side.
  * @param props - Component props.
  * @param props.baseId - Id unique to the layout, tying each tab to its column.
  * @param props.onTabChange - Switches column.
@@ -25,8 +31,11 @@ export const Tabs = ({
   tabs,
   value,
 }: TabsProps): JSX.Element => {
+  const { ref } = useLayoutHeight<HTMLDivElement>(TAB_BAR_HEIGHT_PROPERTY);
+
   return (
-    <StyledTabBar>
+    <StyledTabBar ref={ref}>
+      <Global styles={tabBarScrollPadding} />
       <StyledTabs
         aria-label={TABS_LABEL}
         onChange={onTabChange}
