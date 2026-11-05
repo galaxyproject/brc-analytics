@@ -2095,7 +2095,12 @@ class GalaxyService:
                 )
                 delay *= 2
                 continue
-            shards = _split_merged(document)
+            try:
+                shards = _split_merged(document)
+            except ValueError as e:
+                raise Exception(
+                    f"kmindex job {job_id}: unreadable merged results {dataset_id}: {e}"
+                ) from e
             if not shards:
                 # kmindex keys every shard it searched, even ones with no hits,
                 # so an empty document is a misread, not a query that matched

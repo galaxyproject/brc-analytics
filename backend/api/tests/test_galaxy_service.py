@@ -4015,7 +4015,8 @@ class TestMergedOutput:
 
         merged.gi.make_get_request = MagicMock(side_effect=answer)
 
-        with pytest.raises(Exception, match="merged results"):
+        # Named, so the log line says which job's results to go and look at.
+        with pytest.raises(Exception, match="kmindex job job1: .*merged results"):
             await merged._aggregate_shards("job1")
 
         assert len(sent) == requests
