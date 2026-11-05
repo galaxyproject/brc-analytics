@@ -494,3 +494,27 @@ class TestRebuild:
         assert again["retry_after_seconds"] == logan_mcp.BUILD_FAILURE_TTL
         # The next poll answers from the marker instead of merging again.
         assert galaxy.get_kmindex_results.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_job_still_running_is_not_ready_not_building(self, env, monkeypatch):
+        # _miss reads "expired" when its own status lookup failed; a second
+        # lookup that says the job is running must not promise a merge.
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_job_status.return_value = MagicMock(
+            is_complete=False, is_successful=False
+        )
+        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert out["status"] == "not_ready"
+        assert out["retry_after_seconds"]
+        galaxy.get_kmindex_results.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_status_lookup_failure_is_retryable(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_job_status.side_effect = RuntimeError("galaxy down")
+        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert out["status_code"] == 502
+        assert out["retry_after_seconds"]
+        galaxy.get_kmindex_results.assert_not_awaited()

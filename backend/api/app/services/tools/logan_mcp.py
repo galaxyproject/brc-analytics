@@ -262,9 +262,24 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
     try:
         status = await galaxy.get_job_status(job_id)
     except Exception as e:
+        # The "expired" answer sends a human to the results page, which an
+        # agent can't use; tell it to ask again instead.
         logger.warning("MCP status for %s failed: %s", job_id, e)
-        return out
-    if status.is_complete and not status.is_successful:
+        return {
+            "error": "Could not read this search's status from Galaxy.",
+            "status_code": 502,
+            "job_id": job_id,
+            "retry_after_seconds": BUILD_RETRY_AFTER,
+        }
+    if not status.is_complete:
+        return {
+            "status": "not_ready",
+            "job_id": job_id,
+            "retry_after_seconds": BUILD_RETRY_AFTER,
+            "results_url": results_url_for(job_id),
+            "message": "This search is still running; poll logan_job_status.",
+        }
+    if not status.is_successful:
         return {
             "status": "failed",
             "job_id": job_id,
