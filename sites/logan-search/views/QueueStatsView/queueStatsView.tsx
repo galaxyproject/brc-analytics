@@ -20,7 +20,6 @@ import { formatWait } from "@repo/shared/components/LoganSearch/LoganSearchStatu
 import { API_BASE_URL } from "@repo/shared/config/api";
 import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import ky from "ky";
-import { useRouter } from "next/router";
 import { type JSX, useEffect, useMemo, useRef, useState } from "react";
 import {
   bucketHoursFor,
@@ -91,7 +90,6 @@ function useQueueHistory(range: QueueRange | null): {
  * @returns The window (null until the URL has been read after mount) and a setter.
  */
 function useQueueRange(): [QueueRange | null, (next: QueueRange) => void] {
-  const router = useRouter();
   const [range, setRange] = useState<QueueRange | null>(null);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -100,13 +98,11 @@ function useQueueRange(): [QueueRange | null, (next: QueueRange) => void] {
   }, []);
   const choose = (next: QueueRange): void => {
     setRange(next);
-    router
-      .replace(
-        { pathname: router.pathname, query: { hours: next } },
-        undefined,
-        { shallow: true }
-      )
-      .catch(() => undefined);
+    // Same approach as the search page's filter params: leaves the rest of
+    // the query alone and adds no history entry for Back to walk.
+    const url = new URL(window.location.href);
+    url.searchParams.set("hours", String(next));
+    window.history.replaceState(null, "", url);
   };
   return [range, choose];
 }

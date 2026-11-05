@@ -28,14 +28,6 @@ jest.mock("vega-embed", () => ({
   default: jest.fn(async () => ({ finalize: jest.fn() })),
 }));
 
-const mockRouter = {
-  pathname: "/queue",
-  replace: jest.fn(() => Promise.resolve(true)),
-};
-jest.mock("next/router", () => ({
-  useRouter: (): typeof mockRouter => mockRouter,
-}));
-
 const mockKy = ky as unknown as { get: jest.Mock };
 
 /**
@@ -190,7 +182,6 @@ describe("QueueStatsView", () => {
     });
     mockKy.get.mockReset();
     mockKy.get.mockReturnValue({ json: () => Promise.resolve(HISTORY) });
-    mockRouter.replace.mockClear();
     window.history.replaceState({}, "", "/queue");
   });
 
@@ -256,16 +247,24 @@ describe("QueueStatsView", () => {
     expect(screen.getByText("Last 72 hours")).toBeTruthy();
     expect(screen.getByText("Loading…")).toBeTruthy();
     expect(mockKy.get.mock.calls[1][1].searchParams).toEqual({ hours: 72 });
-    expect(mockRouter.replace).toHaveBeenCalledWith(
-      { pathname: "/queue", query: { hours: 72 } },
-      undefined,
-      { shallow: true }
-    );
+    expect(window.location.search).toBe("?hours=72");
 
     pending.resolve?.({ ...HISTORY, hours: 72 });
     await waitFor(() =>
       expect(screen.queryByText("Loading…")).not.toBeInTheDocument()
     );
     expect(screen.getByText("2 h 18 min")).toBeTruthy();
+  });
+
+  test("switching the window keeps the link's other parameters", async () => {
+    window.history.replaceState({}, "", "/queue?utm_source=mail&hours=24");
+    renderPage();
+    expect(await screen.findByText("2 h 18 min")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "72 hours" }));
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.get("hours")).toBe("72");
+    expect(params.get("utm_source")).toBe("mail");
   });
 });
