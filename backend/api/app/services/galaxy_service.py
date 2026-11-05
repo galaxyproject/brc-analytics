@@ -637,6 +637,13 @@ def _split_merged(document: object) -> List[Optional[dict]]:
     """
     if not isinstance(document, dict):
         raise ValueError(f"merged results are a {type(document).__name__}, not a dict")
+    for name, queries in document.items():
+        # Checked here, where the message can say what was wrong, rather than
+        # left to fail as an AttributeError deep in the merge.
+        if queries is not None and not isinstance(queries, dict):
+            raise ValueError(
+                f"merged results for {name} are a {type(queries).__name__}, not a dict"
+            )
     return [{name: queries} for name, queries in document.items()]
 
 

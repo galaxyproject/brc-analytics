@@ -3961,8 +3961,9 @@ class TestMergedOutput:
             lambda: _archive_response(b"", status_code=503),
             lambda: _archive_response(b"{}"),
             lambda: _archive_response(b"[]"),
+            lambda: _archive_response(b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": [1]}'),
         ],
-        ids=["unavailable", "no-shards", "not-a-dict"],
+        ids=["unavailable", "no-shards", "not-a-dict", "shard-not-a-dict"],
     )
     async def test_an_unreadable_file_fails_uncached(
         self, merged, monkeypatch, response
