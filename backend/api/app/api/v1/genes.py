@@ -1,15 +1,54 @@
 """Gene API: genes read from the gene snapshot, and BioNym's claims about them."""
 
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
-from app.models.genes import BionymClaims, GeneResponse
+from app.models.genes import BionymClaims, GeneResponse, GeneSearchResponse
 from app.services.bionym_graphs import BionymGraphStore
-from app.services.gene_catalog import GeneCatalogService
+from app.services.gene_catalog import MAX_SEARCH_WORDS, GeneCatalogService
 
 router = APIRouter()
+
+DEFAULT_SEARCH_LIMIT = 10
+MAX_SEARCH_LIMIT = 50
+
+
+# Declared before /{gene_uid}, which would otherwise take "search" as a UID.
+@router.get("/search", response_model=GeneSearchResponse)
+def search_genes(
+    q: str = Query(
+        ...,
+        max_length=200,
+        description="Words that start a gene's IDs or its products' words",
+    ),
+    assembly: Optional[str] = Query(None, description="An assembly accession"),
+    limit: int = Query(DEFAULT_SEARCH_LIMIT, ge=1, le=MAX_SEARCH_LIMIT),
+    service: GeneCatalogService = Depends(get_gene_catalog_service),
+) -> GeneSearchResponse:
+    """Genes found by prefix of their IDs, symbols, or their products' words.
+
+    Case-insensitive. Each word must match a term of the gene: the last may
+    be the start of one, the others must be whole. Each gene is listed once,
+    at its best match, best first.
+    """
+    query = q.strip()
+    word_count = len(query.split())
+    if word_count == 0:
+        raise HTTPException(status_code=422, detail="The query is empty")
+    if word_count > MAX_SEARCH_WORDS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"The query has more than {MAX_SEARCH_WORDS} words",
+        )
+    if service.snapshot is None:
+        raise HTTPException(status_code=503, detail="Gene data is unavailable")
+    results, truncated = service.search_genes(query, assembly, limit)
+    return GeneSearchResponse(
+        snapshot=service.snapshot, query=query, results=results, truncated=truncated
+    )
 
 
 @router.get("/{gene_uid}", response_model=GeneResponse)

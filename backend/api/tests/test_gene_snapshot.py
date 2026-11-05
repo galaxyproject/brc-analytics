@@ -1,6 +1,7 @@
 """Tests for serving the pinned gene snapshot: the download, its checks and
 retries, and that gene data failing turns off only the gene features."""
 
+import csv
 import hashlib
 import json
 import os
@@ -19,10 +20,15 @@ from app.core.dependencies import get_gene_catalog_service
 from app.services import gene_snapshot
 from app.services.gene_catalog import SCHEMA_VERSION, GeneCatalogService
 from app.services.gene_snapshot import read_pin
+from tests.conftest import GENE_SNAPSHOT_EXPORT
 from tests.test_genes_api import make_client
 
 AMA1 = "d9049485-ed74-5455-98c2-5dc13eef544a"
 URL = "https://genes.test/snapshots/genes.duckdb"
+
+# The test snapshot's build ID.
+with open(GENE_SNAPSHOT_EXPORT / "snapshot.csv", newline="") as _f:
+    BUILD_ID = next(csv.DictReader(_f))["build_id"]
 
 
 @pytest.fixture
@@ -57,7 +63,7 @@ def snapshot_bytes(gene_snapshot_path):
 
 def write_pin(path, content, **changes):
     pin = {
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": BUILD_ID,
         "url": URL,
         "sha256": hashlib.sha256(content).hexdigest(),
         "size": len(content),
@@ -94,12 +100,10 @@ def test_pinned_snapshot_is_downloaded_and_served(tmp_path, store, snapshot_byte
     assert service.health() == {
         "status": "ready",
         "source": "pinned",
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": BUILD_ID,
     }
     assert store.requests == [URL]
-    assert os.listdir(tmp_path / "genes") == [
-        "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
-    ]
+    assert os.listdir(tmp_path / "genes") == [f"{BUILD_ID}.duckdb"]
     response = make_client(service).get(f"/api/v1/genes/{AMA1}")
     assert response.status_code == 200
     assert response.json()["gene"]["locusTag"] == "PF3D7_1133400"

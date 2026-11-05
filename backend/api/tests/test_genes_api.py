@@ -225,7 +225,8 @@ def test_concurrent_requests(service, gene_uid):
 @pytest.mark.parametrize(
     "change",
     [
-        "UPDATE snapshot SET schema_version = 2",
+        "UPDATE snapshot SET schema_version = 1",
+        "DROP TABLE search_term",
         "DROP TABLE alt_id",
         "ALTER TABLE transcript DROP COLUMN protein_product",
     ],
