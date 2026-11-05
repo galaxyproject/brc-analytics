@@ -12,7 +12,13 @@ import { QueueStatsView } from "@logan/views/QueueStatsView/queueStatsView";
 import { ThemeProvider } from "@mui/material";
 import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import ky from "ky";
 
 jest.mock("ky", () => ({
@@ -254,6 +260,44 @@ describe("QueueStatsView", () => {
       expect(screen.queryByText("Loading…")).not.toBeInTheDocument()
     );
     expect(screen.getByText("2 h 18 min")).toBeTruthy();
+  });
+
+  test("a failed first read of the new window shows the error, not the old window's figures", async () => {
+    renderPage();
+    expect(await screen.findByText("2 h 18 min")).toBeTruthy();
+
+    mockKy.get.mockReturnValue({
+      json: () => Promise.reject(new Error("down")),
+    });
+    fireEvent.click(screen.getByRole("button", { name: "72 hours" }));
+
+    expect(
+      await screen.findByText(/The history could not be loaded/)
+    ).toBeTruthy();
+    expect(screen.queryByText("2 h 18 min")).not.toBeInTheDocument();
+  });
+
+  test("a failed refresh keeps the figures already shown", async () => {
+    jest.useFakeTimers();
+    try {
+      renderPage();
+      expect(await screen.findByText("2 h 18 min")).toBeTruthy();
+
+      mockKy.get.mockReturnValue({
+        json: () => Promise.reject(new Error("down")),
+      });
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(5 * 60_000);
+      });
+
+      expect(mockKy.get).toHaveBeenCalledTimes(2);
+      expect(screen.getByText("2 h 18 min")).toBeTruthy();
+      expect(
+        screen.queryByText(/The history could not be loaded/)
+      ).not.toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   test("switching the window keeps the link's other parameters", async () => {
