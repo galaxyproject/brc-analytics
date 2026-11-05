@@ -25,6 +25,7 @@ from starlette.requests import Request
 from app.core import dependencies
 from app.core.config import get_settings
 from app.core.partner_keys import Partner
+from app.core.rate_limit import client_ip
 from app.models.galaxy import KmindexQuerySubmission
 from app.services import logan_jobs
 from app.services.galaxy_service import (
@@ -86,7 +87,7 @@ def _dedupe_key(request: Request, partner: Optional[Partner], fingerprint: str) 
         who = f"partner:{partner.partner_id}"
     else:
         # Same identity the anonymous submit pool charges.
-        who = dependencies.get_submit_rate_limiter()._get_client_key(request)
+        who = f"ip:{client_ip(request)}"
     digest = hashlib.sha256(who.encode("utf-8")).hexdigest()[:32]
     return f"mcp:logan:dedupe:{digest}:{fingerprint}"
 

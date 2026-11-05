@@ -86,9 +86,6 @@ def env(monkeypatch):
     monkeypatch.setattr(dependencies, "get_sra_mirror_service", lambda: None)
     submit_limiter = MagicMock()
     submit_limiter.check = AsyncMock(return_value={})
-    submit_limiter._get_client_key = lambda request, principal=None: (
-        f"ratelimit:submit:{request.client.host}"
-    )
     partner_submit = MagicMock()
     partner_submit.check = AsyncMock(return_value={})
     monkeypatch.setattr(
@@ -233,6 +230,16 @@ class TestDedupe:
         again = await _submit()
         assert again["status"] == "submitted"
         assert env.galaxy.submit_kmindex_query.await_count == 2
+
+    @pytest.mark.asyncio
+    async def test_caller_behind_a_trusted_proxy_is_one_caller(self, env, monkeypatch):
+        monkeypatch.setenv("TRUST_PROXY_HEADERS", "true")
+        get_settings.cache_clear()
+        xff = {"X-Forwarded-For": "192.0.2.44"}
+        _as(monkeypatch, _request(xff, ip="10.0.0.1"))
+        await _submit()
+        _as(monkeypatch, _request(xff, ip="10.0.0.2"))
+        assert (await _submit())["status"] == "reused"
 
     @pytest.mark.asyncio
     async def test_different_search_is_not_reused(self, env, monkeypatch):
