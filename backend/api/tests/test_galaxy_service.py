@@ -3959,6 +3959,27 @@ class TestMergedOutput:
         assert merged.gi.make_get_request.call_count == 2
 
     @pytest.mark.asyncio
+    async def test_a_download_cut_inside_a_character_is_retried(
+        self, merged, monkeypatch
+    ):
+        # Cut mid-way through a multi-byte character, the bytes fail to decode
+        # before they ever fail to parse.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        whole = json.dumps(
+            {"GENOMIC_BCT_0": {"r\u00e9sum\u00e9": {"SRR1": 0.9}}}, ensure_ascii=False
+        ).encode()
+        cut = whole.index("\u00e9".encode()) + 1
+        merged.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(whole[:cut]),
+                _archive_response(whole),
+            ]
+        )
+
+        assert (await merged._aggregate_shards("job1"))["total_matches"] == 1
+        assert merged.gi.make_get_request.call_count == 2
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "response, requests",
         [

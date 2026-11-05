@@ -2079,9 +2079,11 @@ class GalaxyService:
                 document = await asyncio.to_thread(self._fetch_merged, dataset_id)
             except Exception as e:
                 # A stream cut short can arrive as truncated JSON rather than
-                # as a transport error, the way a short archive fails to open.
+                # as a transport error, the way a short archive fails to open --
+                # or, cut inside a multi-byte character, as bytes that won't
+                # decode at all.
                 retryable = _is_retryable_fetch_error(e) or isinstance(
-                    e, json.JSONDecodeError
+                    e, (json.JSONDecodeError, UnicodeDecodeError)
                 )
                 if not retryable or attempt == KMINDEX_MERGED_ATTEMPTS - 1:
                     raise Exception(
