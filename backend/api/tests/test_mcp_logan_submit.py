@@ -501,13 +501,18 @@ class TestRebuild:
         assert out["status_code"] == 401
 
     @pytest.mark.asyncio
-    async def test_busy_lane_is_quiet(self, env, monkeypatch):
+    async def test_busy_lane_is_quiet(self, env, monkeypatch, caplog):
         _as(monkeypatch, _request())
         galaxy = self._galaxy()
         galaxy.get_kmindex_results.side_effect = GalaxyJobAggregating("queued")
-        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
-        await self._drain()
+        with caplog.at_level("WARNING", logger=logan_mcp.logger.name):
+            out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+            await self._drain()
         assert out["status"] == "building"
+        # Without the specific clause the generic one would log and mark the
+        # merge failed; a busy lane is neither.
+        assert not caplog.records
+        assert not await galaxy.cache.get(logan_mcp._build_failure_key(self.JOB))
 
     @pytest.mark.asyncio
     async def test_failed_merge_is_an_error_not_building_forever(
