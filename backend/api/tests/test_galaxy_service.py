@@ -3884,7 +3884,9 @@ class TestMergedOutput:
                 "threshold": '"0.5"',
             }
         )
-        service._download_collection = AsyncMock()
+        # None, so a dispatch slip falls through to the per-shard path and
+        # trips assert_not_awaited instead of merging a MagicMock.
+        service._download_collection = AsyncMock(return_value=None)
         service._download_shard = AsyncMock()
         service.gi.make_get_request = MagicMock(
             return_value=_archive_response(json.dumps(self.MERGED).encode())
@@ -3940,6 +3942,7 @@ class TestMergedOutput:
         aggregate = await merged._aggregate_shards("job1")
 
         assert aggregate["total_matches"] == 3
+        assert merged.gi.make_get_request.call_count == 2
 
     @pytest.mark.asyncio
     async def test_a_truncated_download_is_retried(self, merged, monkeypatch):
@@ -3953,29 +3956,50 @@ class TestMergedOutput:
         )
 
         assert (await merged._aggregate_shards("job1"))["total_matches"] == 3
+        assert merged.gi.make_get_request.call_count == 2
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
-        "response",
+        "response, requests",
         [
-            lambda: _archive_response(b"", status_code=503),
-            lambda: _archive_response(b"{}"),
-            lambda: _archive_response(b"[]"),
-            lambda: _archive_response(b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": [1]}'),
+            # Worth waiting out: the whole budget, then fail.
+            (
+                lambda: _archive_response(b"", status_code=503),
+                galaxy_service.KMINDEX_MERGED_ATTEMPTS,
+            ),
+            # Gone or refused, or read fine and wrong: asking again won't help.
+            (lambda: _archive_response(b"", status_code=404), 1),
+            (lambda: _archive_response(b"{}"), 1),
+            (lambda: _archive_response(b"[]"), 1),
+            (
+                lambda: _archive_response(
+                    b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": [1]}'
+                ),
+                1,
+            ),
         ],
-        ids=["unavailable", "no-shards", "not-a-dict", "shard-not-a-dict"],
+        ids=["unavailable", "gone", "no-shards", "not-a-dict", "shard-not-a-dict"],
     )
     async def test_an_unreadable_file_fails_uncached(
-        self, merged, monkeypatch, response
+        self, merged, monkeypatch, response, requests
     ):
         # The file is the whole result. Read as zero hits, it would be cached
         # as a complete answer to a query that matched things.
         monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
-        merged.gi.make_get_request = MagicMock(side_effect=lambda *a, **k: response())
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(response())
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
 
         with pytest.raises(Exception, match="merged results"):
             await merged._aggregate_shards("job1")
 
+        assert len(sent) == requests
+        for r in sent:
+            r.close.assert_called_once()
         merged.cache.set.assert_not_called()
         merged._download_shard.assert_not_awaited()
 
