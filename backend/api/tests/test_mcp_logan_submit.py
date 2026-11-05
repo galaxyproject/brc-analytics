@@ -1,0 +1,313 @@
+"""logan_submit over MCP: anonymous and partner-keyed searches."""
+
+from __future__ import annotations
+
+import json
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.routing import Mount
+
+from app.core import dependencies
+from app.core.config import get_settings
+from app.core.partner_keys import generate_partner_key, hash_partner_key
+from app.models.galaxy import GalaxyJobResponse
+from app.services import logan_jobs
+from app.services.galaxy_service import GalaxySubmitNotStarted, KmindexUnknownIndex
+from app.services.mcp_server import create_mcp_server
+from app.services.tools import logan_mcp
+from tests.test_mcp import _catalog_data, _parse_sse
+
+KEY = generate_partner_key()
+JOB_ID = "0123456789abcdef"
+SEQ = ">q\nACGTACGTACGTACGTACGTACGTACGTACGTACGT\n"
+SUNSET = (datetime.now(timezone.utc) + timedelta(days=90)).replace(microsecond=0)
+
+
+class FakeCache:
+    def __init__(self):
+        self.store: dict[str, str] = {}
+
+    async def get(self, key):
+        value = self.store.get(key)
+        return json.loads(value) if value else None
+
+    async def set(self, key, value, ttl=3600):
+        self.store[key] = json.dumps(value)
+        return True
+
+    async def set_if_absent(self, key, value, ttl):
+        if key in self.store:
+            return False
+        self.store[key] = json.dumps(value)
+        return True
+
+    async def delete(self, key):
+        return self.store.pop(key, None) is not None
+
+
+def _request(headers: dict | None = None, ip: str = "203.0.113.7") -> Request:
+    return Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/",
+            "headers": [
+                (k.lower().encode(), v.encode()) for k, v in (headers or {}).items()
+            ],
+            "client": (ip, 1234),
+        }
+    )
+
+
+@pytest.fixture()
+def env(monkeypatch):
+    monkeypatch.setenv("PARTNER_API_ENABLED", "true")
+    monkeypatch.setenv("PARTNER_API_KEYS", f"acme:k1:{hash_partner_key(KEY)}")
+    monkeypatch.setenv("PARTNER_API_SUNSET", SUNSET.isoformat())
+    monkeypatch.setenv("GALAXY_API_KEY", "service-key")
+    monkeypatch.delenv("PARTNER_SUBMIT_PAUSED", raising=False)
+    get_settings.cache_clear()
+    dependencies.reset_all_services()
+
+    cache = FakeCache()
+    monkeypatch.setattr(dependencies, "get_cache_service", lambda: cache)
+    monkeypatch.setattr(dependencies, "get_sra_mirror_service", lambda: None)
+    submit_limiter = MagicMock()
+    submit_limiter.check = AsyncMock(return_value={})
+    submit_limiter._get_client_key = lambda request, principal=None: (
+        f"ratelimit:submit:{request.client.host}"
+    )
+    partner_submit = MagicMock()
+    partner_submit.check = AsyncMock(return_value={})
+    monkeypatch.setattr(
+        dependencies, "get_submit_rate_limiter", MagicMock(return_value=submit_limiter)
+    )
+    monkeypatch.setattr(
+        dependencies,
+        "get_partner_submit_rate_limiter",
+        MagicMock(return_value=partner_submit),
+    )
+
+    galaxy = MagicMock()
+    galaxy.is_available.return_value = True
+    galaxy.credential = MagicMock(kind="service")
+    galaxy.submit_kmindex_query = AsyncMock(
+        return_value=GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1")
+    )
+    built: list[tuple[str, object]] = []
+
+    def anonymous(cache_, sra):
+        built.append(("anonymous", None))
+        return galaxy
+
+    def partnered(partner, cache_, sra):
+        built.append(("partner", partner.partner_id))
+        return galaxy
+
+    monkeypatch.setattr(logan_jobs, "anonymous_galaxy_service", anonymous)
+    monkeypatch.setattr(logan_jobs, "partner_galaxy_service", partnered)
+    record = AsyncMock()
+    monkeypatch.setattr(logan_jobs, "record_submission", record)
+
+    state = MagicMock(
+        cache=cache,
+        galaxy=galaxy,
+        built=built,
+        record=record,
+        submit_limiter=submit_limiter,
+        partner_submit=partner_submit,
+    )
+    yield state
+    get_settings.cache_clear()
+
+
+def _as(monkeypatch, request):
+    monkeypatch.setattr(logan_mcp, "current_request", lambda: request)
+
+
+async def _submit(**kw):
+    args = {"sequence": SEQ, "indexes": ["GENOMIC_VRL"], **kw}
+    return await logan_mcp.logan_submit(**args)
+
+
+class TestAnonymous:
+    @pytest.mark.asyncio
+    async def test_starts_a_search_on_the_anonymous_pool(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        out = await _submit()
+        assert out["status"] == "submitted"
+        assert out["job_id"] == JOB_ID
+        assert out["as"] == "anonymous"
+        assert out["results_url"] == f"/logan-search?job={JOB_ID}"
+        assert env.built == [("anonymous", None)]
+        env.submit_limiter.check.assert_awaited_once()
+        env.partner_submit.check.assert_not_awaited()
+        assert env.record.await_args.kwargs["source"] == "mcp"
+
+    @pytest.mark.asyncio
+    async def test_spent_pool_is_an_error_dict_with_retry(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.submit_limiter.check.side_effect = HTTPException(
+            status_code=429, detail="over", headers={"Retry-After": "120"}
+        )
+        out = await _submit()
+        assert out == {"error": "over", "status_code": 429, "retry_after_seconds": 120}
+        env.galaxy.submit_kmindex_query.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_unknown_index_is_a_400(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.galaxy.submit_kmindex_query.side_effect = KmindexUnknownIndex("NOPE")
+        out = await _submit(indexes=["NOPE"])
+        assert out["status_code"] == 400
+
+    @pytest.mark.asyncio
+    async def test_galaxy_down_is_a_503(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.galaxy.is_available.return_value = False
+        out = await _submit()
+        assert out["status_code"] == 503
+
+    @pytest.mark.asyncio
+    async def test_not_started_is_a_502_and_not_remembered(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.galaxy.submit_kmindex_query.side_effect = GalaxySubmitNotStarted("x")
+        out = await _submit()
+        assert out["status_code"] == 502
+        assert not env.cache.store
+
+    @pytest.mark.asyncio
+    async def test_bad_arguments_are_a_422_without_touching_galaxy(
+        self, env, monkeypatch
+    ):
+        _as(monkeypatch, _request())
+        out = await _submit(threshold=0.1)
+        assert out["status_code"] == 422
+        assert out["details"][0]["field"] == "threshold"
+        env.galaxy.submit_kmindex_query.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_no_http_request_is_refused(self, env, monkeypatch):
+        _as(monkeypatch, None)
+        out = await _submit()
+        assert "HTTP" in out["error"]
+
+
+class TestDedupe:
+    @pytest.mark.asyncio
+    async def test_same_search_again_reuses_the_job(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        first = await _submit()
+        again = await _submit()
+        assert first["status"] == "submitted"
+        assert again["status"] == "reused"
+        assert again["job_id"] == JOB_ID
+        assert env.galaxy.submit_kmindex_query.await_count == 1
+        # A reuse starts nothing, so it spends nothing.
+        assert env.submit_limiter.check.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_different_search_is_not_reused(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        await _submit()
+        await _submit(threshold=0.9)
+        assert env.galaxy.submit_kmindex_query.await_count == 2
+
+    @pytest.mark.asyncio
+    async def test_different_caller_is_not_reused(self, env, monkeypatch):
+        _as(monkeypatch, _request(ip="203.0.113.7"))
+        await _submit()
+        _as(monkeypatch, _request(ip="198.51.100.9"))
+        await _submit()
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        await _submit()
+        assert env.galaxy.submit_kmindex_query.await_count == 3
+
+
+class TestPartner:
+    @pytest.mark.asyncio
+    async def test_key_runs_as_the_partner(self, env, monkeypatch):
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        out = await _submit()
+        assert out["status"] == "submitted"
+        assert out["as"] == "partner:acme"
+        assert env.built == [("partner", "acme")]
+        env.partner_submit.check.assert_awaited_once()
+        env.submit_limiter.check.assert_not_awaited()
+        kwargs = env.record.await_args.kwargs
+        assert kwargs["source"] == "partner"
+        assert kwargs["partner_id"] == "acme"
+
+    @pytest.mark.asyncio
+    async def test_bad_key_is_a_401_not_anonymous(self, env, monkeypatch):
+        _as(monkeypatch, _request({"X-API-Key": "brc_wrong"}))
+        out = await _submit()
+        assert out["status_code"] == 401
+        env.galaxy.submit_kmindex_query.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_key_past_sunset_is_a_410(self, env, monkeypatch):
+        past = datetime.now(timezone.utc) - timedelta(days=1)
+        monkeypatch.setenv("PARTNER_API_SUNSET", past.isoformat())
+        get_settings.cache_clear()
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        out = await _submit()
+        assert out["status_code"] == 410
+
+    @pytest.mark.asyncio
+    async def test_key_when_partner_api_is_off_is_a_400(self, env, monkeypatch):
+        monkeypatch.setenv("PARTNER_API_ENABLED", "false")
+        get_settings.cache_clear()
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        out = await _submit()
+        assert out["status_code"] == 400
+
+    @pytest.mark.asyncio
+    async def test_paused_partner_submits_are_a_503(self, env, monkeypatch):
+        monkeypatch.setenv("PARTNER_SUBMIT_PAUSED", "true")
+        get_settings.cache_clear()
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        out = await _submit()
+        assert out["status_code"] == 503
+
+
+def test_tool_reaches_the_real_http_request(env, tmp_path):
+    """Through the mounted stateless HTTP app, the tool sees the caller's
+    headers -- which is the whole basis for telling partners from anonymous."""
+    galaxy_for_gating = MagicMock()
+    galaxy_for_gating.is_available.return_value = True
+    mcp = create_mcp_server(
+        _catalog_data(tmp_path), MagicMock(), galaxy=galaxy_for_gating
+    )
+    mcp_app = mcp.http_app(path="/", stateless_http=True)
+
+    @asynccontextmanager
+    async def lifespan(app):
+        async with mcp_app.lifespan(app):
+            yield
+
+    app = Starlette(routes=[Mount("/mcp", app=mcp_app)], lifespan=lifespan)
+    body = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "logan_submit",
+            "arguments": {"sequence": SEQ, "indexes": ["GENOMIC_VRL"]},
+        },
+    }
+    headers = {"Accept": "application/json, text/event-stream", "X-API-Key": KEY}
+    with TestClient(app) as client:
+        response = client.post("/mcp/", json=body, headers=headers)
+    assert response.status_code == 200, response.text
+    result = _parse_sse(response.text)["result"]
+    out = result.get("structuredContent") or json.loads(result["content"][0]["text"])
+    assert out["as"] == "partner:acme", out
+    assert out["job_id"] == JOB_ID

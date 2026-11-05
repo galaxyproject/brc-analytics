@@ -21,6 +21,7 @@ import redis.asyncio as redis
 from fastapi import HTTPException
 from starlette.requests import Request
 
+from app.core import dependencies
 from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 from app.core.dependencies import check_partner_submit_rate_limit
@@ -234,6 +235,69 @@ async def submit_partner_job(
         galaxy_job_id=response.job_id,
         partner_id=partner.partner_id,
         source="partner",
+        submission=submission,
+    )
+    return response.job_id
+
+
+MCP_HISTORY_NAME = "BRC Logan MCP"
+
+
+def anonymous_galaxy_service(
+    cache: CacheService, sra_mirror: Optional[SRAMirrorService]
+) -> GalaxyService:
+    """A GalaxyService on the BRC service account for keyless MCP searches.
+
+    Its own history, so agent traffic can be told apart from the web's
+    anonymous searches when someone goes looking in Galaxy.
+    """
+    key = get_settings().GALAXY_API_KEY
+    credential = GalaxyCredential(kind="service", secret=key) if key else None
+    return GalaxyService(
+        cache,
+        credential=credential,
+        history_name=MCP_HISTORY_NAME,
+        sra_mirror=sra_mirror,
+    )
+
+
+async def submit_anonymous_job(
+    request: Request,
+    submission: KmindexQuerySubmission,
+    galaxy: GalaxyService,
+) -> str:
+    """
+    Start a keyless search and return its Galaxy job id.
+
+    Charged to the same per-IP submit pool as an anonymous search from the web
+    page: an agent with no key is just another anonymous client.
+    """
+    if not submission.sequence.strip():
+        raise HTTPException(status_code=400, detail="Query sequence cannot be empty")
+    require_galaxy(galaxy)
+    await dependencies.get_submit_rate_limiter().check(request)
+    try:
+        response = await galaxy.submit_kmindex_query(submission)
+    except KmindexUnknownIndex as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except GalaxySubmitNotStarted as e:
+        logger.error(f"MCP submit failed: {e}")
+        raise HTTPException(
+            status_code=502, detail="Failed to submit kmindex query"
+        ) from e
+    except Exception as e:
+        logger.error(f"MCP submit ended ambiguously (Galaxy may have started it): {e}")
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "The kmindex query may or may not have started; Galaxy did not "
+                "confirm it"
+            ),
+        ) from e
+    await record_submission(
+        credential=galaxy.credential,
+        galaxy_job_id=response.job_id,
+        source="mcp",
         submission=submission,
     )
     return response.job_id

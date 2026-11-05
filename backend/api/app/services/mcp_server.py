@@ -9,7 +9,7 @@ from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
 from app.services.sra_mirror import SRAMirrorService
-from app.services.tools import logan_tools
+from app.services.tools import logan_mcp, logan_tools
 from app.services.tools.catalog_tools import AssistantDeps
 
 logger = logging.getLogger(__name__)
@@ -56,13 +56,14 @@ def create_mcp_server(
         )
     if logan_enabled:
         instructions += (
-            "\n\nThis server also exposes read-only access to Logan sequence "
-            "searches (kmindex jobs run through BRC Analytics at "
-            "/logan-search): logan_job_status, logan_cohort (whole-match-set "
-            "counts and facets -- the only honest numbers for a search) and "
-            "logan_hits (a page of score-ranked hits with SRA metadata). "
-            "Results are cached for a day after the results page assembles "
-            "them; a tool that reports 'expired' means open that page first."
+            "\n\nThis server also runs Logan sequence searches (kmindex over "
+            "SRA, the same search as /logan-search): logan_submit starts one "
+            "and returns a job_id at once; logan_job_status says when it has "
+            "finished; logan_cohort gives whole-match-set counts and facets "
+            "(the only honest numbers for a search) and logan_hits a page of "
+            "score-ranked hits with SRA metadata. Results are cached for a day "
+            "after they are first assembled; a tool that reports 'expired' "
+            "means open that job's results page first."
         )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
@@ -314,6 +315,28 @@ def create_mcp_server(
             return json.loads(
                 await logan_tools.logan_hits(_deps, job_id, offset=offset, limit=limit)
             )
+
+        @mcp.tool()
+        async def logan_submit(
+            sequence: str, indexes: List[str], threshold: float = 0.5
+        ) -> dict:
+            """Start a Logan sequence search (kmindex) over SRA and return its
+            job_id right away; it does not wait for the search. Poll
+            logan_job_status until it is complete, then read logan_cohort and
+            logan_hits.
+
+            Without an API key this runs as an anonymous search under the same
+            per-IP hourly limit as the web page. Sending the same search again
+            within ten minutes returns the job already started.
+
+            Args:
+                sequence: one FASTA record, up to 5,000 bases.
+                indexes: Logan index names to search, e.g. ["GENOMIC_VRL"]
+                    (see logan_list_indexes).
+                threshold: minimum fraction of the query's k-mers a run must
+                    share, 0.25 to 1.0 (default 0.5).
+            """
+            return await logan_mcp.logan_submit(sequence, indexes, threshold)
 
         logger.info("Logan search tools registered on MCP server")
 
