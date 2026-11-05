@@ -226,7 +226,8 @@ _CASES = [
         ],
         "expected_schema": {"analysis_type": "Transcriptomics"},
         "expected_details": {"workflow": "rnaseq-pe"},
-        "expected_complete": False,
+        # Every choice is made by the last turn, so it can hand off.
+        "expected_complete": True,
     },
     {
         # Pure exploration: nothing is committed, so the schema must stay empty.
