@@ -86,6 +86,38 @@ export interface GeneResponse {
 }
 
 /**
+ * What a search matched a gene on.
+ */
+export interface GeneSearchMatch {
+  // A search term type: an alias type, or transcriptProduct's and
+  // proteinProduct's for a word of one of the gene's transcripts' products.
+  type: string;
+  // The alias as written, or the whole product the word is in.
+  value: string;
+}
+
+export interface GeneSearchResult {
+  assemblyAccession: string;
+  geneUid: string;
+  locusTag: string | null;
+  matchedOn: GeneSearchMatch;
+  name: string | null;
+  organism: GeneOrganism;
+  pageUrl: string;
+  symbol: string | null;
+}
+
+export interface GeneSearchResponse {
+  // The query as searched: trimmed of surrounding whitespace.
+  query: string;
+  // Best first; each gene once, at its best match.
+  results: GeneSearchResult[];
+  snapshot: GeneSnapshotInfo;
+  // Whether more genes matched than were returned.
+  truncated: boolean;
+}
+
+/**
  * One claim BioNym drew from a source: a language model's statement, the quote
  * it rests on, and BioNym's confidence in it, from 0 to 1.
  */
