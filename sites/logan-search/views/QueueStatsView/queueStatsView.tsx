@@ -65,7 +65,12 @@ function useQueueHistory(range: QueueRange | null): {
         timeout: 120000,
       })
         .json<QueueHistory>()
-        .then((next) => setState({ failed: false, history: next, range }))
+        .then((next) => {
+          // An answer that lands after the switch would retag the state with
+          // the old window and strand the new one on "Loading".
+          if (controller.signal.aborted) return;
+          setState({ failed: false, history: next, range });
+        })
         .catch(() => {
           if (controller.signal.aborted) return;
           setState((prev) => ({

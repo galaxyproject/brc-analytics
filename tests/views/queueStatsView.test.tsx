@@ -286,6 +286,34 @@ describe("QueueStatsView", () => {
     expect(spec.encoding.x.axis.format).toBe("%a %H:%M");
   });
 
+  test("a late answer for the old window doesn't replace the new one", async () => {
+    // ky rejects an aborted request, but an answer already on its way can
+    // still land after the switch; this mock ignores the abort to stand in.
+    const stale: { resolve?: (value: QueueHistory) => void } = {};
+    mockKy.get
+      .mockReturnValueOnce({
+        json: () =>
+          new Promise<QueueHistory>((resolve) => {
+            stale.resolve = resolve;
+          }),
+      })
+      .mockReturnValueOnce({
+        json: () =>
+          Promise.resolve({ ...HISTORY, hours: 72, wait_p90_minutes: 250 }),
+      });
+    renderPage();
+    await waitFor(() => expect(mockKy.get).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole("button", { name: "72 hours" }));
+    expect(await screen.findByText("4 h 10 min")).toBeTruthy();
+    await act(async () => {
+      stale.resolve?.(HISTORY);
+    });
+
+    expect(screen.queryByText("Loading…")).not.toBeInTheDocument();
+    expect(screen.getByText("4 h 10 min")).toBeTruthy();
+  });
+
   test("switching the window reloads it and records it in the URL", async () => {
     renderPage();
     expect(await screen.findByText("2 h 18 min")).toBeTruthy();
