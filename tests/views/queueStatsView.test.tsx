@@ -20,6 +20,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import ky from "ky";
+import embed from "vega-embed";
 
 jest.mock("ky", () => ({
   __esModule: true,
@@ -35,6 +36,7 @@ jest.mock("vega-embed", () => ({
 }));
 
 const mockKy = ky as unknown as { get: jest.Mock };
+const mockEmbed = embed as unknown as jest.Mock;
 
 /**
  * A search row.
@@ -187,6 +189,7 @@ describe("QueueStatsView", () => {
       window_minutes: 120,
     });
     mockKy.get.mockReset();
+    mockEmbed.mockClear();
     mockKy.get.mockReturnValue({ json: () => Promise.resolve(HISTORY) });
     window.history.replaceState({}, "", "/queue");
   });
@@ -234,6 +237,9 @@ describe("QueueStatsView", () => {
     ).toBeTruthy();
     // 07:11-08:07 UTC falls in one or two 3 h blocks depending on the zone.
     expect(screen.getByRole("columnheader", { name: "Hours" })).toBeTruthy();
+    await waitFor(() => expect(mockEmbed).toHaveBeenCalled());
+    const spec = mockEmbed.mock.calls[0][1];
+    expect(spec.encoding.x.axis.format).toBe("%a %H:%M");
   });
 
   test("switching the window reloads it and records it in the URL", async () => {

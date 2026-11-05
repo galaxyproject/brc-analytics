@@ -160,13 +160,20 @@ const Stat = ({
  * Each search's wait, drawn with vega-lite.
  * @param props - Component props.
  * @param props.history - The history to draw.
+ * @param props.range - The window it covers.
  * @returns The chart.
  */
-const WaitChart = ({ history }: { history: QueueHistory }): JSX.Element => {
+const WaitChart = ({
+  history,
+  range,
+}: {
+  history: QueueHistory;
+  range: QueueRange;
+}): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const spec = useMemo(
-    () => buildWaitSpec(history.rows, parseQueueRange(String(history.hours))),
-    [history.hours, history.rows]
+    () => buildWaitSpec(history.rows, range),
+    [history.rows, range]
   );
   useEffect(() => {
     let result: { finalize: () => void } | null = null;
@@ -307,7 +314,9 @@ export const QueueStatsView = (): JSX.Element => {
                       value={waitText(history.run_p50_minutes)}
                     />
                   </StatGrid>
-                  {history.rows.length > 0 && <WaitChart history={history} />}
+                  {history.rows.length > 0 && (
+                    <WaitChart history={history} range={shownRange} />
+                  )}
                   {history.truncated && (
                     <Typography color="textSecondary" variant="caption">
                       Galaxy&apos;s job list hit its limit, so the oldest
