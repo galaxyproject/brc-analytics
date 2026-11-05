@@ -2764,6 +2764,16 @@ class GalaxyService:
             logger.debug("Galaxy job %s full response: %s", job_id, job_data)
 
             state = job_data["state"]
+            if state in TERMINAL_JOB_STATES and state != GalaxyJobState.OK:
+                # stderr and exit_code only come in the full dict, which is too
+                # heavy for every poll. A failed status is cached for an hour,
+                # so this runs about once per failed job.
+                try:
+                    job_data = await asyncio.to_thread(
+                        self.gi.jobs.show_job, job_id, full_details=True
+                    )
+                except Exception as e:
+                    logger.warning("Full details for failed job %s: %s", job_id, e)
             status = GalaxyJobStatus(
                 job_id=job_id,
                 state=state,

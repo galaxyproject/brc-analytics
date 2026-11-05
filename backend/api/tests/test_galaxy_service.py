@@ -142,6 +142,33 @@ class TestJobStatusStates:
         assert not status.is_complete
 
     @pytest.mark.asyncio
+    async def test_a_failed_job_carries_its_stderr(self, service):
+        # Galaxy only returns stderr in the full job dict, so without the
+        # second fetch every "failed" answer has no reason attached.
+        full = {**self._job("error"), "exit_code": 139, "stderr": "Segmentation fault"}
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=lambda job_id, full_details=False: (
+                full if full_details else self._job("error")
+            )
+        )
+
+        status = await service.get_job_status("job1")
+
+        assert status.stderr == "Segmentation fault"
+        assert status.exit_code == 139
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("state", ["ok", "running"])
+    async def test_only_a_failed_job_pays_for_the_full_fetch(self, service, state):
+        # Every open search polls this; the full dict is only worth it once.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
+        service._get_job_outputs = AsyncMock(return_value=[])
+
+        await service.get_job_status("job1")
+
+        service.gi.jobs.show_job.assert_called_once_with("job1")
+
+    @pytest.mark.asyncio
     async def test_a_state_the_enum_does_not_list_is_not_a_500(self, service):
         service.gi.jobs.show_job = MagicMock(
             return_value=self._job("some_future_state")
