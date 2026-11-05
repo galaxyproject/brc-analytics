@@ -3,7 +3,7 @@ import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Di
 import { TOOLTIP_PROPS } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/RowSelectionCell/constants";
 import { Button, DialogActions, DialogContent, Tooltip } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
-import { StyledDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog.styles";
+import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
 import { Table } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { type JSX } from "react";
 import { type Props } from "./types";
@@ -44,7 +44,7 @@ export const AssembliesSelector = ({
   const count = getRowSelectionCount(table);
   const addValidation = getAddSelectionValidation(count, workflow);
   return (
-    <StyledDialog
+    <SelectorDialog
       onClose={onClose}
       // Starts the selection from the configured assemblies each time the dialog opens.
       onTransitionEnter={() =>
@@ -83,6 +83,6 @@ export const AssembliesSelector = ({
           </span>
         </Tooltip>
       </DialogActions>
-    </StyledDialog>
+    </SelectorDialog>
   );
 };
