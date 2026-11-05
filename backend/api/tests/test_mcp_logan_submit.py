@@ -303,6 +303,14 @@ class TestPartner:
         env.galaxy.submit_kmindex_query.assert_not_awaited()
 
     @pytest.mark.asyncio
+    async def test_empty_key_is_a_401_not_anonymous(self, env, monkeypatch):
+        # A client whose key variable came up empty still meant to send one.
+        _as(monkeypatch, _request({"X-API-Key": ""}))
+        out = await _submit()
+        assert out["status_code"] == 401
+        env.galaxy.submit_kmindex_query.assert_not_awaited()
+
+    @pytest.mark.asyncio
     async def test_key_past_sunset_is_a_410(self, env, monkeypatch):
         past = datetime.now(timezone.utc) - timedelta(days=1)
         monkeypatch.setenv("PARTNER_API_SUNSET", past.isoformat())

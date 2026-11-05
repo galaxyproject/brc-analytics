@@ -72,7 +72,7 @@ def resolve_partner(request: Request) -> Optional[Partner]:
     it can't.
     """
     key = request.headers.get("x-api-key")
-    if not key:
+    if key is None:
         return None
     if not get_settings().PARTNER_API_ENABLED:
         raise HTTPException(
