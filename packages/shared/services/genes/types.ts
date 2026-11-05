@@ -76,7 +76,7 @@ export interface Gene {
   symbol: string | null;
   transcripts: GeneTranscript[];
   // The assembly's UCSC Genome Browser address; null when UCSC has no browser
-  // for it.
+  // for it, or its browser doesn't have the gene's sequence.
   ucscBrowserUrl: string | null;
 }
 
