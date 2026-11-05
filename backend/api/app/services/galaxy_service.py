@@ -1293,6 +1293,7 @@ class GalaxyService:
         sort: KmindexSort = "score",
         order: Optional[KmindexOrder] = None,
         lane: AggregationLane = "native",
+        wait: Optional[bool] = None,
     ) -> KmindexResults:
         """Merge a kmindex job's per-shard outputs into one ranked hit list.
 
@@ -1301,11 +1302,14 @@ class GalaxyService:
             GalaxyJobAggregating when all its slots are taken instead of
             waiting, because its callers poll and a connection parked behind
             other partner merges is one the proxy will cut anyway.
+        @param wait: whether a cold merge waits for a free slot. Defaults to
+            the lane's own habit; False makes the native lane answer like the
+            partner one, for callers who poll and shouldn't queue there.
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        aggregate, source_job_id = await self._load_aggregate(job_id, lane)
+        aggregate, source_job_id = await self._load_aggregate(job_id, lane, wait)
 
         ordering, sort, order = await self._ordering_for(
             aggregate, source_job_id, sort, order or _default_order(sort)
@@ -1327,7 +1331,10 @@ class GalaxyService:
         )
 
     async def _load_aggregate(
-        self, job_id: str, lane: AggregationLane = "native"
+        self,
+        job_id: str,
+        lane: AggregationLane = "native",
+        wait: Optional[bool] = None,
     ) -> Tuple[dict, str]:
         """The job's cached aggregate, merging its shards first on a miss.
 
@@ -1337,6 +1344,8 @@ class GalaxyService:
 
         @param job_id: the kmindex job.
         @param lane: whose aggregation lock a cold merge takes.
+        @param wait: whether to wait for a free slot; None means the lane's
+            default (native waits, partner doesn't).
         @returns: the aggregate, and the job it lives under: job_id's job-cache
             original when job_id is a copy, else job_id itself. The export file
             is written under that job too.
@@ -1372,7 +1381,9 @@ class GalaxyService:
             slots = _AGGREGATION_LANES[lane]
             # No await between this check and the acquire below, so on one event
             # loop a free slot is still free when async-with takes it.
-            if lane == "partner" and slots.locked():
+            if wait is None:
+                wait = lane != "partner"
+            if not wait and slots.locked():
                 raise GalaxyJobAggregating(
                     f"Results for job {requested_job_id} are queued behind other merges"
                 )

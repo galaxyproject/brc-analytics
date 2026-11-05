@@ -518,9 +518,14 @@ class TestLoganToolGating:
         assert "logan_cohort" in mcp.instructions
 
     def test_cohort_miss_is_a_dict(self, tmp_path):
+        # Over MCP a finished job's miss starts a merge rather than sending the
+        # agent to a page it can't open (see test_mcp_logan_submit).
         galaxy = _fake_galaxy(cached=None)
-        galaxy.get_job_status = AsyncMock(return_value=MagicMock(is_complete=True))
+        galaxy.get_job_status = AsyncMock(
+            return_value=MagicMock(is_complete=True, is_successful=True)
+        )
+        galaxy.get_kmindex_results = AsyncMock()
         mcp = create_mcp_server(_catalog_data(tmp_path), MagicMock(), galaxy=galaxy)
         out = _call_tool(mcp, "logan_cohort", {"job_id": "fe6f66a714dcbec8"})
-        assert out["status"] == "expired"
+        assert out["status"] == "building"
         assert out["results_url"] == "/logan-search?job=fe6f66a714dcbec8"

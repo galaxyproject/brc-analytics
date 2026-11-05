@@ -299,7 +299,8 @@ def create_mcp_server(
             Args:
                 job_id: the 16-character Galaxy job id from a Logan results URL.
             """
-            return json.loads(await logan_tools.logan_cohort(_deps, job_id))
+            out = json.loads(await logan_tools.logan_cohort(_deps, job_id))
+            return await logan_mcp.with_rebuild(galaxy, job_id, out)
 
         @mcp.tool()
         async def logan_hits(job_id: str, offset: int = 0, limit: int = 25) -> dict:
@@ -312,9 +313,10 @@ def create_mcp_server(
                 offset: first hit to return (0-based).
                 limit: hits per page (default 25, capped at 100).
             """
-            return json.loads(
+            out = json.loads(
                 await logan_tools.logan_hits(_deps, job_id, offset=offset, limit=limit)
             )
+            return await logan_mcp.with_rebuild(galaxy, job_id, out)
 
         @mcp.tool()
         async def logan_submit(

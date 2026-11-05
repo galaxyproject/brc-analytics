@@ -12,6 +12,7 @@ agent can act on, and the status and Retry-After tell it how.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 from typing import Any, List, Optional
@@ -26,7 +27,12 @@ from app.core.config import get_settings
 from app.core.partner_keys import Partner
 from app.models.galaxy import KmindexQuerySubmission
 from app.services import logan_jobs
-from app.services.galaxy_service import GalaxyService
+from app.services.galaxy_service import (
+    AggregationLane,
+    GalaxyJobAggregating,
+    GalaxyJobNotComplete,
+    GalaxyService,
+)
 from app.services.logan_snapshot import results_url_for
 
 logger = logging.getLogger(__name__)
@@ -158,3 +164,70 @@ async def logan_queue(galaxy: GalaxyService) -> dict:
         logger.error(f"MCP queue read failed: {e}")
         return {"error": "Failed to read the search queue", "status_code": 502}
     return status.model_dump(mode="json")
+
+
+# Seconds to tell an agent to wait before asking again while results merge.
+BUILD_RETRY_AFTER = 15
+STDERR_TAIL = 2000
+
+# Strong references to running merges: the event loop only keeps weak ones,
+# and a merge collected mid-flight leaves its claim marker set for an hour.
+_builds: set[asyncio.Task] = set()
+
+
+def _start_build(galaxy: GalaxyService, job_id: str, lane: AggregationLane) -> None:
+    async def build() -> None:
+        try:
+            await galaxy.get_kmindex_results(
+                job_id, limit=1, offset=0, lane=lane, wait=False
+            )
+        except (GalaxyJobAggregating, GalaxyJobNotComplete):
+            pass  # someone else is merging it, or no slot; the next poll retries
+        except Exception as e:
+            logger.warning("MCP merge for %s failed: %s", job_id, e)
+
+    task = asyncio.create_task(build())
+    _builds.add(task)
+    task.add_done_callback(_builds.discard)
+
+
+async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
+    """Turn a cache miss on a finished search into a merge the agent can wait on.
+
+    The read tools are cache-only because the assistant can't wait on a merge
+    inside a chat turn. An MCP client can: it gets told to ask again shortly
+    while the merge runs off the request, so no tool call sits through a
+    multi-minute merge. Key holders merge on the partner lane; anonymous
+    callers on the native one, without ever queueing there behind the web.
+    """
+    if out.get("status") != "expired":
+        return out
+    request = current_request()
+    try:
+        partner = resolve_partner(request) if request is not None else None
+    except HTTPException as e:
+        return http_error(e)
+    try:
+        status = await galaxy.get_job_status(job_id)
+    except Exception as e:
+        logger.warning("MCP status for %s failed: %s", job_id, e)
+        return out
+    if status.is_complete and not status.is_successful:
+        return {
+            "status": "failed",
+            "job_id": job_id,
+            "error": (status.stderr or "")[-STDERR_TAIL:] or None,
+            "results_url": results_url_for(job_id),
+        }
+    _start_build(galaxy, job_id, "partner" if partner is not None else "native")
+    return {
+        "status": "building",
+        "job_id": job_id,
+        "retry_after_seconds": BUILD_RETRY_AFTER,
+        "results_url": results_url_for(job_id),
+        "message": (
+            "This search has finished and its results are being merged now. "
+            f"Ask again in about {BUILD_RETRY_AFTER} seconds; a search over "
+            "every index can take a few minutes to merge."
+        ),
+    }

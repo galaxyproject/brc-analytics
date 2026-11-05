@@ -3362,6 +3362,21 @@ class TestAggregationLanes:
 
         assert (await reader).total_hits == 1
 
+    @pytest.mark.asyncio
+    async def test_a_busy_native_lane_turns_away_a_caller_that_wont_wait(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock(return_value=_listing(1))
+        slots = galaxy_service._AGGREGATION_LANES["native"]
+
+        await slots.acquire()
+        try:
+            with pytest.raises(GalaxyJobAggregating, match="queued"):
+                await service.get_kmindex_results("job4", wait=False)
+        finally:
+            slots.release()
+
+        service._aggregate_shards.assert_not_awaited()
+
 
 class TestAggregateTTL:
     """

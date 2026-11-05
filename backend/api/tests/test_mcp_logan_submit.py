@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -19,7 +20,11 @@ from app.core.config import get_settings
 from app.core.partner_keys import generate_partner_key, hash_partner_key
 from app.models.galaxy import GalaxyJobResponse, KmindexQueueStatus
 from app.services import logan_jobs
-from app.services.galaxy_service import GalaxySubmitNotStarted, KmindexUnknownIndex
+from app.services.galaxy_service import (
+    GalaxyJobAggregating,
+    GalaxySubmitNotStarted,
+    KmindexUnknownIndex,
+)
 from app.services.mcp_server import create_mcp_server
 from app.services.tools import logan_mcp
 from tests.test_mcp import _call_tool, _catalog_data, _parse_sse, _tool_names
@@ -352,3 +357,77 @@ class TestIndexesAndQueue:
         out = _call_tool(self._mcp(tmp_path, galaxy), "logan_queue", {})
         assert out["waiting"] == 3
         assert out["running"] == 1
+
+
+class TestRebuild:
+    JOB = "fe6f66a714dcbec8"
+
+    def _galaxy(self, is_successful=True, stderr=None):
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.get_job_status = AsyncMock(
+            return_value=MagicMock(
+                is_complete=True, is_successful=is_successful, stderr=stderr
+            )
+        )
+        galaxy.get_kmindex_results = AsyncMock()
+        return galaxy
+
+    async def _drain(self):
+        await asyncio.gather(*list(logan_mcp._builds))
+
+    @pytest.mark.asyncio
+    async def test_anonymous_miss_merges_on_the_native_lane_without_waiting(
+        self, env, monkeypatch
+    ):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        await self._drain()
+        assert out["status"] == "building"
+        assert out["retry_after_seconds"] == logan_mcp.BUILD_RETRY_AFTER
+        kwargs = galaxy.get_kmindex_results.await_args.kwargs
+        assert kwargs["lane"] == "native"
+        assert kwargs["wait"] is False
+
+    @pytest.mark.asyncio
+    async def test_key_holder_miss_merges_on_the_partner_lane(self, env, monkeypatch):
+        _as(monkeypatch, _request({"X-API-Key": KEY}))
+        galaxy = self._galaxy()
+        await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        await self._drain()
+        assert galaxy.get_kmindex_results.await_args.kwargs["lane"] == "partner"
+
+    @pytest.mark.asyncio
+    async def test_failed_job_says_so_instead_of_building(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy(is_successful=False, stderr="x" * 5000)
+        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert out["status"] == "failed"
+        assert len(out["error"]) == logan_mcp.STDERR_TAIL
+        galaxy.get_kmindex_results.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_hits_and_not_ready_pass_through(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        for out in ({"status": "ok"}, {"status": "not_ready"}):
+            assert await logan_mcp.with_rebuild(galaxy, self.JOB, out) == out
+        galaxy.get_kmindex_results.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_bad_key_on_a_read_is_a_401(self, env, monkeypatch):
+        _as(monkeypatch, _request({"X-API-Key": "brc_wrong"}))
+        out = await logan_mcp.with_rebuild(
+            self._galaxy(), self.JOB, {"status": "expired"}
+        )
+        assert out["status_code"] == 401
+
+    @pytest.mark.asyncio
+    async def test_busy_lane_is_quiet(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_results.side_effect = GalaxyJobAggregating("queued")
+        out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        await self._drain()
+        assert out["status"] == "building"
