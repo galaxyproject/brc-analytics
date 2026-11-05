@@ -1,6 +1,13 @@
 import { ROUTES } from "@repo/shared/routes/constants";
 import { expect, test } from "./utils/fixtures";
 
+const ASSEMBLY = {
+  description:
+    "Genome assembly GCA_003287225.2 of Phascolarctos cinereus, at scaffold level, with 1,245 scaffolds, totaling 3,192,623,321 bp.",
+  title: "Phascolarctos cinereus (GCA_003287225.2) - Genome Ark 2",
+  url: `${ROUTES.GENOMES}/GCA_003287225_2`,
+};
+
 const PAGES = [
   { name: "About", url: "/about" },
   { name: "Partner Resources", url: "/about/partner-resources" },
@@ -44,4 +51,16 @@ test.describe("Genome Ark 2 - UI Smoke Tests", () => {
       await expect(page.locator("h1").first()).toBeVisible();
     });
   }
+
+  test("assembly page should have its own title and description", async ({
+    page,
+  }) => {
+    await page.goto(ASSEMBLY.url);
+
+    await expect(page).toHaveTitle(ASSEMBLY.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      ASSEMBLY.description
+    );
+  });
 });

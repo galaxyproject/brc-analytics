@@ -112,7 +112,7 @@ describe("buildAssemblyJsonLd", () => {
         "Trichomonas",
         "Trichomonas vaginalis",
       ],
-      name: "Trichomonas vaginalis — G3 (GCA_000002825.3)",
+      name: "Trichomonas vaginalis G3 (GCA_000002825.3)",
       provider: { "@type": "Organization", name: APP_TITLE, url: BROWSER_URL },
       sameAs: [
         "https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000002825.3",

@@ -39,11 +39,11 @@ export function buildAssemblyDescription(assembly: AssemblySummary): string {
  * strain is the catalog's strain name, not its strain-level taxon, which
  * repeats the species (e.g. "Trichomonas vaginalis strain G3").
  * @param assembly - Assembly.
- * @returns E.g. "Trichomonas vaginalis — G3 (GCA_000002825.3)".
+ * @returns E.g. "Trichomonas vaginalis G3 (GCA_000002825.3)".
  */
 export function buildAssemblyName(assembly: AssemblySummary): string {
   const { accession, strainName, taxonomicLevelSpecies } = assembly;
-  const strain = strainName ? ` — ${strainName}` : "";
+  const strain = strainName ? ` ${strainName}` : "";
   return `${taxonomicLevelSpecies}${strain} (${accession})`;
 }
 

@@ -25,7 +25,7 @@ describe("buildAssemblyName", () => {
 
   test("adds the strain when the assembly has one", () => {
     expect(buildAssemblyName({ ...ASSEMBLY, strainName: "3D7" })).toBe(
-      "Plasmodium falciparum — 3D7 (GCF_000002765.6)"
+      "Plasmodium falciparum 3D7 (GCF_000002765.6)"
     );
   });
 });
@@ -67,7 +67,7 @@ describe("buildAssemblyPageMeta", () => {
     expect(buildAssemblyPageMeta({ ...ASSEMBLY, strainName: "3D7" })).toEqual({
       pageDescription:
         "Genome assembly GCF_000002765.6 of Plasmodium falciparum 3D7, at complete genome level, with 14 chromosomes and 14 scaffolds, totaling 23,292,622 bp.",
-      pageTitle: "Plasmodium falciparum — 3D7 (GCF_000002765.6)",
+      pageTitle: "Plasmodium falciparum 3D7 (GCF_000002765.6)",
     });
   });
 });
