@@ -2,11 +2,14 @@ import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { getGenomeId } from "@brc/apis/utils";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import { ENVIRONMENT, getEnvironment } from "@repo/shared/config/environment";
+import {
+  buildAssemblyDescription,
+  buildAssemblyName,
+} from "@repo/shared/meta/assembly/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { buildFastaUrl } from "@repo/shared/utils/galaxy-api/url-utils";
 import { NCBI_DATASETS_URL } from "@repo/shared/viewModelBuilders/constants";
 import {
-  DESCRIPTION_LOCALE,
   DOWNLOAD_ENCODING_FORMAT,
   GENE_MODEL_NAME,
   GENOME_SEQUENCE_NAME,
@@ -49,7 +52,7 @@ export function buildAssemblyJsonLd(
     },
     isAccessibleForFree: true,
     keywords: buildKeywords(assembly),
-    name: buildName(assembly),
+    name: buildAssemblyName(assembly),
     provider: { "@type": "Organization", name: appTitle, url: browserURL },
     sameAs: [
       `${NCBI_DATASETS_URL}/genome/${accession}`,
@@ -64,36 +67,13 @@ export function buildAssemblyJsonLd(
 }
 
 /**
- * Describes an assembly in a sentence: its organism, accession, level, counts
- * and length.
+ * The assembly's description for its Dataset record: its descriptive sentence,
+ * cut to Google Dataset Search's maximum.
  * @param assembly - Assembly.
- * @returns E.g. "Genome assembly GCA_000002825.3 of Trichomonas vaginalis G3,
- * at scaffold level, with 64,769 scaffolds, totaling 176,420,065 bp."
+ * @returns The description.
  */
 export function buildDescription(assembly: BRCDataCatalogGenome): string {
-  const {
-    accession,
-    chromosomes,
-    length,
-    level,
-    scaffoldCount,
-    strainName,
-    taxonomicLevelSpecies,
-  } = assembly;
-  const organism = strainName
-    ? `${taxonomicLevelSpecies} ${strainName}`
-    : taxonomicLevelSpecies;
-  const counts = [
-    countOf(chromosomes, "chromosome"),
-    countOf(scaffoldCount, "scaffold"),
-  ].filter(Boolean);
-  const description = [
-    `Genome assembly ${accession} of ${organism}`,
-    `at ${level.toLowerCase()} level`,
-    ...(counts.length > 0 ? [`with ${counts.join(" and ")}`] : []),
-    `totaling ${length.toLocaleString(DESCRIPTION_LOCALE)} bp.`,
-  ].join(", ");
-  return truncateDescription(description);
+  return truncateDescription(buildAssemblyDescription(assembly));
 }
 
 /**
@@ -149,19 +129,6 @@ function buildKeywords(assembly: BRCDataCatalogGenome): string[] {
 }
 
 /**
- * The assembly's name: its species, strain if it has one, and accession. The
- * strain is the catalog's strain name, not its strain-level taxon, which
- * repeats the species (e.g. "Trichomonas vaginalis strain G3").
- * @param assembly - Assembly.
- * @returns E.g. "Trichomonas vaginalis — G3 (GCA_000002825.3)".
- */
-function buildName(assembly: BRCDataCatalogGenome): string {
-  const { accession, strainName, taxonomicLevelSpecies } = assembly;
-  const strain = strainName ? ` — ${strainName}` : "";
-  return `${taxonomicLevelSpecies}${strain} (${accession})`;
-}
-
-/**
  * The assembly's statistics that have a value, with their units.
  * @param assembly - Assembly.
  * @returns The statistics.
@@ -181,17 +148,6 @@ function buildVariableMeasured(
       },
     ];
   });
-}
-
-/**
- * A count with its noun, e.g. "1 chromosome" or "14 chromosomes".
- * @param count - Count, or null when unknown.
- * @param noun - Singular noun.
- * @returns The phrase, or null when the count is unknown or zero.
- */
-function countOf(count: number | null, noun: string): string | null {
-  if (!count) return null;
-  return `${count.toLocaleString(DESCRIPTION_LOCALE)} ${noun}${count === 1 ? "" : "s"}`;
 }
 
 /**

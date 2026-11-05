@@ -1,10 +1,6 @@
 import { BRC_DATA_CATALOG_CATEGORY_LABEL as LABEL } from "@site-config/brc-analytics/category";
 import { type VariableMeasured } from "./types";
 
-// The locale the description's numbers are written in, so the record reads the
-// same whatever the build machine's or reader's locale.
-export const DESCRIPTION_LOCALE = "en-US";
-
 // The downloads, the genome sequence (FASTA) and gene model (GTF), are gzipped
 // files from the UCSC Genome Browser's downloads.
 export const DOWNLOAD_ENCODING_FORMAT = "application/gzip";

@@ -21,6 +21,7 @@ export const OgMeta = ({
   const image = `${browserURL}/favicons/android-chrome-512x512.png`;
   return (
     <NextHead>
+      <meta key="description" name="description" content={description} />
       <meta key="og:title" property="og:title" content={title} />
       <meta
         key="og:description"

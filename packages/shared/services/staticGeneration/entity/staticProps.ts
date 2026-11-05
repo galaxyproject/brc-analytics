@@ -13,14 +13,16 @@ import type { EntityPageParams, EntityPageProps } from "./types";
  * (e.g. a pre-filtered workflows slice) so it can prerender fully.
  * @param config - Site config accessor (provides the site's entity configs).
  * @param entityListType - Entity list type (route segment) for the page.
- * @param meta - Page metadata (description and title).
+ * @param meta - Page metadata (description and title), or a function that
+ * builds it from the entity record. Without a record, a function gives none,
+ * and the page falls back to the site's default title and description.
  * @param augmentData - Optional build-time augmenter applied to the record.
  * @returns getStaticProps.
  */
 export function makeEntityStaticProps<R, D extends R = R>(
   config: () => Pick<SiteConfig, "entities">,
   entityListType: string,
-  meta: PageMeta,
+  meta: PageMeta | ((data: D) => PageMeta),
   augmentData?: (data: R) => Promise<D>
 ): GetStaticProps<EntityPageProps<D>, EntityPageParams> {
   return async ({ params }) => {
@@ -35,8 +37,6 @@ export function makeEntityStaticProps<R, D extends R = R>(
     const props: EntityPageProps<D> = {
       entityId: params.entityId,
       entityListType,
-      pageDescription: meta.pageDescription,
-      pageTitle: meta.pageTitle,
     };
 
     if (entityConfig.detail.staticLoad) {
@@ -46,6 +46,8 @@ export function makeEntityStaticProps<R, D extends R = R>(
         props.data = augmentData ? await augmentData(data) : (data as D);
     }
 
-    return { props };
+    const pageMeta =
+      typeof meta === "function" ? props.data && meta(props.data) : meta;
+    return { props: { ...pageMeta, ...props } };
   };
 }

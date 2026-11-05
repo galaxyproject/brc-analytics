@@ -91,7 +91,7 @@ export interface AppProvidersProps {
  * @param props.appConfig - Active site config.
  * @param props.appProps - Next.js app props (Component + pageProps).
  * @param props.appTheme - Resolved MUI/Emotion theme.
- * @param props.defaultDescription - Fallback OG description for the site.
+ * @param props.defaultDescription - Fallback page description for the site.
  * @param props.defaultEntityListType - Entity list type for pages that don't
  * name one; "" for a site with no entity lists.
  * @returns the application shell.
