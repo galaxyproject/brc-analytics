@@ -516,6 +516,9 @@ class TestLoganToolGating:
         )
         assert LOGAN_TOOL_NAMES <= _tool_names(mcp)
         assert "logan_cohort" in mcp.instructions
+        # Over MCP a miss answers building, not the old "open the page".
+        assert "building" in mcp.instructions
+        assert "expired" not in mcp.instructions
 
     def test_cohort_miss_is_a_dict(self, tmp_path):
         # Over MCP a finished job's miss starts a merge rather than sending the

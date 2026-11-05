@@ -115,8 +115,9 @@ searches (per-IP submit pool, `BRC Logan MCP` history, recorded as source
 partner submit path (`app/services/logan_jobs.py`). On a cache miss for a
 finished job, `logan_cohort` and `logan_hits` start the merge in the background
 and answer `building` -- partner lane for key holders, native lane without
-queueing for everyone else. The assistant's copies of the read tools stay
-cache-only.
+queueing for everyone else. That native lane is the web's single merge slot,
+so an anonymous MCP merge still makes a web user's cold merge wait behind it.
+The assistant's copies of the read tools stay cache-only.
 
 Every MCP request is charged to a rate limit (`app/core/mcp_rate_limit.py`): a
 valid partner key spends that partner's budget, anything else the shared

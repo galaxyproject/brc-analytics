@@ -61,9 +61,11 @@ def create_mcp_server(
             "and returns a job_id at once; logan_job_status says when it has "
             "finished; logan_cohort gives whole-match-set counts and facets "
             "(the only honest numbers for a search) and logan_hits a page of "
-            "score-ranked hits with SRA metadata. Results are cached for a day "
-            "after they are first assembled; a tool that reports 'expired' "
-            "means open that job's results page first."
+            "score-ranked hits with SRA metadata. Merged results are cached "
+            "for a couple of hours; when they aren't, logan_cohort and "
+            "logan_hits answer 'building' with retry_after_seconds while the "
+            "merge runs, so wait that long and ask again. Send a partner key "
+            "as an X-API-Key header to search on that partner's budget."
         )
     mcp = FastMCP("BRC Analytics", instructions=instructions)
 
