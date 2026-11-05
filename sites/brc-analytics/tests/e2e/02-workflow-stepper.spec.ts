@@ -3,7 +3,7 @@ import { type Locator, type Page } from "@playwright/test";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { buildConfigureWorkflowUrl } from "@repo/shared/routes/utils";
-import { expect, test } from "./utils/fixtures";
+import { expect as baseExpect, test } from "./utils/fixtures";
 
 /**
  * Test URLs using real catalog data.
@@ -47,8 +47,9 @@ const MUI_STEP_CONTENT = ".MuiStepContent-root";
 // Timeout for stepper content to render (data-dependent steps may load slowly).
 const STEP_LOAD_TIMEOUT = 15000;
 
-// Use the shared timeout as the default for Playwright expectations in this spec.
-expect.configure({ timeout: STEP_LOAD_TIMEOUT });
+// Every expect in this spec defaults to STEP_LOAD_TIMEOUT. configure() returns
+// a new expect rather than changing the imported one.
+const expect = baseExpect.configure({ timeout: STEP_LOAD_TIMEOUT });
 
 /**
  * Builds an assembly configure-workflow URL for the given workflow TRS ID.
