@@ -23,6 +23,7 @@ from app.core.partner_keys import (
     sunset_header,
 )
 from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus, KmindexQueueStatus
+from app.services import logan_jobs
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotFound,
@@ -129,7 +130,7 @@ def partner_env(tmp_path, monkeypatch):
         MagicMock(return_value=limiter),
     )
     record = AsyncMock()
-    monkeypatch.setattr(partner_module, "record_submission", record)
+    monkeypatch.setattr(logan_jobs, "record_submission", record)
 
     from app.main import create_app
 
