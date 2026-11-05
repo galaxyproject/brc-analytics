@@ -3876,7 +3876,10 @@ class TestMergedOutput:
         service._job_params = AsyncMock(
             return_value={
                 "db_opts": json.dumps(
-                    {"db_opts_selector": "db", "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"]}
+                    {
+                        "db_opts_selector": "db",
+                        "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
+                    }
                 ),
                 "threshold": '"0.5"',
             }

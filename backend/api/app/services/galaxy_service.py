@@ -2068,8 +2068,7 @@ class GalaxyService:
                 # so an empty document is a misread, not a query that matched
                 # nothing.
                 raise Exception(
-                    f"kmindex job {job_id}: merged results {dataset_id} name no "
-                    "shards"
+                    f"kmindex job {job_id}: merged results {dataset_id} name no shards"
                 )
             return shards
         raise AssertionError("unreachable")
