@@ -226,7 +226,6 @@ async def logan_queue(galaxy: GalaxyService) -> dict:
 
 # Seconds to tell an agent to wait before asking again while results merge.
 BUILD_RETRY_AFTER = 15
-STDERR_TAIL = 2000
 
 # A merge that fails is remembered this long, so polls get an answer instead
 # of "building" forever, each one starting the same failing merge again.
@@ -301,7 +300,7 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
         return {
             "status": "failed",
             "job_id": job_id,
-            "error": (status.stderr or "")[-STDERR_TAIL:] or None,
+            "error": (status.stderr or "")[-logan_jobs.STDERR_TAIL :] or None,
             "results_url": results_url_for(job_id),
         }
     if await galaxy.cache.get(_build_failure_key(job_id)):

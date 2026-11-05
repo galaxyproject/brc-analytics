@@ -43,6 +43,7 @@ from app.services.galaxy_service import (
 from app.services.logan_jobs import (
     RESULTS_RETRY_AFTER,
     STATUS_RETRY_AFTER,
+    STDERR_TAIL,
     partner_galaxy_service,
     require_galaxy,
     submit_partner_job,
@@ -56,8 +57,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(get_partner)])
 
 PARTNER_PREFIX = "/api/v1/partner/logan"
-
-STDERR_TAIL = 2000
 
 JobId = Path(..., pattern=JOB_ID_PATTERN)
 

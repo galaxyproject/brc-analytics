@@ -54,25 +54,39 @@ RESULTS_RETRY_AFTER = "15"
 IDEMPOTENCY_TTL = CacheTTL.ONE_DAY
 
 
-def partner_galaxy_service(
-    partner: Partner,
-    cache: CacheService,
-    sra_mirror: Optional[SRAMirrorService],
+# How much of a failed job's stderr a caller sees.
+STDERR_TAIL = 2000
+
+MCP_HISTORY_NAME = "BRC Logan MCP"
+
+
+def _service_account_galaxy(
+    cache: CacheService, sra_mirror: Optional[SRAMirrorService], history_name: str
 ) -> GalaxyService:
-    """
-    A GalaxyService on the BRC service account, in the partner's own history.
+    """A GalaxyService on the BRC service account, in the given history.
 
     Built from the service key directly, never from get_galaxy_credential:
     that one prefers a signed-in user's bearer, so a stray session cookie on a
-    partner request would otherwise run the job as that user.
+    partner or MCP request would otherwise run the job as that user.
     """
     key = get_settings().GALAXY_API_KEY
     credential = GalaxyCredential(kind="service", secret=key) if key else None
     return GalaxyService(
         cache,
         credential=credential,
-        history_name=f"BRC Logan Partner - {partner.partner_id}",
+        history_name=history_name,
         sra_mirror=sra_mirror,
+    )
+
+
+def partner_galaxy_service(
+    partner: Partner,
+    cache: CacheService,
+    sra_mirror: Optional[SRAMirrorService],
+) -> GalaxyService:
+    """A service-account GalaxyService in the partner's own history."""
+    return _service_account_galaxy(
+        cache, sra_mirror, f"BRC Logan Partner - {partner.partner_id}"
     )
 
 
@@ -240,25 +254,15 @@ async def submit_partner_job(
     return response.job_id
 
 
-MCP_HISTORY_NAME = "BRC Logan MCP"
-
-
 def anonymous_galaxy_service(
     cache: CacheService, sra_mirror: Optional[SRAMirrorService]
 ) -> GalaxyService:
-    """A GalaxyService on the BRC service account for keyless MCP searches.
+    """A service-account GalaxyService for keyless MCP searches.
 
     Its own history, so agent traffic can be told apart from the web's
     anonymous searches when someone goes looking in Galaxy.
     """
-    key = get_settings().GALAXY_API_KEY
-    credential = GalaxyCredential(kind="service", secret=key) if key else None
-    return GalaxyService(
-        cache,
-        credential=credential,
-        history_name=MCP_HISTORY_NAME,
-        sra_mirror=sra_mirror,
-    )
+    return _service_account_galaxy(cache, sra_mirror, MCP_HISTORY_NAME)
 
 
 async def submit_anonymous_job(

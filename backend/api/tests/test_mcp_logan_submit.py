@@ -481,7 +481,7 @@ class TestRebuild:
         galaxy = self._galaxy(is_successful=False, stderr="x" * 5000)
         out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
         assert out["status"] == "failed"
-        assert len(out["error"]) == logan_mcp.STDERR_TAIL
+        assert len(out["error"]) == logan_jobs.STDERR_TAIL
         galaxy.get_kmindex_results.assert_not_awaited()
 
     @pytest.mark.asyncio
@@ -549,3 +549,15 @@ class TestRebuild:
         assert out["status_code"] == 502
         assert out["retry_after_seconds"]
         galaxy.get_kmindex_results.assert_not_awaited()
+
+
+def test_anonymous_searches_run_as_the_service_account_in_their_own_history(
+    monkeypatch,
+):
+    monkeypatch.setenv("GALAXY_API_KEY", "service-key")
+    get_settings.cache_clear()
+    galaxy = logan_jobs.anonymous_galaxy_service(MagicMock(), None)
+    assert galaxy.credential.kind == "service"
+    assert galaxy.credential.secret == "service-key"
+    assert galaxy.history_name == logan_jobs.MCP_HISTORY_NAME
+    get_settings.cache_clear()

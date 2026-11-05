@@ -445,7 +445,7 @@ class TestStatus:
         body = client.get(f"{BASE}/jobs/{JOB_ID}", headers=HEADERS).json()
 
         assert body["error"].endswith("the reason")
-        assert len(body["error"]) == partner_module.STDERR_TAIL
+        assert len(body["error"]) == logan_jobs.STDERR_TAIL
 
     def test_a_finished_job_has_no_retry_after(self, partner_env):
         client, galaxy, _ = partner_env
