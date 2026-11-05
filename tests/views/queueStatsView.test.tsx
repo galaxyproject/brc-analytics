@@ -260,8 +260,8 @@ describe("QueueStatsView", () => {
     );
     const html = markup.replaceAll("<!-- -->", "");
 
-    expect(html).not.toContain("Last 24 hours");
-    expect(html).not.toContain("the last 24 hours");
+    expect(html).not.toMatch(/last \d+ hours/i);
+    expect(html).toContain("Recent hours");
   });
 
   test("opens on the window a shared link names", async () => {
