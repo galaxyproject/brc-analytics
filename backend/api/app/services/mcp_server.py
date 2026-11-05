@@ -338,6 +338,24 @@ def create_mcp_server(
             """
             return await logan_mcp.logan_submit(sequence, indexes, threshold)
 
+        @mcp.tool()
+        async def logan_list_indexes() -> dict:
+            """The Logan index names logan_submit can search. Each index covers
+            one slice of SRA (e.g. GENOMIC_VRL for viral genomic runs,
+            METAGENOMIC_ENV for environmental metagenomes); a search can name
+            several, and searching every index takes longest.
+            """
+            return await logan_mcp.logan_list_indexes(galaxy)
+
+        @mcp.tool()
+        async def logan_queue() -> dict:
+            """How backed up Logan searches are right now: searches waiting and
+            running, how long the oldest has waited, and recent wait times.
+            Covers BRC's own searches, not the whole cluster, so it says how
+            ours are faring rather than predicting a start time.
+            """
+            return await logan_mcp.logan_queue(galaxy)
+
         logger.info("Logan search tools registered on MCP server")
 
     # -- Catalog resources (read-only context documents) --

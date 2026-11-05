@@ -17,12 +17,12 @@ from starlette.routing import Mount
 from app.core import dependencies
 from app.core.config import get_settings
 from app.core.partner_keys import generate_partner_key, hash_partner_key
-from app.models.galaxy import GalaxyJobResponse
+from app.models.galaxy import GalaxyJobResponse, KmindexQueueStatus
 from app.services import logan_jobs
 from app.services.galaxy_service import GalaxySubmitNotStarted, KmindexUnknownIndex
 from app.services.mcp_server import create_mcp_server
 from app.services.tools import logan_mcp
-from tests.test_mcp import _catalog_data, _parse_sse
+from tests.test_mcp import _call_tool, _catalog_data, _parse_sse, _tool_names
 
 KEY = generate_partner_key()
 JOB_ID = "0123456789abcdef"
@@ -311,3 +311,44 @@ def test_tool_reaches_the_real_http_request(env, tmp_path):
     out = result.get("structuredContent") or json.loads(result["content"][0]["text"])
     assert out["as"] == "partner:acme", out
     assert out["job_id"] == JOB_ID
+
+
+class TestIndexesAndQueue:
+    def _mcp(self, tmp_path, galaxy):
+        return create_mcp_server(_catalog_data(tmp_path), MagicMock(), galaxy=galaxy)
+
+    def _galaxy(self):
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        return galaxy
+
+    def test_registered_alongside_the_other_logan_tools(self, tmp_path):
+        names = _tool_names(self._mcp(tmp_path, self._galaxy()))
+        assert {"logan_submit", "logan_list_indexes", "logan_queue"} <= names
+
+    def test_lists_indexes(self, tmp_path):
+        galaxy = self._galaxy()
+        galaxy.list_kmindex_indexes = AsyncMock(return_value=["GENOMIC_VRL", "X"])
+        out = _call_tool(self._mcp(tmp_path, galaxy), "logan_list_indexes", {})
+        assert out == {"count": 2, "indexes": ["GENOMIC_VRL", "X"]}
+
+    def test_index_failure_is_an_error_dict(self, tmp_path):
+        galaxy = self._galaxy()
+        galaxy.list_kmindex_indexes = AsyncMock(side_effect=RuntimeError("boom"))
+        out = _call_tool(self._mcp(tmp_path, galaxy), "logan_list_indexes", {})
+        assert out["status_code"] == 502
+
+    def test_queue(self, tmp_path):
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_queue = AsyncMock(
+            return_value=KmindexQueueStatus(
+                waiting=3,
+                running=1,
+                recent_searches=5,
+                window_minutes=120,
+                as_of="2026-11-05T12:00:00Z",
+            )
+        )
+        out = _call_tool(self._mcp(tmp_path, galaxy), "logan_queue", {})
+        assert out["waiting"] == 3
+        assert out["running"] == 1

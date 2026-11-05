@@ -26,6 +26,7 @@ from app.core.config import get_settings
 from app.core.partner_keys import Partner
 from app.models.galaxy import KmindexQuerySubmission
 from app.services import logan_jobs
+from app.services.galaxy_service import GalaxyService
 from app.services.logan_snapshot import results_url_for
 
 logger = logging.getLogger(__name__)
@@ -139,3 +140,21 @@ def _started(job_id: str, partner: Optional[Partner], reused: bool) -> dict:
             "this job_id, then read logan_cohort and logan_hits."
         ),
     }
+
+
+async def logan_list_indexes(galaxy: GalaxyService) -> dict:
+    try:
+        indexes = await galaxy.list_kmindex_indexes()
+    except Exception as e:
+        logger.error(f"MCP index list failed: {e}")
+        return {"error": "Failed to list Logan indexes", "status_code": 502}
+    return {"count": len(indexes), "indexes": indexes}
+
+
+async def logan_queue(galaxy: GalaxyService) -> dict:
+    try:
+        status = await galaxy.get_kmindex_queue()
+    except Exception as e:
+        logger.error(f"MCP queue read failed: {e}")
+        return {"error": "Failed to read the search queue", "status_code": 502}
+    return status.model_dump(mode="json")
