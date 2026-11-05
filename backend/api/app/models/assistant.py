@@ -119,8 +119,15 @@ class AnalysisStateUpdate(BaseModel):
     workflow: Optional[str] = Field(
         None,
         description=(
-            "Specific Galaxy workflow. Include the IWC ID, e.g. "
-            "'Haploid variant calling (varcall-haploid)'."
+            "Specific Galaxy workflow, as a display label, e.g. "
+            "'Haploid variant calling'."
+        ),
+    )
+    workflow_iwc_id: Optional[str] = Field(
+        None,
+        description=(
+            "IWC id of the chosen workflow, exactly as the workflows looked up "
+            "this session list it, e.g. 'varcall-haploid'."
         ),
     )
     data_source: Optional[str] = Field(

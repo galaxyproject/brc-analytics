@@ -11,7 +11,7 @@ import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 from sqlalchemy import select
@@ -26,6 +26,7 @@ from app.db.crud import (
 from app.db.models import AssistantTurnLog, Base
 from app.models.assistant import TokenUsage, TurnOutcome, TurnTelemetry
 from app.services import turn_log
+from tests.catalog_stub import stub_catalog
 
 # app_with_stubbed_agent / client come from tests/conftest.py.
 
@@ -278,8 +279,7 @@ def _stub_agent():
     from app.services.assistant_agent import AssistantAgent
 
     instance = object.__new__(AssistantAgent)
-    instance.catalog = MagicMock()
-    instance.catalog.workflows_by_category = []
+    instance.catalog = stub_catalog()
     instance.sra_mirror = None
     instance.galaxy = None
     instance.query_con = None

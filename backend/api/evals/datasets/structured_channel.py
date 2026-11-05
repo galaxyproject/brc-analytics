@@ -88,9 +88,17 @@ class NoLeak(Evaluator):
 
 @dataclass
 class FinalSchemaContains(Evaluator):
-    """Fraction of expected schema fields whose value contains the needle."""
+    """Fraction of expected schema fields whose `attr` contains the needle: the
+    value by default, or the catalog detail -- e.g. the workflow's TRS id,
+    which the extractor's label can't stand in for (#1957)."""
 
     expected: dict[str, str] = field(default_factory=dict)
+    attr: str = "value"
+
+    def get_default_evaluation_name(self) -> str:
+        # Its own report column per attr, e.g. FinalSchemaContains[detail].
+        name = super().get_default_evaluation_name()
+        return name if self.attr == "value" else f"{name}[{self.attr}]"
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
         expected = self.expected
@@ -101,7 +109,7 @@ class FinalSchemaContains(Evaluator):
         for key, needle in expected.items():
             field_obj = schema.get(key) or {}
             actual = (
-                field_obj.get("value") if isinstance(field_obj, dict) else ""
+                field_obj.get(self.attr) if isinstance(field_obj, dict) else ""
             ) or ""
             if str(needle).lower() in str(actual).lower():
                 hits += 1
@@ -203,6 +211,24 @@ _CASES = [
         "expected_complete": True,
     },
     {
+        # The #1808 repro: the workflows are listed in one turn and picked by a
+        # shortened label in the next, so only the extractor's IWC id can map
+        # it. A later turn must carry the pick forward (#1957).
+        "name": "reworded_workflow",
+        "turns": [
+            (
+                "I want to do RNA-seq on yeast, with the reference S288C assembly",
+                True,
+            ),
+            ("Which RNA-seq workflows can I use?", False),
+            ("use RNA-Seq Paired-End", True),
+            ("I'll pull my reads from ENA", True),
+        ],
+        "expected_schema": {"analysis_type": "Transcriptomics"},
+        "expected_details": {"workflow": "rnaseq-pe"},
+        "expected_complete": False,
+    },
+    {
         # Pure exploration: nothing is committed, so the schema must stay empty.
         "name": "explore_only",
         "turns": [
@@ -247,6 +273,10 @@ def build(
         ]
         if c.get("expected_schema"):
             evaluators.append(FinalSchemaContains(expected=c["expected_schema"]))
+        if c.get("expected_details"):
+            evaluators.append(
+                FinalSchemaContains(expected=c["expected_details"], attr="detail")
+            )
         if c.get("clear_fields"):
             evaluators.append(SchemaFieldEmpty(fields=tuple(c["clear_fields"])))
         cases.append(
