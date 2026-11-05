@@ -611,6 +611,22 @@ def _merged_output_id(outputs: List[GalaxyJobOutput]) -> Optional[str]:
     return None
 
 
+def _kmindex_takes_merge(tool_id: str) -> bool:
+    """
+    Whether this kmindex_query version declares the merge input (0.7.1 on).
+
+    Galaxy's tool request API rejects an input the tool doesn't declare, so
+    sending merge to 0.7.0 would fail every submit. An id with no version
+    to read is assumed current.
+    """
+    version = tool_id.rsplit("/", 1)[-1].split("+", 1)[0]
+    try:
+        parts = tuple(int(p) for p in version.split("."))
+    except ValueError:
+        return True
+    return parts >= (0, 7, 1)
+
+
 def _split_merged(document: object) -> List[Optional[dict]]:
     """
     One single-shard document per top-level key of a merged results file.
@@ -1208,16 +1224,18 @@ class GalaxyService:
                     "url": "base64://" + base64.b64encode(content).decode("ascii"),
                 },
                 "format": "json",
-                # Explicit though it is the default: the read path depends on
-                # the one merged dataset, and a changed default would quietly
-                # turn every new job back into a collection.
-                "merge": True,
                 "threshold": submission.threshold,
                 "zvalue": submission.zvalue,
             },
             "tool_id": self.settings.GALAXY_KMINDEX_TOOL_ID,
             "use_cached_jobs": self.settings.KMINDEX_USE_CACHED_JOBS,
         }
+        if _kmindex_takes_merge(self.settings.GALAXY_KMINDEX_TOOL_ID):
+            # Explicit though it is the default: the read path depends on the
+            # one merged dataset, and a changed default would quietly turn
+            # every new job back into a collection. Left out for an older pin,
+            # so rolling the env var back to 0.7.0 still submits.
+            payload["inputs"]["merge"] = True
         try:
             response = await asyncio.to_thread(
                 self.gi.make_post_request, f"{self.gi.url}/jobs", payload=payload

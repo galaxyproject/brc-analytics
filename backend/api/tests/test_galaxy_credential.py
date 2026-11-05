@@ -859,6 +859,40 @@ async def test_the_query_goes_to_galaxy_as_a_hashed_url(monkeypatch, use_cached)
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "version, sends_merge",
+    [("0.7.0+galaxy0", False), ("0.7.1+galaxy0", True), ("0.8.0+galaxy0", True)],
+)
+async def test_merge_is_only_sent_to_a_version_that_has_it(
+    monkeypatch, version, sends_merge
+):
+    # Galaxy's tool request API rejects an input the tool doesn't declare, so
+    # pointing the env var back at 0.7.0 must not fail every submit. Without
+    # merge, 0.7.0 writes its collection, which the read path still handles.
+    from app.core.config import get_settings
+    from app.models.galaxy import KmindexQuerySubmission
+
+    monkeypatch.setenv(
+        "GALAXY_KMINDEX_TOOL_ID",
+        f"toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/{version}",
+    )
+    get_settings.cache_clear()
+    try:
+        galaxy = FakeGalaxy()
+        galaxy.gi.make_post_request = MagicMock(return_value={"tool_request_id": "tr1"})
+        svc = _service(galaxy)
+        submission = KmindexQuerySubmission(
+            sequence=">q\nACGTACGTACGTACGTACGTACGTACGTACGT", indexes=["GENOMIC_BCT"]
+        )
+        await svc._request_kmindex_job(submission, "h1")
+    finally:
+        get_settings.cache_clear()
+
+    inputs = galaxy.gi.make_post_request.call_args.kwargs["payload"]["inputs"]
+    assert ("merge" in inputs) is sends_merge
+
+
+@pytest.mark.asyncio
 async def test_pastes_that_differ_only_in_line_endings_send_the_same_bytes():
     from app.models.galaxy import KmindexQuerySubmission
 

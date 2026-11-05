@@ -263,7 +263,8 @@ class Settings:
         )
         # Versioned rather than short id: kmindex_query's parameter shape has
         # changed across releases, so pinning keeps tool_inputs valid. 0.7.1 is
-        # the first with the merge input that submit sends and results read.
+        # the first with the merge input; submit only sends it from 0.7.1 on,
+        # so this can still be pointed back at 0.7.0.
         self.GALAXY_KMINDEX_TOOL_ID: str = os.getenv(
             "GALAXY_KMINDEX_TOOL_ID",
             "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.1+galaxy0",
