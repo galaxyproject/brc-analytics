@@ -83,18 +83,23 @@ const HISTORY: QueueHistory = {
 
 describe("timeBuckets", () => {
   test("groups by submission hour, newest first, leaving cache hits out of the waits", () => {
-    const buckets = timeBuckets(ROWS);
-
-    expect(buckets.map((b) => b.start)).toEqual([
-      "2026-10-15T08:00:00.000Z",
-      "2026-10-15T07:00:00.000Z",
+    // Local times, as below: a half-hour zone would split ROWS differently.
+    const local = (hour: number, minute = 0): string =>
+      new Date(2026, 9, 15, hour, minute).toISOString();
+    const buckets = timeBuckets([
+      row(local(7, 11), { wait_minutes: 50.8 }),
+      row(local(7, 38), { wait_minutes: 27.9 }),
+      row(local(7, 52), { cached: true, wait_minutes: null }),
+      row(local(8, 7), { wait_minutes: 1.6 }),
     ]);
+
+    expect(buckets.map((b) => b.start)).toEqual([local(8), local(7)]);
     expect(buckets[1]).toEqual({
       cacheHits: 1,
       longestWait: 50.8,
       medianWait: 27.9,
       searches: 3,
-      start: "2026-10-15T07:00:00.000Z",
+      start: local(7),
     });
   });
 
