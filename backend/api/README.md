@@ -106,13 +106,21 @@ public run as of its build. Opt-in: registered only when `SRA_MIRROR_PATH`
 points at a built mirror file; a default deploy exposes only the catalog and
 ENA tools.
 
-**Logan search tools** (`logan_job_status`, `logan_cohort`, `logan_hits`) --
-read-only access to Logan/kmindex sequence searches run through
-`/logan-search`: whether a job finished, its whole-match-set counts and facets,
-and pages of score-ranked hits with SRA metadata. Opt-in: registered only when
-`GALAXY_API_KEY` is set. Cache-only -- they read the merged result the results
-page assembled (cached for a day) and never rebuild it, so a tool that reports
-`expired` means opening that page first.
+**Logan search tools** (`logan_submit`, `logan_list_indexes`, `logan_queue`,
+`logan_job_status`, `logan_cohort`, `logan_hits`) -- start Logan/kmindex
+sequence searches and read their results. Opt-in: registered only when
+`GALAXY_API_KEY` is set. `logan_submit` runs keyless callers as anonymous
+searches (per-IP submit pool, `BRC Logan MCP` history, recorded as source
+`mcp`) and callers sending a valid partner `X-API-Key` header through the
+partner submit path (`app/services/logan_jobs.py`). On a cache miss for a
+finished job, `logan_cohort` and `logan_hits` start the merge in the background
+and answer `building` -- partner lane for key holders, native lane without
+queueing for everyone else. The assistant's copies of the read tools stay
+cache-only.
+
+Every MCP request is charged to a rate limit (`app/core/mcp_rate_limit.py`): a
+valid partner key spends that partner's budget, anything else the shared
+per-IP pool.
 
 **Catalog resources** (`brc://catalog/summary`, `brc://catalog/categories`,
 `brc://catalog/workflows`, `brc://catalog/organisms/{taxonomy_id}`) -- read-only
