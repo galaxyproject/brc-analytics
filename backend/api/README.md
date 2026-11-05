@@ -80,6 +80,14 @@ Services:
 - `GET /api/v1/cache/health` - Redis cache connectivity check
 - `GET /api/v1/version` - API version and environment information
 
+### Genes
+
+Read from the gene snapshot (see [Gene data (local)](#gene-data-local)); 503 while it is unavailable.
+
+- `GET /api/v1/genes/search?q=&assembly=&limit=` - Genes found by the start of their locus tag, name, symbol, old locus tag, NCBI Gene ID, transcript ID or protein accession (accessions with or without their version), or of a word of their transcripts' products. Case-insensitive; with several words, each must match, the last as a prefix. Best match first, each gene once, with what it matched on; `limit` is 10 by default and at most 50, and `truncated` says there were more.
+- `GET /api/v1/genes/{gene_uid}` - One gene
+- `GET /api/v1/genes/{gene_uid}/bionym` - The claims in a gene's BioNym graph
+
 ### Documentation
 
 - `GET /api/docs` - Interactive Swagger UI
