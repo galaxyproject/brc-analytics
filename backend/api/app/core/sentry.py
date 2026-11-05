@@ -91,7 +91,34 @@ def _scrub_query_urls(event: dict) -> None:
                 item[field] = _scrub(item[field])
 
 
+# Sentry's MCP integration records every tool argument on its span, with or
+# without send_default_pii, so logan_submit's sequence would ride along on
+# every traced call. Span data is only ever in transactions and, when the MCP
+# span is the transaction itself, an event's trace context.
+_MCP_SEQUENCE_ARGUMENT = "mcp.request.argument.sequence"
+
+
+def _scrub_span_data(data: Any) -> None:
+    if isinstance(data, dict) and _MCP_SEQUENCE_ARGUMENT in data:
+        data[_MCP_SEQUENCE_ARGUMENT] = "[Filtered]"
+
+
+def _scrub_mcp_arguments(event: dict) -> None:
+    trace = (event.get("contexts") or {}).get("trace")
+    if isinstance(trace, dict):
+        _scrub_span_data(trace.get("data"))
+    for span in event.get("spans") or []:
+        if isinstance(span, dict):
+            _scrub_span_data(span.get("data"))
+
+
+def before_send_transaction(event: dict, hint: dict) -> Optional[dict]:
+    _scrub_mcp_arguments(event)
+    return event
+
+
 def before_send(event: dict, hint: dict) -> Optional[dict]:
+    _scrub_mcp_arguments(event)
     # Scrub first so the bioblend fingerprint is built from the cleaned message.
     _scrub_query_urls(event)
     _fingerprint_bioblend(event)

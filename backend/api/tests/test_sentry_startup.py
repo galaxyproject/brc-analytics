@@ -10,7 +10,7 @@ from sentry_sdk.transport import Transport
 
 from app.core.config import get_settings
 from app.core.dependencies import reset_all_services
-from app.core.sentry import before_send
+from app.core.sentry import before_send, before_send_transaction
 from app.main import create_app
 
 
@@ -56,6 +56,11 @@ def test_create_app_with_sentry_dsn(sentry_events):
     assert app.title == "BRC Analytics API"
     # Without the filter, caller-input MCP errors flood Sentry as errors.
     assert sentry_sdk.get_client().options["before_send"] is before_send
+    # The MCP integration records tool arguments, a query sequence among them.
+    assert (
+        sentry_sdk.get_client().options["before_send_transaction"]
+        is before_send_transaction
+    )
 
 
 def test_sentry_events_carry_no_query_sequence(sentry_events):

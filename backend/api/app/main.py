@@ -35,7 +35,7 @@ from app.core.dependencies import (
     reset_all_services,
 )
 from app.core.mcp_rate_limit import MCPRateLimitMiddleware
-from app.core.sentry import before_send
+from app.core.sentry import before_send, before_send_transaction
 from app.db.session import close_db, init_db
 from app.services import turn_log
 from app.services.galaxy_service import cancel_kmindex_index_refreshes
@@ -102,6 +102,7 @@ def create_app() -> FastAPI:
             release=settings.APP_VERSION,
             traces_sample_rate=1.0,
             before_send=before_send,
+            before_send_transaction=before_send_transaction,
             # Search queries are users' sequences, some unpublished, and they
             # sit in frame locals and request bodies; keep both out of events.
             include_local_variables=False,
