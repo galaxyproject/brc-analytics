@@ -21,6 +21,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import ky from "ky";
+import { renderToString } from "react-dom/server.node";
 import embed from "vega-embed";
 
 jest.mock("ky", () => ({
@@ -241,6 +242,21 @@ describe("QueueStatsView", () => {
       "/galaxy/kmindex/queue/history"
     );
     expect(mockKy.get.mock.calls[0][1].searchParams).toEqual({ hours: 24 });
+  });
+
+  test("the static page doesn't name a window before the URL is read", () => {
+    window.history.replaceState({}, "", "/queue?hours=72");
+
+    // No effects run on the server, as on the exported HTML.
+    const markup = renderToString(
+      <ThemeProvider theme={createLoganTheme()}>
+        <QueueStatsView />
+      </ThemeProvider>
+    );
+    const html = markup.replaceAll("<!-- -->", "");
+
+    expect(html).not.toContain("Last 24 hours");
+    expect(html).not.toContain("the last 24 hours");
   });
 
   test("opens on the window a shared link names", async () => {

@@ -198,6 +198,10 @@ export const QueueStatsView = (): JSX.Element => {
   const [range, setRange] = useQueueRange();
   const { failed, history } = useQueueHistory(range);
   const shownRange = range ?? DEFAULT_QUEUE_RANGE;
+  // Until the URL is read the window isn't known, and the exported HTML
+  // shouldn't claim the default for a ?hours=72 link.
+  const windowText =
+    range === null ? "recent hours" : `the last ${range} hours`;
   const bucketHours = bucketHoursFor(shownRange);
   const buckets = useMemo(
     () => (history ? timeBuckets(history.rows, bucketHours) : []),
@@ -208,7 +212,7 @@ export const QueueStatsView = (): JSX.Element => {
     <>
       <LoganHero
         head="Search queue"
-        subHead={`How long Logan searches have waited to start, right now and over the last ${shownRange} hours. Counts searches run through the shared BRC account, which includes logan-search.org and anonymous searches here.`}
+        subHead={`How long Logan searches have waited to start, right now and over ${windowText}. Counts searches run through the shared BRC account, which includes logan-search.org and anonymous searches here.`}
         variant="article"
       />
       <ResultsSection>
@@ -245,7 +249,7 @@ export const QueueStatsView = (): JSX.Element => {
                 mb={1}
               >
                 <Typography variant="subtitle1">
-                  Last {shownRange} hours
+                  {range === null ? "Recent hours" : `Last ${range} hours`}
                 </Typography>
                 <ToggleButtonGroup
                   aria-label="Time range"
