@@ -265,6 +265,12 @@ KMINDEX_COLLECTION_ATTEMPTS = 3
 # still have collections, and their results links still have to load, so the
 # collection path stays until those jobs no longer matter.
 KMINDEX_MERGED_OUTPUT = "output_merged_json"
+# Versions submit has moved off. Their jobs still wait on Vista or sit in the
+# last day's history after a bump, and Galaxy matches tool_id exactly, so the
+# queue and history listings name them next to the pinned id.
+KMINDEX_EARLIER_TOOL_IDS = (
+    "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0",
+)
 # The merged file is the whole result, so there is nothing to fall back to:
 # the same budget as an archive, then the read fails uncached.
 KMINDEX_MERGED_ATTEMPTS = 3
@@ -2596,9 +2602,14 @@ class GalaxyService:
         _SERVICE_USER_IDS[url] = user_id
         return user_id
 
+    def _listed_kmindex_tool_ids(self) -> List[str]:
+        """The pinned kmindex tool id, then the earlier ones still worth counting."""
+        pinned = self.settings.GALAXY_KMINDEX_TOOL_ID
+        return [pinned, *(t for t in KMINDEX_EARLIER_TOOL_IDS if t != pinned)]
+
     async def _read_kmindex_queue(self) -> KmindexQueueStatus:
         now = datetime.now(timezone.utc)
-        tool_id = self.settings.GALAXY_KMINDEX_TOOL_ID
+        tool_id = self._listed_kmindex_tool_ids()
         user_id = await self._service_user_id()
         # Unfinished jobs get a listing of their own. Galaxy lists newest
         # update first, and a queued job's update_time stops moving once it is
@@ -2768,7 +2779,7 @@ class GalaxyService:
         # submitted in the window was updated in it too, so this covers it.
         jobs = await asyncio.to_thread(
             self.gi.jobs.get_jobs,
-            tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
+            tool_id=self._listed_kmindex_tool_ids(),
             user_id=user_id,
             date_range_min=since.date().isoformat(),
             limit=KMINDEX_HISTORY_LISTING_LIMIT,

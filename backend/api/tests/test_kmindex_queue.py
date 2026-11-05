@@ -270,7 +270,61 @@ async def test_waiting_jobs_get_a_listing_of_their_own(service):
     assert set(recent["state"]) == {"ok", "error"}
     assert recent["order_by"] == "update_time"
     for kwargs in (active, recent):
-        assert kwargs["tool_id"] == service.settings.GALAXY_KMINDEX_TOOL_ID
+        assert service.settings.GALAXY_KMINDEX_TOOL_ID in kwargs["tool_id"]
+
+
+_PINNED = "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.1+galaxy0"
+_EARLIER = "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0"
+
+
+def _galaxy_filtering_on_tool(svc, jobs):
+    """Galaxy matches tool_id exactly, against one id or any of a list."""
+
+    def _listing(state=None, tool_id=None, **_):
+        wanted = [tool_id] if isinstance(tool_id, str) else list(tool_id or [])
+        return [
+            j
+            for j in jobs
+            if (state is None or j["state"] in state) and j["tool_id"] in wanted
+        ]
+
+    svc.gi.jobs.get_jobs = MagicMock(side_effect=_listing)
+    svc.gi.jobs.get_metrics = MagicMock(return_value=[])
+
+
+@pytest.mark.asyncio
+async def test_jobs_from_before_a_version_bump_still_count(service, monkeypatch):
+    # Searches queued on 0.7.0 when 0.7.1 deploys are still waiting on Vista;
+    # dropping them would understate the queue just as it is at its busiest.
+    monkeypatch.setattr(service.settings, "GALAXY_KMINDEX_TOOL_ID", _PINNED)
+    _galaxy_filtering_on_tool(
+        service,
+        [
+            {**_job("new", "queued", created_ago=5), "tool_id": _PINNED},
+            {**_job("old", "queued", created_ago=30), "tool_id": _EARLIER},
+        ],
+    )
+
+    queue = await service.get_kmindex_queue()
+
+    assert queue.waiting == 2
+    assert queue.oldest_waiting_minutes == 30.0
+
+
+@pytest.mark.asyncio
+async def test_history_keeps_searches_from_before_a_version_bump(service, monkeypatch):
+    monkeypatch.setattr(service.settings, "GALAXY_KMINDEX_TOOL_ID", _PINNED)
+    _galaxy_filtering_on_tool(
+        service,
+        [
+            {**_job("new", "queued", created_ago=5), "tool_id": _PINNED},
+            {**_job("old", "queued", created_ago=30), "tool_id": _EARLIER},
+        ],
+    )
+
+    history = await service.get_kmindex_queue_history(24)
+
+    assert history.searches == 2
 
 
 @pytest.mark.asyncio
