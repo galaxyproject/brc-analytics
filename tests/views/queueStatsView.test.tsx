@@ -1,6 +1,7 @@
 import { createLoganTheme } from "@logan/theme/theme";
 import {
   bucketHoursFor,
+  bucketLabel,
   buildWaitSpec,
   parseQueueRange,
   type QueueHistory,
@@ -142,6 +143,18 @@ describe("ranges", () => {
   test("coarsens the table to 3 h blocks past a day", () => {
     expect(bucketHoursFor(24)).toBe(1);
     expect(bucketHoursFor(72)).toBe(3);
+  });
+});
+
+describe("bucketLabel", () => {
+  test("names the hour, or the block's start and end past one hour", () => {
+    const nine = new Date(2026, 10, 3, 9).toISOString();
+    // Some ICU versions put a narrow no-break space before AM/PM.
+    const label = (hours: number): string =>
+      bucketLabel(nine, hours).replace(/\s/g, " ");
+
+    expect(label(1)).toBe("Nov 3, 9 AM");
+    expect(label(3)).toBe("Nov 3, 9 AM – 12 PM");
   });
 });
 

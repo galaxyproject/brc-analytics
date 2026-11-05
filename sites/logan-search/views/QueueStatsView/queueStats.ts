@@ -59,6 +59,24 @@ export function bucketHoursFor(range: QueueRange): number {
 }
 
 /**
+ * A table row's time span, e.g. "Nov 5, 9 AM" or "Nov 5, 9 AM – 12 PM".
+ * @param start - The bucket's start, ISO 8601.
+ * @param bucketHours - Hours the bucket covers.
+ * @returns Text.
+ */
+export function bucketLabel(start: string, bucketHours: number): string {
+  const from = new Date(start);
+  const label = from.toLocaleString(undefined, {
+    day: "numeric",
+    hour: "numeric",
+    month: "short",
+  });
+  if (bucketHours === 1) return label;
+  const to = new Date(from.getTime() + bucketHours * 3_600_000);
+  return `${label} – ${to.toLocaleTimeString(undefined, { hour: "numeric" })}`;
+}
+
+/**
  * The middle value, taking the lower one for an even count, as the backend does.
  * @param values - Non-empty list.
  * @returns The median.
