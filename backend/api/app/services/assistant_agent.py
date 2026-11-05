@@ -16,8 +16,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Set,
-    Tuple,
 )
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
@@ -65,11 +63,7 @@ from app.services.logan_snapshot import (
 )
 from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
-from app.services.tools.catalog_data import (
-    CatalogData,
-    _is_assembly_scope,
-    trs_id_key,
-)
+from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_query import (
     CatalogQuery,  # noqa: F401 (tool annotation)
 )
@@ -113,14 +107,11 @@ _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
 # ends agree on what "my own data" looks like.
 _TOP_N_RE = re.compile(r"\btop\s+(\d{1,3})\b", re.IGNORECASE)
 _RUN_ACCESSION_RE = re.compile(r"\b[ESD]RR\d{6,}\b")
-# A TRS id inside free text, e.g. "RNA-Seq (#workflow/github.com/.../main)".
+# A TRS id inside tool output, e.g. "#workflow/github.com/.../main/versions/v1".
 _TRS_ID_IN_TEXT = re.compile(r"#?workflow/[^\s()\[\]{},;\"']+", re.IGNORECASE)
 # An id-shaped token (letters, digits, `_` and `-`), so an IWC id like
 # "rnaseq-pe-main" is matched whole, never as part of a longer id.
 _ID_TOKEN_RE = re.compile(r"[\w-]+")
-# Everything that isn't a letter or digit, collapsed when comparing workflow
-# names, so "Paired-End" and "Paired end" compare equal.
-_NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 _UPLOAD_RE = re.compile(r"\b(upload|user|own|local)\b", re.IGNORECASE)
 
 # Either structured-output trailer keyword. Used to bound a malformed marker's
@@ -393,14 +384,17 @@ Rules:
   it, treat that as committed.
 - analysis_type is the CATEGORY: 'gene expression' / 'RNA-seq' -> \
   'Transcriptomics'; 'find variants' / 'variant calling' -> 'Variant Calling'.
-- For assembly include the accession; for workflow use the display label that \
-  includes the IWC id (e.g. 'Haploid variant calling (varcall-haploid)'), not \
-  the bare id.
+- For assembly include the accession.
+- For workflow, write its display label in workflow and its IWC id in \
+  workflow_iwc_id (e.g. 'Haploid variant calling' and 'varcall-haploid'). The \
+  id is what selects the workflow: without it the pick is lost. Carry the \
+  prior workflow_iwc_id forward with the prior workflow, and set both to null \
+  together.
 - You may be given the workflows looked up this session, each with its name \
   and iwc_id. When the user commits to one of them, even if the reply calls it \
-  something shorter or worded differently, write it as that entry's \
-  '<name> (<iwc_id>)'. Being on that list is not a commitment: the user still \
-  has to pick it.
+  something shorter or worded differently, write that entry's name and \
+  iwc_id. Being on that list is not a commitment: the user still has to pick \
+  it.
 - When a high-level choice changes, null any CARRIED-FORWARD downstream field \
   that no longer applies, but KEEP one the user replaced this same turn: a new \
   organism clears a stale assembly and workflow; a new analysis type clears a \
@@ -480,16 +474,16 @@ def build_system_prompt(
 SessionWorkflow = Dict[str, Optional[str]]
 
 
-def _normalise_name(name: str) -> str:
-    """Lowercase `name` and collapse each run of non-alphanumerics to a space.
-
-    HTML entities are decoded first: the catalog stores "CUT&amp;RUN"."""
-    return _NON_ALNUM_RE.sub(" ", html.unescape(name).lower()).strip()
+def _workflow_ref(wf: Dict[str, Any]) -> Optional[str]:
+    """What a workflow field's detail holds: the catalog trsId, else iwcId."""
+    return wf.get("trsId") or wf.get("iwcId")
 
 
-def _trs_keys_in(text: str) -> Set[str]:
-    """The version-free keys of the TRS ids in `text`, minus trailing periods."""
-    return {trs_id_key(m.rstrip(".")) for m in _TRS_ID_IN_TEXT.findall(text)}
+def _workflow_name(wf: Dict[str, Any]) -> Optional[str]:
+    """A catalog workflow's display name. HTML entities are decoded: the
+    catalog stores "CUT&amp;RUN"."""
+    name = wf.get("workflowName")
+    return html.unescape(name) if name else name
 
 
 def _wrap_tool(fn):
@@ -541,6 +535,10 @@ _STATE_FIELDS = (
     "workflow",
     "data_source",
 )
+
+# The extractor's structured workflow pick (AnalysisStateUpdate). It isn't a
+# tracker field of its own: it decides the workflow field's catalog match.
+_WORKFLOW_ID_FIELD = "workflow_iwc_id"
 
 # Row labels from the setup panel, so the transcript note a clear leaves behind
 # names what the user actually clicked.
@@ -1121,8 +1119,8 @@ class AssistantAgent:
             agent=agent,
         )
 
-    @staticmethod
     def build_extract_payload(
+        self,
         prior: AnalysisSchema,
         user_message: str,
         reply: str,
@@ -1139,9 +1137,13 @@ class AssistantAgent:
 
         `workflows` lists the catalog workflows the chat model looked up this
         session ({"iwc_id", "name"}), so the extractor can write the IWC id of
-        a workflow the reply names only by a shortened or reworded label.
+        a workflow the reply names only by a shortened or reworded label. The
+        prior tracker carries the committed workflow's IWC id, so the extractor
+        can copy it forward with the label.
         """
         prior_state = {name: getattr(prior, name).value for name in _STATE_FIELDS}
+        prior_wf = self.catalog.find_workflow(prior.workflow.detail)
+        prior_state[_WORKFLOW_ID_FIELD] = prior_wf.get("iwcId") if prior_wf else None
         payload = f"PRIOR tracker (JSON): {json.dumps(prior_state)}\n"
         # Without this the extractor only sees a null where a value was, and a
         # reply that mentions the old choice in passing can fill it right back.
@@ -1202,12 +1204,17 @@ class AssistantAgent:
             return {}, None
         tracker: AnalysisStateUpdate = result.output
         updates = self._snapshot_to_updates(tracker, prior)
-        # A workflow that fails to reach the panel either was worded so it
-        # can't be mapped (logged by _find_workflow_trs_id) or was left out,
+        # A workflow that fails to reach the panel either had no visible IWC
+        # id (logged by _resolve_workflow) or was left out,
         # i.e. omitted or written as null. Log the second case while the
         # session has candidates and none is set; it also fires on turns where
         # the user is still choosing.
-        if not updates.get("workflow") and workflows and not prior.workflow.value:
+        if (
+            not updates.get("workflow")
+            and not updates.get(_WORKFLOW_ID_FIELD)
+            and workflows
+            and not prior.workflow.value
+        ):
             logger.warning(
                 "Extractor left the workflow out; session candidates: %s",
                 [wf["iwc_id"] for wf in workflows],
@@ -1264,6 +1271,8 @@ class AssistantAgent:
                 "committed tracker; copying forward instead of wiping"
             )
             return {}
+        if _WORKFLOW_ID_FIELD in set_fields:
+            updates[_WORKFLOW_ID_FIELD] = tracker.workflow_iwc_id
         return updates
 
     async def chat(
@@ -1479,7 +1488,6 @@ class AssistantAgent:
         # tracker carries forward. Bound the extractor to the time left in the
         # turn budget so the two sequential calls can't blow the frontend timeout.
         remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
-        workflows = None
         if not message:
             # A clear on its own: the user said nothing they could have
             # committed to, so there is nothing to extract -- and skipping it
@@ -1493,21 +1501,19 @@ class AssistantAgent:
             )
             schema_updates, extract_usage = {}, None
         else:
-            workflows = self._session_workflows(result.all_messages())
             schema_updates, extract_usage = await self._extract_state(
                 state.schema_state,
                 message,
                 reply_text,
                 timeout=min(EXTRACT_RUN_TIMEOUT_SECONDS, remaining),
                 cleared=cleared,
-                workflows=workflows,
+                workflows=self._session_workflows(result.all_messages()),
             )
         schema_state = self._apply_schema_updates(
             state.schema_state,
             schema_updates,
             logan=state.metadata.get("logan"),
             user_message=message,
-            workflows=workflows,
         )
 
         # 3) Suggestions are derived server-side from the new tracker state (no
@@ -2145,7 +2151,6 @@ class AssistantAgent:
         updates: Dict[str, Optional[str]],
         logan: Optional[dict] = None,
         user_message: Optional[str] = None,
-        workflows: Optional[List[SessionWorkflow]] = None,
     ) -> AnalysisSchema:
         """Apply LLM-emitted schema updates to the current schema.
 
@@ -2153,13 +2158,16 @@ class AssistantAgent:
         corrections when the user changes their mind). The catalog-derived fields
         are reconciled on every call -- even with no updates -- so a restored
         session carrying stale derived state is corrected on the next turn.
+        The workflow is resolved separately, by _resolve_workflow.
         """
         schema = current.model_copy(deep=True)
+        workflow = self._resolve_workflow(updates, current.workflow)
+        if workflow is not None:
+            schema.workflow = workflow
         valid_fields = {
             "organism",
             "assembly",
             "analysis_type",
-            "workflow",
             "data_source",
             "data_characteristics",
             "gene_annotation",
@@ -2184,49 +2192,6 @@ class AssistantAgent:
                     field.detail = acc_match.group(1)
                 else:
                     field.detail = self._find_assembly_accession(str(value), schema)
-
-            # For workflow, try a TRS id in the value string, then the iwcId,
-            # falling back to a case-insensitive name match against the catalog.
-            if key == "workflow":
-                workflow_value = str(value)
-                # A restated choice keeps its match while the catalog still has
-                # it: the session's lookups, which the name fallback depends
-                # on, change between turns.
-                prior = current.workflow
-                if workflow_value == prior.value and self._workflow_by_ref(
-                    prior.detail
-                ):
-                    field.detail = prior.detail
-                if not field.detail:
-                    field.detail = self._find_workflow_by_trs_value(workflow_value)
-                # Whole tokens, so "rnaseq-pe-main-v2" is not "rnaseq-pe-main".
-                value_tokens = set(_ID_TOKEN_RE.findall(workflow_value))
-                for cat in self.catalog.workflows_by_category:
-                    if field.detail:
-                        break
-                    for wf in cat.get("workflows", []):
-                        # Skip non-ASSEMBLY-scope workflows so an LLM-emitted
-                        # SCHEMA_UPDATE can't populate a handoff-capable detail
-                        # for a workflow the catalog tools hide (#1321).
-                        if not _is_assembly_scope(wf):
-                            continue
-                        iwc_id = wf.get("iwcId")
-                        if iwc_id and iwc_id in value_tokens:
-                            # `.get("trsId", iwc_id)` would keep a None trsId;
-                            # _condense_workflow stores trsId as None when
-                            # absent, so default to iwc_id on falsy values.
-                            field.detail = wf.get("trsId") or iwc_id
-                            break
-                if not field.detail:
-                    field.detail = self._find_workflow_trs_id(workflow_value, workflows)
-                if not field.detail:
-                    # Named a workflow we can't map to a visible (assembly-scope)
-                    # catalog entry. Clear the field rather than commit a phantom
-                    # or silently keep a stale prior workflow the user was trying
-                    # to change -- either would let a handoff fire on the wrong
-                    # workflow (Codex).
-                    setattr(schema, key, SchemaField())
-                    continue
 
             if key == "data_source":
                 field.detail = self._data_source_detail(
@@ -2304,12 +2269,16 @@ class AssistantAgent:
         """Drop a FILLED workflow whose detail no longer maps to a visible
         catalog entry -- e.g. a restored session carrying a stale or
         organism-scope workflow detail. Runs before the derived reflectors so
-        the tracker can't complete or hand off on a phantom workflow (Copilot)."""
-        if (
-            schema.workflow.status == FieldStatus.FILLED
-            and self._workflow_by_ref(schema.workflow.detail) is None
-        ):
+        the tracker can't complete or hand off on a phantom workflow (Copilot).
+        A detail saved under an older TRS version is moved to the catalog's
+        current one: the handoff looks the workflow up by its exact version."""
+        if schema.workflow.status != FieldStatus.FILLED:
+            return
+        wf = self.catalog.find_workflow(schema.workflow.detail)
+        if wf is None:
             schema.workflow = SchemaField()
+        else:
+            schema.workflow.detail = _workflow_ref(wf)
 
     def _reflect_data_characteristics(self, schema: AnalysisSchema) -> None:
         """Derive data characteristics from the selected workflow's inputs.
@@ -2341,7 +2310,7 @@ class AssistantAgent:
         assembled genome report that; a resolved workflow that needs no
         user-provided sequencing/genome input reports that too, so it doesn't
         leave data_characteristics EMPTY and block handoff forever (NoopDog)."""
-        wf = self._workflow_by_ref(workflow_ref)
+        wf = self.catalog.find_workflow(workflow_ref)
         if wf is None:
             return None
         params = wf.get("parameters", [])
@@ -2443,27 +2412,10 @@ class AssistantAgent:
             return url
         return None
 
-    def _workflow_by_ref(self, workflow_ref: Optional[str]) -> Optional[Dict[str, Any]]:
-        """Return the catalog workflow dict matched by trsId or iwcId, or None.
-
-        Only ASSEMBLY-scope workflows are visible to the assistant, so an
-        organism/comparative-scope ref -- e.g. one carried in a restored session
-        -- resolves to None and never drives derivation or handoff (Codex #5).
-        """
-        if not workflow_ref:
-            return None
-        for cat in self.catalog.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
-                    continue
-                if workflow_ref in (wf.get("trsId"), wf.get("iwcId")):
-                    return wf
-        return None
-
     def _workflow_requires_gene_model(self, workflow_ref: Optional[str]) -> bool:
         """True when the workflow (matched by trsId or iwcId) takes a
         GENE_MODEL_URL parameter."""
-        wf = self._workflow_by_ref(workflow_ref)
+        wf = self.catalog.find_workflow(workflow_ref)
         return wf is not None and any(
             p.get("variable") == "GENE_MODEL_URL" for p in wf.get("parameters", [])
         )
@@ -2512,85 +2464,63 @@ class AssistantAgent:
         logger.info("Assembly fallback matched '%s'", accession)
         return accession
 
-    def _find_workflow_by_trs_value(self, value: str) -> Optional[str]:
-        """The catalog trsId of the visible workflow whose TRS id appears in
-        `value`. Tool output shows the model TRS ids, which it restates in any
-        version or none, so match on the normalised form."""
-        keys = _trs_keys_in(value)
-        if not keys:
+    def _resolve_workflow(
+        self, updates: Dict[str, Optional[str]], prior: SchemaField
+    ) -> Optional[SchemaField]:
+        """The workflow field after the extractor's update, or None to leave it
+        as it is.
+
+        `workflow_iwc_id` picks the workflow by exact lookup. An id that isn't a
+        visible catalog workflow (#1321) counts as no id, so a mistyped id can't
+        wipe a pick being carried forward. Without an id, the label is never
+        parsed (#1957): one equal to the prior label keeps the prior pick, and
+        any other clears it rather than keep a workflow the user may have moved
+        away from. An omitted label keeps the prior pick, or, with an id, shows
+        the new one by its catalog name. A null label clears.
+        """
+        if "workflow" in updates and updates["workflow"] is None:
+            return SchemaField()
+        label = updates.get("workflow")
+        workflow_iwc_id = updates.get(_WORKFLOW_ID_FIELD)
+        if "workflow" in updates and not label:
             return None
-        for cat in self.catalog.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                trs_id = wf.get("trsId")
-                if _is_assembly_scope(wf) and trs_id and trs_id_key(trs_id) in keys:
-                    return trs_id
-        return None
-
-    def _find_workflow_trs_id(
-        self, value: str, workflows: Optional[List[SessionWorkflow]] = None
-    ) -> Optional[str]:
-        """Fallback: match a workflow by name when iwcId isn't in the value.
-
-        Names are compared case-insensitively with every run of punctuation
-        and whitespace treated as one space, so "Paired-End" matches the
-        catalog's "Paired end". An exact name wins. Otherwise the names the
-        value contains are preferred to the names it is part of, and the
-        longest wins if it contains the rest ("Capture Hi-C Processing" over
-        "Hi-C Processing"); anything else ambiguous, like "RNA Seq", clears
-        rather than commits whichever workflow comes first. When `workflows`
-        lists the session's lookups, a partial match must be one of them, so a
-        label can't pick a workflow the chat never showed."""
-        val_norm = _normalise_name(value)
-        partial: Dict[str, Tuple[str, Optional[str]]] = {}
-        # An empty value is in every name, so it never matches.
-        for cat in self.catalog.workflows_by_category if val_norm else []:
-            for wf in cat.get("workflows", []):
-                if not _is_assembly_scope(wf):
-                    continue
-                wf_name = _normalise_name(wf.get("workflowName") or "")
-                # `or` (not `get(..., default)`) so a None trsId still
-                # falls back to iwcId -- see _condense_workflow.
-                ref = wf.get("trsId") or wf.get("iwcId")
-                if not wf_name or not ref:
-                    continue
-                if wf_name == val_norm:
-                    logger.info("Workflow fallback matched name '%s'", wf_name)
-                    return ref
-                if wf_name in val_norm or val_norm in wf_name:
-                    partial[ref] = (wf_name, wf.get("iwcId"))
-        # Names inside the value first; a name the value is part of counts alone.
-        names = {r: m for r, m in partial.items() if m[0] in val_norm} or (
-            partial if len(partial) == 1 else {}
+        wf = self.catalog.find_workflow(workflow_iwc_id)
+        if workflow_iwc_id and wf is None:
+            logger.warning(
+                "Workflow id '%s' isn't a visible catalog workflow", workflow_iwc_id
+            )
+        prior_wf = self.catalog.find_workflow(prior.detail)
+        if wf is None:
+            if not label:
+                return None
+            if label != prior.value or prior_wf is None:
+                logger.warning(
+                    "Extractor named workflow '%s' without a visible IWC id", label
+                )
+                return SchemaField()
+            wf = prior_wf
+        elif not label:
+            if prior_wf is not None and prior_wf.get("iwcId") == wf.get("iwcId"):
+                return None
+            label = _workflow_name(wf) or wf.get("iwcId")
+        return SchemaField(
+            value=label, status=FieldStatus.FILLED, detail=_workflow_ref(wf)
         )
-        if names:
-            ref, (wf_name, iwc_id) = max(names.items(), key=lambda i: len(i[1][0]))
-            shown = {wf["iwc_id"] for wf in workflows or []}
-            if all(m[0] in wf_name for m in names.values()) and (
-                not shown or iwc_id in shown
-            ):
-                logger.info("Workflow fallback matched name '%s'", wf_name)
-                return ref
-        logger.warning(
-            "Workflow fallback found no unique match for '%s' (%d partial)",
-            value,
-            len(partial),
-        )
-        return None
 
     def _session_workflows(self, messages: List[ModelMessage]) -> List[SessionWorkflow]:
         """The visible workflows the chat model's tool results named.
 
         The reply often names a workflow by a shortened label ("RNA-Seq
-        Paired-End") that the catalog name match can't map; the tool results
-        carry its id. Only results count, not call arguments, so a guessed id
-        that came back "not found" is no candidate. The kept history is read,
-        not just this turn, because a workflow is often looked up in one turn
-        and committed to in a later one with no tool call; a lookup older than
-        the history window is missed. Ids are matched against the catalog
-        rather than read from each tool's JSON, so every tool that names a
-        workflow counts, by IWC id or TRS id. Returns {"iwc_id", "name"} per
-        workflow, in catalog order, ASSEMBLY scope only (the rest can't be
-        committed).
+        Paired-End"); the tool results carry its id, and the extractor is shown
+        these so it can write that id. Only results count, not call arguments,
+        so a guessed id that came back "not found" is no candidate. The kept
+        history is read, not just this turn, because a workflow is often looked
+        up in one turn and committed to in a later one with no tool call; a
+        lookup older than the history window is missed. Every IWC id or TRS id
+        in the results is looked up in the catalog rather than read from each
+        tool's JSON, so every tool that names a workflow counts. Returns
+        {"iwc_id", "name"} per workflow, in catalog order, visible ones only
+        (the rest can't be committed).
         """
         texts = []
         for message in messages:
@@ -2598,19 +2528,12 @@ class AssistantAgent:
                 if part.part_kind == "tool-return":
                     texts.append(part.model_response_str())
         traffic = "\n".join(texts)
-        tokens = set(_ID_TOKEN_RE.findall(traffic))
-        trs_keys = _trs_keys_in(traffic)
-        found: Dict[str, SessionWorkflow] = {}
-        for cat in self.catalog.workflows_by_category:
-            for wf in cat.get("workflows", []):
-                iwc_id = wf.get("iwcId")
-                if not iwc_id or iwc_id in found or not _is_assembly_scope(wf):
-                    continue
-                trs_id = wf.get("trsId")
-                if iwc_id in tokens or (trs_id and trs_id_key(trs_id) in trs_keys):
-                    name = wf.get("workflowName")
-                    found[iwc_id] = {
-                        "iwc_id": iwc_id,
-                        "name": html.unescape(name) if name else name,
-                    }
-        return list(found.values())
+        # Whole tokens, so "rnaseq-pe-main-v2" is not "rnaseq-pe-main".
+        ids = set(_ID_TOKEN_RE.findall(traffic))
+        ids.update(m.rstrip(".") for m in _TRS_ID_IN_TEXT.findall(traffic))
+        named = {wf.get("iwcId") for wf in map(self.catalog.find_workflow, ids) if wf}
+        return [
+            {"iwc_id": wf.get("iwcId"), "name": _workflow_name(wf)}
+            for wf in self.catalog.visible_workflows()
+            if wf.get("iwcId") in named
+        ]

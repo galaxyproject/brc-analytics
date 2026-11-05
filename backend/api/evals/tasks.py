@@ -392,9 +392,7 @@ def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
                         n: (getattr(schema, n).value, getattr(schema, n).status)
                         for n in _STATE_FIELDS
                     }
-                    schema = aa._apply_schema_updates(
-                        schema, updates, workflows=workflows
-                    )
+                    schema = aa._apply_schema_updates(schema, updates)
                     state_nonempty = any(
                         before[n]
                         != (getattr(schema, n).value, getattr(schema, n).status)
