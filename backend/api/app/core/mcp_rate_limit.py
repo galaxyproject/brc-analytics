@@ -16,7 +16,6 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.core import dependencies
 from app.core.config import get_settings
-from app.core.partner_keys import match_partner_key
 
 
 class MCPRateLimitMiddleware:
@@ -30,10 +29,14 @@ class MCPRateLimitMiddleware:
         request = Request(scope)
         settings = get_settings()
         partner = None
-        if settings.PARTNER_API_ENABLED:
-            partner = match_partner_key(
-                request.headers.get("x-api-key"), settings.PARTNER_API_KEYS
-            )
+        key = request.headers.get("x-api-key")
+        if settings.PARTNER_API_ENABLED and key:
+            # The same check the tools make, sunset included, so a retired key
+            # never keeps the larger partner allowance.
+            try:
+                partner = dependencies.authenticate_partner_key(key)
+            except HTTPException:
+                partner = None
         try:
             if partner is not None:
                 await dependencies.get_partner_rate_limiter().check(
