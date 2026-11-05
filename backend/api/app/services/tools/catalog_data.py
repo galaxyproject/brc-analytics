@@ -311,7 +311,7 @@ class CatalogData:
     ) -> List[Dict[str, Any]]:
         """Return workflows compatible with the given organism ploidies and taxonomy."""
         results = []
-        for wf in self._workflows_by_iwc_id.values():
+        for wf in self.visible_workflows():
             wf_ploidy = wf.get("ploidy", _PLOIDY_ANY)
             wf_tax = wf.get("taxonomyId")
 
@@ -322,12 +322,25 @@ class CatalogData:
                 results.append(self._summarize_workflow(wf))
         return results
 
+    def visible_workflows(self) -> List[Dict[str, Any]]:
+        """Each ASSEMBLY-scope workflow once, in catalog order: the workflows
+        the assistant can show and commit."""
+        return list(self._workflows_by_iwc_id.values())
+
+    def find_workflow(self, workflow_id: Optional[str]) -> Optional[Dict[str, Any]]:
+        """The ASSEMBLY-scope catalog workflow with this IWC id or TRS id (any
+        version, or none), or None. A hidden or unknown id is None."""
+        if not workflow_id:
+            return None
+        wf = self._workflows_by_iwc_id.get(workflow_id)
+        if wf is None:
+            iwc_id = self._iwc_id_by_trs_key.get(trs_id_key(workflow_id))
+            wf = self._workflows_by_iwc_id.get(iwc_id) if iwc_id else None
+        return wf
+
     def get_workflow_details(self, iwc_id: str) -> Optional[Dict[str, Any]]:
         """Look up a workflow by IWC id or TRS id (any version, or none)."""
-        wf = self._workflows_by_iwc_id.get(iwc_id)
-        if wf is None and iwc_id:
-            trs_iwc_id = self._iwc_id_by_trs_key.get(trs_id_key(iwc_id))
-            wf = self._workflows_by_iwc_id.get(trs_iwc_id) if trs_iwc_id else None
+        wf = self.find_workflow(iwc_id)
         if wf is None:
             return None
         return self._summarize_workflow(wf, include_params=True)
