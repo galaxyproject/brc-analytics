@@ -2243,9 +2243,16 @@ class AssistantAgent:
             # catalog trsId appearing mid-session matches on value. Only a
             # genuinely different workflow differs on both. organism/analysis_type
             # carry no detail here, so they compare by value alone -- an organism
-            # change still triggers clearing.
+            # change still triggers clearing. Two workflows the catalog knows
+            # compare by IWC id alone, so a new pick under the old label counts
+            # as changed.
             prior_f = getattr(prior, name)
             new_f = getattr(schema, name)
+            if name == "workflow":
+                prior_wf = self.catalog.find_workflow(prior_f.detail)
+                new_wf = self.catalog.find_workflow(new_f.detail)
+                if prior_wf and new_wf:
+                    return prior_wf.get("iwcId") != new_wf.get("iwcId")
             if prior_f.value == new_f.value:
                 return False
             if prior_f.detail and new_f.detail and prior_f.detail == new_f.detail:
@@ -2475,15 +2482,13 @@ class AssistantAgent:
         wipe a pick being carried forward. Without an id, the label is never
         parsed (#1957): one equal to the prior label keeps the prior pick, and
         any other clears it rather than keep a workflow the user may have moved
-        away from. An omitted label keeps the prior pick, or, with an id, shows
-        the new one by its catalog name. A null label clears.
+        away from. An omitted or empty label keeps the prior pick, or, with an
+        id, shows the new one by its catalog name. A null label clears.
         """
         if "workflow" in updates and updates["workflow"] is None:
             return SchemaField()
         label = updates.get("workflow")
         workflow_iwc_id = updates.get(_WORKFLOW_ID_FIELD)
-        if "workflow" in updates and not label:
-            return None
         wf = self.catalog.find_workflow(workflow_iwc_id)
         if workflow_iwc_id and wf is None:
             logger.warning(

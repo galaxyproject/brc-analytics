@@ -3709,6 +3709,61 @@ class TestWorkflowId:
             value="CUT&RUN Analysis", status=FieldStatus.FILLED, detail="trs-0"
         )
 
+    def test_empty_label_with_id_picks_that_workflow(self, agent, chosen):
+        result = agent._apply_schema_updates(
+            chosen,
+            {"workflow": "", "workflow_iwc_id": "haploid-variant-calling-wgs-pe-main"},
+        )
+        assert result.workflow == SchemaField(
+            value="Paired end variant calling in haploid system",
+            status=FieldStatus.FILLED,
+            detail=_HAPLOID_TRS,
+        )
+
+    @pytest.mark.parametrize(
+        "upstream",
+        [{"organism": "Escherichia coli"}, {"analysis_type": "Variant Calling"}],
+    )
+    def test_new_workflow_under_the_old_label_survives_an_upstream_change(
+        self, agent, chosen, upstream
+    ):
+        # The extractor reused the old label for a different workflow; the id
+        # says it is a new pick, so the upstream change doesn't clear it.
+        chosen.organism = SchemaField(value="yeast", status=FieldStatus.FILLED)
+        chosen.analysis_type = SchemaField(
+            value="Transcriptomics", status=FieldStatus.FILLED
+        )
+        result = agent._apply_schema_updates(
+            chosen,
+            {
+                **upstream,
+                "workflow": "RNA-Seq Paired-End",
+                "workflow_iwc_id": "haploid-variant-calling-wgs-pe-main",
+            },
+        )
+        assert result.workflow.detail == _HAPLOID_TRS
+
+    @pytest.mark.parametrize(
+        "upstream",
+        [{"organism": "Escherichia coli"}, {"analysis_type": "Variant Calling"}],
+    )
+    def test_carried_workflow_is_cleared_by_an_upstream_change(
+        self, agent, chosen, upstream
+    ):
+        chosen.organism = SchemaField(value="yeast", status=FieldStatus.FILLED)
+        chosen.analysis_type = SchemaField(
+            value="Transcriptomics", status=FieldStatus.FILLED
+        )
+        result = agent._apply_schema_updates(
+            chosen,
+            {
+                **upstream,
+                "workflow": "RNA-Seq Paired-End",
+                "workflow_iwc_id": "rnaseq-pe-main",
+            },
+        )
+        assert result.workflow == SchemaField()
+
     def test_prior_id_without_label_keeps_the_prior_label(self, agent, chosen):
         result = agent._apply_schema_updates(
             chosen, {"workflow_iwc_id": "rnaseq-pe-main"}
