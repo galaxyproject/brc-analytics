@@ -2101,8 +2101,10 @@ class GalaxyService:
         """
         Download a merged results dataset to a temp file and parse it.
 
-        Streamed to disk rather than read whole, so a conserved query's
-        million-hit file is not held twice over, once raw and once parsed.
+        Streamed to disk, so the download itself never joins its chunks into
+        one buffer the way r.content would. json.load still reads the whole
+        file in before parsing, so the raw bytes and the parsed result are both
+        held at the peak; the collection path only ever held one member raw.
         """
         r = self.gi.make_get_request(
             f"{self.gi.url}/datasets/{dataset_id}/display",
