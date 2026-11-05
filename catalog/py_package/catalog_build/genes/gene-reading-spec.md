@@ -33,6 +33,7 @@ Relationships:
 - A gene has one or more transcripts. A transcript has zero or one protein. A gene has no product or protein of its own in the file; its transcripts' are shown.
 - A gene's label, shown as "Gene ID" on its page, is its locus tag, else its name. It's for display only: two genes can share a label, so `gene_uid` identifies a gene.
 - IDs that find a gene are its aliases (the snapshot's `alt_id` table), each with its type: `locus_tag`, `name`, `symbol`, `ncbi_gene_id`, `transcript_id`, `protein_accession` and `old_locus_tag`. Old locus tags are former IDs; the rest are current.
+- A gene's search terms (the snapshot's `search_term` table) are what gene search matches the start of: each of its aliases, and each word of its transcripts' transcript products and protein products (types `transcript_product` and `protein_product`), all lowercased. A product's words are split at whitespace and trimmed of punctuation; one joined by hyphens or slashes is also split into its parts (`ATP-dependent` gives `atp-dependent`, `atp` and `dependent`). Words of fewer than 3 characters, and `putative`, `protein`, `of`, `the`, `and`, `family`, `domain` and `like`, are left out. Each term is stored once per gene and type.
 
 ## 2. How an NCBI GFF3 is read
 

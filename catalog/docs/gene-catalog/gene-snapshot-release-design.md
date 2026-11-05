@@ -125,7 +125,7 @@ Then set `GENE_SNAPSHOT_PATH` to the file's absolute path in `backend/api/.env`,
 
 ## Tests
 
-The backend's tests read a small gene snapshot kept as text in `backend/api/tests/data/gene_snapshot/`: four of 3D7's genes, exported with DuckDB's `EXPORT DATABASE` and imported into a temporary file when the tests start. It is a copy of the build's output at one point in time, so a change to the snapshot's tables needs it exported again; changing `SCHEMA_VERSION` without doing so fails the backend's tests, which is the reminder. The build's own tests are in `catalog/py_package/tests/test_genes_build_gene_snapshot.py`.
+The backend's tests read a small gene snapshot kept as text in `backend/api/tests/data/gene_snapshot/`: sixteen of 3D7's genes, exported with DuckDB's `EXPORT DATABASE` and imported into a temporary file when the tests start. It is a copy of the build's output at one point in time, so a change to the snapshot's tables needs it exported again; changing `SCHEMA_VERSION` without doing so fails the backend's tests, which is the reminder. To export it again, build 3D7's snapshot (see [Local development](#local-development)) and, from `backend/api`, run `uv run python scripts/export_test_gene_snapshot.py <file>`; the script lists the genes kept and what each is there to test. Gene search's tests also run against the whole 3D7 snapshot when `GENE_SNAPSHOT_3D7_PATH` names one. The build's own tests are in `catalog/py_package/tests/test_genes_build_gene_snapshot.py`.
 
 ## Not yet
 
