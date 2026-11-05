@@ -34,6 +34,7 @@ from app.core.dependencies import (
     get_sra_mirror_service,
     reset_all_services,
 )
+from app.core.mcp_rate_limit import MCPRateLimitMiddleware
 from app.core.sentry import before_send
 from app.db.session import close_db, init_db
 from app.services import turn_log
@@ -213,7 +214,7 @@ def create_app() -> FastAPI:
         tags=["workflow_runs"],
     )
 
-    app.mount(MCP_MOUNT_PATH, mcp_app)
+    app.mount(MCP_MOUNT_PATH, MCPRateLimitMiddleware(mcp_app))
 
     @app.get("/")
     async def root():
