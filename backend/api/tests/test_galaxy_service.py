@@ -451,6 +451,20 @@ class TestQueryValidation:
     def test_headerless_sequence_accepted(self):
         assert KmindexQuerySubmission(sequence="ACGT", indexes=["GENOMIC_BCT"])
 
+    def test_headerless_sequence_gets_a_header(self):
+        # kmindex segfaults on a query with no header line, so a bare pasted
+        # sequence has to reach Galaxy as a one-record FASTA.
+        submission = KmindexQuerySubmission(
+            sequence="ACGT\nTTGA\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == ">query\nACGT\nTTGA\n"
+
+    def test_existing_header_is_kept(self):
+        submission = KmindexQuerySubmission(
+            sequence="\n>mine\nACGT\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == "\n>mine\nACGT\n"
+
 
 class TestQueryLengthCap:
     """The UI enforces the same ceiling, but the UI is not the only caller."""

@@ -136,6 +136,21 @@ class KmindexQuerySubmission(BaseModel):
 
     @field_validator("sequence")
     @classmethod
+    def has_header(cls, value: str) -> str:
+        """
+        Give a bare pasted sequence a FASTA header.
+
+        kmindex segfaults on a query with no header line, and API and MCP
+        callers often send just the bases.
+        """
+        if value.strip() and not any(
+            line.startswith(">") for line in value.splitlines()
+        ):
+            return ">query\n" + value
+        return value
+
+    @field_validator("sequence")
+    @classmethod
     def single_record(cls, value: str) -> str:
         """
         Reject multi-record FASTA.
