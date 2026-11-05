@@ -106,6 +106,9 @@ def env(monkeypatch):
     galaxy.submit_kmindex_query = AsyncMock(
         return_value=GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1")
     )
+    galaxy.get_job_status = AsyncMock(
+        return_value=MagicMock(is_complete=False, is_successful=False)
+    )
     built: list[tuple[str, object]] = []
 
     def anonymous(cache_, sra):
@@ -217,6 +220,19 @@ class TestDedupe:
         assert env.galaxy.submit_kmindex_query.await_count == 1
         # A reuse starts nothing, so it spends nothing.
         assert env.submit_limiter.check.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_failed_job_is_not_handed_back(self, env, monkeypatch):
+        # An agent that saw the job fail and sends the search again wants a
+        # new run, not the dead one.
+        _as(monkeypatch, _request())
+        await _submit()
+        env.galaxy.get_job_status.return_value = MagicMock(
+            is_complete=True, is_successful=False
+        )
+        again = await _submit()
+        assert again["status"] == "submitted"
+        assert env.galaxy.submit_kmindex_query.await_count == 2
 
     @pytest.mark.asyncio
     async def test_different_search_is_not_reused(self, env, monkeypatch):

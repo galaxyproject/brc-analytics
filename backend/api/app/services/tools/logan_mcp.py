@@ -117,20 +117,29 @@ async def logan_submit(
         dedupe_key = _dedupe_key(
             request, partner, logan_jobs.submission_fingerprint(submission)
         )
+        if partner is not None:
+            galaxy = logan_jobs.partner_galaxy_service(partner, cache, sra_mirror)
+        else:
+            galaxy = logan_jobs.anonymous_galaxy_service(cache, sra_mirror)
         # Claimed before submitting, so a retry that lands while the first
         # call is still talking to Galaxy finds the claim instead of nothing.
         if not await cache.set_if_absent(dedupe_key, {"pending": True}, CLAIM_TTL):
-            return _claimed(await cache.get(dedupe_key) or {}, partner)
+            existing = await cache.get(dedupe_key) or {}
+            if not (
+                existing.get("job_id") and await _job_failed(galaxy, existing["job_id"])
+            ):
+                return _claimed(existing, partner)
+            await cache.delete(dedupe_key)
+            if not await cache.set_if_absent(dedupe_key, {"pending": True}, CLAIM_TTL):
+                return _claimed(await cache.get(dedupe_key) or {}, partner)
     except HTTPException as e:
         return http_error(e)
     try:
         if partner is not None:
-            galaxy = logan_jobs.partner_galaxy_service(partner, cache, sra_mirror)
             job_id = await logan_jobs.submit_partner_job(
                 request, partner, submission, galaxy, cache
             )
         else:
-            galaxy = logan_jobs.anonymous_galaxy_service(cache, sra_mirror)
             job_id = await logan_jobs.submit_anonymous_job(request, submission, galaxy)
     except HTTPException as e:
         if _maybe_started(e):
@@ -140,6 +149,14 @@ async def logan_submit(
         return http_error(e)
     await cache.set(dedupe_key, {"job_id": job_id}, DEDUPE_TTL)
     return _started(job_id, partner, reused=False)
+
+
+async def _job_failed(galaxy: GalaxyService, job_id: str) -> bool:
+    try:
+        status = await galaxy.get_job_status(job_id)
+    except Exception:
+        return False  # can't tell; reusing is the cheaper mistake
+    return bool(status.is_complete and not status.is_successful)
 
 
 def _maybe_started(e: HTTPException) -> bool:
