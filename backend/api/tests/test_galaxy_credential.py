@@ -854,6 +854,8 @@ async def test_the_query_goes_to_galaxy_as_a_hashed_url(monkeypatch, use_cached)
     assert fastx["name"] == "query.fasta"
     assert inputs["threshold"] == submission.threshold
     assert inputs["zvalue"] == submission.zvalue
+    # Results are read from the one merged dataset this asks for.
+    assert inputs["merge"] is True
 
 
 @pytest.mark.asyncio

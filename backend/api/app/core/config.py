@@ -262,10 +262,11 @@ class Settings:
             "GALAXY_RANDOM_LINES_TOOL_ID", "random_lines1"
         )
         # Versioned rather than short id: kmindex_query's parameter shape has
-        # changed across releases, so pinning keeps tool_inputs valid.
+        # changed across releases, so pinning keeps tool_inputs valid. 0.7.1 is
+        # the first with the merge input that submit sends and results read.
         self.GALAXY_KMINDEX_TOOL_ID: str = os.getenv(
             "GALAXY_KMINDEX_TOOL_ID",
-            "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0",
+            "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.1+galaxy0",
         )
         # Let Galaxy answer a repeated query with its finished job. A switch so
         # it can be turned off without a deploy if the cache ever hands back

@@ -1202,6 +1202,10 @@ class GalaxyService:
                     "url": "base64://" + base64.b64encode(content).decode("ascii"),
                 },
                 "format": "json",
+                # Explicit though it is the default: the read path depends on
+                # the one merged dataset, and a changed default would quietly
+                # turn every new job back into a collection.
+                "merge": True,
                 "threshold": submission.threshold,
                 "zvalue": submission.zvalue,
             },
