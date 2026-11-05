@@ -156,6 +156,16 @@ describe("bucketLabel", () => {
     expect(label(1)).toBe("Nov 3, 9 AM");
     expect(label(3)).toBe("Nov 3, 9 AM – 12 PM");
   });
+
+  test("ends a block on the wall-clock hour across a clock change", () => {
+    // Only bites in a zone that changes clocks on these nights (any US zone);
+    // run with TZ=America/New_York to see it.
+    const label = (start: Date): string =>
+      bucketLabel(start.toISOString(), 3).replace(/\s/g, " ");
+
+    expect(label(new Date(2026, 2, 8, 0))).toBe("Mar 8, 12 AM – 3 AM");
+    expect(label(new Date(2026, 10, 1, 0))).toBe("Nov 1, 12 AM – 3 AM");
+  });
 });
 
 describe("buildWaitSpec", () => {

@@ -72,7 +72,10 @@ export function bucketLabel(start: string, bucketHours: number): string {
     month: "short",
   });
   if (bucketHours === 1) return label;
-  const to = new Date(from.getTime() + bucketHours * 3_600_000);
+  // Wall-clock hours, like timeBuckets, so a clock-change night still ends
+  // the block where the next one starts.
+  const to = new Date(from);
+  to.setHours(from.getHours() + bucketHours);
   return `${label} – ${to.toLocaleTimeString(undefined, { hour: "numeric" })}`;
 }
 
