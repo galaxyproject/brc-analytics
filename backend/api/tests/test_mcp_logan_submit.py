@@ -235,6 +235,51 @@ class TestDedupe:
         await _submit()
         assert env.galaxy.submit_kmindex_query.await_count == 3
 
+    @pytest.mark.asyncio
+    async def test_retry_during_the_first_submit_starts_nothing(self, env, monkeypatch):
+        # The timeout retry the dedupe exists for lands while the first call
+        # is still uploading to Galaxy.
+        _as(monkeypatch, _request())
+        release = asyncio.Event()
+
+        async def slow_submit(_submission):
+            await release.wait()
+            return GalaxyJobResponse(job_id=JOB_ID, upload_dataset_id="ds1")
+
+        env.galaxy.submit_kmindex_query.side_effect = slow_submit
+        first = asyncio.create_task(_submit())
+        await asyncio.sleep(0)
+        retry_task = asyncio.create_task(_submit())
+        await asyncio.sleep(0)
+        release.set()
+        assert (await first)["status"] == "submitted"
+        retry = await retry_task
+        assert retry["status_code"] == 409
+        assert retry["retry_after_seconds"]
+        assert env.galaxy.submit_kmindex_query.await_count == 1
+        assert (await _submit())["status"] == "reused"
+
+    @pytest.mark.asyncio
+    async def test_ambiguous_failure_is_not_blindly_retried(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.galaxy.submit_kmindex_query.side_effect = RuntimeError("reply lost")
+        first = await _submit()
+        again = await _submit()
+        assert first["status_code"] == 502
+        assert again["status_code"] == 409
+        assert "may" in again["error"]
+        assert env.galaxy.submit_kmindex_query.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_refused_submit_can_be_sent_again(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        env.submit_limiter.check.side_effect = [
+            HTTPException(status_code=429, detail="over"),
+            {},
+        ]
+        assert (await _submit())["status_code"] == 429
+        assert (await _submit())["status"] == "submitted"
+
 
 class TestPartner:
     @pytest.mark.asyncio

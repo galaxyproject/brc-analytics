@@ -32,6 +32,8 @@ from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotComplete,
     GalaxyService,
+    GalaxySubmitNotStarted,
+    KmindexUnknownIndex,
 )
 from app.services.logan_snapshot import results_url_for
 
@@ -41,6 +43,10 @@ logger = logging.getLogger(__name__)
 # window the same caller sending the same search gets the job it already
 # started, not a second search across every index.
 DEDUPE_TTL = 600
+# How long a claim made before submitting holds off a retry: long enough to
+# cover an upload and tool run, short enough that an interrupted submit
+# doesn't block the same search for the whole dedupe window.
+CLAIM_TTL = 120
 
 
 def http_error(e: HTTPException) -> dict:
@@ -111,9 +117,13 @@ async def logan_submit(
         dedupe_key = _dedupe_key(
             request, partner, logan_jobs.submission_fingerprint(submission)
         )
-        existing = await cache.get(dedupe_key)
-        if existing and existing.get("job_id"):
-            return _started(existing["job_id"], partner, reused=True)
+        # Claimed before submitting, so a retry that lands while the first
+        # call is still talking to Galaxy finds the claim instead of nothing.
+        if not await cache.set_if_absent(dedupe_key, {"pending": True}, CLAIM_TTL):
+            return _claimed(await cache.get(dedupe_key) or {}, partner)
+    except HTTPException as e:
+        return http_error(e)
+    try:
         if partner is not None:
             galaxy = logan_jobs.partner_galaxy_service(partner, cache, sra_mirror)
             job_id = await logan_jobs.submit_partner_job(
@@ -123,9 +133,39 @@ async def logan_submit(
             galaxy = logan_jobs.anonymous_galaxy_service(cache, sra_mirror)
             job_id = await logan_jobs.submit_anonymous_job(request, submission, galaxy)
     except HTTPException as e:
+        if _maybe_started(e):
+            await cache.set(dedupe_key, {"outcome": "unknown"}, CLAIM_TTL)
+        else:
+            await cache.delete(dedupe_key)
         return http_error(e)
     await cache.set(dedupe_key, {"job_id": job_id}, DEDUPE_TTL)
     return _started(job_id, partner, reused=False)
+
+
+def _maybe_started(e: HTTPException) -> bool:
+    # logan_jobs raises from the Galaxy error when Galaxy was asked; only a
+    # clean refusal there means nothing runs. Anything raised before the
+    # submit (budget, pause, validation) has no cause.
+    cause = e.__cause__
+    return cause is not None and not isinstance(
+        cause, (GalaxySubmitNotStarted, KmindexUnknownIndex)
+    )
+
+
+def _claimed(existing: dict, partner: Optional[Partner]) -> dict:
+    if existing.get("job_id"):
+        return _started(existing["job_id"], partner, reused=True)
+    if existing.get("outcome") == "unknown":
+        error = (
+            "The same search just failed after Galaxy was asked to run it, so "
+            "it may be running anyway. Check logan_queue, or send it again "
+            "after the retry delay."
+        )
+        retry_after = CLAIM_TTL
+    else:
+        error = "The same search is being started right now; ask again shortly."
+        retry_after = int(logan_jobs.STATUS_RETRY_AFTER)
+    return {"error": error, "status_code": 409, "retry_after_seconds": retry_after}
 
 
 def _started(job_id: str, partner: Optional[Partner], reused: bool) -> dict:
