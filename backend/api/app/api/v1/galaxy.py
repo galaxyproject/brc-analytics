@@ -726,9 +726,7 @@ async def get_job_status(
             )
 
         logger.debug(f"Getting status for job: {job_id}")
-        status = await galaxy_service.get_job_status(job_id)
-
-        return status
+        return await galaxy_service.get_job_status(job_id)
 
     except HTTPException:
         raise

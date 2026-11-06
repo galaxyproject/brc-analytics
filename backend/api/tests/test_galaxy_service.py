@@ -142,6 +142,50 @@ class TestJobStatusStates:
         assert not status.is_complete
 
     @pytest.mark.asyncio
+    async def test_a_failed_job_carries_its_stderr(self, service):
+        # Galaxy only returns stderr in the full job dict, so without the
+        # second fetch every "failed" answer has no reason attached.
+        full = {**self._job("error"), "exit_code": 139, "stderr": "Segmentation fault"}
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=lambda job_id, full_details=False: (
+                full if full_details else self._job("error")
+            )
+        )
+
+        status = await service.get_job_status("job1")
+
+        assert status.stderr == "Segmentation fault"
+        assert status.exit_code == 139
+
+    @pytest.mark.asyncio
+    async def test_a_failed_full_fetch_still_answers_failed(self, service, caplog):
+        # The reason is a nice-to-have; the state is what ends the polling.
+        def show_job(job_id, full_details=False):
+            if full_details:
+                raise RuntimeError("galaxy timed out")
+            return self._job("error")
+
+        service.gi.jobs.show_job = MagicMock(side_effect=show_job)
+
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            status = await service.get_job_status("job1")
+
+        assert status.is_complete and not status.is_successful
+        assert status.stderr is None
+        assert "galaxy timed out" in caplog.text
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("state", ["ok", "running"])
+    async def test_only_a_failed_job_pays_for_the_full_fetch(self, service, state):
+        # Every open search polls this; the full dict is only worth it once.
+        service.gi.jobs.show_job = MagicMock(return_value=self._job(state))
+        service._get_job_outputs = AsyncMock(return_value=[])
+
+        await service.get_job_status("job1")
+
+        service.gi.jobs.show_job.assert_called_once_with("job1")
+
+    @pytest.mark.asyncio
     async def test_a_state_the_enum_does_not_list_is_not_a_500(self, service):
         service.gi.jobs.show_job = MagicMock(
             return_value=self._job("some_future_state")
@@ -3361,6 +3405,24 @@ class TestAggregationLanes:
         slots.release()
 
         assert (await reader).total_hits == 1
+
+    @pytest.mark.asyncio
+    async def test_a_busy_native_lane_turns_away_a_caller_that_wont_wait(self, service):
+        service.sra_mirror = None
+        service._aggregate_shards = AsyncMock(return_value=_listing(1))
+        slots = galaxy_service._AGGREGATION_LANES["native"]
+
+        await slots.acquire()
+        try:
+            with pytest.raises(GalaxyJobAggregating, match="queued"):
+                # If wait is ignored this blocks on the held slot; fail fast.
+                await asyncio.wait_for(
+                    service.get_kmindex_results("job4", wait=False), timeout=5
+                )
+        finally:
+            slots.release()
+
+        service._aggregate_shards.assert_not_awaited()
 
 
 class TestAggregateTTL:

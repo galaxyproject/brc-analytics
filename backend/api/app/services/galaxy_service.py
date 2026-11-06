@@ -219,6 +219,11 @@ LIVE_JOB_STATUS_TTL = 10
 # it rejected outright ("Invalid access token."), which means a bad audience,
 # scope, or signature. Only the first is something the user can fix by
 # connecting their account -- see galaxy/lib/galaxy/authnz/managers.py.
+# How much of a failed job's stderr any reader gets. The status routes are
+# unauthenticated, and tool output can name server paths and hosts; the end of
+# stderr is the part that says why the job failed.
+STDERR_TAIL = 2000
+
 UNLINKED_ACCOUNT_MARKERS = ("locate user", "log into galaxy")
 
 
@@ -1293,6 +1298,7 @@ class GalaxyService:
         sort: KmindexSort = "score",
         order: Optional[KmindexOrder] = None,
         lane: AggregationLane = "native",
+        wait: Optional[bool] = None,
     ) -> KmindexResults:
         """Merge a kmindex job's per-shard outputs into one ranked hit list.
 
@@ -1301,11 +1307,14 @@ class GalaxyService:
             GalaxyJobAggregating when all its slots are taken instead of
             waiting, because its callers poll and a connection parked behind
             other partner merges is one the proxy will cut anyway.
+        @param wait: whether a cold merge waits for a free slot. Defaults to
+            the lane's own habit; False makes the native lane answer like the
+            partner one, for callers who poll and shouldn't queue there.
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
 
-        aggregate, source_job_id = await self._load_aggregate(job_id, lane)
+        aggregate, source_job_id = await self._load_aggregate(job_id, lane, wait)
 
         ordering, sort, order = await self._ordering_for(
             aggregate, source_job_id, sort, order or _default_order(sort)
@@ -1327,7 +1336,10 @@ class GalaxyService:
         )
 
     async def _load_aggregate(
-        self, job_id: str, lane: AggregationLane = "native"
+        self,
+        job_id: str,
+        lane: AggregationLane = "native",
+        wait: Optional[bool] = None,
     ) -> Tuple[dict, str]:
         """The job's cached aggregate, merging its shards first on a miss.
 
@@ -1337,6 +1349,8 @@ class GalaxyService:
 
         @param job_id: the kmindex job.
         @param lane: whose aggregation lock a cold merge takes.
+        @param wait: whether to wait for a free slot; None means the lane's
+            default (native waits, partner doesn't).
         @returns: the aggregate, and the job it lives under: job_id's job-cache
             original when job_id is a copy, else job_id itself. The export file
             is written under that job too.
@@ -1372,7 +1386,9 @@ class GalaxyService:
             slots = _AGGREGATION_LANES[lane]
             # No await between this check and the acquire below, so on one event
             # loop a free slot is still free when async-with takes it.
-            if lane == "partner" and slots.locked():
+            if wait is None:
+                wait = lane != "partner"
+            if not wait and slots.locked():
                 raise GalaxyJobAggregating(
                     f"Results for job {requested_job_id} are queued behind other merges"
                 )
@@ -2753,6 +2769,16 @@ class GalaxyService:
             logger.debug("Galaxy job %s full response: %s", job_id, job_data)
 
             state = job_data["state"]
+            if state in TERMINAL_JOB_STATES and state != GalaxyJobState.OK:
+                # stderr and exit_code only come in the full dict, which is too
+                # heavy for every poll. A failed status is cached for an hour,
+                # so this runs about once per failed job.
+                try:
+                    job_data = await asyncio.to_thread(
+                        self.gi.jobs.show_job, job_id, full_details=True
+                    )
+                except Exception as e:
+                    logger.warning("Full details for failed job %s: %s", job_id, e)
             status = GalaxyJobStatus(
                 job_id=job_id,
                 state=state,
@@ -2760,8 +2786,8 @@ class GalaxyService:
                 updated_time=job_data["update_time"],
                 is_complete=state in TERMINAL_JOB_STATES,
                 is_successful=state == GalaxyJobState.OK,
-                stdout=job_data.get("stdout"),
-                stderr=job_data.get("stderr"),
+                stdout=None,
+                stderr=(job_data.get("stderr") or "")[-STDERR_TAIL:] or None,
                 exit_code=job_data.get("exit_code"),
                 copied_from_job_id=job_data.get("copied_from_job_id"),
                 # Carried for in-process callers (see the field's comment);

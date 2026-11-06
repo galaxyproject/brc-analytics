@@ -20,7 +20,7 @@ from app.models.galaxy import KmindexQuerySubmission, query_bases
 
 logger = logging.getLogger(__name__)
 
-SubmissionSource = Literal["native", "partner"]
+SubmissionSource = Literal["native", "partner", "mcp"]
 
 # An insert is milliseconds; this only bounds a database that has stopped
 # answering, which would otherwise hold the submit response hostage.
@@ -43,7 +43,7 @@ async def record_submission(
 
     @param galaxy_job_id: the job Galaxy created.
     @param submission: the validated request, for indexes, size and settings.
-    @param source: native or partner.
+    @param source: native, partner, or mcp (a keyless MCP search).
     @param credential: the Galaxy identity the job ran as.
     @param partner_id: the partner, when source is partner.
     """

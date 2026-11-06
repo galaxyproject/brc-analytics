@@ -349,7 +349,8 @@ class KmindexSubmission(Base):
         default=uuid.uuid4,
     )
     galaxy_job_id: Mapped[str] = mapped_column(Text, nullable=False)
-    # "native" (brc-analytics.org itself) or "partner" (the partner API).
+    # "native" (brc-analytics.org itself), "partner" (the partner API, over
+    # HTTP or MCP), or "mcp" (a keyless search from the MCP server).
     source: Mapped[str] = mapped_column(String(16), nullable=False)
     partner_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     # The Galaxy identity the job ran as: "service" or "user".

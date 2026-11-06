@@ -11,6 +11,27 @@ from app.core.config import get_settings
 logger = logging.getLogger(__name__)
 
 
+def client_ip(request: Request) -> str:
+    """The caller's IP as every per-IP limit sees it.
+
+    Honors X-Forwarded-For only when TRUST_PROXY_HEADERS is set --
+    otherwise XFF is spoofable and breaks per-IP rate limits.
+    """
+    ip = request.client.host if request.client else "unknown"
+    if get_settings().TRUST_PROXY_HEADERS:
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            # Pick the first non-empty entry. Malformed XFF (leading
+            # comma, all empty, etc.) would otherwise yield "" and
+            # collapse every malformed-header client onto one key.
+            for candidate in forwarded.split(","):
+                candidate = candidate.strip()
+                if candidate:
+                    ip = candidate
+                    break
+    return ip
+
+
 class RateLimiter:
     """Redis-based rate limiter using sliding window counter"""
 
@@ -45,19 +66,7 @@ class RateLimiter:
         """
         if principal:
             return f"{self.namespace}:user:{principal}"
-        client_ip = request.client.host if request.client else "unknown"
-        if get_settings().TRUST_PROXY_HEADERS:
-            forwarded = request.headers.get("x-forwarded-for")
-            if forwarded:
-                # Pick the first non-empty entry. Malformed XFF (leading
-                # comma, all empty, etc.) would otherwise yield "" and
-                # collapse every malformed-header client onto one key.
-                for candidate in forwarded.split(","):
-                    candidate = candidate.strip()
-                    if candidate:
-                        client_ip = candidate
-                        break
-        return f"{self.namespace}:{client_ip}"
+        return f"{self.namespace}:{client_ip(request)}"
 
     async def check(self, request: Request, principal: str | None = None) -> dict:
         """

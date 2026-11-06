@@ -268,6 +268,16 @@ async def get_partner(
     Past the sunset date every call is 410, key or not -- that is what keeps a
     temporary API temporary.
     """
+    partner = authenticate_partner_key(x_api_key)
+    await get_partner_rate_limiter().check(request, principal=partner.partner_id)
+    return partner
+
+
+def authenticate_partner_key(x_api_key: str | None) -> Partner:
+    """The partner a key belongs to, without charging any budget.
+
+    Raises 410 past the sunset date and 401 for a missing or unknown key.
+    """
     settings = get_settings()
     sunset = settings.PARTNER_API_SUNSET
     if sunset is not None and datetime.now(timezone.utc) >= sunset:
@@ -275,7 +285,6 @@ async def get_partner(
     partner = match_partner_key(x_api_key, settings.PARTNER_API_KEYS)
     if partner is None:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
-    await get_partner_rate_limiter().check(request, principal=partner.partner_id)
     return partner
 
 

@@ -23,6 +23,7 @@ from app.core.partner_keys import (
     sunset_header,
 )
 from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus, KmindexQueueStatus
+from app.services import galaxy_service, logan_jobs
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxyJobNotFound,
@@ -129,7 +130,7 @@ def partner_env(tmp_path, monkeypatch):
         MagicMock(return_value=limiter),
     )
     record = AsyncMock()
-    monkeypatch.setattr(partner_module, "record_submission", record)
+    monkeypatch.setattr(logan_jobs, "record_submission", record)
 
     from app.main import create_app
 
@@ -444,7 +445,7 @@ class TestStatus:
         body = client.get(f"{BASE}/jobs/{JOB_ID}", headers=HEADERS).json()
 
         assert body["error"].endswith("the reason")
-        assert len(body["error"]) == partner_module.STDERR_TAIL
+        assert len(body["error"]) == galaxy_service.STDERR_TAIL
 
     def test_a_finished_job_has_no_retry_after(self, partner_env):
         client, galaxy, _ = partner_env

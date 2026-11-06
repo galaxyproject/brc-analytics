@@ -20,6 +20,10 @@ X-API-Key: <your key>
 A missing or wrong key gets `401`. Keep the key on your server. The API is
 meant to be called server-to-server, not from a browser.
 
+The same key works on the MCP server at `/api/v1/mcp/`: send it as an
+`X-API-Key` header and `logan_submit` runs under your partner budget, exactly
+like `POST /jobs` here. See the MCP page on brc-analytics.org for the tools.
+
 ## Limits
 
 - 60 submissions per hour.
