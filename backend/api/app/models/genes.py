@@ -118,7 +118,8 @@ class GeneSearchResult(_CamelModel):
 
 class GeneSearchResponse(_CamelModel):
     snapshot: GeneSnapshotInfo
-    # The query as searched: trimmed of surrounding whitespace.
+    # The words searched: the query lowercased, trimmed of punctuation, and
+    # without the words left out (see GeneCatalogService.search_words).
     query: str
     results: List[GeneSearchResult]
     # Whether more genes matched than were returned.

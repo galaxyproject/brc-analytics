@@ -217,6 +217,7 @@ def test_concurrent_requests(gene_service, gene_uid):
     [
         "UPDATE snapshot SET schema_version = 1",
         "DROP TABLE search_term",
+        "ALTER TABLE snapshot DROP COLUMN search_stop_words",
         "DROP TABLE alt_id",
         "ALTER TABLE transcript DROP COLUMN protein_product",
     ],

@@ -227,6 +227,16 @@ def test_tables_declare_their_keys(snapshot):
     }
 
 
+def test_the_snapshot_records_how_product_words_were_made(snapshot):
+    con, _ = snapshot
+    assert con.execute(
+        "SELECT search_stop_words, search_min_word_length FROM snapshot"
+    ).fetchone() == (
+        ["and", "domain", "family", "like", "of", "protein", "putative", "the"],
+        3,
+    )
+
+
 def test_search_terms(snapshot):
     con, _ = snapshot
     rows = con.execute(

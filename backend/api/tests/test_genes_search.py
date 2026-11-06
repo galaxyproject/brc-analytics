@@ -104,6 +104,54 @@ def test_several_words_each_match_the_last_as_a_prefix(gene_client):
     assert search(gene_client, "apical helicase")["results"] == []
 
 
+AMA1_AND_TRAMP = ["PF3D7_1133400", "PF3D7_1218000"]
+
+
+@pytest.mark.parametrize(
+    "q, searched, found",
+    [
+        # A product as the results list shows it: "1" is no product word.
+        ("apical membrane antigen 1", "apical membrane antigen", ["PF3D7_1133400"]),
+        # Stop words aren't product words either.
+        ("putative apical membrane protein", "apical membrane", AMA1_AND_TRAMP),
+        # Surrounding punctuation, as the build trims it from product words.
+        ("Apical, membrane.", "apical membrane", AMA1_AND_TRAMP),
+    ],
+)
+def test_words_no_product_word_can_be_are_left_out(gene_client, q, searched, found):
+    body = search(gene_client, q)
+    assert body["query"] == searched
+    assert [r["locusTag"] for r in body["results"]] == found
+
+
+@pytest.mark.parametrize("q", ["(AMA1)", "ama1,", '"AMA1"'])
+def test_a_lone_word_is_trimmed_of_punctuation(gene_client, q):
+    assert matches(search(gene_client, q)) == [("PF3D7_1133400", "name", "AMA1")]
+
+
+def test_a_lone_short_or_stop_word_is_kept(gene_client):
+    # It may start a longer term.
+    assert search(gene_client, "am")["query"] == "am"
+    assert [r["locusTag"] for r in search(gene_client, "am")["results"]] == [
+        "PF3D7_1133400"
+    ]
+    assert search(gene_client, "the")["query"] == "the"
+
+
+def test_a_query_of_only_left_out_words_keeps_its_last(gene_client):
+    assert search(gene_client, "of the")["query"] == "the"
+
+
+def test_internal_punctuation_is_kept(gene_client):
+    assert search(gene_client, "der1-2")["query"] == "der1-2"
+    assert search(gene_client, "PF3D7_0105400.1")["query"] == "pf3d7_0105400.1"
+
+
+@pytest.mark.parametrize("q", ["\U0010ffff", "a\U0010ffff", "\U0010ffff\U0010ffff"])
+def test_the_last_code_point_is_searched_not_an_error(gene_client, q):
+    assert search(gene_client, q)["results"] == []
+
+
 def test_one_word_finds_every_gene_it_starts_a_term_of(gene_client):
     assert [r["locusTag"] for r in search(gene_client, "apical")["results"]] == [
         "PF3D7_1133400",
@@ -215,6 +263,8 @@ def test_the_query_is_trimmed(gene_client):
         {},
         {"q": ""},
         {"q": "   "},
+        # No words once punctuation is trimmed.
+        {"q": "( )"},
         {"q": "a" * (MAX_SEARCH_LENGTH + 1)},
         {"q": " ".join(["ama"] * (MAX_SEARCH_WORDS + 1))},
         {"q": "ama", "limit": 0},
@@ -246,6 +296,10 @@ def test_whole_3d7_snapshot():
             assert [r["locusTag"] for r in search(client, q)["results"]] == [
                 "PF3D7_1133400"
             ]
+        assert [
+            r["locusTag"]
+            for r in search(client, "apical membrane antigen 1")["results"]
+        ] == ["PF3D7_1133400"]
         apical = [r["locusTag"] for r in search(client, "apical memb")["results"]]
         assert apical[0] == "PF3D7_1133400"
         assert "PF3D7_1218000" in apical
