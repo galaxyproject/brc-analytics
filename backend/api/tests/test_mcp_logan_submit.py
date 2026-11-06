@@ -299,7 +299,9 @@ class TestDedupe:
     def test_claim_outlasts_the_slowest_submit(self):
         # The history lookup, upload and tool request can each take a full
         # request timeout, and then the job id poll runs its own. A claim
-        # that lapses first lets a retry start a second search.
+        # that lapses first lets a retry start a second search. This pins the
+        # usual path; a stale-history retry or a last poll past the deadline
+        # can run longer, and the proxy's 300 s limit is what bounds those.
         slowest = (
             galaxy_service.KMINDEX_TOOL_REQUEST_TIMEOUT
             + 3 * galaxy_service.GALAXY_REQUEST_TIMEOUT
