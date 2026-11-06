@@ -44,10 +44,11 @@ logger = logging.getLogger(__name__)
 # window the same caller sending the same search gets the job it already
 # started, not a second search across every index.
 DEDUPE_TTL = 600
-# How long a claim made before submitting holds off a retry: long enough to
-# cover an upload and tool run, short enough that an interrupted submit
-# doesn't block the same search for the whole dedupe window.
-CLAIM_TTL = 120
+# How long a claim made before submitting holds off a retry. It has to
+# outlast the slowest submit -- history lookup, upload and tool request at a
+# request timeout each, then the job id poll -- or a retry in a backed-up
+# queue starts a second search. The proxy gives up on the call at 300 s.
+CLAIM_TTL = 300
 
 
 def http_error(e: HTTPException) -> dict:
@@ -144,7 +145,9 @@ async def logan_submit(
             job_id = await logan_jobs.submit_anonymous_job(request, submission, galaxy)
     except HTTPException as e:
         if _maybe_started(e):
-            await cache.set(dedupe_key, {"outcome": "unknown"}, CLAIM_TTL)
+            # Held as long as a job id would be: sending it again sooner
+            # could start the search a second time.
+            await cache.set(dedupe_key, {"outcome": "unknown"}, DEDUPE_TTL)
         else:
             await cache.delete(dedupe_key)
         return http_error(e)
@@ -176,10 +179,10 @@ def _claimed(existing: dict, partner: Optional[Partner]) -> dict:
     if existing.get("outcome") == "unknown":
         error = (
             "The same search just failed after Galaxy was asked to run it, so "
-            "it may be running anyway. Check logan_queue, or send it again "
-            "after the retry delay."
+            "it may be running anyway. Sending it again before the retry "
+            "delay could start it twice."
         )
-        retry_after = CLAIM_TTL
+        retry_after = DEDUPE_TTL
     else:
         error = "The same search is being started right now; ask again shortly."
         retry_after = int(logan_jobs.STATUS_RETRY_AFTER)

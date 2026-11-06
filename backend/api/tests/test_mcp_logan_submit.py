@@ -19,14 +19,14 @@ from app.core import dependencies
 from app.core.config import get_settings
 from app.core.partner_keys import generate_partner_key, hash_partner_key
 from app.models.galaxy import GalaxyJobResponse, KmindexQueueStatus
-from app.services import logan_jobs
+from app.services import galaxy_service, logan_jobs
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
     GalaxySubmitNotStarted,
     KmindexUnknownIndex,
 )
 from app.services.mcp_server import create_mcp_server
-from app.services.tools import logan_mcp
+from app.services.tools import logan_mcp, logan_tools
 from tests.test_mcp import _call_tool, _catalog_data, _parse_sse, _tool_names
 
 KEY = generate_partner_key()
@@ -38,6 +38,7 @@ SUNSET = (datetime.now(timezone.utc) + timedelta(days=90)).replace(microsecond=0
 class FakeCache:
     def __init__(self):
         self.store: dict[str, str] = {}
+        self.ttls: dict[str, int] = {}
 
     async def get(self, key):
         value = self.store.get(key)
@@ -45,12 +46,14 @@ class FakeCache:
 
     async def set(self, key, value, ttl=3600):
         self.store[key] = json.dumps(value)
+        self.ttls[key] = ttl
         return True
 
     async def set_if_absent(self, key, value, ttl):
         if key in self.store:
             return False
         self.store[key] = json.dumps(value)
+        self.ttls[key] = ttl
         return True
 
     async def delete(self, key):
@@ -293,6 +296,62 @@ class TestDedupe:
         assert "may" in again["error"]
         assert env.galaxy.submit_kmindex_query.await_count == 1
 
+    def test_claim_outlasts_the_slowest_submit(self):
+        # The history lookup, upload and tool request can each take a full
+        # request timeout, and then the job id poll runs its own. A claim
+        # that lapses first lets a retry start a second search.
+        slowest = (
+            galaxy_service.KMINDEX_TOOL_REQUEST_TIMEOUT
+            + 3 * galaxy_service.GALAXY_REQUEST_TIMEOUT
+        )
+        assert logan_mcp.CLAIM_TTL > slowest
+
+    @pytest.mark.asyncio
+    async def test_ambiguous_failure_holds_off_for_the_dedupe_window(
+        self, env, monkeypatch
+    ):
+        # The search may be running; a hold that lapses in two minutes and
+        # then says "send it again" starts the duplicate it exists to stop.
+        _as(monkeypatch, _request())
+        env.galaxy.submit_kmindex_query.side_effect = RuntimeError("reply lost")
+        await _submit()
+        again = await _submit()
+        (key,) = env.cache.store
+        assert env.cache.ttls[key] == logan_mcp.DEDUPE_TTL
+        assert again["retry_after_seconds"] == logan_mcp.DEDUPE_TTL
+        # logan_queue only has counts, so it can't help an agent find the job.
+        assert "logan_queue" not in again["error"]
+
+    @pytest.mark.asyncio
+    async def test_retry_that_loses_the_reclaim_starts_nothing(self, env, monkeypatch):
+        # Two retries of a failed job both clear its claim; only the one that
+        # claims again first may submit.
+        _as(monkeypatch, _request())
+        await _submit()
+        env.galaxy.get_job_status.return_value = MagicMock(
+            is_complete=True, is_successful=False
+        )
+        real_delete = env.cache.delete
+
+        async def delete_then_lose_the_race(key):
+            await real_delete(key)
+            await env.cache.set_if_absent(key, {"pending": True}, 1)
+            return True
+
+        monkeypatch.setattr(env.cache, "delete", delete_then_lose_the_race)
+        again = await _submit()
+        assert again["status_code"] == 409
+        assert env.galaxy.submit_kmindex_query.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_unreadable_status_reuses_the_job(self, env, monkeypatch):
+        _as(monkeypatch, _request())
+        await _submit()
+        env.galaxy.get_job_status.side_effect = RuntimeError("galaxy down")
+        again = await _submit()
+        assert again["status"] == "reused"
+        assert env.galaxy.submit_kmindex_query.await_count == 1
+
     @pytest.mark.asyncio
     async def test_refused_submit_can_be_sent_again(self, env, monkeypatch):
         _as(monkeypatch, _request())
@@ -434,6 +493,29 @@ class TestIndexesAndQueue:
         assert out["waiting"] == 3
         assert out["running"] == 1
 
+    def test_queue_failure_is_an_error_dict(self, tmp_path):
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_queue = AsyncMock(side_effect=RuntimeError("boom"))
+        out = _call_tool(self._mcp(tmp_path, galaxy), "logan_queue", {})
+        assert out["status_code"] == 502
+
+    @pytest.mark.parametrize("tool", ["logan_cohort", "logan_hits"])
+    def test_result_reads_go_through_the_rebuild(self, tmp_path, monkeypatch, tool):
+        # A finished job whose results expired has to turn into a merge here;
+        # handed back as is, the agent gets "expired" and nothing to wait on.
+        async def expired(*args, **kwargs):
+            return json.dumps({"status": "expired"})
+
+        async def rebuild(galaxy, job_id, out):
+            return {"status": "building", "saw": out["status"]}
+
+        monkeypatch.setattr(logan_tools, tool, expired)
+        monkeypatch.setattr(logan_mcp, "with_rebuild", rebuild)
+        out = _call_tool(
+            self._mcp(tmp_path, self._galaxy()), tool, {"job_id": "fe6f66a714dcbec8"}
+        )
+        assert out == {"status": "building", "saw": "expired"}
+
 
 class TestRebuild:
     JOB = "fe6f66a714dcbec8"
@@ -564,5 +646,5 @@ def test_anonymous_searches_run_as_the_service_account_in_their_own_history(
     galaxy = logan_jobs.anonymous_galaxy_service(MagicMock(), None)
     assert galaxy.credential.kind == "service"
     assert galaxy.credential.secret == "service-key"
-    assert galaxy.history_name == logan_jobs.MCP_HISTORY_NAME
+    assert galaxy.history_name == "BRC Logan MCP"
     get_settings.cache_clear()
