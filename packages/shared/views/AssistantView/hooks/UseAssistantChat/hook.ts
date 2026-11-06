@@ -62,7 +62,7 @@ function isRetryableSaveFailure(error: unknown): boolean {
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat state, the session and saved analysis on screen, the last save, sendMessage, clearField, and reset/retry functions.
+ * @returns Chat actions (send, clear a field, reset, retry) and chat state, including the session and saved analysis on screen and the last save.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -73,7 +73,6 @@ export const useAssistantChat = ({
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([]);
   const [schema, setSchema] = useState<AnalysisSchema | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionChip[]>([]);
-  const [isComplete, setIsComplete] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
   const [logan, setLogan] = useState<LoganContext | null>(null);
@@ -154,7 +153,6 @@ export const useAssistantChat = ({
     setMessages([]);
     setSchema(null);
     setSuggestions([]);
-    setIsComplete(false);
     setIsSaved(false);
     setHandoffUrl(null);
     setLogan(null);
@@ -169,7 +167,7 @@ export const useAssistantChat = ({
   // Hydrate from either an explicit initialSessionId (URL param, set by the
   // saved-analysis restore flow) or a localStorage-stored session. URL wins.
   // Either way we call the restore endpoint so we get computed handoff state
-  // (handoff_url, is_complete, suggestions), not just messages + schema.
+  // (handoff_url, suggestions), not just messages + schema.
   useEffect(() => {
     // Until the query settles a handed-over question is invisible, and
     // restoring on that first pass would race the question to the message list.
@@ -218,7 +216,6 @@ export const useAssistantChat = ({
         setMessages(restored.messages);
         setSchema(restored.schema_state);
         setSuggestions(restored.suggestions);
-        setIsComplete(restored.is_complete);
         setHandoffUrl(restored.handoff_url);
         setLogan(restored.logan ?? null);
         // Whether this is already on disk is the server's to answer. Inferring
@@ -300,7 +297,6 @@ export const useAssistantChat = ({
         setMessages(created.messages);
         setSchema(created.schema_state);
         setSuggestions(created.suggestions);
-        setIsComplete(created.is_complete);
         setHandoffUrl(created.handoff_url);
         setLogan(created.logan ?? null);
         // ?sessionId= goes too: it names the conversation this one displaced,
@@ -472,7 +468,6 @@ export const useAssistantChat = ({
 
         setSchema(response.schema_state);
         setSuggestions(response.suggestions);
-        setIsComplete(response.is_complete);
         setHandoffUrl(response.handoff_url);
         setLogan(response.logan ?? null);
         // Latched, not mirrored: a later turn whose write fails does not
@@ -495,12 +490,12 @@ export const useAssistantChat = ({
     [showSession]
   );
 
-  const sendMessage = useCallback(
+  const onSendMessage = useCallback(
     (message: string): Promise<void> => runTurn({ message }),
     [runTurn]
   );
 
-  const clearField = useCallback(
+  const onClearField = useCallback(
     async (field: ClearableField): Promise<void> => {
       // Nothing to clear before there is a conversation to clear it on.
       if (!sessionIdRef.current) return;
@@ -526,7 +521,7 @@ export const useAssistantChat = ({
     // be there to displace it again on a reload.
     sessionIdRef.current = null;
     localStorage.removeItem(sessionKey);
-    void sendMessage(question);
+    void onSendMessage(question);
     // Both parameters go: ?sessionId= outranks the stored pointer on mount, so
     // leaving it behind means a reload restores the very conversation the
     // question displaced and orphans the one it opened.
@@ -534,9 +529,9 @@ export const useAssistantChat = ({
       ASSISTANT_QUERY_PARAM.QUESTION,
       ASSISTANT_QUERY_PARAM.SESSION_ID,
     ]);
-  }, [question, router, sendMessage, sessionKey]);
+  }, [onSendMessage, question, router, sessionKey]);
 
-  const retry = useCallback(async (): Promise<void> => {
+  const onRetryTurn = useCallback(async (): Promise<void> => {
     if (!lastFailedRequest) return;
     const request = lastFailedRequest;
     setLastFailedRequest(null);
@@ -546,12 +541,12 @@ export const useAssistantChat = ({
     await runTurn(request);
   }, [lastFailedRequest, runTurn]);
 
-  const retryRestore = useCallback((): Promise<void> => {
+  const onRetryRestore = useCallback((): Promise<void> => {
     setRestoreAttempt((attempt) => attempt + 1);
     return Promise.resolve();
   }, []);
 
-  const resetSession = useCallback((): void => {
+  const onResetSession = useCallback((): void => {
     // The conversation left behind isn't deleted: it may be saved, which the
     // page can't always tell, and reopening a saved one would race the delete.
     // Unsaved, its live session simply expires.
@@ -572,28 +567,31 @@ export const useAssistantChat = ({
 
   // A failed message retries that message; a failed restore, the restore.
   let onRetry: (() => Promise<void>) | undefined;
-  if (lastFailedRequest) onRetry = retry;
-  else if (isRestoreFailed) onRetry = retryRestore;
+  if (lastFailedRequest) onRetry = onRetryTurn;
+  else if (isRestoreFailed) onRetry = onRetryRestore;
 
   return {
-    clearField,
-    error,
-    handoffUrl,
-    isComplete,
-    isRestoring,
-    isSaved,
-    lastSave,
-    loading,
-    logan,
-    messages,
-    onRetry,
-    resetSession,
-    retryRestore,
-    savedAnalysisId,
-    schema,
-    sendMessage,
-    shownSessionId,
-    suggestions,
+    actions: {
+      onClearField,
+      onResetSession,
+      onRetry,
+      onRetryRestore,
+      onSendMessage,
+    },
+    state: {
+      error,
+      handoffUrl,
+      isRestoring,
+      isSaved,
+      lastSave,
+      loading,
+      logan,
+      messages,
+      savedAnalysisId,
+      schema,
+      shownSessionId,
+      suggestions,
+    },
   };
 };
 

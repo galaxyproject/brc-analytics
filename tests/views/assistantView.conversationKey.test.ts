@@ -5,13 +5,13 @@ import { act, renderHook } from "@testing-library/react";
 // the user moves to a different conversation and kept otherwise.
 describe("useConversationKey", () => {
   test("starting a new analysis resets the session and moves the key", () => {
-    const resetSession = jest.fn();
-    const { result } = renderHook(() => useConversationKey(resetSession));
+    const onResetSession = jest.fn();
+    const { result } = renderHook(() => useConversationKey(onResetSession));
     const before = result.current.conversationKey;
 
     act(() => result.current.onNewAnalysis());
 
-    expect(resetSession).toHaveBeenCalledTimes(1);
+    expect(onResetSession).toHaveBeenCalledTimes(1);
     expect(result.current.conversationKey).not.toBe(before);
   });
 

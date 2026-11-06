@@ -118,7 +118,7 @@ describe("useAssistantChat with initialLoganJobId", () => {
       })
     );
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
 
     expect(mockPost).toHaveBeenCalledWith(
       "assistant/session",
@@ -127,9 +127,11 @@ describe("useAssistantChat with initialLoganJobId", () => {
     // The Logan job outranks a URL session id: no restore is attempted.
     expect(mockGet).not.toHaveBeenCalled();
     expect(localStorage.getItem(SESSION_KEY)).toBe("sess-logan");
-    expect(result.current.messages[0].role).toBe("assistant");
-    expect(result.current.schema?.organism.value).toBe("Plasmodium falciparum");
-    expect(result.current.logan?.job_id).toBe(JOB_ID);
+    expect(result.current.state.messages[0].role).toBe("assistant");
+    expect(result.current.state.schema?.organism.value).toBe(
+      "Plasmodium falciparum"
+    );
+    expect(result.current.state.logan?.job_id).toBe(JOB_ID);
     expect(mockReplace).toHaveBeenCalledWith(
       { pathname: "/assistant", query: {} },
       undefined,
@@ -142,9 +144,9 @@ describe("useAssistantChat with initialLoganJobId", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ initialLoganJobId: JOB_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
-    expect(result.current.error).toContain("expired");
-    expect(result.current.error).toContain(`/logan-search?job=${JOB_ID}`);
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
+    expect(result.current.state.error).toContain("expired");
+    expect(result.current.state.error).toContain(`/logan-search?job=${JOB_ID}`);
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
 
@@ -153,8 +155,8 @@ describe("useAssistantChat with initialLoganJobId", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ initialLoganJobId: JOB_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
-    expect(result.current.error).toContain("still running");
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
+    expect(result.current.state.error).toContain("still running");
   });
 
   it("maps a failed job", async () => {
@@ -162,8 +164,8 @@ describe("useAssistantChat with initialLoganJobId", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ initialLoganJobId: JOB_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
-    expect(result.current.error).toContain("failed");
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
+    expect(result.current.state.error).toContain("failed");
   });
 
   it("falls back to the generic message for anything else", async () => {
@@ -171,18 +173,18 @@ describe("useAssistantChat with initialLoganJobId", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ initialLoganJobId: JOB_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
-    expect(result.current.error).toContain("unavailable");
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
+    expect(result.current.state.error).toContain("unavailable");
   });
 
-  it("resetSession clears logan", async () => {
+  it("onResetSession clears logan", async () => {
     mockPost.mockReturnValue(resolves(SESSION));
     const { result } = renderHook(() =>
       useAssistantChat({ initialLoganJobId: JOB_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.logan).not.toBeNull());
-    act(() => result.current.resetSession());
-    expect(result.current.logan).toBeNull();
+    await waitFor(() => expect(result.current.state.logan).not.toBeNull());
+    act(() => result.current.actions.onResetSession());
+    expect(result.current.state.logan).toBeNull();
   });
 
   it("does not restore over the session it just opened", async () => {
@@ -198,12 +200,12 @@ describe("useAssistantChat with initialLoganJobId", () => {
         }),
       { initialProps: { jobId: JOB_ID } as { jobId?: string } }
     );
-    await waitFor(() => expect(result.current.logan).not.toBeNull());
+    await waitFor(() => expect(result.current.state.logan).not.toBeNull());
 
     rerender({ jobId: undefined });
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(mockGet).not.toHaveBeenCalled();
-    expect(result.current.logan?.job_id).toBe(JOB_ID);
+    expect(result.current.state.logan?.job_id).toBe(JOB_ID);
   });
 
   it("without a job id the hook restores as before", async () => {
@@ -215,12 +217,12 @@ describe("useAssistantChat with initialLoganJobId", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(mockPost).not.toHaveBeenCalled();
     expect(mockGet).toHaveBeenCalledWith(
       "assistant/session/stored-session",
       expect.anything()
     );
-    expect(result.current.logan).toBeNull();
+    expect(result.current.state.logan).toBeNull();
   });
 });
