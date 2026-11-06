@@ -148,9 +148,14 @@ class KmindexQuerySubmission(BaseModel):
         kmindex segfaults on a query with no header line, and API and MCP
         callers often send just the bases.
         """
-        if value.strip() and not value.lstrip().startswith(">"):
+        stripped = value.lstrip()
+        if not stripped:
+            return value
+        if not stripped.startswith(">"):
             return f">{UNNAMED_QUERY}\n" + value
-        return value
+        # Galaxy gets the query stripped anyway; stripping here too means the
+        # record and base-count checks below see an indented header as one.
+        return stripped
 
     @field_validator("sequence")
     @classmethod
