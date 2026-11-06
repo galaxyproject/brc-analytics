@@ -465,6 +465,20 @@ class TestQueryValidation:
         )
         assert submission.sequence == "\n>mine\nACGT\n"
 
+    def test_indented_header_is_kept(self):
+        # The form sends the textarea as typed, so a paste can start with
+        # spaces before the ">".
+        submission = KmindexQuerySubmission(
+            sequence="  >mine\nACGT\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == "  >mine\nACGT\n"
+
+    def test_blank_sequence_gets_no_header(self):
+        # A made-up header would hide the blank input from the empty check
+        # and send ">query" alone to Galaxy.
+        submission = KmindexQuerySubmission(sequence="  \n", indexes=["GENOMIC_BCT"])
+        assert submission.sequence == "  \n"
+
 
 class TestQueryLengthCap:
     """The UI enforces the same ceiling, but the UI is not the only caller."""

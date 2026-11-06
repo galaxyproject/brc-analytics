@@ -143,9 +143,7 @@ class KmindexQuerySubmission(BaseModel):
         kmindex segfaults on a query with no header line, and API and MCP
         callers often send just the bases.
         """
-        if value.strip() and not any(
-            line.startswith(">") for line in value.splitlines()
-        ):
+        if value.strip() and not value.lstrip().startswith(">"):
             return ">query\n" + value
         return value
 
