@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from fastapi import HTTPException
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.core import dependencies
@@ -37,17 +36,12 @@ class MCPRateLimitMiddleware:
                 partner = dependencies.authenticate_partner_key(key)
             except HTTPException:
                 partner = None
-        try:
-            if partner is not None:
-                await dependencies.get_partner_rate_limiter().check(
-                    request, principal=partner.partner_id
-                )
-            else:
-                await dependencies.get_rate_limiter().check(request)
-        except HTTPException as e:
-            response = JSONResponse(
-                {"detail": e.detail}, status_code=e.status_code, headers=e.headers
+        # A spent budget raises HTTPException, which FastAPI's handler turns
+        # into the same 429 and Retry-After the routers send.
+        if partner is not None:
+            await dependencies.get_partner_rate_limiter().check(
+                request, principal=partner.partner_id
             )
-            await response(scope, receive, send)
-            return
+        else:
+            await dependencies.get_rate_limiter().check(request)
         await self.app(scope, receive, send)

@@ -112,6 +112,7 @@ def test_spent_budget_answers_429_before_the_mcp_app(limiters):
         response = client.post("/api/v1/mcp/", json=INIT, headers=ACCEPT)
     assert response.status_code == 429
     assert response.headers["Retry-After"] == "30"
+    assert response.json() == {"detail": "over"}
 
 
 def test_slashless_path_is_still_charged(limiters):
@@ -122,3 +123,23 @@ def test_slashless_path_is_still_charged(limiters):
         )
     assert response.status_code == 200
     general.check.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_non_http_traffic_passes_through_uncharged(monkeypatch):
+    # Lifespan and websocket scopes have no headers or client to charge, and
+    # an MCP session manager that never sees lifespan never starts.
+    from app.core.mcp_rate_limit import MCPRateLimitMiddleware
+
+    general = MagicMock()
+    general.check = AsyncMock(return_value={})
+    monkeypatch.setattr(
+        dependencies, "get_rate_limiter", MagicMock(return_value=general)
+    )
+    inner = AsyncMock()
+    scope = {"type": "lifespan"}
+
+    await MCPRateLimitMiddleware(inner)(scope, AsyncMock(), AsyncMock())
+
+    inner.assert_awaited_once()
+    general.check.assert_not_awaited()
