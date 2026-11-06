@@ -563,7 +563,7 @@ class TestRebuild:
         galaxy = self._galaxy(is_successful=False, stderr="x" * 5000)
         out = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
         assert out["status"] == "failed"
-        assert len(out["error"]) == logan_jobs.STDERR_TAIL
+        assert len(out["error"]) == galaxy_service.STDERR_TAIL
         galaxy.get_kmindex_results.assert_not_awaited()
 
     @pytest.mark.asyncio

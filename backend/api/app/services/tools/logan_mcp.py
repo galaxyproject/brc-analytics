@@ -29,6 +29,7 @@ from app.core.rate_limit import client_ip
 from app.models.galaxy import KmindexQuerySubmission
 from app.services import logan_jobs
 from app.services.galaxy_service import (
+    STDERR_TAIL,
     AggregationLane,
     GalaxyJobAggregating,
     GalaxyJobNotComplete,
@@ -303,7 +304,7 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
         return {
             "status": "failed",
             "job_id": job_id,
-            "error": (status.stderr or "")[-logan_jobs.STDERR_TAIL :] or None,
+            "error": (status.stderr or "")[-STDERR_TAIL:] or None,
             "results_url": results_url_for(job_id),
         }
     if await galaxy.cache.get(_build_failure_key(job_id)):

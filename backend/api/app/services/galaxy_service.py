@@ -219,6 +219,11 @@ LIVE_JOB_STATUS_TTL = 10
 # it rejected outright ("Invalid access token."), which means a bad audience,
 # scope, or signature. Only the first is something the user can fix by
 # connecting their account -- see galaxy/lib/galaxy/authnz/managers.py.
+# How much of a failed job's stderr any reader gets. The status routes are
+# unauthenticated, and tool output can name server paths and hosts; the end of
+# stderr is the part that says why the job failed.
+STDERR_TAIL = 2000
+
 UNLINKED_ACCOUNT_MARKERS = ("locate user", "log into galaxy")
 
 
@@ -2781,8 +2786,8 @@ class GalaxyService:
                 updated_time=job_data["update_time"],
                 is_complete=state in TERMINAL_JOB_STATES,
                 is_successful=state == GalaxyJobState.OK,
-                stdout=job_data.get("stdout"),
-                stderr=job_data.get("stderr"),
+                stdout=None,
+                stderr=(job_data.get("stderr") or "")[-STDERR_TAIL:] or None,
                 exit_code=job_data.get("exit_code"),
                 copied_from_job_id=job_data.get("copied_from_job_id"),
                 # Carried for in-process callers (see the field's comment);

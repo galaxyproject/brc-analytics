@@ -53,10 +53,6 @@ RESULTS_RETRY_AFTER = "15"
 # says to watch evicted_keys.
 IDEMPOTENCY_TTL = CacheTTL.ONE_DAY
 
-
-# How much of a failed job's stderr a caller sees.
-STDERR_TAIL = 2000
-
 MCP_HISTORY_NAME = "BRC Logan MCP"
 
 

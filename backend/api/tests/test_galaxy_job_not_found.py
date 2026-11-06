@@ -10,6 +10,7 @@ import pytest
 
 from app.api.v1.galaxy import get_galaxy_service
 from app.services.galaxy_service import GalaxyJobNotFound
+from tests.test_galaxy_service import service  # noqa: F401
 from tests.test_galaxy_submit_ownership import app_client  # noqa: F401
 
 JOB_ID = "0123456789abcdef"
@@ -158,33 +159,37 @@ def test_show_job_with_an_undecodable_id_logs_no_error(caplog):
     assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
 
 
-def test_public_status_only_carries_the_end_of_stderr(app_client):  # noqa: F811
+@pytest.mark.parametrize(
+    "path", [f"/api/v1/galaxy/jobs/{JOB_ID}/status", f"/api/v1/galaxy/jobs/{JOB_ID}"]
+)
+def test_public_job_routes_only_carry_the_end_of_stderr(
+    app_client,
+    service,
+    path,  # noqa: F811
+):
     # A failed job's status comes from Galaxy's full job dict, whose tool
-    # output can name server paths and hosts. This route is unauthenticated,
-    # so it gets the same tail the partner API and MCP do, and no stdout.
-    from app.models.galaxy import GalaxyJobStatus
-    from app.services.logan_jobs import STDERR_TAIL
+    # output can name server paths and hosts. Both routes are unauthenticated,
+    # so they get the same tail the partner API and MCP do, and no stdout.
+    from app.services.galaxy_service import STDERR_TAIL
 
     app, client = app_client
-    service = MagicMock()
-    service.is_available.return_value = True
-    service.get_job_status = AsyncMock(
-        return_value=GalaxyJobStatus(
-            job_id=JOB_ID,
-            state="error",
-            created_time="t",
-            updated_time="t",
-            is_complete=True,
-            stdout="/srv/galaxy/jobs/123 on node7",
-            stderr="x" * STDERR_TAIL + "Segmentation fault",
-            exit_code=139,
-        )
+    service.gi.jobs.show_job = MagicMock(
+        return_value={
+            "create_time": "t",
+            "exit_code": 139,
+            "outputs": {},
+            "state": "error",
+            "stderr": "x" * STDERR_TAIL + "Segmentation fault",
+            "stdout": "/srv/galaxy/jobs/123 on node7",
+            "update_time": "t",
+        }
     )
     app.dependency_overrides[get_galaxy_service] = lambda: service
 
-    body = client.get(f"/api/v1/galaxy/jobs/{JOB_ID}/status").json()
+    body = client.get(path).json()
+    status = body.get("status", body)
 
-    assert body["stdout"] is None
-    assert len(body["stderr"]) == STDERR_TAIL
-    assert body["stderr"].endswith("Segmentation fault")
-    assert body["exit_code"] == 139
+    assert status["stdout"] is None
+    assert len(status["stderr"]) == STDERR_TAIL
+    assert status["stderr"].endswith("Segmentation fault")
+    assert status["exit_code"] == 139

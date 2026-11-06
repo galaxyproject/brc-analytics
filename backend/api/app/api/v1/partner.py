@@ -34,6 +34,7 @@ from app.models.galaxy import (
 from app.models.logan import JOB_ID_PATTERN
 from app.models.partner import PartnerJobCreated, PartnerJobStatus
 from app.services.galaxy_service import (
+    STDERR_TAIL,
     GalaxyJobAggregating,
     GalaxyJobFailed,
     GalaxyJobNotComplete,
@@ -43,7 +44,6 @@ from app.services.galaxy_service import (
 from app.services.logan_jobs import (
     RESULTS_RETRY_AFTER,
     STATUS_RETRY_AFTER,
-    STDERR_TAIL,
     partner_galaxy_service,
     require_galaxy,
     submit_partner_job,
