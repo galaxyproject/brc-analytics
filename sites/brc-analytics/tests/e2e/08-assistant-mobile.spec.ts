@@ -1,4 +1,4 @@
-import { type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 import type {
   AssistantChatResponse,
   SchemaFieldState,
@@ -10,6 +10,7 @@ import {
 } from "@repo/shared/views/AssistantView/components/Conversation/components/Completion/constants";
 import { ARIA_LABEL } from "@repo/shared/views/AssistantView/components/Conversation/components/Composer/constants";
 import { HEADING as SUGGESTIONS_HEADING } from "@repo/shared/views/AssistantView/components/Conversation/components/Suggestions/constants";
+import { TABS_LABEL } from "@repo/shared/views/AssistantView/components/Layout/constants";
 import { expect, test } from "./utils/fixtures";
 
 const ASSISTANT_URL = "/assistant?assistant-ui=true";
@@ -52,6 +53,27 @@ const COMPLETE_REPLY_WITH_SUGGESTION: AssistantChatResponse = {
   ...COMPLETE_REPLY,
   suggestions: [{ label: "What's next?", message: "What's next?" }],
 };
+
+/**
+ * Reads an element's height.
+ * @param locator - The element.
+ * @returns Its rendered height, in pixels.
+ */
+async function getHeight(locator: Locator): Promise<number> {
+  return locator.evaluate((element) => element.getBoundingClientRect().height);
+}
+
+/**
+ * Reads the page's scroll padding, which focus and scrolling into view stop
+ * below.
+ * @param page - The Playwright page.
+ * @returns The html element's computed `scroll-padding-top`, in pixels.
+ */
+async function getScrollPaddingTop(page: Page): Promise<number> {
+  return page.evaluate(() =>
+    parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)
+  );
+}
 
 /**
  * Stands in for the backend, which this suite doesn't run: the assistant
@@ -140,6 +162,57 @@ test.describe("BRC Analytics - Assistant, completed setup", () => {
       await expect(
         page.getByRole("heading", { name: COMPLETION_HEADING })
       ).toBeHidden();
+    });
+  });
+});
+
+test.describe("BRC Analytics - Assistant, pinned tab bar", () => {
+  test.describe("on a phone", () => {
+    test.use({ viewport: { height: 500, width: 390 } });
+
+    test("keeps a focused control below the tab bar", async ({ page }) => {
+      await mockBackend(page, COMPLETE_REPLY);
+      await page.goto(ASSISTANT_URL);
+      const tabBar = page
+        .locator(":has(> .MuiTabs-root)")
+        .filter({ has: page.getByRole("tablist", { name: TABS_LABEL }) });
+      const expected =
+        (await getHeight(page.locator("header"))) + (await getHeight(tabBar));
+      // The tab bar's height reaches the scroll padding once it is measured.
+      await expect
+        .poll(() => getScrollPaddingTop(page))
+        .toBeCloseTo(expected, 0);
+
+      await page.getByRole("tab", { name: /History/ }).click();
+      const signIn = page
+        .getByRole("tabpanel", { name: /History/ })
+        .getByRole("button", { name: "Sign in" });
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      );
+      await signIn.focus();
+      const tabBarBox = await tabBar.boundingBox();
+      const signInBox = await signIn.boundingBox();
+      expect(signInBox?.y).toBeGreaterThanOrEqual(
+        (tabBarBox?.y ?? 0) + (tabBarBox?.height ?? 0) - 1
+      );
+    });
+  });
+
+  test.describe("on a desktop", () => {
+    test.use({ viewport: { height: 900, width: 1440 } });
+
+    // The tab bar is hidden there, so only the header pads the page.
+    test("keeps the header's scroll padding", async ({ page }) => {
+      await mockBackend(page, COMPLETE_REPLY);
+      await page.goto(ASSISTANT_URL);
+      await expect(
+        page.getByRole("tablist", { name: TABS_LABEL })
+      ).toBeHidden();
+      expect(await getScrollPaddingTop(page)).toBeCloseTo(
+        await getHeight(page.locator("header")),
+        0
+      );
     });
   });
 });

@@ -19,7 +19,9 @@ import {
 
 // Pinned beneath the header while the page scrolls the active tab, and
 // hidden on wider screens, where the columns sit side by side. Its tabs sit
-// inside the page's scroll padding, so focusing one shouldn't scroll the page.
+// inside the page's scroll padding; `pinnedFocus` is there so focusing one
+// doesn't scroll the page, though findable-ui's compiled selector doesn't
+// reach the tabs yet.
 // Its padding and the track and tab padding in `StyledTabs` add up to the
 // `TAB_BAR_HEIGHT` fallback; update it when they change.
 export const StyledTabBar = styled("div")`
