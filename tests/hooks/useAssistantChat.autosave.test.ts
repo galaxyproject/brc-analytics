@@ -131,7 +131,7 @@ describe("useAssistantChat auto-save", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isSaved).toBe(true));
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
     expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID);
   });
 
@@ -151,7 +151,7 @@ describe("useAssistantChat auto-save", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isSaved).toBe(true));
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
     expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
   });
 
@@ -168,12 +168,12 @@ describe("useAssistantChat auto-save", () => {
     const { rerender, result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.isSaved).toBe(true));
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
 
     auth(false);
     rerender();
 
-    await waitFor(() => expect(result.current.isSaved).toBe(false));
+    await waitFor(() => expect(result.current.state.isSaved).toBe(false));
 
     // And the latch went with it: signing back in re-saves rather than
     // finding this session already attempted.
@@ -193,9 +193,9 @@ describe("useAssistantChat auto-save", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
-    expect(result.current.isSaved).toBe(false);
+    expect(result.current.state.isSaved).toBe(false);
   });
 
   test("a failed save leaves the label off rather than claiming otherwise", async () => {
@@ -209,7 +209,7 @@ describe("useAssistantChat auto-save", () => {
     await waitFor(() =>
       expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
     );
-    expect(result.current.isSaved).toBe(false);
+    expect(result.current.state.isSaved).toBe(false);
   });
 
   test("a save that could succeed later is tried again", async () => {
@@ -231,7 +231,7 @@ describe("useAssistantChat auto-save", () => {
     );
 
     await act(async () => {
-      await result.current.sendMessage("still here");
+      await result.current.actions.onSendMessage("still here");
     });
 
     await waitFor(() =>
@@ -258,7 +258,7 @@ describe("useAssistantChat auto-save", () => {
         await jest.advanceTimersByTimeAsync(5_000);
       });
 
-      await waitFor(() => expect(result.current.isSaved).toBe(true));
+      await waitFor(() => expect(result.current.state.isSaved).toBe(true));
       expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(2);
     } finally {
       jest.useRealTimers();
@@ -313,7 +313,7 @@ describe("useAssistantChat auto-save", () => {
     );
 
     await act(async () => {
-      await result.current.sendMessage("still here");
+      await result.current.actions.onSendMessage("still here");
     });
 
     expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1);
@@ -339,10 +339,10 @@ describe("useAssistantChat auto-save", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
     await act(async () => {
-      await result.current.sendMessage("hello");
+      await result.current.actions.onSendMessage("hello");
     });
 
-    expect(result.current.isSaved).toBe(false);
+    expect(result.current.state.isSaved).toBe(false);
 
     mockClient.assistantChat.mockResolvedValue({
       handoff_url: null,
@@ -354,10 +354,10 @@ describe("useAssistantChat auto-save", () => {
       suggestions: [],
     } as unknown as Awaited<ReturnType<typeof mockClient.assistantChat>>);
     await act(async () => {
-      await result.current.sendMessage("again");
+      await result.current.actions.onSendMessage("again");
     });
 
-    expect(result.current.isSaved).toBe(true);
+    expect(result.current.state.isSaved).toBe(true);
   });
 
   test("a confirmed save is reported with the analysis it saved", async () => {
@@ -370,11 +370,13 @@ describe("useAssistantChat auto-save", () => {
     );
 
     await waitFor(() =>
-      expect(result.current.lastSave).toEqual({ savedAnalysisId: "analysis-1" })
+      expect(result.current.state.lastSave).toEqual({
+        savedAnalysisId: "analysis-1",
+      })
     );
     // Signing in saves without a turn, so the save is the only thing that can
     // tell the chat history which row is now open.
-    expect(result.current.savedAnalysisId).toBe("analysis-1");
+    expect(result.current.state.savedAnalysisId).toBe("analysis-1");
   });
 
   test("only a turn the backend wrote is reported as a save", async () => {
@@ -388,10 +390,10 @@ describe("useAssistantChat auto-save", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
     await act(async () => {
-      await result.current.sendMessage("hello");
+      await result.current.actions.onSendMessage("hello");
     });
 
-    expect(result.current.lastSave).toBeNull();
+    expect(result.current.state.lastSave).toBeNull();
 
     mockClient.assistantChat.mockResolvedValue({
       ...chatReply(),
@@ -399,10 +401,12 @@ describe("useAssistantChat auto-save", () => {
       saved_analysis_id: "analysis-1",
     });
     await act(async () => {
-      await result.current.sendMessage("again");
+      await result.current.actions.onSendMessage("again");
     });
 
-    expect(result.current.lastSave).toEqual({ savedAnalysisId: "analysis-1" });
+    expect(result.current.state.lastSave).toEqual({
+      savedAnalysisId: "analysis-1",
+    });
   });
 
   test("the save is attempted once per session, not once per render", async () => {
@@ -419,7 +423,7 @@ describe("useAssistantChat auto-save", () => {
     rerender();
     rerender();
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1);
   });
 
@@ -447,17 +451,17 @@ describe("useAssistantChat auto-save", () => {
     } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
     rerender({ initialSessionId: OPENED_ID });
     await waitFor(() =>
-      expect(result.current.savedAnalysisId).toBe("analysis-opened")
+      expect(result.current.state.savedAnalysisId).toBe("analysis-opened")
     );
 
     await act(async () => {
       save.resolve({ saved_analysis_id: "analysis-left-behind" });
     });
 
-    expect(result.current.lastSave).toEqual({
+    expect(result.current.state.lastSave).toEqual({
       savedAnalysisId: "analysis-left-behind",
     });
-    expect(result.current.savedAnalysisId).toBe("analysis-opened");
+    expect(result.current.state.savedAnalysisId).toBe("analysis-opened");
   });
 
   test("a save that lands after a turn started still selects its analysis", async () => {
@@ -476,12 +480,12 @@ describe("useAssistantChat auto-save", () => {
     );
 
     await act(async () => {
-      await result.current.sendMessage("still there?");
+      await result.current.actions.onSendMessage("still there?");
     });
     await act(async () => {
       save.resolve({ saved_analysis_id: "analysis-1" });
     });
 
-    expect(result.current.savedAnalysisId).toBe("analysis-1");
+    expect(result.current.state.savedAnalysisId).toBe("analysis-1");
   });
 });

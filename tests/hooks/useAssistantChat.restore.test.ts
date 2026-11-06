@@ -77,9 +77,9 @@ describe("useAssistantChat restore", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
-    expect(result.current.error).toBeNull();
+    expect(result.current.state.error).toBeNull();
   });
 
   test("a 404 on a session named in the URL says so rather than rendering blank", async () => {
@@ -89,8 +89,8 @@ describe("useAssistantChat restore", () => {
       useAssistantChat({ initialSessionId: STORED_ID, sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
-    expect(result.current.error).toMatch(/no longer available/i);
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
+    expect(result.current.state.error).toMatch(/no longer available/i);
   });
 
   test("a 403 drops the pointer -- this browser can never restore that session", async () => {
@@ -103,7 +103,7 @@ describe("useAssistantChat restore", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
 
@@ -115,7 +115,7 @@ describe("useAssistantChat restore", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.error).not.toBeNull());
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
     expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
   });
 
@@ -127,7 +127,7 @@ describe("useAssistantChat restore", () => {
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
 
-    await waitFor(() => expect(result.current.error).not.toBeNull());
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
     expect(localStorage.getItem(SESSION_KEY)).toBe(STORED_ID);
   });
 
@@ -142,10 +142,10 @@ describe("useAssistantChat restore", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
 
     await act(async () => {
-      await result.current.sendMessage("still there?");
+      await result.current.actions.onSendMessage("still there?");
     });
 
     expect(mockClient.assistantChat).toHaveBeenCalledWith(
@@ -163,9 +163,9 @@ describe("useAssistantChat restore", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ initialSessionId: STORED_ID, sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.error).not.toBeNull());
+    await waitFor(() => expect(result.current.state.error).not.toBeNull());
 
-    act(() => result.current.resetSession());
+    act(() => result.current.actions.onResetSession());
 
     expect(mockReplace).toHaveBeenCalledWith(
       expect.objectContaining({ query: {} }),
@@ -242,7 +242,9 @@ async function renderRestored(): Promise<
       useAssistantChat({ initialSessionId, sessionKey: SESSION_KEY }),
     { initialProps: {} }
   );
-  await waitFor(() => expect(rendered.result.current.messages).toHaveLength(2));
+  await waitFor(() =>
+    expect(rendered.result.current.state.messages).toHaveLength(2)
+  );
   return rendered;
 }
 
@@ -264,17 +266,17 @@ describe("useAssistantChat switching conversations on the page", () => {
 
     mockQuery = { sessionId: OPENED_ID };
     rerender({ initialSessionId: OPENED_ID });
-    await waitFor(() => expect(result.current.isRestoring).toBe(true));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(true));
 
-    act(() => result.current.resetSession());
+    act(() => result.current.actions.onResetSession());
     mockQuery = {};
     rerender({});
     await act(async () => {
       opening.resolve(restoredConversation(OPENED_ID, "opened reply"));
     });
 
-    expect(result.current.isRestoring).toBe(false);
-    expect(result.current.messages).toEqual([]);
+    expect(result.current.state.isRestoring).toBe(false);
+    expect(result.current.state.messages).toEqual([]);
   });
 
   test("a reply for the conversation left behind does not land in the one opened", async () => {
@@ -283,7 +285,7 @@ describe("useAssistantChat switching conversations on the page", () => {
     mockClient.assistantChat.mockReturnValueOnce(turn.promise);
     let sending!: Promise<void>;
     act(() => {
-      sending = result.current.sendMessage("still there?");
+      sending = result.current.actions.onSendMessage("still there?");
     });
 
     mockClient.assistantRestore.mockResolvedValueOnce(
@@ -291,7 +293,7 @@ describe("useAssistantChat switching conversations on the page", () => {
     );
     rerender({ initialSessionId: OPENED_ID });
     await waitFor(() =>
-      expect(result.current.messages[1]?.content).toBe("opened reply")
+      expect(result.current.state.messages[1]?.content).toBe("opened reply")
     );
 
     await act(async () => {
@@ -299,13 +301,12 @@ describe("useAssistantChat switching conversations on the page", () => {
       await sending;
     });
 
-    expect(result.current.messages.map(({ content }) => content)).toEqual([
-      "hi",
-      "opened reply",
-    ]);
-    expect(result.current.shownSessionId).toBe(OPENED_ID);
+    expect(result.current.state.messages.map(({ content }) => content)).toEqual(
+      ["hi", "opened reply"]
+    );
+    expect(result.current.state.shownSessionId).toBe(OPENED_ID);
     expect(localStorage.getItem(SESSION_KEY)).toBe(OPENED_ID);
-    expect(result.current.loading).toBe(false);
+    expect(result.current.state.loading).toBe(false);
   });
 
   test("a conversation that fails to load for a transient reason is not shown as open", async () => {
@@ -316,10 +317,10 @@ describe("useAssistantChat switching conversations on the page", () => {
     mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
 
     rerender({ initialSessionId: OPENED_ID });
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
 
-    expect(result.current.error).not.toBeNull();
-    expect(result.current.shownSessionId).toBeNull();
+    expect(result.current.state.error).not.toBeNull();
+    expect(result.current.state.shownSessionId).toBeNull();
   });
 
   test("a conversation that failed to load can be restored again on request", async () => {
@@ -328,20 +329,20 @@ describe("useAssistantChat switching conversations on the page", () => {
     const { rerender, result } = await renderRestored();
     mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
     rerender({ initialSessionId: OPENED_ID });
-    await waitFor(() => expect(result.current.onRetry).toBeDefined());
+    await waitFor(() => expect(result.current.actions.onRetry).toBeDefined());
 
     mockClient.assistantRestore.mockResolvedValueOnce(
       restoredConversation(OPENED_ID, "opened reply")
     );
     await act(async () => {
-      await result.current.onRetry?.();
+      await result.current.actions.onRetry?.();
     });
 
     await waitFor(() =>
-      expect(result.current.messages[1]?.content).toBe("opened reply")
+      expect(result.current.state.messages[1]?.content).toBe("opened reply")
     );
-    expect(result.current.shownSessionId).toBe(OPENED_ID);
-    expect(result.current.error).toBeNull();
+    expect(result.current.state.shownSessionId).toBe(OPENED_ID);
+    expect(result.current.state.error).toBeNull();
   });
 
   test("a save that lands for the conversation left behind is reported against it", async () => {
@@ -352,14 +353,16 @@ describe("useAssistantChat switching conversations on the page", () => {
     mockClient.assistantChat.mockReturnValueOnce(turn.promise);
     let sending!: Promise<void>;
     act(() => {
-      sending = result.current.sendMessage("still there?");
+      sending = result.current.actions.onSendMessage("still there?");
     });
 
     mockClient.assistantRestore.mockResolvedValueOnce(
       restoredConversation(OPENED_ID, "opened reply")
     );
     rerender({ initialSessionId: OPENED_ID });
-    await waitFor(() => expect(result.current.shownSessionId).toBe(OPENED_ID));
+    await waitFor(() =>
+      expect(result.current.state.shownSessionId).toBe(OPENED_ID)
+    );
 
     await act(async () => {
       turn.resolve({
@@ -370,7 +373,7 @@ describe("useAssistantChat switching conversations on the page", () => {
       await sending;
     });
 
-    expect(result.current.lastSave).toEqual({
+    expect(result.current.state.lastSave).toEqual({
       savedAnalysisId: "analysis-left-behind",
     });
   });
@@ -380,7 +383,7 @@ describe("useAssistantChat switching conversations on the page", () => {
     // a saved one's session would race reopening it -- so nothing is deleted.
     const { result } = await renderRestored();
 
-    act(() => result.current.resetSession());
+    act(() => result.current.actions.onResetSession());
 
     expect(mockClient.assistantDeleteSession).not.toHaveBeenCalled();
   });
@@ -391,15 +394,15 @@ describe("useAssistantChat switching conversations on the page", () => {
     mockClient.assistantRestore.mockRejectedValueOnce(httpError(404));
 
     rerender({ initialSessionId: OPENED_ID });
-    await waitFor(() => expect(result.current.isRestoring).toBe(false));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
 
-    expect(result.current.messages).toEqual([]);
-    expect(result.current.schema).toBeNull();
-    expect(result.current.isSaved).toBe(false);
-    expect(result.current.error).toMatch(/no longer available/i);
+    expect(result.current.state.messages).toEqual([]);
+    expect(result.current.state.schema).toBeNull();
+    expect(result.current.state.isSaved).toBe(false);
+    expect(result.current.state.error).toMatch(/no longer available/i);
     // Nothing is shown, so the history highlights nothing and the conversation
     // can be picked again to retry.
-    expect(result.current.shownSessionId).toBeNull();
+    expect(result.current.state.shownSessionId).toBeNull();
   });
 
   test("starting a new analysis mid-restore does not bring the old conversation back", async () => {
@@ -412,15 +415,15 @@ describe("useAssistantChat switching conversations on the page", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
-    await waitFor(() => expect(result.current.isRestoring).toBe(true));
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(true));
 
-    act(() => result.current.resetSession());
+    act(() => result.current.actions.onResetSession());
     await act(async () => {
       restoring.resolve(restoredConversation(STORED_ID, "stored reply"));
     });
 
-    expect(result.current.messages).toEqual([]);
-    expect(result.current.shownSessionId).toBeNull();
+    expect(result.current.state.messages).toEqual([]);
+    expect(result.current.state.shownSessionId).toBeNull();
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
 
@@ -430,7 +433,7 @@ describe("useAssistantChat switching conversations on the page", () => {
   test("a restore reports the saved analysis it brought back", async () => {
     const { result } = await renderRestored();
 
-    expect(result.current.savedAnalysisId).toBe(`analysis-${STORED_ID}`);
+    expect(result.current.state.savedAnalysisId).toBe(`analysis-${STORED_ID}`);
   });
 
   test("a turn reports the saved analysis it belongs to", async () => {
@@ -442,13 +445,13 @@ describe("useAssistantChat switching conversations on the page", () => {
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
     );
-    expect(result.current.savedAnalysisId).toBeNull();
+    expect(result.current.state.savedAnalysisId).toBeNull();
 
     await act(async () => {
-      await result.current.sendMessage("hello");
+      await result.current.actions.onSendMessage("hello");
     });
 
-    expect(result.current.savedAnalysisId).toBe("analysis-first-save");
+    expect(result.current.state.savedAnalysisId).toBe("analysis-first-save");
   });
 
   test("opening another conversation moves to its saved analysis", async () => {
@@ -460,15 +463,15 @@ describe("useAssistantChat switching conversations on the page", () => {
     rerender({ initialSessionId: OPENED_ID });
 
     await waitFor(() =>
-      expect(result.current.savedAnalysisId).toBe(`analysis-${OPENED_ID}`)
+      expect(result.current.state.savedAnalysisId).toBe(`analysis-${OPENED_ID}`)
     );
   });
 
   test("a new analysis has no saved analysis until it is saved", async () => {
     const { result } = await renderRestored();
 
-    act(() => result.current.resetSession());
+    act(() => result.current.actions.onResetSession());
 
-    expect(result.current.savedAnalysisId).toBeNull();
+    expect(result.current.state.savedAnalysisId).toBeNull();
   });
 });

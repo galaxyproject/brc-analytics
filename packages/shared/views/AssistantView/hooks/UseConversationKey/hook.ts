@@ -7,18 +7,18 @@ import type { UseConversationKey } from "./types";
  * the history -- so the panel starts afresh, unsent draft included. An open
  * that fails, loses to a later navigation, or retries the conversation already
  * named, a retried restore, and a conversation's own replies leave it be.
- * @param resetSession - Starts a new conversation.
+ * @param onResetSession - Starts a new conversation.
  * @returns The key, and the sidebar's new analysis and opened handlers.
  */
 export const useConversationKey = (
-  resetSession: () => void
+  onResetSession: () => void
 ): UseConversationKey => {
   const [conversationKey, setConversationKey] = useState(0);
 
   const onNewAnalysis = useCallback((): void => {
-    resetSession();
+    onResetSession();
     setConversationKey((key) => key + 1);
-  }, [resetSession]);
+  }, [onResetSession]);
 
   const onOpened = useCallback((): void => {
     setConversationKey((key) => key + 1);

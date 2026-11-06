@@ -28,6 +28,18 @@ export interface TurnRequest {
   message?: string;
 }
 
+/**
+ * What the chat can be asked to do.
+ */
+export interface UseAssistantChatActions {
+  onClearField: (field: ClearableField) => Promise<void>;
+  onResetSession: () => void;
+  /** Retries the failed message or restore; undefined when nothing failed. */
+  onRetry?: () => Promise<void>;
+  onRetryRestore: () => Promise<void>;
+  onSendMessage: (message: string) => Promise<void>;
+}
+
 export interface UseAssistantChatOptions {
   initialLoganJobId?: string;
   initialMessage?: string;
@@ -36,22 +48,24 @@ export interface UseAssistantChatOptions {
 }
 
 export interface UseAssistantChatReturn {
-  clearField: (field: ClearableField) => Promise<void>;
+  actions: UseAssistantChatActions;
+  state: UseAssistantChatState;
+}
+
+/**
+ * The conversation on screen and where it stands.
+ */
+export interface UseAssistantChatState {
   error: string | null;
   handoffUrl: string | null;
-  isComplete: boolean;
   isRestoring: boolean;
   isSaved: boolean;
   lastSave: LastSave | null;
   loading: boolean;
   logan: LoganContext | null;
   messages: ChatMessageDisplay[];
-  onRetry?: () => Promise<void>;
-  resetSession: () => void;
-  retryRestore: () => Promise<void>;
   savedAnalysisId: string | null;
   schema: AnalysisSchema | null;
-  sendMessage: (message: string) => Promise<void>;
   shownSessionId: string | null;
   suggestions: SuggestionChip[];
 }
