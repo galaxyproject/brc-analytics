@@ -74,6 +74,11 @@ class GalaxyJobSubmission(BaseModel):
 
 MAX_QUERY_BASES = 5000
 
+# The header given to a pasted sequence that has none. kmindex reports hits
+# under it, so the results read it back as "no name" -- which is why it's
+# something nobody would type, unlike "query".
+UNNAMED_QUERY = "brc_unnamed_query"
+
 
 def query_bases(sequence: str) -> int:
     """Bases in a FASTA query, not counting header lines or whitespace."""
@@ -144,7 +149,7 @@ class KmindexQuerySubmission(BaseModel):
         callers often send just the bases.
         """
         if value.strip() and not value.lstrip().startswith(">"):
-            return ">query\n" + value
+            return f">{UNNAMED_QUERY}\n" + value
         return value
 
     @field_validator("sequence")

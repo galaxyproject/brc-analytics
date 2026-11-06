@@ -24,6 +24,7 @@ from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     SETTLED_JOB_STATES,
     TERMINAL_JOB_STATES,
+    UNNAMED_QUERY,
     GalaxyDataset,
     GalaxyJobOutput,
     GalaxyJobResponse,
@@ -647,7 +648,8 @@ def _merge_shard_hits(
         shard_had_hits = False
         for shard_name, queries in shard.items():
             for name, accessions in (queries or {}).items():
-                query_name = query_name or name
+                if name != UNNAMED_QUERY:
+                    query_name = query_name or name
                 for accession, raw_score in (accessions or {}).items():
                     # Logan's own site subtracts a false-positive baseline
                     # for 227 saturated samples and re-applies the
