@@ -1,7 +1,6 @@
 """Tests for serving the pinned gene snapshot: the download, its checks and
 retries, and that gene data failing turns off only the gene features."""
 
-import csv
 import hashlib
 import json
 import os
@@ -20,15 +19,10 @@ from app.core.dependencies import get_gene_catalog_service
 from app.services import gene_snapshot
 from app.services.gene_catalog import SCHEMA_VERSION, GeneCatalogService
 from app.services.gene_snapshot import read_pin
-from tests.conftest import GENE_SNAPSHOT_EXPORT
-from tests.test_genes_api import make_client
+from tests.genes_helpers import BUILD_ID, make_client
 
 AMA1 = "d9049485-ed74-5455-98c2-5dc13eef544a"
 URL = "https://genes.test/snapshots/genes.duckdb"
-
-# The test snapshot's build ID.
-with open(GENE_SNAPSHOT_EXPORT / "snapshot.csv", newline="") as _f:
-    BUILD_ID = next(csv.DictReader(_f))["build_id"]
 
 
 @pytest.fixture
@@ -438,9 +432,7 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
         yield snapshot_bytes[:100]
         for stale in genes.glob("*.partial"):
             stale.unlink()
-        (genes / f"{BUILD_ID}.duckdb.partial").write_bytes(
-            b"half-written"
-        )
+        (genes / f"{BUILD_ID}.duckdb.partial").write_bytes(b"half-written")
         yield snapshot_bytes[100:]
 
     store.responses.extend(
