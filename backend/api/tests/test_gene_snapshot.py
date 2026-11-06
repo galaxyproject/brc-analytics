@@ -438,7 +438,7 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
         yield snapshot_bytes[:100]
         for stale in genes.glob("*.partial"):
             stale.unlink()
-        (genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb.partial").write_bytes(
+        (genes / f"{BUILD_ID}.duckdb.partial").write_bytes(
             b"half-written"
         )
         yield snapshot_bytes[100:]
@@ -451,7 +451,7 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
     )
     service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
     assert service.status == "ready"
-    target = genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
+    target = genes / f"{BUILD_ID}.duckdb"
     assert target.read_bytes() == snapshot_bytes
     service.close()
 

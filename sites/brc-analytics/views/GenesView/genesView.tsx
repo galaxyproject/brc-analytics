@@ -28,7 +28,7 @@ export const GenesView = ({
         {search.status === "idle" ? (
           <ExampleGenes />
         ) : (
-          <GeneSearchResults search={search} />
+          <GeneSearchResults query={query} search={search} />
         )}
       </GenesPanel>
     </StyledGrid>

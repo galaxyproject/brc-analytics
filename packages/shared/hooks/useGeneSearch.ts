@@ -13,7 +13,6 @@ export type GeneSearchState =
   | { status: "loading" }
   | { status: "unavailable" }
   | {
-      query: string;
       results: GeneSearchResult[];
       status: "found";
       truncated: boolean;
@@ -34,11 +33,10 @@ export function isValidGeneSearch(query: string): boolean {
 
 /**
  * Search the gene API for up to GENE_SEARCH_LIMIT genes.
- * @param query - The search, or undefined or empty for none.
+ * @param q - The search, trimmed; empty for none.
  * @returns The genes found, loading, or why there are none.
  */
-export function useGeneSearch(query: string | undefined): GeneSearchState {
-  const q = query?.trim() ?? "";
+export function useGeneSearch(q: string): GeneSearchState {
   const enabled = q !== "" && isValidGeneSearch(q);
   const { data, isError } = useQuery({
     enabled,
@@ -51,8 +49,8 @@ export function useGeneSearch(query: string | undefined): GeneSearchState {
   if (q === "") return { status: "idle" };
   if (!enabled) return { status: "invalid" };
   if (data) {
-    const { query: searched, results, truncated } = data;
-    return { query: searched, results, status: "found", truncated };
+    const { results, truncated } = data;
+    return { results, status: "found", truncated };
   }
   return isError ? { status: "unavailable" } : { status: "loading" };
 }

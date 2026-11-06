@@ -39,10 +39,6 @@ GENES = {
     "PF3D7_1130400": "PF3D7_11, for truncation",
 }
 
-# Tables holding rows per gene, children first, so a delete never leaves a
-# reference that doesn't resolve.
-GENE_TABLES = ("search_term", "alt_id", "transcript", "gene")
-
 
 def export(snapshot: Path, out: Path) -> None:
     with tempfile.TemporaryDirectory() as workdir:
@@ -57,7 +53,17 @@ def export(snapshot: Path, out: Path) -> None:
             (count,) = con.execute("SELECT count(*) FROM kept").fetchone()
             if count != len(GENES):
                 raise ValueError(f"{len(GENES) - count} of GENES aren't in {snapshot}")
-            for table in GENE_TABLES:
+            # Every table with rows per gene, gene last, so a delete never
+            # leaves a reference that doesn't resolve.
+            tables = [
+                table
+                for (table,) in con.execute(
+                    "SELECT table_name FROM information_schema.columns"
+                    " WHERE column_name = 'gene_uid' AND table_name != 'kept'"
+                    " ORDER BY table_name = 'gene'"
+                ).fetchall()
+            ]
+            for table in tables:
                 # Deleting keeps the remaining rows in their written order.
                 con.execute(
                     f"DELETE FROM {table} WHERE gene_uid NOT IN"

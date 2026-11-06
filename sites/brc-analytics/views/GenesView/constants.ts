@@ -73,21 +73,9 @@ export const EXAMPLE_GENES: ExampleGene[] = [
   },
 ];
 
-// How a search result names each kind of term it matched on.
+// How a search result names the kinds of term it matched on whose type, with
+// underscores as spaces, doesn't read right (e.g. "locus tag" does).
 export const MATCH_TYPE_NAMES: Record<string, string> = {
-  locus_tag: "locus tag",
-  name: "name",
   ncbi_gene_id: "NCBI Gene ID",
-  old_locus_tag: "old locus tag",
-  protein_accession: "protein accession",
-  protein_product: "protein product",
-  symbol: "symbol",
   transcript_id: "transcript ID",
-  transcript_product: "transcript product",
 };
-
-// The kinds of term whose value is a product: shown in quotes.
-export const PRODUCT_MATCH_TYPES = new Set([
-  "protein_product",
-  "transcript_product",
-]);

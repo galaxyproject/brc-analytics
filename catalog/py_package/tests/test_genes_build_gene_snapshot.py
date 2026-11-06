@@ -66,7 +66,7 @@ def test_counts(snapshot):
         "gene": 4,
         "transcript": 5,
         "alt_id": 21,
-        "search_term": 34,
+        "search_term": 40,
     }
 
 
@@ -216,7 +216,6 @@ def test_tables_declare_their_keys(snapshot):
         "gene",
         "transcript",
         "alt_id",
-        "search_term",
     }
     assert foreign == {
         "annotation_set_version",
@@ -243,14 +242,17 @@ def test_search_terms(snapshot):
         ("810891", "ncbi_gene_id", "810891", 1),
         ("ama1", "name", "AMA1", 0),
         ("ama1", "symbol", "AMA1", 1),
-        ("antigen", "protein_product", product, 2),
-        ("antigen", "transcript_product", product, 2),
-        ("apical", "protein_product", product, 2),
-        ("apical", "transcript_product", product, 2),
-        ("membrane", "protein_product", product, 2),
-        ("membrane", "transcript_product", product, 2),
+        ("antigen", "protein_product", product, 4),
+        ("antigen", "transcript_product", product, 4),
+        ("apical", "protein_product", product, 4),
+        ("apical", "transcript_product", product, 4),
+        ("membrane", "protein_product", product, 4),
+        ("membrane", "transcript_product", product, 4),
         ("pf3d7_1133400", "locus_tag", "PF3D7_1133400", 0),
+        # Accessions with and without their version.
+        ("xm_001347979", "transcript_id", "XM_001347979.2", 1),
         ("xm_001347979.2", "transcript_id", "XM_001347979.2", 1),
+        ("xp_001348015", "protein_accession", "XP_001348015.1", 1),
         ("xp_001348015.1", "protein_accession", "XP_001348015.1", 1),
     ]
 
@@ -263,12 +265,24 @@ def test_search_terms_are_stored_in_term_order(snapshot):
     assert terms == sorted(terms)
 
 
+def test_search_terms_are_each_stored_once(snapshot):
+    # search_term has no primary key to enforce it.
+    con, _ = snapshot
+    assert (
+        con.execute(
+            "SELECT term, type, gene_uid FROM search_term"
+            " GROUP BY ALL HAVING count(*) > 1"
+        ).fetchall()
+        == []
+    )
+
+
 def test_a_product_word_two_transcripts_share_is_one_term(snapshot):
     # PF3D7_0105400's two transcripts are both "uncharacterized protein".
     con, _ = snapshot
     assert con.execute(
         "SELECT term, type FROM search_term s JOIN gene g USING (gene_uid)"
-        " WHERE g.locus_tag = 'PF3D7_0105400' AND type_rank = 2 ORDER BY type"
+        " WHERE g.locus_tag = 'PF3D7_0105400' AND type_rank = 4 ORDER BY type"
     ).fetchall() == [
         ("uncharacterized", "protein_product"),
         ("uncharacterized", "transcript_product"),
@@ -283,7 +297,7 @@ def test_transcript_and_protein_products_give_their_own_words(tmp_path, catalog)
     try:
         rows = con.execute(
             "SELECT type, list(term ORDER BY term) FROM search_term"
-            " WHERE type_rank = 2 GROUP BY type ORDER BY type"
+            " WHERE type_rank = 4 GROUP BY type ORDER BY type"
         ).fetchall()
     finally:
         con.close()

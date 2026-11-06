@@ -4,6 +4,9 @@ export const SOURCE_KIND = {
   PAPER: "paper",
 } as const;
 
+// What the gene pages show for an empty value.
+export const EMPTY_VALUE = "—";
+
 // The most genes a search returns, and the gene API's limit.
 export const GENE_SEARCH_LIMIT = 50;
 

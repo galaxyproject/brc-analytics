@@ -1,5 +1,5 @@
 import { type GeneSearchMatch } from "@repo/shared/services/genes/types";
-import { MATCH_TYPE_NAMES, PRODUCT_MATCH_TYPES } from "./constants";
+import { MATCH_TYPE_NAMES } from "./constants";
 
 /**
  * What a search result matched on, as the results list says it.
@@ -11,6 +11,7 @@ import { MATCH_TYPE_NAMES, PRODUCT_MATCH_TYPES } from "./constants";
  */
 export function describeMatch({ type, value }: GeneSearchMatch): string {
   const name = MATCH_TYPE_NAMES[type] ?? type.replaceAll("_", " ");
-  const shown = PRODUCT_MATCH_TYPES.has(type) ? `"${value}"` : value;
+  // A product (transcript_product, protein_product) is quoted.
+  const shown = type.endsWith("_product") ? `"${value}"` : value;
   return `Matched ${name} ${shown}`;
 }

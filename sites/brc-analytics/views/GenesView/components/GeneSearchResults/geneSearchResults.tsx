@@ -11,11 +11,12 @@ import {
 } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
+  EMPTY_VALUE,
   GENE_SEARCH_LIMIT,
   GENE_SEARCH_MAX_LENGTH,
   GENE_SEARCH_MAX_WORDS,
 } from "@repo/shared/services/genes/constants";
-import { geneLabel } from "@repo/shared/services/genes/label";
+import { geneLabel, geneSymbol } from "@repo/shared/services/genes/label";
 import Link from "next/link";
 import { type JSX, type ReactNode } from "react";
 import { type GeneSearchResultsProps } from "./types";
@@ -24,10 +25,12 @@ import { type GeneSearchResultsProps } from "./types";
  * A gene search's results, each with what it matched on, or why there are
  * none.
  * @param props - Component props.
+ * @param props.query - The search, as typed.
  * @param props.search - The search's state.
  * @returns The results' table, or a message.
  */
 export const GeneSearchResults = ({
+  query,
   search,
 }: GeneSearchResultsProps): JSX.Element => {
   switch (search.status) {
@@ -47,7 +50,7 @@ export const GeneSearchResults = ({
         </Message>
       );
   }
-  const { query, results, truncated } = search;
+  const { results, truncated } = search;
   if (results.length === 0)
     return <Message>No genes match &ldquo;{query}&rdquo;.</Message>;
   return (
@@ -75,7 +78,7 @@ export const GeneSearchResults = ({
                     {geneLabel(result)}
                   </Link>
                 </TableCell>
-                <TableCell>{result.symbol ?? "—"}</TableCell>
+                <TableCell>{geneSymbol(result) ?? EMPTY_VALUE}</TableCell>
                 <TableCell>{result.organism.name}</TableCell>
                 <TableCell>{describeMatch(result.matchedOn)}</TableCell>
               </TableRow>

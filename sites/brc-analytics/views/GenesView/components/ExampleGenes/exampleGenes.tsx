@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { EMPTY_VALUE } from "@repo/shared/services/genes/constants";
 import Link from "next/link";
 import { type JSX } from "react";
 
@@ -34,7 +35,7 @@ export const ExampleGenes = (): JSX.Element => {
                   {locusTag}
                 </Link>
               </TableCell>
-              <TableCell>{symbol ?? "—"}</TableCell>
+              <TableCell>{symbol ?? EMPTY_VALUE}</TableCell>
               <TableCell>{note}</TableCell>
             </TableRow>
           ))}

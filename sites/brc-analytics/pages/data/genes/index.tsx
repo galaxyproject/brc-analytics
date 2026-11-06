@@ -15,7 +15,7 @@ const Page = (): JSX.Element => {
     router.isReady && typeof router.query.q === "string"
       ? router.query.q.trim()
       : "";
-  const search = useGeneSearch(genePagesEnabled ? query : undefined);
+  const search = useGeneSearch(genePagesEnabled ? query : "");
   if (!genePagesEnabled) return <Error statusCode={404} />;
   const onSearch = (q: string): void => {
     // Each search is a history entry, so Back returns to the one before.

@@ -1,6 +1,6 @@
 term,type,gene_uid,display,assembly_accession,species_taxonomy_id,type_rank
-26s,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-26s,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
+26s,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+26s,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
 314888158,ncbi_gene_id,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,314888158,GCF_000002765.6,5833,1
 314888234,ncbi_gene_id,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,314888234,GCF_000002765.6,5833,1
 36312532,ncbi_gene_id,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,36312532,GCF_000002765.6,5833,1
@@ -21,57 +21,57 @@ aep,name,f09ebfac-9e31-502b-b29a-b251d8207a3e,AEP,GCF_000002765.6,5833,0
 aep,symbol,f09ebfac-9e31-502b-b29a-b251d8207a3e,AEP,GCF_000002765.6,5833,1
 ama1,name,d9049485-ed74-5455-98c2-5dc13eef544a,AMA1,GCF_000002765.6,5833,0
 ama1,symbol,d9049485-ed74-5455-98c2-5dc13eef544a,AMA1,GCF_000002765.6,5833,1
-antigen,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-antigen,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-apical,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-apical,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-apical,protein_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,2
-apical,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,2
-apical,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-apical,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-apical,transcript_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,2
+antigen,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+antigen,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+apical,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+apical,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+apical,protein_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,4
+apical,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,4
+apical,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+apical,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+apical,transcript_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,4
 apr1,name,864bdd95-e8c3-55bb-9e3e-af28803f4e14,APR1,GCF_000002765.6,5833,0
 apr1,symbol,864bdd95-e8c3-55bb-9e3e-af28803f4e14,APR1,GCF_000002765.6,5833,1
-apr1,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,2
-atp,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,2
-atp,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-atp-dependent,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,2
-atp-dependent,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-dependent,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,2
-dependent,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-der1,protein_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,2
-der1,protein_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,2
-der1,transcript_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,2
-der1,transcript_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,2
+apr1,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,4
+atp,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,4
+atp,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+atp-dependent,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,4
+atp-dependent,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+dependent,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,4
+dependent,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+der1,protein_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,4
+der1,protein_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,4
+der1,transcript_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,4
+der1,transcript_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,4
 der1-2,name,24a6332d-046c-5378-a4b3-37a7f49793ed,Der1-2,GCF_000002765.6,5833,0
 der1-2,name,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-2,GCF_000002765.6,5833,0
 der1-2,symbol,24a6332d-046c-5378-a4b3-37a7f49793ed,Der1-2,GCF_000002765.6,5833,1
 der1-2,symbol,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-2,GCF_000002765.6,5833,1
-der1-like,protein_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,2
-der1-like,protein_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,2
-der1-like,transcript_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,2
-der1-like,transcript_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,2
-dna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-dna/rna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-el38,protein_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,2
-el38,transcript_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,2
-exonemal,protein_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,2
-exonemal,transcript_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,2
-helicase,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,2
-helicase,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-membrane,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-membrane,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-membrane,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-membrane,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,2
-mutase,protein_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,2
-mutase,transcript_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,2
-ncrna,transcript_product,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,uncharacterized ncRNA,GCF_000002765.6,5833,2
+der1-like,protein_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,4
+der1-like,protein_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,4
+der1-like,transcript_product,24a6332d-046c-5378-a4b3-37a7f49793ed,putative DER1-like protein,GCF_000002765.6,5833,4
+der1-like,transcript_product,f523b703-1c83-5ab0-ab69-b42b2c6f4968,DER1-like protein,GCF_000002765.6,5833,4
+dna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+dna/rna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+el38,protein_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,4
+el38,transcript_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,4
+exonemal,protein_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,4
+exonemal,transcript_product,f09ebfac-9e31-502b-b29a-b251d8207a3e,apical exonemal protein,GCF_000002765.6,5833,4
+helicase,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,4
+helicase,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+membrane,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+membrane,protein_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+membrane,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+membrane,transcript_product,d9049485-ed74-5455-98c2-5dc13eef544a,apical membrane antigen 1,GCF_000002765.6,5833,4
+mutase,protein_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,4
+mutase,transcript_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,4
+ncrna,transcript_product,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,uncharacterized ncRNA,GCF_000002765.6,5833,4
 pagm,name,797888b4-1368-5202-b4c6-25f3accdbb2c,PAGM,GCF_000002765.6,5833,0
 pagm,symbol,797888b4-1368-5202-b4c6-25f3accdbb2c,PAGM,GCF_000002765.6,5833,1
 pbgs,name,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,PBGS,GCF_000002765.6,5833,0
 pbgs,symbol,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,PBGS,GCF_000002765.6,5833,1
-peptidase,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-peptidase,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
+peptidase,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+peptidase,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
 pf3d7_0103600,locus_tag,7b3c7733-2509-5585-995f-694be505af1c,PF3D7_0103600,GCF_000002765.6,5833,0
 pf3d7_0105400,locus_tag,9ef15f58-60fc-5de4-98b8-7c8cb0169013,PF3D7_0105400,GCF_000002765.6,5833,0
 pf3d7_0105400,name,9ef15f58-60fc-5de4-98b8-7c8cb0169013,PF3D7_0105400,GCF_000002765.6,5833,0
@@ -97,81 +97,112 @@ pf3d7_1440300,locus_tag,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,PF3D7_1440300,GCF_0
 pf3d7_1440300,old_locus_tag,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,PF3D7_1440300,GCF_000002765.6,5833,1
 pfp0,name,732579b0-5fa8-5b39-8a28-551b54014712,PfP0,GCF_000002765.6,5833,0
 pfp0,symbol,732579b0-5fa8-5b39-8a28-551b54014712,PfP0,GCF_000002765.6,5833,1
-phosphoacetylglucosamine,protein_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,2
-phosphoacetylglucosamine,transcript_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,2
-polar,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,2
-porphobilinogen,protein_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,2
-porphobilinogen,transcript_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,2
-processing,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-processing,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-protease,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-protease,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
+phosphoacetylglucosamine,protein_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,4
+phosphoacetylglucosamine,transcript_product,797888b4-1368-5202-b4c6-25f3accdbb2c,putative phosphoacetylglucosamine mutase,GCF_000002765.6,5833,4
+polar,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,4
+porphobilinogen,protein_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,4
+porphobilinogen,transcript_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,4
+processing,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+processing,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+protease,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+protease,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
 psh1,name,7b3c7733-2509-5585-995f-694be505af1c,PSH1,GCF_000002765.6,5833,0
 psh1,symbol,7b3c7733-2509-5585-995f-694be505af1c,PSH1,GCF_000002765.6,5833,1
-psh1,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
-regulatory,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-regulatory,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-related,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-related,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-ribosomal,protein_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,2
-ribosomal,protein_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,2
-ribosomal,transcript_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,2
-ribosomal,transcript_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,2
-ring,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,2
-rna,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,2
-rna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,2
+psh1,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
+regulatory,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+regulatory,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+related,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+related,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+ribosomal,protein_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,4
+ribosomal,protein_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,4
+ribosomal,transcript_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,4
+ribosomal,transcript_product,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,eL38 family ribosomal protein,GCF_000002765.6,5833,4
+ring,transcript_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,putative apical polar ring protein APR1,GCF_000002765.6,5833,4
+rna,protein_product,7b3c7733-2509-5585-995f-694be505af1c,putative ATP-dependent RNA helicase,GCF_000002765.6,5833,4
+rna,transcript_product,7b3c7733-2509-5585-995f-694be505af1c,ATP-dependent DNA/RNA helicase PSH1,GCF_000002765.6,5833,4
 rpl38,name,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,RPL38,GCF_000002765.6,5833,0
 rpl38,symbol,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,RPL38,GCF_000002765.6,5833,1
 rpt5,name,04416d00-045d-5747-a24b-67f3d1bbf2e0,RPT5,GCF_000002765.6,5833,0
 rpt5,symbol,04416d00-045d-5747-a24b-67f3d1bbf2e0,RPT5,GCF_000002765.6,5833,1
-stromal,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-stromal,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-stromal-processing,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-stromal-processing,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,2
-subunit,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-subunit,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,2
-synthase,protein_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,2
-synthase,transcript_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,2
-thrombospondin,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-thrombospondin,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-thrombospondin-related,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
-thrombospondin-related,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,2
+stromal,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+stromal,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+stromal-processing,protein_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+stromal-processing,transcript_product,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,putative stromal-processing peptidase,GCF_000002765.6,5833,4
+subunit,protein_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+subunit,transcript_product,04416d00-045d-5747-a24b-67f3d1bbf2e0,putative 26S protease regulatory subunit 6A,GCF_000002765.6,5833,4
+synthase,protein_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,4
+synthase,transcript_product,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,porphobilinogen synthase,GCF_000002765.6,5833,4
+thrombospondin,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+thrombospondin,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+thrombospondin-related,protein_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
+thrombospondin-related,transcript_product,b26f0626-b67d-5782-98be-68fc176971da,thrombospondin-related apical membrane protein,GCF_000002765.6,5833,4
 tramp,name,b26f0626-b67d-5782-98be-68fc176971da,TRAMP,GCF_000002765.6,5833,0
 tramp,symbol,b26f0626-b67d-5782-98be-68fc176971da,TRAMP,GCF_000002765.6,5833,1
-ul10,protein_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,2
-ul10,transcript_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,2
-uncharacterized,protein_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,uncharacterized protein,GCF_000002765.6,5833,2
-uncharacterized,protein_product,9ef15f58-60fc-5de4-98b8-7c8cb0169013,uncharacterized protein,GCF_000002765.6,5833,2
-uncharacterized,transcript_product,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,uncharacterized ncRNA,GCF_000002765.6,5833,2
-uncharacterized,transcript_product,9ef15f58-60fc-5de4-98b8-7c8cb0169013,uncharacterized protein,GCF_000002765.6,5833,2
+ul10,protein_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,4
+ul10,transcript_product,732579b0-5fa8-5b39-8a28-551b54014712,uL10 family ribosomal protein,GCF_000002765.6,5833,4
+uncharacterized,protein_product,864bdd95-e8c3-55bb-9e3e-af28803f4e14,uncharacterized protein,GCF_000002765.6,5833,4
+uncharacterized,protein_product,9ef15f58-60fc-5de4-98b8-7c8cb0169013,uncharacterized protein,GCF_000002765.6,5833,4
+uncharacterized,transcript_product,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,uncharacterized ncRNA,GCF_000002765.6,5833,4
+uncharacterized,transcript_product,9ef15f58-60fc-5de4-98b8-7c8cb0169013,uncharacterized protein,GCF_000002765.6,5833,4
+xm_001347565,transcript_id,24a6332d-046c-5378-a4b3-37a7f49793ed,XM_001347565.2,GCF_000002765.6,5833,1
 xm_001347565.2,transcript_id,24a6332d-046c-5378-a4b3-37a7f49793ed,XM_001347565.2,GCF_000002765.6,5833,1
+xm_001347946,transcript_id,797888b4-1368-5202-b4c6-25f3accdbb2c,XM_001347946.2,GCF_000002765.6,5833,1
 xm_001347946.2,transcript_id,797888b4-1368-5202-b4c6-25f3accdbb2c,XM_001347946.2,GCF_000002765.6,5833,1
+xm_001347948,transcript_id,732579b0-5fa8-5b39-8a28-551b54014712,XM_001347948.2,GCF_000002765.6,5833,1
 xm_001347948.2,transcript_id,732579b0-5fa8-5b39-8a28-551b54014712,XM_001347948.2,GCF_000002765.6,5833,1
+xm_001347949,transcript_id,04416d00-045d-5747-a24b-67f3d1bbf2e0,XM_001347949.2,GCF_000002765.6,5833,1
 xm_001347949.2,transcript_id,04416d00-045d-5747-a24b-67f3d1bbf2e0,XM_001347949.2,GCF_000002765.6,5833,1
+xm_001347979,transcript_id,d9049485-ed74-5455-98c2-5dc13eef544a,XM_001347979.2,GCF_000002765.6,5833,1
 xm_001347979.2,transcript_id,d9049485-ed74-5455-98c2-5dc13eef544a,XM_001347979.2,GCF_000002765.6,5833,1
+xm_001348017,transcript_id,f09ebfac-9e31-502b-b29a-b251d8207a3e,XM_001348017.2,GCF_000002765.6,5833,1
 xm_001348017.2,transcript_id,f09ebfac-9e31-502b-b29a-b251d8207a3e,XM_001348017.2,GCF_000002765.6,5833,1
+xm_001348058,transcript_id,864bdd95-e8c3-55bb-9e3e-af28803f4e14,XM_001348058.2,GCF_000002765.6,5833,1
 xm_001348058.2,transcript_id,864bdd95-e8c3-55bb-9e3e-af28803f4e14,XM_001348058.2,GCF_000002765.6,5833,1
+xm_001348519,transcript_id,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,XM_001348519.2,GCF_000002765.6,5833,1
 xm_001348519.2,transcript_id,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,XM_001348519.2,GCF_000002765.6,5833,1
+xm_001348520,transcript_id,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,XM_001348520.3,GCF_000002765.6,5833,1
 xm_001348520.3,transcript_id,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,XM_001348520.3,GCF_000002765.6,5833,1
+xm_001350546,transcript_id,b26f0626-b67d-5782-98be-68fc176971da,XM_001350546.2,GCF_000002765.6,5833,1
 xm_001350546.2,transcript_id,b26f0626-b67d-5782-98be-68fc176971da,XM_001350546.2,GCF_000002765.6,5833,1
+xm_001350949,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XM_001350949.2,GCF_000002765.6,5833,1
 xm_001350949.2,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XM_001350949.2,GCF_000002765.6,5833,1
+xm_001351176,transcript_id,f523b703-1c83-5ab0-ab69-b42b2c6f4968,XM_001351176.3,GCF_000002765.6,5833,1
 xm_001351176.3,transcript_id,f523b703-1c83-5ab0-ab69-b42b2c6f4968,XM_001351176.3,GCF_000002765.6,5833,1
+xm_024473254,transcript_id,7b3c7733-2509-5585-995f-694be505af1c,XM_024473254.2,GCF_000002765.6,5833,1
 xm_024473254.2,transcript_id,7b3c7733-2509-5585-995f-694be505af1c,XM_024473254.2,GCF_000002765.6,5833,1
+xm_024473365,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XM_024473365.1,GCF_000002765.6,5833,1
 xm_024473365.1,transcript_id,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XM_024473365.1,GCF_000002765.6,5833,1
+xm_088596634,transcript_id,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,XM_088596634.1,GCF_000002765.6,5833,1
 xm_088596634.1,transcript_id,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,XM_088596634.1,GCF_000002765.6,5833,1
+xp_001347601,protein_accession,24a6332d-046c-5378-a4b3-37a7f49793ed,XP_001347601.1,GCF_000002765.6,5833,1
 xp_001347601.1,protein_accession,24a6332d-046c-5378-a4b3-37a7f49793ed,XP_001347601.1,GCF_000002765.6,5833,1
+xp_001347982,protein_accession,797888b4-1368-5202-b4c6-25f3accdbb2c,XP_001347982.1,GCF_000002765.6,5833,1
 xp_001347982.1,protein_accession,797888b4-1368-5202-b4c6-25f3accdbb2c,XP_001347982.1,GCF_000002765.6,5833,1
+xp_001347984,protein_accession,732579b0-5fa8-5b39-8a28-551b54014712,XP_001347984.1,GCF_000002765.6,5833,1
 xp_001347984.1,protein_accession,732579b0-5fa8-5b39-8a28-551b54014712,XP_001347984.1,GCF_000002765.6,5833,1
+xp_001347985,protein_accession,04416d00-045d-5747-a24b-67f3d1bbf2e0,XP_001347985.1,GCF_000002765.6,5833,1
 xp_001347985.1,protein_accession,04416d00-045d-5747-a24b-67f3d1bbf2e0,XP_001347985.1,GCF_000002765.6,5833,1
+xp_001348015,protein_accession,d9049485-ed74-5455-98c2-5dc13eef544a,XP_001348015.1,GCF_000002765.6,5833,1
 xp_001348015.1,protein_accession,d9049485-ed74-5455-98c2-5dc13eef544a,XP_001348015.1,GCF_000002765.6,5833,1
+xp_001348053,protein_accession,f09ebfac-9e31-502b-b29a-b251d8207a3e,XP_001348053.1,GCF_000002765.6,5833,1
 xp_001348053.1,protein_accession,f09ebfac-9e31-502b-b29a-b251d8207a3e,XP_001348053.1,GCF_000002765.6,5833,1
+xp_001348094,protein_accession,864bdd95-e8c3-55bb-9e3e-af28803f4e14,XP_001348094.1,GCF_000002765.6,5833,1
 xp_001348094.1,protein_accession,864bdd95-e8c3-55bb-9e3e-af28803f4e14,XP_001348094.1,GCF_000002765.6,5833,1
+xp_001348555,protein_accession,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,XP_001348555.1,GCF_000002765.6,5833,1
 xp_001348555.1,protein_accession,3ff70d8a-9e27-5f1b-9a5b-084542dd8f0f,XP_001348555.1,GCF_000002765.6,5833,1
+xp_001348556,protein_accession,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,XP_001348556.2,GCF_000002765.6,5833,1
 xp_001348556.2,protein_accession,b954f71c-0b4f-5ded-8ff6-a8a8ed136f7c,XP_001348556.2,GCF_000002765.6,5833,1
+xp_001350582,protein_accession,b26f0626-b67d-5782-98be-68fc176971da,XP_001350582.1,GCF_000002765.6,5833,1
 xp_001350582.1,protein_accession,b26f0626-b67d-5782-98be-68fc176971da,XP_001350582.1,GCF_000002765.6,5833,1
+xp_001350985,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XP_001350985.1,GCF_000002765.6,5833,1
 xp_001350985.1,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XP_001350985.1,GCF_000002765.6,5833,1
+xp_001351212,protein_accession,f523b703-1c83-5ab0-ab69-b42b2c6f4968,XP_001351212.2,GCF_000002765.6,5833,1
 xp_001351212.2,protein_accession,f523b703-1c83-5ab0-ab69-b42b2c6f4968,XP_001351212.2,GCF_000002765.6,5833,1
+xp_024328879,protein_accession,7b3c7733-2509-5585-995f-694be505af1c,XP_024328879.1,GCF_000002765.6,5833,1
 xp_024328879.1,protein_accession,7b3c7733-2509-5585-995f-694be505af1c,XP_024328879.1,GCF_000002765.6,5833,1
+xp_024328984,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XP_024328984.1,GCF_000002765.6,5833,1
 xp_024328984.1,protein_accession,9ef15f58-60fc-5de4-98b8-7c8cb0169013,XP_024328984.1,GCF_000002765.6,5833,1
+xp_088452686,protein_accession,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,XP_088452686.1,GCF_000002765.6,5833,1
 xp_088452686.1,protein_accession,c75d97cb-7e0b-5c86-98df-ff17bd1a743b,XP_088452686.1,GCF_000002765.6,5833,1
+xr_002966645,transcript_id,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,XR_002966645.1,GCF_000002765.6,5833,1
 xr_002966645.1,transcript_id,2cc320f9-66d6-58ba-a73f-e8b67bf4b03e,XR_002966645.1,GCF_000002765.6,5833,1

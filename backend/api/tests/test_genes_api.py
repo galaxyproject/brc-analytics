@@ -1,5 +1,6 @@
 """Tests for the gene API, against the test gene snapshot (conftest.py)."""
 
+import csv
 import gzip
 import json
 import shutil
@@ -16,9 +17,12 @@ from app.api.v1 import genes
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
 from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
 from app.services.gene_catalog import GeneCatalogService
+from tests.conftest import GENE_SNAPSHOT_EXPORT
 
-# The test snapshot's build, as tests/data/gene_snapshot/snapshot.csv has it.
-BUILD_ID = "temp-GCF_000002765.6-2026-10-28T212348Z"
+# The test snapshot's build ID, read from its export rather than from the
+# service, so a test of the service's health doesn't compare it with itself.
+with open(GENE_SNAPSHOT_EXPORT / "snapshot.csv", newline="") as _f:
+    BUILD_ID = next(csv.DictReader(_f))["build_id"]
 
 
 def make_client(
@@ -46,25 +50,11 @@ def altered_snapshot(tmp_path, snapshot_path, sql: str) -> GeneCatalogService:
 
 
 @pytest.fixture(scope="module")
-def service(gene_snapshot_path):
-    service = GeneCatalogService.local(
-        str(gene_snapshot_path), "https://brc-analytics.org/"
-    )
-    yield service
-    service.close()
-
-
-@pytest.fixture
-def client(service):
-    return make_client(service)
-
-
-@pytest.fixture(scope="module")
-def gene_uid(service):
+def gene_uid(gene_service):
     """Look a gene's UID up in the snapshot by its locus tag."""
 
     def lookup(locus_tag: str) -> uuid.UUID:
-        cur = service._con.cursor()
+        cur = gene_service._con.cursor()
         try:
             row = cur.execute(
                 "SELECT gene_uid FROM gene WHERE locus_tag = ?", [locus_tag]
@@ -76,18 +66,18 @@ def gene_uid(service):
     return lookup
 
 
-def test_local_snapshot_opens(service):
-    assert service.is_available()
-    assert service.health() == {
+def test_local_snapshot_opens(gene_service):
+    assert gene_service.is_available()
+    assert gene_service.health() == {
         "status": "ready",
         "source": "local",
         "build_id": BUILD_ID,
     }
 
 
-def test_gene(client, gene_uid):
+def test_gene(gene_client, gene_uid):
     uid = gene_uid("PF3D7_1133400")
-    response = client.get(f"/api/v1/genes/{uid}")
+    response = gene_client.get(f"/api/v1/genes/{uid}")
     assert response.status_code == 200
     body = response.json()
     assert body["snapshot"]["update"] is None
@@ -156,16 +146,16 @@ def test_gene(client, gene_uid):
     assert provenance["retrievedAt"].endswith("Z")
 
 
-def test_old_locus_tags_are_former_ids(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}")
+def test_old_locus_tags_are_former_ids(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}")
     aliases = response.json()["gene"]["aliases"]
     assert [
         (a["value"], a["current"]) for a in aliases if a["type"] == "old_locus_tag"
     ] == [("PF3D7_0105400.1", False), ("PF3D7_0105400.2", False)]
 
 
-def test_transcript_without_an_id(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0203500')}")
+def test_transcript_without_an_id(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0203500')}")
     gene = response.json()["gene"]
     assert gene["biotype"] == "tRNA"
     assert [
@@ -188,14 +178,14 @@ def test_assembly_without_a_ucsc_browser(tmp_path, gene_snapshot_path, gene_uid)
     assert response.json()["gene"]["ucscBrowserUrl"] is None
 
 
-def test_unknown_gene_is_404(client):
-    response = client.get(f"/api/v1/genes/{uuid.uuid4()}")
+def test_unknown_gene_is_404(gene_client):
+    response = gene_client.get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"]
 
 
-def test_gene_uid_that_is_not_a_uuid_is_422(client):
-    assert client.get("/api/v1/genes/PF3D7_1133400").status_code == 422
+def test_gene_uid_that_is_not_a_uuid_is_422(gene_client):
+    assert gene_client.get("/api/v1/genes/PF3D7_1133400").status_code == 422
 
 
 def test_missing_snapshot_is_503(tmp_path, gene_uid):
@@ -207,18 +197,18 @@ def test_missing_snapshot_is_503(tmp_path, gene_uid):
     assert response.json() == {"detail": "Gene data is unavailable"}
 
 
-def test_transcript_and_protein_products_differ(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0103600')}")
+def test_transcript_and_protein_products_differ(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0103600')}")
     [transcript] = response.json()["gene"]["transcripts"]
     assert transcript["transcriptProduct"] == "ATP-dependent DNA/RNA helicase PSH1"
     assert transcript["proteinProduct"] == "putative ATP-dependent RNA helicase"
 
 
-def test_concurrent_requests(service, gene_uid):
+def test_concurrent_requests(gene_service, gene_uid):
     # Each request makes its own cursor from the shared connection.
     uids = [gene_uid(lt) for lt in ["PF3D7_1133400", "PF3D7_0105400"]] * 50
     with ThreadPoolExecutor(max_workers=16) as pool:
-        genes = list(pool.map(service.get_gene, uids))
+        genes = list(pool.map(gene_service.get_gene, uids))
     assert [g.locus_tag for g in genes] == ["PF3D7_1133400", "PF3D7_0105400"] * 50
 
 
@@ -261,8 +251,8 @@ def test_the_app_starts_and_stops_a_local_snapshot(app_with_stubbed_agent):
     assert service._con is None
 
 
-def test_transcripts_are_in_genome_order(client, gene_uid):
-    gene = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
+def test_transcripts_are_in_genome_order(gene_client, gene_uid):
+    gene = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
     assert [t["transcriptId"] for t in gene["transcripts"]] == [
         "XM_001350949.2",
         "XM_024473365.1",

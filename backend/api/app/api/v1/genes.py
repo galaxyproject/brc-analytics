@@ -8,12 +8,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
 from app.models.genes import BionymClaims, GeneResponse, GeneSearchResponse
 from app.services.bionym_graphs import BionymGraphStore
-from app.services.gene_catalog import MAX_SEARCH_WORDS, GeneCatalogService
+from app.services.gene_catalog import GeneCatalogService
 
 router = APIRouter()
 
 DEFAULT_SEARCH_LIMIT = 10
 MAX_SEARCH_LIMIT = 50
+MAX_SEARCH_LENGTH = 200
+MAX_SEARCH_WORDS = 10
 
 
 # Declared before /{gene_uid}, which would otherwise take "search" as a UID.
@@ -21,7 +23,7 @@ MAX_SEARCH_LIMIT = 50
 def search_genes(
     q: str = Query(
         ...,
-        max_length=200,
+        max_length=MAX_SEARCH_LENGTH,
         description="Words that start a gene's IDs or its products' words",
     ),
     assembly: Optional[str] = Query(None, description="An assembly accession"),
@@ -35,17 +37,17 @@ def search_genes(
     at its best match, best first.
     """
     query = q.strip()
-    word_count = len(query.split())
-    if word_count == 0:
+    words = query.lower().split()
+    if not words:
         raise HTTPException(status_code=422, detail="The query is empty")
-    if word_count > MAX_SEARCH_WORDS:
+    if len(words) > MAX_SEARCH_WORDS:
         raise HTTPException(
             status_code=422,
             detail=f"The query has more than {MAX_SEARCH_WORDS} words",
         )
     if service.snapshot is None:
         raise HTTPException(status_code=503, detail="Gene data is unavailable")
-    results, truncated = service.search_genes(query, assembly, limit)
+    results, truncated = service.search_genes(words, assembly, limit)
     return GeneSearchResponse(
         snapshot=service.snapshot, query=query, results=results, truncated=truncated
     )
