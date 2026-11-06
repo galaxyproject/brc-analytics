@@ -7,6 +7,10 @@ const createJestConfig = nextJest({
   dir: "./sites/brc-analytics",
 });
 
+// Pinned to a zone with clock changes: CI runs in UTC, where a test of
+// local-hour grouping or a DST night passes whether the code is right or not.
+process.env.TZ = "America/New_York";
+
 /** @type {import('jest').Config} */
 const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>/"],
