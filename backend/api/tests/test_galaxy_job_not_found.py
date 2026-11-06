@@ -156,3 +156,35 @@ def test_show_job_with_an_undecodable_id_logs_no_error(caplog):
 
     assert is_missing_job_error(raised.value)
     assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+
+def test_public_status_only_carries_the_end_of_stderr(app_client):  # noqa: F811
+    # A failed job's status comes from Galaxy's full job dict, whose tool
+    # output can name server paths and hosts. This route is unauthenticated,
+    # so it gets the same tail the partner API and MCP do, and no stdout.
+    from app.models.galaxy import GalaxyJobStatus
+    from app.services.logan_jobs import STDERR_TAIL
+
+    app, client = app_client
+    service = MagicMock()
+    service.is_available.return_value = True
+    service.get_job_status = AsyncMock(
+        return_value=GalaxyJobStatus(
+            job_id=JOB_ID,
+            state="error",
+            created_time="t",
+            updated_time="t",
+            is_complete=True,
+            stdout="/srv/galaxy/jobs/123 on node7",
+            stderr="x" * STDERR_TAIL + "Segmentation fault",
+            exit_code=139,
+        )
+    )
+    app.dependency_overrides[get_galaxy_service] = lambda: service
+
+    body = client.get(f"/api/v1/galaxy/jobs/{JOB_ID}/status").json()
+
+    assert body["stdout"] is None
+    assert len(body["stderr"]) == STDERR_TAIL
+    assert body["stderr"].endswith("Segmentation fault")
+    assert body["exit_code"] == 139

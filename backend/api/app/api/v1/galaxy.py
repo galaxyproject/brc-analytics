@@ -55,6 +55,7 @@ from app.services.kmindex_filters import (
     subset_row_count,
 )
 from app.services.kmindex_submissions import record_submission
+from app.services.logan_jobs import STDERR_TAIL
 from app.services.sra_mirror import (
     SRAMirrorService,
     export_download_name,
@@ -728,7 +729,14 @@ async def get_job_status(
         logger.debug(f"Getting status for job: {job_id}")
         status = await galaxy_service.get_job_status(job_id)
 
-        return status
+        # Anyone with a job id can read this, and a failed job's tool output
+        # can name server paths and hosts. The end of stderr is what says why.
+        return status.model_copy(
+            update={
+                "stdout": None,
+                "stderr": (status.stderr or "")[-STDERR_TAIL:] or None,
+            }
+        )
 
     except HTTPException:
         raise
