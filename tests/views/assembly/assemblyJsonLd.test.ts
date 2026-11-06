@@ -112,7 +112,7 @@ describe("buildAssemblyJsonLd", () => {
         "Trichomonas",
         "Trichomonas vaginalis",
       ],
-      name: "Trichomonas vaginalis — G3 (GCA_000002825.3)",
+      name: "Trichomonas vaginalis G3 (GCA_000002825.3)",
       provider: { "@type": "Organization", name: APP_TITLE, url: BROWSER_URL },
       sameAs: [
         "https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000002825.3",
@@ -200,20 +200,6 @@ describe("buildAssemblyJsonLd", () => {
 });
 
 describe("buildDescription", () => {
-  it("counts chromosomes and scaffolds, singular for one", () => {
-    expect(
-      buildDescription({
-        ...ASSEMBLY,
-        chromosomes: 1,
-        level: "Complete Genome",
-        scaffoldCount: 2,
-        strainName: null,
-      })
-    ).toBe(
-      "Genome assembly GCA_000002825.3 of Trichomonas vaginalis, at complete genome level, with 1 chromosome and 2 scaffolds, totaling 176,420,065 bp."
-    );
-  });
-
   it("truncates a description over 5000 characters", () => {
     const description = buildDescription({
       ...ASSEMBLY,

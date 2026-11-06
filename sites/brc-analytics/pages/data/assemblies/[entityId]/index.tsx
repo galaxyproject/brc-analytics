@@ -1,8 +1,8 @@
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { config } from "@brc/config/config";
-import { BRC_PAGE_META } from "@brc/meta/constants";
 import { AssemblyJsonLd } from "@brc/views/EntityView/assembly/components/AssemblyJsonLd/assemblyJsonLd";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
+import { buildAssemblyPageMeta } from "@repo/shared/meta/assembly/utils";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import { makeEntityStaticProps } from "@repo/shared/services/staticGeneration/entity/staticProps";
 import type { EntityPageProps } from "@repo/shared/services/staticGeneration/entity/types";
@@ -43,7 +43,7 @@ export const getStaticPaths = makeEntityStaticPaths(config, ENTITY_LIST_TYPE);
 export const getStaticProps = makeEntityStaticProps<BRCDataCatalogGenome>(
   config,
   ENTITY_LIST_TYPE,
-  BRC_PAGE_META.ASSEMBLY_DETAIL
+  buildAssemblyPageMeta
 );
 
 export default Page;

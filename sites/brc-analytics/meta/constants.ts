@@ -21,11 +21,6 @@ export const BRC_PAGE_META = {
       "Browse genome assemblies available for analysis on BRC Analytics.",
     pageTitle: "Assemblies",
   },
-  ASSEMBLY_DETAIL: {
-    pageDescription:
-      "Select and configure workflows for genome analysis on BRC Analytics.",
-    pageTitle: "Analyze",
-  },
   ASSISTANT: {
     pageDescription:
       "Get AI-assisted help with genomic analysis on BRC Analytics.",

@@ -21,11 +21,6 @@ export const GA2_PAGE_META = {
       "Browse genome assemblies available for analysis on Genome Ark 2.",
     pageTitle: "Assemblies",
   },
-  ASSEMBLY_DETAIL: {
-    pageDescription:
-      "Select and configure workflows for genome analysis on Genome Ark 2.",
-    pageTitle: "Analyze",
-  },
   CUSTOM_WORKFLOW: {
     pageDescription:
       "Configure a custom workflow for genome analysis on Genome Ark 2.",

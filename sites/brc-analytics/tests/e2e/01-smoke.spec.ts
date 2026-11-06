@@ -1,6 +1,13 @@
 import { ROUTES } from "@repo/shared/routes/constants";
 import { expect, test } from "./utils/fixtures";
 
+const ASSEMBLY = {
+  description:
+    "Genome assembly GCF_000002765.6 of Plasmodium falciparum, at complete genome level, with 14 chromosomes and 14 scaffolds, totaling 23,292,622 bp.",
+  title: "Plasmodium falciparum (GCF_000002765.6) - BRC Analytics",
+  url: `${ROUTES.GENOMES}/GCF_000002765_6`,
+};
+
 const PAGES = [
   { name: "About", url: "/about" },
   { name: "Learn", url: "/learn" },
@@ -45,4 +52,16 @@ test.describe("BRC Analytics - UI Smoke Tests", () => {
       await expect(page.locator("h1").first()).toBeVisible();
     });
   }
+
+  test("assembly page should have its own title and description", async ({
+    page,
+  }) => {
+    await page.goto(ASSEMBLY.url);
+
+    await expect(page).toHaveTitle(ASSEMBLY.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      ASSEMBLY.description
+    );
+  });
 });
