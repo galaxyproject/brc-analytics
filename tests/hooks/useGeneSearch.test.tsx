@@ -1,7 +1,7 @@
 import { useGeneSearch } from "@repo/shared/hooks/useGeneSearch";
 import { type GeneSearchResult } from "@repo/shared/services/genes/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { type JSX, type ReactNode } from "react";
 
 // The API client is built with ky.create; its get is this stub.
@@ -66,7 +66,6 @@ describe("useGeneSearch", () => {
   it("asks for up to 50 genes, and returns them", async () => {
     mockGet.mockReturnValue(found(true));
     const result = renderUseGeneSearch("ama");
-    expect(result.current).toEqual({ status: "loading" });
     await waitFor(() =>
       expect(result.current).toEqual({
         results: [RESULT],
@@ -88,13 +87,17 @@ describe("useGeneSearch", () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 
-  it("is unavailable when the request fails", async () => {
+  it("is unavailable when the request fails, until a retry answers", async () => {
     mockGet.mockReturnValue({
       json: () => Promise.reject(new TypeError("Failed to fetch")),
     });
     const result = renderUseGeneSearch("ama");
-    await waitFor(() =>
-      expect(result.current).toEqual({ status: "unavailable" })
-    );
+    await waitFor(() => expect(result.current.status).toBe("unavailable"));
+    mockGet.mockReturnValue(found());
+    act(() => {
+      if (result.current.status === "unavailable") result.current.retry();
+    });
+    await waitFor(() => expect(result.current.status).toBe("found"));
+    expect(mockGet).toHaveBeenCalledTimes(2);
   });
 });

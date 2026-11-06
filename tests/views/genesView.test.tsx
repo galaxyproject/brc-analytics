@@ -92,6 +92,29 @@ describe("GenesView", () => {
     expect(onSearch).toHaveBeenCalledWith("apical memb");
   });
 
+  it("doesn't search again for the search already shown", () => {
+    const onSearch = renderView(found([AMA1]), "ama");
+    fireEvent.submit(screen.getByRole("search"));
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it("retries the search already shown if it failed", () => {
+    const retry = jest.fn();
+    const onSearch = renderView({ retry, status: "unavailable" }, "ama");
+    fireEvent.submit(screen.getByRole("search"));
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it("searches when the box's text differs from the search shown", () => {
+    const onSearch = renderView(found([AMA1]), "ama");
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "ama1" },
+    });
+    fireEvent.submit(screen.getByRole("search"));
+    expect(onSearch).toHaveBeenCalledWith("ama1");
+  });
+
   it("shows the search in the box", () => {
     renderView(found([AMA1]), "ama");
     expect(screen.getByRole("searchbox")).toHaveValue("ama");
@@ -124,7 +147,7 @@ describe("GenesView", () => {
     [found([]), "No genes match “ama”."],
     [{ status: "loading" }, "Searching…"],
     [
-      { status: "unavailable" },
+      { retry: jest.fn(), status: "unavailable" },
       "Gene search is unavailable right now. Please try again later.",
     ],
     [{ status: "invalid" }, "Search for at most 10 words and 200 characters."],

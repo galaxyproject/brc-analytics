@@ -11,7 +11,8 @@ export type GeneSearchState =
   | { status: "idle" }
   | { status: "invalid" }
   | { status: "loading" }
-  | { status: "unavailable" }
+  // retry runs the failed search again.
+  | { retry: () => void; status: "unavailable" }
   | {
       results: GeneSearchResult[];
       status: "found";
@@ -38,7 +39,7 @@ export function isValidGeneSearch(query: string): boolean {
  */
 export function useGeneSearch(q: string): GeneSearchState {
   const enabled = q !== "" && isValidGeneSearch(q);
-  const { data, isError } = useQuery({
+  const { data, isError, isFetching, refetch } = useQuery({
     enabled,
     queryFn: ({ signal }) =>
       apiClient.searchGenes(q, GENE_SEARCH_LIMIT, signal),
@@ -52,5 +53,8 @@ export function useGeneSearch(q: string): GeneSearchState {
     const { results, truncated } = data;
     return { results, status: "found", truncated };
   }
-  return isError ? { status: "unavailable" } : { status: "loading" };
+  // A retry of a failed search is loading until it answers.
+  if (isError && !isFetching)
+    return { retry: (): void => void refetch(), status: "unavailable" };
+  return { status: "loading" };
 }
