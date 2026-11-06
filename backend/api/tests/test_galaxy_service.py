@@ -3998,8 +3998,23 @@ class TestMergedOutput:
                 ),
                 1,
             ),
+            # kmindex writes {} for a shard with no hits, never null, so a null
+            # can't be read as one searched clean.
+            (
+                lambda: _archive_response(
+                    b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": null}'
+                ),
+                1,
+            ),
         ],
-        ids=["unavailable", "gone", "no-shards", "not-a-dict", "shard-not-a-dict"],
+        ids=[
+            "unavailable",
+            "gone",
+            "no-shards",
+            "not-a-dict",
+            "shard-not-a-dict",
+            "shard-null",
+        ],
     )
     async def test_an_unreadable_file_fails_uncached(
         self, merged, monkeypatch, response, requests
