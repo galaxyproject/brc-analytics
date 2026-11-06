@@ -7,25 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from app.api.v1.genes import MAX_SEARCH_LIMIT
-from app.services.gene_catalog import MAX_SEARCH_WORDS, GeneCatalogService
+from app.api.v1.genes import MAX_SEARCH_LENGTH, MAX_SEARCH_LIMIT, MAX_SEARCH_WORDS
+from app.services.gene_catalog import GeneCatalogService
 from tests.test_genes_api import altered_snapshot, make_client
 
 AMA1 = "d9049485-ed74-5455-98c2-5dc13eef544a"
-
-
-@pytest.fixture(scope="module")
-def service(gene_snapshot_path):
-    service = GeneCatalogService.local(
-        str(gene_snapshot_path), "https://brc-analytics.org/"
-    )
-    yield service
-    service.close()
-
-
-@pytest.fixture
-def client(service):
-    return make_client(service)
 
 
 def search(client, q, **params):
@@ -42,10 +28,10 @@ def matches(body):
     ]
 
 
-def test_a_symbol_prefix_finds_the_gene(client, service):
-    body = search(client, "ama")
+def test_a_symbol_prefix_finds_the_gene(gene_client, gene_service):
+    body = search(gene_client, "ama")
     assert body == {
-        "snapshot": {"buildId": service.snapshot.build_id, "update": None},
+        "snapshot": {"buildId": gene_service.snapshot.build_id, "update": None},
         "query": "ama",
         "results": [
             {
@@ -82,29 +68,29 @@ def test_a_symbol_prefix_finds_the_gene(client, service):
         ("antigen", ("protein_product", "apical membrane antigen 1")),
     ],
 )
-def test_each_kind_of_term_finds_the_gene(client, q, matched_on):
-    body = search(client, q)
+def test_each_kind_of_term_finds_the_gene(gene_client, q, matched_on):
+    body = search(gene_client, q)
     assert [(r["geneUid"], tuple(r["matchedOn"].values())) for r in body["results"]][
         :1
     ] == [(AMA1, matched_on)]
 
 
-def test_an_old_locus_tag_finds_its_gene(client):
-    assert matches(search(client, "PF3D7_0105400.1")) == [
+def test_an_old_locus_tag_finds_its_gene(gene_client):
+    assert matches(search(gene_client, "PF3D7_0105400.1")) == [
         ("PF3D7_0105400", "old_locus_tag", "PF3D7_0105400.1")
     ]
 
 
-def test_a_transcript_product_word(client):
+def test_a_transcript_product_word(gene_client):
     # PSH1's transcript product, not its protein's ("putative ATP-dependent
     # RNA helicase").
-    assert matches(search(client, "dna")) == [
+    assert matches(search(gene_client, "dna")) == [
         ("PF3D7_0103600", "transcript_product", "ATP-dependent DNA/RNA helicase PSH1")
     ]
 
 
-def test_several_words_each_match_the_last_as_a_prefix(client):
-    assert matches(search(client, "apical memb")) == [
+def test_several_words_each_match_the_last_as_a_prefix(gene_client):
+    assert matches(search(gene_client, "apical memb")) == [
         ("PF3D7_1133400", "protein_product", "apical membrane antigen 1"),
         (
             "PF3D7_1218000",
@@ -113,13 +99,13 @@ def test_several_words_each_match_the_last_as_a_prefix(client):
         ),
     ]
     # Words before the last are whole words.
-    assert search(client, "apic membrane")["results"] == []
+    assert search(gene_client, "apic membrane")["results"] == []
     # And each must match.
-    assert search(client, "apical helicase")["results"] == []
+    assert search(gene_client, "apical helicase")["results"] == []
 
 
-def test_one_word_finds_every_gene_it_starts_a_term_of(client):
-    assert [r["locusTag"] for r in search(client, "apical")["results"]] == [
+def test_one_word_finds_every_gene_it_starts_a_term_of(gene_client):
+    assert [r["locusTag"] for r in search(gene_client, "apical")["results"]] == [
         "PF3D7_1133400",
         "PF3D7_1137200",
         "PF3D7_1141300",
@@ -127,15 +113,17 @@ def test_one_word_finds_every_gene_it_starts_a_term_of(client):
     ]
 
 
-def test_a_symbol_two_genes_share_lists_both(client):
-    assert matches(search(client, "der1-2")) == [
+def test_a_symbol_two_genes_share_lists_both(gene_client):
+    assert matches(search(gene_client, "der1-2")) == [
         ("PF3D7_0314300", "name", "DER1-2"),
         ("PF3D7_1032500", "name", "Der1-2"),
     ]
 
 
-def test_a_locus_tag_that_is_another_genes_old_one_lists_both_current_first(client):
-    body = search(client, "PF3D7_1440300")
+def test_a_locus_tag_that_is_another_genes_old_one_lists_both_current_first(
+    gene_client,
+):
+    body = search(gene_client, "PF3D7_1440300")
     assert matches(body) == [
         ("PF3D7_1440300", "locus_tag", "PF3D7_1440300"),
         ("PF3D7_1440200", "old_locus_tag", "PF3D7_1440300"),
@@ -143,10 +131,10 @@ def test_a_locus_tag_that_is_another_genes_old_one_lists_both_current_first(clie
     assert body["results"][0]["name"] == "PBGS"
 
 
-def test_each_gene_is_listed_once_at_its_best_match(client):
+def test_each_gene_is_listed_once_at_its_best_match(gene_client):
     # AMA1 is its name, its symbol and a prefix of its locus tag's; listed
     # once, on its name.
-    assert matches(search(client, "ama1")) == [("PF3D7_1133400", "name", "AMA1")]
+    assert matches(search(gene_client, "ama1")) == [("PF3D7_1133400", "name", "AMA1")]
 
 
 def test_ranking(tmp_path, gene_snapshot_path):
@@ -160,7 +148,7 @@ def test_ranking(tmp_path, gene_snapshot_path):
         ("PF3D7_1133400", "zz", "protein_accession"),
         ("PF3D7_1218000", "zz", "name"),
     ]
-    rank = {"transcript_product": 2, "symbol": 1, "protein_accession": 1}
+    rank = {"transcript_product": 4, "symbol": 1, "protein_accession": 1}
     sql = ";".join(
         f"INSERT INTO search_term SELECT '{term}', '{kind}', gene_uid,"
         f" upper('{term}'), assembly_accession, NULL, {rank.get(kind, 0)}"
@@ -182,8 +170,8 @@ def test_ranking(tmp_path, gene_snapshot_path):
     ]
 
 
-def test_truncation(client):
-    body = search(client, "PF3D7_11", limit=5)
+def test_truncation(gene_client):
+    body = search(gene_client, "PF3D7_11", limit=5)
     assert [r["locusTag"] for r in body["results"]] == [
         "PF3D7_1130000",
         "PF3D7_1130100",
@@ -192,33 +180,33 @@ def test_truncation(client):
         "PF3D7_1130400",
     ]
     assert body["truncated"] is True
-    body = search(client, "PF3D7_11", limit=8)
+    body = search(gene_client, "PF3D7_11", limit=8)
     assert len(body["results"]) == 8
     assert body["truncated"] is False
 
 
-def test_limit_defaults_to_10(client):
-    body = search(client, "PF3D7_")
+def test_limit_defaults_to_10(gene_client):
+    body = search(gene_client, "PF3D7_")
     assert len(body["results"]) == 10
     assert body["truncated"] is True
 
 
-def test_by_assembly(client):
-    assert len(search(client, "ama1", assembly="GCF_000002765.6")["results"]) == 1
-    assert search(client, "ama1", assembly="GCF_000001405.40")["results"] == []
+def test_by_assembly(gene_client):
+    assert len(search(gene_client, "ama1", assembly="GCF_000002765.6")["results"]) == 1
+    assert search(gene_client, "ama1", assembly="GCF_000001405.40")["results"] == []
 
 
-def test_nothing_found(client):
-    assert search(client, "nosuchgene") == {
-        "snapshot": search(client, "ama")["snapshot"],
+def test_nothing_found(gene_client):
+    assert search(gene_client, "nosuchgene") == {
+        "snapshot": search(gene_client, "ama")["snapshot"],
         "query": "nosuchgene",
         "results": [],
         "truncated": False,
     }
 
 
-def test_the_query_is_trimmed(client):
-    assert search(client, "  ama  ")["query"] == "ama"
+def test_the_query_is_trimmed(gene_client):
+    assert search(gene_client, "  ama  ")["query"] == "ama"
 
 
 @pytest.mark.parametrize(
@@ -227,14 +215,14 @@ def test_the_query_is_trimmed(client):
         {},
         {"q": ""},
         {"q": "   "},
-        {"q": "a" * 201},
+        {"q": "a" * (MAX_SEARCH_LENGTH + 1)},
         {"q": " ".join(["ama"] * (MAX_SEARCH_WORDS + 1))},
         {"q": "ama", "limit": 0},
         {"q": "ama", "limit": MAX_SEARCH_LIMIT + 1},
     ],
 )
-def test_bad_queries_are_422(client, params):
-    assert client.get("/api/v1/genes/search", params=params).status_code == 422
+def test_bad_queries_are_422(gene_client, params):
+    assert gene_client.get("/api/v1/genes/search", params=params).status_code == 422
 
 
 def test_search_is_503_without_gene_data(tmp_path):

@@ -80,19 +80,17 @@ PRODUCT_STOP_WORDS = frozenset(
 )
 MIN_PRODUCT_WORD_LENGTH = 3
 
-# search_term.type_rank: how good a match on each kind of term is.
+# search_term.type_rank: how good a match on each kind of term is, lowest
+# best. Search ranks a term the gene's word only starts 2 below the same term
+# matched whole, so a product word ranks after every alias match.
 TYPE_RANK_OWN_ALIAS = 0
 TYPE_RANK_OTHER_ALIAS = 1
-TYPE_RANK_PRODUCT_WORD = 2
+TYPE_RANK_PRODUCT_WORD = 4
 
-# The order each table's rows are written in. Sorted by gene UID, a lookup by
-# gene reads one row group; sorted by term, a prefix of a term is a range.
-TABLE_ORDER = {
-    "gene": "gene_uid",
-    "transcript": "gene_uid",
-    "alt_id": "gene_uid",
-    "search_term": "term, type, gene_uid",
-}
+# Tables written in an order of their own. The rest are sorted by gene UID
+# when they have one, so a lookup by gene reads one row group; search_term is
+# sorted by term, so a prefix of a term is a range of rows.
+TABLE_ORDER = {"search_term": "term, type, gene_uid"}
 
 SCHEMA = """
 CREATE TABLE snapshot (
@@ -192,8 +190,11 @@ CREATE TABLE alt_id (
 );
 
 -- What gene search matches, one row per term, type and gene, from the latest
--- annotation set versions only: each alias, and each word of the gene's
--- transcripts' products. Sorted by term, so a prefix is a range of rows.
+-- annotation set versions only: each alias (an accession also without its
+-- version), and each word of the gene's transcripts' products. Sorted by term,
+-- so a prefix is a range of rows. No primary key: search reads ranges, never
+-- keys, and the index would be most of the table's size; search_term_rows
+-- keeps each row once.
 CREATE TABLE search_term (
     term VARCHAR NOT NULL,
     type VARCHAR NOT NULL,
@@ -201,8 +202,7 @@ CREATE TABLE search_term (
     display VARCHAR NOT NULL,
     assembly_accession VARCHAR NOT NULL REFERENCES assembly (accession),
     species_taxonomy_id VARCHAR,
-    type_rank INTEGER NOT NULL,
-    PRIMARY KEY (term, type, gene_uid)
+    type_rank INTEGER NOT NULL
 );
 """
 
@@ -310,6 +310,13 @@ def _code_commit() -> Optional[str]:
         return None
 
 
+def unversioned(value_lower: str, alias_type: str) -> str:
+    """An alias without its `.N` version, if it is an accession that has one."""
+    if alias_type in VERSIONED_ALIAS_TYPES:
+        return re.sub(r"\.\d+$", "", value_lower)
+    return value_lower
+
+
 def product_words(product: str) -> List[str]:
     """The words of a product that find its gene, lowercased, each once.
 
@@ -321,9 +328,9 @@ def product_words(product: str) -> List[str]:
     for token in product.lower().split():
         token = token.strip(string.punctuation)
         words.append(token)
-        parts = re.split(r"[-/]", token)
-        if len(parts) > 1:
-            words.extend(part.strip(string.punctuation) for part in parts)
+        words.extend(
+            part.strip(string.punctuation) for part in re.split(r"[-/]", token)
+        )
     return [
         word
         for word in dict.fromkeys(words)
@@ -341,7 +348,9 @@ def search_term_rows(
     """A gene's search terms: its aliases and its products' words.
 
     `aliases` and `products` are (value, type) pairs. A term is kept once per
-    type, with the first value it came from as its display.
+    type, with the first value it came from as its display. An accession is
+    also a term without its version, so typing it without one is an exact
+    match.
     """
     terms: Dict[Tuple[str, str], Tuple[str, int]] = {}
     for value, alias_type in aliases:
@@ -350,7 +359,9 @@ def search_term_rows(
             if alias_type in OWN_ALIAS_TYPES
             else TYPE_RANK_OTHER_ALIAS
         )
-        terms.setdefault((value.lower(), alias_type), (value, rank))
+        value_lower = value.lower()
+        for term in dict.fromkeys([value_lower, unversioned(value_lower, alias_type)]):
+            terms.setdefault((term, alias_type), (value, rank))
     for product, product_type in products:
         for word in product_words(product):
             terms.setdefault((word, product_type), (product, TYPE_RANK_PRODUCT_WORD))
@@ -487,11 +498,7 @@ def snapshot_rows(
                     "gene_uid": uid,
                     "asv_id": asv_id,
                     "value_lower": value_lower,
-                    "value_unversioned": (
-                        re.sub(r"\.\d+$", "", value_lower)
-                        if alias_type in VERSIONED_ALIAS_TYPES
-                        else value_lower
-                    ),
+                    "value_unversioned": unversioned(value_lower, alias_type),
                     "publisher": publisher,
                     "via": None,
                     "latest": True,
@@ -512,8 +519,8 @@ def snapshot_rows(
 def write_snapshot(rows: Dict[str, List[Dict[str, Any]]], out: Path) -> None:
     """Write the tables to `out`, replacing it only once every row is in.
 
-    The tables declare their keys, so a duplicate key or a reference that
-    doesn't resolve fails the insert and leaves `out` as it was.
+    The tables declare their keys (but search_term's), so a duplicate key or
+    a reference that doesn't resolve fails the insert and leaves `out` as it was.
     """
     out.parent.mkdir(parents=True, exist_ok=True)
     partial = out.with_name(out.name + ".partial")
@@ -528,9 +535,12 @@ def write_snapshot(rows: Dict[str, List[Dict[str, Any]]], out: Path) -> None:
                 continue
             con.register("frame", pd.DataFrame(table_rows))
             columns = ", ".join(f'"{c}"' for c in table_rows[0])
-            order = f" ORDER BY {TABLE_ORDER[table]}" if table in TABLE_ORDER else ""
+            order = TABLE_ORDER.get(
+                table, "gene_uid" if "gene_uid" in table_rows[0] else None
+            )
+            order_by = f" ORDER BY {order}" if order else ""
             con.execute(
-                f"INSERT INTO {table} ({columns}) SELECT {columns} FROM frame{order}"
+                f"INSERT INTO {table} ({columns}) SELECT {columns} FROM frame{order_by}"
             )
             con.unregister("frame")
         con.execute("COMMIT")

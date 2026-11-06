@@ -43,7 +43,7 @@ function found(truncated = false): { json: () => Promise<unknown> } {
  * @param query - The search.
  * @returns The hook's result.
  */
-function renderUseGeneSearch(query: string | undefined): {
+function renderUseGeneSearch(query: string): {
   current: ReturnType<typeof useGeneSearch>;
 } {
   const queryClient = new QueryClient({
@@ -58,21 +58,17 @@ function renderUseGeneSearch(query: string | undefined): {
 beforeEach(() => mockGet.mockReset());
 
 describe("useGeneSearch", () => {
-  it.each([undefined, "", "   "])(
-    "is idle, without a request, for no search (%p)",
-    (query) => {
-      expect(renderUseGeneSearch(query).current).toEqual({ status: "idle" });
-      expect(mockGet).not.toHaveBeenCalled();
-    }
-  );
+  it("is idle, without a request, for no search", () => {
+    expect(renderUseGeneSearch("").current).toEqual({ status: "idle" });
+    expect(mockGet).not.toHaveBeenCalled();
+  });
 
   it("asks for up to 50 genes, and returns them", async () => {
     mockGet.mockReturnValue(found(true));
-    const result = renderUseGeneSearch(" ama ");
+    const result = renderUseGeneSearch("ama");
     expect(result.current).toEqual({ status: "loading" });
     await waitFor(() =>
       expect(result.current).toEqual({
-        query: "ama",
         results: [RESULT],
         status: "found",
         truncated: true,

@@ -69,7 +69,7 @@ function found(
   results: GeneSearchResult[],
   truncated = false
 ): GeneSearchState {
-  return { query: "ama", results, status: "found", truncated };
+  return { results, status: "found", truncated };
 }
 
 describe("GenesView", () => {
@@ -129,7 +129,7 @@ describe("GenesView", () => {
     ],
     [{ status: "invalid" }, "Search for at most 10 words and 200 characters."],
   ])("says why there are no results (%p)", (search, message) => {
-    renderView(search);
+    renderView(search, "ama");
     expect(screen.getByRole("status")).toHaveTextContent(message);
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
@@ -150,7 +150,12 @@ describe("describeMatch", () => {
       "apical membrane antigen 1",
       'Matched transcript product "apical membrane antigen 1"',
     ],
-    ["some_new_type", "x", "Matched some new type x"],
+    ["symbol", "AMA1", "Matched symbol AMA1"],
+    [
+      "protein_product",
+      "apical membrane antigen 1",
+      'Matched protein product "apical membrane antigen 1"',
+    ],
   ])("describes a %s match", (type, value, text) => {
     expect(describeMatch({ type, value })).toBe(text);
   });

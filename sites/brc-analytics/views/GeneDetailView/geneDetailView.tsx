@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
+import { EMPTY_VALUE } from "@repo/shared/services/genes/constants";
 import {
   geneLabel,
   geneSymbol,
@@ -22,7 +23,7 @@ import Link from "next/link";
 import { type JSX } from "react";
 import { BionymSection } from "./components/BionymSection/bionymSection";
 import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
-import { EMPTY_VALUE, GENE_BREADCRUMBS } from "./constants";
+import { GENE_BREADCRUMBS } from "./constants";
 import {
   FieldLabel,
   FieldList,
