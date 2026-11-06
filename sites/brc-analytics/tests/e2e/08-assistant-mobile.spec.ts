@@ -76,6 +76,25 @@ async function getScrollPaddingTop(page: Page): Promise<number> {
 }
 
 /**
+ * Reads how far the page is scrolled.
+ * @param page - The Playwright page.
+ * @returns The window's vertical scroll position, in pixels.
+ */
+async function getScrollY(page: Page): Promise<number> {
+  return page.evaluate(() => window.scrollY);
+}
+
+/**
+ * Scrolls the page to the bottom.
+ * @param page - The Playwright page.
+ */
+async function scrollToBottom(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight)
+  );
+}
+
+/**
  * Stands in for the backend, which this suite doesn't run: the assistant
  * completes the setup on the first message, and every other call is refused,
  * as for a signed-out user.
@@ -118,6 +137,30 @@ async function completeSetup(
   ).toBeEnabled();
   await field.press("Enter");
   await expect(page.getByText(REPLY)).toBeVisible();
+}
+
+/**
+ * Opens the new assistant UI and waits until the pinned tab bar's height
+ * reaches the page's scroll padding, which happens once it is measured.
+ * @param page - The Playwright page.
+ * @returns The pinned tab bar.
+ */
+async function openWithPinnedTabBar(page: Page): Promise<Locator> {
+  await mockBackend(page, COMPLETE_REPLY);
+  await page.goto(ASSISTANT_URL);
+  const tabBar = page
+    .locator(":has(> .MuiTabs-root)")
+    .filter({ has: page.getByRole("tablist", { name: TABS_LABEL }) });
+  const header = page.locator("header");
+  await expect
+    .poll(
+      async () =>
+        (await getScrollPaddingTop(page)) -
+        (await getHeight(header)) -
+        (await getHeight(tabBar))
+    )
+    .toBeCloseTo(0, 0);
+  return tabBar;
 }
 
 test.describe("BRC Analytics - Assistant, completed setup", () => {
@@ -171,31 +214,47 @@ test.describe("BRC Analytics - Assistant, pinned tab bar", () => {
     test.use({ viewport: { height: 500, width: 390 } });
 
     test("keeps a focused control below the tab bar", async ({ page }) => {
-      await mockBackend(page, COMPLETE_REPLY);
-      await page.goto(ASSISTANT_URL);
-      const tabBar = page
-        .locator(":has(> .MuiTabs-root)")
-        .filter({ has: page.getByRole("tablist", { name: TABS_LABEL }) });
-      const expected =
-        (await getHeight(page.locator("header"))) + (await getHeight(tabBar));
-      // The tab bar's height reaches the scroll padding once it is measured.
-      await expect
-        .poll(() => getScrollPaddingTop(page))
-        .toBeCloseTo(expected, 0);
-
+      const tabBar = await openWithPinnedTabBar(page);
       await page.getByRole("tab", { name: /History/ }).click();
       const signIn = page
         .getByRole("tabpanel", { name: /History/ })
         .getByRole("button", { name: "Sign in" });
-      await page.evaluate(() =>
-        window.scrollTo(0, document.documentElement.scrollHeight)
-      );
+      await scrollToBottom(page);
       await signIn.focus();
       const tabBarBox = await tabBar.boundingBox();
       const signInBox = await signIn.boundingBox();
       expect(signInBox?.y).toBeGreaterThanOrEqual(
         (tabBarBox?.y ?? 0) + (tabBarBox?.height ?? 0) - 1
       );
+    });
+
+    // A tab is always in view, so focusing one shouldn't scroll the page,
+    // although it sits inside the page's scroll padding.
+    test("doesn't scroll the page when a tab takes focus", async ({ page }) => {
+      await openWithPinnedTabBar(page);
+      const historyTab = page.getByRole("tab", { name: /History/ });
+      await historyTab.click();
+      const historyPanel = page.getByRole("tabpanel", { name: /History/ });
+      // The sign-in prompt renders once auth resolves; waited for so the
+      // column's height is settled before scrolling.
+      await expect(
+        historyPanel.getByRole("button", { name: "Sign in" })
+      ).toBeVisible();
+      // Focused before scrolling, since focusing it scrolls it into view.
+      await historyPanel.getByRole("button", { name: "New analysis" }).focus();
+      await scrollToBottom(page);
+      const scrollY = await getScrollY(page);
+      expect(scrollY).toBeGreaterThan(0);
+
+      // The column's first control: Shift+Tab moves focus to the History tab.
+      await page.keyboard.press("Shift+Tab");
+      await expect(historyTab).toBeFocused();
+      expect(await getScrollY(page)).toBe(scrollY);
+
+      // Arrow keys move focus between the tabs.
+      await page.keyboard.press("ArrowRight");
+      await expect(page.getByRole("tab", { name: /Chat/ })).toBeFocused();
+      expect(await getScrollY(page)).toBe(scrollY);
     });
   });
 
