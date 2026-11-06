@@ -32,24 +32,28 @@ def search_genes(
 ) -> GeneSearchResponse:
     """Genes found by prefix of their IDs, symbols, or their products' words.
 
-    Case-insensitive. Each word must match a term of the gene: the last may
-    be the start of one, the others must be whole. Each gene is listed once,
-    at its best match, best first.
+    Case-insensitive, and surrounding punctuation is ignored. Each word must
+    match a term of the gene: the last may be the start of one, the others
+    must be whole. In a query of several words, stop words and words of 1 or
+    2 characters are left out. Each gene is listed once, at its best match,
+    best first.
     """
-    query = q.strip()
-    words = query.lower().split()
-    if not words:
-        raise HTTPException(status_code=422, detail="The query is empty")
-    if len(words) > MAX_SEARCH_WORDS:
+    if len(q.split()) > MAX_SEARCH_WORDS:
         raise HTTPException(
             status_code=422,
             detail=f"The query has more than {MAX_SEARCH_WORDS} words",
         )
     if service.snapshot is None:
         raise HTTPException(status_code=503, detail="Gene data is unavailable")
+    words = service.search_words(q)
+    if not words:
+        raise HTTPException(status_code=422, detail="The query has no words")
     results, truncated = service.search_genes(words, assembly, limit)
     return GeneSearchResponse(
-        snapshot=service.snapshot, query=query, results=results, truncated=truncated
+        snapshot=service.snapshot,
+        query=" ".join(words),
+        results=results,
+        truncated=truncated,
     )
 
 

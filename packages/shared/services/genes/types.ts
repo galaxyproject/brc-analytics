@@ -108,7 +108,8 @@ export interface GeneSearchResult {
 }
 
 export interface GeneSearchResponse {
-  // The query as searched: trimmed of surrounding whitespace.
+  // The words searched: the query lowercased, trimmed of punctuation, and
+  // without the stop words and 1 or 2 character words of a query of several.
   query: string;
   // Best first; each gene once, at its best match.
   results: GeneSearchResult[];

@@ -10,6 +10,8 @@ per assembly for now, so every row is the latest.
 import atexit
 import logging
 import shutil
+import string
+import sys
 import tempfile
 import threading
 from contextlib import contextmanager
@@ -184,9 +186,14 @@ def _search_params(words: List[str], assembly: Optional[str], limit: int) -> Lis
     return [last, last, _next_prefix(last), *by_assembly, *others, limit]
 
 
-def _next_prefix(word: str) -> str:
-    """The least string after every string that starts with word."""
-    return word[:-1] + chr(ord(word[-1]) + 1)
+def _next_prefix(word: str) -> Optional[str]:
+    """The least string after every string that starts with word, or None
+    when there is none: a word of only the last code point, U+10FFFF. No
+    term starts with one, and None makes the range empty."""
+    stem = word.rstrip(chr(sys.maxunicode))
+    if not stem:
+        return None
+    return stem[:-1] + chr(ord(stem[-1]) + 1)
 
 
 def _records(cur: duckdb.DuckDBPyConnection) -> List[Dict[str, Any]]:
@@ -209,6 +216,10 @@ class GeneCatalogService:
         self.source = source
         self.status: GeneDataStatus = "loading"
         self.snapshot: Optional[GeneSnapshotInfo] = None
+        # The words the snapshot's product words leave out, and their least
+        # length; read from the snapshot (see search_words).
+        self._stop_words: frozenset[str] = frozenset()
+        self._min_word_length = 0
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         # Held only while a request's cursor is made from the shared
         # connection, as SRAMirrorService does; the queries run unlocked.
@@ -277,11 +288,12 @@ class GeneCatalogService:
         )
         try:
             row = con.execute(
-                'SELECT build_id, "update", schema_version FROM snapshot'
+                'SELECT build_id, "update", schema_version, search_stop_words,'
+                " search_min_word_length FROM snapshot"
             ).fetchone()
             if row is None:
                 raise duckdb.InvalidInputException("its snapshot table is empty")
-            build_id, update, schema_version = row
+            build_id, update, schema_version, stop_words, min_word_length = row
             if schema_version != SCHEMA_VERSION:
                 raise duckdb.InvalidInputException(
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
@@ -309,6 +321,8 @@ class GeneCatalogService:
                 con.close()
                 raise DownloadStopped
             self._con = con
+            self._stop_words = frozenset(stop_words)
+            self._min_word_length = min_word_length
             self.snapshot = snapshot
             self.status = "ready"
         logger.info("Gene snapshot loaded (%s): build %s", self.source, build_id)
@@ -376,6 +390,28 @@ class GeneCatalogService:
                 "page_url": self.page_url(gene_uid),
             }
         )
+
+    def search_words(self, query: str) -> List[str]:
+        """The words of a query that search matches, normalized as the
+        snapshot's terms are: lowercased and trimmed of surrounding
+        punctuation, so "(AMA1)" is ama1.
+
+        With several words, those no product word can be are left out: stop
+        words and words shorter than the snapshot's least, so "apical
+        membrane antigen 1" searches apical membrane antigen. If that leaves
+        none, the last word is kept. A lone word is always kept: it may start
+        a longer term, or be a short alias.
+        """
+        words = [w.strip(string.punctuation) for w in query.lower().split()]
+        words = [w for w in words if w]
+        if len(words) <= 1:
+            return words
+        kept = [
+            w
+            for w in words
+            if len(w) >= self._min_word_length and w not in self._stop_words
+        ]
+        return kept or words[-1:]
 
     def search_genes(
         self, words: List[str], assembly: Optional[str], limit: int

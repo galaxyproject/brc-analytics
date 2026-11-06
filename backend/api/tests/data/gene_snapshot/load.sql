@@ -1,5 +1,5 @@
 COPY assembly FROM 'tests/data/gene_snapshot/assembly.csv' (FORMAT 'csv', force_not_null ('organism_name', 'taxonomy_id', 'is_ref', 'accession'), quote '"', delimiter ',', header 1);
-COPY "snapshot" FROM 'tests/data/gene_snapshot/snapshot.csv' (FORMAT 'csv', force_not_null ('schema_version', 'built_at', 'build_id'), quote '"', delimiter ',', header 1);
+COPY "snapshot" FROM 'tests/data/gene_snapshot/snapshot.csv' (FORMAT 'csv', force_not_null ('schema_version', 'built_at', 'search_stop_words', 'search_min_word_length', 'build_id'), quote '"', delimiter ',', header 1);
 COPY annotation_set_version FROM 'tests/data/gene_snapshot/annotation_set_version.csv' (FORMAT 'csv', force_not_null ('assembly_accession', 'publisher', 'version', 'publisher_file_sha256', 'first_seen', 'latest', 'asv_id'), quote '"', delimiter ',', header 1);
 COPY gene FROM 'tests/data/gene_snapshot/gene.csv' (FORMAT 'csv', force_not_null ('gene_uid', 'asv_id', 'present', 'latest', 'assembly_accession', 'seq_name', 'start', 'end', 'strand'), quote '"', delimiter ',', header 1);
 COPY search_term FROM 'tests/data/gene_snapshot/search_term.csv' (FORMAT 'csv', force_not_null ('term', 'type', 'gene_uid', 'display', 'assembly_accession', 'type_rank'), quote '"', delimiter ',', header 1);

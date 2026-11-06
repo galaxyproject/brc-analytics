@@ -1,2 +1,2 @@
-build_id,schema_version,update,built_at,gene_sources_commit,code_commit,check_report
-temp-GCF_000002765.6-2026-11-06T200810Z,2,,2026-11-06 20:11:04,,42c6daeef1dee148fe7ddea464d92664c2e3bf1a,
+build_id,schema_version,update,built_at,gene_sources_commit,code_commit,check_report,search_stop_words,search_min_word_length
+temp-GCF_000002765.6-2026-11-06T222407Z,2,,2026-11-06 22:24:49,,f4cd12980a84d1add021514cba27af867d9dd866,,"[and, domain, family, like, of, protein, putative, the]",3

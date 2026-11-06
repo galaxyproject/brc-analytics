@@ -100,7 +100,12 @@ CREATE TABLE snapshot (
     built_at TIMESTAMP NOT NULL,
     gene_sources_commit VARCHAR,
     code_commit VARCHAR,
-    check_report JSON
+    check_report JSON,
+    -- The rules search_term's product words were made by, so search can drop
+    -- the words of a query that are never terms: product words shorter than
+    -- search_min_word_length, and search_stop_words.
+    search_stop_words VARCHAR[] NOT NULL,
+    search_min_word_length INTEGER NOT NULL
 );
 
 CREATE TABLE assembly (
@@ -399,6 +404,8 @@ def snapshot_rows(
                 "gene_sources_commit": None,
                 "code_commit": _code_commit(),
                 "check_report": None,
+                "search_stop_words": sorted(PRODUCT_STOP_WORDS),
+                "search_min_word_length": MIN_PRODUCT_WORD_LENGTH,
             }
         ],
         "assembly": [assembly],
