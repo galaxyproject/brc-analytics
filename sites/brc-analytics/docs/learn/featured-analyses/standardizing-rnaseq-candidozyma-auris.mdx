@@ -100,10 +100,10 @@ For this analysis we used Claude Code Agent (CCA) produced by Anthropic, configu
 <Figure
   alt="Analysis Flow"
   caption={
-    <figcaption>
+    <>
       Figure 1: Analysis flow in this manuscript (A) and with integrated AI
       agents that will be available in future releases (B).
-    </figcaption>
+    </>
   }
   src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/flow.webp"
 />
@@ -123,10 +123,10 @@ _Go ahead and execute the plan. Once you are done please add name tags to datase
 <Figure
   alt="Collection Split"
   caption={
-    <figcaption>
+    <>
       Figure 2: CCA splits collection containing counts into three collections
       corresponding to three different strains (conditions).
-    </figcaption>
+    </>
   }
   src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/collection-split.webp"
 />
@@ -160,15 +160,13 @@ The study compared three strains (Table 3): AR0382_WT, a wild-type highly adhesi
 <Figure
   alt="Santana Validation"
   caption={
-    <figcaption>
-      <span>
-        Figure 3: Validation of Santana et al. <code>DESeq2</code> results using
-        official NCBI gene ID mapping. Left: tnSWI1 vs AR0382 comparison (n=203
-        genes, R²=0.94). Right: AR0387 vs AR0382 comparison (n=165 genes,
-        R²=0.89). Red dashed line indicates perfect correlation (y=x). Key gene
-        SCF1 is labeled.
-      </span>
-    </figcaption>
+    <span>
+      Figure 3: Validation of Santana et al. <code>DESeq2</code> results using
+      official NCBI gene ID mapping. Left: tnSWI1 vs AR0382 comparison (n=203
+      genes, R²=0.94). Right: AR0387 vs AR0382 comparison (n=165 genes,
+      R²=0.89). Red dashed line indicates perfect correlation (y=x). Key gene
+      SCF1 is labeled.
+    </span>
   }
   src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/santana_combined_sidebyside.webp"
 />
@@ -180,15 +178,13 @@ This study compared two strains with distinct aggregation phenotypes: AR0382 (B1
 <Figure
   alt="Wang Validation"
   caption={
-    <figcaption>
-      <span>
-        Figure 4: Validation of Wang et al. <code>DESeq2</code> results using
-        official NCBI gene ID mapping. Left: In vitro biofilm comparison (n=76
-        genes, R²=0.98). Right: In vivo mouse catheter model (n=259 genes,
-        R²=0.9998). Red dashed line indicates perfect correlation (y=x). Key
-        adhesin genes SCF1 and ALS4112 are labeled.
-      </span>
-    </figcaption>
+    <span>
+      Figure 4: Validation of Wang et al. <code>DESeq2</code> results using
+      official NCBI gene ID mapping. Left: In vitro biofilm comparison (n=76
+      genes, R²=0.98). Right: In vivo mouse catheter model (n=259 genes,
+      R²=0.9998). Red dashed line indicates perfect correlation (y=x). Key
+      adhesin genes SCF1 and ALS4112 are labeled.
+    </span>
   }
   src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/wang-validation-scatter.webp"
 />
@@ -246,14 +242,12 @@ All analyses used _Candidozyma auris_ B8441 reference genome GCA_002759435.3 obt
 <Figure
   alt="IWC RNA-seq Workflow"
   caption={
-    <figcaption>
-      <span>
-        Figure 5: IWC paired-end RNA-seq workflow. The pipeline processes FASTQ
-        files through quality filtering (<code>fastp</code>), alignment (
-        <code>STAR</code>), and quantification, with optional coverage track
-        generation and QC aggregation via <code>MultiQC</code>.
-      </span>
-    </figcaption>
+    <span>
+      Figure 5: IWC paired-end RNA-seq workflow. The pipeline processes FASTQ
+      files through quality filtering (<code>fastp</code>), alignment (
+      <code>STAR</code>), and quantification, with optional coverage track
+      generation and QC aggregation via <code>MultiQC</code>.
+    </span>
   }
   src="/learn/featured-analyses/standardizing-rnaseq-candidozyma-auris/rnaseq-workflow.webp"
 />

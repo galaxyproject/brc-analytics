@@ -60,3 +60,11 @@ async def test_partner_status_failure_logs_a_warning_not_an_error(caplog):
     assert excinfo.value.status_code == 502
     records = [r for r in caplog.records if r.name == "app.api.v1.partner"]
     assert records and all(r.levelno == logging.WARNING for r in records)
+
+
+def test_bioblend_fingerprint_carries_no_query_url():
+    # The fingerprint is built from the message, so it must see the scrubbed one.
+    message = 'POST: error 400: b\'{"url": "base64://QUNHVEFDR1Q="}\''
+    event = before_send({"logentry": {"message": message}, "logger": "bioblend"}, {})
+
+    assert "QUNHVEFDR1Q=" not in str(event["fingerprint"])

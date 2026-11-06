@@ -48,7 +48,9 @@ RUN chown -R app:app /app
 # runtime user, because Docker seeds a fresh named volume with the ownership of
 # the image directory it covers -- mount one over a path that does not exist
 # and it arrives root-owned, which this process cannot write to.
-RUN mkdir -p /data/exports && chown -R app:app /data
+# /data/genes is where the pinned gene snapshot downloads at startup. It has
+# no volume: the file goes with the container.
+RUN mkdir -p /data/exports /data/genes && chown -R app:app /data
 USER app
 
 EXPOSE 8000

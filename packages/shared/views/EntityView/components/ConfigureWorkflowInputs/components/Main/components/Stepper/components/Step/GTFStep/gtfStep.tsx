@@ -28,14 +28,16 @@ import {
 import { useAssembly } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/providers/Assembly/hook";
 import { Fragment, type JSX, useEffect } from "react";
 import { StyledGrid } from "./gtfStep.styles";
+import { useConfigureGeneModel } from "./hooks/UseConfigureGeneModel/hook";
 import { useRadioGroup } from "./hooks/UseRadioGroup/hook";
 import { useQuery } from "./query/hook";
 import { STEP } from "./step";
-import { configureGTFStep, getGeneModelLabel } from "./utils";
+import { getGeneModelLabel, isGeneModelCleared } from "./utils";
 
 export const GTFStep = ({
   active,
   completed,
+  configuredInput,
   description,
   entryLabel,
   index,
@@ -46,11 +48,18 @@ export const GTFStep = ({
 }: StepProps): JSX.Element => {
   const assembly = useAssembly();
   const { data, error, isLoading } = useQuery(assembly);
-  const { controls, onChange, onValueChange, value } = useRadioGroup(data);
+  const {
+    controls,
+    onChange,
+    onValueChange,
+    value: rawValue,
+  } = useRadioGroup(data);
+  // When the reference changes, the gene model is cleared before the new
+  // reference's gene models load — show no selection so the radio can't keep
+  // showing the previous reference's gene model.
+  const value = isGeneModelCleared(configuredInput) ? "" : rawValue;
 
-  useEffect(() => {
-    configureGTFStep(data, onConfigure, onValueChange);
-  }, [data, onConfigure, onValueChange]);
+  useConfigureGeneModel(assembly?.accession, data, onConfigure, onValueChange);
 
   // Auto-configure step with empty string if there's an error
   // Empty string represents "user will provide in Galaxy" similar to how sequencing steps use empty arrays

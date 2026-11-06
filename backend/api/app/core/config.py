@@ -20,8 +20,9 @@ DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
 # so importing it doesn't drag the full Settings instantiation along.
 SESSION_COOKIE_NAME = "brc_assistant_session"
 
-DEFAULT_GENE_SNAPSHOT_PATH = (
-    Path(__file__).resolve().parents[1] / "data" / "genes" / "genes-3d7.duckdb"
+# Which gene snapshot this release serves (see app/services/gene_snapshot.py).
+GENE_SNAPSHOT_PIN_PATH = (
+    Path(__file__).resolve().parents[1] / "data" / "genes" / "snapshot-pin.json"
 )
 
 
@@ -227,11 +228,10 @@ class Settings:
         # SRA-DuckDB mirror. Empty path disables the assistant's SRA tools.
         self.SRA_MIRROR_PATH: str = os.getenv("SRA_MIRROR_PATH", "")
 
-        # Gene snapshot the gene API reads. Defaults to the temporary 3D7 file
-        # checked in with the app (#1904); the real snapshot will be mounted.
-        self.GENE_SNAPSHOT_PATH: str = os.getenv(
-            "GENE_SNAPSHOT_PATH", str(DEFAULT_GENE_SNAPSHOT_PATH)
-        )
+        # Set only on a developer's machine: a local gene snapshot to serve.
+        # Unset, the pinned one is downloaded into GENE_SNAPSHOT_DIR.
+        self.GENE_SNAPSHOT_PATH: str = os.getenv("GENE_SNAPSHOT_PATH", "")
+        self.GENE_SNAPSHOT_DIR: str = os.getenv("GENE_SNAPSHOT_DIR", "/data/genes")
 
         # Where a kmindex search's full, mirror-enriched match set is written
         # so it can be downloaded afterwards. Empty path disables the export

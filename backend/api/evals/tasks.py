@@ -366,7 +366,10 @@ def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
             # if the reply already spent the budget.
             remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.time() - turn_start)
             if reply_produced and remaining >= EXTRACT_MIN_BUDGET_SECONDS:
-                payload = aa.build_extract_payload(schema, turn["text"], reply_text)
+                workflows = aa._session_workflows(history)
+                payload = aa.build_extract_payload(
+                    schema, turn["text"], reply_text, workflows=workflows
+                )
                 try:
                     # Mirror production chat() exactly: no-retry extractor call
                     # (_run_agent_once) + delta-safe apply (_snapshot_to_updates,
@@ -389,7 +392,9 @@ def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
                         n: (getattr(schema, n).value, getattr(schema, n).status)
                         for n in _STATE_FIELDS
                     }
-                    schema = aa._apply_schema_updates(schema, updates)
+                    schema = aa._apply_schema_updates(
+                        schema, updates, workflows=workflows
+                    )
                     state_nonempty = any(
                         before[n]
                         != (getattr(schema, n).value, getattr(schema, n).status)

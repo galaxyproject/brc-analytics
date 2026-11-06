@@ -9,7 +9,6 @@ import { type AppSiteConfig } from "@repo/shared/config/types";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type WorkflowEntity } from "@repo/shared/views/WorkflowsView/types";
 import { SUPPORT_URL } from "./constants";
-import { floating } from "./floating/floating";
 import { genomeEntityConfig } from "./index/genome/genomeEntityConfig";
 import { organismEntityConfig } from "./index/organism/organismEntityConfig";
 import { workflowEntityConfig } from "./index/workflow/workflowEntityConfig";
@@ -52,7 +51,6 @@ export function makeConfig(
     ],
     gitHubUrl,
     layout: {
-      floating,
       footer: {
         Branding: Branding(),
         navLinks: [
@@ -79,6 +77,11 @@ export function makeConfig(
             { label: "Organisms", url: ROUTES.ORGANISMS },
             { label: "Assemblies", url: ROUTES.GENOMES },
             { label: "Workflows", url: ROUTES.WORKFLOWS },
+            {
+              label: "Contact Us",
+              target: ANCHOR_TARGET.BLANK,
+              url: SUPPORT_URL,
+            },
           ],
           undefined,
         ],

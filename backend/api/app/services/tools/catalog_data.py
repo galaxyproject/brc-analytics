@@ -414,5 +414,7 @@ class CatalogData:
             "compatible": len(issues) == 0,
             "issues": issues,
             "workflow": wf.get("name"),
+            # The id lets the extractor map a shortened workflow label.
+            "iwc_id": wf.get("iwc_id"),
             "assembly": accession,
         }

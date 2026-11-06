@@ -1,3 +1,5 @@
+import type { SOURCE_KIND } from "./constants";
+
 /**
  * The gene snapshot an answer was read from.
  */
@@ -25,6 +27,9 @@ export interface GeneOrganism {
 }
 
 export interface GeneTranscript {
+  // The transcript's GFF3 row ID: unique within the gene, and set even when
+  // transcriptId isn't.
+  gff3RowId: string;
   location: GeneLocation;
   proteinAccession: string | null;
   // The CDS's product: the protein's name.
@@ -70,9 +75,48 @@ export interface Gene {
   status: "current" | "not_in_latest";
   symbol: string | null;
   transcripts: GeneTranscript[];
+  // The assembly's UCSC Genome Browser address; null when UCSC has no browser
+  // for it.
+  ucscBrowserUrl: string | null;
 }
 
 export interface GeneResponse {
   gene: Gene;
   snapshot: GeneSnapshotInfo;
+}
+
+/**
+ * One claim BioNym drew from a source: a language model's statement, the quote
+ * it rests on, and BioNym's confidence in it, from 0 to 1.
+ */
+export interface BionymClaim {
+  confidence: number;
+  quote: string;
+  text: string;
+}
+
+export type BionymSourceKind = (typeof SOURCE_KIND)[keyof typeof SOURCE_KIND];
+
+/**
+ * A paper or dataset BioNym drew claims from.
+ */
+export interface BionymSource {
+  claims: BionymClaim[];
+  id: string;
+  kind: BionymSourceKind;
+  title: string;
+  // Null unless the graph gives an https: link.
+  url: string | null;
+}
+
+/**
+ * The claims in a gene's BioNym graph, grouped by source.
+ */
+export interface BionymClaims {
+  geneUid: string;
+  // BioNym's input for the graph: the gene's locus tag.
+  input: string;
+  // The latest date BioNym retrieved evidence on, as YYYY-MM-DD.
+  runDate: string;
+  sources: BionymSource[];
 }

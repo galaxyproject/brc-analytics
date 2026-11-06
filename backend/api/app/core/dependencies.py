@@ -1,13 +1,14 @@
 import logging
 from datetime import datetime, timezone
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from fastapi import Cookie, Depends, Header, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheService
-from app.core.config import get_settings
+from app.core.config import GENE_SNAPSHOT_PIN_PATH, get_settings
 from app.core.galaxy_credential import GalaxyCredential
 from app.core.partner_keys import Partner, match_partner_key
 from app.core.rate_limit import RateLimiter
@@ -17,6 +18,7 @@ from app.db.session import get_db_session
 from app.models.user_data import UserMeResponse
 from app.services.assistant_agent import AssistantAgent
 from app.services.auth_service import COOKIE_NAME, AuthService
+from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
 from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
@@ -70,7 +72,18 @@ def get_sra_mirror_service() -> Optional[SRAMirrorService]:
 @lru_cache(maxsize=1)
 def get_gene_catalog_service() -> GeneCatalogService:
     settings = get_settings()
-    return GeneCatalogService(settings.GENE_SNAPSHOT_PATH, settings.FRONTEND_URL)
+    if settings.GENE_SNAPSHOT_PATH:
+        return GeneCatalogService.local(
+            settings.GENE_SNAPSHOT_PATH, settings.FRONTEND_URL
+        )
+    return GeneCatalogService.pinned(
+        GENE_SNAPSHOT_PIN_PATH, Path(settings.GENE_SNAPSHOT_DIR), settings.FRONTEND_URL
+    )
+
+
+@lru_cache(maxsize=1)
+def get_bionym_graphs() -> BionymGraphStore:
+    return BionymGraphStore(BIONYM_GRAPHS_DIR)
 
 
 @lru_cache(maxsize=1)
@@ -315,6 +328,7 @@ def reset_all_services() -> None:
     get_ena_service.cache_clear()
     get_sra_mirror_service.cache_clear()
     get_gene_catalog_service.cache_clear()
+    get_bionym_graphs.cache_clear()
     get_service_galaxy.cache_clear()
     get_assistant_agent.cache_clear()
     get_rate_limiter.cache_clear()

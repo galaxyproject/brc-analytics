@@ -1,7 +1,8 @@
 import { type BRCDataCatalogGenome } from "@brc/apis/assembly";
 import { config } from "@brc/config/config";
-import { BRC_PAGE_META } from "@brc/meta/constants";
+import { AssemblyJsonLd } from "@brc/views/EntityView/assembly/components/AssemblyJsonLd/assemblyJsonLd";
 import { Side as BRCSide } from "@brc/views/EntityView/assembly/components/Side/brc/side";
+import { buildAssemblyPageMeta } from "@repo/shared/meta/assembly/utils";
 import { makeEntityStaticPaths } from "@repo/shared/services/staticGeneration/entity/staticPaths";
 import { makeEntityStaticProps } from "@repo/shared/services/staticGeneration/entity/staticProps";
 import type { EntityPageProps } from "@repo/shared/services/staticGeneration/entity/types";
@@ -12,7 +13,8 @@ const ENTITY_LIST_TYPE = "assemblies";
 
 /**
  * Assembly detail page. Prerendered in full: the assembly record arrives via
- * props, so no entity list is loaded.
+ * props, so no entity list is loaded. In production, the page head carries
+ * the assembly's schema.org Dataset record, for Google Dataset Search.
  * @param props - Page props.
  * @param props.data - Assembly.
  * @param props.entityId - Assembly entity ID.
@@ -25,7 +27,14 @@ const Page = ({
   if (!data) return <></>;
 
   return (
-    <AssemblyView SideComponent={BRCSide} assembly={data} entityId={entityId} />
+    <>
+      <AssemblyJsonLd assembly={data} />
+      <AssemblyView
+        SideComponent={BRCSide}
+        assembly={data}
+        entityId={entityId}
+      />
+    </>
   );
 };
 
@@ -34,7 +43,7 @@ export const getStaticPaths = makeEntityStaticPaths(config, ENTITY_LIST_TYPE);
 export const getStaticProps = makeEntityStaticProps<BRCDataCatalogGenome>(
   config,
   ENTITY_LIST_TYPE,
-  BRC_PAGE_META.ASSEMBLY_DETAIL
+  buildAssemblyPageMeta
 );
 
 export default Page;

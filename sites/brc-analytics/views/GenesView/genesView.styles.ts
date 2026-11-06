@@ -1,37 +1,31 @@
-import { BackPageView } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
-import { GridPaperSection } from "@databiosphere/findable-ui/lib/components/common/Section/section.styles";
-import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/palette";
+import { Title } from "@databiosphere/findable-ui/lib/components/common/Title/title";
+import {
+  bpDownSm,
+  bpUpSm,
+} from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
 
-// findable-ui's back page grid, as the assembly and organism pages use, with
-// its rows kept to their content's height.
-export const GenesBackPageView = styled(BackPageView)`
-  align-content: start;
-`;
+// The title-only header of the other top-level data pages, as the Priority
+// Pathogens page lays it out.
+export const StyledGrid = styled("div")`
+  align-content: flex-start;
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr;
+  min-width: 0;
+  padding-bottom: 24px;
 
-export const GenesPanel = styled(GridPaperSection)`
-  && {
-    display: grid;
-    gap: 24px;
-    grid-column: 1 / -1;
-    padding: 20px;
+  ${bpUpSm} {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: min(calc(100% - 32px), 1232px);
   }
 `;
 
-export const ResultsTable = styled.table`
-  border-collapse: collapse;
-  width: 100%;
+export const StyledTitle = styled(Title)`
+  padding: 24px 0 16px;
 
-  th,
-  td {
-    border-bottom: 1px solid ${PALETTE.SMOKE_MAIN};
+  ${bpDownSm} {
     padding: 12px 16px;
-    text-align: left;
-  }
-
-  th {
-    font-size: 13px;
-    font-weight: 500;
-    text-transform: uppercase;
   }
 `;

@@ -1,7 +1,7 @@
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { DialogContent } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
-import { StyledDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog.styles";
+import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
 import { Table } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/Table/table";
 import { type JSX } from "react";
 import { type Props } from "./types";
@@ -20,7 +20,7 @@ export const AssemblySelector = ({
   table,
 }: Props): JSX.Element => {
   return (
-    <StyledDialog
+    <SelectorDialog
       onClose={onClose}
       // Resets filters to initial state after the dialog close animation completes, ensuring the next time the dialog is opened, it shows the pre-filtered list of assemblies.
       onTransitionExited={() => table.resetColumnFilters()}
@@ -31,6 +31,6 @@ export const AssemblySelector = ({
         <ColumnFilters table={table} />
         <Table table={table} />
       </DialogContent>
-    </StyledDialog>
+    </SelectorDialog>
   );
 };

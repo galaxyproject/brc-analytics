@@ -29,6 +29,7 @@ from app.core.dependencies import (
     get_cache_service,
     get_catalog_data,
     get_ena_service,
+    get_gene_catalog_service,
     get_service_galaxy,
     get_sra_mirror_service,
     reset_all_services,
@@ -100,6 +101,10 @@ def create_app() -> FastAPI:
             release=settings.APP_VERSION,
             traces_sample_rate=1.0,
             before_send=before_send,
+            # Search queries are users' sequences, some unpublished, and they
+            # sit in frame locals and request bodies; keep both out of events.
+            include_local_variables=False,
+            max_request_body_size="never",
         )
 
     mcp = create_mcp_server(
@@ -138,6 +143,11 @@ def create_app() -> FastAPI:
             # hold up a restart.
             warm_task = asyncio.create_task(warm_kmindex_indexes())
 
+            # Also off the boot path: a pinned gene snapshot downloads in the
+            # background, and until it is ready only gene requests fail.
+            gene_catalog = get_gene_catalog_service()
+            gene_catalog.start()
+
             # Owns the retention sweep for the app's lifetime.
             async with turn_log.lifecycle():
                 yield
@@ -149,6 +159,7 @@ def create_app() -> FastAPI:
             with suppress(asyncio.CancelledError):
                 await warm_task
             await cancel_kmindex_index_refreshes()
+            gene_catalog.close()
 
             auth_service = get_auth_service()
             await auth_service.close()

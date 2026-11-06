@@ -1,12 +1,15 @@
-import { GENES_BREADCRUMBS } from "@brc/views/GenesView/constants";
-import {
-  GenesBackPageView,
-  GenesPanel,
-  ResultsTable,
-} from "@brc/views/GenesView/genesView.styles";
+import { GenesPanel } from "@brc/components/Genes/genes.styles";
 import { BackPageHero as BackPageHeroLayout } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/backPageView.styles";
 import { BackPageHero } from "@databiosphere/findable-ui/lib/components/Layout/components/BackPage/components/BackPageHero/backPageHero";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { sanitizeEntityId } from "@repo/shared/apis/utils";
 import { ROUTES } from "@repo/shared/routes/constants";
 import {
@@ -14,30 +17,33 @@ import {
   geneSymbol,
   geneTitle,
 } from "@repo/shared/services/genes/label";
-import {
-  type Gene,
-  type GeneLocation,
-} from "@repo/shared/services/genes/types";
-import { formatNumber } from "@repo/shared/viewModelBuilders/viewModelBuilders";
+import { GENOME_BROWSER_IMAGE_PROPS } from "@repo/shared/viewModelBuilders/constants";
 import Link from "next/link";
 import { type JSX } from "react";
-import { FieldLabel, FieldList, FieldValue } from "./geneDetailView.styles";
+import { BionymSection } from "./components/BionymSection/bionymSection";
+import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
+import { EMPTY_VALUE, GENE_BREADCRUMBS } from "./constants";
+import {
+  FieldLabel,
+  FieldList,
+  FieldValue,
+  GeneBackPageView,
+} from "./geneDetailView.styles";
+import { type GeneDetailViewProps, type GeneStatusViewProps } from "./types";
+import {
+  formatAnnotation,
+  formatLocation,
+  getGeneTypeName,
+  getNcbiGeneId,
+  getNcbiGeneUrl,
+  getPreviousIds,
+  getUcscPositionUrl,
+} from "./utils";
 
-interface GeneDetailViewProps {
-  gene: Gene;
-}
-
-/**
- * Format a genome location as the stub page shows it.
- * @param location - Genome location.
- * @returns E.g. "NC_037282.1:1,292,966-1,296,696 (+)".
- */
-function formatLocation(location: GeneLocation): string {
-  const { end, seqName, start, strand } = location;
-  return `${seqName}:${formatNumber(start)}-${formatNumber(end)} (${strand})`;
-}
-
-export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
+export const GeneDetailView = ({
+  bionym,
+  gene,
+}: GeneDetailViewProps): JSX.Element => {
   const assemblyHref = replaceParameters(ROUTES.GENOME, {
     entityId: sanitizeEntityId(gene.assemblyAccession),
   });
@@ -45,19 +51,44 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
     entityId: sanitizeEntityId(gene.organism.speciesTaxonomyId),
   });
   const label = geneLabel(gene);
-  const breadcrumbs = [...GENES_BREADCRUMBS, { path: "", text: label }];
+  const ncbiGeneId = getNcbiGeneId(gene.aliases);
+  const ncbiGeneUrl = getNcbiGeneUrl(ncbiGeneId);
+  const previousIds = getPreviousIds(gene.aliases);
 
   return (
-    <GenesBackPageView>
+    <GeneBackPageView>
       <BackPageHeroLayout>
-        <BackPageHero breadcrumbs={breadcrumbs} title={geneTitle(gene)} />
+        <BackPageHero
+          breadcrumbs={[...GENE_BREADCRUMBS, { path: "", text: label }]}
+          title={geneTitle(gene)}
+        />
       </BackPageHeroLayout>
       <GenesPanel>
         <FieldList>
           <FieldLabel>Gene ID</FieldLabel>
-          <FieldValue>{label}</FieldValue>
+          <FieldValue>
+            <OffSiteLink text={label} url={ncbiGeneUrl} />
+          </FieldValue>
           <FieldLabel>Symbol</FieldLabel>
-          <FieldValue>{geneSymbol(gene) ?? "—"}</FieldValue>
+          <FieldValue>{geneSymbol(gene) ?? EMPTY_VALUE}</FieldValue>
+          <FieldLabel>Gene type</FieldLabel>
+          <FieldValue>
+            {getGeneTypeName(gene.biotype) ?? EMPTY_VALUE}
+          </FieldValue>
+          <FieldLabel>NCBI GeneID</FieldLabel>
+          <FieldValue>
+            <OffSiteLink text={ncbiGeneId || EMPTY_VALUE} url={ncbiGeneUrl} />
+          </FieldValue>
+          {previousIds.length > 0 && (
+            <>
+              <FieldLabel>Previous IDs</FieldLabel>
+              <FieldValue>
+                {previousIds.map((previousId) => (
+                  <div key={previousId}>{previousId}</div>
+                ))}
+              </FieldValue>
+            </>
+          )}
           <FieldLabel>Organism</FieldLabel>
           <FieldValue>
             <Link href={organismHref}>{gene.organism.name}</Link>
@@ -67,30 +98,49 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
             <Link href={assemblyHref}>{gene.assemblyAccession}</Link>
           </FieldValue>
           <FieldLabel>Location</FieldLabel>
-          <FieldValue>{formatLocation(gene.location)}</FieldValue>
+          <FieldValue>
+            <OffSiteLink
+              imageProps={GENOME_BROWSER_IMAGE_PROPS}
+              text={formatLocation(gene.location)}
+              url={getUcscPositionUrl(gene.ucscBrowserUrl, gene.location)}
+            />
+          </FieldValue>
+          <FieldLabel>Annotation</FieldLabel>
+          <FieldValue>{formatAnnotation(gene.provenance)}</FieldValue>
         </FieldList>
-        <ResultsTable>
-          <thead>
-            <tr>
-              <th scope="col">Transcript</th>
-              <th scope="col">Transcript product</th>
-              <th scope="col">Protein</th>
-              <th scope="col">Protein product</th>
-            </tr>
-          </thead>
-          <tbody>
-            {gene.transcripts.map((transcript, i) => (
-              <tr key={i}>
-                <td>{transcript.transcriptId ?? "—"}</td>
-                <td>{transcript.transcriptProduct ?? "—"}</td>
-                <td>{transcript.proteinAccession ?? "—"}</td>
-                <td>{transcript.proteinProduct ?? "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </ResultsTable>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Transcript</TableCell>
+                <TableCell>Transcript product</TableCell>
+                <TableCell>Protein</TableCell>
+                <TableCell>Protein product</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {gene.transcripts.map((transcript) => (
+                <TableRow key={transcript.gff3RowId}>
+                  <TableCell>
+                    {transcript.transcriptId ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.transcriptProduct ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.proteinAccession ?? EMPTY_VALUE}
+                  </TableCell>
+                  <TableCell>
+                    {transcript.proteinProduct ?? EMPTY_VALUE}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </GenesPanel>
-    </GenesBackPageView>
+      {bionym && <BionymSection bionym={bionym} />}
+    </GeneBackPageView>
   );
 };
 
@@ -102,15 +152,13 @@ export const GeneDetailView = ({ gene }: GeneDetailViewProps): JSX.Element => {
  */
 export const GeneStatusView = ({
   message,
-}: {
-  message: string;
-}): JSX.Element => {
+}: GeneStatusViewProps): JSX.Element => {
   return (
-    <GenesBackPageView>
+    <GeneBackPageView>
       <BackPageHeroLayout>
-        <BackPageHero breadcrumbs={GENES_BREADCRUMBS} title="Gene" />
+        <BackPageHero breadcrumbs={GENE_BREADCRUMBS} title="Gene" />
       </BackPageHeroLayout>
       <GenesPanel>{message}</GenesPanel>
-    </GenesBackPageView>
+    </GeneBackPageView>
   );
 };

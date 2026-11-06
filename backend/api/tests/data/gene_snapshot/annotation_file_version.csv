@@ -1,0 +1,2 @@
+sha256,md5,sha256_uncompressed,md5_uncompressed,size,url,retrieved_at,archive_key,asv_id
+6ebba335abc68759b2b762c20a508d226e2d80bff062aee30eb08977909254fb,117595853f779bc95939644bd6a504a2,ee8b2de70ce62f7d4d117cd32d09da38df47b57124856df04a639ebbbc9df2fd,d7db1e0d61cea2fe984e20dff5bb3b93,978805,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/765/GCF_000002765.6_GCA_000002765/GCF_000002765.6_GCA_000002765_genomic.gff.gz,2026-10-28 21:23:48,,ncbi-refseq-GCF_000002765.6-6ebba335

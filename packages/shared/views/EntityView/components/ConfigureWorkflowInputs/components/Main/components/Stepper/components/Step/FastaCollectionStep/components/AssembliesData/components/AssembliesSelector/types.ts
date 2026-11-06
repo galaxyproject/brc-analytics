@@ -5,7 +5,7 @@ import { type Assembly } from "./hooks/UseTable/types";
 
 export interface Props
   extends
-    Pick<ConfiguredInput, "fastaCollection">,
+    Pick<ConfiguredInput, "fastaCollection" | "referenceAssembly">,
     Pick<StepProps, "onConfigure" | "stepKey" | "workflow"> {
   onClose: () => void;
   open: boolean;
