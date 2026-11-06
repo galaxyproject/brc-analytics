@@ -18,7 +18,8 @@ const Page = (): JSX.Element => {
   const search = useGeneSearch(genePagesEnabled ? query : "");
   if (!genePagesEnabled) return <Error statusCode={404} />;
   const onSearch = (q: string): void => {
-    // Each search is a history entry, so Back returns to the one before.
+    // Each new search is a history entry, so Back returns to the one before;
+    // GenesView doesn't call this for the search already shown.
     router.push(
       { pathname: router.pathname, query: q ? { q } : {} },
       undefined,

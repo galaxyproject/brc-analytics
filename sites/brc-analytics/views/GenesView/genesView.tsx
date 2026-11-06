@@ -8,7 +8,8 @@ import { type GenesViewProps } from "./types";
 
 /**
  * The genes page: a search box, and the search's results, or example genes
- * until a search is made.
+ * until a search is made. Submitting the search already shown starts no new
+ * search, so it adds no history entry; if that search failed, it is retried.
  * @param props - Component props.
  * @param props.onSearch - Called with a new search; empty to clear it.
  * @param props.query - The search shown, from the page's ?q=.
@@ -20,11 +21,15 @@ export const GenesView = ({
   query,
   search,
 }: GenesViewProps): JSX.Element => {
+  const onSubmit = (q: string): void => {
+    if (q !== query) onSearch(q);
+    else if (search.status === "unavailable") search.retry();
+  };
   return (
     <StyledGrid>
       <StyledTitle>Genes</StyledTitle>
       <GenesPanel>
-        <GeneSearchForm key={query} onSearch={onSearch} query={query} />
+        <GeneSearchForm key={query} onSearch={onSubmit} query={query} />
         {search.status === "idle" ? (
           <ExampleGenes />
         ) : (
