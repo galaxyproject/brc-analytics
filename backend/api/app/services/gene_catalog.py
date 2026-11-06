@@ -21,7 +21,11 @@ from uuid import UUID
 import duckdb
 
 from app.models.genes import Gene, GeneSnapshotInfo
-from app.services.gene_snapshot import DownloadStopped, fetch_pinned_snapshot
+from app.services.gene_snapshot import (
+    DownloadStopped,
+    SnapshotRejected,
+    fetch_pinned_snapshot,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +157,9 @@ class GeneCatalogService:
         self._find_snapshot = find_snapshot
         self._loader: Optional[threading.Thread] = None
         self._stop = threading.Event()
+        # Held while the loader publishes its connection and while close()
+        # takes it down, so a loader finishing at shutdown can't leave one open.
+        self._open_lock = threading.Lock()
 
     @classmethod
     def local(cls, path: str, frontend_url: str) -> "GeneCatalogService":
@@ -221,7 +228,7 @@ class GeneCatalogService:
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
                 )
             if pinned_build_id is not None and build_id != pinned_build_id:
-                raise duckdb.InvalidInputException(
+                raise SnapshotRejected(
                     f"it is build {build_id}, not the pinned {pinned_build_id}"
                 )
             # Run each query once, so a missing table or column fails here
@@ -237,9 +244,13 @@ class GeneCatalogService:
         except BaseException:
             con.close()
             raise
-        self._con = con
-        self.snapshot = snapshot
-        self.status = "ready"
+        with self._open_lock:
+            if self._stop.is_set():
+                con.close()
+                raise DownloadStopped
+            self._con = con
+            self.snapshot = snapshot
+            self.status = "ready"
         logger.info("Gene snapshot loaded (%s): build %s", self.source, build_id)
 
     def health(self) -> Dict[str, Optional[str]]:
@@ -299,7 +310,8 @@ class GeneCatalogService:
         )
 
     def close(self) -> None:
-        self._stop.set()
-        if self._con is not None:
-            self._con.close()
-            self._con = None
+        with self._open_lock:
+            self._stop.set()
+            if self._con is not None:
+                self._con.close()
+                self._con = None

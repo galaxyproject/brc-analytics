@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import shutil
+import threading
 from collections import namedtuple
 
 import duckdb
@@ -27,13 +28,16 @@ URL = "https://genes.test/snapshots/genes.duckdb"
 @pytest.fixture
 def store(monkeypatch):
     """A stand-in gene data store: answers with the queued responses in turn,
-    then with the last one, and records the URLs it was asked for."""
+    then with the last one, and records the URLs it was asked for. A queued
+    callable is called with the request for its answer."""
     responses = []
     requests = []
 
     def handler(request):
         requests.append(str(request.url))
         answer = responses[min(len(requests), len(responses)) - 1]
+        if callable(answer):
+            answer = answer(request)
         if isinstance(answer, Exception):
             raise answer
         return answer
@@ -120,6 +124,17 @@ def test_a_file_that_is_not_the_pinned_one_is_refused(
     assert service.status == "unavailable"
     # Not retried: the store's copy won't change. Nothing is left behind.
     assert len(store.requests) == 1
+    assert os.listdir(tmp_path / "genes") == []
+
+
+def test_a_truncated_download_is_refused(tmp_path, store, snapshot_bytes, caplog):
+    # The connection closed early: the size check says so before the
+    # checksum does.
+    store.responses.append(httpx.Response(200, content=snapshot_bytes[:-1]))
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "unavailable"
+    assert len(store.requests) == 1
+    assert f"not the pinned {len(snapshot_bytes):,}" in caplog.text
     assert os.listdir(tmp_path / "genes") == []
 
 
@@ -253,6 +268,25 @@ def test_not_enough_disk_is_not_downloaded(
     assert store.requests == []
 
 
+def test_a_disk_failure_is_retried(tmp_path, store, snapshot_bytes, monkeypatch):
+    # Disk failures are retried like network ones: here the room appears
+    # before the second attempt.
+    usage = namedtuple("usage", "total used free")
+    checks = []
+
+    def disk_usage(_):
+        checks.append(1)
+        return usage(0, 0, len(snapshot_bytes) - (1 if len(checks) == 1 else 0))
+
+    monkeypatch.setattr(gene_snapshot.shutil, "disk_usage", disk_usage)
+    store.responses.append(httpx.Response(200, content=snapshot_bytes))
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "ready"
+    assert len(checks) == 2
+    assert len(store.requests) == 1
+    service.close()
+
+
 def test_a_partial_download_left_by_a_killed_process_is_cleared(
     tmp_path, store, snapshot_bytes, monkeypatch
 ):
@@ -272,6 +306,7 @@ def test_a_partial_download_left_by_a_killed_process_is_cleared(
     assert load(tmp_path, pin_path).status == "ready"
 
 
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can write anywhere")
 def test_an_unwritable_directory_is_not_downloaded_to(tmp_path, store, snapshot_bytes):
     (tmp_path / "genes").mkdir(mode=0o500)
     service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
@@ -314,13 +349,24 @@ def test_a_damaged_earlier_download_is_replaced(
 
 def test_shutdown_stops_the_retries(tmp_path, store, snapshot_bytes, monkeypatch):
     monkeypatch.setattr(gene_snapshot, "RETRY_WAITS", (600,))
-    store.responses.append(httpx.Response(403))
+    asked = threading.Event()
+
+    def refuse(request):
+        asked.set()
+        return httpx.Response(403)
+
+    store.responses.append(refuse)
     service = GeneCatalogService.pinned(
         write_pin(tmp_path / "pin.json", snapshot_bytes), tmp_path / "genes", ""
     )
     service.start()
+    # Shut down only once the first attempt has failed, so the loader is in
+    # (or headed for) the 600 second wait before the second.
+    assert asked.wait(timeout=5)
     service.close()
     assert not join_loader(service, timeout=5).is_alive()
+    assert len(store.requests) == 1
+    assert service.status == "loading"
 
 
 @pytest.fixture
@@ -374,3 +420,70 @@ def test_the_committed_pin_is_one_this_release_reads():
     pin = read_pin(GENE_SNAPSHOT_PIN_PATH)
     assert pin.schema_version == SCHEMA_VERSION
     assert pin.url.endswith(f"/snapshots/{pin.build_id}.duckdb")
+
+
+def test_a_second_process_downloading_alongside_does_not_break_the_first(
+    tmp_path, store, snapshot_bytes
+):
+    # Another process starting on the same directory mid-download clears any
+    # partial file it finds and begins its own; that must not swap a
+    # half-written file in under this one.
+    genes = tmp_path / "genes"
+
+    def body():
+        yield snapshot_bytes[:100]
+        for stale in genes.glob("*.partial"):
+            stale.unlink()
+        (genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb.partial").write_bytes(
+            b"half-written"
+        )
+        yield snapshot_bytes[100:]
+
+    store.responses.extend(
+        [
+            httpx.Response(200, content=body()),
+            httpx.Response(200, content=snapshot_bytes),
+        ]
+    )
+    service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
+    assert service.status == "ready"
+    target = genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
+    assert target.read_bytes() == snapshot_bytes
+    service.close()
+
+
+def test_a_snapshot_found_after_shutdown_is_not_opened(gene_snapshot_path):
+    # The download finished just as the app shut down: the loader must not
+    # open a connection on a service that is already closed.
+    def find_then_shut_down(stop):
+        service.close()
+        return gene_snapshot_path, None
+
+    service = GeneCatalogService("", "pinned", find_then_shut_down)
+    service._load()
+    assert service._con is None
+    assert service.status == "loading"
+
+
+def test_shutdown_stops_a_download_mid_stream(
+    tmp_path, store, snapshot_bytes, monkeypatch
+):
+    # One byte per chunk, so each byte sent is read as it comes.
+    monkeypatch.setattr(gene_snapshot, "_CHUNK_BYTES", 1)
+    sent = []
+
+    def endless():
+        while len(sent) < 1000:
+            sent.append(1)
+            if len(sent) == 2:
+                service.close()
+            yield b"x"
+
+    store.responses.append(httpx.Response(200, content=endless()))
+    service = GeneCatalogService.pinned(
+        write_pin(tmp_path / "pin.json", snapshot_bytes), tmp_path / "genes", ""
+    )
+    service._load()
+    assert len(sent) <= 3
+    assert service.status == "loading"
+    assert os.listdir(tmp_path / "genes") == []

@@ -9,7 +9,9 @@ catalog/docs/gene-catalog/gene-snapshot-release-design.md.
 
 import hashlib
 import logging
+import os
 import shutil
+import tempfile
 import threading
 from pathlib import Path
 from typing import Tuple
@@ -107,24 +109,31 @@ def _download(pin: GeneSnapshotPin, directory: Path, stop: threading.Event) -> P
     if _is_pinned_file(target, pin):
         return target
     directory.mkdir(parents=True, exist_ok=True)
-    partial = target.with_name(target.name + ".partial")
-    # Neither can be served: a target that failed the check above, and a
-    # partial left by a process killed mid-download. Their space counts as free.
+    # Neither can be served: a target that failed the check above, and
+    # partials left by a process killed mid-download. Their space counts as
+    # free. A partial another process is still writing only costs it a retry.
     target.unlink(missing_ok=True)
-    partial.unlink(missing_ok=True)
+    for stale in directory.glob(f"{target.name}*.partial"):
+        stale.unlink(missing_ok=True)
     free = shutil.disk_usage(directory).free
     if free < pin.size:
         raise OSError(
             f"{directory} has {free:,} bytes free; the snapshot is {pin.size:,}"
         )
 
+    # A name of this attempt's own, so a second process downloading into
+    # the same directory can't swap its half-written file in under this one.
+    # Made first, so a directory that can't be written to fails before any
+    # request is made.
+    fd, name = tempfile.mkstemp(
+        dir=directory, prefix=f"{target.name}.", suffix=".partial"
+    )
+    partial = Path(name)
     digest = hashlib.sha256()
     received = 0
     try:
-        # The file first, so a directory that can't be written to fails
-        # before any request is made.
         with (
-            partial.open("wb") as out,
+            os.fdopen(fd, "wb") as out,
             httpx.stream("GET", pin.url, timeout=_TIMEOUT) as response,
         ):
             response.raise_for_status()

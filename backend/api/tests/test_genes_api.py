@@ -17,6 +17,9 @@ from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
 from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
 from app.services.gene_catalog import GeneCatalogService
 
+# The test snapshot's build, as tests/data/gene_snapshot/snapshot.csv has it.
+BUILD_ID = "temp-GCF_000002765.6-2026-10-28T212348Z"
+
 
 def make_client(
     service: Optional[GeneCatalogService] = None,
@@ -78,9 +81,8 @@ def test_local_snapshot_opens(service):
     assert service.health() == {
         "status": "ready",
         "source": "local",
-        "build_id": service.snapshot.build_id,
+        "build_id": BUILD_ID,
     }
-    assert service.snapshot.build_id.startswith("temp-GCF_000002765.6-")
 
 
 def test_gene(client, gene_uid):
@@ -242,6 +244,20 @@ def test_the_app_serves_genes_from_its_local_snapshot(app_with_stubbed_agent):
     )
     assert response.status_code == 200
     assert response.json()["gene"]["locusTag"] == "PF3D7_1133400"
+
+
+def test_the_app_starts_and_stops_a_local_snapshot(app_with_stubbed_agent):
+    # The lifespan starts every service; a local one is already open, so it
+    # must not start a loader that opens it a second time. Shutdown closes it.
+    with TestClient(app_with_stubbed_agent) as client:
+        service = get_gene_catalog_service()
+        assert service._loader is None
+        assert client.get("/api/v1/health").json()["genes"] == {
+            "status": "ready",
+            "source": "local",
+            "build_id": BUILD_ID,
+        }
+    assert service._con is None
 
 
 def test_transcripts_are_in_genome_order(client, gene_uid):
