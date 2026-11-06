@@ -26,11 +26,13 @@ from app.core.cache import CacheTTL
 from app.core.galaxy_credential import GalaxyCredential
 from app.models.galaxy import (
     MAX_QUERY_BASES,
+    UNNAMED_QUERY,
     GalaxyJobState,
     GalaxyJobStatus,
     KmindexHit,
     KmindexQuerySubmission,
     KmindexSort,
+    query_bases,
 )
 from app.services import galaxy_service
 from app.services.galaxy_service import (
@@ -494,6 +496,52 @@ class TestQueryValidation:
 
     def test_headerless_sequence_accepted(self):
         assert KmindexQuerySubmission(sequence="ACGT", indexes=["GENOMIC_BCT"])
+
+    def test_headerless_sequence_gets_a_header(self):
+        # kmindex segfaults on a query with no header line, so a bare pasted
+        # sequence has to reach Galaxy as a one-record FASTA.
+        submission = KmindexQuerySubmission(
+            sequence="ACGT\nTTGA\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == f">{UNNAMED_QUERY}\nACGT\nTTGA\n"
+
+    def test_existing_header_is_kept(self):
+        submission = KmindexQuerySubmission(
+            sequence="\n>mine\nACGT\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == ">mine\nACGT\n"
+
+    def test_indented_header_is_kept(self):
+        # The form sends the textarea as typed, so a paste can start with
+        # spaces before the ">".
+        submission = KmindexQuerySubmission(
+            sequence="  >mine desc\nACGT\n", indexes=["GENOMIC_BCT"]
+        )
+        assert submission.sequence == ">mine desc\nACGT\n"
+        assert query_bases(submission.sequence) == 4
+
+    def test_the_added_name_reads_as_no_name(self):
+        # kmindex reports hits under the header's name. Ours is a placeholder,
+        # so the results page falls back to the job id and the assistant hears
+        # "unnamed" rather than a name the user never chose.
+        shard = {"GENOMIC_VRL": {UNNAMED_QUERY: {"SRR1": 0.9}}}
+        _, query_name, *_ = galaxy_service._merge_shard_hits([shard], 0.5)
+        assert query_name is None
+
+    def test_a_query_the_user_named_query_keeps_its_name(self):
+        shard = {"GENOMIC_VRL": {"query": {"SRR1": 0.9}}}
+        _, query_name, *_ = galaxy_service._merge_shard_hits([shard], 0.5)
+        assert query_name == "query"
+
+    def test_blank_sequence_gets_no_header(self):
+        # A made-up header would hide the blank input from the empty check
+        # and send a header alone to Galaxy.
+        submission = KmindexQuerySubmission(sequence="  \n", indexes=["GENOMIC_BCT"])
+        assert submission.sequence == "  \n"
+
+    def test_an_indented_first_header_does_not_slip_a_second_record_in(self):
+        with pytest.raises(ValidationError, match="one sequence per query"):
+            KmindexQuerySubmission(sequence="  >a\nAC\n>b\nGT", indexes=["GENOMIC_BCT"])
 
 
 class TestQueryLengthCap:

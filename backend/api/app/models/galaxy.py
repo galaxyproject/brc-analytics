@@ -74,6 +74,11 @@ class GalaxyJobSubmission(BaseModel):
 
 MAX_QUERY_BASES = 5000
 
+# The header given to a pasted sequence that has none. kmindex reports hits
+# under it, so the results read it back as "no name" -- which is why it's
+# something nobody would type, unlike "query".
+UNNAMED_QUERY = "brc_unnamed_query"
+
 
 def query_bases(sequence: str) -> int:
     """Bases in a FASTA query, not counting header lines or whitespace."""
@@ -133,6 +138,24 @@ class KmindexQuerySubmission(BaseModel):
         if not seen:
             raise ValueError("Select at least one index")
         return seen
+
+    @field_validator("sequence")
+    @classmethod
+    def has_header(cls, value: str) -> str:
+        """
+        Give a bare pasted sequence a FASTA header.
+
+        kmindex segfaults on a query with no header line, and API and MCP
+        callers often send just the bases.
+        """
+        stripped = value.lstrip()
+        if not stripped:
+            return value
+        if not stripped.startswith(">"):
+            return f">{UNNAMED_QUERY}\n" + value
+        # Galaxy gets the query stripped anyway; stripping here too means the
+        # record and base-count checks below see an indented header as one.
+        return stripped
 
     @field_validator("sequence")
     @classmethod
