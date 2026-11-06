@@ -1,52 +1,17 @@
 """Tests for the gene API, against the test gene snapshot (conftest.py)."""
 
-import csv
 import gzip
 import json
-import shutil
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
 
-import duckdb
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.api.v1 import genes
-from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
+from app.core.dependencies import get_gene_catalog_service
 from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
 from app.services.gene_catalog import GeneCatalogService
-from tests.conftest import GENE_SNAPSHOT_EXPORT
-
-# The test snapshot's build ID, read from its export rather than from the
-# service, so a test of the service's health doesn't compare it with itself.
-with open(GENE_SNAPSHOT_EXPORT / "snapshot.csv", newline="") as _f:
-    BUILD_ID = next(csv.DictReader(_f))["build_id"]
-
-
-def make_client(
-    service: Optional[GeneCatalogService] = None,
-    graphs: Optional[BionymGraphStore] = None,
-) -> TestClient:
-    """A client for the gene routes, serving the given gene snapshot and
-    BioNym graphs in place of the app's own."""
-    app = FastAPI()
-    app.include_router(genes.router, prefix="/api/v1/genes")
-    if service is not None:
-        app.dependency_overrides[get_gene_catalog_service] = lambda: service
-    if graphs is not None:
-        app.dependency_overrides[get_bionym_graphs] = lambda: graphs
-    return TestClient(app)
-
-
-def altered_snapshot(tmp_path, snapshot_path, sql: str) -> GeneCatalogService:
-    """A service over a copy of the test snapshot, changed by sql."""
-    path = tmp_path / "genes.duckdb"
-    shutil.copy(snapshot_path, path)
-    with duckdb.connect(str(path)) as con:
-        con.execute(sql)
-    return GeneCatalogService.local(str(path), "")
+from tests.genes_helpers import BUILD_ID, altered_snapshot, make_client
 
 
 @pytest.fixture(scope="module")

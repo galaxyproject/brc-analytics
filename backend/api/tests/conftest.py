@@ -22,14 +22,10 @@ from app.models.assistant import (
     SessionState,
     TurnTelemetry,
 )
+from tests.genes_helpers import GENE_SNAPSHOT_EXPORT
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
-
-# Sixteen of 3D7's genes, exported from a snapshot as text so the fixture can
-# be reviewed. scripts/export_test_gene_snapshot.py writes it, and lists the
-# genes and what each is there to test.
-GENE_SNAPSHOT_EXPORT = Path(__file__).parent / "data" / "gene_snapshot"
 
 
 @pytest.fixture(scope="session")
@@ -57,7 +53,7 @@ def gene_service(gene_snapshot_path):
 @pytest.fixture
 def gene_client(gene_service):
     """A client for the gene routes, serving gene_service."""
-    from tests.test_genes_api import make_client
+    from tests.genes_helpers import make_client
 
     return make_client(gene_service)
 

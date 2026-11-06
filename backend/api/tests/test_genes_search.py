@@ -9,7 +9,7 @@ import pytest
 
 from app.api.v1.genes import MAX_SEARCH_LENGTH, MAX_SEARCH_LIMIT, MAX_SEARCH_WORDS
 from app.services.gene_catalog import GeneCatalogService
-from tests.test_genes_api import altered_snapshot, make_client
+from tests.genes_helpers import altered_snapshot, make_client
 
 AMA1 = "d9049485-ed74-5455-98c2-5dc13eef544a"
 
