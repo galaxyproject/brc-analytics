@@ -158,6 +158,23 @@ class TestJobStatusStates:
         assert status.exit_code == 139
 
     @pytest.mark.asyncio
+    async def test_a_failed_full_fetch_still_answers_failed(self, service, caplog):
+        # The reason is a nice-to-have; the state is what ends the polling.
+        def show_job(job_id, full_details=False):
+            if full_details:
+                raise RuntimeError("galaxy timed out")
+            return self._job("error")
+
+        service.gi.jobs.show_job = MagicMock(side_effect=show_job)
+
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            status = await service.get_job_status("job1")
+
+        assert status.is_complete and not status.is_successful
+        assert status.stderr is None
+        assert "galaxy timed out" in caplog.text
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize("state", ["ok", "running"])
     async def test_only_a_failed_job_pays_for_the_full_fetch(self, service, state):
         # Every open search polls this; the full dict is only worth it once.
@@ -3398,7 +3415,10 @@ class TestAggregationLanes:
         await slots.acquire()
         try:
             with pytest.raises(GalaxyJobAggregating, match="queued"):
-                await service.get_kmindex_results("job4", wait=False)
+                # If wait is ignored this blocks on the held slot; fail fast.
+                await asyncio.wait_for(
+                    service.get_kmindex_results("job4", wait=False), timeout=5
+                )
         finally:
             slots.release()
 

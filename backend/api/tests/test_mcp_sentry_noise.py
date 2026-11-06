@@ -264,3 +264,20 @@ def test_submitted_sequence_stays_out_of_traces(catalog):
     dumped = json.dumps(transport.transactions)
     assert "mcp.request.argument.sequence" in dumped
     assert sequence not in dumped
+
+
+def test_submitted_sequence_stays_out_of_error_events():
+    # An error raised inside the MCP span carries the span's data in its
+    # trace context, and errors go through before_send, not the transaction
+    # hook.
+    event = {
+        "contexts": {
+            "trace": {"data": {"mcp.request.argument.sequence": "ACGTTGCA" * 20}}
+        },
+        "logentry": {"message": "x"},
+        "logger": "app.foo",
+    }
+    out = before_send(event, {})
+    assert out["contexts"]["trace"]["data"]["mcp.request.argument.sequence"] == (
+        "[Filtered]"
+    )
