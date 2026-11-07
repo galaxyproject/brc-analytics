@@ -41,7 +41,11 @@ def _capture(monkeypatch, tmp_path, galaxy_available: bool) -> dict:
     seen: dict = {}
 
     def model_fn(messages, info):
-        if info.output_tools:  # the tracker extractor
+        if info.output_tools:  # the tracker extractor -- the only output call
+            props = info.output_tools[0].parameters_json_schema.get("properties", {})
+            seen["narrowing_pass_ran"] = seen.get("narrowing_pass_ran") or (
+                "intent" in props
+            )
             return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {})])
         system = [
             p.content
@@ -71,12 +75,22 @@ def _capture(monkeypatch, tmp_path, galaxy_available: bool) -> dict:
 
         snap = LoganSnapshot.model_validate(load_fixture("logan_pfal_18s").snapshot)
         state = await agent.create_logan_session_from_snapshot(snap, None)
-        await agent.chat("How many runs are from Malawi?", session_id=state.session_id)
+        _r, _t, after = await agent.chat_with_telemetry(
+            "How many runs are from Malawi?", session_id=state.session_id
+        )
+        seen["metadata_keys"] = sorted(after.metadata)
+        seen["logan_keys"] = sorted(after.metadata.get("logan") or {})
 
     try:
         asyncio.run(go())
     finally:
         get_settings.cache_clear()
+    seen["narrow_agent"] = agent.narrow_agent
+    seen["export_reads"] = [
+        c
+        for c in (galaxy.calls if galaxy else [])
+        if c[0] == "get_cached_kmindex_export"
+    ]
     return seen
 
 
@@ -95,6 +109,14 @@ def test_off_matches_the_pre_narrowing_capture(
         monkeypatch.setenv("LOGAN_NARROWING_MODE", mode)
     key = "galaxy" if galaxy_available else "no_galaxy"
     seen = _capture(monkeypatch, tmp_path, galaxy_available)
+
+    # Off behaves as well as looks like today: no pass built or run, no export
+    # read, and nothing new written to the session.
+    assert seen.pop("narrow_agent") is None
+    assert seen.pop("export_reads") == []
+    assert not seen.pop("narrowing_pass_ran", False)
+    assert "logan_narrowing" not in seen.pop("metadata_keys")
+    assert "selection" not in seen.pop("logan_keys")
 
     if os.environ.get("REGENERATE_LOGAN_OFF_GOLDEN") and mode is None:
         data = _golden() if GOLDEN.exists() else {}
