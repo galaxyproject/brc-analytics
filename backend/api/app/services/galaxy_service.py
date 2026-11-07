@@ -265,6 +265,22 @@ KMINDEX_MAX_HITS = 50000
 # downloads.
 KMINDEX_COLLECTION_ATTEMPTS = 3
 
+# kmindex_query 0.7.1 with merge on writes every shard into this one dataset
+# instead of a collection: {shard_name: {query_name: {accession: score}}}, the
+# same documents the collection held, keyed side by side. Jobs run by 0.7.0
+# still have collections, and their results links still have to load, so the
+# collection path stays until those jobs no longer matter.
+KMINDEX_MERGED_OUTPUT = "output_merged_json"
+# Versions submit has moved off. Their jobs still wait on Vista or sit in the
+# last day's history after a bump, and Galaxy matches tool_id exactly, so the
+# queue and history listings name them next to the pinned id.
+KMINDEX_EARLIER_TOOL_IDS = (
+    "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.0+galaxy0",
+)
+# The merged file is the whole result, so there is nothing to fall back to:
+# the same budget as an archive, then the read fails uncached.
+KMINDEX_MERGED_ATTEMPTS = 3
+
 # Statuses worth backing off and asking again for, rather than dropping the shard.
 RETRYABLE_SHARD_STATUSES = frozenset({429, 502, 503, 504})
 
@@ -452,7 +468,7 @@ _AGGREGATION_LANES: dict[str, asyncio.Semaphore] = {
 # An all-index aggregate is several MB, and a day of them at the partner submit
 # budget alone would be ~2 GB, well past what the VM can give Redis. Two hours
 # covers someone paging through a result; after that the next read re-merges
-# from the job's outputs, which Galaxy keeps, in one collection download.
+# from the job's outputs, which Galaxy keeps, in one download.
 KMINDEX_AGG_TTL = 2 * CacheTTL.ONE_HOUR
 
 # Finding or creating the history jobs land in is a read-then-write against
@@ -591,6 +607,50 @@ def _output_collection_id(job_data: dict) -> Optional[str]:
         if isinstance(c, dict) and c.get("src") == "hdca"
     ]
     return collections[0] if len(collections) == 1 else None
+
+
+def _merged_output_id(outputs: List[GalaxyJobOutput]) -> Optional[str]:
+    """The merged results dataset, for a job run with kmindex's merge on."""
+    for output in outputs:
+        if output.name == KMINDEX_MERGED_OUTPUT:
+            return output.dataset.id
+    return None
+
+
+def _kmindex_takes_merge(tool_id: str) -> bool:
+    """
+    Whether this kmindex_query version declares the merge input (0.7.1 on).
+
+    Galaxy's tool request API rejects an input the tool doesn't declare, so
+    sending merge to 0.7.0 would fail every submit. An id with no version
+    to read is assumed current.
+    """
+    version = tool_id.rsplit("/", 1)[-1].split("+", 1)[0]
+    try:
+        parts = tuple(int(p) for p in version.split("."))
+    except ValueError:
+        return True
+    return parts >= (0, 7, 1)
+
+
+def _split_merged(document: object) -> List[Optional[dict]]:
+    """
+    One single-shard document per top-level key of a merged results file.
+
+    Splitting it back into what the collection would have held lets the merge
+    and its shard accounting run unchanged: kmindex writes a key for every shard
+    it searched, hits or not, so shards_searched still means what it did.
+    """
+    if not isinstance(document, dict):
+        raise ValueError(f"merged results are a {type(document).__name__}, not a dict")
+    for name, queries in document.items():
+        # Checked here, where the message can say what was wrong, rather than
+        # left to fail as an AttributeError deep in the merge.
+        if not isinstance(queries, dict):
+            raise ValueError(
+                f"merged results for {name} are a {type(queries).__name__}, not a dict"
+            )
+    return [{name: queries} for name, queries in document.items()]
 
 
 def _tie_break(accession: str) -> str:
@@ -1184,6 +1244,12 @@ class GalaxyService:
             "tool_id": self.settings.GALAXY_KMINDEX_TOOL_ID,
             "use_cached_jobs": self.settings.KMINDEX_USE_CACHED_JOBS,
         }
+        if _kmindex_takes_merge(self.settings.GALAXY_KMINDEX_TOOL_ID):
+            # Explicit though it is the default: the read path depends on the
+            # one merged dataset, and a changed default would quietly turn
+            # every new job back into a collection. Left out for an older pin,
+            # so rolling the env var back to 0.7.0 still submits.
+            payload["inputs"]["merge"] = True
         try:
             response = await asyncio.to_thread(
                 self.gi.make_post_request, f"{self.gi.url}/jobs", payload=payload
@@ -2012,6 +2078,82 @@ class GalaxyService:
             return shards
         return None
 
+    async def _download_merged(
+        self, job_id: str, dataset_id: str
+    ) -> List[Optional[dict]]:
+        """
+        Every shard from the job's one merged results dataset.
+
+        @param job_id: the job, for logging.
+        @param dataset_id: its merged output.
+        @returns: one parsed shard per shard kmindex searched.
+        @raises Exception: the file could not be read. Nothing else holds the
+            hits, so an empty or partial answer here would be cached as a
+            complete one; failing leaves the next read to try again.
+        """
+        delay = KMINDEX_BACKOFF_SECONDS
+        for attempt in range(KMINDEX_MERGED_ATTEMPTS):
+            try:
+                document = await asyncio.to_thread(self._fetch_merged, dataset_id)
+            except Exception as e:
+                # A stream cut short can arrive as truncated JSON rather than
+                # as a transport error, the way a short archive fails to open --
+                # or, cut inside a multi-byte character, as bytes that won't
+                # decode at all.
+                retryable = _is_retryable_fetch_error(e) or isinstance(
+                    e, (json.JSONDecodeError, UnicodeDecodeError)
+                )
+                if not retryable or attempt == KMINDEX_MERGED_ATTEMPTS - 1:
+                    raise Exception(
+                        f"kmindex job {job_id}: could not read merged results "
+                        f"{dataset_id}: {e}"
+                    ) from e
+                await asyncio.sleep(
+                    delay * (1 + random.random() * KMINDEX_BACKOFF_JITTER)
+                )
+                delay *= 2
+                continue
+            try:
+                shards = _split_merged(document)
+            except ValueError as e:
+                raise Exception(
+                    f"kmindex job {job_id}: unreadable merged results {dataset_id}: {e}"
+                ) from e
+            if not shards:
+                # kmindex keys every shard it searched, even ones with no hits,
+                # so an empty document is a misread, not a query that matched
+                # nothing.
+                raise Exception(
+                    f"kmindex job {job_id}: merged results {dataset_id} name no shards"
+                )
+            return shards
+        raise AssertionError("unreachable")
+
+    def _fetch_merged(self, dataset_id: str) -> object:
+        """
+        Download a merged results dataset to a temp file and parse it.
+
+        Streamed to disk, so the download itself never joins its chunks into
+        one buffer the way r.content would. json.load still reads the whole
+        file in before parsing, so the raw bytes and the parsed result are both
+        held at the peak; the collection path only ever held one member raw.
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/datasets/{dataset_id}/display",
+            params={"preview": "false"},
+            stream=True,
+        )
+        try:
+            if r.status_code != 200:
+                raise ShardFetchError(r.status_code, f"{dataset_id}: {r.text[:200]}")
+            with tempfile.TemporaryFile() as body:
+                for chunk in r.iter_content(chunk_size=1 << 20):
+                    body.write(chunk)
+                body.seek(0)
+                return json.load(body)
+        finally:
+            r.close()
+
     def _fetch_collection(self, collection_id: str) -> List[Optional[dict]]:
         """
         Download a collection's zip to a temp file and parse each member.
@@ -2131,9 +2273,14 @@ class GalaxyService:
         submitted_indexes = _submitted_index_names(params)
         threshold = _submitted_threshold(params)
 
-        shards = await self._download_collection(job_id, status)
-        if shards is None:
-            shards = await self._download_each_shard(job_id, status)
+        merged_id = _merged_output_id(status.outputs)
+        if merged_id:
+            shards = await self._download_merged(job_id, merged_id)
+        else:
+            # A job from before the merged output: its shards are a collection.
+            shards = await self._download_collection(job_id, status)
+            if shards is None:
+                shards = await self._download_each_shard(job_id, status)
 
         (
             hits,
@@ -2507,9 +2654,14 @@ class GalaxyService:
         _SERVICE_USER_IDS[url] = user_id
         return user_id
 
+    def _listed_kmindex_tool_ids(self) -> List[str]:
+        """The pinned kmindex tool id, then the earlier ones still worth counting."""
+        pinned = self.settings.GALAXY_KMINDEX_TOOL_ID
+        return [pinned, *(t for t in KMINDEX_EARLIER_TOOL_IDS if t != pinned)]
+
     async def _read_kmindex_queue(self) -> KmindexQueueStatus:
         now = datetime.now(timezone.utc)
-        tool_id = self.settings.GALAXY_KMINDEX_TOOL_ID
+        tool_id = self._listed_kmindex_tool_ids()
         user_id = await self._service_user_id()
         # Unfinished jobs get a listing of their own. Galaxy lists newest
         # update first, and a queued job's update_time stops moving once it is
@@ -2679,7 +2831,7 @@ class GalaxyService:
         # submitted in the window was updated in it too, so this covers it.
         jobs = await asyncio.to_thread(
             self.gi.jobs.get_jobs,
-            tool_id=self.settings.GALAXY_KMINDEX_TOOL_ID,
+            tool_id=self._listed_kmindex_tool_ids(),
             user_id=user_id,
             date_range_min=since.date().isoformat(),
             limit=KMINDEX_HISTORY_LISTING_LIMIT,

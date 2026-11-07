@@ -681,8 +681,8 @@ class GalaxyJobStatus(BaseModel):
     )
     outputs: List[GalaxyJobOutput] = []
     # The collection the outputs belong to, when the tool writes one: kmindex
-    # does, and downloading it as one archive is one request instead of one per
-    # shard.
+    # before 0.7.1 (or with merge off) does, and downloading it as one archive
+    # is one request instead of one per shard. Still read for those older jobs.
     output_collection_id: Optional[str] = None
     stdout: Optional[str] = None
     stderr: Optional[str] = None

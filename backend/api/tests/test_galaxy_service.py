@@ -3945,6 +3945,238 @@ class TestCollectionDownload:
         assert service._download_shard.await_count == 2
 
 
+def _merged_status(dataset_id="merged1"):
+    """A finished 0.7.1 job: one merged results dataset and no collection."""
+    from app.models.galaxy import GalaxyDataset, GalaxyJobOutput
+
+    status = _status_of("job1")
+    status.outputs = [
+        GalaxyJobOutput(
+            id=dataset_id,
+            name="output_merged_json",
+            dataset=GalaxyDataset(id=dataset_id, name="output_merged_json"),
+        )
+    ]
+    return status
+
+
+class TestMergedOutput:
+    """
+    kmindex_query 0.7.1 writes one merged results file in place of the
+    collection. Its top-level keys are the shards the collection used to hold,
+    so it has to aggregate exactly as those shards did -- and a job from 0.7.0
+    still has to come down through its collection.
+    """
+
+    # kmindex's own layout: a key for every shard searched, an empty object
+    # for a shard with no hits, and {query: {}} for one whose hits were all
+    # under the threshold.
+    MERGED = {
+        "GENOMIC_BCT_0": {"q1": {"SRR1": 0.9, "SRR2": 0.6}},
+        "GENOMIC_BCT_1": {},
+        "GENOMIC_PHG_0_null": {"q1": {"SRR3": 0.7}},
+        "GENOMIC_PHG_1": {"q1": {}},
+    }
+
+    @pytest.fixture()
+    def merged(self, service):
+        service.sra_mirror = None
+        service.gi.url = "https://galaxy.example/api"
+        service.get_job_status = AsyncMock(return_value=_merged_status())
+        service._job_params = AsyncMock(
+            return_value={
+                "db_opts": json.dumps(
+                    {
+                        "db_opts_selector": "db",
+                        "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
+                    }
+                ),
+                "threshold": '"0.5"',
+            }
+        )
+        # None, so a dispatch slip falls through to the per-shard path and
+        # trips assert_not_awaited instead of merging a MagicMock.
+        service._download_collection = AsyncMock(return_value=None)
+        service._download_shard = AsyncMock()
+        service.gi.make_get_request = MagicMock(
+            return_value=_archive_response(json.dumps(self.MERGED).encode())
+        )
+        return service
+
+    @pytest.mark.asyncio
+    async def test_a_merged_job_is_read_in_one_download(self, merged):
+        aggregate = await merged._aggregate_shards("job1")
+
+        assert merged.gi.make_get_request.call_count == 1
+        assert merged.gi.make_get_request.call_args.args == (
+            "https://galaxy.example/api/datasets/merged1/display",
+        )
+        merged._download_collection.assert_not_awaited()
+        merged._download_shard.assert_not_awaited()
+        assert [h["accession"] for h in aggregate["hits"]] == ["SRR1", "SRR3", "SRR2"]
+        assert aggregate["query_name"] == "q1"
+
+    @pytest.mark.asyncio
+    async def test_shard_accounting_counts_the_shards_inside_the_file(self, merged):
+        # One file, but four shards searched -- the results page reports
+        # coverage in shards, and "1 of 1" would say nothing.
+        aggregate = await merged._aggregate_shards("job1")
+
+        assert aggregate["shards_searched"] == 4
+        assert aggregate["shards_with_hits"] == 2
+        assert aggregate["shards_failed"] == 0
+
+    @pytest.mark.asyncio
+    async def test_hits_are_still_attributed_to_their_index(self, merged):
+        aggregate = await merged._aggregate_shards("job1")
+
+        assert {h["shard"] for h in aggregate["hits"]} == {
+            "GENOMIC_BCT_0",
+            "GENOMIC_PHG_0_null",
+        }
+        assert aggregate["per_index"] == [
+            {"hits_after_cap": 2, "hits_before_cap": 2, "index": "GENOMIC_BCT"},
+            {"hits_after_cap": 1, "hits_before_cap": 1, "index": "GENOMIC_PHG"},
+        ]
+
+    @pytest.mark.asyncio
+    async def test_a_rate_limited_download_is_retried(self, merged, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        merged.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(b"", status_code=429),
+                _archive_response(json.dumps(self.MERGED).encode()),
+            ]
+        )
+
+        aggregate = await merged._aggregate_shards("job1")
+
+        assert aggregate["total_matches"] == 3
+        assert merged.gi.make_get_request.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_a_truncated_download_is_retried(self, merged, monkeypatch):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        whole = json.dumps(self.MERGED).encode()
+        merged.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(whole[: len(whole) // 2]),
+                _archive_response(whole),
+            ]
+        )
+
+        assert (await merged._aggregate_shards("job1"))["total_matches"] == 3
+        assert merged.gi.make_get_request.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_a_download_cut_inside_a_character_is_retried(
+        self, merged, monkeypatch
+    ):
+        # Cut mid-way through a multi-byte character, the bytes fail to decode
+        # before they ever fail to parse.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        whole = json.dumps(
+            {"GENOMIC_BCT_0": {"r\u00e9sum\u00e9": {"SRR1": 0.9}}}, ensure_ascii=False
+        ).encode()
+        cut = whole.index("\u00e9".encode()) + 1
+        merged.gi.make_get_request = MagicMock(
+            side_effect=[
+                _archive_response(whole[:cut]),
+                _archive_response(whole),
+            ]
+        )
+
+        assert (await merged._aggregate_shards("job1"))["total_matches"] == 1
+        assert merged.gi.make_get_request.call_count == 2
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "response, requests",
+        [
+            # Worth waiting out: the whole budget, then fail.
+            (
+                lambda: _archive_response(b"", status_code=503),
+                galaxy_service.KMINDEX_MERGED_ATTEMPTS,
+            ),
+            # Gone or refused, or read fine and wrong: asking again won't help.
+            (lambda: _archive_response(b"", status_code=404), 1),
+            (lambda: _archive_response(b"{}"), 1),
+            (lambda: _archive_response(b"[]"), 1),
+            (
+                lambda: _archive_response(
+                    b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": [1]}'
+                ),
+                1,
+            ),
+            # kmindex writes {} for a shard with no hits, never null, so a null
+            # can't be read as one searched clean.
+            (
+                lambda: _archive_response(
+                    b'{"IDX_0": {"q": {"SRR1": 0.9}}, "IDX_1": null}'
+                ),
+                1,
+            ),
+        ],
+        ids=[
+            "unavailable",
+            "gone",
+            "no-shards",
+            "not-a-dict",
+            "shard-not-a-dict",
+            "shard-null",
+        ],
+    )
+    async def test_an_unreadable_file_fails_uncached(
+        self, merged, monkeypatch, response, requests
+    ):
+        # The file is the whole result. Read as zero hits, it would be cached
+        # as a complete answer to a query that matched things.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(response())
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
+
+        # Named, so the log line says which job's results to go and look at.
+        with pytest.raises(Exception, match="kmindex job job1: .*merged results"):
+            await merged._aggregate_shards("job1")
+
+        assert len(sent) == requests
+        for r in sent:
+            r.close.assert_called_once()
+        merged.cache.set.assert_not_called()
+        merged._download_shard.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_an_older_job_still_reads_its_collection(self, merged):
+        # Results links for jobs run before 0.7.1 have to keep loading.
+        from app.models.galaxy import GalaxyDataset, GalaxyJobOutput
+
+        old = _status_of("job1")
+        old.outputs = [
+            GalaxyJobOutput(
+                id=f"ds{i}",
+                name=f"__new_primary_file_output_json|IDX_{i}__",
+                dataset=GalaxyDataset(id=f"ds{i}", name="x"),
+            )
+            for i in range(2)
+        ]
+        old.output_collection_id = "hdca1"
+        merged.get_job_status = AsyncMock(return_value=old)
+        merged._download_collection = AsyncMock(
+            return_value=[{"IDX_0": {"q": {"SRR1": 0.9}}}, {"IDX_1": {}}]
+        )
+
+        aggregate = await merged._aggregate_shards("job1")
+
+        merged._download_collection.assert_awaited_once()
+        merged.gi.make_get_request.assert_not_called()
+        assert aggregate["shards_searched"] == 2
+
+
 def _status_of(job_id, copied_from=None):
     """A finished job's status, as get_job_status would build it."""
     return GalaxyJobStatus(
