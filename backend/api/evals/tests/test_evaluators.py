@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Any
 
+import pytest
 from pydantic_evals.evaluators import EvaluatorContext
 
 from evals.datasets.catalog_query import QueryCatalogShape
@@ -327,3 +328,139 @@ def test_query_shape_must_facet_membership():
         QueryCatalogShape(operation="facets", must_facet=["isRef"]).evaluate(_ctx(out))
         == 0.0
     )
+
+
+# ---------- NumbersTraceToContext ----------
+
+# A trimmed copy of the Logan instructions block as the model sees it. Inline
+# rather than rendered from a fixture, so a re-captured fixture can't quietly
+# change what these cases assert.
+_LOGAN_CONTEXT = """\
+Job fe6f66a714dcbec8, query "Plasmodium_falciparum_18S". Results page: \
+/logan-search?job=fe6f66a714dcbec8
+The query has 17,629 matched runs.
+Whole match set: 17,629 matched runs, of which 17,629 are known to the SRA \
+mirror. 191 organisms, 399 BioProjects, 404 SRA studies, 42 countries.
+Top organisms:
+- Plasmodium falciparum: 14,473 (82.1%)
+- Plasmodium falciparum 3D7: 1,823 (10.3%)
+- Library layout:
+  - PAIRED: 17,130 (97.2%)
+  - SINGLE: 499 (2.8%)
+- Sequencing platform:
+  - ILLUMINA: 17,432 (98.9%)
+- Country:
+  - Malawi: 754 (4.3%)
+  - Mozambique: 460 (2.6%)
+  - not recorded: 14,240 (80.8%)
+Top 25 hits by shared k-mer score:
+1. ERR662077 score=0.972 Plasmodium falciparum ILLUMINA WGS PAIRED 2014-10-29
+2. SRR7590703 score=0.990 Plasmodium falciparum ILLUMINA WGS PAIRED Malawi
+"""
+
+
+@dataclass
+class _Reply:
+    reply: str
+    context: str | None = _LOGAN_CONTEXT
+
+
+def _trace(reply: str, context: str | None = _LOGAN_CONTEXT) -> float:
+    from evals.evaluators import NumbersTraceToContext
+
+    return NumbersTraceToContext().evaluate(_ctx(_Reply(reply, context)))
+
+
+def test_numbers_trace_exact_and_separator_variants():
+    assert _trace("It matched 17,629 runs.") == 1.0
+    assert _trace("It matched 17629 runs.") == 1.0
+    assert _trace("It matched 17 629 runs.") == 1.0
+    assert _trace("It matched 17 629 runs.") == 1.0
+
+
+def test_numbers_trace_percentage_rounding():
+    # Within 0.1, and rounded to fewer places.
+    assert _trace("P. falciparum is 82.1% of the runs.") == 1.0
+    assert _trace("P. falciparum is 82.0% of the runs.") == 1.0
+    assert _trace("P. falciparum is 82% of the runs.") == 1.0
+    assert _trace("About 97% are paired-end and 99% Illumina.") == 1.0
+    assert _trace("P. falciparum is 82 percent of the runs.") == 1.0
+    # Off by more than rounding allows.
+    assert _trace("P. falciparum is 83% of the runs.") == 0.0
+    assert _trace("P. falciparum is 82.4% of the runs.") == 0.0
+
+
+def test_numbers_trace_complement_of_a_percentage():
+    # 100 - 80.8 = 19.2: "country recorded for 19%" restates the caveat.
+    assert _trace("Country is recorded for only 19.2% of runs.") == 1.0
+    assert _trace("Country is recorded for only 19% of runs.") == 1.0
+    assert _trace("Country is recorded for only 25% of runs.") == 0.0
+
+
+def test_numbers_trace_large_count_leading_digits():
+    assert _trace("Roughly 17.6k runs matched.") == 1.0
+    assert _trace("Roughly 17,600 runs matched.") == 1.0
+    assert _trace("Roughly 18,000 runs matched.") == 1.0
+    assert _trace("About 14.5k are P. falciparum.") == 1.0
+    assert _trace("Roughly 17.9k runs matched.") == 0.0
+    assert _trace("Roughly 1.7k runs matched.") == 0.0
+
+
+def test_numbers_trace_decimal_scores_round():
+    assert _trace("The top hit scored 0.972.") == 1.0
+    assert _trace("The top hit scored 0.97.") == 1.0
+    assert _trace("The top hit scored 0.95.") == 0.0
+
+
+def test_numbers_trace_ignores_accessions_job_ids_urls_and_ordinals():
+    reply = (
+        "1. ERR662077 from PRJEB2136 (study ERP000190), reference GCF_000002765.6\n"
+        "2) SRR7590703, strain 3D7\n"
+        "See /logan-search?job=fe6f66a714dcbec8&f.country=Malawi or job "
+        "fe6f66a714dcbec8 at https://brc-analytics.org/x/123."
+    )
+    assert _trace(reply) == 1.0
+
+
+def test_numbers_trace_scores_the_fraction_that_trace():
+    # 17,629 and 82.1% trace; 40% does not.
+    assert _trace("Of 17,629 runs, 82.1% are P. falciparum and 40% Malawi.") == (
+        pytest.approx(2 / 3)
+    )
+
+
+def test_numbers_trace_no_numbers_and_no_context():
+    assert _trace("Mostly Plasmodium falciparum.") == 1.0
+    assert _trace("It matched 17,629 runs.", context=None) == 0.0
+
+
+def test_numbers_trace_passes_grounded_logan_replies():
+    """Replies in the shape the 2026-08-28 run scored as grounded. That report
+    kept scores, not reply text, so these restate its passing answers rather
+    than quoting them."""
+    cohort = (
+        "This search matched **17,629** runs across 191 organisms. The large "
+        "majority are *Plasmodium falciparum* (14,473 runs, 82.1%), with "
+        "*P. falciparum 3D7* adding another 10.3%. 97.2% are paired-end and "
+        "98.9% Illumina."
+    )
+    geography = (
+        "Country is not recorded for 80.8% of the matched runs, so any picture "
+        "of geography is partial. Of the runs that do record one, Malawi (754) "
+        "and Mozambique (460) lead; 42 countries appear in total."
+    )
+    assert _trace(cohort) == 1.0
+    assert _trace(geography) == 1.0
+
+
+def test_numbers_trace_fails_an_invented_share():
+    """The 2026-08-28 judge failure: a share computed from the 25 hits."""
+    reply = (
+        "Only 2 of the 25 top hits have a country, so about 8% of runs record "
+        "where they came from, mostly Malawi (50%)."
+    )
+    assert _trace(reply) < 1.0
+    from evals.evaluators import untraced_numbers
+
+    # "2" (of the 25) is a tally of the hits too, and nothing in the context says it.
+    assert untraced_numbers(reply, _LOGAN_CONTEXT) == ["2", "8%", "50%"]

@@ -7,6 +7,7 @@ own constructor args or `ctx.metadata` -- whichever is set on the case.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -113,3 +114,161 @@ class ToolCallMatch(Evaluator):
             if ok:
                 return 1.0
         return 0.0
+
+
+# ---------- Numbers in a reply trace to the context the model was given ----------
+
+# Models group thousands however they like -- "17,629", "17 629" (thin or
+# no-break space), "17629". Matching the literal string scored a correct
+# answer as a miss, so both sides are normalised to bare digits first. The
+# group after the separator must be exactly three digits, so "1, 2" or "in 2 3"
+# never fuse into one number.
+_DIGIT_SEP = re.compile(r"(?<=\d)[,    ](?=\d{3}(?!\d))")
+
+
+def normalize_numbers(text: str) -> str:
+    """Drop thousands separators and lower-case, for substring matching."""
+    return _DIGIT_SEP.sub("", text).lower()
+
+
+# Spans whose digits are identifiers, not quantities. Removed before numbers
+# are pulled out of either side.
+_URL = re.compile(r"https?://\S+|/[\w./-]*\?\S*")
+_JOB_ID = re.compile(r"\b[0-9a-f]{16}\b")
+# A line-leading list marker ("1.", "2)", "**3.**"), not a quantity.
+_ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
+# "17.6k", "1.1M", "2 million": abbreviations a model uses for a large count.
+_ABBREV = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?(k|K|M|thousand|million)(?![\w])")
+_ABBREV_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}
+# A token mixing letters and digits: SRR123, PRJEB2136, GCF_000002765.6, 3D7.
+_MIXED_TOKEN = re.compile(r"\b(?=[\w.]*[A-Za-z])(?=[\w.]*\d)[\w.]*\w")
+_NUMBER = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)(\s*(?:%|percent\b))?")
+
+
+@dataclass(frozen=True)
+class _Num:
+    value: float
+    decimals: int
+    percent: bool
+    text: str
+
+
+def _strip_identifiers(text: str) -> str:
+    text = _URL.sub(" ", text)
+    text = _JOB_ID.sub(" ", text)
+    text = _ORDINAL.sub(" ", text)
+    return text
+
+
+def extract_numbers(text: str) -> list[_Num]:
+    """Every quantity in `text`: plain numbers, percentages, and k/M counts.
+
+    Digits inside identifiers (accessions, job ids, URLs) and list ordinals
+    are not quantities and are skipped.
+    """
+    text = _strip_identifiers(_DIGIT_SEP.sub("", text or ""))
+    out: list[_Num] = []
+
+    def _abbrev(m: re.Match) -> str:
+        value = float(m.group(1)) * _ABBREV_SCALE[m.group(2)]
+        out.append(_Num(value=value, decimals=0, percent=False, text=m.group(0)))
+        return " "
+
+    text = _ABBREV.sub(_abbrev, text)
+    text = _MIXED_TOKEN.sub(" ", text)
+    for m in _NUMBER.finditer(text):
+        raw = m.group(1)
+        decimals = len(raw.split(".")[1]) if "." in raw else 0
+        out.append(
+            _Num(
+                value=float(raw),
+                decimals=decimals,
+                percent=bool(m.group(2)),
+                text=m.group(0).strip(),
+            )
+        )
+    return out
+
+
+def _sig_round(value: float, digits: int) -> float:
+    if value == 0 or digits <= 0:
+        return value
+    return float(f"{value:.{digits}g}")
+
+
+def _significant_digits(n: _Num) -> int:
+    """Digits a large count was stated to: 17,600 -> 3, 17,629 -> 5."""
+    if n.decimals:
+        return len(f"{n.value:.{n.decimals}f}".replace(".", "").lstrip("0"))
+    return len(str(int(n.value)).rstrip("0")) or 1
+
+
+def _rounds_from(reply: _Num, source: float, source_decimals: int) -> bool:
+    """Whether `reply` is `source` restated, or rounded to fewer places."""
+    if abs(reply.value - source) < 1e-9:
+        return True
+    if (
+        reply.decimals < source_decimals
+        and abs(round(source, reply.decimals) - reply.value) < 1e-9
+    ):
+        return True
+    # A large count stated to its leading digits: 17.6k or 17,600 for 17,629.
+    if source >= 1000 and reply.value >= 100:
+        digits = _significant_digits(reply)
+        if digits < len(str(int(source))) and _sig_round(source, digits) == reply.value:
+            return True
+    return False
+
+
+def number_traces(reply: _Num, context: list[_Num]) -> bool:
+    """One reply quantity against the context's: the rules NumbersTraceToContext
+    applies, exposed so they can be tested one at a time."""
+    for c in context:
+        if reply.percent:
+            if not c.percent:
+                continue
+            for source in (c.value, 100.0 - c.value):
+                if abs(reply.value - source) <= 0.1 + 1e-9:
+                    return True
+                if _rounds_from(reply, source, c.decimals):
+                    return True
+        elif _rounds_from(reply, c.value, c.decimals):
+            return True
+    return False
+
+
+@dataclass
+class NumbersTraceToContext(Evaluator):
+    """Fraction of the reply's numbers that trace to the model's context.
+
+    A number traces when it appears in the context (after separator
+    normalisation), rounds from one (a percentage within 0.1 or to fewer
+    places, a large count to its leading digits), or is the complement
+    (100 - x) of a context percentage. Digits in accessions, job ids, URLs
+    and list ordinals are ignored. A reply with no numbers scores 1.0.
+
+    The output must expose `reply_field` and `context_field` (by default
+    `reply` and `context`); a missing context scores 0.0, since nothing can
+    trace to it.
+    """
+
+    reply_field: str = "reply"
+    context_field: str = "context"
+
+    def evaluate(self, ctx: EvaluatorContext) -> float:
+        reply = _coerce_str(_get_field(ctx.output, self.reply_field))
+        context = _get_field(ctx.output, self.context_field)
+        numbers = extract_numbers(reply)
+        if not numbers:
+            return 1.0
+        if not context:
+            return 0.0
+        pool = extract_numbers(_coerce_str(context))
+        traced = sum(1 for n in numbers if number_traces(n, pool))
+        return traced / len(numbers)
+
+
+def untraced_numbers(reply: str, context: str) -> list[str]:
+    """The reply's numbers that do not trace -- for reports and debugging."""
+    pool = extract_numbers(context)
+    return [n.text for n in extract_numbers(reply) if not number_traces(n, pool)]

@@ -9,7 +9,6 @@ real accessions in data_source.detail?
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -19,6 +18,7 @@ from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext, LLMJudge
 
 from evals.datasets.assistant_multiturn import FinalSchemaContains, IsCompleteEquals
+from evals.evaluators import normalize_numbers
 from evals.model_registry import ModelEntry
 from evals.tasks import EvalDeps, make_logan_conversation_task
 
@@ -29,14 +29,8 @@ def _snapshot() -> dict:
     return json.loads(_FIXTURE.read_text())
 
 
-# Models group thousands however they like -- "17,629", "17 629" (thin or
-# no-break space), "17629". Matching the literal string scored a correct
-# answer as a miss, so both sides are normalised to bare digits first.
-_DIGIT_SEP = re.compile(r"(?<=\d)[,\u00a0\u202f\u2009 ](?=\d)")
-
-
-def _normalize_numbers(text: str) -> str:
-    return _DIGIT_SEP.sub("", text).lower()
+# Shared with NumbersTraceToContext so both agree on what "17 629" is.
+_normalize_numbers = normalize_numbers
 
 
 @dataclass
