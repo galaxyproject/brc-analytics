@@ -658,12 +658,15 @@ def execute(
     q: "CatalogQuery | LoganHitQuery",
     con,
     facet_limit: int = _FACET_LIMIT,
+    null_key: object = "(none)",
 ) -> dict:
     """Run a CatalogQuery against DuckDB; return the summary contract.
 
     Entity/column/sort identifiers are interpolated into SQL, not parameterized
     (SQL identifiers can't be) — the CatalogQuery allowlist validator is what
     gates that interpolation, so don't loosen it without revisiting this.
+    `null_key` labels a facet's missing-value bucket; a caller that has to tell
+    it from a real "(none)" value passes something no value can be.
     """
     where, params = _compile_where(q)
     cap = q.limit
@@ -683,7 +686,7 @@ def execute(
                 f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {int(facet_limit)}",
                 params,
             ).fetchall()
-            out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
+            out[col] = {(null_key if k is None else str(k)): c for k, c in rows}
         return out
 
     total = con.execute(
@@ -899,8 +902,8 @@ def logan_vocabulary(
             q = LoganHitQuery(operation="facets", facet_by=list(fields[i : i + chunk]))
             # Two over the limit: one for the NULL bucket, which is dropped,
             # and one to tell a list that was cut from one that just fits.
-            facets = execute(q, con, facet_limit=limit + 2)["facets"]
-            for name, buckets in facets.items():
-                values = [v for v in buckets if v != "(none)"]
+            facets = execute(q, con, facet_limit=limit + 2, null_key=None)
+            for name, buckets in facets["facets"].items():
+                values = [v for v in buckets if v is not None]
                 out[name] = (values[:limit], len(values) > limit)
     return out
