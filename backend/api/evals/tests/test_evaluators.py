@@ -533,6 +533,46 @@ def test_units_exponents_and_long_numbers_are_quantities():
     assert extract_numbers("job 806580fd1ed1cc90 finished") == []
 
 
+def test_time_and_size_suffixes_are_quantities_not_identifiers():
+    from evals.evaluators import extract_numbers
+
+    for text, value in (
+        ("took 999ms", 999.0),
+        ("took 2.5 sec", 2.5),
+        ("in 3 min", 3.0),
+        ("over 12h", 12.0),
+        ("a 4GiB file", 4.0),
+        ("12 days ago", 12.0),
+    ):
+        assert [n.value for n in extract_numbers(text)] == [value], text
+    # Invented, so untraced -- not silently dropped as an identifier.
+    assert _trace("The query took 999ms.", "17,629 runs") == 0.0
+    assert _trace("The pass took 1.4 sec.", "median 1.4") == 1.0
+    # A decade is still not a quantity.
+    assert extract_numbers("runs from the 1990s") == []
+
+
+def test_exponents_keep_their_real_decimal_places():
+    from evals.evaluators import extract_numbers
+
+    [tenth] = extract_numbers("a threshold of 1e-1")
+    assert (tenth.value, tenth.decimals) == (0.1, 1)
+    [big] = extract_numbers("2.5e3 runs")
+    assert (big.value, big.decimals) == (2500.0, 0)
+    assert _trace("A threshold of 1e-1.", "score >= 0.1") == 1.0
+    assert _trace("A threshold of 1e-1.", "score >= 0.25") == 0.0
+
+
+def test_an_absurd_exponent_is_skipped_not_a_crash():
+    from evals.evaluators import extract_numbers
+
+    assert extract_numbers("1e999 runs") == []
+    assert extract_numbers("1e-999 runs") == []
+    assert extract_numbers("9e99999999999999999999 and 5 runs")[-1].value == 5.0
+    assert extract_numbers("1e" + "9" * 5000 + " and 5 runs")[-1].value == 5.0
+    assert _trace("1e999 runs, 17,629 in all.", "17,629 runs") == 1.0
+
+
 def test_numbers_trace_large_counts_keep_two_leading_digits():
     assert _trace("About 20,000 runs.") == 0.0
     assert _trace("About 18,000 runs.") == 1.0

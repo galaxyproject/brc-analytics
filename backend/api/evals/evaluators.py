@@ -148,13 +148,19 @@ _ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
 # "17.6k", "1.1M", "2 million": abbreviations a model uses for a large count.
 _ABBREV = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?(k|K|M|thousand|million)(?![\w])")
 _ABBREV_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}
-# Quantities written with a unit or an exponent ("999GB", "30x", "1e6"). Read
-# before identifiers are stripped, which would otherwise take them for one.
+# Quantities written with a unit or an exponent ("999GB", "30x", "999ms",
+# "1e6"). Read before identifiers are stripped, which would otherwise take
+# them for one.
 _UNIT = re.compile(
     r"(?<![\w.])(\d+(?:\.\d+)?)\s?"
-    r"(?:[KMGT]B|[kKMG]bp?|bp|[MG]bases|x|X)(?![\w])"
+    r"(?:[KMGT]i?B|kB|[kKMG]bp?|bp|[MG]bases|x|X"
+    # No bare "s": "the 1990s" is a decade, not 1990 seconds.
+    r"|[mµun]s|secs?|seconds?|mins?|minutes?|h|hrs?|hours?|days?)(?![\w])"
 )
-_SCI = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]([+-]?\d+)(?![\w.])")
+# Past this a float overflows (or underflows to 0); no count is that size.
+_MAX_EXPONENT = 300
+# A full stop after the exponent ends the sentence; a digit after one doesn't.
+_SCI = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]([+-]?\d+)(?!\w|\.\d)")
 # A token mixing letters and digits: SRR123, PRJEB2136, GCF_000002765.6, 3D7.
 _MIXED_TOKEN = re.compile(r"\b(?=[\w.]*[A-Za-z])(?=[\w.]*\d)[\w.]*\w")
 _NUMBER = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)(\s*(?:%|percent\b))?")
@@ -190,8 +196,19 @@ def extract_numbers(text: str) -> list[_Num]:
         return " "
 
     def _sci(m: re.Match) -> str:
-        value = float(m.group(1)) * 10 ** int(m.group(2))
-        out.append(_Num(value=value, decimals=0, percent=False, text=m.group(0)))
+        # Length first: int() refuses a digit string past 4,300 characters.
+        if len(m.group(2)) <= 5 and abs(int(m.group(2))) <= _MAX_EXPONENT:
+            exact = Decimal(f"{m.group(1)}e{m.group(2)}")
+            # 1e-1 is 0.1, one decimal place; 2.5e3 is 2500, none.
+            decimals = max(0, -exact.as_tuple().exponent)
+            out.append(
+                _Num(
+                    value=float(exact),
+                    decimals=decimals,
+                    percent=False,
+                    text=m.group(0),
+                )
+            )
         return " "
 
     def _unit(m: re.Match) -> str:
