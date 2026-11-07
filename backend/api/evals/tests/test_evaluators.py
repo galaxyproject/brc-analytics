@@ -464,3 +464,25 @@ def test_numbers_trace_fails_an_invented_share():
 
     # "2" (of the 25) is a tally of the hits too, and nothing in the context says it.
     assert untraced_numbers(reply, _LOGAN_CONTEXT) == ["2", "8%", "50%"]
+
+
+def test_numbers_trace_on_real_baseline_replies():
+    """Replies MiniMax gave in the 2026-11-07 baseline, against the F1 block it
+    was given: two grounded ones pass, and the one that misapplied a
+    Logan-wide count ("227 saturated samples") to this search does not."""
+    import json
+    from pathlib import Path
+
+    from app.services.logan_prompt import render_logan_instructions
+    from evals.evaluators import untraced_numbers
+    from evals.logan_fixture import load_fixture
+
+    data = json.loads(
+        (Path(__file__).parent / "data" / "logan_baseline_replies.json").read_text()
+    )["replies"]
+    context = render_logan_instructions(load_fixture("logan_pfal_18s").snapshot)
+    assert _trace(data["what_is_this_cohort"]["reply"], context) == 1.0
+    assert _trace(data["where_is_the_data_from"]["reply"], context) == 1.0
+    invented = data["score_meaning"]["reply"]
+    assert _trace(invented, context) < 1.0
+    assert "227" in untraced_numbers(invented, context)
