@@ -39,7 +39,7 @@ export function isValidGeneSearch(query: string): boolean {
  */
 export function useGeneSearch(q: string): GeneSearchState {
   const enabled = q !== "" && isValidGeneSearch(q);
-  const { data, isError, isFetching, refetch } = useQuery({
+  const { data, isError, refetch } = useQuery({
     enabled,
     queryFn: ({ signal }) =>
       apiClient.searchGenes(q, GENE_SEARCH_LIMIT, signal),
@@ -53,8 +53,9 @@ export function useGeneSearch(q: string): GeneSearchState {
     const { results, truncated } = data;
     return { results, status: "found", truncated };
   }
-  // A retry of a failed search is loading until it answers.
-  if (isError && !isFetching)
+  // A retry of a failed search is loading until it answers: refetching a
+  // query with no data puts it back to pending, so isError is false.
+  if (isError)
     return { retry: (): void => void refetch(), status: "unavailable" };
   return { status: "loading" };
 }

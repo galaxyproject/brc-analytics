@@ -93,9 +93,25 @@ describe("useGeneSearch", () => {
     });
     const result = renderUseGeneSearch("ama");
     await waitFor(() => expect(result.current.status).toBe("unavailable"));
-    mockGet.mockReturnValue(found());
+    // The retry's answer is held back, so the hook can be seen loading.
+    let answer: ((value: unknown) => void) | undefined;
+    mockGet.mockReturnValue({
+      json: () =>
+        new Promise((resolve) => {
+          answer = resolve;
+        }),
+    });
     act(() => {
       if (result.current.status === "unavailable") result.current.retry();
+    });
+    await waitFor(() => expect(result.current).toEqual({ status: "loading" }));
+    await act(async () => {
+      answer?.({
+        query: "ama",
+        results: [RESULT],
+        snapshot: {},
+        truncated: false,
+      });
     });
     await waitFor(() => expect(result.current.status).toBe("found"));
     expect(mockGet).toHaveBeenCalledTimes(2);
