@@ -6,11 +6,14 @@ import {
 import {
   Card,
   CardContent,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import { formatWait } from "@repo/shared/components/LoganSearch/LoganSearchStatus/queueNote";
@@ -18,7 +21,17 @@ import { API_BASE_URL } from "@repo/shared/config/api";
 import { useKmindexQueue } from "@repo/shared/hooks/useKmindexQueue";
 import ky from "ky";
 import { type JSX, useEffect, useMemo, useRef, useState } from "react";
-import { buildWaitSpec, hourlyBuckets, type QueueHistory } from "./queueStats";
+import {
+  bucketHoursFor,
+  bucketLabel,
+  buildWaitSpec,
+  DEFAULT_QUEUE_RANGE,
+  parseQueueRange,
+  QUEUE_RANGES,
+  type QueueHistory,
+  type QueueRange,
+  timeBuckets,
+} from "./queueStats";
 import { ChartBox, StatGrid } from "./queueStatsView.styles";
 
 // The backend keeps the history for five minutes; asking more often would
@@ -26,27 +39,45 @@ import { ChartBox, StatGrid } from "./queueStatsView.styles";
 const HISTORY_POLL_MS = 5 * 60_000;
 
 /**
- * The last day of searches, refreshed every few minutes.
- * @returns The history, null before it lands, and whether the last read failed.
+ * The searches in the chosen window, refreshed every few minutes.
+ * @param range - Hours to cover, or null before the URL has been read.
+ * @returns The history, null before this window's lands, and whether the last read failed.
  */
-function useQueueHistory(): { failed: boolean; history: QueueHistory | null } {
-  const [history, setHistory] = useState<QueueHistory | null>(null);
-  const [failed, setFailed] = useState(false);
+function useQueueHistory(range: QueueRange | null): {
+  failed: boolean;
+  history: QueueHistory | null;
+} {
+  // Tagged with the window it was read for, so switching shows "Loading"
+  // rather than the other window's figures under the new heading.
+  const [state, setState] = useState<{
+    failed: boolean;
+    history: QueueHistory | null;
+    range: QueueRange;
+  } | null>(null);
   useEffect(() => {
+    if (range === null) return;
     const controller = new AbortController();
     const read = (): void => {
       ky.get(`${API_BASE_URL}/galaxy/kmindex/queue/history`, {
         retry: 0,
+        searchParams: { hours: range },
         signal: controller.signal,
         timeout: 120000,
       })
         .json<QueueHistory>()
         .then((next) => {
-          setHistory(next);
-          setFailed(false);
+          // An answer that lands after the switch would retag the state with
+          // the old window and strand the new one on "Loading".
+          if (controller.signal.aborted) return;
+          setState({ failed: false, history: next, range });
         })
         .catch(() => {
-          if (!controller.signal.aborted) setFailed(true);
+          if (controller.signal.aborted) return;
+          setState((prev) => ({
+            failed: true,
+            history: prev?.range === range ? prev.history : null,
+            range,
+          }));
         });
     };
     read();
@@ -55,8 +86,31 @@ function useQueueHistory(): { failed: boolean; history: QueueHistory | null } {
       clearInterval(timer);
       controller.abort();
     };
+  }, [range]);
+  if (!state || state.range !== range) return { failed: false, history: null };
+  return { failed: state.failed, history: state.history };
+}
+
+/**
+ * The window from ?hours=, kept in the URL so a link opens on the same view.
+ * @returns The window (null until the URL has been read after mount) and a setter.
+ */
+function useQueueRange(): [QueueRange | null, (next: QueueRange) => void] {
+  const [range, setRange] = useState<QueueRange | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL is only readable after mount on a statically exported page
+    setRange(parseQueueRange(params.get("hours")));
   }, []);
-  return { failed, history };
+  const choose = (next: QueueRange): void => {
+    setRange(next);
+    // Same approach as the search page's filter params: leaves the rest of
+    // the query alone and adds no history entry for Back to walk.
+    const url = new URL(window.location.href);
+    url.searchParams.set("hours", String(next));
+    window.history.replaceState(null, "", url);
+  };
+  return [range, choose];
 }
 
 /**
@@ -94,11 +148,21 @@ const Stat = ({
  * Each search's wait, drawn with vega-lite.
  * @param props - Component props.
  * @param props.history - The history to draw.
+ * @param props.range - The window it covers.
  * @returns The chart.
  */
-const WaitChart = ({ history }: { history: QueueHistory }): JSX.Element => {
+const WaitChart = ({
+  history,
+  range,
+}: {
+  history: QueueHistory;
+  range: QueueRange;
+}): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spec = useMemo(() => buildWaitSpec(history.rows), [history.rows]);
+  const spec = useMemo(
+    () => buildWaitSpec(history.rows, range),
+    [history.rows, range]
+  );
   useEffect(() => {
     let result: { finalize: () => void } | null = null;
     let cancelled = false;
@@ -130,22 +194,30 @@ const WaitChart = ({ history }: { history: QueueHistory }): JSX.Element => {
 
 /**
  * Unlisted: how long Logan searches have waited to start, now and over the
- * last day. For the people running the service and the courses that use it.
+ * last 24 or 72 hours. For the people running the service and the courses
+ * that use it.
  * @returns The page.
  */
 export const QueueStatsView = (): JSX.Element => {
   const queue = useKmindexQueue(true);
-  const { failed, history } = useQueueHistory();
-  const hours = useMemo(
-    () => (history ? hourlyBuckets(history.rows) : []),
-    [history]
+  const [range, setRange] = useQueueRange();
+  const { failed, history } = useQueueHistory(range);
+  const shownRange = range ?? DEFAULT_QUEUE_RANGE;
+  // Until the URL is read the window isn't known, and the exported HTML
+  // shouldn't claim the default for a ?hours=72 link.
+  const windowText =
+    range === null ? "recent hours" : `the last ${range} hours`;
+  const bucketHours = bucketHoursFor(shownRange);
+  const buckets = useMemo(
+    () => (history ? timeBuckets(history.rows, bucketHours) : []),
+    [bucketHours, history]
   );
 
   return (
     <>
       <LoganHero
         head="Search queue"
-        subHead="How long Logan searches have waited to start, right now and over the last day. Counts searches run through the shared BRC account, which includes logan-search.org and anonymous searches here."
+        subHead={`How long Logan searches have waited to start, right now and over ${windowText}. Counts searches run through the shared BRC account, which includes logan-search.org and anonymous searches here.`}
         variant="article"
       />
       <ResultsSection>
@@ -173,9 +245,33 @@ export const QueueStatsView = (): JSX.Element => {
           </Card>
           <Card>
             <CardContent>
-              <Typography gutterBottom variant="subtitle1">
-                Last {history?.hours ?? 24} hours
-              </Typography>
+              <Stack
+                alignItems="center"
+                direction="row"
+                flexWrap="wrap"
+                gap={1}
+                justifyContent="space-between"
+                mb={1}
+              >
+                <Typography variant="subtitle1">
+                  {range === null ? "Recent hours" : `Last ${range} hours`}
+                </Typography>
+                <ToggleButtonGroup
+                  aria-label="Time range"
+                  exclusive
+                  onChange={(_, next: QueueRange | null): void => {
+                    if (next !== null) setRange(next);
+                  }}
+                  size="small"
+                  value={range}
+                >
+                  {QUEUE_RANGES.map((option) => (
+                    <ToggleButton key={option} value={option}>
+                      {option} hours
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
               {!history ? (
                 <Typography color="textSecondary" variant="body2">
                   {failed
@@ -210,18 +306,22 @@ export const QueueStatsView = (): JSX.Element => {
                       value={waitText(history.run_p50_minutes)}
                     />
                   </StatGrid>
-                  {history.rows.length > 0 && <WaitChart history={history} />}
+                  {history.rows.length > 0 && (
+                    <WaitChart history={history} range={shownRange} />
+                  )}
                   {history.truncated && (
                     <Typography color="textSecondary" variant="caption">
                       Galaxy&apos;s job list hit its limit, so the oldest
                       searches in this window are missing.
                     </Typography>
                   )}
-                  {hours.length > 0 && (
+                  {buckets.length > 0 && (
                     <Table size="small" sx={{ mt: 2 }}>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Hour</TableCell>
+                          <TableCell>
+                            {bucketHours === 1 ? "Hour" : "Hours"}
+                          </TableCell>
                           <TableCell align="right">Searches</TableCell>
                           <TableCell align="right">From cache</TableCell>
                           <TableCell align="right">Median wait</TableCell>
@@ -229,14 +329,10 @@ export const QueueStatsView = (): JSX.Element => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {hours.map((bucket) => (
-                          <TableRow key={bucket.hour}>
+                        {buckets.map((bucket) => (
+                          <TableRow key={bucket.start}>
                             <TableCell>
-                              {new Date(bucket.hour).toLocaleString(undefined, {
-                                day: "numeric",
-                                hour: "numeric",
-                                month: "short",
-                              })}
+                              {bucketLabel(bucket.start, bucketHours)}
                             </TableCell>
                             <TableCell align="right">
                               {bucket.searches}
