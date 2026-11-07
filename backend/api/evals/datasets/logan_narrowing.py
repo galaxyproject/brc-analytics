@@ -5,14 +5,16 @@ which one runs (`tool`: the model calls query_logan_hits; `extract`: a
 tool-less pre-reply pass emits the query and the server injects the result).
 Each case is scored on:
 
-- LoganQueryShape -- the last query the last turn emitted (the last
-  query_logan_hits call, or the extractor's query) has exactly the expected
-  filters: the right fields, ops and values, nothing missing and nothing
-  extra. Equivalent spellings agree: eq x == in [x], and on the integer
-  fields gt 2019 == gte 2020.
+- LoganQueryShape -- the last query that answered the last turn (the last
+  query_logan_hits call that returned a count, or the extractor's query when
+  the pass counted and applied it) has exactly the expected filters: the
+  right fields, ops and values, nothing missing and nothing extra.
+  Equivalent spellings agree: eq x == in [x], and on the integer fields
+  gt 2019 == gte 2020.
 - _ReplyHasCount -- the final reply states the ground-truth count, computed
   here with plain SQL over the fixture parquet (never through the engine
-  under test), and states no other run total;
+  under test), states no other run total as the matching count, and
+  mentions no total it couldn't have been given;
 - NumbersTraceToContext -- nothing else in the reply is invented;
 - _SelectionHas (extract only) -- what the session kept as its selection,
   exactly.
@@ -184,6 +186,36 @@ def run_total_claims(reply: str) -> list[int]:
     return claims
 
 
+# A total stated as the answer -- the count of runs that match -- rather than
+# as a reference point beside it: "181 of the 231", "7,744 out of 17,629",
+# "181 are WGS", "999 matching runs", "999 runs match", "matching runs: 12".
+# "matched" and "results" are left out: replies use them for the search's own
+# total ("17,629 matched runs", "in your search results").
+_ANSWER_CLAIM = re.compile(
+    r"(?<![\w.%])(\d+)\s+(?:out\s+)?of\s+(?:the\s+|these\s+|those\s+)?\d+"
+    r"|(?<![\w.%])(\d+)\s+(?:are|were|match)\b"
+    r"|(?<![\w.%])(\d+)\s+(?:[A-Za-z][\w.-]*\s+){0,3}?matching\s+runs?\b"
+    r"|(?<![\w.%])(\d+)\s+(?:[A-Za-z][\w.-]*\s+){0,3}?runs?\s+match\b"
+    r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w.%])"
+)
+# "all 460 are WGS", "of the 999 matching runs": a group the answer is set
+# against, not the answer.
+_REFERENCE_BEFORE = re.compile(
+    r"\b(?:all|of|out\s+of)\s+(?:the\s+|these\s+|those\s+)?$"
+)
+
+
+def answer_claims(reply: str) -> list[int]:
+    """The run totals the reply states as the matching count, in order."""
+    text = normalize_numbers(reply or "").replace("*", "").replace("_", " ")
+    claims = []
+    for m in _ANSWER_CLAIM.finditer(text):
+        if _REFERENCE_BEFORE.search(text[: m.start()]):
+            continue
+        claims.append(int(next(g for g in m.groups() if g is not None)))
+    return claims
+
+
 def _context_counts(context: str) -> set[int]:
     """Whole numbers the model was handed (cohort counts, tool returns)."""
     return {
@@ -215,6 +247,13 @@ class _ReplyHasCount(Evaluator):
             *_context_counts(getattr(ctx.output, "context", "") or ""),
         }
         if any(c not in allowed for c in claims):
+            return 0.0
+        # The search's total or a selection's size is fine beside the answer,
+        # not as it: "42 runs were expected; actually 999 matching runs".
+        # Only those: a breakdown beside the answer ("181 are WGS and 279 are
+        # WGA") is held to the rule above, not to this one.
+        others = set(self.also_ok) - {self.expected}
+        if any(c in others for c in answer_claims(reply)):
             return 0.0
         if self.expected in claims:
             return 1.0

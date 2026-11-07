@@ -215,6 +215,35 @@ def test_a_contradicting_total_fails():
     assert ev.evaluate(_ctx(_Out("181 runs match; actually 190 runs."))) == 0.0
 
 
+def test_an_allowed_total_stated_as_the_answer_fails():
+    ev = _ReplyHasCount(expected=42, also_ok=[999, 17629])
+    for reply in (
+        "42 runs were expected; actually 999 matching runs.",
+        "42 runs? No: 999 runs match.",
+        "999 of the 17,629 runs match; earlier I said 42 runs.",
+        "Matching runs: 999 (42 runs in the selection).",
+    ):
+        assert ev.evaluate(_ctx(_Out(reply))) == 0.0, reply
+    # Beside the answer, as the group it is drawn from, they are fine.
+    for reply in (
+        "42 of the 999 runs match.",
+        "There are 42 matching runs (out of 17,629 total matched runs).",
+        "Of the 999 matching runs, 42 are WGS.",
+        "42 runs are WGS; all 999 are from the selection.",
+    ):
+        assert ev.evaluate(_ctx(_Out(reply))) == 1.0, reply
+
+    # A breakdown beside the answer is not a second answer.
+    @dataclass
+    class _WithContext(_Out):
+        context: str = ""
+
+    breakdown = _WithContext(
+        "Of the 999 Thai runs, 42 are WGS and 957 are WGA.", context="WGA: 957"
+    )
+    assert ev.evaluate(_ctx(breakdown)) == 1.0
+
+
 def test_zero_needs_a_none_claim_and_no_other_total():
     zero = _ReplyHasCount(expected=0, also_ok=[17629])
     assert zero.evaluate(_ctx(_Out("There are no WGA runs from Mozambique."))) == 1.0
