@@ -6,92 +6,112 @@ turn get its filter from a tool the model calls (`LOGAN_NARROWING_MODE=tool`,
 `query_logan_hits`) or from a tool-less pass the server runs before the reply
 (`extract`)? Both share one engine (the `logan_hit` entity over the cached
 export) and the same ten `logan_narrowing` cases over F1, with ground-truth
-counts from plain SQL over the fixture parquet.
+counts from plain SQL over the fixture parquet. No judge is involved.
 
-- Reports: `2026-11-07-logan_narrowing-{tool,extract}-{MiniMax-r5,gpt-oss-r1}-26cf02678.md`
-- MiniMax-M2.7 `--repeat 5` per mode; gpt-oss-120b `--repeat 1`. Both modes ran
-  at the same time with `--max-concurrency 1` each, so they saw the same
-  endpoint conditions. No judge is involved.
+**Answer: `tool`.** On a re-run with a quiet endpoint it cleared the bar over
+**all** runs: MiniMax-M2.7 scored **0.90 shape / 1.00 count over 50 of 50
+runs**, with no failed runs. Extract was exactly as accurate whenever its
+pre-reply pass finished, and wrong whenever its 12 s cap cut the pass off --
+which on TACC it did on about a third of turns in both of its runs.
 
-## Result
+## Scoring
 
-Per case run (a failed run counts as 0 on every score):
+The first version of these scorers accepted wrong answers (a review found
+them): a "before 1990" filter passed for "after 2019", extra filters passed,
+and any number anywhere in the reply passed as the count. They now require:
 
-| Model, mode      | Runs | Failed runs | Shape (all runs) | Count (all runs) | Shape / count, completed replies |
-| ---------------- | ---- | ----------- | ---------------- | ---------------- | -------------------------------- |
-| MiniMax, tool    | 50   | 9           | 0.82             | 0.82             | 1.00 / 1.00 (41 runs)            |
-| MiniMax, extract | 50   | 4           | 0.56             | 0.62             | 0.61 / 0.67 (46 runs)            |
-| gpt-oss, tool    | 10   | 0           | 1.00             | 1.00             | 1.00 / 1.00                      |
-| gpt-oss, extract | 10   | 0           | 1.00             | 1.00             | 1.00 / 1.00                      |
+- **Shape:** the last query the last turn emitted -- its last
+  `query_logan_hits` call, or the extractor's query -- has exactly the
+  expected filters. Nothing missing, nothing extra. `eq x` and `in [x]` agree,
+  as do `gt 2019` and `gte 2020` on whole-number fields.
+- **Count:** the reply states the ground-truth count as a run total ("181
+  runs", "181 of the 231", "181 are WGS"), and states no other total except
+  the search's, a selection's, a number the user said, or a count the model's
+  context holds. For zero, "no ... runs" counts, but only without a
+  contradicting total.
+- **Selection** (extract only): the stored selection's filters are exactly
+  the expected ones.
 
-The extract runs split cleanly on whether the pre-reply pass beat its 12 s
-cap:
+Every number below is from the per-case `--dump-dir` dumps, re-scored with
+those scorers; a failed run counts 0 on every score. The runner's own tables
+in the reports are the old scorers' and, under `--repeat`, also mis-weight
+failures (each failed repeat counts as a whole case).
 
-| MiniMax, extract                | Runs | Shape | Count |
-| ------------------------------- | ---- | ----- | ----- |
-| narrowing completed (last turn) | 28   | 1.00  | 1.00  |
-| narrowing timed out (last turn) | 18   | 0.00  | 0.17  |
+## Results
 
-Every "failed run" in either mode is the conversational reply itself hitting
-its 105 s timeout -- the TACC MiniMax endpoint was congested for most of the
-run (a two-word probe took 9-45 s at the worst point and 0.3 s when quiet).
-That is not a mechanism failure, and it hit both modes; but it is also why
-the tool's all-runs score is 0.82.
+| Run                                  | Model, mode      | Runs | Failed | Shape (all) | Count (all) | Shape / count, completed |
+| ------------------------------------ | ---------------- | ---- | ------ | ----------- | ----------- | ------------------------ |
+| re-run, quiet endpoint (`b7e5793cd`) | MiniMax, tool    | 50   | 0      | **0.90**    | **1.00**    | 0.90 / 1.00              |
+| re-run, congested (`b7e5793cd`)      | MiniMax, extract | 50   | 0      | 0.64        | 0.66        | 0.64 / 0.66              |
+| first run, congested (`26cf02678`)   | MiniMax, tool    | 50   | 9      | 0.72        | 0.82        | 0.88 / 1.00              |
+| first run, congested (`26cf02678`)   | MiniMax, extract | 50   | 4      | 0.56        | 0.56        | 0.61 / 0.61              |
+| first run (`26cf02678`)              | gpt-oss, tool    | 10   | 0      | 1.00        | 1.00        | 1.00 / 1.00              |
+| first run (`26cf02678`)              | gpt-oss, extract | 10   | 0      | 1.00        | 1.00        | 1.00 / 1.00              |
 
-The runner's own table in the MiniMax reports reads lower (0.53 and 0.40)
-because, with `--repeat`, it averages each case's repeats into one number and
-then adds every failed repeat to the denominator as a whole case. The per-run
-numbers above are computed from the per-case dumps (`--dump-dir`).
+Extract, split by whether the last turn's narrowing pass finished:
+
+| Run       | Narrowing completed: runs, shape / count | Timed out at 12 s: runs, shape / count |
+| --------- | ---------------------------------------- | -------------------------------------- |
+| re-run    | 32, 1.00 / 1.00                          | 18, 0.00 / 0.06                        |
+| first run | 28, 1.00 / 1.00                          | 18, 0.00 / 0.17                        |
+
+What keeps the tool's shape at 0.90 rather than 1.00:
+
+- **Re-run.** All five `empty_result` runs made the right count query
+  (Mozambique AND WGA, 0) and then a second, breakdown query (Mozambique by
+  assay type) to explain the zero. The rule scores the last query, so these
+  fail on shape. Their replies were correct ("0 WGA runs from Mozambique; all
+  460 are WGS").
+- **First run.** All five `count_country_instrument` runs added
+  `platform=ILLUMINA` beside `instrument=Illumina NovaSeq 6000`. That filter
+  is redundant -- the count is unchanged -- but it is extra, so it fails.
+
+The first run's 9 tool failures were the conversational reply hitting its
+105 s timeout while TACC's MiniMax endpoint was congested; the re-run, on a
+quiet endpoint, had none. The extract re-run met congestion again (24 of 65
+narrowing passes timed out). The two arms of the re-run ran one after the
+other, not side by side, so they did not see identical conditions; the
+narrowing pass's own latency when it completed (median 1.4 s, max 2.3 s) is
+what to compare, and the cap is what fails it.
 
 ## Latency
 
-- Narrowing pass (extract): median 1.6 s when it completed on MiniMax, max
-  7.9 s; 25 of 59 MiniMax turns hit the 12 s cap. gpt-oss: median 2.4 s, none
-  capped.
-- Whole turns on MiniMax had a median of 7.5 s (tool) and 33.1 s (extract)
-  over completed runs, dominated by the congestion; on gpt-oss both modes
-  were 5.8 s.
-- The tool adds one model round (tool call, then the answer) only on turns
-  that need it; the extract pass adds a call to every Logan turn, and its cap
-  is a hard trade between latency and correctness on a slow endpoint.
+- Narrowing pass (extract), when it completed: median 1.4 s (re-run) and
+  1.6 s (first run), max 7.9 s. Timed out: 24 of 65 turns (re-run), 25 of 59
+  (first run).
+- Whole MiniMax turns, median: tool 3.5 s on the quiet re-run (7.5 s in the
+  first, congested run); extract 41.9 s and 33.1 s, both congested.
+- gpt-oss: 5.8 s per turn in both modes; narrowing median 2.4 s, none capped.
 
 ## Recommendation: `tool`
 
 The plan's rule: pick `tool` if it scores >= 0.90 on shape and count for
 MiniMax; otherwise `extract` if it does; otherwise neither.
 
-On every MiniMax reply that completed, the tool scored **1.00 on both shape
-and count** (41 of 41), and 1.00 on gpt-oss. Counting the endpoint's reply
-timeouts as failures it is 0.82, below the bar -- but extract is lower still
-on the same basis (0.56 / 0.62), and fails for a reason of its own: whenever
-its pass was cut off at 12 s the reply had nothing to go on. When the pass
-did complete, extract was exactly as accurate as the tool. So the extractor
-buys no accuracy and costs a call on every turn plus a timeout that a slow
-endpoint will hit.
+**Tool clears >= 0.90 over all runs on the quiet re-run: 0.90 shape, 1.00
+count, 50 of 50 runs completed.** It meets the shape bar exactly, and the
+five misses are a correct query followed by an explanatory one. On the
+earlier congested run it did not (0.72 / 0.82 over all runs, 9 runs lost to
+reply timeouts). Extract never cleared it (0.56-0.64 shape) and fails for a
+reason of its own: a pass cut off by its 12 s cap leaves the reply with
+nothing to go on. When the pass did finish it was exactly as accurate as the
+tool, so it buys no accuracy for a call on every Logan turn.
 
-This also resolves the README's contradiction. The August "45-65% tool
-emission" figure does not hold for a single, clearly named tool: MiniMax
-called `query_logan_hits` with the right filters on every completed run --
-including the misspelt "Kenia" (it used Kenya), the follow-up that keeps the
-selection's filter, the explicit clear, and the whole-search question that
-must drop it.
+The August "45-65% tool emission" figure does not hold for one clearly named
+tool. MiniMax called `query_logan_hits` on every run that completed, in both
+tool runs, including the misspelt "Kenia" (it used Kenya), the follow-up that
+keeps the selection, the explicit clear and the whole-search question.
 
-Caveat to clear before slice B builds on this: the 0.82 is an endpoint
-number, not a mechanism one. Re-run `logan_narrowing` in tool mode at a quiet
-time (it costs about 200 calls); if completed-reply scores stay at 1.00 and
-the timeouts go away, the >= 0.90 bar is met outright. What the tool does
-not give for free is a persistent selection: slice C's "set up variant
-calling on those" will need the session to remember the last query the tool
-ran, which extract mode did by construction.
+For slice C: the tool keeps no selection. "Set up variant calling on those"
+needs the session to remember the last query the tool ran, which extract did
+by construction.
 
 ## Cost
 
-| Run                       | HTTP calls | Wall time      |
-| ------------------------- | ---------- | -------------- |
-| MiniMax tool + extract x5 | 320        | 3,198 s (both) |
-| gpt-oss tool + extract x1 | 78         | 75 s (both)    |
-
-Two earlier attempts were abandoned when the endpoint stalled (at
-concurrency 4 and 3 per mode): 220 calls and about 25 minutes, no results
-kept. The first of them also ran on code from before the review fixes in
-`26cf02678`.
+| Run                                   | HTTP calls | Wall time      |
+| ------------------------------------- | ---------- | -------------- |
+| first run, MiniMax tool + extract x5  | 320        | 3,198 s (both) |
+| first run, gpt-oss tool + extract x1  | 78         | 75 s (both)    |
+| re-run, MiniMax tool x5               | 199        | 512 s          |
+| re-run, MiniMax extract x5            | 170        | 2,512 s        |
+| abandoned attempts (endpoint stalled) | 220        | about 25 min   |
