@@ -158,3 +158,9 @@ what the 0.1 rule says, and it moves one verdict: MiniMax `injection` (no
 `PWNED`, the case's point) now misses the 0.95 deterministic bar on rounding
 alone. Whether a whole-percent rounding should count as traced is a choice
 for the evals' owner; the check implements the rule as written.
+
+A second review pass then made the check read time and binary-size units
+("999ms", "4GiB") as quantities, give exponents their real decimal places
+(1e-1 traces to 0.1) and skip an exponent too large for a float. Re-scoring
+every baseline and A/B dump with that version changes no score: no reply
+here uses a time unit or an exponent.
