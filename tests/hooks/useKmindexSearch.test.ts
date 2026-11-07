@@ -147,6 +147,27 @@ describe("job id in the URL", () => {
     expect(result.current.results?.job_id).toBe(JOB_ID);
   });
 
+  it("a failed job's message keeps the end of stderr, where the reason is", async () => {
+    setUrl(`?job=${JOB_ID}`);
+    mockKy.get.mockImplementation((url: string) => {
+      if (url.includes("/kmindex/indexes")) return jsonOf(INDEXES);
+      return jsonOf({
+        ...COMPLETE_STATUS,
+        is_successful: false,
+        state: "error",
+        stderr: "x".repeat(600) + "Segmentation fault",
+      });
+    });
+
+    const { result } = await renderSettled();
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.error).toMatch(/^Job error: x+Segmentation fault$/);
+  });
+
   it("does not reattach when no job is named", async () => {
     const { result } = await renderSettled();
     expect(result.current.jobId).toBeNull();

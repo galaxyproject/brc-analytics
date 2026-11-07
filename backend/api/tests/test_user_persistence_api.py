@@ -608,6 +608,9 @@ def _bind_cookie(client, session_id: str) -> None:
     """Hold the signed cookie for a session the test planted directly in the
     store, the way a browser that started it with /chat would."""
     secret = get_settings().SESSION_COOKIE_SECRET
+    # Drop the cookie /chat set first; two same-name cookies leave the server
+    # picking whichever the client happens to send last.
+    client.cookies.delete(SESSION_COOKIE_NAME)
     client.cookies.set(SESSION_COOKIE_NAME, sign_session_id(session_id, secret))
 
 

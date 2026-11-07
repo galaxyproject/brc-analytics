@@ -36,6 +36,13 @@ Add the server to Claude Code using the CLI:
 claude mcp add --transport http brc-analytics https://brc-analytics.org/api/v1/mcp/
 ```
 
+If you have a BRC Analytics partner API key, send it as a header so Logan searches you start are charged to your own budget rather than the shared anonymous one:
+
+```bash
+claude mcp add --transport http brc-analytics https://brc-analytics.org/api/v1/mcp/ \
+  --header "X-API-Key: <your key>"
+```
+
 ### Claude Desktop
 
 Claude Desktop connects to remote MCP servers as custom connectors. Open **Settings > Connectors**, choose **Add custom connector**, and paste the endpoint URL:
@@ -121,13 +128,16 @@ Search repositories for raw sequencing reads to power your analyses:
 - `sra_data_summary(organism)` -- snapshot of available SRA data (run counts, top platforms, assays, BioProjects).
 - `get_sra_study_runs(accession, limit=200)` -- retrieve runs for an SRA study (`SRP*`, `ERP*`, `DRP*`) or BioProject (`PRJNA*`, `PRJEB*`, `PRJDB*`).
 
-**Logan search tools** -- read-only access to Logan sequence searches run from the Logan search page _(available on deployments configured with a Galaxy API key)_:
+**Logan search tools** -- run Logan sequence searches over SRA, the same search as the Logan search page _(available on deployments configured with a Galaxy API key)_:
 
+- `logan_submit(sequence, indexes, threshold=0.5)` -- start a search on one FASTA record (up to 5,000 bases) and get its `job_id` back right away.
+- `logan_list_indexes()` -- the index names a search can use.
+- `logan_queue()` -- how many searches are waiting and running, and recent wait times.
 - `logan_job_status(job_id)` -- check whether a Logan search has finished.
 - `logan_cohort(job_id)` -- whole-match-set counts and facets for a finished search.
 - `logan_hits(job_id, offset=0, limit=25)` -- a page of score-ranked hits with SRA metadata (`limit` is capped at 100).
 
-These read the results the search page already assembled and cached for a day; if a tool reports the results as `expired`, open that search's results page again first.
+Searches usually take a few minutes. Without a key, `logan_submit` runs as an anonymous search under the same hourly limit as the search page; with a partner key header it runs under your partner budget. Sending the same search again within ten minutes returns the job already started. If a finished search's results aren't cached, `logan_cohort` and `logan_hits` start merging them and answer `building` with a `retry_after_seconds` hint; ask again after that.
 
 ### Catalog Resources
 
@@ -158,7 +168,7 @@ The assistant will chain tool calls together as needed -- e.g., look up an organ
 
 ## Limitations
 
-- **Read-only.** The server exposes catalog, resource, and sequencing data but cannot launch workflows on Galaxy. Use the BRC Analytics web interface to start an analysis.
+- **No workflow launches.** Apart from Logan searches, the server only reads: it can't launch workflows on Galaxy. Use the BRC Analytics web interface to start an analysis.
 - **Snapshot of the catalog.** Catalog data updates when new catalog builds are published, matching what powers the website.
 - **External API dependencies.** ENA searches query the European Nucleotide Archive directly and may fail or rate-limit during upstream outages (where enabled, the local SRA mirror keeps working when ENA does not).
 

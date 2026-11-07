@@ -15,7 +15,7 @@ from pydantic import BaseModel, TypeAdapter
 from sentry_sdk.transport import Transport
 
 from app.core.errors import CallerInputError
-from app.core.sentry import before_send
+from app.core.sentry import before_send, before_send_transaction
 from app.services.catalog_data import CatalogData
 from app.services.mcp_server import create_mcp_server
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
@@ -213,4 +213,71 @@ def test_missing_catalog_file_is_logged_as_an_error(tmp_path, caplog):
     assert any(
         r.levelname == "ERROR" and "workflows.json" in r.getMessage()
         for r in caplog.records
+    )
+
+
+class _TransactionTransport(Transport):
+    def __init__(self, options=None):
+        super().__init__(options)
+        self.transactions = []
+
+    def capture_envelope(self, envelope):
+        for item in envelope.items:
+            if item.type == "transaction":
+                self.transactions.append(item.payload.json)
+
+
+def test_submitted_sequence_stays_out_of_traces(catalog):
+    # The MCP integration puts tool arguments on its span regardless of
+    # send_default_pii, and a search query is a user's (maybe unpublished)
+    # sequence.
+    transport = _TransactionTransport()
+    sentry_sdk.init(
+        dsn="https://examplePublicKey@example.ingest.sentry.io/1",
+        transport=transport,
+        before_send=before_send,
+        before_send_transaction=before_send_transaction,
+        traces_sample_rate=1.0,
+    )
+    galaxy = MagicMock()
+    galaxy.is_available.return_value = True
+    mcp = create_mcp_server(catalog, MagicMock(), galaxy=galaxy)
+    sequence = "ACGTTGCAGGCC" * 30
+
+    async def go():
+        with sentry_sdk.start_transaction(name="mcp"):
+            async with Client(mcp) as client:
+                await client.call_tool(
+                    "logan_submit",
+                    {"sequence": sequence, "indexes": ["vertebrata"]},
+                    raise_on_error=False,
+                )
+
+    try:
+        asyncio.run(go())
+        sentry_sdk.flush()
+    finally:
+        sentry_sdk.get_client().close()
+        sentry_sdk.init()
+
+    assert transport.transactions
+    dumped = json.dumps(transport.transactions)
+    assert "mcp.request.argument.sequence" in dumped
+    assert sequence not in dumped
+
+
+def test_submitted_sequence_stays_out_of_error_events():
+    # An error raised inside the MCP span carries the span's data in its
+    # trace context, and errors go through before_send, not the transaction
+    # hook.
+    event = {
+        "contexts": {
+            "trace": {"data": {"mcp.request.argument.sequence": "ACGTTGCA" * 20}}
+        },
+        "logentry": {"message": "x"},
+        "logger": "app.foo",
+    }
+    out = before_send(event, {})
+    assert out["contexts"]["trace"]["data"]["mcp.request.argument.sequence"] == (
+        "[Filtered]"
     )

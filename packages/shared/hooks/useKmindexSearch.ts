@@ -806,7 +806,7 @@ export const useKmindexSearch = (
           setState((prev) => ({
             ...prev,
             error: `Job ${status.state}${
-              status.stderr ? `: ${status.stderr.slice(0, 500)}` : ""
+              status.stderr ? `: ${status.stderr.slice(-500)}` : ""
             }`,
           }));
         }
