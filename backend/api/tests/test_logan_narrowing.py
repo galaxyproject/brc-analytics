@@ -599,8 +599,8 @@ class TestExportQueries:
             def interrupt(self):
                 interrupted.set()
 
-        def blocking(con_holder=None):
-            con_holder.append(FakeCon())
+        def blocking(interrupt=None):
+            interrupt.attach(FakeCon())
             for _ in range(50):
                 if interrupted.is_set():
                     raise RuntimeError("interrupted")
@@ -614,17 +614,156 @@ class TestExportQueries:
         asyncio.run(go())
         assert interrupted.wait(1.0)
 
-    def test_concurrent_queries_are_bounded(self, monkeypatch):
+    def test_a_cancel_before_the_connection_exists_still_stops_it(self):
+        import threading
+
+        from app.services.logan_narrowing import run_export_query
+        from app.services.tools.catalog_query import QueryCancelled
+
+        connecting, ran, raised = threading.Event(), [], []
+        release = threading.Event()
+
+        def slow_connect(interrupt=None):
+            connecting.set()
+            release.wait(2.0)  # the cancel lands here, before attach
+            try:
+                interrupt.attach(object())
+            except QueryCancelled:
+                raised.append(True)
+                raise
+            ran.append(True)
+
+        async def go():
+            task = asyncio.ensure_future(run_export_query(slow_connect))
+            await asyncio.to_thread(connecting.wait, 2.0)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            release.set()  # the cancel is in; now let the connect finish
+
+        asyncio.run(go())
+        deadline = threading.Event()
+        for _ in range(100):
+            if raised or ran:
+                break
+            deadline.wait(0.02)
+        assert raised == [True] and ran == []
+
+    def test_a_cancelled_query_keeps_its_slot_until_its_thread_returns(
+        self, monkeypatch
+    ):
+        import threading
+
+        import app.services.logan_narrowing as ln
+
+        monkeypatch.setattr(ln, "_EXPORT_SLOTS", threading.BoundedSemaphore(1))
+        first_done, second_started = threading.Event(), threading.Event()
+        order = []
+
+        def deaf(interrupt=None):
+            # Ignores the interrupt, as a statement past its last check would.
+            threading.Event().wait(0.3)
+            order.append("first done")
+            first_done.set()
+
+        def second(interrupt=None):
+            order.append("second started")
+            second_started.set()
+            return 2
+
+        async def go():
+            with pytest.raises(asyncio.TimeoutError):
+                await asyncio.wait_for(ln.run_export_query(deaf), timeout=0.05)
+            return await ln.run_export_query(second)
+
+        assert asyncio.run(go()) == 2
+        assert order == ["first done", "second started"]
+
+    def test_waiting_for_a_slot_holds_no_thread_and_cancelling_frees_it(
+        self, monkeypatch
+    ):
+        import threading
+
+        import app.services.logan_narrowing as ln
+
+        sem = threading.BoundedSemaphore(1)
+        monkeypatch.setattr(ln, "_EXPORT_SLOTS", sem)
+        entered, release = [], threading.Event()
+
+        def hold(interrupt=None):
+            entered.append("hold")
+            release.wait(2.0)
+
+        def quick(interrupt=None):
+            entered.append("quick")
+
+        async def go():
+            holder = asyncio.ensure_future(ln.run_export_query(hold))
+            waiters = [
+                asyncio.ensure_future(ln.run_export_query(quick)) for _ in range(5)
+            ]
+            await asyncio.sleep(0.2)
+            # Only the holder reached a thread; the rest wait on the loop.
+            assert entered == ["hold"]
+            for w in waiters:
+                w.cancel()
+            await asyncio.gather(*waiters, return_exceptions=True)
+            release.set()
+            await holder
+
+        asyncio.run(go())
+        assert entered == ["hold"]
+        # Every slot came back: the one there is can be taken, and only one.
+        assert sem.acquire(blocking=False) and not sem.acquire(blocking=False)
+        sem.release()
+
+    def test_a_call_cancelled_before_its_thread_starts_returns_the_slot(
+        self, monkeypatch
+    ):
+        import threading
+
+        import app.services.logan_narrowing as ln
+
+        sem = threading.BoundedSemaphore(1)
+        monkeypatch.setattr(ln, "_EXPORT_SLOTS", sem)
+        ran = []
+
+        async def go():
+            loop = asyncio.get_running_loop()
+            # One executor thread, kept busy, so the next call is queued
+            # behind it and cancelled before it starts.
+            from concurrent.futures import ThreadPoolExecutor
+
+            pool = ThreadPoolExecutor(max_workers=1)
+            loop.set_default_executor(pool)
+            gate = threading.Event()
+            busy = loop.run_in_executor(pool, gate.wait, 2.0)
+            task = asyncio.ensure_future(
+                ln.run_export_query(lambda interrupt=None: ran.append(1))
+            )
+            await asyncio.sleep(0.1)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            gate.set()
+            await busy
+
+        asyncio.run(go())
+        assert ran == []
+        assert sem.acquire(blocking=False)
+        sem.release()
+
+    def test_concurrent_queries_are_bounded_across_event_loops(self, monkeypatch):
         import threading
         import time as _time
 
         import app.services.logan_narrowing as ln
 
-        monkeypatch.setattr(ln, "EXPORT_QUERY_SLOTS", 2)
+        monkeypatch.setattr(ln, "_EXPORT_SLOTS", threading.BoundedSemaphore(2))
         lock = threading.Lock()
         running, peak = [0], [0]
 
-        def work(con_holder=None):
+        def work(interrupt=None):
             with lock:
                 running[0] += 1
                 peak[0] = max(peak[0], running[0])
@@ -634,7 +773,17 @@ class TestExportQueries:
             return 1
 
         async def go():
-            return await asyncio.gather(*(ln.run_export_query(work) for _ in range(6)))
+            return await asyncio.gather(*(ln.run_export_query(work) for _ in range(3)))
 
-        assert asyncio.run(go()) == [1] * 6
+        # Two loops in two threads, as two workers' requests would be.
+        results = []
+        loops = [
+            threading.Thread(target=lambda: results.append(asyncio.run(go())))
+            for _ in range(2)
+        ]
+        for t in loops:
+            t.start()
+        for t in loops:
+            t.join()
+        assert results == [[1] * 3, [1] * 3]
         assert peak[0] == 2
