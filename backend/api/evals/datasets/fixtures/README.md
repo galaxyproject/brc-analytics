@@ -9,14 +9,14 @@ loads them and serves them to the assistant through a Galaxy stand-in.
 After capturing or deriving, run `npx prettier --write` on the JSON: the
 repository's pre-commit check formats every JSON file.
 
-| Id  | Name                    | Source                                                                                                                                                                                                      |
-| --- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1  | `logan_pfal_18s`        | Captured from dev, job `806580fd1ed1cc90` (_P. falciparum_ 18S against GENOMIC_INV, 17,629 matches, not truncated). Export kept whole: 17,629 rows, 210 KB.                                                 |
-| F2  | `logan_truncated_mixed` | Captured from dev, job `dee9dc267ca2a401` (`salmonella_invA` against GENOMIC_BCT, 560,854 matches, truncated at 50,000, 2,613 organisms). Export trimmed to 5,000 rows: top 1,000 plus a stratified sample. |
-| F3  | `logan_saturated`       | Derived from F1 (`--derive saturated`): the last six of the top 25 become soil metagenomes with `fp_correction` 0.2 and lowered scores. Synthetic.                                                          |
-| F4  | `logan_no_mirror`       | Derived from F1 (`--derive no_mirror`): no cohort, no geography, no hit metadata, `sra_mirror_available` false.                                                                                             |
-| F5  | `logan_injected`        | Derived from F1 (`--derive injected`): instruction-shaped `query_name` and second top organism, both under the 80-character prompt cap.                                                                     |
-| F6  | the two `.parquet`s     | Captured with F1 and F2.                                                                                                                                                                                    |
+| Id  | Name                    | Source                                                                                                                                                                                                                                           |
+| --- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F1  | `logan_pfal_18s`        | Captured from dev, job `806580fd1ed1cc90` (_P. falciparum_ 18S against GENOMIC_INV, 17,629 matches, not truncated). Export kept whole: 17,629 rows, 210 KB.                                                                                      |
+| F2  | `logan_truncated_mixed` | Captured from dev, job `dee9dc267ca2a401` (`salmonella_invA` against GENOMIC_BCT, 560,854 matches, truncated at 50,000, 2,613 organisms). Export trimmed to 5,000 rows: top 1,000 plus a proportional sample stratified on organism and country. |
+| F3  | `logan_saturated`       | Derived from F1 (`--derive saturated`): the last six of the top 25 become soil metagenomes with `fp_correction` 0.2 and lowered scores. Synthetic.                                                                                               |
+| F4  | `logan_no_mirror`       | Derived from F1 (`--derive no_mirror`): no cohort, no geography, no hit metadata, `sra_mirror_available` false.                                                                                                                                  |
+| F5  | `logan_injected`        | Derived from F1 (`--derive injected`): instruction-shaped `query_name` and second top organism, both under the 80-character prompt cap.                                                                                                          |
+| F6  | the two `.parquet`s     | Captured with F1 and F2.                                                                                                                                                                                                                         |
 
 All captured 2026-11-07 from `https://dev.brc-analytics.org` (running main at
 `d53633908`), minutes after the jobs' results were read, so the aggregate and

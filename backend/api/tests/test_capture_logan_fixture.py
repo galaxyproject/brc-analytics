@@ -214,3 +214,27 @@ def test_search_parameters_records_unknowns(cap):
         "query_bases": "unknown",
     }
     assert cap.search_parameters({})["indexes"] == "unknown"
+
+
+def test_trim_keeps_the_tails_proportions(cap, tmp_path):
+    """A stratum's share of the sample tracks its share of the tail: a sample
+    that favours rare strata would invert exactly the mixes a truncated
+    fixture exists to show."""
+    src, dest = tmp_path / "in.parquet", tmp_path / "out.parquet"
+    rows = []
+    for i in range(2000):
+        if i < 1400:
+            org = "big"
+        elif i < 1900:
+            org = "mid"
+        else:
+            org = f"rare {i % 50}"  # 50 strata of two rows each
+        rows.append((f"SRR{i:06d}", 1.0 - i / 4000, org, None, None, None))
+    _export(src, rows)
+    cap.trim_export(src, dest, max_rows=300, top=100)
+    tail = _read(dest)[100:]
+    big = sum(r[2] == "big" for r in tail)
+    mid = sum(r[2] == "mid" for r in tail)
+    # The tail (rows 100+) is 1300 big, 500 mid, 100 rare: 68% / 26% / 5%.
+    assert 0.6 <= big / len(tail) <= 0.72
+    assert 0.2 <= mid / len(tail) <= 0.3

@@ -53,6 +53,7 @@ import argparse
 import copy
 import hashlib
 import json
+import shutil
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -93,10 +94,10 @@ def trim_export(
     The export is written in rank order, so file order is the score sort. A
     file that already fits is copied whole. Otherwise the first `top` rows are
     kept, and the rest of the budget is a sample stratified on (organism,
-    country): every stratum is cut to its proportional share (at least one
-    row), then strata are interleaved -- every stratum's first row before any
-    stratum's second -- until the budget is spent, so rare organisms and
-    countries survive the trim. Order within a stratum is by md5(accession),
+    country): every stratum gets its proportional share rounded down, so the
+    sample keeps the tail's proportions, and the rows that rounding leaves over
+    go one each to strata that got none, so rare organisms and countries
+    survive the trim as far as the budget allows. Order within a stratum is by md5(accession),
     so the same export always trims to the same rows. The output keeps every
     column and the original rank order.
 
@@ -134,10 +135,16 @@ def trim_export(
                         count(*) OVER (PARTITION BY organism, country) AS _n
                     FROM src WHERE _rank >= {top}
                 ),
+                quota AS (
+                    SELECT *, CAST(floor(_n * {frac}) AS BIGINT) AS _q FROM rest
+                ),
                 sampled AS (
-                    SELECT * FROM rest
-                    WHERE _rn <= greatest(1, ceil(_n * {frac}))
-                    ORDER BY _rn, md5(accession)
+                    -- Every stratum's proportional share (rounded down), then
+                    -- the rows that rounding left over go to the next row of
+                    -- each stratum, those that got nothing first.
+                    SELECT * FROM quota
+                    WHERE _rn <= _q + 1
+                    ORDER BY _rn > _q, _q > 0, md5(accession)
                     LIMIT {budget}
                 )
                 SELECT {select} FROM (
@@ -339,15 +346,17 @@ def capture(
                     for chunk in resp.iter_bytes():
                         fh.write(chunk)
             parquet = out_dir / f"{name}.parquet"
-            trim = trim_export(raw, parquet, max_rows=max_rows, top=top)
-
-    size = parquet.stat().st_size
-    if size > max_bytes:
-        parquet.unlink()
-        raise SystemExit(
-            f"{parquet.name} is {size} bytes, over the {max_bytes} cap; "
-            "lower --max-rows"
-        )
+            # Trimmed beside the download and moved into place only once it
+            # fits, so a failed re-capture leaves the old fixture alone.
+            staged = Path(tmp) / "trimmed.parquet"
+            trim = trim_export(raw, staged, max_rows=max_rows, top=top)
+            size = staged.stat().st_size
+            if size > max_bytes:
+                raise SystemExit(
+                    f"{parquet.name} would be {size} bytes, over the "
+                    f"{max_bytes} cap; lower --max-rows"
+                )
+            shutil.move(str(staged), parquet)
     trim["bytes"] = size
 
     snapshot = build_logan_snapshot(

@@ -686,12 +686,12 @@
       "study": "SRP365341"
     }
   ],
-  "captured_at": "2026-11-07T14:28:36.465444+00:00",
+  "captured_at": "2026-11-07T15:14:18.513553+00:00",
   "_fixture": {
     "source": {
       "base_url": "https://dev.brc-analytics.org",
       "job_id": "dee9dc267ca2a401",
-      "captured_at": "2026-11-07T14:28:36.465444+00:00",
+      "captured_at": "2026-11-07T15:14:18.513553+00:00",
       "endpoints": ["/results?limit=25", "/summary", "/export?format=parquet"]
     },
     "search": {
@@ -14982,7 +14982,7 @@
         "latitude",
         "longitude"
       ],
-      "bytes": 119206
+      "bytes": 79177
     }
   }
 }
