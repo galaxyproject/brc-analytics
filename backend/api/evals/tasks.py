@@ -441,6 +441,8 @@ class LoganTurnTrace:
     tool_calls: list[tuple[str, dict]]
     tool_returns: list[str]
     latency_s: float
+    # One per tool call: that call's return, or None when it got none.
+    call_returns: list[Optional[str]] = field(default_factory=list)
     # Named sub-timings a mode records for itself (e.g. a pre-reply pass).
     timings: dict[str, float] = field(default_factory=dict)
     # LOGAN_NARROWING_MODE=extract: what the pre-reply pass read out of this
@@ -502,6 +504,27 @@ def _trace_parts(messages: list[dict]) -> tuple[str, list, list[str]]:
     return instructions, calls, returns
 
 
+def _call_returns(messages: list[dict]) -> list[Optional[str]]:
+    """Each tool call's own return, in call order, matched by tool_call_id;
+    None where the call got no return (a validation retry, or none at all)."""
+    by_id: dict[str, str] = {}
+    for msg in messages:
+        for part in msg.get("parts", []):
+            if part.get("part_kind") == "tool-return" and part.get("tool_call_id"):
+                content = part.get("content")
+                by_id[part["tool_call_id"]] = (
+                    content
+                    if isinstance(content, str)
+                    else json.dumps(content, default=str)
+                )
+    return [
+        by_id.get(part.get("tool_call_id") or "")
+        for msg in messages
+        for part in msg.get("parts", [])
+        if part.get("part_kind") == "tool-call"
+    ]
+
+
 def make_logan_conversation_task(
     deps: EvalDeps, entry: ModelEntry, galaxy: Any = None
 ) -> Callable:
@@ -550,6 +573,7 @@ def make_logan_conversation_task(
                     tool_calls=calls,
                     tool_returns=returns,
                     latency_s=latency,
+                    call_returns=_call_returns(messages),
                     timings=(
                         {"narrowing_s": record["latency_s"]}
                         if "latency_s" in record

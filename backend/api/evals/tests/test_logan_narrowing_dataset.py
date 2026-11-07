@@ -27,6 +27,7 @@ from evals.datasets.logan_narrowing import (
 class _Turn:
     tool_calls: list = field(default_factory=list)
     narrowing: dict = field(default_factory=dict)
+    call_returns: list = field(default_factory=list)
 
 
 @dataclass
@@ -54,9 +55,14 @@ def _f(name, op, value):
     return {"field": name, "op": op, "value": value}
 
 
-def _tool(*filter_lists) -> _Out:
+OK = '{"total": 1}'
+
+
+def _tool(*filter_lists, returns=None) -> _Out:
     calls = [("query_logan_hits", {"filters": fl}) for fl in filter_lists]
-    return _Out(turns=[_Turn(tool_calls=calls)])
+    if returns is None:
+        returns = [OK] * len(calls)
+    return _Out(turns=[_Turn(tool_calls=calls, call_returns=returns)])
 
 
 YEAR = LoganQueryShape(
@@ -111,7 +117,8 @@ def test_shape_scores_the_last_query_of_the_last_turn():
             _Turn(
                 tool_calls=[
                     ("query_logan_hits", {"filters": [_f("country", "eq", "Senegal")]})
-                ]
+                ],
+                call_returns=[OK],
             ),
             _Turn(),
         ]
@@ -119,43 +126,74 @@ def test_shape_scores_the_last_query_of_the_last_turn():
     assert shape.evaluate(_ctx(early)) == 0.0
 
 
-def test_shape_reads_the_extractor_but_not_intent_none():
+def _narrowed(**record) -> _Out:
+    return _Out(turns=[_Turn(narrowing=record)])
+
+
+KENYA = {"filters": [_f("country", "eq", "Kenya")]}
+
+
+def test_shape_reads_an_extractor_query_only_when_it_was_counted_and_applied():
     shape = LoganQueryShape(expect=[_f("country", "eq", "Kenya")])
-    asked = _Out(
-        turns=[
-            _Turn(
-                narrowing={
-                    "intent": "ask",
-                    "query": {"filters": [_f("country", "eq", "Kenya")]},
-                }
-            )
-        ]
+    assert (
+        shape.evaluate(
+            _ctx(_narrowed(intent="ask", outcome="ask", query=KENYA, total=3))
+        )
+        == 1.0
     )
-    none = _Out(
-        turns=[
-            _Turn(
-                narrowing={
-                    "intent": "none",
-                    "query": {"filters": [_f("country", "eq", "Kenya")]},
-                }
-            )
-        ]
+    assert (
+        shape.evaluate(
+            _ctx(_narrowed(intent="select", outcome="select", query=KENYA, total=3))
+        )
+        == 1.0
     )
+    # Read out but never applied: nothing was counted for the reply.
+    for record in (
+        {"intent": "none", "outcome": "none", "query": KENYA},
+        {"intent": "ask", "outcome": "unresolved", "query": KENYA},
+        {"intent": "ask", "outcome": "timeout", "query": KENYA},
+        {"intent": "ask", "outcome": "error", "query": KENYA},
+        {"intent": "ask", "outcome": "ask", "query": KENYA},  # no total
+    ):
+        assert shape.evaluate(_ctx(_narrowed(**record))) == 0.0, record
+
+
+def test_shape_scores_the_last_tool_call_that_returned_a_count():
+    shape = LoganQueryShape(expect=[_f("country", "eq", "Kenya")])
+    kenya, mali = [_f("country", "eq", "Kenya")], [_f("country", "eq", "Mali")]
+    # A later call that failed doesn't displace the one that answered.
+    for bad in (
+        '{"error": "Query failed; try a simpler filter."}',
+        '{"status": "export_not_cached"}',
+        None,  # a validation retry: no return at all
+        "not json",
+    ):
+        out = _tool(kenya, mali, returns=[OK, bad])
+        assert shape.evaluate(_ctx(out)) == 1.0, bad
+    # A turn none of whose calls returned a count has no query.
+    assert shape.evaluate(_ctx(_tool(kenya, returns=['{"error": "x"}']))) == 0.0
+    # The parameter may arrive nested under its name.
     nested = _Out(
         turns=[
             _Turn(
-                tool_calls=[
-                    (
-                        "query_logan_hits",
-                        {"query": {"filters": [_f("country", "eq", "Kenya")]}},
-                    )
-                ]
+                tool_calls=[("query_logan_hits", {"query": KENYA})], call_returns=[OK]
             )
         ]
     )
-    assert shape.evaluate(_ctx(asked)) == 1.0
-    assert shape.evaluate(_ctx(none)) == 0.0
     assert shape.evaluate(_ctx(nested)) == 1.0
+
+
+def test_an_unpaired_trace_falls_back_to_position_only_when_counts_agree():
+    @dataclass
+    class _Old:
+        tool_calls: list
+        tool_returns: list
+        narrowing: dict = field(default_factory=dict)
+
+    shape = LoganQueryShape(expect=[_f("country", "eq", "Kenya")])
+    call = ("query_logan_hits", KENYA)
+    assert shape.evaluate(_ctx(_Out(turns=[_Old([call], [OK])]))) == 1.0
+    assert shape.evaluate(_ctx(_Out(turns=[_Old([call], [])]))) == 0.0
 
 
 def test_count_must_be_stated_as_a_run_total():
