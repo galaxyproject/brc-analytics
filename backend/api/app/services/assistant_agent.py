@@ -50,7 +50,7 @@ from app.models.assistant import (
     TurnOutcome,
     TurnTelemetry,
 )
-from app.models.logan import LoganSnapshot
+from app.models.logan import JOB_ID_PATTERN, LoganSnapshot
 from app.services.logan_prompt import (
     LOGAN_TOOLS_PROMPT,
     render_logan_instructions,
@@ -106,6 +106,7 @@ logger = logging.getLogger(__name__)
 # whitespace (incl. newlines). Used by _wrap_user_message to neutralize
 # fence-break attempts in user text.
 _USER_INPUT_CLOSE_TAG = re.compile(r"</\s*user_input\s*>", re.IGNORECASE)
+_LOGAN_JOB_ID = re.compile(JOB_ID_PATTERN)
 
 # data_source resolution (structured detail, #1296). "top N" resolves against
 # the session's Logan snapshot; explicit run accessions are captured wherever
@@ -551,6 +552,19 @@ _FIELD_LABELS = {
     "workflow": "Workflow",
     "data_source": "Data source",
 }
+
+
+def _logan_job_id(metadata: Optional[Dict[str, Any]]) -> Optional[str]:
+    """The Logan job a session was opened from, when it is a well-formed id.
+
+    Read off the stored snapshot, which a saved session can carry back in
+    hand-edited; anything but 16 hex characters is not worth a column.
+    """
+    logan = (metadata or {}).get("logan")
+    job_id = logan.get("job_id") if isinstance(logan, dict) else None
+    if isinstance(job_id, str) and _LOGAN_JOB_ID.match(job_id):
+        return job_id
+    return None
 
 
 async def _safe_record(
@@ -1342,6 +1356,7 @@ class AssistantAgent:
                         latency_ms=int((time.monotonic() - turn_start) * 1000),
                         model=self.settings.AI_PRIMARY_MODEL or None,
                         provider=self.get_provider(),
+                        logan_job_id=progress.get("logan_job_id"),
                     ),
                 )
             raise
@@ -1386,6 +1401,7 @@ class AssistantAgent:
         state.metadata["turn_count"] = turn_index + 1
         progress["session_id"] = state.session_id
         progress["turn_index"] = turn_index
+        progress["logan_job_id"] = _logan_job_id(state.metadata)
 
         # Fields cleared from the setup panel are applied here, before either
         # model call, so the clear can't hinge on how the model reads anything
@@ -1420,6 +1436,7 @@ class AssistantAgent:
                 owner_keycloak_sub=owner_keycloak_sub,
                 user_message=self._logged_message(message, clear_fields or []),
                 latency_ms=int((time.monotonic() - turn_start) * 1000),
+                logan_job_id=progress["logan_job_id"],
             )
             return response, telemetry, state
 
@@ -1575,6 +1592,7 @@ class AssistantAgent:
             latency_ms=int((time.monotonic() - turn_start) * 1000),
             model=self.settings.AI_PRIMARY_MODEL or None,
             provider=self.get_provider(),
+            logan_job_id=progress["logan_job_id"],
         )
 
         if on_turn is not None:

@@ -309,6 +309,9 @@ class AssistantTurnLog(Base):
     latency_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     model: Mapped[str | None] = mapped_column(String(255), nullable=True)
     provider: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # The Logan search the session was opened from, so those turns can be
+    # found without reading transcripts. Null for every other conversation.
+    logan_job_id: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utcnow,
@@ -322,6 +325,7 @@ class AssistantTurnLog(Base):
         # time, so this serves it without a sort node.
         Index("ix_assistant_turn_log_session_created", "session_id", "created_at"),
         Index("ix_assistant_turn_log_created_at", "created_at"),
+        Index("ix_assistant_turn_log_logan_job_id", "logan_job_id"),
         # Partial: 'success' dominates and would never use an index, but it
         # would still cost an index insert on every turn.
         Index(
