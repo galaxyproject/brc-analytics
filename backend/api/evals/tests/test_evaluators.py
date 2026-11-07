@@ -486,3 +486,39 @@ def test_numbers_trace_on_real_baseline_replies():
     invented = data["score_meaning"]["reply"]
     assert _trace(invented, context) < 1.0
     assert "227" in untraced_numbers(invented, context)
+
+
+def test_numbers_trace_bare_counts_do_not_match_shares():
+    # 2.7% rounds to 3 and 0.4% to 0, but neither says "3 runs".
+    ctx = "Kenya 2.7% of runs, Laos 0.4%, 191 organisms"
+    assert _trace("Only 3 runs came from Kenya.", ctx) == 0.0
+    assert _trace("There are 0 runs from Laos.", ctx) == 0.0
+    assert _trace("191 organisms appear.", ctx) == 1.0
+    # A share stated without its sign still traces.
+    assert _trace("Kenya is 2.7 of every hundred runs.", ctx) == 1.0
+
+
+def test_numbers_trace_rounds_half_up():
+    assert _trace("About 13% are from Malawi.", "Malawi 12.5%") == 1.0
+    assert _trace("About 3% are from Malawi.", "Malawi 2.5%") == 1.0
+    assert _trace("About 17.7k runs.", "17,650 runs") == 1.0
+
+
+def test_numbers_trace_large_counts_keep_two_leading_digits():
+    assert _trace("About 20,000 runs.") == 0.0
+    assert _trace("About 18,000 runs.") == 1.0
+
+
+def test_adjacent_numbers_do_not_fuse():
+    from evals.evaluators import extract_numbers
+
+    assert [n.value for n in extract_numbers("In 2019 754 runs were released")] == [
+        2019.0,
+        754.0,
+    ]
+    assert [n.value for n in extract_numbers("17 629 and 1,823 runs")] == [
+        17629.0,
+        1823.0,
+    ]
+    # The accession is skipped; the count after it survives.
+    assert [n.value for n in extract_numbers("SRR123 456 runs")] == [456.0]

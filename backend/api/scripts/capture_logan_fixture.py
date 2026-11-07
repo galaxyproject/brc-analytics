@@ -97,9 +97,9 @@ def trim_export(
     country): every stratum gets its proportional share rounded down, so the
     sample keeps the tail's proportions, and the rows that rounding leaves over
     go one each to strata that got none, so rare organisms and countries
-    survive the trim as far as the budget allows. Order within a stratum is by md5(accession),
-    so the same export always trims to the same rows. The output keeps every
-    column and the original rank order.
+    survive the trim as far as the budget allows. Order within a stratum is
+    by md5(accession), so the same export always trims to the same rows. The
+    output keeps every column and the original rank order.
 
     @returns: what was done, for the fixture's provenance record.
     """

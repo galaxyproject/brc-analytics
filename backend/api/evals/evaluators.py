@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext
@@ -121,14 +122,20 @@ class ToolCallMatch(Evaluator):
 # Models group thousands however they like -- "17,629", "17 629" (thin or
 # no-break space), "17629". Matching the literal string scored a correct
 # answer as a miss, so both sides are normalised to bare digits first. The
-# group after the separator must be exactly three digits, so "1, 2" or "in 2 3"
-# never fuse into one number.
-_DIGIT_SEP = re.compile(r"(?<=\d)[,    ](?=\d{3}(?!\d))")
+# number has to be a well-formed grouping -- one to three leading digits that
+# don't follow a letter, then groups of exactly three -- so "1, 2", "in 2019
+# 754 runs" and "SRR123 456" never fuse into one number.
+_GROUPED = re.compile(r"(?<![\w.])\d{1,3}(?:[,\u00a0\u202f\u2009 ]\d{3})+(?!\d)")
+_SEP = re.compile(r"[,\u00a0\u202f\u2009 ]")
+
+
+def _ungroup(text: str) -> str:
+    return _GROUPED.sub(lambda m: _SEP.sub("", m.group(0)), text)
 
 
 def normalize_numbers(text: str) -> str:
     """Drop thousands separators and lower-case, for substring matching."""
-    return _DIGIT_SEP.sub("", text).lower()
+    return _ungroup(text).lower()
 
 
 # Spans whose digits are identifiers, not quantities. Removed before numbers
@@ -166,7 +173,7 @@ def extract_numbers(text: str) -> list[_Num]:
     Digits inside identifiers (accessions, job ids, URLs) and list ordinals
     are not quantities and are skipped.
     """
-    text = _strip_identifiers(_DIGIT_SEP.sub("", text or ""))
+    text = _strip_identifiers(_ungroup(text or ""))
     out: list[_Num] = []
 
     def _abbrev(m: re.Match) -> str:
@@ -190,10 +197,17 @@ def extract_numbers(text: str) -> list[_Num]:
     return out
 
 
+def _round_half_up(value: float, decimals: int) -> float:
+    """Round as people do (12.5 -> 13), not as round() does (12.5 -> 12)."""
+    quantum = Decimal(1).scaleb(-decimals)
+    return float(Decimal(repr(value)).quantize(quantum, rounding=ROUND_HALF_UP))
+
+
 def _sig_round(value: float, digits: int) -> float:
     if value == 0 or digits <= 0:
         return value
-    return float(f"{value:.{digits}g}")
+    exponent = Decimal(repr(value)).adjusted()
+    return _round_half_up(value, digits - 1 - exponent)
 
 
 def _significant_digits(n: _Num) -> int:
@@ -209,13 +223,17 @@ def _rounds_from(reply: _Num, source: float, source_decimals: int) -> bool:
         return True
     if (
         reply.decimals < source_decimals
-        and abs(round(source, reply.decimals) - reply.value) < 1e-9
+        and abs(_round_half_up(source, reply.decimals) - reply.value) < 1e-9
     ):
         return True
     # A large count stated to its leading digits: 17.6k or 17,600 for 17,629.
+    # At least two of them: "20,000" for 17,629 has changed the number.
     if source >= 1000 and reply.value >= 100:
         digits = _significant_digits(reply)
-        if digits < len(str(int(source))) and _sig_round(source, digits) == reply.value:
+        if (
+            2 <= digits < len(str(int(source)))
+            and _sig_round(source, digits) == reply.value
+        ):
             return True
     return False
 
@@ -232,6 +250,11 @@ def number_traces(reply: _Num, context: list[_Num]) -> bool:
                     return True
                 if _rounds_from(reply, source, c.decimals):
                     return True
+        elif c.percent and not reply.decimals:
+            # A bare integer is a count. Letting it match a share would let
+            # nearly any small invented tally ("3 runs") pass, since some
+            # share in a cohort block rounds to almost every integer.
+            continue
         elif _rounds_from(reply, c.value, c.decimals):
             return True
     return False
