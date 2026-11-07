@@ -3,20 +3,23 @@ import {
   type TreeNode,
 } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/types";
 import {
+  contrastRatio,
   createFilterUrl,
   findNodeByName,
+  FIRST_RING_COLORS,
   formatAssemblyCount,
   getArcStroke,
+  getArcStrokeWidth,
   getChildColors,
-  getLabelColor,
   getNodeColor,
   getVisibleNodes,
   isInLineage,
+  LABEL_COLOR,
   labelFits,
   layoutRelativeTo,
   truncateLabel,
 } from "@repo/shared/views/HomeView/components/Section/components/SectionAssemblies/components/Sunburst/utils";
-import { hcl, hsl } from "d3-color";
+import { hcl, hsl, lab } from "d3-color";
 import { hierarchy, partition } from "d3-hierarchy";
 import { sampleTree, taxon } from "./fixtures";
 
@@ -155,13 +158,23 @@ describe("getNodeColor", () => {
     );
   });
 
-  it("keeps the outer rings close to their center-child's saturation", () => {
+  it("fades each ring further toward the page, but never all the way", () => {
     const root = layout(sampleTree());
     const colors = getChildColors(root, PALETTE);
-    const beta = hsl(getNodeColor(findNodeByName(root, "Beta"), root, colors));
+    const toPage = (color: string): number => {
+      const a = lab(color);
+      const page = lab("#F7F8F9");
+      return Math.hypot(a.l - page.l, a.a - page.a, a.b - page.b);
+    };
+    const beta = toPage(
+      getNodeColor(findNodeByName(root, "Beta"), root, colors)
+    );
     // Two rings out from Beta.
-    const outer = hsl(getNodeColor(findNodeByName(root, "c-1"), root, colors));
-    expect(outer.s).toBeGreaterThanOrEqual(beta.s - 0.1);
+    const outer = toPage(
+      getNodeColor(findNodeByName(root, "c-1"), root, colors)
+    );
+    expect(outer).toBeLessThan(beta * 0.6);
+    expect(outer).toBeGreaterThan(beta * 0.1);
   });
 });
 
@@ -215,10 +228,26 @@ describe("createFilterUrl", () => {
   });
 });
 
-describe("getLabelColor", () => {
-  it("uses light text on dark arcs and dark text on light ones", () => {
-    expect(getLabelColor("#604c81", "#212B36", "#FFFFFF")).toBe("#FFFFFF");
-    expect(getLabelColor("#d5db9a", "#212B36", "#FFFFFF")).toBe("#212B36");
+describe("contrastRatio", () => {
+  it("matches the WCAG ratios for black and white", () => {
+    expect(contrastRatio("#000000", "#FFFFFF")).toBeCloseTo(21, 5);
+    expect(contrastRatio("#777777", "#777777")).toBeCloseTo(1, 5);
+  });
+
+  it("gives the label colour AA contrast on every first-ring colour", () => {
+    // Deeper rings only fade toward the page, which raises the contrast.
+    for (const color of FIRST_RING_COLORS) {
+      expect(contrastRatio(color, LABEL_COLOR)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
+
+describe("getArcStrokeWidth", () => {
+  it("outlines arcs but leaves slivers bare so they merge", () => {
+    const wide = { x0: 0, x1: 0.2, y0: 1, y1: 2 };
+    const sliver = { x0: 0, x1: 0.0001, y0: 1, y1: 2 };
+    expect(getArcStrokeWidth(wide, 100, 4)).toBeGreaterThan(0);
+    expect(getArcStrokeWidth(sliver, 100, 4)).toBe(0);
   });
 });
 

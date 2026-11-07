@@ -1,28 +1,49 @@
 import { type LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { hcl, hsl, rgb } from "d3-color";
+import { interpolateLab } from "d3-interpolate";
 import { type ArcCoords, type TreeNode } from "./types";
 
 const TAU = 2 * Math.PI;
 
 /**
+ * Dark text used for every arc label. One colour reads as one layer; the
+ * palette below is tuned so it never has to flip to white.
+ */
+export const LABEL_COLOR = "#212B36";
+
+/**
  * First-ring colours, handed out largest arc first: muted natural tones,
  * with lightness spread so neighbouring ranks stay apart under red-green
- * and blue-yellow colour blindness.
+ * and blue-yellow colour blindness. Each is only as light as it has to be
+ * for LABEL_COLOR to clear WCAG AA (4.5:1) on it.
  */
 export const FIRST_RING_COLORS = [
-  "#3F6E8C",
-  "#C08040",
-  "#5E9A74",
-  "#8F3F3F",
+  "#6896B5",
+  "#C38342",
+  "#619D77",
+  "#CF7875",
   "#B98DB3",
-  "#66702F",
+  "#8D9653",
   "#9CC2B4",
   "#D9B65E",
 ];
 
+// Outline width, and the arc length below which an arc goes without one: a
+// run of one-assembly slivers otherwise reads as a stripe of outlines.
+const ARC_STROKE_WIDTH = 0.6;
+const MIN_OUTLINED_ARC = 1.5;
+
 // Width of the hue band, in degrees, that a first-ring arc's descendants
 // spread across around its colour.
 const HUE_BAND = 50;
+
+// Each ring past the first mixes this much further toward the page, so depth
+// reads as lightness and the disc doesn't sit on the page as one dark mass.
+const RING_FADE = 0.3;
+const MAX_FADE = 0.78;
+// Roughly the home page section background; the fade can't read the CSS
+// variable, and landing a shade off it doesn't show.
+const FADE_TOWARD = "#F7F8F9";
 
 /**
  * Colours for the children of the chart's center, assigned by size so the
@@ -77,8 +98,7 @@ function getHueOffset(node: TreeNode, from: TreeNode, band: number): number {
  * Colour of a node's arc when the chart is centred on `center`. Each child
  * of the center takes its own colour; deeper nodes take a hue near their
  * center-child ancestor's, picked by their place in the tree so siblings and
- * cousins differ, lightened a little per ring but kept close to its
- * saturation so the outer rings don't wash out.
+ * cousins differ, and faded toward the page a step per ring.
  * @param node - A descendant of `center`.
  * @param center - Node the chart is centred on.
  * @param childColors - One colour per child of `center`, in order.
@@ -100,22 +120,43 @@ export function getNodeColor(
   // Shift the hue in HCL so it moves without changing perceived lightness.
   const base = hcl(childColors[index]);
   const hue = base.h - HUE_BAND / 2 + getHueOffset(node, centerChild, HUE_BAND);
-  const shifted = hsl(hcl(hue, base.c, base.l).rgb());
-  return hsl(
-    shifted.h,
-    Math.max(0, shifted.s - 0.03 * steps),
-    Math.min(0.85, shifted.l + 0.045 * steps)
+  return rgb(
+    interpolateLab(
+      hcl(hue, base.c, base.l),
+      FADE_TOWARD
+    )(Math.min(MAX_FADE, RING_FADE * steps))
   ).toString();
 }
 
 /**
- * Outline for an arc: a darker shade of its own fill, which separates
- * neighbouring arcs without drawing a uniform web over the chart.
+ * Outline for an arc: a shade darker than its own fill. Arcs butt up against
+ * each other with no gaps, so this is all that separates them, and keeping
+ * it tonal means no background shows through between arcs.
  * @param fill - Arc fill colour.
  * @returns A CSS colour.
  */
 export function getArcStroke(fill: string): string {
-  return hsl(fill).darker(0.9).toString();
+  return hsl(fill).darker(0.35).toString();
+}
+
+/**
+ * Outline width for an arc: none for slivers, so they merge into a band of
+ * their branch's colour.
+ * @param coords - Arc coordinates.
+ * @param ringWidth - Radial thickness of one ring, in px.
+ * @param depth - Rings including the center disc.
+ * @returns Stroke width, in px.
+ */
+export function getArcStrokeWidth(
+  coords: ArcCoords,
+  ringWidth: number,
+  depth: number
+): number {
+  const midRadius =
+    ((Math.min(coords.y0, depth) + Math.min(coords.y1, depth)) / 2) * ringWidth;
+  return (coords.x1 - coords.x0) * midRadius < MIN_OUTLINED_ARC
+    ? 0
+    : ARC_STROKE_WIDTH;
 }
 
 /**
@@ -144,23 +185,15 @@ function luminance(color: string): number {
 }
 
 /**
- * Picks dark or light label text, whichever contrasts more with the fill.
- * @param fill - Arc fill colour.
- * @param dark - Dark text colour.
- * @param light - Light text colour.
- * @returns The text colour to use.
+ * WCAG 2 contrast ratio between two colours.
+ * @param a - CSS colour.
+ * @param b - CSS colour.
+ * @returns Ratio from 1 (identical) to 21 (black on white).
  */
-export function getLabelColor(
-  fill: string,
-  dark: string,
-  light: string
-): string {
-  const contrast = (a: number, b: number): number =>
-    (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-  const l = luminance(fill);
-  return contrast(l, luminance(dark)) >= contrast(l, luminance(light))
-    ? dark
-    : light;
+export function contrastRatio(a: string, b: string): number {
+  const la = luminance(a);
+  const lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
 /**

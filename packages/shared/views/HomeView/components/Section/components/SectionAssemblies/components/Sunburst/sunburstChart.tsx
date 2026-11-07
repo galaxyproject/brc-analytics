@@ -10,11 +10,12 @@ import { ChartFrame, Layout, Tooltip } from "./sunburst.styles";
 import { type ArcCoords, type TaxonomyNode, type TreeNode } from "./types";
 import {
   FIRST_RING_COLORS,
+  LABEL_COLOR,
   findNodeByName,
   formatAssemblyCount,
   getArcStroke,
+  getArcStrokeWidth,
   getChildColors,
-  getLabelColor,
   getNodeColor,
   getVisibleNodes,
   isInLineage,
@@ -25,8 +26,6 @@ import {
 
 // Hex rather than the theme's CSS variables: label colours are picked by
 // computing contrast against the arc fill.
-const LABEL_DARK = "#212B36";
-const LABEL_LIGHT = "#FFFFFF";
 
 const WIDTH = 800;
 const RADIUS = (WIDTH - 10) / 2;
@@ -105,11 +104,8 @@ export const SunburstChart = ({
     const arc = d3Arc<ArcCoords>()
       .startAngle((d) => d.x0)
       .endAngle((d) => d.x1)
-      .cornerRadius(3)
-      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.006))
-      .padRadius(RADIUS)
       .innerRadius((d) => Math.min(d.y0, DEPTH) * ringWidth)
-      .outerRadius((d) => Math.max(0, Math.min(d.y1, DEPTH) * ringWidth - 1));
+      .outerRadius((d) => Math.min(d.y1, DEPTH) * ringWidth);
 
     // Labels are sized in viewBox units, so on a small screen the chart's
     // scale-down would shrink them past reading. Keep them at least
@@ -170,14 +166,14 @@ export const SunburstChart = ({
       .append("text")
       .attr("text-anchor", "middle")
       .attr("y", -30)
-      .attr("fill", LABEL_DARK)
+      .attr("fill", LABEL_COLOR)
       .style("font-size", "16px")
       .style("font-weight", 600);
     const centerCount = centerGroup
       .append("text")
       .attr("text-anchor", "middle")
       .attr("y", 8)
-      .attr("fill", LABEL_DARK)
+      .attr("fill", LABEL_COLOR)
       .style("font-size", "30px")
       .style("font-weight", 700);
     const centerDetail = centerGroup
@@ -292,7 +288,6 @@ export const SunburstChart = ({
       center: TreeNode,
       from: Map<TreeNode, ArcCoords> | null
     ): void {
-      const colorOf = colorsFor(center);
       labelLayer.style("font-size", `${fontSize}px`);
       const labelNodes = next.filter((d) =>
         labelFits(d.target, ringWidth, DEPTH, fontSize)
@@ -311,7 +306,7 @@ export const SunburstChart = ({
             )
             .attr("fill-opacity", from && duration > 0 ? 0 : 1)
         )
-        .attr("fill", (d) => getLabelColor(colorOf(d), LABEL_DARK, LABEL_LIGHT))
+        .attr("fill", LABEL_COLOR)
         .text((d) =>
           truncateLabel(
             d.data.name,
@@ -355,6 +350,8 @@ export const SunburstChart = ({
       currentRoot = center;
       const colorOf = colorsFor(center);
       const strokeOf = (d: TreeNode): string => getArcStroke(colorOf(d));
+      const strokeWidthOf = (d: TreeNode): number =>
+        getArcStrokeWidth(d.target, ringWidth, DEPTH);
 
       const path = arcLayer
         .selectAll<SVGPathElement, TreeNode>("path")
@@ -363,7 +360,6 @@ export const SunburstChart = ({
           enter
             .append("path")
             .attr("d", (d) => arc(d.current))
-            .attr("stroke-width", 1)
             .on("mousemove", showTooltip)
             .on("mouseleave", hideTooltip)
             .on("mouseenter.lineage focus", (_event, d) => highlight(d))
@@ -390,7 +386,8 @@ export const SunburstChart = ({
       path
         .filter((d) => nextSet.has(d) && (!animate || !rendered.has(d)))
         .attr("fill", colorOf)
-        .attr("stroke", strokeOf);
+        .attr("stroke", strokeOf)
+        .attr("stroke-width", strokeWidthOf);
 
       // Snapshot start positions: the path tweens rewrite d.current as they
       // run, and the label tweens must start from the same place.
@@ -400,6 +397,7 @@ export const SunburstChart = ({
           .filter((d) => nextSet.has(d))
           .attr("fill", colorOf)
           .attr("stroke", strokeOf)
+          .attr("stroke-width", strokeWidthOf)
           .attr("d", (d) => arc(d.target))
           .each((d) => {
             d.current = d.target;
@@ -413,7 +411,8 @@ export const SunburstChart = ({
         .transition("fill")
         .duration(duration)
         .attr("fill", colorOf)
-        .attr("stroke", strokeOf);
+        .attr("stroke", strokeOf)
+        .attr("stroke-width", strokeWidthOf);
       path
         .transition()
         .duration(duration)
