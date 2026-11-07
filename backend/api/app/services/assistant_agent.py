@@ -62,6 +62,7 @@ from app.services.logan_prompt import (
 from app.services.logan_snapshot import (
     LOGAN_TOP_HITS,
     build_logan_snapshot,
+    clean_text,
     logan_context_from,
     prefill_from_logan,
     results_url_for,
@@ -165,7 +166,7 @@ LOGAN_NARROW_TIMEOUT_SECONDS = 12.0
 # Values offered to the narrowing pass per field: enough to cover every
 # country a search has seen, small enough to keep the prompt short.
 LOGAN_NARROW_VOCAB_LIMIT = 200
-LOGAN_NARROW_ORGANISM_LIMIT = 30
+LOGAN_NARROW_ORGANISM_LIMIT = 100
 
 # Human-readable "detail" labels for the tracker fields the catalog derives
 # (data characteristics, gene annotation). These fields are always recomputed
@@ -546,15 +547,20 @@ def _logan_instructions(ctx: RunContext[AssistantDeps]) -> Optional[str]:
     block = render_logan_instructions(logan)
     if block is None:
         return None
-    extra = _logan_narrowing_instructions(logan)
+    extra = _logan_narrowing_instructions(
+        logan, has_galaxy=getattr(ctx.deps, "galaxy", None) is not None
+    )
     return block + "\n\n" + extra if extra else block
 
 
-def _logan_narrowing_instructions(logan: Optional[dict]) -> Optional[str]:
+def _logan_narrowing_instructions(
+    logan: Optional[dict], has_galaxy: bool = True
+) -> Optional[str]:
     """What a narrowing mode adds after the Logan block; None when off."""
     mode = get_settings().LOGAN_NARROWING_MODE
     if mode == "tool":
-        return LOGAN_NARROW_TOOL_HINT
+        # The tool is registered exactly when there is a Galaxy service.
+        return LOGAN_NARROW_TOOL_HINT if has_galaxy else None
     if mode == "extract" and isinstance(logan, dict):
         return logan.get(_NARROWED_KEY) or _render_selection_note(
             logan.get("selection")
@@ -576,15 +582,28 @@ LOGAN_NARROW_TOOL_HINT = (
 )
 
 
+def _safe(value: Any) -> str:
+    """Untrusted text (export values, model output, the user's words) as one
+    capped line, the way the snapshot treats SRA metadata."""
+    return clean_text(str(value)) or ""
+
+
+def _safe_value(value: Any) -> Any:
+    if isinstance(value, list):
+        return [_safe_value(v) for v in value]
+    return _safe(value) if isinstance(value, str) else value
+
+
 def _filters_text(filters: list) -> str:
     parts = []
     for f in filters:
         f = f if isinstance(f, dict) else f.model_dump(mode="json")
         op, value = f.get("op"), f.get("value")
+        field_name = _safe(f.get("field"))
         if op in ("is_null", "not_null"):
-            parts.append(f"{f.get('field')} {op.replace('_', ' ')}")
+            parts.append(f"{field_name} {op.replace('_', ' ')}")
         else:
-            parts.append(f"{f.get('field')} {op} {json.dumps(value)}")
+            parts.append(f"{field_name} {op} {json.dumps(_safe_value(value))}")
     return " AND ".join(parts) if parts else "(no filters)"
 
 
@@ -619,12 +638,12 @@ def _render_narrowed_view(
         f"Matching runs: {result.get('total', 0):,} of {total_matches:,}.",
     ]
     for field_name, buckets in (result.get("facets") or {}).items():
-        lines.append(f"Breakdown by {field_name}:")
+        lines.append(f"Breakdown by {_safe(field_name)}:")
         for value, count in buckets.items():
-            lines.append(f"- {value}: {count:,}")
+            lines.append(f"- {_safe(value)}: {count:,}")
     for row in result.get("rows") or []:
         lines.append(
-            "- " + " ".join(str(v) for v in row.values() if v not in (None, ""))
+            "- " + " ".join(_safe(v) for v in row.values() if v not in (None, ""))
         )
     if cleared:
         lines.append("The previous selection was cleared.")
@@ -636,7 +655,7 @@ def _render_narrowed_view(
     if unresolved:
         lines.append(
             "Could not apply (no such value in this search): "
-            + ", ".join(unresolved)
+            + ", ".join(json.dumps(_safe(u)) for u in unresolved)
             + ". Say so rather than reporting zero for them."
         )
     lines.append("Use these numbers as they are; do not recompute them.")
@@ -681,9 +700,12 @@ the whole search ("in the whole search", "overall") does not use the selection.
 selection"), set clear_selection true; then any question in the same message \
 is over the whole search.
 - Values must be spelled exactly as in VALUES. Map a misspelling or a common \
-name to the listed value (Kenia -> Kenya, Nanopore -> OXFORD_NANOPORE). If a \
-value matches nothing listed, leave that filter out and put the user's word \
-in unresolved.
+name to the listed value (Kenia -> Kenya, Nanopore -> OXFORD_NANOPORE). The \
+platform, library_layout, assay_type, instrument and country lists are \
+complete: if a value for one of those matches nothing listed, leave that \
+filter out and put the user's word in unresolved. The organism list is only \
+the commonest, and bioproject, study and accession are not listed at all: \
+for those, use the value as the user wrote it.
 - operation "count" for how-many questions; "facets" with facet_by for a \
 breakdown ("by country"); "list" when the user wants to see runs.
 """
@@ -923,7 +945,9 @@ class AssistantAgent:
             logger.info("Logan search tools registered with assistant agent")
 
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
-        narrowing = settings.LOGAN_NARROWING_MODE if logan_available else "off"
+        # The export read is cache-only and needs no Galaxy connection, so a
+        # Galaxy service object is enough -- the same test the hint uses.
+        narrowing = settings.LOGAN_NARROWING_MODE if self.galaxy is not None else "off"
         if narrowing == "tool":
             tools.append(
                 Tool(
@@ -1763,9 +1787,16 @@ class AssistantAgent:
         # budget as well as the logged latency, so an NTP or VM clock jump
         # could otherwise skip extraction or blow the frontend timeout.
         logan = state.metadata.get("logan")
+        reply_kwargs: Dict[str, Any] = {}
         # getattr: an agent assembled without __init__ (the tests do) has none.
         if getattr(self, "narrow_agent", None) is not None and logan and message:
             logan = await self._narrow_for_turn(state, message, turn_index)
+            # The pass spent part of the turn budget; the reply gets the rest,
+            # so the two together stay inside the frontend's timeout.
+            reply_kwargs["timeout"] = min(
+                ASSISTANT_RUN_TIMEOUT_SECONDS,
+                ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start),
+            )
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
@@ -1774,7 +1805,7 @@ class AssistantAgent:
             logan=logan,
         )
         result = await self._run_agent_with_retry(
-            augmented_message, deps=deps, message_history=agent_history
+            augmented_message, deps=deps, message_history=agent_history, **reply_kwargs
         )
         raw_reply = str(result.output)
 
@@ -2049,7 +2080,7 @@ class AssistantAgent:
                 self._narrow(logan, message, record),
                 timeout=LOGAN_NARROW_TIMEOUT_SECONDS,
             )
-        except asyncio.TimeoutError:
+        except (asyncio.TimeoutError, AssistantTimeoutError):
             record["outcome"] = "timeout"
         except Exception:
             logger.exception("Logan narrowing failed; replying without it")
