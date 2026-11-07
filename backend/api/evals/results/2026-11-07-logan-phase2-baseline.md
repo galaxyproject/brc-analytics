@@ -131,3 +131,11 @@ Call counts include the judge (DeepSeek-V3.2) and every tool round. An earlier
 pass of the grounding runs, discarded because the fixture stand-in returned
 only 25 hits to a 100-hit page request, cost another 203 calls and about
 seven minutes.
+
+## Addendum: numbers check fixed after this run
+
+A review found the numbers check let a bare integer trace to any share that
+rounds to it, rounded halves to even, and fused adjacent numbers ("2019 754").
+Fixed in `83e8d11fc`. Re-scoring these runs' saved replies with the fixed
+check changes one score -- gpt-oss `score_meaning` drops from 1.00 to 0.94
+(a bare "0") -- and no verdict.
