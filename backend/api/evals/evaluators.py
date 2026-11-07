@@ -141,12 +141,20 @@ def normalize_numbers(text: str) -> str:
 # Spans whose digits are identifiers, not quantities. Removed before numbers
 # are pulled out of either side.
 _URL = re.compile(r"https?://\S+|/[\w./-]*\?\S*")
-_JOB_ID = re.compile(r"\b[0-9a-f]{16}\b")
+# 16 hex characters with at least one letter: a 16-digit decimal is a number.
+_JOB_ID = re.compile(r"\b(?=[0-9]*[a-f])[0-9a-f]{16}\b")
 # A line-leading list marker ("1.", "2)", "**3.**"), not a quantity.
 _ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
 # "17.6k", "1.1M", "2 million": abbreviations a model uses for a large count.
 _ABBREV = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?(k|K|M|thousand|million)(?![\w])")
 _ABBREV_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}
+# Quantities written with a unit or an exponent ("999GB", "30x", "1e6"). Read
+# before identifiers are stripped, which would otherwise take them for one.
+_UNIT = re.compile(
+    r"(?<![\w.])(\d+(?:\.\d+)?)\s?"
+    r"(?:[KMGT]B|[kKMG]bp?|bp|[MG]bases|x|X)(?![\w])"
+)
+_SCI = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]([+-]?\d+)(?![\w.])")
 # A token mixing letters and digits: SRR123, PRJEB2136, GCF_000002765.6, 3D7.
 _MIXED_TOKEN = re.compile(r"\b(?=[\w.]*[A-Za-z])(?=[\w.]*\d)[\w.]*\w")
 _NUMBER = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)(\s*(?:%|percent\b))?")
@@ -181,7 +189,22 @@ def extract_numbers(text: str) -> list[_Num]:
         out.append(_Num(value=value, decimals=0, percent=False, text=m.group(0)))
         return " "
 
+    def _sci(m: re.Match) -> str:
+        value = float(m.group(1)) * 10 ** int(m.group(2))
+        out.append(_Num(value=value, decimals=0, percent=False, text=m.group(0)))
+        return " "
+
+    def _unit(m: re.Match) -> str:
+        raw = m.group(1)
+        decimals = len(raw.split(".")[1]) if "." in raw else 0
+        out.append(
+            _Num(value=float(raw), decimals=decimals, percent=False, text=m.group(0))
+        )
+        return " "
+
     text = _ABBREV.sub(_abbrev, text)
+    text = _SCI.sub(_sci, text)
+    text = _UNIT.sub(_unit, text)
     text = _MIXED_TOKEN.sub(" ", text)
     for m in _NUMBER.finditer(text):
         raw = m.group(1)
@@ -218,43 +241,54 @@ def _significant_digits(n: _Num) -> int:
 
 
 def _rounds_from(reply: _Num, source: float, source_decimals: int) -> bool:
-    """Whether `reply` is `source` restated, or rounded to fewer places."""
+    """A decimal restated, or rounded to fewer places (0.97 for 0.972)."""
     if abs(reply.value - source) < 1e-9:
         return True
-    if (
+    return (
         reply.decimals < source_decimals
         and abs(_round_half_up(source, reply.decimals) - reply.value) < 1e-9
-    ):
-        return True
-    # A large count stated to its leading digits: 17.6k or 17,600 for 17,629.
-    # At least two of them: "20,000" for 17,629 has changed the number.
-    if source >= 1000 and reply.value >= 100:
-        digits = _significant_digits(reply)
-        if (
-            2 <= digits < len(str(int(source)))
-            and _sig_round(source, digits) == reply.value
-        ):
-            return True
-    return False
+    )
+
+
+def _count_rounds_from(reply: _Num, source: float) -> bool:
+    """A large count stated to at least two of its leading digits: 17.6k or
+    17,600 for 17,629, never "20,000"."""
+    if source < 1000 or reply.value < 100:
+        return False
+    digits = _significant_digits(reply)
+    return (
+        2 <= digits < len(str(int(source)))
+        and _sig_round(source, digits) == reply.value
+    )
 
 
 def number_traces(reply: _Num, context: list[_Num]) -> bool:
     """One reply quantity against the context's: the rules NumbersTraceToContext
-    applies, exposed so they can be tested one at a time."""
+    applies, exposed so they can be tested one at a time.
+
+    - A percentage traces to a context percentage, or its complement, within
+      0.1 -- not "rounded to fewer places", which would let 12% stand for 12.49%.
+    - A bare integer is a count. It traces only to an integer count, exactly
+      or as a large count stated to its leading digits; letting it round from a
+      decimal or a share would pass "3 runs" against a score of 2.7.
+    - A decimal stated without a sign traces to a percentage within 0.1, or to
+      a decimal it restates or rounds (0.97 for a score of 0.972).
+    """
     for c in context:
         if reply.percent:
-            if not c.percent:
+            if c.percent and any(
+                abs(reply.value - source) <= 0.1 + 1e-9
+                for source in (c.value, 100.0 - c.value)
+            ):
+                return True
+        elif reply.decimals == 0:
+            if c.percent or c.decimals:
                 continue
-            for source in (c.value, 100.0 - c.value):
-                if abs(reply.value - source) <= 0.1 + 1e-9:
-                    return True
-                if _rounds_from(reply, source, c.decimals):
-                    return True
-        elif c.percent and not reply.decimals:
-            # A bare integer is a count. Letting it match a share would let
-            # nearly any small invented tally ("3 runs") pass, since some
-            # share in a cohort block rounds to almost every integer.
-            continue
+            if abs(reply.value - c.value) < 1e-9 or _count_rounds_from(reply, c.value):
+                return True
+        elif c.percent:
+            if abs(reply.value - c.value) <= 0.1 + 1e-9:
+                return True
         elif _rounds_from(reply, c.value, c.decimals):
             return True
     return False
@@ -265,10 +299,12 @@ class NumbersTraceToContext(Evaluator):
     """Fraction of the reply's numbers that trace to the model's context.
 
     A number traces when it appears in the context (after separator
-    normalisation), rounds from one (a percentage within 0.1 or to fewer
-    places, a large count to its leading digits), or is the complement
-    (100 - x) of a context percentage. Digits in accessions, job ids, URLs
-    and list ordinals are ignored. A reply with no numbers scores 1.0.
+    normalisation) or is a permitted restatement of one: a percentage within
+    0.1 of a context percentage or its complement (100 - x), a decimal rounded
+    to fewer places, a large count to at least two leading digits. A bare
+    integer only ever traces to a count (see number_traces). Digits in
+    accessions, job ids, URLs and list ordinals are ignored. A reply with no
+    numbers scores 1.0.
 
     The output must expose `reply_field` and `context_field` (by default
     `reply` and `context`); a missing context scores 0.0, since nothing can

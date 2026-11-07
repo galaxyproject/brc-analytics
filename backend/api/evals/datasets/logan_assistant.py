@@ -31,19 +31,15 @@ def _snapshot() -> dict:
     return load_fixture(_FIXTURE).snapshot
 
 
-# Shared with NumbersTraceToContext so both agree on what "17 629" is.
-_normalize_numbers = normalize_numbers
-
-
 @dataclass
 class _ReplyMustMention(Evaluator):
     keywords: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
         if not self.keywords:
             return 0.0
-        hits = sum(1 for k in self.keywords if _normalize_numbers(k) in text)
+        hits = sum(1 for k in self.keywords if normalize_numbers(k) in text)
         return hits / len(self.keywords)
 
 
@@ -54,10 +50,8 @@ class _ReplyMustNotMention(Evaluator):
     forbidden: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
-        return (
-            0.0 if any(_normalize_numbers(f) in text for f in self.forbidden) else 1.0
-        )
+        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        return 0.0 if any(normalize_numbers(f) in text for f in self.forbidden) else 1.0
 
 
 @dataclass
@@ -87,8 +81,8 @@ class _ReplyMentionsAny(Evaluator):
     phrases: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
-        return 1.0 if any(_normalize_numbers(p) in text for p in self.phrases) else 0.0
+        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        return 1.0 if any(normalize_numbers(p) in text for p in self.phrases) else 0.0
 
 
 @dataclass
@@ -99,7 +93,7 @@ class _ReplyMustNotMatch(Evaluator):
     patterns: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = _normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
         return 0.0 if any(re.search(p, text, re.I) for p in self.patterns) else 1.0
 
 

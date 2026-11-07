@@ -379,21 +379,26 @@ def test_numbers_trace_exact_and_separator_variants():
 
 
 def test_numbers_trace_percentage_rounding():
-    # Within 0.1, and rounded to fewer places.
+    # Within 0.1 of the context's share, and no further.
     assert _trace("P. falciparum is 82.1% of the runs.") == 1.0
     assert _trace("P. falciparum is 82.0% of the runs.") == 1.0
     assert _trace("P. falciparum is 82% of the runs.") == 1.0
-    assert _trace("About 97% are paired-end and 99% Illumina.") == 1.0
     assert _trace("P. falciparum is 82 percent of the runs.") == 1.0
-    # Off by more than rounding allows.
+    assert _trace("About 97.2% are paired-end and 99% Illumina.") == 1.0
+    # 0.2 away is out, even when it is the nearest integer.
+    assert _trace("About 97% are paired-end.") == 0.0
     assert _trace("P. falciparum is 83% of the runs.") == 0.0
     assert _trace("P. falciparum is 82.4% of the runs.") == 0.0
+    # 12% is the right integer for 12.49%, but 0.49 away.
+    assert _trace("About 12% are from Malawi.", "Malawi 12.49%") == 0.0
 
 
 def test_numbers_trace_complement_of_a_percentage():
-    # 100 - 80.8 = 19.2: "country recorded for 19%" restates the caveat.
+    # 100 - 80.8 = 19.2: "country recorded for 19.2%" restates the caveat;
+    # 19% is 0.2 away and, under the 0.1 rule, does not.
     assert _trace("Country is recorded for only 19.2% of runs.") == 1.0
-    assert _trace("Country is recorded for only 19% of runs.") == 1.0
+    assert _trace("Country is recorded for only 19.3% of runs.") == 1.0
+    assert _trace("Country is recorded for only 19% of runs.") == 0.0
     assert _trace("Country is recorded for only 25% of runs.") == 0.0
 
 
@@ -482,7 +487,8 @@ def test_numbers_trace_on_real_baseline_replies():
     )["replies"]
     context = render_logan_instructions(load_fixture("logan_pfal_18s").snapshot)
     assert _trace(data["what_is_this_cohort"]["reply"], context) == 1.0
-    assert _trace(data["where_is_the_data_from"]["reply"], context) == 1.0
+    # "19%" for 19.2% recorded is 0.2 off: untraced under the 0.1 rule.
+    assert untraced_numbers(data["where_is_the_data_from"]["reply"], context) == ["19%"]
     invented = data["score_meaning"]["reply"]
     assert _trace(invented, context) < 1.0
     assert "227" in untraced_numbers(invented, context)
@@ -499,9 +505,32 @@ def test_numbers_trace_bare_counts_do_not_match_shares():
 
 
 def test_numbers_trace_rounds_half_up():
-    assert _trace("About 13% are from Malawi.", "Malawi 12.5%") == 1.0
-    assert _trace("About 3% are from Malawi.", "Malawi 2.5%") == 1.0
+    # Decimals and large counts round half up; shares use the 0.1 rule.
+    assert _trace("A score of 0.13.", "score=0.125") == 1.0
     assert _trace("About 17.7k runs.", "17,650 runs") == 1.0
+
+
+def test_numbers_trace_bare_counts_do_not_round_from_decimals():
+    assert _trace("Only 1 run matched.", "top score 0.9") == 0.0
+    assert _trace("3 runs came from Kenya.", "Kenya 2.7") == 0.0
+    assert _trace("2 runs look saturated.", "mean ANI 2.4") == 0.0
+    assert _trace("Only 1 run matched.", "1 run, score 0.9") == 1.0
+
+
+def test_units_exponents_and_long_numbers_are_quantities():
+    from evals.evaluators import extract_numbers
+
+    assert [n.value for n in extract_numbers("999GB of reads")] == [999.0]
+    assert [n.value for n in extract_numbers("1e6 runs")] == [1e6]
+    assert [n.value for n in extract_numbers("at 30x coverage")] == [30.0]
+    assert [n.value for n in extract_numbers("there are 1234567890123456 runs")] == [
+        1234567890123456.0
+    ]
+    # With nothing in the context to support them, none of them trace.
+    assert _trace("999GB of reads.", "17,629 runs") == 0.0
+    assert _trace("1e6 runs.", "17,629 runs") == 0.0
+    # A job id still has a hex letter in it and is still skipped.
+    assert extract_numbers("job 806580fd1ed1cc90 finished") == []
 
 
 def test_numbers_trace_large_counts_keep_two_leading_digits():
