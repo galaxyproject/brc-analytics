@@ -2468,11 +2468,35 @@ class TestCachedKmindexExport:
         con.execute(f"COPY (SELECT {cols}) TO '{path}' (FORMAT parquet)")
         con.close()
 
-    @staticmethod
-    def _forbid_cold_path(service):
+    class _NoGalaxy:
+        """Any use of the Galaxy client at all fails the test."""
+
+        def __getattr__(self, name):
+            raise AssertionError(f"touched Galaxy: gi.{name}")
+
+    @classmethod
+    def _forbid_cold_path(cls, service):
         service._load_aggregate = AsyncMock(side_effect=AssertionError("cold path"))
         service._aggregate_shards = AsyncMock(side_effect=AssertionError("cold"))
         service._resolve_source = AsyncMock(side_effect=AssertionError("galaxy"))
+        service.get_job_status = AsyncMock(side_effect=AssertionError("status"))
+        service.gi = cls._NoGalaxy()
+
+    @pytest.mark.asyncio
+    async def test_a_copy_whose_original_is_not_cached_is_none(self, service):
+        # The status cache names an original, but nothing is cached under it
+        # either: still None, and still no Galaxy call to go and find out.
+        service._agg_cache_key = lambda job_id: f"agg:{job_id}"
+
+        async def get(key):
+            if key == service.cache.make_key("galaxy:job_status", {"job_id": "copy1"}):
+                return {"copied_from_job_id": "orig1"}
+            return None
+
+        service.cache.get = AsyncMock(side_effect=get)
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("copy1") is None
 
     @pytest.mark.asyncio
     async def test_hit_returns_the_current_export(self, service, monkeypatch, tmp_path):
