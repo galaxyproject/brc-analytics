@@ -238,3 +238,63 @@ def test_trim_keeps_the_tails_proportions(cap, tmp_path):
     # The tail (rows 100+) is 1300 big, 500 mid, 100 rare: 68% / 26% / 5%.
     assert 0.6 <= big / len(tail) <= 0.72
     assert 0.2 <= mid / len(tail) <= 0.3
+
+
+def _real_export(path: Path, n: int = 30) -> None:
+    con = duckdb.connect()
+    con.execute(
+        f"COPY (SELECT 'SRR' || lpad(i::VARCHAR, 6, '0') AS accession, "
+        f"1.0 - i / {2 * n} AS score, 'P' AS organism, NULL::VARCHAR AS country "
+        f"FROM range({n}) t(i)) TO '{path}' (FORMAT parquet)"
+    )
+    con.close()
+
+
+def test_assemble_writes_both_into_a_fresh_out_dir(cap, tmp_path):
+    raw = tmp_path / "raw.parquet"
+    _real_export(raw)
+    out_dir = tmp_path / "new" / "fixtures"
+    page = logan_page().model_dump(mode="json")
+    json_path, parquet = cap.assemble_fixture(
+        page, {}, raw, "fx", out_dir, source={"job_id": "x"}, captured_at="t"
+    )
+    assert json_path.exists() and parquet.exists()
+    data = json.loads(json_path.read_text())
+    assert data["_fixture"]["trim"]["top"] == 30  # kept whole: all exact
+    LoganSnapshot.model_validate(data)
+
+
+def test_a_failed_capture_leaves_the_old_pair_alone(cap, tmp_path):
+    raw = tmp_path / "raw.parquet"
+    _real_export(raw)
+    out_dir = tmp_path / "fixtures"
+    out_dir.mkdir()
+    (out_dir / "fx.json").write_text("OLD JSON")
+    (out_dir / "fx.parquet").write_bytes(b"OLD PARQUET")
+    broken = logan_page().model_dump(mode="json")
+    del broken["total_hits"]  # fails KmindexResults validation
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        cap.assemble_fixture(broken, {}, raw, "fx", out_dir, source={}, captured_at="t")
+    assert (out_dir / "fx.json").read_text() == "OLD JSON"
+    assert (out_dir / "fx.parquet").read_bytes() == b"OLD PARQUET"
+    # Over the size cap fails the same way.
+    with pytest.raises(SystemExit):
+        cap.assemble_fixture(
+            logan_page().model_dump(mode="json"),
+            {},
+            raw,
+            "fx",
+            out_dir,
+            source={},
+            captured_at="t",
+            max_bytes=10,
+        )
+    assert (out_dir / "fx.parquet").read_bytes() == b"OLD PARQUET"
+
+
+def test_trim_records_where_the_exact_rows_end(cap, tmp_path):
+    src, dest = tmp_path / "in.parquet", tmp_path / "out.parquet"
+    _export(src, _rows(200))
+    assert cap.trim_export(src, dest, max_rows=30, top=10)["top"] == 10

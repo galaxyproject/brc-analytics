@@ -3138,6 +3138,7 @@
     "trim": {
       "rows_total": 17629,
       "rows_kept": 17629,
+      "top": 17629,
       "method": "whole file",
       "columns": [
         "accession",

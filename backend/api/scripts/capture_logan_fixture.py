@@ -144,7 +144,7 @@ def trim_export(
                     -- each stratum, those that got nothing first.
                     SELECT * FROM quota
                     WHERE _rn <= _q + 1
-                    ORDER BY _rn > _q, _q > 0, md5(accession)
+                    ORDER BY _rn > _q, _q > 0, md5(accession), _rank
                     LIMIT {budget}
                 )
                 SELECT {select} FROM (
@@ -167,6 +167,8 @@ def trim_export(
     return {
         "rows_total": total,
         "rows_kept": kept,
+        # Rows below this rank are exact; past it a trimmed file is a sample.
+        "top": total if kept == total else top,
         "method": method,
         "columns": columns,
     }
@@ -328,10 +330,6 @@ def capture(
 ) -> tuple[Path, Path]:
     import httpx
 
-    from app.models.galaxy import KmindexResults
-    from app.models.logan import LoganSnapshot
-    from app.services.logan_snapshot import build_logan_snapshot
-
     api = f"{base_url.rstrip('/')}/api/v1/galaxy/kmindex/jobs/{job_id}"
     captured_at = datetime.now(timezone.utc).isoformat()
     with httpx.Client(timeout=120.0, follow_redirects=True) as client:
@@ -345,45 +343,78 @@ def capture(
                 with raw.open("wb") as fh:
                     for chunk in resp.iter_bytes():
                         fh.write(chunk)
-            parquet = out_dir / f"{name}.parquet"
-            # Trimmed beside the download and moved into place only once it
-            # fits, so a failed re-capture leaves the old fixture alone.
-            staged = Path(tmp) / "trimmed.parquet"
-            trim = trim_export(raw, staged, max_rows=max_rows, top=top)
-            size = staged.stat().st_size
-            if size > max_bytes:
-                raise SystemExit(
-                    f"{parquet.name} would be {size} bytes, over the "
-                    f"{max_bytes} cap; lower --max-rows"
-                )
-            shutil.move(str(staged), parquet)
-    trim["bytes"] = size
+            return assemble_fixture(
+                results,
+                summary,
+                raw,
+                name,
+                out_dir,
+                source={"base_url": base_url, "job_id": job_id},
+                captured_at=captured_at,
+                max_rows=max_rows,
+                top=top,
+                max_bytes=max_bytes,
+            )
 
-    snapshot = build_logan_snapshot(
-        KmindexResults.model_validate(results), captured_at=captured_at
-    )
-    data = snapshot.model_dump(mode="json")
-    data[EXTRAS_KEY] = {
-        "source": {
-            "base_url": base_url,
-            "job_id": job_id,
-            "captured_at": captured_at,
-            "endpoints": [
-                f"/results?limit={TOP_HITS}",
-                "/summary",
-                "/export?format=parquet",
-            ],
-        },
-        "search": search_parameters(results),
-        "geography": summary.get("geography") or results.get("geography"),
-        "results": results,
-        "parquet": parquet.name,
-        "trim": trim,
-    }
-    # The fixture must load as a snapshot, extras and all.
-    LoganSnapshot.model_validate(data)
-    out = out_dir / f"{name}.json"
-    out.write_text(json.dumps(data, indent=1, sort_keys=False) + "\n")
+
+def assemble_fixture(
+    results: dict,
+    summary: dict,
+    raw_export: Path,
+    name: str,
+    out_dir: Path,
+    source: dict,
+    captured_at: str,
+    max_rows: int = DEFAULT_MAX_ROWS,
+    top: int = DEFAULT_TOP,
+    max_bytes: int = DEFAULT_MAX_BYTES,
+) -> tuple[Path, Path]:
+    """Build both fixture files beside each other in a temp dir, check them,
+    and only then move them into `out_dir` -- so a failure anywhere leaves the
+    existing pair untouched, never a new parquet beside an old JSON."""
+    from app.models.galaxy import KmindexResults
+    from app.models.logan import LoganSnapshot
+    from app.services.logan_snapshot import build_logan_snapshot
+
+    with tempfile.TemporaryDirectory() as tmp:
+        staged_parquet = Path(tmp) / f"{name}.parquet"
+        trim = trim_export(raw_export, staged_parquet, max_rows=max_rows, top=top)
+        size = staged_parquet.stat().st_size
+        if size > max_bytes:
+            raise SystemExit(
+                f"{name}.parquet would be {size} bytes, over the {max_bytes} cap; "
+                "lower --max-rows"
+            )
+        trim["bytes"] = size
+        snapshot = build_logan_snapshot(
+            KmindexResults.model_validate(results), captured_at=captured_at
+        )
+        data = snapshot.model_dump(mode="json")
+        data[EXTRAS_KEY] = {
+            "source": {
+                **source,
+                "captured_at": captured_at,
+                "endpoints": [
+                    f"/results?limit={TOP_HITS}",
+                    "/summary",
+                    "/export?format=parquet",
+                ],
+            },
+            "search": search_parameters(results),
+            "geography": summary.get("geography") or results.get("geography"),
+            "results": results,
+            "parquet": f"{name}.parquet",
+            "trim": trim,
+        }
+        # The fixture must load as a snapshot, extras and all.
+        LoganSnapshot.model_validate(data)
+        staged_json = Path(tmp) / f"{name}.json"
+        staged_json.write_text(json.dumps(data, indent=1, sort_keys=False) + "\n")
+
+        out_dir.mkdir(parents=True, exist_ok=True)
+        parquet, out = out_dir / f"{name}.parquet", out_dir / f"{name}.json"
+        shutil.move(str(staged_parquet), parquet)
+        shutil.move(str(staged_json), out)
     return out, parquet
 
 

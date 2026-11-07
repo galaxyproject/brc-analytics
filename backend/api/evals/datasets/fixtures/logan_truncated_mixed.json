@@ -14962,6 +14962,7 @@
     "trim": {
       "rows_total": 560854,
       "rows_kept": 5000,
+      "top": 1000,
       "method": "top 1000 by rank, then 4000 sampled from the remaining 559854 stratified on (organism, country)",
       "columns": [
         "accession",
