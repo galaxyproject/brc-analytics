@@ -63,6 +63,29 @@ def load_all_fixtures(fixture_dir: Path = FIXTURE_DIR) -> list[LoganFixture]:
     return out
 
 
+def _export_hits(parquet: Path, offset: int, limit: int) -> list[dict]:
+    """Export rows offset..offset+limit, shaped as results-page hits."""
+    import duckdb
+
+    from app.services.kmindex_filters import _hit_from_row
+
+    con = duckdb.connect()
+    try:
+        cur = con.execute(
+            "SELECT * FROM read_parquet(?) LIMIT ? OFFSET ?",
+            [str(parquet), limit, offset],
+        )
+        names = [d[0] for d in cur.description]
+        out = []
+        for row in cur.fetchall():
+            hit = _hit_from_row(names, row)
+            hit["ani"] = dict(zip(names, row, strict=True)).get("ani")
+            out.append(hit)
+        return out
+    finally:
+        con.close()
+
+
 class FixtureGalaxy:
     """The slice of GalaxyService the assistant reads, served from fixtures.
 
@@ -108,9 +131,12 @@ class FixtureGalaxy:
     async def get_cached_kmindex_results(
         self, job_id: str, limit: int = 25, offset: int = 0
     ) -> Any:
-        """The captured results page, or None for a job with no fixture.
+        """A results page, or None for a job with no fixture.
 
-        Only the captured hits exist, so a page past them comes back empty.
+        The captured hits serve the top of the list. Past them, hits come from
+        the fixture's export, which is written in the same rank order (for a
+        trimmed export, exact through its top rows); a fixture without one
+        has nothing past its captured hits.
         """
         from app.models.galaxy import KmindexResults
 
@@ -119,8 +145,12 @@ class FixtureGalaxy:
         if fx is None or not fx.extras.get("results"):
             return None
         page = dict(fx.extras["results"])
-        hits = list(page.get("hits") or [])
-        page["hits"] = hits[offset : offset + limit]
+        captured = list(page.get("hits") or [])
+        hits = captured[offset : offset + limit]
+        start = offset + len(hits)
+        if len(hits) < limit and fx.parquet is not None:
+            hits += _export_hits(fx.parquet, start, limit - len(hits))
+        page["hits"] = hits
         page["limit"] = limit
         page["offset"] = offset
         return KmindexResults.model_validate(page)

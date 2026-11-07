@@ -168,3 +168,38 @@ def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
     assert "This Logan search" in out.context
     assert "What is this?" in out.context
     assert out.session_metadata["logan"]["job_id"] == JOB
+
+
+def test_pages_past_the_captured_hits_come_from_the_export(tmp_path):
+    import duckdb
+
+    _write_fixture(tmp_path, "pf")
+    # A real export behind the fixture: the three captured hits, then two more.
+    con = duckdb.connect()
+    con.execute(
+        f"""COPY (SELECT * FROM (VALUES
+            ('ERR662077', 1.0, 1.0, 's', 'Plasmodium falciparum', 1),
+            ('SRR7590703', 1.0, 1.0, 's', 'Plasmodium falciparum', 2),
+            ('ERR450106', 0.98, 0.99, 's', 'Plasmodium falciparum', 3),
+            ('SRR0000004', 0.7, 0.98, 's', 'Plasmodium vivax', 4),
+            ('SRR0000005', 0.6, 0.97, 's', NULL, 5)
+        ) t(accession, score, ani, shard, organism, n) ORDER BY n)
+        TO '{tmp_path / "pf.parquet"}' (FORMAT parquet)"""
+    )
+    con.close()
+    galaxy = FixtureGalaxy(load_all_fixtures(tmp_path))
+
+    async def go():
+        page = await galaxy.get_cached_kmindex_results(JOB, limit=4, offset=1)
+        return page
+
+    page = asyncio.run(go())
+    assert [h.accession for h in page.hits] == [
+        "SRR7590703",
+        "ERR450106",
+        "SRR0000004",
+        "SRR0000005",
+    ]
+    assert page.hits[2].sra.organism == "Plasmodium vivax"
+    # A run the mirror doesn't carry has no metadata object, as on the page.
+    assert page.hits[3].sra is None
