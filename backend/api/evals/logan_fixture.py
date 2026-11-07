@@ -149,7 +149,15 @@ class FixtureGalaxy:
         hits = captured[offset : offset + limit]
         start = offset + len(hits)
         if len(hits) < limit and fx.parquet is not None:
-            hits += _export_hits(fx.parquet, start, limit - len(hits))
+            # Past a trimmed export's exact top rows the file is a sample, and
+            # serving it as ranks would invent an order; stop there instead.
+            trim = fx.extras.get("trim") or {}
+            trimmed = trim.get("rows_kept") not in (None, trim.get("rows_total"))
+            end = offset + limit
+            if trimmed:
+                end = min(end, trim.get("top", 1000))
+            if end > start:
+                hits += _export_hits(fx.parquet, start, end - start)
         page["hits"] = hits
         page["limit"] = limit
         page["offset"] = offset

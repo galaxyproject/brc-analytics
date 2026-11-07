@@ -203,3 +203,23 @@ def test_pages_past_the_captured_hits_come_from_the_export(tmp_path):
     assert page.hits[2].sra.organism == "Plasmodium vivax"
     # A run the mirror doesn't carry has no metadata object, as on the page.
     assert page.hits[3].sra is None
+
+
+def test_a_trimmed_export_is_not_paged_past_its_exact_rows(tmp_path):
+    import duckdb
+
+    _write_fixture(tmp_path, "pf")
+    con = duckdb.connect()
+    con.execute(
+        "COPY (SELECT 'SRR' || i AS accession, 1.0 - i / 100 AS score, 0.9 AS ani, "
+        f"'s' AS shard FROM range(10) t(i)) TO '{tmp_path / 'pf.parquet'}' "
+        "(FORMAT parquet)"
+    )
+    con.close()
+    data = json.loads((tmp_path / "pf.json").read_text())
+    data["_fixture"]["trim"] = {"rows_total": 500, "rows_kept": 10, "top": 5}
+    (tmp_path / "pf.json").write_text(json.dumps(data))
+    galaxy = FixtureGalaxy(load_all_fixtures(tmp_path))
+    page = asyncio.run(galaxy.get_cached_kmindex_results(JOB, limit=10, offset=0))
+    # Three captured hits, then export rows 3 and 4 -- and nothing sampled.
+    assert len(page.hits) == 5
