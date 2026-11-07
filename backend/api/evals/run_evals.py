@@ -15,6 +15,7 @@ import dataclasses
 import datetime as _dt
 import json
 import logging
+import os
 import re
 import subprocess
 import time
@@ -145,10 +146,29 @@ def _dump_output(output) -> object:
     return to_jsonable_python(data, fallback=str)
 
 
+def _run_mode() -> str:
+    """The server setting a run's numbers depend on, for naming its dump."""
+    return (os.environ.get("LOGAN_NARROWING_MODE") or "off").strip().lower()
+
+
+def dump_path(dump_dir: Path, dataset: str, model: str) -> Path:
+    """Where one (dataset, model) run's dump goes: named for the narrowing
+    mode too, and never over an earlier dump, so two arms of an A/B written
+    to one directory can't replace each other."""
+    stem = f"{dataset}@{model}@{_run_mode()}"
+    path = dump_dir / f"{stem}.jsonl"
+    n = 2
+    while path.exists():
+        path = dump_dir / f"{stem}.{n}.jsonl"
+        n += 1
+    return path
+
+
 def write_dump(path: Path, report) -> None:
-    """One JSON line per case run: name, scores and the full output."""
+    """One JSON line per case run: name, mode, scores and the full output."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w") as fh:
+    mode = _run_mode()
+    with path.open("x") as fh:
         for case in report.cases:
             scores = {
                 name: _score_value(val)
@@ -158,6 +178,7 @@ def write_dump(path: Path, report) -> None:
                 json.dumps(
                     {
                         "case": case.name,
+                        "mode": mode,
                         "scores": scores,
                         "duration_s": getattr(case, "task_duration", None),
                         "output": _dump_output(case.output),
@@ -167,7 +188,13 @@ def write_dump(path: Path, report) -> None:
             )
         for failure in getattr(report, "failures", []):
             fh.write(
-                json.dumps({"case": failure.name, "error": str(failure.error_message)})
+                json.dumps(
+                    {
+                        "case": failure.name,
+                        "mode": mode,
+                        "error": str(failure.error_message),
+                    }
+                )
                 + "\n"
             )
 
@@ -200,7 +227,7 @@ async def _run_one(
     )
     elapsed = time.time() - started
     if dump_dir is not None:
-        write_dump(dump_dir / f"{dataset_name}@{model_name}.jsonl", report)
+        write_dump(dump_path(dump_dir, dataset_name, model_name), report)
 
     aggregated: dict[str, dict[str, list[float]]] = {}
     for case in report.cases:

@@ -79,4 +79,21 @@ def test_write_dump_keeps_outputs_and_drops_the_snapshot(tmp_path):
     assert first["output"]["reply"] == "17,629 runs"
     assert first["output"]["session_metadata"]["logan"] == {"selection": {"n": 3}}
     assert first["output"]["session_metadata"]["turn_count"] == 1
-    assert second == {"case": "d", "error": "boom"}
+    assert second == {"case": "d", "mode": "off", "error": "boom"}
+    assert first["mode"] == "off"
+
+
+def test_dump_paths_name_the_mode_and_never_overwrite(tmp_path, monkeypatch):
+    from evals.run_evals import dump_path
+
+    monkeypatch.setenv("LOGAN_NARROWING_MODE", "tool")
+    first = dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7")
+    assert first.name == "logan_narrowing@MiniMax-M2.7@tool.jsonl"
+    first.write_text("")
+    assert dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7").name == (
+        "logan_narrowing@MiniMax-M2.7@tool.2.jsonl"
+    )
+    monkeypatch.setenv("LOGAN_NARROWING_MODE", "extract")
+    assert dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7").name == (
+        "logan_narrowing@MiniMax-M2.7@extract.jsonl"
+    )
