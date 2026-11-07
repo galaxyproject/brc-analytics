@@ -1,14 +1,14 @@
 """The Logan eval datasets build and reference a fixture that loads."""
 
 import json
-from pathlib import Path
 
 from app.models.logan import LoganSnapshot
 
 
 def test_fixture_is_a_valid_snapshot():
-    path = Path("evals/datasets/fixtures/logan_eukaryote.json")
-    snap = LoganSnapshot.model_validate(json.loads(path.read_text()))
+    from evals.datasets.logan_assistant import _snapshot
+
+    snap = LoganSnapshot.model_validate(_snapshot())
     assert snap.cohort is not None
     assert snap.top_hits[0].accession == "ERR662077"
     # The multiturn case asks for the top 5; the fixture has to hold that many.
@@ -91,3 +91,34 @@ def test_reply_matching_ignores_thousands_separators():
     for rendering in ("17,629", "17 629", "17 629", "17629"):
         ctx = _Ctx(_Out(reply=f"The search matched {rendering} runs."))
         assert _ReplyMustMention(keywords=["17,629"]).evaluate(ctx) == 1.0
+
+
+def test_every_fixture_loads_fits_and_serves():
+    from evals.logan_fixture import FIXTURE_DIR, FixtureGalaxy, load_all_fixtures
+
+    fixtures = load_all_fixtures()
+    names = {f.name for f in fixtures}
+    assert {
+        "logan_pfal_18s",
+        "logan_truncated_mixed",
+        "logan_saturated",
+        "logan_no_mirror",
+        "logan_injected",
+    } <= names
+    for fx in fixtures:
+        LoganSnapshot.model_validate(fx.snapshot)
+        for path in (FIXTURE_DIR / f"{fx.name}.json", fx.parquet):
+            if path is not None:
+                assert path.stat().st_size <= 2 * 1024 * 1024, path.name
+    # One job id each, or the fixture-backed Galaxy refuses to build.
+    FixtureGalaxy(fixtures)
+
+
+def test_truncated_fixture_is_truncated_and_trimmed():
+    from evals.logan_fixture import load_fixture
+
+    fx = load_fixture("logan_truncated_mixed")
+    assert fx.snapshot["truncated"] is True
+    assert fx.snapshot["total_matches"] > 50_000
+    assert fx.parquet is not None
+    assert fx.extras["trim"]["rows_kept"] <= 5000

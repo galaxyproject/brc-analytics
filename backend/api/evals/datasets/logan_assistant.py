@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Callable
 
 from pydantic_ai.models import Model
@@ -19,14 +18,16 @@ from pydantic_evals.evaluators import Evaluator, EvaluatorContext, LLMJudge
 
 from evals.datasets.assistant_multiturn import FinalSchemaContains, IsCompleteEquals
 from evals.evaluators import normalize_numbers
+from evals.logan_fixture import load_fixture
 from evals.model_registry import ModelEntry
 from evals.tasks import EvalDeps, make_logan_conversation_task
 
-_FIXTURE = Path(__file__).parent / "fixtures" / "logan_eukaryote.json"
+# F1: the P. falciparum 18S search as dev rendered it (fixtures/README.md).
+_FIXTURE = "logan_pfal_18s"
 
 
 def _snapshot() -> dict:
-    return json.loads(_FIXTURE.read_text())
+    return load_fixture(_FIXTURE).snapshot
 
 
 # Shared with NumbersTraceToContext so both agree on what "17 629" is.
