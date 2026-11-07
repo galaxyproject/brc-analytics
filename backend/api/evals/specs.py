@@ -12,6 +12,7 @@ from evals.datasets import (
     assistant_multiturn,
     catalog_query,
     logan_assistant,
+    logan_narrowing,
     sra_assistant_multiturn,
     sra_tool_selection,
     structured_channel,
@@ -27,4 +28,5 @@ SPECS: dict[str, Callable] = {
     "sra_assistant_multiturn": sra_assistant_multiturn.build,
     "logan_grounding": logan_assistant.build_grounding,
     "logan_multiturn": logan_assistant.build_multiturn,
+    "logan_narrowing": logan_narrowing.build,
 }
