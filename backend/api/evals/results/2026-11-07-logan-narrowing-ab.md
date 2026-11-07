@@ -20,20 +20,31 @@ The first version of these scorers accepted wrong answers (a review found
 them): a "before 1990" filter passed for "after 2019", extra filters passed,
 and any number anywhere in the reply passed as the count. They now require:
 
-- **Shape:** the last query the last turn emitted -- its last
-  `query_logan_hits` call, or the extractor's query -- has exactly the
-  expected filters. Nothing missing, nothing extra. `eq x` and `in [x]` agree,
-  as do `gt 2019` and `gte 2020` on whole-number fields.
+- **Shape:** the last query that answered the last turn has exactly the
+  expected filters. That is its last `query_logan_hits` call whose own return
+  holds a count (a call that errored, found no cached export or failed
+  validation is skipped), or else the extractor's query when the pass counted
+  and applied it (not when it timed out, errored or stopped on a value it
+  couldn't resolve). A turn with neither scores 0. Nothing missing, nothing
+  extra. `eq x` and `in [x]` agree, as do `gt 2019` and `gte 2020` on
+  whole-number fields.
 - **Count:** the reply states the ground-truth count as a run total ("181
   runs", "181 of the 231", "181 are WGS"), and states no other total except
   the search's, a selection's, a number the user said, or a count the model's
-  context holds. For zero, "no ... runs" counts, but only without a
-  contradicting total.
+  context holds -- and those only as the group the answer is drawn from ("of
+  the 17,629"), never as the matching count itself ("actually 999 matching
+  runs" fails even when 999 is the search's total). For zero, "no ... runs"
+  counts, but only without a contradicting total.
 - **Selection** (extract only): the stored selection's filters are exactly
   the expected ones.
 
 Every number below is from the per-case `--dump-dir` dumps, re-scored with
-those scorers; a failed run counts 0 on every score. The runner's own tables
+those scorers; a failed run counts 0 on every score. A second review pass
+tightened the shape and count rules as described above; re-scoring every
+dump with that version changed no score. The dumps predate per-call return
+pairing, so their calls are paired with returns by position, which holds
+because `query_logan_hits` was the only tool any of these turns called (every
+turn has as many returns as calls). The runner's own tables
 in the reports are the old scorers' and, under `--repeat`, also mis-weight
 failures (each failed repeat counts as a whole case).
 
@@ -89,7 +100,7 @@ The plan's rule: pick `tool` if it scores >= 0.90 on shape and count for
 MiniMax; otherwise `extract` if it does; otherwise neither.
 
 **Tool clears >= 0.90 over all runs on the quiet re-run: 0.90 shape, 1.00
-count, 50 of 50 runs completed.** It meets the shape bar exactly, and the
+count, 50 of 50 runs completed** (unchanged under the tightened scorers). It meets the shape bar exactly, and the
 five misses are a correct query followed by an explanatory one. On the
 earlier congested run it did not (0.72 / 0.82 over all runs, 9 runs lost to
 reply timeouts). Extract never cleared it (0.56-0.64 shape) and fails for a
