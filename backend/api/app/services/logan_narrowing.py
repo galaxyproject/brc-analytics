@@ -25,8 +25,8 @@ own.
 import asyncio
 import json
 import logging
+import threading
 import time
-import weakref
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,6 +41,8 @@ from app.services.tools.catalog_query import (
     ENTITY_SCHEMA,
     Filter,
     LoganHitQuery,
+    QueryCancelled,
+    QueryInterrupt,
     execute_logan_hits,
     logan_vocabulary,
 )
@@ -152,39 +154,51 @@ class LoganNarrowing(BaseModel):
 
 # ---------- running export queries ----------
 
-_slots: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Semaphore]" = (
-    weakref.WeakKeyDictionary()
-)
-
-
-def _export_slots() -> asyncio.Semaphore:
-    # One per event loop: a semaphore created on one loop can't be awaited on
-    # another, and the tests run many.
-    loop = asyncio.get_running_loop()
-    if loop not in _slots:
-        _slots[loop] = asyncio.Semaphore(EXPORT_QUERY_SLOTS)
-    return _slots[loop]
+# Process-wide, so the cap holds across event loops (and the workers' own
+# loops). Released by the worker thread when it returns, so a query the caller
+# has given up on keeps its slot until its thread is actually done.
+_EXPORT_SLOTS = threading.BoundedSemaphore(EXPORT_QUERY_SLOTS)
+# How often a query waiting for a slot tries again. The wait is on the event
+# loop, not in a thread, so a queue of waiters holds no executor threads.
+_SLOT_POLL_S = 0.05
 
 
 async def run_export_query(fn: Callable[..., Any], *args: Any) -> Any:
     """Run a blocking export query off the loop, at most EXPORT_QUERY_SLOTS at
-    a time, and interrupt its DuckDB connection if the caller gives up.
+    a time across the process, and stop it if the caller gives up.
 
-    `fn` takes `con_holder=` and appends the connection it opens (see
-    catalog_query._logan_connection); without that a cancelled to_thread
-    call just keeps scanning.
+    `fn` takes `interrupt=` (see catalog_query.QueryInterrupt); without that a
+    cancelled to_thread call just keeps scanning.
     """
-    holder: list = []
-    async with _export_slots():
+    interrupt = QueryInterrupt()
+    # Whoever runs first of the thread and a cancel decides who releases the
+    # slot: a call cancelled before its thread starts may never run at all.
+    handoff = threading.Lock()
+    started = abandoned = False
+
+    def call() -> Any:
+        nonlocal started
+        with handoff:
+            if abandoned:
+                raise QueryCancelled("export query cancelled before it ran")
+            started = True
         try:
-            return await asyncio.to_thread(fn, *args, con_holder=holder)
-        except asyncio.CancelledError:
-            for con in holder:
-                try:
-                    con.interrupt()
-                except Exception:  # noqa: BLE001 -- already closed is fine
-                    pass
-            raise
+            interrupt.check()
+            return fn(*args, interrupt=interrupt)
+        finally:
+            _EXPORT_SLOTS.release()
+
+    while not _EXPORT_SLOTS.acquire(blocking=False):
+        await asyncio.sleep(_SLOT_POLL_S)
+    try:
+        return await asyncio.to_thread(call)
+    except asyncio.CancelledError:
+        interrupt.cancel()
+        with handoff:
+            if not started:
+                abandoned = True
+                _EXPORT_SLOTS.release()
+        raise
 
 
 # ---------- tool mode ----------

@@ -224,9 +224,54 @@ class TestVocabulary:
         values, cut = logan_vocabulary(F1, ("country",), n)["country"]
         assert not cut and len(values) == n
 
-    def test_the_connection_is_handed_out_for_interrupting(self):
-        holder = []
-        execute_logan_hits(_q(), F1, con_holder=holder)
-        assert len(holder) == 1
+    def test_a_cancel_during_connect_closes_without_running_anything(self, monkeypatch):
+        from app.services import kmindex_filters
+        from app.services.tools.catalog_query import QueryCancelled, QueryInterrupt
+
+        interrupt = QueryInterrupt()
+        opened = []
+        real = kmindex_filters._connect
+
+        def connect_then_cancelled():
+            con = real()
+            opened.append(con)
+            interrupt.cancel()  # lands before the connection is registered
+            return con
+
+        monkeypatch.setattr(kmindex_filters, "_connect", connect_then_cancelled)
+        with pytest.raises(QueryCancelled):
+            execute_logan_hits(_q(), F1, interrupt=interrupt)
         with pytest.raises(duckdb.ConnectionException):
-            holder[0].execute("SELECT 1")
+            opened[0].execute("SELECT 1")
+
+    def test_a_cancel_between_statements_stops_the_next_one(self, monkeypatch):
+        from app.services.tools.catalog_query import QueryCancelled, QueryInterrupt
+
+        interrupt = QueryInterrupt()
+        real = cq.execute
+
+        def cancel_first(q, con, **kw):
+            # The view is built; cancel before execute() issues its count.
+            interrupt.cancel()
+            return real(q, con, **kw)
+
+        monkeypatch.setattr(cq, "execute", cancel_first)
+        with pytest.raises(QueryCancelled):
+            execute_logan_hits(_q(), F1, interrupt=interrupt)
+
+    def test_a_running_statement_is_interrupted(self):
+        from app.services.tools.catalog_query import QueryInterrupt
+
+        interrupt = QueryInterrupt()
+        seen = []
+
+        class Con:
+            def interrupt(self):
+                seen.append("interrupt")
+
+        interrupt.attach(Con())
+        interrupt.cancel()
+        assert seen == ["interrupt"]
+        interrupt.detach()
+        interrupt.cancel()  # nothing attached: no second interrupt
+        assert seen == ["interrupt"]
