@@ -38,6 +38,8 @@ def search_genes(
     2 characters are left out. Each gene is listed once, at its best match,
     best first.
     """
+    if not q.strip():
+        raise HTTPException(status_code=422, detail="The query is empty")
     if len(q.split()) > MAX_SEARCH_WORDS:
         raise HTTPException(
             status_code=422,
@@ -46,9 +48,10 @@ def search_genes(
     if service.snapshot is None:
         raise HTTPException(status_code=503, detail="Gene data is unavailable")
     words = service.search_words(q)
-    if not words:
-        raise HTTPException(status_code=422, detail="The query has no words")
-    results, truncated = service.search_genes(words, assembly, limit)
+    # Punctuation alone, such as "-": no words, so nothing matches.
+    results, truncated = (
+        service.search_genes(words, assembly, limit) if words else ([], False)
+    )
     return GeneSearchResponse(
         snapshot=service.snapshot,
         query=" ".join(words),
