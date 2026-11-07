@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import copy
+import dataclasses
 import datetime as _dt
+import json
 import logging
 import re
 import subprocess
@@ -18,6 +21,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from pydantic_core import to_jsonable_python
 from pydantic_evals.evaluators import LLMJudge
 
 from evals.judge import build_pydantic_ai_model
@@ -124,6 +128,50 @@ def _declared_evaluator_names(case, dataset_evaluators) -> frozenset[str]:
     return frozenset(names)
 
 
+def _dump_output(output) -> object:
+    """A case output as JSON-safe data for --dump-dir.
+
+    A Logan session's metadata carries the whole snapshot, which the fixture
+    already records; only what a turn may have added to it is kept.
+    """
+    if dataclasses.is_dataclass(output) and not isinstance(output, type):
+        data = dataclasses.asdict(output)
+    else:
+        data = copy.deepcopy(output)
+    meta = data.get("session_metadata") if isinstance(data, dict) else None
+    if isinstance(meta, dict) and isinstance(meta.get("logan"), dict):
+        logan = meta["logan"]
+        meta["logan"] = {k: logan[k] for k in ("selection",) if k in logan}
+    return to_jsonable_python(data, fallback=str)
+
+
+def write_dump(path: Path, report) -> None:
+    """One JSON line per case run: name, scores and the full output."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as fh:
+        for case in report.cases:
+            scores = {
+                name: _score_value(val)
+                for name, val in {**case.scores, **case.assertions}.items()
+            }
+            fh.write(
+                json.dumps(
+                    {
+                        "case": case.name,
+                        "scores": scores,
+                        "duration_s": getattr(case, "task_duration", None),
+                        "output": _dump_output(case.output),
+                    }
+                )
+                + "\n"
+            )
+        for failure in getattr(report, "failures", []):
+            fh.write(
+                json.dumps({"case": failure.name, "error": str(failure.error_message)})
+                + "\n"
+            )
+
+
 async def _run_one(
     dataset_name: str,
     model_name: str,
@@ -132,6 +180,7 @@ async def _run_one(
     judge_model,
     only: list[str] | None,
     repeat: int,
+    dump_dir: Path | None = None,
 ) -> RunResult:
     build = SPECS[dataset_name]
     # Fresh cache per run so LLMService's content-keyed entries can't be served
@@ -148,6 +197,8 @@ async def _run_one(
         progress=False,
     )
     elapsed = time.time() - started
+    if dump_dir is not None:
+        write_dump(dump_dir / f"{dataset_name}@{model_name}.jsonl", report)
 
     aggregated: dict[str, dict[str, list[float]]] = {}
     for case in report.cases:
@@ -223,6 +274,7 @@ async def _amain(args) -> int:
                     judge_model,
                     only,
                     args.repeat,
+                    dump_dir=Path(args.dump_dir) if args.dump_dir else None,
                 )
             except DatasetRequirementError as exc:
                 # Precondition (e.g. SRA_MIRROR_PATH) is model-independent, so
@@ -282,6 +334,12 @@ def main() -> int:
         "--output",
         default=None,
         help="explicit output path (default: evals/results/<date>-<slug>-<sha>.md)",
+    )
+    parser.add_argument(
+        "--dump-dir",
+        default=None,
+        help="also write every case's output and scores as JSONL here, one "
+        "file per dataset and model (replies, traces, latencies)",
     )
     args = parser.parse_args()
     return asyncio.run(_amain(args))
