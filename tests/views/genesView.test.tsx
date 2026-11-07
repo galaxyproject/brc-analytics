@@ -7,6 +7,7 @@ import { type GeneSearchResult } from "@repo/shared/services/genes/types";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
+import { type JSX } from "react";
 
 const theme = createTheme();
 
@@ -47,16 +48,20 @@ const TRAMP: GeneSearchResult = {
  * @param query - The search shown.
  * @returns The onSearch mock.
  */
-function renderView(search: GeneSearchState, query = ""): jest.Mock {
+function renderView(
+  search: GeneSearchState,
+  query = ""
+): { onSearch: jest.Mock; rerender: (query: string) => void } {
   const onSearch = jest.fn();
-  render(
+  const view = (shown: string): JSX.Element => (
     <ThemeProvider theme={theme}>
       <EmotionThemeProvider theme={theme}>
-        <GenesView onSearch={onSearch} query={query} search={search} />
+        <GenesView onSearch={onSearch} query={shown} search={search} />
       </EmotionThemeProvider>
     </ThemeProvider>
   );
-  return onSearch;
+  const { rerender } = render(view(query));
+  return { onSearch, rerender: (shown) => rerender(view(shown)) };
 }
 
 /**
@@ -85,7 +90,7 @@ describe("GenesView", () => {
   });
 
   it("searches for the box's text, trimmed, when submitted", () => {
-    const onSearch = renderView({ status: "idle" });
+    const { onSearch } = renderView({ status: "idle" });
     const box = screen.getByRole("searchbox", { name: "Search genes" });
     fireEvent.change(box, { target: { value: "  apical memb " } });
     fireEvent.submit(screen.getByRole("search"));
@@ -93,26 +98,35 @@ describe("GenesView", () => {
   });
 
   it("doesn't search again for the search already shown", () => {
-    const onSearch = renderView(found([AMA1]), "ama");
+    const { onSearch } = renderView(found([AMA1]), "ama");
     fireEvent.submit(screen.getByRole("search"));
     expect(onSearch).not.toHaveBeenCalled();
   });
 
   it("retries the search already shown if it failed", () => {
     const retry = jest.fn();
-    const onSearch = renderView({ retry, status: "unavailable" }, "ama");
+    const { onSearch } = renderView({ retry, status: "unavailable" }, "ama");
     fireEvent.submit(screen.getByRole("search"));
     expect(retry).toHaveBeenCalledTimes(1);
     expect(onSearch).not.toHaveBeenCalled();
   });
 
   it("searches when the box's text differs from the search shown", () => {
-    const onSearch = renderView(found([AMA1]), "ama");
+    const { onSearch } = renderView(found([AMA1]), "ama");
     fireEvent.change(screen.getByRole("searchbox"), {
       target: { value: "ama1" },
     });
     fireEvent.submit(screen.getByRole("search"));
     expect(onSearch).toHaveBeenCalledWith("ama1");
+  });
+
+  it("shows a new search in the box, as on going Back", () => {
+    const { rerender } = renderView(found([AMA1]), "ama1");
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "typed but not searched" },
+    });
+    rerender("ama");
+    expect(screen.getByRole("searchbox")).toHaveValue("ama");
   });
 
   it("shows the search in the box", () => {

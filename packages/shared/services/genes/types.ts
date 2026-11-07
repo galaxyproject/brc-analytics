@@ -89,8 +89,9 @@ export interface GeneResponse {
  * What a search matched a gene on.
  */
 export interface GeneSearchMatch {
-  // A search term type: an alias type, or transcriptProduct's and
-  // proteinProduct's for a word of one of the gene's transcripts' products.
+  // A search term type, snake_case as the gene API writes it: an alias type
+  // (e.g. protein_accession), or transcript_product or protein_product for a
+  // word of one of the gene's transcripts' products.
   type: string;
   // The alias as written, or the whole product the word is in.
   value: string;
