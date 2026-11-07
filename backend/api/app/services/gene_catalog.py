@@ -186,6 +186,11 @@ def _search_params(words: List[str], assembly: Optional[str], limit: int) -> Lis
     return [last, last, _next_prefix(last), *by_assembly, *others, limit]
 
 
+# The surrogate code points, U+D800 to U+DFFF: not characters, so no string
+# DuckDB takes holds one.
+_SURROGATES = range(0xD800, 0xE000)
+
+
 def _next_prefix(word: str) -> Optional[str]:
     """The least string after every string that starts with word, or None
     when there is none: a word of only the last code point, U+10FFFF. No
@@ -193,7 +198,10 @@ def _next_prefix(word: str) -> Optional[str]:
     stem = word.rstrip(chr(sys.maxunicode))
     if not stem:
         return None
-    return stem[:-1] + chr(ord(stem[-1]) + 1)
+    following = ord(stem[-1]) + 1
+    if following in _SURROGATES:
+        following = _SURROGATES.stop
+    return stem[:-1] + chr(following)
 
 
 def _records(cur: duckdb.DuckDBPyConnection) -> List[Dict[str, Any]]:
@@ -404,8 +412,6 @@ class GeneCatalogService:
         """
         words = [w.strip(string.punctuation) for w in query.lower().split()]
         words = [w for w in words if w]
-        if len(words) <= 1:
-            return words
         kept = [
             w
             for w in words

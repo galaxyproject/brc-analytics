@@ -50,7 +50,7 @@ def export(snapshot: Path, out: Path) -> None:
                 " WHERE list_contains(?, locus_tag)",
                 [list(GENES)],
             )
-            (count,) = con.execute("SELECT count(*) FROM kept").fetchone()
+            count = len(con.execute("SELECT gene_uid FROM kept").fetchall())
             if count != len(GENES):
                 raise ValueError(f"{len(GENES) - count} of GENES aren't in {snapshot}")
             # Every table with rows per gene, gene last, so a delete never
@@ -76,7 +76,9 @@ def export(snapshot: Path, out: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(
+        description="Write the backend tests' gene snapshot from 3D7's."
+    )
     parser.add_argument("snapshot", type=Path, help="3D7's gene snapshot")
     args = parser.parse_args()
     export(args.snapshot, EXPORT_DIR)

@@ -3,7 +3,6 @@ snapshot (conftest.py): 16 of 3D7's genes, chosen in
 scripts/export_test_gene_snapshot.py."""
 
 import os
-from pathlib import Path
 
 import pytest
 
@@ -147,8 +146,25 @@ def test_internal_punctuation_is_kept(gene_client):
     assert search(gene_client, "PF3D7_0105400.1")["query"] == "pf3d7_0105400.1"
 
 
-@pytest.mark.parametrize("q", ["\U0010ffff", "a\U0010ffff", "\U0010ffff\U0010ffff"])
-def test_the_last_code_point_is_searched_not_an_error(gene_client, q):
+@pytest.mark.parametrize("q", ["-", "...", "( )"])
+def test_punctuation_alone_finds_nothing(gene_client, q):
+    body = search(gene_client, q)
+    assert (body["query"], body["results"], body["truncated"]) == ("", [], False)
+
+
+@pytest.mark.parametrize(
+    "q",
+    [
+        # The last code point: no string follows it.
+        "\U0010ffff",
+        "a\U0010ffff",
+        "\U0010ffff\U0010ffff",
+        # The code point before the surrogates, which no string can hold.
+        "\ud7ff",
+        "a\ud7ff",
+    ],
+)
+def test_the_highest_code_points_are_searched_not_an_error(gene_client, q):
     assert search(gene_client, q)["results"] == []
 
 
@@ -218,6 +234,48 @@ def test_ranking(tmp_path, gene_snapshot_path):
     ]
 
 
+def test_a_genes_shortest_match_of_its_best_kind_is_shown(tmp_path, gene_snapshot_path):
+    # Two of AMA1's other aliases start "zz". The longer one's type sorts
+    # first, so only the length picks the shorter.
+    terms = [("zzlonger", "ncbi_gene_id"), ("zzs", "symbol")]
+    sql = ";".join(
+        f"INSERT INTO search_term SELECT '{term}', '{kind}', gene_uid,"
+        f" upper('{term}'), assembly_accession, NULL, 1"
+        " FROM gene WHERE locus_tag = 'PF3D7_1133400'"
+        for term, kind in terms
+    )
+    service = altered_snapshot(tmp_path, gene_snapshot_path, sql)
+    try:
+        body = search(make_client(service), "zz")
+    finally:
+        service.close()
+    assert matches(body) == [("PF3D7_1133400", "symbol", "ZZS")]
+
+
+def test_a_gene_in_an_older_annotation_set_version_is_listed_once(
+    tmp_path, gene_snapshot_path
+):
+    # gene's key is (gene_uid, asv_id), so a gene is a row per version it is
+    # in; search terms are the latest version's, and the gene is listed once,
+    # from its latest row.
+    sql = """
+        INSERT INTO annotation_set_version
+            SELECT * REPLACE ('older' AS asv_id, 0 AS version, false AS latest)
+            FROM annotation_set_version;
+        INSERT INTO gene
+            SELECT * REPLACE ('older' AS asv_id, false AS latest, 'OLD' AS name)
+            FROM gene WHERE locus_tag = 'PF3D7_1133400';
+    """
+    service = altered_snapshot(tmp_path, gene_snapshot_path, sql)
+    try:
+        body = search(make_client(service), "PF3D7_1133400")
+    finally:
+        service.close()
+    assert [(r["locusTag"], r["name"]) for r in body["results"]] == [
+        ("PF3D7_1133400", "AMA1")
+    ]
+
+
 def test_truncation(gene_client):
     body = search(gene_client, "PF3D7_11", limit=5)
     assert [r["locusTag"] for r in body["results"]] == [
@@ -263,8 +321,6 @@ def test_the_query_is_trimmed(gene_client):
         {},
         {"q": ""},
         {"q": "   "},
-        # No words once punctuation is trimmed.
-        {"q": "( )"},
         {"q": "a" * (MAX_SEARCH_LENGTH + 1)},
         {"q": " ".join(["ama"] * (MAX_SEARCH_WORDS + 1))},
         {"q": "ama", "limit": 0},
@@ -283,12 +339,12 @@ def test_search_is_503_without_gene_data(tmp_path):
 
 # The issue's examples (#1905), against 3D7's whole snapshot. Run when
 # GENE_SNAPSHOT_3D7_PATH names one built by build_gene_snapshot.
-FULL_3D7 = os.environ.get("GENE_SNAPSHOT_3D7_PATH")
+FULL_3D7 = os.environ.get("GENE_SNAPSHOT_3D7_PATH", "")
 
 
 @pytest.mark.skipif(not FULL_3D7, reason="GENE_SNAPSHOT_3D7_PATH isn't set")
 def test_whole_3d7_snapshot():
-    service = GeneCatalogService.local(str(Path(FULL_3D7)), "")
+    service = GeneCatalogService.local(FULL_3D7, "")
     client = make_client(service)
     try:
         assert matches(search(client, "ama"))[0] == ("PF3D7_1133400", "name", "AMA1")
