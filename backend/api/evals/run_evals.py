@@ -181,6 +181,7 @@ async def _run_one(
     only: list[str] | None,
     repeat: int,
     dump_dir: Path | None = None,
+    max_concurrency: int | None = None,
 ) -> RunResult:
     build = SPECS[dataset_name]
     # Fresh cache per run so LLMService's content-keyed entries can't be served
@@ -195,6 +196,7 @@ async def _run_one(
         name=f"{dataset_name}@{model_name}",
         repeat=repeat,
         progress=False,
+        max_concurrency=max_concurrency,
     )
     elapsed = time.time() - started
     if dump_dir is not None:
@@ -275,6 +277,7 @@ async def _amain(args) -> int:
                     only,
                     args.repeat,
                     dump_dir=Path(args.dump_dir) if args.dump_dir else None,
+                    max_concurrency=args.max_concurrency,
                 )
             except DatasetRequirementError as exc:
                 # Precondition (e.g. SRA_MIRROR_PATH) is model-independent, so
@@ -340,6 +343,13 @@ def main() -> int:
         default=None,
         help="also write every case's output and scores as JSONL here, one "
         "file per dataset and model (replies, traces, latencies)",
+    )
+    parser.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=None,
+        help="cap on cases in flight at once (default: no cap). Lower it for "
+        "a shared endpoint, or when the latency itself is being measured",
     )
     args = parser.parse_args()
     return asyncio.run(_amain(args))
