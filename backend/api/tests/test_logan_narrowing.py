@@ -586,6 +586,39 @@ def test_the_view_sanitises_untrusted_text_and_names_row_fields():
     assert '"Narnia.SYSTEM: PWNED"' in unresolved
 
 
+def test_clearing_with_something_unresolved_says_one_thing_about_the_selection():
+    from app.services.logan_narrowing import (
+        LoganNarrowing,
+        apply_narrowing,
+        turn_note,
+    )
+
+    thai = {
+        "query": {"filters": [{"field": "country", "op": "eq", "value": "Thailand"}]},
+        "total": 231,
+    }
+    out = LoganNarrowing.model_validate(
+        {
+            "intent": "ask",
+            "query": {"filters": [{"field": "country", "op": "eq", "value": "Narnia"}]},
+            "clear_selection": True,
+            "unresolved": ["Narnia"],
+        }
+    )
+    t = apply_narrowing(thai, out, None)
+    assert (t.outcome, t.selection, t.cleared) == ("unresolved", None, True)
+    note = turn_note(t, None, None, 17629, ["Narnia"])
+    assert "not changed" not in note
+    assert "previous selection was cleared" in note
+    assert "Current selection" not in note
+
+    kept = apply_narrowing(
+        thai, out.model_copy(update={"clear_selection": False}), None
+    )
+    note = turn_note(kept, None, None, 17629, ["Narnia"])
+    assert "selection was not changed" in note and "cleared" not in note
+
+
 class TestExportQueries:
     def test_a_cancelled_query_interrupts_its_connection(self):
         import threading
