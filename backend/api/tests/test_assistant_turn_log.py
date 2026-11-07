@@ -905,6 +905,14 @@ class TestLoganJobIdIsRecorded:
 
         assert recorded[0].logan_job_id is None
 
+    def test_a_trailing_newline_is_not_a_job_id(self):
+        # "$" matches before a final newline, so a plain match would let a
+        # 17-character value through to a String(16) column.
+        from app.services.assistant_agent import _logan_job_id
+
+        assert _logan_job_id({"logan": {"job_id": self.JOB}}) == self.JOB
+        assert _logan_job_id({"logan": {"job_id": self.JOB + "\n"}}) is None
+
     @pytest.mark.asyncio
     async def test_a_failed_logan_turn_still_records_the_job(self):
         recorded = []

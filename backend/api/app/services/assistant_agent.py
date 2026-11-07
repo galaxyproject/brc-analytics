@@ -562,7 +562,7 @@ def _logan_job_id(metadata: Optional[Dict[str, Any]]) -> Optional[str]:
     """
     logan = (metadata or {}).get("logan")
     job_id = logan.get("job_id") if isinstance(logan, dict) else None
-    if isinstance(job_id, str) and _LOGAN_JOB_ID.match(job_id):
+    if isinstance(job_id, str) and _LOGAN_JOB_ID.fullmatch(job_id):
         return job_id
     return None
 
