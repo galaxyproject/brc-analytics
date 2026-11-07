@@ -203,3 +203,46 @@ def test_orm_json_columns_match_what_the_migrations_create():
         where = f"{name}.{column.name}"
         assert column.type.compile(postgresql.dialect()) == "JSONB", where
         assert column.type.compile(sqlite.dialect()) == "JSON", where
+
+
+def test_turn_log_logan_job_id_upgrades_and_downgrades(migrated_db, monkeypatch):
+    """0008 adds an indexed, nullable logan_job_id; its downgrade removes both
+    and leaves the table's other indexes alone (SQLite rebuilds the table to
+    drop a column, which is where an index could get lost)."""
+
+    def _columns_and_indexes():
+        engine = create_engine(migrated_db)
+        try:
+            inspector = inspect(engine)
+            columns = {
+                c["name"]: c for c in inspector.get_columns("assistant_turn_log")
+            }
+            indexes = {
+                i["name"]: i["column_names"]
+                for i in inspector.get_indexes("assistant_turn_log")
+            }
+            return columns, indexes
+        finally:
+            engine.dispose()
+
+    columns, indexes = _columns_and_indexes()
+    assert columns["logan_job_id"]["nullable"] is True
+    assert indexes["ix_assistant_turn_log_logan_job_id"] == ["logan_job_id"]
+    before = {k: v for k, v in indexes.items() if "logan" not in k}
+
+    async_url = migrated_db.replace("sqlite:///", "sqlite+aiosqlite:///")
+    monkeypatch.setenv("DATABASE_URL", async_url)
+    get_settings.cache_clear()
+    cfg = Config(str(_alembic_ini_path()))
+    cfg.set_main_option("sqlalchemy.url", async_url)
+    with _logging_restored():
+        command.downgrade(cfg, "20261005_0007")
+    columns, indexes = _columns_and_indexes()
+    assert "logan_job_id" not in columns
+    assert indexes == before
+
+    with _logging_restored():
+        command.upgrade(cfg, "head")
+    columns, _ = _columns_and_indexes()
+    assert "logan_job_id" in columns
+    get_settings.cache_clear()
