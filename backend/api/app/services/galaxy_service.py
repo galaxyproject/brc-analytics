@@ -1644,6 +1644,42 @@ class GalaxyService:
             )
         )
 
+    async def get_cached_kmindex_export(self, job_id: str) -> Optional[Path]:
+        """The job's current export parquet, if -- and only if -- its
+        aggregate is already cached and the file behind it is on disk.
+
+        The assistant's way onto the whole match set. _filterable_export
+        answers the same question for the results page, but reaches it through
+        _load_aggregate, which merges every shard on a miss; a chat turn can't
+        wait for that, and the page is what pays for it. So this reads Redis
+        and stats the file, and a miss of either is None -- the caller sends
+        the user to the results page.
+
+        @param job_id: the kmindex job.
+        @returns: the export's path, or None when there is no cached aggregate
+            or no current export under it.
+        """
+        export_job_id = job_id
+        aggregate = await self.cache.get(self._agg_cache_key(job_id))
+        if aggregate is None:
+            source = await self._cached_copied_from(job_id)
+            if source:
+                aggregate = await self.cache.get(self._agg_cache_key(source))
+                export_job_id = source
+        if aggregate is None:
+            return None
+        if self._export_state(aggregate, export_job_id)["status"] != EXPORT_AVAILABLE:
+            return None
+        path = export_file_path(self.settings.KMINDEX_EXPORT_DIR, export_job_id)
+        if path is None:
+            return None
+        try:
+            current = await asyncio.to_thread(export_is_current, path)
+        except Exception as e:
+            logger.warning(f"kmindex job {export_job_id}: unreadable export: {e}")
+            return None
+        return path if current else None
+
     async def source_job_id(self, job_id: str) -> str:
         """
         The job whose outputs this one shares: its job-cache original, if any.

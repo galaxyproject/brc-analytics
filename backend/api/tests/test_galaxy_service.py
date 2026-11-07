@@ -2454,6 +2454,113 @@ class TestCachedKmindexRead:
         assert await service.get_cached_kmindex_results("job1") is None
 
 
+class TestCachedKmindexExport:
+    """The assistant's way onto the export: Redis and a stat, never a merge."""
+
+    @staticmethod
+    def _write_export(path, with_ani=True):
+        import duckdb
+
+        cols = "'SRR1' AS accession, 0.9 AS score" + (
+            ", 0.95 AS ani" if with_ani else ""
+        )
+        con = duckdb.connect()
+        con.execute(f"COPY (SELECT {cols}) TO '{path}' (FORMAT parquet)")
+        con.close()
+
+    @staticmethod
+    def _forbid_cold_path(service):
+        service._load_aggregate = AsyncMock(side_effect=AssertionError("cold path"))
+        service._aggregate_shards = AsyncMock(side_effect=AssertionError("cold"))
+        service._resolve_source = AsyncMock(side_effect=AssertionError("galaxy"))
+
+    @pytest.mark.asyncio
+    async def test_hit_returns_the_current_export(self, service, monkeypatch, tmp_path):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._write_export(tmp_path / "job1.parquet")
+        service.cache.get = AsyncMock(
+            return_value={"export": {"status": "available", "rows": 1}}
+        )
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") == (
+            tmp_path / "job1.parquet"
+        )
+        service._load_aggregate.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_miss_is_none_without_aggregating(self, service):
+        service.cache.get = AsyncMock(return_value=None)
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") is None
+        service._load_aggregate.assert_not_called()
+        service._aggregate_shards.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_a_copy_reads_its_originals_export(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._write_export(tmp_path / "orig1.parquet")
+        aggregate = {"export": {"status": "available", "rows": 1}}
+        # The fixture's cache is a mock whose make_key returns one shared
+        # object, so give each job a key of its own.
+        service._agg_cache_key = lambda job_id: f"agg:{job_id}"
+        orig_key = "agg:orig1"
+
+        async def get(key):
+            return aggregate if key == orig_key else None
+
+        service.cache.get = AsyncMock(side_effect=get)
+        service._cached_copied_from = AsyncMock(return_value="orig1")
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("copy1") == (
+            tmp_path / "orig1.parquet"
+        )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("status", ["too_large", "unavailable", "bogus"])
+    async def test_no_export_recorded_is_none(
+        self, service, monkeypatch, tmp_path, status
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._write_export(tmp_path / "job1.parquet")
+        service.cache.get = AsyncMock(return_value={"export": {"status": status}})
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") is None
+
+    @pytest.mark.asyncio
+    async def test_a_claimed_export_with_no_file_is_none(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") is None
+
+    @pytest.mark.asyncio
+    async def test_a_stale_export_is_none(self, service, monkeypatch, tmp_path):
+        # Written before the score correction: no `ani` column.
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        self._write_export(tmp_path / "job1.parquet", with_ani=False)
+        service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") is None
+
+    @pytest.mark.asyncio
+    async def test_no_export_dir_is_none(self, service, monkeypatch):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", "")
+        service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
+        self._forbid_cold_path(service)
+
+        assert await service.get_cached_kmindex_export("job1") is None
+
+
 class TestKmindexIndexList:
     """
     The index picker's options come off the pinned tool's form, the one Galaxy
