@@ -200,3 +200,33 @@ class TestExecute:
             t.join()
         assert not errors
         assert results == [expected] * 6
+
+
+class TestVocabulary:
+    def test_values_come_from_the_engines_facets(self):
+        from app.services.tools.catalog_query import logan_vocabulary
+
+        vocab = logan_vocabulary(F1, ("country", "platform", "organism"), 200)
+        countries, cut = vocab["country"]
+        assert not cut
+        assert countries[0] == "Malawi" and "Kenya" in countries
+        assert "(none)" not in countries
+        assert vocab["platform"][0][0] == "ILLUMINA"
+
+    def test_a_cut_list_says_so_even_with_a_null_bucket(self):
+        from app.services.tools.catalog_query import logan_vocabulary
+
+        # Country is mostly NULL in F1, so the NULL bucket is the top one;
+        # it must not use up the slot that tells a cut list from a whole one.
+        n = len(logan_vocabulary(F1, ("country",), 200)["country"][0])
+        values, cut = logan_vocabulary(F1, ("country",), n - 1)["country"]
+        assert cut and len(values) == n - 1
+        values, cut = logan_vocabulary(F1, ("country",), n)["country"]
+        assert not cut and len(values) == n
+
+    def test_the_connection_is_handed_out_for_interrupting(self):
+        holder = []
+        execute_logan_hits(_q(), F1, con_holder=holder)
+        assert len(holder) == 1
+        with pytest.raises(duckdb.ConnectionException):
+            holder[0].execute("SELECT 1")

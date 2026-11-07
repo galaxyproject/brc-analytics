@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -372,7 +373,7 @@ class CatalogQuery(BaseModel):
         return _validate_query(self)
 
 
-def _validate_query(self):
+def _validate_query(q: "CatalogQuery | LoganHitQuery"):
     """The checks every query model runs, whatever its entity.
 
     A function rather than a shared base class, so CatalogQuery's own fields
@@ -380,34 +381,34 @@ def _validate_query(self):
     """
     # entity/operation are Literals -- pydantic already rejects bad values and
     # advertises the allowed set in the tool schema.
-    if self.operation == "facets" and not self.facet_by:
+    if q.operation == "facets" and not q.facet_by:
         raise ValueError("operation 'facets' needs at least one facet_by field")
-    schema = ENTITY_SCHEMA[self.entity]
+    schema = ENTITY_SCHEMA[q.entity]
     allowed = schema.field_names
     # facet_by is checked first, and against this entity's facetable set
-    # rather than its full field list. The enum spans both entities, so an
-    # assembly-only scalar reaches here on an organism query; answering that
-    # with the generic "valid fields" list would offer taxonomicGroup, the
-    # model would take the suggestion, and the Literal would reject it on the
-    # retry -- the exact exhaustion this branch exists to stop. Every field
-    # named here is one that would actually work.
-    bad_facets = sorted({c for c in self.facet_by if c not in schema.facetable_fields})
+    # rather than its full field list. CatalogQuery's enum spans both catalog
+    # entities, so an assembly-only scalar reaches here on an organism query;
+    # answering that with the generic "valid fields" list would offer
+    # taxonomicGroup, the model would take the suggestion, and the Literal
+    # would reject it on the retry -- the exact exhaustion this branch exists
+    # to stop. Every field named here is one that would actually work.
+    bad_facets = sorted({c for c in q.facet_by if c not in schema.facetable_fields})
     if bad_facets:
         raise ValueError(
-            f"cannot facet on {bad_facets} for entity {self.entity!r}; "
+            f"cannot facet on {bad_facets} for entity {q.entity!r}; "
             f"group-by needs a scalar field of that entity. Valid facet "
             f"fields: {sorted(schema.facetable_fields)}"
         )
-    referenced = [f.field for f in self.filters] + [s.field for s in self.sort]
+    referenced = [f.field for f in q.filters] + [s.field for s in q.sort]
     unknown = sorted({f for f in referenced if f not in allowed})
     if unknown:
         raise ValueError(
-            f"unknown field(s) {unknown} for entity {self.entity!r}; "
+            f"unknown field(s) {unknown} for entity {q.entity!r}; "
             f"valid fields: {sorted(allowed)}"
         )
     list_fields = schema.list_fields
     numeric_fields = schema.numeric_fields
-    for f in self.filters:
+    for f in q.filters:
         # Every op except the null checks needs a value; without this, a None
         # compiles to a comparison against NULL that silently matches nothing.
         if f.op not in (Op.is_null, Op.not_null) and f.value is None:
@@ -453,7 +454,7 @@ def _validate_query(self):
         )
         if consumes_list and isinstance(f.value, list) and not f.value:
             raise ValueError(f"{f.op.value} needs a non-empty value list")
-    return self
+    return q
 
 
 _SQL_BINOP = {
@@ -652,7 +653,9 @@ def connect(catalog_dir: str):
     return None
 
 
-def execute(q: CatalogQuery, con) -> dict:
+def execute(
+    q: "CatalogQuery | LoganHitQuery", con, facet_limit: int = _FACET_LIMIT
+) -> dict:
     """Run a CatalogQuery against DuckDB; return the summary contract.
 
     Entity/column/sort identifiers are interpolated into SQL, not parameterized
@@ -674,7 +677,7 @@ def execute(q: CatalogQuery, con) -> dict:
                 f"SELECT {qcol} AS k, count(*) AS c FROM {entity} WHERE {where} "
                 # `, k` is a stable tiebreaker so equal-count buckets (and which
                 # ones fall at the LIMIT boundary) don't shuffle across runs.
-                f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {_FACET_LIMIT}",
+                f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {int(facet_limit)}",
                 params,
             ).fetchall()
             out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
@@ -760,13 +763,16 @@ class LoganExportMismatch(RuntimeError):
     """The export file lacks a column logan_hit declares, or types it wrong."""
 
 
-def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
-    """Run a LoganHitQuery over one job's export; same summary as execute().
+@contextmanager
+def _logan_connection(parquet: Path, con_holder: Optional[list] = None):
+    """A private, capped connection with the job's export as `logan_hit`.
 
-    Opens a private connection with the results page's thread and memory caps
-    (kmindex_filters._connect), so unlike the shared catalog connection this is
-    safe to call from a worker thread -- nothing else ever touches it -- and one
-    heavy filter cannot take the VM. Closed before returning.
+    Uses the results page's thread and memory caps (kmindex_filters'
+    capped connection -- imported here so duckdb stays a lazy import, as in
+    connect()). Nothing else ever touches it, so unlike the shared catalog
+    connection it is safe from a worker thread. A caller that may give up on
+    the query passes `con_holder` and gets the connection appended, so it can
+    `interrupt()` it. Closed on exit.
 
     @raises LoganExportMismatch: when the file is not the shape declared above,
         which is a writer change to fix, not something to answer around.
@@ -774,6 +780,8 @@ def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
     from app.services.kmindex_filters import _connect
 
     con = _connect()
+    if con_holder is not None:
+        con_holder.append(con)
     try:
         rel = con.read_parquet(str(parquet))
         coltypes = {
@@ -792,6 +800,40 @@ def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
             )
         rel = rel.project("*, CAST(year(release_date) AS INTEGER) AS release_year")
         rel.create_view("logan_hit", replace=True)
-        return execute(q, con)
+        yield con
     finally:
         con.close()
+
+
+def execute_logan_hits(
+    q: LoganHitQuery, parquet: Path, con_holder: Optional[list] = None
+) -> dict:
+    """Run a LoganHitQuery over one job's export; same summary as execute()."""
+    with _logan_connection(parquet, con_holder) as con:
+        return execute(q, con)
+
+
+def logan_vocabulary(
+    parquet: Path,
+    fields: Sequence[str],
+    limit: int,
+    con_holder: Optional[list] = None,
+) -> dict[str, tuple[list[str], bool]]:
+    """The commonest values of each field in one job's export, through the
+    engine's own facets, and whether each list was cut at `limit`.
+
+    One connection for every field; facet_by is capped per query, so the
+    fields go through in chunks of that cap.
+    """
+    out: dict[str, tuple[list[str], bool]] = {}
+    chunk = LoganHitQuery.model_fields["facet_by"].metadata[0].max_length
+    with _logan_connection(parquet, con_holder) as con:
+        for i in range(0, len(fields), chunk):
+            q = LoganHitQuery(operation="facets", facet_by=list(fields[i : i + chunk]))
+            # Two over the limit: one for the NULL bucket, which is dropped,
+            # and one to tell a list that was cut from one that just fits.
+            facets = execute(q, con, facet_limit=limit + 2)["facets"]
+            for name, buckets in facets.items():
+                values = [v for v in buckets if v != "(none)"]
+                out[name] = (values[:limit], len(values) > limit)
+    return out
