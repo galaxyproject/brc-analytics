@@ -1,120 +1,40 @@
 import { GenesPanel } from "@brc/components/Genes/genes.styles";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
-import { ROUTES } from "@repo/shared/routes/constants";
-import Link from "next/link";
 import { type JSX } from "react";
+import { ExampleGenes } from "./components/ExampleGenes/exampleGenes";
+import { GeneSearchForm } from "./components/GeneSearchForm/geneSearchForm";
+import { GeneSearchResults } from "./components/GeneSearchResults/geneSearchResults";
 import { StyledGrid, StyledTitle } from "./genesView.styles";
-import { type ExampleGene } from "./types";
+import { type GenesViewProps } from "./types";
 
-// Genes of P. falciparum 3D7 (GCF_000002765.6) in the temporary gene snapshot
-// (#1904), until search (#1905) replaces this list. Gene UIDs are UUID5s of the
-// assembly accession and the gene's GFF3 row ID, so they don't change when the
-// snapshot is regenerated from the same release.
-const EXAMPLE_GENES: ExampleGene[] = [
-  {
-    geneUid: "d9049485-ed74-5455-98c2-5dc13eef544a",
-    locusTag: "PF3D7_1133400",
-    note: "Apical membrane antigen 1",
-    symbol: "AMA1",
-  },
-  {
-    geneUid: "f493ed2a-23d9-5f55-90e1-310c3680d495",
-    locusTag: "PF3D7_0831800",
-    note: "Histidine-rich protein II",
-    symbol: "HRP2",
-  },
-  {
-    geneUid: "091bb705-4cc0-5416-8f65-6711ad8248db",
-    locusTag: "PF3D7_0930300",
-    note: "Merozoite surface protein 1",
-    symbol: "MSP1",
-  },
-  {
-    geneUid: "86dfe185-cc1f-577e-991d-100ff28d1c86",
-    locusTag: "PF3D7_0304600",
-    note: "Circumsporozoite protein",
-    symbol: "CSP",
-  },
-  {
-    geneUid: "9ef15f58-60fc-5de4-98b8-7c8cb0169013",
-    locusTag: "PF3D7_0105400",
-    note: "No symbol; two transcripts and two old locus tags",
-    symbol: null,
-  },
-  {
-    geneUid: "c309de32-b052-5136-8696-0e8e599b7cef",
-    locusTag: "PF3D7_0203500",
-    note: "A tRNA, with no product and no transcript ID",
-    symbol: null,
-  },
-  {
-    geneUid: "340d7c74-6ca0-5b0d-a0ed-7d3beefb4f41",
-    locusTag: "PF3D7_0100500",
-    note: "A transcribed pseudogene",
-    symbol: null,
-  },
-  {
-    geneUid: "7b3c7733-2509-5585-995f-694be505af1c",
-    locusTag: "PF3D7_0103600",
-    note: "Transcript and protein products differ",
-    symbol: "PSH1",
-  },
-  {
-    geneUid: "26701dae-095d-55c0-9551-adfd5ea8174f",
-    locusTag: "PF3D7_0205700",
-    note: "Two transcripts whose proteins have different products",
-    symbol: null,
-  },
-  {
-    geneUid: "4747203f-fa09-562d-9f2b-21b204dd662c",
-    locusTag: "PF3D7_0112300",
-    note: "A ribosomal RNA",
-    symbol: null,
-  },
-  {
-    geneUid: "542eba05-f671-5495-94fd-f01e7083c05b",
-    locusTag: "PF3D7_0115050",
-    note: "A snoRNA",
-    symbol: null,
-  },
-];
-
-export const GenesView = (): JSX.Element => {
+/**
+ * The genes page: a search box, and the search's results, or example genes
+ * until a search is made. Submitting the search already shown starts no new
+ * search, so it adds no history entry; if that search failed, it is retried.
+ * @param props - Component props.
+ * @param props.onSearch - Called with a new search; empty to clear it.
+ * @param props.query - The search shown, from the page's ?q=.
+ * @param props.search - The search's state.
+ * @returns The genes page.
+ */
+export const GenesView = ({
+  onSearch,
+  query,
+  search,
+}: GenesViewProps): JSX.Element => {
+  const onSubmit = (q: string): void => {
+    if (q !== query) onSearch(q);
+    else if (search.status === "unavailable") search.retry();
+  };
   return (
     <StyledGrid>
       <StyledTitle>Genes</StyledTitle>
       <GenesPanel>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Gene ID</TableCell>
-                <TableCell>Symbol</TableCell>
-                <TableCell>Example of</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {EXAMPLE_GENES.map(({ geneUid, locusTag, note, symbol }) => (
-                <TableRow key={geneUid}>
-                  <TableCell>
-                    <Link href={`${ROUTES.GENE_DETAIL}?uid=${geneUid}`}>
-                      {locusTag}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{symbol ?? "—"}</TableCell>
-                  <TableCell>{note}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <GeneSearchForm key={query} onSearch={onSubmit} query={query} />
+        {search.status === "idle" ? (
+          <ExampleGenes />
+        ) : (
+          <GeneSearchResults query={query} search={search} />
+        )}
       </GenesPanel>
     </StyledGrid>
   );

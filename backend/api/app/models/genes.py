@@ -95,6 +95,37 @@ class GeneResponse(_CamelModel):
     gene: Gene
 
 
+class GeneSearchMatch(_CamelModel):
+    """What a search matched a gene on."""
+
+    # A search_term type: an alias type, or transcript_product or
+    # protein_product for a word of one of the gene's transcripts' products.
+    type: str
+    # The alias as written, or the whole product the word is in.
+    value: str
+
+
+class GeneSearchResult(_CamelModel):
+    matched_on: GeneSearchMatch
+    gene_uid: UUID
+    locus_tag: Optional[str]
+    name: Optional[str]
+    symbol: Optional[str]
+    assembly_accession: str
+    organism: GeneOrganism
+    page_url: str
+
+
+class GeneSearchResponse(_CamelModel):
+    snapshot: GeneSnapshotInfo
+    # The words searched: the query lowercased, trimmed of punctuation, and
+    # without the words left out (see GeneCatalogService.search_words).
+    query: str
+    results: List[GeneSearchResult]
+    # Whether more genes matched than were returned.
+    truncated: bool
+
+
 class BionymClaim(_CamelModel):
     """One claim BioNym drew from a source: a language model's statement,
     the quote it rests on, and BioNym's confidence in it, from 0 to 1."""

@@ -10,17 +10,20 @@ per assembly for now, so every row is the latest.
 import atexit
 import logging
 import shutil
+import string
+import sys
 import tempfile
 import threading
+from contextlib import contextmanager
 from datetime import timezone
 from functools import lru_cache, partial
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Tuple
 from uuid import UUID
 
 import duckdb
 
-from app.models.genes import Gene, GeneSnapshotInfo
+from app.models.genes import Gene, GeneSearchResult, GeneSnapshotInfo
 from app.services.gene_snapshot import (
     DownloadStopped,
     SnapshotRejected,
@@ -31,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 # The snapshot schema this service reads (build_gene_snapshot's
 # SCHEMA_VERSION); a file of another version is reported unavailable.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # The order aliases are listed in on a gene.
 _ALIAS_TYPE_ORDER = (
@@ -130,6 +133,69 @@ ORDER BY list_position({list(_ALIAS_TYPE_ORDER)}, type) NULLS LAST, type, value
 """
 
 
+def _search_sql(word_count: int, by_assembly: bool) -> str:
+    """The search for a query of word_count words (see _search_params).
+
+    The last word may start a term of the gene: a range of the term-sorted
+    table, [word, _next_prefix(word)). Every other word must be a whole term
+    of it. The gene's best match on the last word is the one shown.
+
+    Ranked best first: exact locus tag or name, exact other alias, locus tag
+    or name prefix, other alias prefix, product word (the build's type_rank
+    puts product words after these); then a shorter matched term, then locus
+    tag (else name).
+    """
+    assembly = " AND assembly_accession = ?" if by_assembly else ""
+    # One condition per word before the last, each with its own placeholder,
+    # bound in turn to that word. Not one condition over a list of the words:
+    # each `term = ?` is a range DuckDB reads by skipping row groups, which a
+    # list match isn't.
+    whole_words = "".join(
+        " AND gene_uid IN (SELECT gene_uid FROM search_term WHERE term = ?)"
+        for _ in range(word_count - 1)
+    )
+    return f"""
+WITH best AS (
+    SELECT gene_uid, type, term, display,
+           type_rank + CASE WHEN term = ? THEN 0 ELSE 2 END AS tier
+    FROM search_term
+    WHERE term >= ? AND term < ?{assembly}{whole_words}
+    QUALIFY row_number() OVER (
+        PARTITION BY gene_uid ORDER BY tier, length(term), type, display
+    ) = 1
+)
+SELECT struct_pack(b.type, value := b.display) AS matched_on,
+       g.gene_uid, g.locus_tag, g.name, g.symbol, g.assembly_accession,
+       struct_pack(
+           name := a.organism_name,
+           species_taxonomy_id := a.species_taxonomy_id,
+           taxonomy_id := a.taxonomy_id
+       ) AS organism
+FROM best b
+JOIN gene g ON g.gene_uid = b.gene_uid AND g.latest AND g.present
+JOIN assembly a ON a.accession = g.assembly_accession
+ORDER BY b.tier, length(b.term), coalesce(g.locus_tag, g.name), g.gene_uid
+LIMIT ?
+"""
+
+
+def _search_params(words: List[str], assembly: Optional[str], limit: int) -> List[Any]:
+    """_search_sql's parameters, for lowercased words."""
+    *others, last = words
+    by_assembly = [assembly] if assembly is not None else []
+    return [last, last, _next_prefix(last), *by_assembly, *others, limit]
+
+
+def _next_prefix(word: str) -> Optional[str]:
+    """The least string after every string that starts with word, or None
+    when there is none: a word of only the last code point, U+10FFFF. No
+    term starts with one, and None makes the range empty."""
+    stem = word.rstrip(chr(sys.maxunicode))
+    if not stem:
+        return None
+    return stem[:-1] + chr(ord(stem[-1]) + 1)
+
+
 def _records(cur: duckdb.DuckDBPyConnection) -> List[Dict[str, Any]]:
     columns = [d[0] for d in cur.description]
     return [dict(zip(columns, row, strict=True)) for row in cur.fetchall()]
@@ -150,6 +216,10 @@ class GeneCatalogService:
         self.source = source
         self.status: GeneDataStatus = "loading"
         self.snapshot: Optional[GeneSnapshotInfo] = None
+        # The words the snapshot's product words leave out, and their least
+        # length; read from the snapshot (see search_words).
+        self._stop_words: frozenset[str] = frozenset()
+        self._min_word_length = 0
         self._con: Optional[duckdb.DuckDBPyConnection] = None
         # Held only while a request's cursor is made from the shared
         # connection, as SRAMirrorService does; the queries run unlocked.
@@ -218,11 +288,12 @@ class GeneCatalogService:
         )
         try:
             row = con.execute(
-                'SELECT build_id, "update", schema_version FROM snapshot'
+                'SELECT build_id, "update", schema_version, search_stop_words,'
+                " search_min_word_length FROM snapshot"
             ).fetchone()
             if row is None:
                 raise duckdb.InvalidInputException("its snapshot table is empty")
-            build_id, update, schema_version = row
+            build_id, update, schema_version, stop_words, min_word_length = row
             if schema_version != SCHEMA_VERSION:
                 raise duckdb.InvalidInputException(
                     f"its schema version is {schema_version}, not {SCHEMA_VERSION}"
@@ -238,6 +309,7 @@ class GeneCatalogService:
                 (_GENE_SQL, [nil]),
                 (_TRANSCRIPTS_SQL, [nil, ""]),
                 (_ALIASES_SQL, [nil, ""]),
+                (_search_sql(2, True), _search_params(["a", "b"], "", 1)),
             ):
                 con.execute(sql, params).fetchall()
             snapshot = GeneSnapshotInfo(build_id=build_id, update=update)
@@ -249,6 +321,8 @@ class GeneCatalogService:
                 con.close()
                 raise DownloadStopped
             self._con = con
+            self._stop_words = frozenset(stop_words)
+            self._min_word_length = min_word_length
             self.snapshot = snapshot
             self.status = "ready"
         logger.info("Gene snapshot loaded (%s): build %s", self.source, build_id)
@@ -269,16 +343,26 @@ class GeneCatalogService:
         # /data/genes/<gene_uid> is routed.
         return f"{self.frontend_url}/data/genes/detail?uid={gene_uid}"
 
-    def get_gene(self, gene_uid: UUID) -> Optional[Gene]:
-        """The gene with this UID, or None if the snapshot doesn't have it."""
+    @contextmanager
+    def _cursor(self) -> Iterator[duckdb.DuckDBPyConnection]:
+        """A cursor for one request.
+
+        One per request: FastAPI runs sync routes on a thread pool, and a
+        DuckDB connection isn't safe to share across threads. A cursor is an
+        independent connection onto the open database.
+        """
         if self._con is None:
             raise RuntimeError("Gene snapshot is unavailable")
-        # One cursor per call: FastAPI runs sync routes on a thread pool, and
-        # a DuckDB connection isn't safe to share across threads. A cursor is
-        # an independent connection onto the open database.
         with self._cursor_lock:
             cur = self._con.cursor()
         try:
+            yield cur
+        finally:
+            cur.close()
+
+    def get_gene(self, gene_uid: UUID) -> Optional[Gene]:
+        """The gene with this UID, or None if the snapshot doesn't have it."""
+        with self._cursor() as cur:
             genes = _records(cur.execute(_GENE_SQL, [gene_uid]))
             if not genes:
                 return None
@@ -287,8 +371,6 @@ class GeneCatalogService:
             asv_id = genes[0]["provenance"]["annotation_set_version_id"]
             transcripts = _records(cur.execute(_TRANSCRIPTS_SQL, [gene_uid, asv_id]))
             aliases = _records(cur.execute(_ALIASES_SQL, [gene_uid, asv_id]))
-        finally:
-            cur.close()
 
         gene = genes[0]
         # Stored as UTC without a zone.
@@ -308,6 +390,45 @@ class GeneCatalogService:
                 "page_url": self.page_url(gene_uid),
             }
         )
+
+    def search_words(self, query: str) -> List[str]:
+        """The words of a query that search matches, normalized as the
+        snapshot's terms are: lowercased and trimmed of surrounding
+        punctuation, so "(AMA1)" is ama1.
+
+        With several words, those no product word can be are left out: stop
+        words and words shorter than the snapshot's least, so "apical
+        membrane antigen 1" searches apical membrane antigen. If that leaves
+        none, the last word is kept. A lone word is always kept: it may start
+        a longer term, or be a short alias.
+        """
+        words = [w.strip(string.punctuation) for w in query.lower().split()]
+        words = [w for w in words if w]
+        if len(words) <= 1:
+            return words
+        kept = [
+            w
+            for w in words
+            if len(w) >= self._min_word_length and w not in self._stop_words
+        ]
+        return kept or words[-1:]
+
+    def search_genes(
+        self, words: List[str], assembly: Optional[str], limit: int
+    ) -> Tuple[List[GeneSearchResult], bool]:
+        """The genes a search's words find, best first, and whether there
+        were more than limit. The words are lowercase; there is at least one."""
+        sql = _search_sql(len(words), assembly is not None)
+        params = _search_params(words, assembly, limit + 1)
+        with self._cursor() as cur:
+            rows = _records(cur.execute(sql, params))
+        results = [
+            GeneSearchResult.model_validate(
+                {**row, "page_url": self.page_url(row["gene_uid"])}
+            )
+            for row in rows[:limit]
+        ]
+        return results, len(rows) > limit
 
     def close(self) -> None:
         with self._open_lock:
