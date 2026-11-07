@@ -84,21 +84,62 @@ def canonical_filters(filters: Any) -> Optional[frozenset]:
     return frozenset(out)
 
 
+def _counted(ret: Any) -> bool:
+    """Whether a query_logan_hits return is a result, not an error, a missing
+    export or a query that failed."""
+    if not isinstance(ret, str):
+        return False
+    try:
+        body = json.loads(ret)
+    except ValueError:
+        return False
+    return isinstance(body, dict) and isinstance(body.get("total"), int)
+
+
+def _tool_queries(turn: Any) -> list[dict]:
+    """The turn's query_logan_hits calls that ran and returned a result.
+
+    Each call is matched to its own return. A trace without that pairing (an
+    older dump) is paired by position when the counts agree, which holds when
+    query_logan_hits is the only tool the turn used; otherwise nothing counts.
+    """
+    calls = list(getattr(turn, "tool_calls", None) or [])
+    returns = getattr(turn, "call_returns", None)
+    if not returns:
+        returns = list(getattr(turn, "tool_returns", None) or [])
+        if len(returns) != len(calls):
+            return []
+    out = []
+    for (name, args), ret in zip(calls, returns, strict=False):
+        if name != TOOL_NAME or not _counted(ret):
+            continue
+        # pydantic-ai flattens a single-model parameter into the tool's own
+        # schema, but a model may still nest it under the parameter's name.
+        out.append(args.get("query") if isinstance(args.get("query"), dict) else args)
+    return out
+
+
+# The extract pass's outcomes when it counted a query and the turn used it.
+_APPLIED = ("ask", "select", "cleared")
+
+
 def last_effective_query(output: Any) -> Optional[dict]:
-    """The query that answered the last turn: its last query_logan_hits call,
-    or else the extractor's query when it asked or selected."""
+    """The query that answered the last turn: the last query_logan_hits call
+    that ran and returned a count, or else the extractor's query when the pass
+    finished, counted it and applied it. A turn with neither has none."""
     turns = getattr(output, "turns", None) or []
     if not turns:
         return None
     last = turns[-1]
-    calls = [args for name, args in (last.tool_calls or []) if name == TOOL_NAME]
-    if calls:
-        args = calls[-1]
-        # pydantic-ai flattens a single-model parameter into the tool's own
-        # schema, but a model may still nest it under the parameter's name.
-        return args.get("query") if isinstance(args.get("query"), dict) else args
+    ran = _tool_queries(last)
+    if ran:
+        return ran[-1]
     narrowing = getattr(last, "narrowing", None) or {}
-    if narrowing.get("intent") in ("ask", "select") and narrowing.get("query"):
+    if (
+        narrowing.get("outcome") in _APPLIED
+        and "total" in narrowing
+        and isinstance(narrowing.get("query"), dict)
+    ):
         return narrowing["query"]
     return None
 
