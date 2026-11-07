@@ -407,10 +407,35 @@ def ground_truth(where: str, fixture: str = FIXTURE) -> int:
 
 
 def require_whole_export(fixture: str = FIXTURE) -> None:
-    """Counts over a trimmed export are a sample's, not the job's."""
-    trim = load_fixture(fixture).extras.get("trim") or {}
-    if trim.get("rows_kept") != trim.get("rows_total"):
+    """Counts over a trimmed export are a sample's, not the job's.
+
+    Missing provenance is not taken as whole: the fixture has to say it kept
+    every row, and the parquet has to hold that many, which is also the
+    search's own total.
+    """
+    fx = load_fixture(fixture)
+    trim = fx.extras.get("trim")
+    if not isinstance(trim, dict):
+        raise RuntimeError(f"{fixture} has no trim record; can't tell it is whole")
+    kept, total = trim.get("rows_kept"), trim.get("rows_total")
+    if not (isinstance(kept, int) and isinstance(total, int)):
+        raise RuntimeError(f"{fixture}'s trim record lacks its row counts")
+    if kept != total:
         raise RuntimeError(f"{fixture}'s export is trimmed; counts would be wrong")
+    if fx.parquet is None:
+        raise RuntimeError(f"fixture {fixture} has no parquet")
+    con = duckdb.connect()
+    try:
+        rows = con.execute(
+            "SELECT count(*) FROM read_parquet(?)", [str(fx.parquet)]
+        ).fetchone()[0]
+    finally:
+        con.close()
+    if rows != total or rows != fx.snapshot.get("total_matches"):
+        raise RuntimeError(
+            f"{fixture}'s parquet has {rows} rows; its trim record says {total} "
+            f"and the search matched {fx.snapshot.get('total_matches')}"
+        )
 
 
 def allowed_totals(case: dict, total_matches: int) -> list[int]:

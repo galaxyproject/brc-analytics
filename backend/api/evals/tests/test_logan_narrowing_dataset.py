@@ -284,6 +284,60 @@ def test_the_fixture_is_the_whole_export():
     require_whole_export()
 
 
+def _copy_fixture(tmp_path, trim, rows=None, total_matches=None):
+    import json
+
+    import duckdb
+
+    from evals.logan_fixture import EXTRAS_KEY, FIXTURE_DIR, load_fixture
+
+    src = load_fixture("logan_pfal_18s")
+    raw = json.loads((FIXTURE_DIR / "logan_pfal_18s.json").read_text())
+    extras = dict(raw[EXTRAS_KEY])
+    if trim is None:
+        extras.pop("trim", None)
+    else:
+        extras["trim"] = trim
+    raw[EXTRAS_KEY] = extras
+    if total_matches is not None:
+        raw["total_matches"] = total_matches
+    (tmp_path / "logan_pfal_18s.json").write_text(json.dumps(raw))
+    limit = f"LIMIT {rows}" if rows is not None else ""
+    con = duckdb.connect()
+    con.execute(
+        f"COPY (SELECT * FROM read_parquet('{src.parquet}') {limit}) "
+        f"TO '{tmp_path / extras['parquet']}' (FORMAT parquet)"
+    )
+    con.close()
+
+
+@pytest.mark.parametrize(
+    "trim, rows, total_matches, why",
+    [
+        (None, None, None, "no trim record"),
+        ({}, None, None, "lacks its row counts"),
+        ({"rows_kept": 17629}, None, None, "lacks its row counts"),
+        ({"rows_kept": 5000, "rows_total": 17629}, None, None, "trimmed"),
+        # Says whole, but the file was cut after the fact.
+        ({"rows_kept": 17629, "rows_total": 17629}, 100, None, "has 100 rows"),
+        # Whole file, but not the search's whole match set.
+        ({"rows_kept": 17629, "rows_total": 17629}, None, 20000, "matched 20000"),
+    ],
+)
+def test_a_fixture_that_cant_be_shown_whole_is_refused(
+    tmp_path, monkeypatch, trim, rows, total_matches, why
+):
+    import evals.datasets.logan_narrowing as ln
+    from evals.logan_fixture import load_fixture
+
+    _copy_fixture(tmp_path, trim, rows, total_matches)
+    monkeypatch.setattr(
+        ln, "load_fixture", lambda name: load_fixture(name, fixture_dir=tmp_path)
+    )
+    with pytest.raises(RuntimeError, match=why):
+        ln.require_whole_export()
+
+
 @pytest.mark.parametrize("case", _CASES, ids=[c["name"] for c in _CASES])
 def test_the_engine_agrees_with_plain_sql_on_every_expected_query(case):
     """Each case's expected filters, run through the engine under test, give
