@@ -373,8 +373,10 @@ def turn_note(
             "The server could not apply part of the user's request: no value in "
             "this search matches "
             + ", ".join(json.dumps(_safe(u)) for u in unresolved)
-            + ". Nothing was counted and the selection was not changed. Say so "
-            "and ask what they meant; do not report a count for it.",
+            + ". Nothing was counted"
+            # The cleared line below says what happened to the selection.
+            + ("" if transition.cleared else " and the selection was not changed")
+            + ". Say so and ask what they meant; do not report a count for it.",
         ]
     elif query is not None and result is not None:
         lines += _render_view(query, result, total_matches)
