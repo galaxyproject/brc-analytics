@@ -49,15 +49,25 @@ def test_load_fixture_splits_snapshot_from_extras(tmp_path):
     assert fx.extras["results"]["job_id"] == JOB
 
 
-def test_load_all_skips_bare_snapshots(tmp_path):
+def test_load_all_refuses_a_bare_snapshot(tmp_path):
     _write_fixture(tmp_path, "pf")
     (tmp_path / "old.json").write_text(json.dumps({"job_id": "x"}))
-    assert [f.name for f in load_all_fixtures(tmp_path)] == ["pf"]
+    with pytest.raises(ValueError, match="old.json"):
+        load_all_fixtures(tmp_path)
 
 
-def test_missing_parquet_reads_as_none(tmp_path):
+def test_a_fixture_without_an_export_has_no_parquet(tmp_path):
     _write_fixture(tmp_path, "pf", with_parquet=False)
     assert load_fixture("pf", tmp_path).parquet is None
+
+
+def test_a_named_export_that_is_missing_is_an_error(tmp_path):
+    # Read as "no export", the fixture would serve its 25 captured hits as the
+    # whole job.
+    _write_fixture(tmp_path, "pf")
+    (tmp_path / "pf.parquet").unlink()
+    with pytest.raises(FileNotFoundError, match="pf.parquet"):
+        load_fixture("pf", tmp_path)
 
 
 def test_fixture_galaxy_serves_known_jobs_and_misses_unknown(tmp_path):

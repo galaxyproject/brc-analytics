@@ -45,21 +45,22 @@ def load_fixture(name: str, fixture_dir: Path = FIXTURE_DIR) -> LoganFixture:
     parquet_name = extras.get("parquet")
     parquet = fixture_dir / parquet_name if parquet_name else None
     if parquet is not None and not parquet.is_file():
-        parquet = None
+        # Reading this as "no export" would quietly serve the 25 captured hits
+        # as the whole job.
+        raise FileNotFoundError(f"fixture {name!r} names a missing export {parquet}")
     return LoganFixture(name=name, snapshot=raw, extras=extras, parquet=parquet)
 
 
 def load_all_fixtures(fixture_dir: Path = FIXTURE_DIR) -> list[LoganFixture]:
-    """Every fixture in the directory that carries the extras key.
-
-    Older single-file snapshots (no `_fixture`) are skipped: they have no job
-    to serve.
-    """
+    """Every fixture in the directory. A JSON file without the extras key is
+    an error rather than skipped, so a hand-edited fixture can't drop out of
+    every run unnoticed."""
     out = []
     for path in sorted(fixture_dir.glob("*.json")):
         raw = json.loads(path.read_text())
-        if isinstance(raw, dict) and EXTRAS_KEY in raw:
-            out.append(load_fixture(path.stem, fixture_dir))
+        if not isinstance(raw, dict) or EXTRAS_KEY not in raw:
+            raise ValueError(f"{path.name} is not a Logan fixture (no {EXTRAS_KEY!r})")
+        out.append(load_fixture(path.stem, fixture_dir))
     return out
 
 
@@ -96,6 +97,7 @@ class FixtureGalaxy:
 
     def __init__(self, fixtures: list[LoganFixture]):
         self._by_job: dict[str, LoganFixture] = {}
+        self._by_name = {fx.name: fx for fx in fixtures}
         for fx in fixtures:
             if fx.job_id in self._by_job:
                 raise ValueError(
@@ -110,6 +112,14 @@ class FixtureGalaxy:
 
     def fixture_for(self, job_id: str) -> Optional[LoganFixture]:
         return self._by_job.get(job_id)
+
+    def fixture_named(self, name: str) -> LoganFixture:
+        """A case's fixture, from the set this stand-in serves -- so a case
+        can't open a session on a snapshot whose job it can't answer for."""
+        try:
+            return self._by_name[name]
+        except KeyError:
+            raise KeyError(f"no fixture named {name!r} is being served") from None
 
     async def get_job_status(self, job_id: str) -> Any:
         from app.models.galaxy import GalaxyJobStatus
@@ -151,11 +161,12 @@ class FixtureGalaxy:
         if len(hits) < limit and fx.parquet is not None:
             # Past a trimmed export's exact top rows the file is a sample, and
             # serving it as ranks would invent an order; stop there instead.
-            trim = fx.extras.get("trim") or {}
-            trimmed = trim.get("rows_kept") not in (None, trim.get("rows_total"))
+            # The capture writes "top" as the whole row count when it kept
+            # every row, so one rule covers both.
             end = offset + limit
-            if trimmed:
-                end = min(end, trim.get("top", 1000))
+            trim = fx.extras.get("trim")
+            if trim:
+                end = min(end, trim["top"])
             if end > start:
                 hits += _export_hits(fx.parquet, start, end - start)
         page["hits"] = hits

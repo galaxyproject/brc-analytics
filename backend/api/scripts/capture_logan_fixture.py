@@ -61,13 +61,18 @@ from pathlib import Path
 from typing import Any, Callable
 
 import duckdb
+import httpx
 
 API_ROOT = Path(__file__).resolve().parents[1]
 if str(API_ROOT) not in sys.path:
     sys.path.insert(0, str(API_ROOT))
 
-FIXTURE_DIR = API_ROOT / "evals" / "datasets" / "fixtures"
-EXTRAS_KEY = "_fixture"
+# Run as a script, so the API package is only importable after the path above.
+from app.models.galaxy import KmindexResults  # noqa: E402
+from app.models.logan import LoganSnapshot  # noqa: E402
+from app.services.logan_snapshot import build_logan_snapshot, clean_text  # noqa: E402
+from evals.logan_fixture import EXTRAS_KEY, FIXTURE_DIR  # noqa: E402
+
 TOP_HITS = 25
 DEFAULT_MAX_ROWS = 5000
 DEFAULT_TOP = 1000
@@ -247,8 +252,6 @@ def derive_no_mirror(fixture: dict) -> dict:
 
 
 def derive_injected(fixture: dict) -> dict:
-    from app.services.logan_snapshot import clean_text
-
     for text in (INJECTED_QUERY_NAME, INJECTED_ORGANISM):
         if clean_text(text) != text:
             raise ValueError(f"{text!r} would not survive clean_text unchanged")
@@ -328,8 +331,6 @@ def capture(
     top: int,
     max_bytes: int,
 ) -> tuple[Path, Path]:
-    import httpx
-
     api = f"{base_url.rstrip('/')}/api/v1/galaxy/kmindex/jobs/{job_id}"
     captured_at = datetime.now(timezone.utc).isoformat()
     with httpx.Client(timeout=120.0, follow_redirects=True) as client:
@@ -372,10 +373,6 @@ def assemble_fixture(
     """Build both fixture files beside each other in a temp dir, check them,
     and only then move them into `out_dir` -- so a failure anywhere leaves the
     existing pair untouched, never a new parquet beside an old JSON."""
-    from app.models.galaxy import KmindexResults
-    from app.models.logan import LoganSnapshot
-    from app.services.logan_snapshot import build_logan_snapshot
-
     with tempfile.TemporaryDirectory() as tmp:
         staged_parquet = Path(tmp) / f"{name}.parquet"
         trim = trim_export(raw_export, staged_parquet, max_rows=max_rows, top=top)
@@ -436,8 +433,6 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--derive needs --from <name> and one <new> name")
         src = json.loads((ns.out / f"{ns.source}.json").read_text())
         out = derive(src, ns.derive, ns.source)
-        from app.models.logan import LoganSnapshot
-
         LoganSnapshot.model_validate(out)
         path = ns.out / f"{ns.args[0]}.json"
         path.write_text(json.dumps(out, indent=1) + "\n")
