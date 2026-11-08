@@ -20,11 +20,14 @@ from pydantic_ai.messages import ModelResponse, ToolCallPart
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
 from app.models.assistant import AnalysisSchema
+from app.models.logan import LoganSnapshot
 from app.services.assistant_agent import AssistantAgent
+from app.services.logan_prompt import render_logan_instructions
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
+from evals.logan_fixture import FixtureGalaxy, load_all_fixtures
 from evals.model_registry import ModelEntry
 
 # AssistantAgent's eager init calls pydantic-ai with a model-name string when
@@ -507,10 +510,6 @@ def make_logan_conversation_task(
     Logan tools it has in production and every read they make is served from
     the fixtures -- no network, and an unknown job id is a cache miss.
     """
-    from app.models.logan import LoganSnapshot
-    from app.services.logan_prompt import render_logan_instructions
-    from evals.logan_fixture import FixtureGalaxy, load_all_fixtures
-
     if galaxy is None:
         galaxy = FixtureGalaxy(load_all_fixtures())
     aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror, galaxy=galaxy)

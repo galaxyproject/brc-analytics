@@ -22,6 +22,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+import duckdb
+
+from app.models.galaxy import GalaxyJobStatus, KmindexResults
+from app.services.kmindex_filters import _hit_from_row
+
 FIXTURE_DIR = Path(__file__).parent / "datasets" / "fixtures"
 EXTRAS_KEY = "_fixture"
 
@@ -66,10 +71,6 @@ def load_all_fixtures(fixture_dir: Path = FIXTURE_DIR) -> list[LoganFixture]:
 
 def _export_hits(parquet: Path, offset: int, limit: int) -> list[dict]:
     """Export rows offset..offset+limit, shaped as results-page hits."""
-    import duckdb
-
-    from app.services.kmindex_filters import _hit_from_row
-
     con = duckdb.connect()
     try:
         cur = con.execute(
@@ -122,8 +123,6 @@ class FixtureGalaxy:
             raise KeyError(f"no fixture named {name!r} is being served") from None
 
     async def get_job_status(self, job_id: str) -> Any:
-        from app.models.galaxy import GalaxyJobStatus
-
         self.calls.append(("get_job_status", job_id))
         now = datetime.now(timezone.utc).isoformat()
         # Every job the evals ask about has finished: a fixture is a finished
@@ -148,8 +147,6 @@ class FixtureGalaxy:
         trimmed export, exact through its top rows); a fixture without one
         has nothing past its captured hits.
         """
-        from app.models.galaxy import KmindexResults
-
         self.calls.append(("get_cached_kmindex_results", job_id))
         fx = self._by_job.get(job_id)
         if fx is None or not fx.extras.get("results"):
