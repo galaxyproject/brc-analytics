@@ -4,7 +4,7 @@ A fixture is a pair captured from a real deployment by
 `scripts/capture_logan_fixture.py`:
 
 - `<name>.json` -- the `LoganSnapshot` the assistant would build, with the raw
-  material later slices need under one extra key, `_fixture`, which the
+  results page and capture details under one extra key, `_fixture`, which the
   snapshot model ignores;
 - `<name>.parquet` (optional) -- the job's export parquet, trimmed.
 
