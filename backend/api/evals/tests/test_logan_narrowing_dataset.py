@@ -68,6 +68,20 @@ YEAR = LoganQueryShape(
 )
 
 
+def test_every_integer_field_folds_gt_into_gte():
+    for name in ("release_year", "mbases"):
+        assert canonical_filters([_f(name, "gt", 100)]) == canonical_filters(
+            [_f(name, "gte", 101)]
+        )
+        assert canonical_filters([_f(name, "lt", 100)]) == canonical_filters(
+            [_f(name, "lte", 99)]
+        )
+    # score is not a whole number: gt 0.9 is not gte 1.9.
+    assert canonical_filters([_f("score", "gt", 0.9)]) != canonical_filters(
+        [_f("score", "gte", 1.9)]
+    )
+
+
 def test_equivalent_spellings_agree():
     assert canonical_filters([_f("release_year", "gt", 2019)]) == canonical_filters(
         [_f("release_year", "gte", 2020)]
@@ -162,6 +176,9 @@ def test_an_unpaired_trace_falls_back_to_position_only_when_counts_agree():
     call = ("query_logan_hits", KENYA)
     assert shape.evaluate(_ctx(_Out(turns=[_Old([call], [OK])]))) == 1.0
     assert shape.evaluate(_ctx(_Out(turns=[_Old([call], [])]))) == 0.0
+    # Two calls, one return: it may be the other call's, so nothing counts.
+    other = ("search_organisms", {"query": "x"})
+    assert shape.evaluate(_ctx(_Out(turns=[_Old([call, other], [OK])]))) == 0.0
 
 
 def test_count_must_be_stated_as_a_run_total():
@@ -337,3 +354,62 @@ def test_context_counts_are_not_contradictions():
         ev.evaluate(_ctx(_WithContext(reply, context="Mozambique: 460 (2.6%)"))) == 1.0
     )
     assert ev.evaluate(_ctx(_WithContext(reply, context="nothing relevant"))) == 0.0
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "Plasmodium vivax runs released after 2019 are 42.",
+        "Of the Plasmodium vivax runs, those after 2019 were 42 in total.",
+        "42 Plasmodium vivax runs were released after 2019.",
+    ],
+)
+def test_the_users_own_number_before_a_verb_is_not_the_answer(reply):
+    # "after 2019 are 42" used to read as a claim of 2019, which was then a
+    # rival total; the claim is the number after the verb.
+    assert run_total_claims(reply, frozenset({2019})) == [42]
+    ev = _ReplyHasCount(expected=42, also_ok=[17629], said=[2019])
+    assert ev.evaluate(_ctx(_Out(reply))) == 1.0
+
+
+def test_a_wrong_answer_after_the_users_number_still_fails():
+    ev = _ReplyHasCount(expected=42, also_ok=[17629], said=[2019])
+    assert ev.evaluate(_ctx(_Out("Runs released after 2019 are 17,629."))) == 0.0
+    assert ev.evaluate(_ctx(_Out("Runs released after 2019 are 41."))) == 0.0
+
+
+def test_build_wires_each_case_to_its_truth_and_allowed_totals(monkeypatch):
+    import evals.datasets.logan_narrowing as ln
+    from evals.evaluators import NumbersTraceToContext
+    from evals.logan_fixture import load_fixture
+
+    monkeypatch.setattr(ln, "make_logan_conversation_task", lambda deps, entry: None)
+    dataset, _task, primary = ln.build(None, None, None)
+    assert primary == "LoganQueryShape"
+    total = load_fixture(ln.FIXTURE).snapshot["total_matches"]
+    by_name = {c.name: c for c in dataset.cases}
+    assert set(by_name) == {c["name"] for c in _CASES}
+    for spec in _CASES:
+        case = by_name[spec["name"]]
+        shape, count, numbers = case.evaluators
+        assert isinstance(shape, LoganQueryShape) and shape.expect == spec["expect"]
+        assert isinstance(numbers, NumbersTraceToContext)
+        assert isinstance(count, _ReplyHasCount)
+        assert count.expected == ground_truth(spec["truth"])
+        assert count.expected == case.metadata["expected_count"]
+        assert case.inputs == {"fixture": ln.FIXTURE, "turns": spec["turns"]}
+    follow = by_name["follow_up_narrows_selection"].evaluators[1]
+    assert follow.also_ok == [total, ground_truth("country = 'Thailand'")]
+    year = by_name["count_organism_year"].evaluators[1]
+    assert year.also_ok == [total] and year.said == [2019]
+
+
+def test_build_refuses_a_trimmed_fixture(monkeypatch):
+    import evals.datasets.logan_narrowing as ln
+
+    def trimmed(fixture=ln.FIXTURE):
+        raise RuntimeError("trimmed")
+
+    monkeypatch.setattr(ln, "require_whole_export", trimmed)
+    with pytest.raises(RuntimeError, match="trimmed"):
+        ln.build(None, None, None)

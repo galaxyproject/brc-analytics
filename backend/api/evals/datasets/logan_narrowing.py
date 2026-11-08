@@ -142,29 +142,33 @@ class LoganQueryShape(Evaluator):
 
 # A run total as people write one: "181 runs", "181 matching runs", "runs: 181".
 _RUN_WORD = r"(?:runs?|matches|matching runs|results|samples|accessions)"
+_NUM = r"(?<![\w.%])(\d+)"
+# "181 of the 231", "7,744 out of 17,629": a claim of the first number.
+_OF = _NUM + r"\s+(?:out\s+)?of\s+(?:the\s+|these\s+|those\s+)?\d+"
+
+
+def _verb(words: str) -> str:
+    """ "181 are WGS". When the number before the verb is one the user said
+    ("released after 2019 are 42"), the claim is the number after it, so
+    that one is captured too."""
+    return (
+        rf"(?<![\w.%])(?P<before>\d+)\s+(?:{words})\b"
+        r"(?:\s+(?P<after>\d+)(?![\w%]|\.\d))?"
+    )
+
+
 # Up to three words between the number and the noun ("181 WGS runs", "5
-# Plasmodium vivax runs"); "181 of the 231", "7,744 out of 17,629" and "181
-# are WGS" are claims of their first number.
+# Plasmodium vivax runs").
 _TOTAL_CLAIM = re.compile(
-    rf"(?<![\w.%])(\d+)\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?{_RUN_WORD}\b"
-    rf"|\b{_RUN_WORD}\s*(?:matched|matching|found|total)?\s*[:=]\s*(\d+)(?![\w.%])"
-    r"|(?<![\w.%])(\d+)\s+(?:out\s+)?of\s+(?:the\s+|these\s+|those\s+)?\d+"
-    r"|(?<![\w.%])(\d+)\s+(?:are|were|is|match|matched)\b"
+    rf"{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?{_RUN_WORD}\b"
+    rf"|\b{_RUN_WORD}\s*(?:matched|matching|found|total)?\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
+    rf"|{_OF}"
+    rf"|{_verb('are|were|is|match|matched')}"
 )
 _ZERO_CLAIM = re.compile(
     rf"\b(?:no|zero|none of the)\s+(?:\w+\s+){{0,3}}?{_RUN_WORD}\b"
     rf"|\bno\s+(?:\w+\s+){{0,3}}?(?:match|matches)\b"
 )
-
-
-def run_total_claims(reply: str) -> list[int]:
-    """Every run total the reply states, in order."""
-    text = normalize_numbers(reply or "").replace("*", "").replace("_", " ")
-    claims = []
-    for m in _TOTAL_CLAIM.finditer(text):
-        claims.append(int(next(g for g in m.groups() if g is not None)))
-    return claims
-
 
 # A total stated as the answer -- the count of runs that match -- rather than
 # as a reference point beside it: "181 of the 231", "7,744 out of 17,629",
@@ -172,11 +176,11 @@ def run_total_claims(reply: str) -> list[int]:
 # "matched" and "results" are left out: replies use them for the search's own
 # total ("17,629 matched runs", "in your search results").
 _ANSWER_CLAIM = re.compile(
-    r"(?<![\w.%])(\d+)\s+(?:out\s+)?of\s+(?:the\s+|these\s+|those\s+)?\d+"
-    r"|(?<![\w.%])(\d+)\s+(?:are|were|match)\b"
-    r"|(?<![\w.%])(\d+)\s+(?:[A-Za-z][\w.-]*\s+){0,3}?matching\s+runs?\b"
-    r"|(?<![\w.%])(\d+)\s+(?:[A-Za-z][\w.-]*\s+){0,3}?runs?\s+match\b"
-    r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w.%])"
+    rf"{_OF}"
+    rf"|{_verb('are|were|match')}"
+    rf"|{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?matching\s+runs?\b"
+    rf"|{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?runs?\s+match\b"
+    r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
 )
 # "all 460 are WGS", "of the 999 matching runs": a group the answer is set
 # against, not the answer.
@@ -185,15 +189,38 @@ _REFERENCE_BEFORE = re.compile(
 )
 
 
-def answer_claims(reply: str) -> list[int]:
-    """The run totals the reply states as the matching count, in order."""
-    text = normalize_numbers(reply or "").replace("*", "").replace("_", " ")
+def _plain(reply: str) -> str:
+    return normalize_numbers(reply or "").replace("*", "").replace("_", " ")
+
+
+def _claims(
+    pattern: re.Pattern, reply: str, said: frozenset[int], skip_references: bool
+) -> list[int]:
+    text = _plain(reply)
     claims = []
-    for m in _ANSWER_CLAIM.finditer(text):
-        if _REFERENCE_BEFORE.search(text[: m.start()]):
+    for m in pattern.finditer(text):
+        if skip_references and _REFERENCE_BEFORE.search(text[: m.start()]):
+            continue
+        before = m.group("before")
+        if before is not None and int(before) in said:
+            # The user's own number before the verb: the claim, if any, is
+            # the one after it.
+            if m.group("after") is not None:
+                claims.append(int(m.group("after")))
             continue
         claims.append(int(next(g for g in m.groups() if g is not None)))
     return claims
+
+
+def run_total_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
+    """Every run total the reply states, in order. `said` holds the numbers
+    the user's own messages contain."""
+    return _claims(_TOTAL_CLAIM, reply, said, skip_references=False)
+
+
+def answer_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
+    """The run totals the reply states as the matching count, in order."""
+    return _claims(_ANSWER_CLAIM, reply, said, skip_references=True)
 
 
 def _context_counts(context: str) -> set[int]:
@@ -209,21 +236,24 @@ def _context_counts(context: str) -> set[int]:
 class _ReplyHasCount(Evaluator):
     """1.0 if the reply states the expected count as a run total (or, for
     zero, says there are none) and states no other total -- except ones the
-    case allows (the selection's own size, the search's total, numbers the
-    user said) and whole numbers the model's context holds ("Mozambique has
+    case allows (the selection's own size, the search's total), numbers the
+    user said, and whole numbers the model's context holds ("Mozambique has
     460 runs"). The last means a wrong total that happens to equal some count
     in the context passes this check; the shape check still catches the
     query behind it."""
 
     expected: int = 0
     also_ok: list[int] = field(default_factory=list)
+    said: list[int] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
         reply = getattr(ctx.output, "reply", "") or ""
-        claims = run_total_claims(reply)
+        said = frozenset(self.said)
+        claims = run_total_claims(reply, said)
         allowed = {
             self.expected,
             *self.also_ok,
+            *said,
             *_context_counts(getattr(ctx.output, "context", "") or ""),
         }
         if any(c not in allowed for c in claims):
@@ -231,15 +261,15 @@ class _ReplyHasCount(Evaluator):
         # The search's total or a selection's size is fine beside the answer,
         # not as it: "42 runs were expected; actually 999 matching runs".
         # Only those: a breakdown beside the answer ("181 are WGS and 279 are
-        # WGA") is held to the rule above, not to this one.
+        # WGA") is held to the rule above, and a number the user said is
+        # theirs to repeat.
         others = set(self.also_ok) - {self.expected}
-        if any(c in others for c in answer_claims(reply)):
+        if any(c in others for c in answer_claims(reply, said)):
             return 0.0
         if self.expected in claims:
             return 1.0
         if self.expected == 0:
-            text = normalize_numbers(reply).lower().replace("*", "")
-            return 1.0 if _ZERO_CLAIM.search(text) else 0.0
+            return 1.0 if _ZERO_CLAIM.search(_plain(reply).lower()) else 0.0
         return 0.0
 
 
@@ -396,13 +426,21 @@ def require_whole_export(fixture: str = FIXTURE) -> None:
 
 def allowed_totals(case: dict, total_matches: int) -> list[int]:
     """Run totals a correct reply may quote besides the answer: the search's
-    total, a selection's size, and numbers the user said."""
+    total and a selection's size."""
     ok = [total_matches]
     if case.get("selection_truth"):
         ok.append(ground_truth(case["selection_truth"]))
-    for turn in case["turns"]:
-        ok += [int(n) for n in re.findall(r"(?<![\w.])\d+(?![\w.])", turn)]
     return ok
+
+
+def user_numbers(case: dict) -> list[int]:
+    """Whole numbers in the user's messages ("after 2019"), which a reply may
+    repeat without claiming them as a total."""
+    return [
+        int(n)
+        for turn in case["turns"]
+        for n in re.findall(r"(?<![\w.])\d+(?![\w.])", turn)
+    ]
 
 
 def build(
@@ -419,7 +457,11 @@ def build(
         expected = ground_truth(c["truth"])
         evaluators: list[Evaluator] = [
             LoganQueryShape(expect=c["expect"]),
-            _ReplyHasCount(expected=expected, also_ok=allowed_totals(c, total_matches)),
+            _ReplyHasCount(
+                expected=expected,
+                also_ok=allowed_totals(c, total_matches),
+                said=user_numbers(c),
+            ),
             NumbersTraceToContext(),
         ]
         cases.append(
