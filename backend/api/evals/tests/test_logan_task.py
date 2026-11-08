@@ -124,15 +124,13 @@ def test_turn_slice_starts_at_the_last_user_prompt():
     ]
     turn = _turn_messages(history)
     assert len(turn) == 3
-    instructions, calls, returns = _trace_parts(turn)
+    instructions, calls, returns, _ = _trace_parts(turn)
     assert instructions == "SECOND"
     assert calls == [("t", {"a": 1}), ("u", {"_raw": "not json"})]
     assert returns == ['{"total": 3}']
 
 
 def test_each_call_is_paired_with_its_own_return():
-    from evals.tasks import _call_returns
-
     turn = [
         {
             "kind": "response",
@@ -152,7 +150,7 @@ def test_each_call_is_paired_with_its_own_return():
             ],
         },
     ]
-    assert _call_returns(turn) == ['{"n": 1}', None, "C"]
+    assert _trace_parts(turn).call_returns == ['{"n": 1}', None, "C"]
 
 
 def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):

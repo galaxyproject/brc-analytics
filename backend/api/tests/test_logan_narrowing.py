@@ -14,22 +14,10 @@ import json
 import pytest
 
 from app.core.config import get_settings
+from evals.datasets.logan_narrowing import ground_truth as _count
 from evals.logan_fixture import FixtureGalaxy, load_all_fixtures, load_fixture
 
 F1 = "logan_pfal_18s"
-
-
-def _count(where: str) -> int:
-    import duckdb
-
-    con = duckdb.connect()
-    try:
-        return con.execute(
-            f"SELECT count(*) FROM read_parquet(?) WHERE {where}",
-            [str(load_fixture(F1).parquet)],
-        ).fetchone()[0]
-    finally:
-        con.close()
 
 
 class _Script:
