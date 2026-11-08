@@ -1,15 +1,12 @@
 import { type LinkProps } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { hcl, hsl, rgb } from "d3-color";
 import { interpolateLab } from "d3-interpolate";
+import { LABEL_COLOR } from "./constants";
 import { type ArcCoords, type TreeNode } from "./types";
 
-const TAU = 2 * Math.PI;
+export { LABEL_COLOR };
 
-/**
- * Dark text used for every arc label. One colour reads as one layer; the
- * palette below is tuned so it never has to flip to white.
- */
-export const LABEL_COLOR = "#212B36";
+const TAU = 2 * Math.PI;
 
 /**
  * First-ring colours, handed out largest arc first: muted natural tones,

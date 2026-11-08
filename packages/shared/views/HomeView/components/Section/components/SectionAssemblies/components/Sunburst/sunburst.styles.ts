@@ -3,6 +3,7 @@ import { PALETTE } from "@databiosphere/findable-ui/lib/styles/common/constants/
 import { SHADOWS } from "@databiosphere/findable-ui/lib/styles/common/constants/shadows";
 import { bpDown1024 } from "@databiosphere/findable-ui/lib/styles/common/mixins/breakpoints";
 import styled from "@emotion/styled";
+import { LABEL_COLOR } from "./constants";
 
 export const Layout = styled.div`
   align-items: start;
@@ -59,7 +60,7 @@ export const ChartFrame = styled.div`
 
   path:focus-visible,
   circle:focus-visible {
-    stroke: ${PALETTE.PRIMARY_MAIN};
+    stroke: ${LABEL_COLOR};
     stroke-width: 3px;
   }
 `;
