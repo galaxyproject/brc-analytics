@@ -769,10 +769,17 @@ def create_logan_view(con, parquet: Path) -> None:
     """Register the job's export on `con` as the `logan_hit` view, after
     checking it is the shape declared above.
 
-    @raises LoganExportMismatch: when the file is not that shape, which is a
-        writer change to fix, not something to answer around.
+    @raises LoganExportMismatch: when the file can't be read, or is not that
+        shape -- a writer change to fix, not something to answer around.
     """
-    rel = con.read_parquet(str(parquet))
+    import duckdb
+
+    try:
+        rel = con.read_parquet(str(parquet))
+    except duckdb.Error as e:
+        # A truncated or corrupt file can no more be counted than a
+        # wrong-shaped one, and retrying with another filter won't help.
+        raise LoganExportMismatch(f"export can't be read: {e}") from e
     coltypes = {
         name: str(kind).upper()
         for name, kind in zip(rel.columns, rel.types, strict=True)
