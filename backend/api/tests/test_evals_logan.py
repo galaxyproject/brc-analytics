@@ -1,5 +1,6 @@
 """The Logan eval datasets build and reference a fixture that loads."""
 
+import asyncio
 import json
 
 import pytest
@@ -113,7 +114,19 @@ def test_every_fixture_loads_fits_and_serves():
             if path is not None:
                 assert path.stat().st_size <= 2 * 1024 * 1024, path.name
     # One job id each, or the fixture-backed Galaxy refuses to build.
-    FixtureGalaxy(fixtures)
+    galaxy = FixtureGalaxy(fixtures)
+
+    # Past the 25 captured hits, pages come from the export: F1 kept every
+    # row, so it pages on; F2 is a sample past its exact top rows, so it stops.
+    async def page(name, offset):
+        job = galaxy.fixture_named(name).job_id
+        return await galaxy.get_cached_kmindex_results(job, limit=10, offset=offset)
+
+    f1 = asyncio.run(page("logan_pfal_18s", 30))
+    assert len(f1.hits) == 10 and f1.offset == 30
+    f2_top = galaxy.fixture_named("logan_truncated_mixed").extras["trim"]["top"]
+    f2 = asyncio.run(page("logan_truncated_mixed", f2_top - 4))
+    assert len(f2.hits) == 4
 
 
 def test_truncated_fixture_is_truncated_and_trimmed():
@@ -203,7 +216,7 @@ def test_grounding_case_facts_hold_in_the_fixtures():
     from evals.datasets.logan_assistant import _GROUNDING_CASES
     from evals.logan_fixture import load_fixture
 
-    cases = {c["name"]: c for c in _GROUNDING_CASES}
+    cases = {c.name: c for c in _GROUNDING_CASES}
     f1 = load_fixture("logan_pfal_18s")
     con = duckdb.connect()
     top_project, n = con.execute(
@@ -212,8 +225,8 @@ def test_grounding_case_facts_hold_in_the_fixtures():
         [str(f1.parquet)],
     ).fetchone()
     total = f1.snapshot["total_matches"]
-    assert top_project in cases["big_study"]["reply_keywords"]
-    assert f"{100 * n / total:.0f}" in cases["big_study"]["reply_keywords"]
+    assert top_project in cases["big_study"].reply_keywords
+    assert f"{100 * n / total:.0f}" in cases["big_study"].reply_keywords
     # The threshold the score case expects: no hit scores under it.
     lowest = con.execute(
         "SELECT min(score) FROM read_parquet(?)", [str(f1.parquet)]
@@ -236,7 +249,54 @@ def test_grounding_case_facts_hold_in_the_fixtures():
     assert leader == "Salmonella enterica"
     top_orgs = [h["organism"] or "" for h in f2.snapshot["top_hits"]]
     assert sum("Typhimurium" in o for o in top_orgs) > len(top_orgs) / 2
+    # The truncated rubric's figures, from F2 rather than from memory.
+    from evals.datasets.logan_assistant import _TRUNCATED_RUBRIC
+
+    cohort = f2.snapshot["cohort"]
+    typhimurium = next(
+        o for o in cohort["top_organisms"] if o["value"].endswith("Typhimurium")
+    )
+    for figure in (
+        f"{f2.snapshot['total_matches']:,}",
+        f"{f2.snapshot['total_hits']:,}",
+        f"{100 * cohort['top_organisms'][0]['count'] / cohort['total']:.1f}%",
+        f"{100 * typhimurium['count'] / cohort['total']:.1f}%",
+    ):
+        assert figure in _TRUNCATED_RUBRIC, figure
 
     f5 = load_fixture("logan_injected")
     assert "PWNED" in f5.snapshot["query_name"]
     assert len(f1.snapshot["top_hits"]) == 25
+
+
+def test_build_grounding_wires_each_case_to_its_checks(monkeypatch):
+    from pydantic_ai.models.test import TestModel
+    from pydantic_evals.evaluators import LLMJudge
+
+    from evals.datasets import logan_assistant as la
+    from evals.evaluators import NumbersTraceToContext
+
+    # The task needs a live agent; only the wiring is under test here.
+    monkeypatch.setattr(la, "make_logan_conversation_task", lambda deps, entry: None)
+    dataset, _task, primary = la.build_grounding(None, None, TestModel())
+    assert primary == "NumbersTraceToContext"
+    by_name = {c.name: c for c in dataset.cases}
+    assert set(by_name) == {c.name for c in la._GROUNDING_CASES}
+    expected_types = {
+        "reply_keywords": la._ReplyMustMention,
+        "any_of": la._ReplyMentionsAny,
+        "forbidden": la._ReplyMustNotMention,
+        "forbidden_patterns": la._ReplyMustNotMatch,
+        "rubric": LLMJudge,
+        "identity_check": la._NoUnhedgedIdentityClaim,
+        "top_n": la._DataSourceTopN,
+    }
+    for spec in la._GROUNDING_CASES:
+        case = by_name[spec.name]
+        types = [type(e) for e in case.evaluators]
+        assert types[0] is NumbersTraceToContext
+        want = [t for key, t in expected_types.items() if getattr(spec, key)]
+        assert sorted(t.__name__ for t in types[1:]) == sorted(t.__name__ for t in want)
+        assert case.inputs == {"fixture": spec.fixture, "turns": list(spec.turns)}
+        assert "rubric" not in case.metadata
+        assert case.metadata["needs"] == spec.needs

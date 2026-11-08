@@ -262,9 +262,8 @@ def _sig_round(value: float, digits: int) -> float:
 
 
 def _significant_digits(n: _Num) -> int:
-    """Digits a large count was stated to: 17,600 -> 3, 17,629 -> 5."""
-    if n.decimals:
-        return len(f"{n.value:.{n.decimals}f}".replace(".", "").lstrip("0"))
+    """Digits a large count was stated to: 17,600 -> 3, 17,629 -> 5. Only
+    whole counts reach here; 17.6k arrives already scaled to 17,600."""
     return len(str(int(n.value)).rstrip("0")) or 1
 
 

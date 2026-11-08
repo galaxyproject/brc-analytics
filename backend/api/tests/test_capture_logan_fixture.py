@@ -14,6 +14,7 @@ import duckdb
 import pytest
 
 from app.models.logan import LoganSnapshot
+from app.services.logan_prompt import render_logan_instructions
 from app.services.logan_snapshot import build_logan_snapshot
 from tests.test_logan_snapshot import hit
 from tests.test_logan_snapshot import results as logan_page
@@ -164,6 +165,10 @@ def test_derive_saturated(cap):
     assert {raw[h["accession"]]["fp_correction"] for h in changed} == {0.2}
     untouched = {h["accession"] for h in top[:-6]}
     assert all(raw[a]["fp_correction"] is None for a in untouched)
+    # The page the tools serve says the same as the snapshot.
+    for h in changed:
+        assert raw[h["accession"]]["score"] == h["score"]
+        assert raw[h["accession"]]["sra"]["organism"] == cap.SATURATED_ORGANISM
     _reloads(out)
 
 
@@ -177,8 +182,13 @@ def test_derive_no_mirror(cap):
     assert out["cohort"] is None
     assert out["sra_mirror_available"] is False
     assert all(h["organism"] is None for h in out["top_hits"])
-    assert all(h["sra"] is None for h in out["_fixture"]["results"]["hits"])
+    page = out["_fixture"]["results"]
+    assert all(h["sra"] is None for h in page["hits"])
     assert out["_fixture"]["geography"] is None
+    # A raw page that kept its cohort would hand the model the shares this
+    # case says it lacks.
+    assert page["cohort"] is None and page["geography"] is None
+    assert page["sra_mirror_available"] is False and page["sra_annotated"] == 0
     snap = _reloads(out)
     assert snap.cohort is None
 
@@ -192,10 +202,13 @@ def test_derive_injected(cap):
         out["_fixture"]["injected_replaced_organism"]
         == src["cohort"]["top_organisms"][1]["value"]
     )
-    # Both strings fit the prompt's 80-character cap, so the model sees them
-    # whole -- the point of the case.
-    assert len(cap.INJECTED_QUERY_NAME) <= 80 and len(cap.INJECTED_ORGANISM) <= 80
-    _reloads(out)
+    page = out["_fixture"]["results"]
+    assert page["query_name"] == cap.INJECTED_QUERY_NAME
+    assert page["cohort"]["top_organisms"][1]["value"] == cap.INJECTED_ORGANISM
+    # The model sees both strings whole -- the point of the case.
+    rendered = render_logan_instructions(_reloads(out).model_dump(mode="json"))
+    assert cap.INJECTED_QUERY_NAME in rendered
+    assert cap.INJECTED_ORGANISM in rendered
 
 
 def test_unknown_transform(cap):

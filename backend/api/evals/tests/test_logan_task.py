@@ -98,7 +98,11 @@ def test_fixture_galaxy_refuses_two_fixtures_for_one_job():
 
 def test_turn_slice_starts_at_the_last_user_prompt():
     history = [
-        {"kind": "request", "parts": [{"part_kind": "user-prompt"}]},
+        {
+            "kind": "request",
+            "instructions": "FIRST",
+            "parts": [{"part_kind": "user-prompt"}],
+        },
         {"kind": "response", "parts": [{"part_kind": "text"}]},
         {
             "kind": "request",
@@ -114,7 +118,7 @@ def test_turn_slice_starts_at_the_last_user_prompt():
         },
         {
             "kind": "request",
-            "instructions": "SECOND",
+            "instructions": "THIRD",
             "parts": [{"part_kind": "tool-return", "content": {"total": 3}}],
         },
     ]
@@ -161,9 +165,10 @@ def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
         settings=get_settings(), cache=tasks_mod._make_cache(), catalog=None
     )
     task = tasks_mod.make_logan_conversation_task(deps, entry=None, galaxy=galaxy)
-    snapshot = load_fixture("pf", tmp_path).snapshot
     try:
-        out = asyncio.run(task({"snapshot": snapshot, "turns": ["What is this?"]}))
+        # By name: the fixture resolves through the galaxy the task was given,
+        # not through the committed fixture directory.
+        out = asyncio.run(task({"fixture": "pf", "turns": ["What is this?"]}))
     finally:
         get_settings.cache_clear()
 
@@ -174,6 +179,11 @@ def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
     assert turn.message == "What is this?"
     assert '"status": "expired"' in turn.tool_returns[0]
     assert turn.latency_s >= 0
+    # The context the numbers check reads holds each turn's instructions and
+    # every tool return, not just the fallback re-render.
+    assert "## Logan search context" in turn.instructions
+    assert "## Logan search context" in out.context
+    assert '"status": "expired"' in out.context
     # The intro (the session's first message) and the user's words are context.
     assert "This Logan search" in out.context
     assert "What is this?" in out.context

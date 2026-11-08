@@ -636,3 +636,36 @@ def test_a_round_count_states_its_leading_digits():
     # One digit is still too few: 9,000 is not 10,212 to two.
     assert _trace("About 9,000 runs.", "10,212 runs") == 0.0
     assert _trace("About 10,000 runs.", "10,712 runs") == 0.0
+
+
+def test_an_unsigned_decimal_traces_to_a_percentage_within_the_band():
+    assert _trace("P. falciparum is 82.1 of every hundred runs.") == 1.0
+    assert _trace("P. falciparum is 82.0 of every hundred runs.") == 1.0
+    assert _trace("P. falciparum is 82.3 of every hundred runs.") == 0.0
+
+
+def test_a_bare_count_never_traces_to_a_decimal():
+    # 3 and 3.0 are equal, but a context decimal is a measurement, not a count.
+    assert _trace("3 runs.", "a score of 3.0") == 0.0
+    assert _trace("3 runs.", "3 runs") == 1.0
+
+
+def test_small_counts_must_be_exact():
+    # Leading-digit rounding is for large counts only: 900 is not 912.
+    assert _trace("About 900 runs.", "912 runs") == 0.0
+    assert _trace("About 9,100 runs.", "9,120 runs") == 1.0
+
+
+def test_millions_scale_before_they_trace():
+    assert _trace("About 1.1M runs.", "1,123,456 runs") == 1.0
+    assert _trace("About 1.1 million runs.", "1,123,456 runs") == 1.0
+    assert _trace("About 2 million runs.", "2,000,000 runs") == 1.0
+    assert _trace("About 1.2M runs.", "1,123,456 runs") == 0.0
+
+
+def test_a_job_id_is_not_a_number():
+    assert extract_numbers("job 0123456789abcdef and job fe6f66a714dcbec8") == []
+    # Sixteen decimal digits are a number, not an id.
+    assert [n.value for n in extract_numbers("1234567890123456")] == [
+        1234567890123456.0
+    ]

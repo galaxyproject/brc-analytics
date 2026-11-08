@@ -502,14 +502,16 @@ def make_logan_conversation_task(
     """Replay a scripted conversation inside a session opened from a Logan
     snapshot fixture, and report the final state plus a per-turn trace.
 
-    The snapshot is injected, not fetched. `galaxy` is a fixture-backed stand-in
+    The snapshot is injected, not fetched: a case names its fixture, and the
+    snapshot comes from the same `galaxy` that serves the job's reads.
+    `galaxy` is a fixture-backed stand-in
     (evals.logan_fixture.FixtureGalaxy) by default, so the session has the same
     Logan tools it has in production and every read they make is served from
     the fixtures -- no network, and an unknown job id is a cache miss.
     """
     from app.models.logan import LoganSnapshot
     from app.services.logan_prompt import render_logan_instructions
-    from evals.logan_fixture import FixtureGalaxy, load_all_fixtures, load_fixture
+    from evals.logan_fixture import FixtureGalaxy, load_all_fixtures
 
     if galaxy is None:
         galaxy = FixtureGalaxy(load_all_fixtures())
@@ -517,11 +519,8 @@ def make_logan_conversation_task(
     _prepare_service(aa, entry)
 
     async def task(case_input: dict) -> LoganConversationOutput:
-        if "fixture" in case_input:
-            raw_snapshot = load_fixture(case_input["fixture"]).snapshot
-        else:
-            raw_snapshot = case_input["snapshot"]
-        snapshot = LoganSnapshot.model_validate(raw_snapshot)
+        fixture = galaxy.fixture_named(case_input["fixture"])
+        snapshot = LoganSnapshot.model_validate(fixture.snapshot)
         state = await aa.create_logan_session_from_snapshot(snapshot, None)
         session_id = state.session_id
         intro = state.messages[0].content if state.messages else ""
