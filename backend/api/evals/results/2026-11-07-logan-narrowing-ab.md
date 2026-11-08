@@ -1,7 +1,7 @@
 # Logan narrowing: tool vs pre-reply extractor (2026-11-07)
 
-The question phase 2 has to settle before slice B: when a user asks about a
-subset of a Logan search ("how many of the Thai runs are WGS?"), does the
+The question to settle before building chat narrowing into Logan sessions:
+when a user asks about a subset of a Logan search ("how many of the Thai runs are WGS?"), does the
 turn get its filter from a tool the model calls (`LOGAN_NARROWING_MODE=tool`,
 `query_logan_hits`) or from a tool-less pass the server runs before the reply
 (`extract`)? Both share one engine (the `logan_hit` entity over the cached
@@ -14,6 +14,12 @@ runs**, with no failed runs. Extract was exactly as accurate whenever its
 pre-reply pass finished, and wrong whenever its 12 s cap cut the pass off --
 which on TACC it did on about a third of turns in both of its runs.
 
+The extract arm was removed after this result: `LOGAN_NARROWING_MODE` is now
+`off` (the default) or `tool`, and any other value reads as `off`. This page
+and its per-run reports stay as the record of why. The extract rows below are
+as they were scored at the time; the scorers that read its pass and its stored
+selection went with it.
+
 ## Scoring
 
 The first version of these scorers accepted wrong answers (a review found
@@ -23,25 +29,29 @@ and any number anywhere in the reply passed as the count. They now require:
 - **Shape:** the last query that answered the last turn has exactly the
   expected filters. That is its last `query_logan_hits` call whose own return
   holds a count (a call that errored, found no cached export or failed
-  validation is skipped), or else the extractor's query when the pass counted
-  and applied it (not when it timed out, errored or stopped on a value it
-  couldn't resolve). A turn with neither scores 0. Nothing missing, nothing
+  validation is skipped); for extract it was the pass's query when the pass
+  counted and applied it (not when it timed out, errored or stopped on a value
+  it couldn't resolve). A turn with neither scores 0. Nothing missing, nothing
   extra. `eq x` and `in [x]` agree, as do `gt 2019` and `gte 2020` on
   whole-number fields.
 - **Count:** the reply states the ground-truth count as a run total ("181
   runs", "181 of the 231", "181 are WGS"), and states no other total except
-  the search's, a selection's, a number the user said, or a count the model's
-  context holds -- and those only as the group the answer is drawn from ("of
-  the 17,629"), never as the matching count itself ("actually 999 matching
-  runs" fails even when 999 is the search's total). For zero, "no ... runs"
-  counts, but only without a contradicting total.
+  the search's, a selection's, or a count the model's context holds -- the
+  first two only as the group the answer is drawn from ("of the 17,629"),
+  never as the matching count itself ("actually 999 matching runs" fails even
+  when 999 is the search's total). A number the user said may be repeated, and
+  when it stands before the verb ("released after 2019 are 42") the claim is
+  the number after it. For zero, "no ... runs" counts, but only without a
+  contradicting total.
 - **Selection** (extract only): the stored selection's filters are exactly
   the expected ones.
 
 Every number below is from the per-case `--dump-dir` dumps, re-scored with
 those scorers; a failed run counts 0 on every score. A second review pass
 tightened the shape and count rules as described above; re-scoring every
-dump with that version changed no score. The dumps predate per-call return
+dump with that version changed no score, and neither did a third (the user's
+number before a verb, a total that ends a sentence): the tool rows were
+re-scored with it and every cell is as shown. The dumps predate per-call return
 pairing, so their calls are paired with returns by position, which holds
 because `query_logan_hits` was the only tool any of these turns called (every
 turn has as many returns as calls). The runner's own tables
@@ -113,9 +123,9 @@ tool. MiniMax called `query_logan_hits` on every run that completed, in both
 tool runs, including the misspelt "Kenia" (it used Kenya), the follow-up that
 keeps the selection, the explicit clear and the whole-search question.
 
-For slice C: the tool keeps no selection. "Set up variant calling on those"
-needs the session to remember the last query the tool ran, which extract did
-by construction.
+For handing a subset to a workflow next: the tool keeps no selection. "Set up
+variant calling on those" needs the session to remember the last query the
+tool ran, which extract did by construction.
 
 ## Cost
 
@@ -126,3 +136,12 @@ by construction.
 | re-run, MiniMax tool x5               | 199        | 512 s          |
 | re-run, MiniMax extract x5            | 170        | 2,512 s        |
 | abandoned attempts (endpoint stalled) | 220        | about 25 min   |
+
+To run the A/B's tool arm again, with each run's dump named for its mode:
+
+```bash
+cd backend/api
+LOGAN_NARROWING_MODE=tool python -m evals.run_evals --datasets logan_narrowing \
+  --models MiniMax-M2.7 --repeat 5 --max-concurrency 6 \
+  --dump-dir /tmp/narrowing --label tool
+```
