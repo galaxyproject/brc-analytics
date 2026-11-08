@@ -55,7 +55,12 @@ def test_write_dump_keeps_outputs_and_drops_the_snapshot(tmp_path):
     out = _Out(
         reply="17,629 runs",
         session_metadata={
-            "logan": {"job_id": "x", "top_hits": [1, 2], "selection": {"n": 3}},
+            "logan": {
+                "job_id": "x",
+                "top_hits": [1, 2],
+                "cohort": {"total": 3},
+                "added_by_a_turn": {"n": 3},
+            },
             "turn_count": 1,
         },
     )
@@ -72,28 +77,33 @@ def test_write_dump_keeps_outputs_and_drops_the_snapshot(tmp_path):
         failures=[SimpleNamespace(name="d", error_message="boom")],
     )
     path = tmp_path / "x.jsonl"
-    write_dump(path, report)
+    write_dump(path, report, label="v2")
     first, second = [json.loads(line) for line in path.read_text().splitlines()]
     assert first["case"] == "c [1/2]"
+    assert first["label"] == "v2"
     assert first["scores"] == {"NumbersTraceToContext": 0.5}
     assert first["output"]["reply"] == "17,629 runs"
-    assert first["output"]["session_metadata"]["logan"] == {"selection": {"n": 3}}
+    # The snapshot's own fields go, by name; the job id and anything else stay.
+    assert first["output"]["session_metadata"]["logan"] == {
+        "job_id": "x",
+        "added_by_a_turn": {"n": 3},
+    }
     assert first["output"]["session_metadata"]["turn_count"] == 1
-    assert second == {"case": "d", "mode": "off", "error": "boom"}
-    assert first["mode"] == "off"
+    assert second == {"case": "d", "label": "v2", "error": "boom"}
 
 
-def test_dump_paths_name_the_mode_and_never_overwrite(tmp_path, monkeypatch):
+def test_dump_paths_carry_the_label_and_never_overwrite(tmp_path):
     from evals.run_evals import dump_path
 
-    monkeypatch.setenv("LOGAN_NARROWING_MODE", "tool")
-    first = dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7")
-    assert first.name == "logan_narrowing@MiniMax-M2.7@tool.jsonl"
-    first.write_text("")
-    assert dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7").name == (
-        "logan_narrowing@MiniMax-M2.7@tool.2.jsonl"
+    assert dump_path(tmp_path, "logan_grounding", "m", None).name == (
+        "logan_grounding@m.jsonl"
     )
-    monkeypatch.setenv("LOGAN_NARROWING_MODE", "extract")
-    assert dump_path(tmp_path, "logan_narrowing", "MiniMax-M2.7").name == (
-        "logan_narrowing@MiniMax-M2.7@extract.jsonl"
+    first = dump_path(tmp_path, "logan_grounding", "m", "v1")
+    assert first.name == "logan_grounding@m@v1.jsonl"
+    first.write_text("")
+    assert dump_path(tmp_path, "logan_grounding", "m", "v1").name == (
+        "logan_grounding@m@v1.2.jsonl"
+    )
+    assert dump_path(tmp_path, "logan_grounding", "m", "v2").name == (
+        "logan_grounding@m@v2.jsonl"
     )

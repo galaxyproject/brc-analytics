@@ -438,8 +438,6 @@ class LoganTurnTrace:
     tool_calls: list[tuple[str, dict]]
     tool_returns: list[str]
     latency_s: float
-    # Named sub-timings a mode records for itself (e.g. a pre-reply pass).
-    timings: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass

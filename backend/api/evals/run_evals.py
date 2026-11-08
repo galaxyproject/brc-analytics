@@ -15,7 +15,6 @@ import dataclasses
 import datetime as _dt
 import json
 import logging
-import os
 import re
 import subprocess
 import time
@@ -25,6 +24,7 @@ from pathlib import Path
 from pydantic_core import to_jsonable_python
 from pydantic_evals.evaluators import LLMJudge
 
+from app.models.logan import LoganSnapshot
 from evals.judge import build_pydantic_ai_model
 from evals.model_registry import load_registry
 from evals.report import RunResult, render_report
@@ -129,12 +129,14 @@ def _declared_evaluator_names(case, dataset_evaluators) -> frozenset[str]:
     return frozenset(names)
 
 
-def _dump_output(output) -> object:
-    """A case output as JSON-safe data for --dump-dir.
+# The snapshot itself is in the fixture already; the job id is enough to
+# find it. Anything else a turn adds to session_metadata["logan"] is kept.
+_SNAPSHOT_KEYS = frozenset(LoganSnapshot.model_fields) - {"job_id"}
 
-    A Logan session's metadata carries the whole snapshot, which the fixture
-    already records; only what a turn may have added to it is kept.
-    """
+
+def _dump_output(output) -> object:
+    """A case output as JSON-safe data for --dump-dir, minus the Logan
+    snapshot a session's metadata carries."""
     if dataclasses.is_dataclass(output) and not isinstance(output, type):
         data = dataclasses.asdict(output)
     else:
@@ -142,20 +144,15 @@ def _dump_output(output) -> object:
     meta = data.get("session_metadata") if isinstance(data, dict) else None
     if isinstance(meta, dict) and isinstance(meta.get("logan"), dict):
         logan = meta["logan"]
-        meta["logan"] = {k: logan[k] for k in ("selection",) if k in logan}
+        meta["logan"] = {k: v for k, v in logan.items() if k not in _SNAPSHOT_KEYS}
     return to_jsonable_python(data, fallback=str)
 
 
-def _run_mode() -> str:
-    """The server setting a run's numbers depend on, for naming its dump."""
-    return (os.environ.get("LOGAN_NARROWING_MODE") or "off").strip().lower()
-
-
-def dump_path(dump_dir: Path, dataset: str, model: str) -> Path:
-    """Where one (dataset, model) run's dump goes: named for the narrowing
-    mode too, and never over an earlier dump, so two arms of an A/B written
-    to one directory can't replace each other."""
-    stem = f"{dataset}@{model}@{_run_mode()}"
+def dump_path(dump_dir: Path, dataset: str, model: str, label: str | None) -> Path:
+    """Where one (dataset, model) run's dump goes: named for --label too, and
+    never over an earlier dump, so two arms of an A/B written to one
+    directory can't replace each other."""
+    stem = f"{dataset}@{model}" + (f"@{label}" if label else "")
     path = dump_dir / f"{stem}.jsonl"
     n = 2
     while path.exists():
@@ -164,10 +161,9 @@ def dump_path(dump_dir: Path, dataset: str, model: str) -> Path:
     return path
 
 
-def write_dump(path: Path, report) -> None:
-    """One JSON line per case run: name, mode, scores and the full output."""
+def write_dump(path: Path, report, label: str | None = None) -> None:
+    """One JSON line per case run: name, label, scores and the full output."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    mode = _run_mode()
     with path.open("x") as fh:
         for case in report.cases:
             scores = {
@@ -178,7 +174,7 @@ def write_dump(path: Path, report) -> None:
                 json.dumps(
                     {
                         "case": case.name,
-                        "mode": mode,
+                        "label": label,
                         "scores": scores,
                         "duration_s": getattr(case, "task_duration", None),
                         "output": _dump_output(case.output),
@@ -191,7 +187,7 @@ def write_dump(path: Path, report) -> None:
                 json.dumps(
                     {
                         "case": failure.name,
-                        "mode": mode,
+                        "label": label,
                         "error": str(failure.error_message),
                     }
                 )
@@ -209,6 +205,7 @@ async def _run_one(
     repeat: int,
     dump_dir: Path | None = None,
     max_concurrency: int | None = None,
+    label: str | None = None,
 ) -> RunResult:
     build = SPECS[dataset_name]
     # Fresh cache per run so LLMService's content-keyed entries can't be served
@@ -227,7 +224,8 @@ async def _run_one(
     )
     elapsed = time.time() - started
     if dump_dir is not None:
-        write_dump(dump_path(dump_dir, dataset_name, model_name), report)
+        path = dump_path(dump_dir, dataset_name, model_name, label)
+        write_dump(path, report, label)
 
     aggregated: dict[str, dict[str, list[float]]] = {}
     for case in report.cases:
@@ -305,6 +303,7 @@ async def _amain(args) -> int:
                     args.repeat,
                     dump_dir=Path(args.dump_dir) if args.dump_dir else None,
                     max_concurrency=args.max_concurrency,
+                    label=args.label,
                 )
             except DatasetRequirementError as exc:
                 # Precondition (e.g. SRA_MIRROR_PATH) is model-independent, so
@@ -377,6 +376,12 @@ def main() -> int:
         default=None,
         help="cap on cases in flight at once (default: no cap). Lower it for "
         "a shared endpoint, or when the latency itself is being measured",
+    )
+    parser.add_argument(
+        "--label",
+        default=None,
+        help="a name for what this run varies (a server setting, a prompt "
+        "version); goes into each --dump-dir file name and record",
     )
     args = parser.parse_args()
     return asyncio.run(_amain(args))
