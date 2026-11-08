@@ -31,15 +31,32 @@ def _snapshot() -> dict:
     return load_fixture(_FIXTURE).snapshot
 
 
+def _reply_text(ctx: EvaluatorContext) -> str:
+    return normalize_numbers(getattr(ctx.output, "reply", "") or "")
+
+
+_BARE_NUMBER = re.compile(r"\d+(?:\.\d+)?")
+
+
+def _mentions(text: str, phrase: str) -> bool:
+    """`phrase` in already-normalised `text`. A bare number has to stand on
+    its own: "25" is not in "2015-2025", though "50" is in "50.4%"."""
+    phrase = normalize_numbers(phrase)
+    if _BARE_NUMBER.fullmatch(phrase):
+        pattern = rf"(?<![\d.]){re.escape(phrase)}(?:\.\d+)?(?!\d)"
+        return re.search(pattern, text) is not None
+    return phrase in text
+
+
 @dataclass
 class _ReplyMustMention(Evaluator):
     keywords: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        text = _reply_text(ctx)
         if not self.keywords:
             return 0.0
-        hits = sum(1 for k in self.keywords if normalize_numbers(k) in text)
+        hits = sum(1 for k in self.keywords if _mentions(text, k))
         return hits / len(self.keywords)
 
 
@@ -50,7 +67,7 @@ class _ReplyMustNotMention(Evaluator):
     forbidden: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        text = _reply_text(ctx)
         return 0.0 if any(normalize_numbers(f) in text for f in self.forbidden) else 1.0
 
 
@@ -81,8 +98,8 @@ class _ReplyMentionsAny(Evaluator):
     phrases: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
-        return 1.0 if any(normalize_numbers(p) in text for p in self.phrases) else 0.0
+        text = _reply_text(ctx)
+        return 1.0 if any(_mentions(text, p) for p in self.phrases) else 0.0
 
 
 @dataclass
@@ -93,27 +110,31 @@ class _ReplyMustNotMatch(Evaluator):
     patterns: list[str] = field(default_factory=list)
 
     def evaluate(self, ctx: EvaluatorContext) -> float:
-        text = normalize_numbers(getattr(ctx.output, "reply", "") or "")
+        text = _reply_text(ctx)
         return 0.0 if any(re.search(p, text, re.I) for p in self.patterns) else 1.0
 
 
 # A sentence that equates the score with sequence identity, unless it hedges
-# with "estimate" or names ANI.
+# with "estimate" or names ANI, or denies it ("is not percent identity" is the
+# answer the rubric wants).
 _SENTENCE = re.compile(r"[^.!?\n]+")
 _IDENTITY_CLAIM = re.compile(r"%\s*identity|percent identity|\bidentical\b", re.I)
 _IDENTITY_HEDGE = re.compile(r"estimat|\bANI\b", re.I)
+_NEGATION = re.compile(r"\bnot\b|n't\b|\brather than\b", re.I)
+
+
+def _claims_identity(sentence: str) -> bool:
+    claim = _IDENTITY_CLAIM.search(sentence)
+    if not claim or _IDENTITY_HEDGE.search(sentence):
+        return False
+    return not _NEGATION.search(sentence[: claim.start()])
 
 
 @dataclass
 class _NoUnhedgedIdentityClaim(Evaluator):
     def evaluate(self, ctx: EvaluatorContext) -> float:
         text = getattr(ctx.output, "reply", "") or ""
-        for sentence in _SENTENCE.findall(text):
-            if _IDENTITY_CLAIM.search(sentence) and not _IDENTITY_HEDGE.search(
-                sentence
-            ):
-                return 0.0
-        return 1.0
+        return 0.0 if any(map(_claims_identity, _SENTENCE.findall(text))) else 1.0
 
 
 @dataclass

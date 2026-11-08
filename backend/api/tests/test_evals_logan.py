@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from app.models.logan import LoganSnapshot
 
 
@@ -147,6 +149,40 @@ def test_identity_claim_needs_a_hedge_in_the_same_sentence():
     hedged = "ANI 0.98 is an estimate, not a measured percent identity."
     assert ev.evaluate(_Ctx(_Out(reply=hedged))) == 1.0
     assert ev.evaluate(_Ctx(_Out(reply="62% of the query's k-mers matched."))) == 1.0
+    # A hedge in the next sentence doesn't excuse this one.
+    split = "A score of 0.62 means 62% identity. ANI is an estimate."
+    assert ev.evaluate(_Ctx(_Out(reply=split))) == 0.0
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "A score of 0.62 is not 62% identity; it is the fraction of the "
+        "query's 31-mers found in the run.",
+        "This does not mean the reads are identical to the query.",
+        "It is not percent identity.",
+        "It isn't percent identity.",
+        "Read it as shared k-mers rather than percent identity.",
+    ],
+)
+def test_denying_identity_is_not_claiming_it(reply):
+    from evals.datasets.logan_assistant import _NoUnhedgedIdentityClaim
+
+    assert _NoUnhedgedIdentityClaim().evaluate(_Ctx(_Out(reply=reply))) == 1.0
+
+
+def test_a_numeric_keyword_must_stand_on_its_own():
+    from evals.datasets.logan_assistant import _ReplyMentionsAny, _ReplyMustMention
+
+    years = _Ctx(
+        _Out(reply="I set your data to the top 100 runs (released 2015-2025).")
+    )
+    assert _ReplyMustMention(keywords=["25"]).evaluate(years) == 0.0
+    assert _ReplyMustMention(keywords=["0.5"]).evaluate(_Ctx(_Out(reply="0.52"))) == 0.0
+    share = _Ctx(_Out(reply="PRJEB2136 holds 50.4% of runs; the threshold is 0.5."))
+    assert _ReplyMustMention(keywords=["50", "0.5"]).evaluate(share) == 1.0
+    capped = _Ctx(_Out(reply="Only the top 150,000 are listed."))
+    assert _ReplyMentionsAny(phrases=["50,000"]).evaluate(capped) == 0.0
 
 
 def test_top_n_evaluator_reads_the_structured_detail():
