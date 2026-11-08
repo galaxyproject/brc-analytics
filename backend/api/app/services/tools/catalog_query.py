@@ -661,7 +661,7 @@ def execute(q: "CatalogQuery | LoganHitQuery", con) -> dict:
     contract.
 
     Entity/column/sort identifiers are interpolated into SQL, not parameterized
-    (SQL identifiers can't be) — the query models' allowlist validator is what
+    (SQL identifiers can't be) -- the query models' allowlist validator is what
     gates that interpolation, so don't loosen it without revisiting this.
     """
     where, params = _compile_where(q)
