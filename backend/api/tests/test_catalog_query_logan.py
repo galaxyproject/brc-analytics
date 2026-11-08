@@ -20,6 +20,7 @@ from app.services.tools.catalog_query import (
     LoganHitQuery,
     execute_logan_hits,
 )
+from evals.datasets.logan_narrowing import ground_truth as _sql
 
 F1 = (
     Path(__file__).resolve().parents[1]
@@ -28,16 +29,6 @@ F1 = (
     / "fixtures"
     / "logan_pfal_18s.parquet"
 )
-
-
-def _sql(where: str) -> int:
-    con = duckdb.connect()
-    try:
-        return con.execute(
-            f"SELECT count(*) FROM read_parquet(?) WHERE {where}", [str(F1)]
-        ).fetchone()[0]
-    finally:
-        con.close()
 
 
 def _q(**kw) -> LoganHitQuery:
@@ -65,6 +56,11 @@ class TestCatalogUnchanged:
 
 
 class TestValidation:
+    def test_a_list_is_capped_at_ten_rows(self):
+        assert _q(operation="list", limit=10).limit == 10
+        with pytest.raises(ValidationError):
+            _q(operation="list", limit=11)
+
     def test_defaults(self):
         q = LoganHitQuery()
         assert (q.entity, q.operation, q.filters) == ("logan_hit", "count", [])

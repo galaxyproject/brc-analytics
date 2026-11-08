@@ -13,7 +13,7 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any, Callable, NamedTuple, Optional
 
 from pydantic_ai.messages import ModelResponse, ToolCallPart
 
@@ -471,11 +471,26 @@ def _turn_messages(history: list[dict]) -> list[dict]:
     return []
 
 
-def _trace_parts(messages: list[dict]) -> tuple[str, list, list[str]]:
-    """(first instructions, tool calls, tool returns) from a turn's messages."""
+class _TurnParts(NamedTuple):
+    instructions: str  # the first request's
+    tool_calls: list[tuple[str, dict]]
+    tool_returns: list[str]
+    # One per tool call, matched by tool_call_id: that call's own return, or
+    # None when it got none (a validation retry, or nothing at all).
+    call_returns: list[Optional[str]]
+
+
+def _content_text(content: Any) -> str:
+    return content if isinstance(content, str) else json.dumps(content, default=str)
+
+
+def _trace_parts(messages: list[dict]) -> _TurnParts:
+    """What one walk over a turn's messages says about the turn."""
     instructions = ""
     calls: list[tuple[str, dict]] = []
+    call_ids: list[str] = []
     returns: list[str] = []
+    by_id: dict[str, str] = {}
     for msg in messages:
         if msg.get("kind") == "request" and not instructions:
             instructions = msg.get("instructions") or ""
@@ -489,35 +504,15 @@ def _trace_parts(messages: list[dict]) -> tuple[str, list, list[str]]:
                     except Exception:
                         args = {"_raw": args}
                 calls.append((part.get("tool_name", ""), args or {}))
+                call_ids.append(part.get("tool_call_id") or "")
             elif kind == "tool-return":
-                content = part.get("content")
-                returns.append(
-                    content
-                    if isinstance(content, str)
-                    else json.dumps(content, default=str)
-                )
-    return instructions, calls, returns
-
-
-def _call_returns(messages: list[dict]) -> list[Optional[str]]:
-    """Each tool call's own return, in call order, matched by tool_call_id;
-    None where the call got no return (a validation retry, or none at all)."""
-    by_id: dict[str, str] = {}
-    for msg in messages:
-        for part in msg.get("parts", []):
-            if part.get("part_kind") == "tool-return" and part.get("tool_call_id"):
-                content = part.get("content")
-                by_id[part["tool_call_id"]] = (
-                    content
-                    if isinstance(content, str)
-                    else json.dumps(content, default=str)
-                )
-    return [
-        by_id.get(part.get("tool_call_id") or "")
-        for msg in messages
-        for part in msg.get("parts", [])
-        if part.get("part_kind") == "tool-call"
-    ]
+                text = _content_text(part.get("content"))
+                returns.append(text)
+                if part.get("tool_call_id"):
+                    by_id[part["tool_call_id"]] = text
+    return _TurnParts(
+        instructions, calls, returns, [by_id.get(i) if i else None for i in call_ids]
+    )
 
 
 def make_logan_conversation_task(
@@ -553,16 +548,16 @@ def make_logan_conversation_task(
             )
             latency = time.monotonic() - started
             messages = _turn_messages(state.agent_message_history)
-            instructions, calls, returns = _trace_parts(messages)
+            parts = _trace_parts(messages)
             turns.append(
                 LoganTurnTrace(
                     message=turn,
                     reply=last_resp.reply,
-                    instructions=instructions,
-                    tool_calls=calls,
-                    tool_returns=returns,
+                    instructions=parts.instructions,
+                    tool_calls=parts.tool_calls,
+                    tool_returns=parts.tool_returns,
                     latency_s=latency,
-                    call_returns=_call_returns(messages),
+                    call_returns=parts.call_returns,
                 )
             )
         assert last_resp is not None
