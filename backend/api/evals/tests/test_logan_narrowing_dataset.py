@@ -15,7 +15,6 @@ from evals.datasets.logan_narrowing import (
     _CASES,
     LoganQueryShape,
     _ReplyHasCount,
-    _SelectionHas,
     canonical_filters,
     ground_truth,
     require_whole_export,
@@ -26,7 +25,6 @@ from evals.datasets.logan_narrowing import (
 @dataclass
 class _Turn:
     tool_calls: list = field(default_factory=list)
-    narrowing: dict = field(default_factory=dict)
     call_returns: list = field(default_factory=list)
 
 
@@ -126,36 +124,7 @@ def test_shape_scores_the_last_query_of_the_last_turn():
     assert shape.evaluate(_ctx(early)) == 0.0
 
 
-def _narrowed(**record) -> _Out:
-    return _Out(turns=[_Turn(narrowing=record)])
-
-
 KENYA = {"filters": [_f("country", "eq", "Kenya")]}
-
-
-def test_shape_reads_an_extractor_query_only_when_it_was_counted_and_applied():
-    shape = LoganQueryShape(expect=[_f("country", "eq", "Kenya")])
-    assert (
-        shape.evaluate(
-            _ctx(_narrowed(intent="ask", outcome="ask", query=KENYA, total=3))
-        )
-        == 1.0
-    )
-    assert (
-        shape.evaluate(
-            _ctx(_narrowed(intent="select", outcome="select", query=KENYA, total=3))
-        )
-        == 1.0
-    )
-    # Read out but never applied: nothing was counted for the reply.
-    for record in (
-        {"intent": "none", "outcome": "none", "query": KENYA},
-        {"intent": "ask", "outcome": "unresolved", "query": KENYA},
-        {"intent": "ask", "outcome": "timeout", "query": KENYA},
-        {"intent": "ask", "outcome": "error", "query": KENYA},
-        {"intent": "ask", "outcome": "ask", "query": KENYA},  # no total
-    ):
-        assert shape.evaluate(_ctx(_narrowed(**record))) == 0.0, record
 
 
 def test_shape_scores_the_last_tool_call_that_returned_a_count():
@@ -188,7 +157,6 @@ def test_an_unpaired_trace_falls_back_to_position_only_when_counts_agree():
     class _Old:
         tool_calls: list
         tool_returns: list
-        narrowing: dict = field(default_factory=dict)
 
     shape = LoganQueryShape(expect=[_f("country", "eq", "Kenya")])
     call = ("query_logan_hits", KENYA)
@@ -250,24 +218,6 @@ def test_zero_needs_a_none_claim_and_no_other_total():
     assert zero.evaluate(_ctx(_Out("I found 0 matching runs."))) == 1.0
     assert zero.evaluate(_ctx(_Out("No change: 50 runs match."))) == 0.0
     assert zero.evaluate(_ctx(_Out("There are 12 runs."))) == 0.0
-
-
-def test_selection_must_be_exact():
-    thai = [_f("country", "eq", "Thailand")]
-
-    def out(filters):
-        return _Out(
-            session_metadata={
-                "logan": {"selection": {"query": {"filters": filters}, "total": 1}}
-            }
-        )
-
-    ev = _SelectionHas(expect=thai)
-    assert ev.evaluate(_ctx(out(thai))) == 1.0
-    assert ev.evaluate(_ctx(out(thai + [_f("platform", "eq", "ILLUMINA")]))) == 0.0
-    assert ev.evaluate(_ctx(_Out())) == 0.0
-    assert _SelectionHas(cleared=True).evaluate(_ctx(out(thai))) == 0.0
-    assert _SelectionHas(cleared=True).evaluate(_ctx(_Out())) == 1.0
 
 
 def test_claims_parse():

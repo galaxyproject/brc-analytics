@@ -241,14 +241,10 @@ class Settings:
 
         # How a session opened from a Logan search narrows the match set from
         # chat. "off" (the default) is the shipped behaviour. "tool" gives the
-        # model a query_logan_hits tool over the job's export; "extract" runs
-        # a tool-less pass before each reply that turns the message into a
-        # query, whose result the server injects. Both read the export through
-        # the cache only. An unknown value reads as "off".
+        # model a query_logan_hits tool over the job's export, read through the
+        # cache only. An unknown value reads as "off".
         mode = os.getenv("LOGAN_NARROWING_MODE", "off").strip().lower()
-        self.LOGAN_NARROWING_MODE: str = (
-            mode if mode in ("off", "tool", "extract") else "off"
-        )
+        self.LOGAN_NARROWING_MODE: str = mode if mode in ("off", "tool") else "off"
 
         # Galaxy job execution. Empty API key disables the Galaxy endpoints --
         # the key is a service account, so jobs land in one shared account

@@ -177,7 +177,7 @@ def _override_model(svc: Any, entry: ModelEntry) -> None:
     against MiniMax, which loops), skewing ExtractSuccessRate.
     """
     new_model = build_pydantic_ai_model(entry)
-    for attr in ("agent", "extract_agent", "narrow_agent"):
+    for attr in ("agent", "extract_agent"):
         agent = getattr(svc, attr, None)
         if agent is not None:
             agent._model = new_model
@@ -443,11 +443,6 @@ class LoganTurnTrace:
     latency_s: float
     # One per tool call: that call's return, or None when it got none.
     call_returns: list[Optional[str]] = field(default_factory=list)
-    # Named sub-timings a mode records for itself (e.g. a pre-reply pass).
-    timings: dict[str, float] = field(default_factory=dict)
-    # LOGAN_NARROWING_MODE=extract: what the pre-reply pass read out of this
-    # turn (intent, query, outcome, latency). Empty in the other modes.
-    narrowing: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -552,7 +547,6 @@ def make_logan_conversation_task(
         last_resp = None
         turns: list[LoganTurnTrace] = []
         for turn in case_input["turns"]:
-            turn_index = int(state.metadata.get("turn_count", 0) or 0)
             started = time.monotonic()
             last_resp, _telemetry, state = await aa.chat_with_telemetry(
                 turn, session_id=session_id
@@ -560,11 +554,6 @@ def make_logan_conversation_task(
             latency = time.monotonic() - started
             messages = _turn_messages(state.agent_message_history)
             instructions, calls, returns = _trace_parts(messages)
-            # Only this turn's record: a turn the pass skipped leaves the
-            # previous one in place.
-            record = state.metadata.get("logan_narrowing") or {}
-            if record.get("turn_index") != turn_index:
-                record = {}
             turns.append(
                 LoganTurnTrace(
                     message=turn,
@@ -574,12 +563,6 @@ def make_logan_conversation_task(
                     tool_returns=returns,
                     latency_s=latency,
                     call_returns=_call_returns(messages),
-                    timings=(
-                        {"narrowing_s": record["latency_s"]}
-                        if "latency_s" in record
-                        else {}
-                    ),
-                    narrowing=dict(record),
                 )
             )
         assert last_resp is not None

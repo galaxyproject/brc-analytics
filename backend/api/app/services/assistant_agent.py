@@ -535,7 +535,7 @@ def _logan_instructions(ctx: RunContext[AssistantDeps]) -> Optional[str]:
         return None
     # What a narrowing mode adds for this turn (see logan_narrowing); None in
     # the default mode, which leaves the block exactly as it was.
-    note = getattr(ctx.deps, "logan_note", None)
+    note = ctx.deps.logan_note
     return block + "\n\n" + note if note else block
 
 
@@ -592,8 +592,7 @@ async def _safe_record(
 class AssistantAgent:
     """High-level wrapper around the pydantic-ai Agent for the analysis assistant."""
 
-    # Class-level defaults: some tests assemble the agent without __init__.
-    narrow_agent: Optional[Agent] = None
+    # Class-level default: some tests assemble the agent without __init__.
     narrowing_mode: str = "off"
 
     def __init__(
@@ -677,7 +676,7 @@ class AssistantAgent:
 
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
         # Resolved once: the export read is cache-only and needs no Galaxy
-        # connection, so a Galaxy service object is all either mode needs.
+        # connection, so a Galaxy service object is all the tool needs.
         self.narrowing_mode = (
             settings.LOGAN_NARROWING_MODE if self.galaxy is not None else "off"
         )
@@ -715,8 +714,6 @@ class AssistantAgent:
             system_prompt=EXTRACT_PROMPT,
             model_settings=ModelSettings(temperature=0.0),
         )
-        if self.narrowing_mode == "extract":
-            self.narrow_agent = self._build_narrow_agent(model)
         logger.info(
             "Assistant agent initialized (extractor output mode: %s, Logan "
             "narrowing: %s)",
@@ -757,16 +754,12 @@ class AssistantAgent:
         Pass `mode` to override the settings-derived choice (the evals harness
         does this per target model).
         """
-        return self._output_spec(AnalysisStateUpdate, mode)
-
-    def _output_spec(self, output_cls: Any, mode: Optional[str] = None):
-        """Wrap a structured output in this model's output mode."""
         mode = mode or self._resolved_output_mode()
         if mode == "tool":
-            return ToolOutput(output_cls)
+            return ToolOutput(AnalysisStateUpdate)
         if mode == "native":
-            return NativeOutput(output_cls)
-        return PromptedOutput(output_cls)
+            return NativeOutput(AnalysisStateUpdate)
+        return PromptedOutput(AnalysisStateUpdate)
 
     def rebuild_extractor(self, mode: str) -> None:
         """Rebuild the extractor agent with a forced output mode.
@@ -784,17 +777,6 @@ class AssistantAgent:
             self.extract_agent.model,
             output_type=self._extractor_output_spec(mode),
             system_prompt=EXTRACT_PROMPT,
-            model_settings=ModelSettings(temperature=0.0),
-        )
-        if self.narrow_agent is not None:
-            self.narrow_agent = self._build_narrow_agent(self.narrow_agent.model, mode)
-
-    def _build_narrow_agent(self, model: Any, mode: Optional[str] = None) -> Agent:
-        """The pre-reply narrowing pass: tool-less, temperature 0."""
-        return Agent(
-            model,
-            output_type=self._output_spec(logan_narrowing.LoganNarrowing, mode),
-            system_prompt=logan_narrowing.NARROW_PROMPT,
             model_settings=ModelSettings(temperature=0.0),
         )
 
@@ -1517,19 +1499,16 @@ class AssistantAgent:
         # budget as well as the logged latency, so an NTP or VM clock jump
         # could otherwise skip extraction or blow the frontend timeout.
         logan = state.metadata.get("logan")
-        logan_note, reply_kwargs = await self._logan_note(
-            state, message, turn_index, turn_start
-        )
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
             con=self.query_con,
             galaxy=self.galaxy,
             logan=logan,
-            logan_note=logan_note,
+            logan_note=self._logan_note(logan),
         )
         result = await self._run_agent_with_retry(
-            augmented_message, deps=deps, message_history=agent_history, **reply_kwargs
+            augmented_message, deps=deps, message_history=agent_history
         )
         raw_reply = str(result.output)
 
@@ -1782,33 +1761,12 @@ class AssistantAgent:
         await self.session_service.save_session(state)
         return state
 
-    async def _logan_note(
-        self, state: SessionState, message: str, turn_index: int, turn_start: float
-    ) -> Tuple[Optional[str], Dict[str, Any]]:
-        """What the narrowing mode adds to this turn's instructions, and any
-        override for the reply call. Nothing at all in the default mode."""
-        logan = state.metadata.get("logan")
-        if not logan or self.narrowing_mode == "off":
-            return None, {}
-        if self.narrowing_mode == "tool":
-            return logan_narrowing.TOOL_HINT, {}
-        if self.narrow_agent is None or not message:
-            return logan_narrowing.render_selection_note(logan.get("selection")), {}
-        note, record = await logan_narrowing.narrow_turn(
-            logan=logan,
-            message=message,
-            turn_index=turn_index,
-            galaxy=self.galaxy,
-            run_once=self._run_agent_once,
-            narrow_agent=self.narrow_agent,
-            close_tag=_USER_INPUT_CLOSE_TAG,
-            timeout_errors=(AssistantTimeoutError,),
-        )
-        state.metadata["logan_narrowing"] = record
-        # The pass spent part of the turn budget; the reply gets the rest, so
-        # the two together stay inside the frontend's timeout.
-        remaining = ASSISTANT_TURN_BUDGET_SECONDS - (time.monotonic() - turn_start)
-        return note, {"timeout": min(ASSISTANT_RUN_TIMEOUT_SECONDS, remaining)}
+    def _logan_note(self, logan: Optional[dict]) -> Optional[str]:
+        """What the narrowing mode adds to a Logan session's instructions:
+        the tool hint in "tool" mode, nothing in the default mode."""
+        if logan and self.narrowing_mode == "tool":
+            return logan_narrowing.TOOL_HINT
+        return None
 
     async def fetch_logan_snapshot(self, job_id: str) -> LoganSnapshot:
         """Read a finished job's cached results into a snapshot.
