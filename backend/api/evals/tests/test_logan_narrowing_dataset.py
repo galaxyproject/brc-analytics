@@ -413,3 +413,26 @@ def test_build_refuses_a_trimmed_fixture(monkeypatch):
     monkeypatch.setattr(ln, "require_whole_export", trimmed)
     with pytest.raises(RuntimeError, match="trimmed"):
         ln.build(None, None, None)
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "Senegal has 169 NovaSeq 6000 runs.",
+        "There are 169 Illumina NovaSeq 6000 runs from Senegal.",
+        "169 runs from Senegal were sequenced on a NovaSeq 6000.",
+    ],
+)
+def test_a_users_number_inside_the_noun_phrase_is_not_the_claim(reply):
+    # The instrument's "6000" used to take the claim, so 169 was never seen.
+    assert run_total_claims(reply, frozenset({6000})) == [169]
+    ev = _ReplyHasCount(expected=169, also_ok=[17629], said=[6000])
+    assert ev.evaluate(_ctx(_Out(reply))) == 1.0
+
+
+def test_a_users_number_is_never_the_matching_count():
+    ev = _ReplyHasCount(expected=42, also_ok=[17629], said=[2019])
+    reply = "42 runs were released after 2019; in total 2019 matching runs."
+    assert ev.evaluate(_ctx(_Out(reply))) == 0.0
+    wrong = _ReplyHasCount(expected=169, also_ok=[17629], said=[6000])
+    assert wrong.evaluate(_ctx(_Out("Senegal has 170 NovaSeq 6000 runs."))) == 0.0
