@@ -20,9 +20,7 @@ capped connection opened per call.
 from __future__ import annotations
 
 import logging
-import threading
 from collections.abc import Sequence
-from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -763,115 +761,44 @@ class LoganExportMismatch(RuntimeError):
     """The export file lacks a column logan_hit declares, or types it wrong."""
 
 
-class QueryCancelled(RuntimeError):
-    """The caller gave up on an export query before or while it ran."""
+def create_logan_view(con, parquet: Path) -> None:
+    """Register the job's export on `con` as the `logan_hit` view, after
+    checking it is the shape declared above.
 
-
-class QueryInterrupt:
-    """Lets the caller of an export query stop it from another thread.
-
-    DuckDB's interrupt() only stops a statement that is running, so a cancel
-    that lands while the connection is still opening, or between statements,
-    would be lost. The flag closes that gap: the worker checks it right after
-    connecting and before every statement, under the same lock cancel() takes
-    to read the connection. A cancel in the instant between that check and the
-    statement starting still lets one statement run; the caller's slot is held
-    until the worker returns, so that costs time, not concurrency.
+    @raises LoganExportMismatch: when the file is not that shape, which is a
+        writer change to fix, not something to answer around.
     """
-
-    def __init__(self) -> None:
-        self._lock = threading.Lock()
-        self._con = None
-        self._cancelled = False
-
-    @property
-    def cancelled(self) -> bool:
-        return self._cancelled
-
-    def cancel(self) -> None:
-        with self._lock:
-            self._cancelled = True
-            con = self._con
-        if con is not None:
-            try:
-                con.interrupt()
-            except Exception:  # noqa: BLE001 -- closed in the meantime is fine
-                pass
-
-    def check(self) -> None:
-        if self._cancelled:
-            raise QueryCancelled("export query cancelled")
-
-    def attach(self, con) -> None:
-        with self._lock:
-            self.check()
-            self._con = con
-
-    def detach(self) -> None:
-        with self._lock:
-            self._con = None
+    rel = con.read_parquet(str(parquet))
+    coltypes = {
+        name: str(kind).upper()
+        for name, kind in zip(rel.columns, rel.types, strict=True)
+    }
+    # Checked before the view is built, so a file without release_date is
+    # reported as a mismatch rather than failing to bind.
+    if "release_date" in coltypes:
+        coltypes["release_year"] = "INTEGER"
+    missing, mistyped = _schema_issues(coltypes, "logan_hit")
+    if missing or mistyped:
+        raise LoganExportMismatch(
+            f"export does not match logan_hit: missing {missing}, mistyped {mistyped}"
+        )
+    rel = rel.project("*, CAST(year(release_date) AS INTEGER) AS release_year")
+    rel.create_view("logan_hit", replace=True)
 
 
-class _Checked:
-    """A connection that refuses each statement once its query is cancelled."""
+def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
+    """Run a LoganHitQuery over one job's export; same summary as execute().
 
-    def __init__(self, con, interrupt: QueryInterrupt) -> None:
-        self._con = con
-        self._interrupt = interrupt
-
-    def execute(self, *args, **kwargs):
-        self._interrupt.check()
-        return self._con.execute(*args, **kwargs)
-
-
-@contextmanager
-def _logan_connection(parquet: Path, interrupt: Optional[QueryInterrupt] = None):
-    """A private, capped connection with the job's export as `logan_hit`.
-
-    Uses the results page's thread and memory caps (kmindex_filters'
-    capped connection -- imported here so duckdb stays a lazy import, as in
-    connect()). Nothing else ever touches it, so unlike the shared catalog
-    connection it is safe from a worker thread. A caller that may give up on
-    the query passes a QueryInterrupt; what is yielded then refuses to run
-    anything once it is cancelled. Closed on exit.
-
-    @raises LoganExportMismatch: when the file is not the shape declared above,
-        which is a writer change to fix, not something to answer around.
-    @raises QueryCancelled: when the interrupt was cancelled before a statement.
+    Blocking, on a private connection with the results page's thread and
+    memory caps (kmindex_filters' capped connection -- imported here so duckdb
+    stays a lazy import, as in connect()). From async code use
+    logan_export_query.run_export_query, which also bounds and cancels it.
     """
     from app.services.kmindex_filters import _connect
 
     con = _connect()
     try:
-        if interrupt is not None:
-            interrupt.attach(con)
-        rel = con.read_parquet(str(parquet))
-        coltypes = {
-            name: str(kind).upper()
-            for name, kind in zip(rel.columns, rel.types, strict=True)
-        }
-        # Checked before the view is built, so a file without release_date is
-        # reported as a mismatch rather than failing to bind.
-        if "release_date" in coltypes:
-            coltypes["release_year"] = "INTEGER"
-        missing, mistyped = _schema_issues(coltypes, "logan_hit")
-        if missing or mistyped:
-            raise LoganExportMismatch(
-                f"export does not match logan_hit: missing {missing}, "
-                f"mistyped {mistyped}"
-            )
-        rel = rel.project("*, CAST(year(release_date) AS INTEGER) AS release_year")
-        rel.create_view("logan_hit", replace=True)
-        yield con if interrupt is None else _Checked(con, interrupt)
-    finally:
-        if interrupt is not None:
-            interrupt.detach()
-        con.close()
-
-
-def execute_logan_hits(
-    q: LoganHitQuery, parquet: Path, interrupt: Optional[QueryInterrupt] = None
-) -> dict:
-    """Run a LoganHitQuery over one job's export; same summary as execute()."""
-    with _logan_connection(parquet, interrupt) as con:
+        create_logan_view(con, parquet)
         return execute(q, con)
+    finally:
+        con.close()
