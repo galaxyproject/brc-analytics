@@ -143,8 +143,17 @@ def normalize_numbers(text: str) -> str:
 _URL = re.compile(r"https?://\S+|/[\w./-]*\?\S*")
 # 16 hex characters with at least one letter: a 16-digit decimal is a number.
 _JOB_ID = re.compile(r"\b(?=[0-9]*[a-f])[0-9a-f]{16}\b")
-# A line-leading list marker ("1.", "2)", "**3.**"), not a quantity.
-_ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
+# A line-leading list marker ("1.", "2)", "**3.**") or a table's leading rank
+# cell ("| 2 |"), not a quantity.
+_ORDINAL = re.compile(
+    r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)|^\s*\|\s*\d{1,3}\s*(?=\|)"
+)
+# An ISO date, with any of the hyphens models write (U+2010-2013, U+2212).
+# Read as numbers, a page of release dates puts every integer from 1 to 31
+# into the context, and an invented "3 runs" traces to a day of the month.
+_DATE = re.compile(r"\b\d{4}[-\u2010-\u2013\u2212]\d{2}[-\u2010-\u2013\u2212]\d{2}\b")
+# An rRNA name written with a space ("18 S"); "18S" is already a mixed token.
+_RRNA = re.compile(r"(?<![\w.])\d+\s?S\b")
 # "17.6k", "1.1M", "2 million": abbreviations a model uses for a large count.
 _ABBREV = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?(k|K|M|thousand|million)(?![\w])")
 _ABBREV_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}
@@ -176,7 +185,9 @@ class _Num:
 
 def _strip_identifiers(text: str) -> str:
     text = _URL.sub(" ", text)
+    text = _DATE.sub(" ", text)
     text = _JOB_ID.sub(" ", text)
+    text = _RRNA.sub(" ", text)
     text = _ORDINAL.sub(" ", text)
     return text
 
@@ -269,13 +280,14 @@ def _rounds_from(reply: _Num, source: float, source_decimals: int) -> bool:
 
 def _count_rounds_from(reply: _Num, source: float) -> bool:
     """A large count stated to at least two of its leading digits: 17.6k or
-    17,600 for 17,629, never "20,000"."""
+    17,600 for 17,629, never "20,000". The reply's own trailing zeros don't
+    say how many digits it kept, so 10,000 for 10,212 is 10,212 to two."""
     if source < 1000 or reply.value < 100:
         return False
-    digits = _significant_digits(reply)
-    return (
-        2 <= digits < len(str(int(source)))
-        and _sig_round(source, digits) == reply.value
+    width = len(str(int(source)))
+    return any(
+        _sig_round(source, digits) == reply.value
+        for digits in range(max(2, _significant_digits(reply)), width)
     )
 
 
@@ -284,7 +296,8 @@ def number_traces(reply: _Num, context: list[_Num]) -> bool:
     applies, exposed so they can be tested one at a time.
 
     - A percentage traces to a context percentage, or its complement, within
-      0.1 -- not "rounded to fewer places", which would let 12% stand for 12.49%.
+      0.1 and no further. Rounding to fewer places is deliberately not
+      allowed: "97%" for 97.2% stays untraced, as would "12%" for 12.49%.
     - A bare integer is a count. It traces only to an integer count, exactly
       or as a large count stated to its leading digits; letting it round from a
       decimal or a share would pass "3 runs" against a score of 2.7.
@@ -317,8 +330,9 @@ class NumbersTraceToContext(Evaluator):
 
     A number traces when it appears in the context (after separator
     normalisation) or is a permitted restatement of one: a percentage within
-    0.1 of a context percentage or its complement (100 - x), a decimal rounded
-    to fewer places, a large count to at least two leading digits. A bare
+    0.1 of a context percentage or its complement (100 - x) -- strictly, so
+    "97%" for 97.2% does not trace -- a decimal rounded to fewer places, a
+    large count to at least two leading digits. A bare
     integer only ever traces to a count (see number_traces). Digits in
     accessions, job ids, URLs and list ordinals are ignored. A reply with no
     numbers scores 1.0.

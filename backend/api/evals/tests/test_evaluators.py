@@ -7,7 +7,13 @@ import pytest
 from pydantic_evals.evaluators import EvaluatorContext
 
 from evals.datasets.catalog_query import QueryCatalogShape
-from evals.evaluators import FieldEquals, LowConfidence, MustMention, ToolCallMatch
+from evals.evaluators import (
+    FieldEquals,
+    LowConfidence,
+    MustMention,
+    ToolCallMatch,
+    extract_numbers,
+)
 
 
 def _ctx(output: Any, metadata: dict | None = None) -> EvaluatorContext:
@@ -591,3 +597,42 @@ def test_adjacent_numbers_do_not_fuse():
     ]
     # The accession is skipped; the count after it survives.
     assert [n.value for n in extract_numbers("SRR123 456 runs")] == [456.0]
+
+
+def test_release_dates_do_not_put_small_counts_in_the_context():
+    from app.services.logan_prompt import render_logan_instructions
+    from evals.logan_fixture import load_fixture
+
+    # F1's hit list carries 25 release dates. Read as numbers they made every
+    # small integer a "count", so these invented ones traced.
+    context = render_logan_instructions(load_fixture("logan_pfal_18s").snapshot)
+    for reply in ("Only 3 runs came from Kenya.", "14 runs came from Peru."):
+        assert _trace(reply, context) == 0.0, reply
+
+
+@pytest.mark.parametrize("hyphen", ["-", "‐", "‑", "‒", "–", "−"])
+def test_a_date_is_an_identifier_whatever_its_hyphen(hyphen):
+    date = hyphen.join(["2014", "10", "29"])
+    assert extract_numbers(f"released {date}") == []
+    assert _trace(f"The top hit was released {date}.", "SRR1 2014-10-29") == 1.0
+
+
+def test_a_tables_leading_rank_is_an_ordinal():
+    table = "| 2 | SRR7590703 | 0.990 |\n|  13 | ERR1 | 0.972 |"
+    assert [n.value for n in extract_numbers(table)] == [0.99, 0.972]
+    # A count in a later cell is still a count.
+    assert [n.value for n in extract_numbers("| Malawi | 754 |")] == [754.0]
+
+
+def test_an_rrna_name_is_not_a_count():
+    assert extract_numbers("the 18 S rRNA and the 18S probe") == []
+    assert [n.value for n in extract_numbers("18 Samples")] == [18.0]
+
+
+def test_a_round_count_states_its_leading_digits():
+    # 10,000 is 10,212 to two digits, though its zeros hide the second one.
+    assert _trace("About 10,000 runs.", "10,212 runs") == 1.0
+    assert _trace("About 10k runs.", "10,212 runs") == 1.0
+    # One digit is still too few: 9,000 is not 10,212 to two.
+    assert _trace("About 9,000 runs.", "10,212 runs") == 0.0
+    assert _trace("About 10,000 runs.", "10,712 runs") == 0.0
