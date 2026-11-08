@@ -39,9 +39,10 @@ and any number anywhere in the reply passed as the count. They now require:
   the search's, a selection's, or a count the model's context holds -- the
   first two only as the group the answer is drawn from ("of the 17,629"),
   never as the matching count itself ("actually 999 matching runs" fails even
-  when 999 is the search's total). A number the user said may be repeated, and
-  when it stands before the verb ("released after 2019 are 42") the claim is
-  the number after it. For zero, "no ... runs" counts, but only without a
+  when 999 is the search's total). A number the user said may be repeated --
+  inside the phrase ("169 NovaSeq 6000 runs" claims 169) or before the verb
+  ("released after 2019 are 42" claims 42) -- but never as the matching count
+  itself. For zero, "no ... runs" counts, but only without a
   contradicting total.
 - **Selection** (extract only): the stored selection's filters are exactly
   the expected ones.
