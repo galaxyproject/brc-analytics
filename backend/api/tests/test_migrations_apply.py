@@ -243,6 +243,39 @@ def test_turn_log_logan_job_id_upgrades_and_downgrades(migrated_db, monkeypatch)
 
     with _logging_restored():
         command.upgrade(cfg, "head")
-    columns, _ = _columns_and_indexes()
+    columns, indexes = _columns_and_indexes()
     assert "logan_job_id" in columns
-    get_settings.cache_clear()
+    assert indexes["ix_assistant_turn_log_logan_job_id"] == ["logan_job_id"]
+
+
+def test_turn_log_logan_job_id_matches_the_model(migrated_db):
+    """Every other DB test builds its schema from the ORM, so a migration that
+    drifted from it would go unnoticed there. The column's length and its
+    index must agree between the two."""
+    from app.db.models import AssistantTurnLog
+
+    engine = create_engine(migrated_db)
+    try:
+        inspector = inspect(engine)
+        column = next(
+            c
+            for c in inspector.get_columns("assistant_turn_log")
+            if c["name"] == "logan_job_id"
+        )
+        migrated_indexes = {
+            i["name"]: (tuple(i["column_names"]), bool(i["unique"]))
+            for i in inspector.get_indexes("assistant_turn_log")
+            if "logan_job_id" in i["column_names"]
+        }
+    finally:
+        engine.dispose()
+
+    model_column = AssistantTurnLog.__table__.c.logan_job_id
+    assert column["type"].length == model_column.type.length
+    assert column["nullable"] == model_column.nullable
+    model_indexes = {
+        i.name: (tuple(c.name for c in i.columns), bool(i.unique))
+        for i in AssistantTurnLog.__table__.indexes
+        if "logan_job_id" in i.columns
+    }
+    assert migrated_indexes == model_indexes
