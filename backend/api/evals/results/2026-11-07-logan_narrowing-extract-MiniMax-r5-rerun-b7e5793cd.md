@@ -1,5 +1,8 @@
 # BRC Analytics evals
 
+The tables below are the runner's own, from scorers that were later
+tightened; the scores to use are in `2026-11-07-logan-narrowing-ab.md`.
+
 - Generated: 2026-11-07T18:13:46Z
 - Commit: `b7e5793cd`
 - Datasets: logan_narrowing
