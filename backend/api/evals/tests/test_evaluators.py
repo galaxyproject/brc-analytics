@@ -617,16 +617,28 @@ def test_a_date_is_an_identifier_whatever_its_hyphen(hyphen):
     assert _trace(f"The top hit was released {date}.", "SRR1 2014-10-29") == 1.0
 
 
-def test_a_tables_leading_rank_is_an_ordinal():
-    table = "| 2 | SRR7590703 | 0.990 |\n|  13 | ERR1 | 0.972 |"
-    assert [n.value for n in extract_numbers(table)] == [0.99, 0.972]
+def test_a_ranked_tables_rank_column_is_an_ordinal():
+    ranked = (
+        "| # | Accession | Score |\n|---|---|---|\n"
+        "| 2 | SRR7590703 | 0.990 |\n|  13 | ERR1 | 0.972 |"
+    )
+    assert [n.value for n in extract_numbers(ranked)] == [0.99, 0.972]
     # A count in a later cell is still a count.
     assert [n.value for n in extract_numbers("| Malawi | 754 |")] == [754.0]
+
+
+def test_a_count_first_table_keeps_its_counts():
+    counts = "| Runs | Country |\n|---|---|\n| 754 | Malawi |"
+    assert [n.value for n in extract_numbers(counts)] == [754.0]
+    assert _trace(counts, "nothing here") == 0.0
 
 
 def test_an_rrna_name_is_not_a_count():
     assert extract_numbers("the 18 S rRNA and the 18S probe") == []
     assert [n.value for n in extract_numbers("18 Samples")] == [18.0]
+    # A count before an abbreviated genus is a count.
+    assert _trace("Only 1,200 S. enterica runs.", "17,629 runs") == 0.0
+    assert _trace("Only 3 S. Typhimurium runs.", "17,629 runs") == 0.0
 
 
 def test_a_round_count_states_its_leading_digits():
@@ -669,3 +681,14 @@ def test_a_job_id_is_not_a_number():
     assert [n.value for n in extract_numbers("1234567890123456")] == [
         1234567890123456.0
     ]
+
+
+def test_abbreviated_counts_scale_exactly():
+    # 16.1 * 1e3 is 16100.000000000002 in floating point, which never equalled
+    # the rounded source.
+    for reply, source in (
+        ("16.1k", "16,123"),
+        ("32.2k", "32,234"),
+        ("64.9k", "64,912"),
+    ):
+        assert _trace(f"About {reply} runs.", f"{source} runs") == 1.0, reply

@@ -143,20 +143,25 @@ def normalize_numbers(text: str) -> str:
 _URL = re.compile(r"https?://\S+|/[\w./-]*\?\S*")
 # 16 hex characters with at least one letter: a 16-digit decimal is a number.
 _JOB_ID = re.compile(r"\b(?=[0-9]*[a-f])[0-9a-f]{16}\b")
-# A line-leading list marker ("1.", "2)", "**3.**") or a table's leading rank
-# cell ("| 2 |"), not a quantity.
-_ORDINAL = re.compile(
-    r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)|^\s*\|\s*\d{1,3}\s*(?=\|)"
-)
+# A line-leading list marker ("1.", "2)", "**3.**"), not a quantity.
+_ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
+# A markdown table: a header row, its separator, then body rows. The first
+# column is a rank only when the header says so ("#", "Rank", or nothing); a
+# count-first table ("| 754 | Malawi |") keeps its counts.
+_TABLE_ROW = re.compile(r"^\s*\|")
+_TABLE_SEPARATOR = re.compile(r"^\s*\|[\s:|-]+\|?\s*$")
+_RANK_HEADERS = {"", "#", "rank", "no", "no.", "n", "nr"}
+_LEADING_RANK = re.compile(r"^(\s*\|\s*)\d{1,3}(\s*\|)")
 # An ISO date, with any of the hyphens models write (U+2010-2013, U+2212).
 # Read as numbers, a page of release dates puts every integer from 1 to 31
 # into the context, and an invented "3 runs" traces to a day of the month.
 _DATE = re.compile(r"\b\d{4}[-\u2010-\u2013\u2212]\d{2}[-\u2010-\u2013\u2212]\d{2}\b")
 # An rRNA name written with a space ("18 S"); "18S" is already a mixed token.
-_RRNA = re.compile(r"(?<![\w.])\d+\s?S\b")
+# Not "S." -- "3 S. enterica runs" is a count before an abbreviated genus.
+_RRNA = re.compile(r"(?<![\w.])\d+\s?S\b(?!\.)")
 # "17.6k", "1.1M", "2 million": abbreviations a model uses for a large count.
 _ABBREV = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?(k|K|M|thousand|million)(?![\w])")
-_ABBREV_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}
+_ABBREV_SCALE = {"k": 1000, "K": 1000, "thousand": 1000, "M": 10**6, "million": 10**6}
 # Quantities written with a unit or an exponent ("999GB", "30x", "999ms",
 # "1e6"). Read before identifiers are stripped, which would otherwise take
 # them for one.
@@ -183,7 +188,24 @@ class _Num:
     text: str
 
 
+def _strip_rank_columns(text: str) -> str:
+    lines = text.split("\n")
+    rank_table = False
+    for i, line in enumerate(lines):
+        if not _TABLE_ROW.match(line):
+            rank_table = False
+            continue
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        if _TABLE_SEPARATOR.match(nxt) and not _TABLE_SEPARATOR.match(line):
+            first = line.strip().strip("|").split("|")[0]
+            rank_table = first.strip().strip("*").lower() in _RANK_HEADERS
+        elif rank_table:
+            lines[i] = _LEADING_RANK.sub(r"\1 \2", line)
+    return "\n".join(lines)
+
+
 def _strip_identifiers(text: str) -> str:
+    text = _strip_rank_columns(text)
     text = _URL.sub(" ", text)
     text = _DATE.sub(" ", text)
     text = _JOB_ID.sub(" ", text)
@@ -193,16 +215,19 @@ def _strip_identifiers(text: str) -> str:
 
 
 def extract_numbers(text: str) -> list[_Num]:
-    """Every quantity in `text`: plain numbers, percentages, and k/M counts.
+    """Every quantity in `text`: plain numbers, percentages, k/M counts and
+    numbers with units or exponents.
 
-    Digits inside identifiers (accessions, job ids, URLs) and list ordinals
-    are not quantities and are skipped.
+    Digits inside identifiers are not quantities and are skipped: accessions,
+    job ids, URLs, ISO dates, list ordinals, a ranked table's rank column and
+    rRNA names ("18 S").
     """
     text = _strip_identifiers(_ungroup(text or ""))
     out: list[_Num] = []
 
     def _abbrev(m: re.Match) -> str:
-        value = float(m.group(1)) * _ABBREV_SCALE[m.group(2)]
+        # Decimal, so 16.1k is 16,100 and not 16,100.000000000002.
+        value = float(Decimal(m.group(1)) * Decimal(_ABBREV_SCALE[m.group(2)]))
         out.append(_Num(value=value, decimals=0, percent=False, text=m.group(0)))
         return " "
 
@@ -333,8 +358,8 @@ class NumbersTraceToContext(Evaluator):
     "97%" for 97.2% does not trace -- a decimal rounded to fewer places, a
     large count to at least two leading digits. A bare
     integer only ever traces to a count (see number_traces). Digits in
-    accessions, job ids, URLs and list ordinals are ignored. A reply with no
-    numbers scores 1.0.
+    identifiers (see extract_numbers) are ignored. A reply with no numbers
+    scores 1.0.
 
     The output must expose `reply_field` and `context_field` (by default
     `reply` and `context`); a missing context scores 0.0, since nothing can
