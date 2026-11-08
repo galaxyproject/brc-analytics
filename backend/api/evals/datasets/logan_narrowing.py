@@ -29,6 +29,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Callable, Optional
 
 import duckdb
@@ -157,31 +158,46 @@ def _verb(words: str) -> str:
     )
 
 
-# Up to three words between the number and the noun ("181 WGS runs", "5
-# Plasmodium vivax runs").
-_TOTAL_CLAIM = re.compile(
-    rf"{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?{_RUN_WORD}\b"
-    rf"|\b{_RUN_WORD}\s*(?:matched|matching|found|total)?\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
-    rf"|{_OF}"
-    rf"|{_verb('are|were|is|match|matched')}"
-)
+def _words(said: frozenset[int]) -> str:
+    """Up to three words between a number and its noun ("181 WGS runs", "5
+    Plasmodium vivax runs"). A number the user said counts as a word there,
+    so "169 NovaSeq 6000 runs" is a claim of 169, not of 6000."""
+    numbers = "".join(f"|{n}" for n in sorted(said))
+    return rf"(?:(?:[A-Za-z][\w.-]*{numbers})\s+){{0,3}}?"
+
+
+@lru_cache(maxsize=32)
+def _total_claim(said: frozenset[int]) -> re.Pattern:
+    return re.compile(
+        rf"{_NUM}\s+{_words(said)}{_RUN_WORD}\b"
+        rf"|\b{_RUN_WORD}\s*(?:matched|matching|found|total)?\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
+        rf"|{_OF}"
+        rf"|{_verb('are|were|is|match|matched')}"
+    )
+
+
 _ZERO_CLAIM = re.compile(
     rf"\b(?:no|zero|none of the)\s+(?:\w+\s+){{0,3}}?{_RUN_WORD}\b"
     rf"|\bno\s+(?:\w+\s+){{0,3}}?(?:match|matches)\b"
 )
+
 
 # A total stated as the answer -- the count of runs that match -- rather than
 # as a reference point beside it: "181 of the 231", "7,744 out of 17,629",
 # "181 are WGS", "999 matching runs", "999 runs match", "matching runs: 12".
 # "matched" and "results" are left out: replies use them for the search's own
 # total ("17,629 matched runs", "in your search results").
-_ANSWER_CLAIM = re.compile(
-    rf"{_OF}"
-    rf"|{_verb('are|were|match')}"
-    rf"|{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?matching\s+runs?\b"
-    rf"|{_NUM}\s+(?:[A-Za-z][\w.-]*\s+){{0,3}}?runs?\s+match\b"
-    r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
-)
+@lru_cache(maxsize=32)
+def _answer_claim(said: frozenset[int]) -> re.Pattern:
+    return re.compile(
+        rf"{_OF}"
+        rf"|{_verb('are|were|match')}"
+        rf"|{_NUM}\s+{_words(said)}matching\s+runs?\b"
+        rf"|{_NUM}\s+{_words(said)}runs?\s+match\b"
+        r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
+    )
+
+
 # "all 460 are WGS", "of the 999 matching runs": a group the answer is set
 # against, not the answer.
 _REFERENCE_BEFORE = re.compile(
@@ -215,12 +231,12 @@ def _claims(
 def run_total_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
     """Every run total the reply states, in order. `said` holds the numbers
     the user's own messages contain."""
-    return _claims(_TOTAL_CLAIM, reply, said, skip_references=False)
+    return _claims(_total_claim(said), reply, said, skip_references=False)
 
 
 def answer_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
     """The run totals the reply states as the matching count, in order."""
-    return _claims(_ANSWER_CLAIM, reply, said, skip_references=True)
+    return _claims(_answer_claim(said), reply, said, skip_references=True)
 
 
 def _context_counts(context: str) -> set[int]:
@@ -260,10 +276,10 @@ class _ReplyHasCount(Evaluator):
             return 0.0
         # The search's total or a selection's size is fine beside the answer,
         # not as it: "42 runs were expected; actually 999 matching runs".
-        # Only those: a breakdown beside the answer ("181 are WGS and 279 are
-        # WGA") is held to the rule above, and a number the user said is
-        # theirs to repeat.
-        others = set(self.also_ok) - {self.expected}
+        # Only those, and the user's own numbers ("in total 2019 matching
+        # runs" is not an answer to "after 2019"): a breakdown beside the
+        # answer ("181 are WGS and 279 are WGA") is held to the rule above.
+        others = (set(self.also_ok) | said) - {self.expected}
         if any(c in others for c in answer_claims(reply, said)):
             return 0.0
         if self.expected in claims:
