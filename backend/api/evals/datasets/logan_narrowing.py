@@ -1,23 +1,20 @@
-"""Chat-side narrowing of a Logan search: tool or pre-reply extractor?
+"""Chat-side narrowing of a Logan search with the query_logan_hits tool.
 
-Same ten cases for both mechanisms; the server's LOGAN_NARROWING_MODE picks
-which one runs (`tool`: the model calls query_logan_hits; `extract`: a
-tool-less pre-reply pass emits the query and the server injects the result).
+Ten questions about subsets of one search, run with LOGAN_NARROWING_MODE=tool
+(with "off" the model has no tool, which is the baseline to compare against).
 Each case is scored on:
 
 - LoganQueryShape -- the last query that answered the last turn (the last
-  query_logan_hits call that returned a count, or the extractor's query when
-  the pass counted and applied it) has exactly the expected filters: the
-  right fields, ops and values, nothing missing and nothing extra.
+  query_logan_hits call that returned a count) has exactly the expected
+  filters: the right fields, ops and values, nothing missing and nothing
+  extra.
   Equivalent spellings agree: eq x == in [x], and on the integer fields
   gt 2019 == gte 2020.
 - _ReplyHasCount -- the final reply states the ground-truth count, computed
   here with plain SQL over the fixture parquet (never through the engine
   under test), states no other run total as the matching count, and
   mentions no total it couldn't have been given;
-- NumbersTraceToContext -- nothing else in the reply is invented;
-- _SelectionHas (extract only) -- what the session kept as its selection,
-  exactly.
+- NumbersTraceToContext -- nothing else in the reply is invented.
 
 Latency is not a score: it is in every turn's trace (--dump-dir), and the
 write-up reads it from there.
@@ -121,29 +118,12 @@ def _tool_queries(turn: Any) -> list[dict]:
     return out
 
 
-# The extract pass's outcomes when it counted a query and the turn used it.
-_APPLIED = ("ask", "select", "cleared")
-
-
 def last_effective_query(output: Any) -> Optional[dict]:
     """The query that answered the last turn: the last query_logan_hits call
-    that ran and returned a count, or else the extractor's query when the pass
-    finished, counted it and applied it. A turn with neither has none."""
+    that ran and returned a count. A turn with none has none."""
     turns = getattr(output, "turns", None) or []
-    if not turns:
-        return None
-    last = turns[-1]
-    ran = _tool_queries(last)
-    if ran:
-        return ran[-1]
-    narrowing = getattr(last, "narrowing", None) or {}
-    if (
-        narrowing.get("outcome") in _APPLIED
-        and "total" in narrowing
-        and isinstance(narrowing.get("query"), dict)
-    ):
-        return narrowing["query"]
-    return None
+    ran = _tool_queries(turns[-1]) if turns else []
+    return ran[-1] if ran else None
 
 
 @dataclass
@@ -263,25 +243,6 @@ class _ReplyHasCount(Evaluator):
         return 0.0
 
 
-@dataclass
-class _SelectionHas(Evaluator):
-    """1.0 if the session's stored selection has exactly the expected filters
-    (or, with `cleared`, if there is no selection)."""
-
-    expect: list[dict] = field(default_factory=list)
-    cleared: bool = False
-
-    def evaluate(self, ctx: EvaluatorContext) -> float:
-        meta = getattr(ctx.output, "session_metadata", None) or {}
-        selection = (meta.get("logan") or {}).get("selection")
-        if self.cleared:
-            return 1.0 if not selection else 0.0
-        if not isinstance(selection, dict):
-            return 0.0
-        got = canonical_filters((selection.get("query") or {}).get("filters"))
-        return 1.0 if got is not None and got == canonical_filters(self.expect) else 0.0
-
-
 def _f(field_name: str, op: str, value: Any) -> dict:
     return {"field": field_name, "op": op, "value": value}
 
@@ -291,9 +252,8 @@ THAILAND = _f("country", "eq", "Thailand")
 
 # `expect` is the exact filter set the answering query must have; `truth` is
 # the same subset as a WHERE clause over the export, run with plain DuckDB
-# below for the reply's count. `selection` (extract mode) is what the session
-# must hold afterwards; `selection_truth` names a subset whose size the reply
-# may also quote.
+# below for the reply's count. `selection_truth` names the subset an earlier
+# turn selected, whose size the reply may also quote.
 _CASES = [
     {
         "name": "count_country_instrument",
@@ -335,14 +295,12 @@ _CASES = [
         "turns": [SELECT_THAILAND],
         "expect": [THAILAND],
         "truth": "country = 'Thailand'",
-        "selection": [THAILAND],
     },
     {
         "name": "follow_up_narrows_selection",
         "turns": [SELECT_THAILAND, "Of those, how many are WGS?"],
         "expect": [THAILAND, _f("assay_type", "eq", "WGS")],
         "truth": "country = 'Thailand' AND assay_type = 'WGS'",
-        "selection": [THAILAND],
         "selection_truth": "country = 'Thailand'",
     },
     {
@@ -354,7 +312,6 @@ _CASES = [
         ],
         "expect": [_f("assay_type", "eq", "WGS"), _f("release_year", "gt", 2019)],
         "truth": "assay_type = 'WGS' AND year(release_date) > 2019",
-        "selection_cleared": True,
         "selection_truth": "country = 'Thailand'",
     },
     {
@@ -386,7 +343,6 @@ _CASES = [
             _f("library_layout", "eq", "PAIRED"),
         ],
         "truth": "country = 'Cambodia' AND library_layout = 'PAIRED'",
-        "selection": [THAILAND],
         "selection_truth": "country = 'Thailand'",
     },
 ]
@@ -469,10 +425,6 @@ def build(
             _ReplyHasCount(expected=expected, also_ok=allowed_totals(c, total_matches)),
             NumbersTraceToContext(),
         ]
-        if mode == "extract" and c.get("selection"):
-            evaluators.append(_SelectionHas(expect=c["selection"]))
-        if mode == "extract" and c.get("selection_cleared"):
-            evaluators.append(_SelectionHas(cleared=True))
         cases.append(
             Case(
                 name=c["name"],

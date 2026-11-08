@@ -202,45 +202,7 @@ class TestExecute:
         assert results == [expected] * 6
 
 
-class TestVocabulary:
-    def test_values_come_from_the_engines_facets(self):
-        from app.services.tools.catalog_query import logan_vocabulary
-
-        vocab = logan_vocabulary(F1, ("country", "platform", "organism"), 200)
-        countries, cut = vocab["country"]
-        assert not cut
-        assert countries[0] == "Malawi" and "Kenya" in countries
-        assert "(none)" not in countries
-        assert vocab["platform"][0][0] == "ILLUMINA"
-
-    def test_a_cut_list_says_so_even_with_a_null_bucket(self):
-        from app.services.tools.catalog_query import logan_vocabulary
-
-        # Country is mostly NULL in F1, so the NULL bucket is the top one;
-        # it must not use up the slot that tells a cut list from a whole one.
-        n = len(logan_vocabulary(F1, ("country",), 200)["country"][0])
-        values, cut = logan_vocabulary(F1, ("country",), n - 1)["country"]
-        assert cut and len(values) == n - 1
-        values, cut = logan_vocabulary(F1, ("country",), n)["country"]
-        assert not cut and len(values) == n
-
-    def test_a_real_none_value_is_kept_while_the_null_bucket_goes(self, tmp_path):
-        from app.services.tools.catalog_query import logan_vocabulary
-
-        # F1 with one country renamed to the literal string the engine uses
-        # to label missing values.
-        path = tmp_path / "none.parquet"
-        con = duckdb.connect()
-        con.execute(
-            "COPY (SELECT * REPLACE (CASE WHEN country = 'Kenya' THEN '(none)' "
-            f"ELSE country END AS country) FROM read_parquet('{F1}')) "
-            f"TO '{path}' (FORMAT parquet)"
-        )
-        con.close()
-        values, _ = logan_vocabulary(path, ("country",), 200)["country"]
-        assert "(none)" in values and "Kenya" not in values
-        assert None not in values
-
+class TestCancellation:
     def test_a_cancel_during_connect_closes_without_running_anything(self, monkeypatch):
         from app.services import kmindex_filters
         from app.services.tools.catalog_query import QueryCancelled, QueryInterrupt

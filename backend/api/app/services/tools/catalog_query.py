@@ -654,19 +654,13 @@ def connect(catalog_dir: str):
     return None
 
 
-def execute(
-    q: "CatalogQuery | LoganHitQuery",
-    con,
-    facet_limit: int = _FACET_LIMIT,
-    null_key: object = "(none)",
-) -> dict:
-    """Run a CatalogQuery against DuckDB; return the summary contract.
+def execute(q: "CatalogQuery | LoganHitQuery", con) -> dict:
+    """Run a CatalogQuery or LoganHitQuery against DuckDB; return the summary
+    contract.
 
     Entity/column/sort identifiers are interpolated into SQL, not parameterized
-    (SQL identifiers can't be) — the CatalogQuery allowlist validator is what
+    (SQL identifiers can't be) — the query models' allowlist validator is what
     gates that interpolation, so don't loosen it without revisiting this.
-    `null_key` labels a facet's missing-value bucket; a caller that has to tell
-    it from a real "(none)" value passes something no value can be.
     """
     where, params = _compile_where(q)
     cap = q.limit
@@ -683,10 +677,10 @@ def execute(
                 f"SELECT {qcol} AS k, count(*) AS c FROM {entity} WHERE {where} "
                 # `, k` is a stable tiebreaker so equal-count buckets (and which
                 # ones fall at the LIMIT boundary) don't shuffle across runs.
-                f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {int(facet_limit)}",
+                f"GROUP BY {qcol} ORDER BY c DESC, k LIMIT {_FACET_LIMIT}",
                 params,
             ).fetchall()
-            out[col] = {(null_key if k is None else str(k)): c for k, c in rows}
+            out[col] = {("(none)" if k is None else str(k)): c for k, c in rows}
         return out
 
     total = con.execute(
@@ -881,29 +875,3 @@ def execute_logan_hits(
     """Run a LoganHitQuery over one job's export; same summary as execute()."""
     with _logan_connection(parquet, interrupt) as con:
         return execute(q, con)
-
-
-def logan_vocabulary(
-    parquet: Path,
-    fields: Sequence[str],
-    limit: int,
-    interrupt: Optional[QueryInterrupt] = None,
-) -> dict[str, tuple[list[str], bool]]:
-    """The commonest values of each field in one job's export, through the
-    engine's own facets, and whether each list was cut at `limit`.
-
-    One connection for every field; facet_by is capped per query, so the
-    fields go through in chunks of that cap.
-    """
-    out: dict[str, tuple[list[str], bool]] = {}
-    chunk = LoganHitQuery.model_fields["facet_by"].metadata[0].max_length
-    with _logan_connection(parquet, interrupt) as con:
-        for i in range(0, len(fields), chunk):
-            q = LoganHitQuery(operation="facets", facet_by=list(fields[i : i + chunk]))
-            # Two over the limit: one for the NULL bucket, which is dropped,
-            # and one to tell a list that was cut from one that just fits.
-            facets = execute(q, con, facet_limit=limit + 2, null_key=None)
-            for name, buckets in facets["facets"].items():
-                values = [v for v in buckets if v is not None]
-                out[name] = (values[:limit], len(values) > limit)
-    return out
