@@ -27,7 +27,6 @@ the job's real count and agrees with the cohort numbers in the same prompt
 from __future__ import annotations
 
 import json
-import os
 import re
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
@@ -37,6 +36,7 @@ from pydantic_ai.models import Model
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext
 
+from app.core.config import get_settings
 from evals.evaluators import (
     NumbersTraceToContext,
     extract_numbers,
@@ -405,15 +405,12 @@ def allowed_totals(case: dict, total_matches: int) -> list[int]:
     return ok
 
 
-def _mode() -> str:
-    return (os.environ.get("LOGAN_NARROWING_MODE") or "off").lower()
-
-
 def build(
     deps: EvalDeps, entry: ModelEntry, judge_model: Model, only: list[str] | None = None
 ) -> tuple[Dataset, Callable, str]:
     require_whole_export()
-    mode = _mode()
+    # What the in-process server will run, parsed by the server's own rule.
+    mode = get_settings().LOGAN_NARROWING_MODE
     total_matches = load_fixture(FIXTURE).snapshot["total_matches"]
     cases = []
     for c in _CASES:

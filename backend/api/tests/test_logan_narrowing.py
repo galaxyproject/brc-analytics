@@ -117,18 +117,38 @@ def _clear_settings():
 
 
 @pytest.mark.parametrize("raw", ["sometimes", "extract", " Extract "])
-def test_an_unknown_mode_reads_as_off(monkeypatch, raw):
+def test_an_unknown_mode_reads_as_off_and_says_so(monkeypatch, caplog, raw):
     # "extract" was a second mode, since removed; a deploy still setting it
     # gets the shipped behaviour rather than a half-configured one.
     monkeypatch.setenv("LOGAN_NARROWING_MODE", raw)
     get_settings.cache_clear()
-    assert get_settings().LOGAN_NARROWING_MODE == "off"
+    with caplog.at_level("WARNING", logger="app.core.config"):
+        assert get_settings().LOGAN_NARROWING_MODE == "off"
+    assert "LOGAN_NARROWING_MODE" in caplog.text
 
 
-def test_the_tool_mode_is_read_loosely(monkeypatch):
-    monkeypatch.setenv("LOGAN_NARROWING_MODE", " Tool ")
+@pytest.mark.parametrize("raw", [" Tool ", "tool", "OFF", None])
+def test_known_modes_are_read_loosely_and_quietly(monkeypatch, caplog, raw):
+    if raw is None:
+        monkeypatch.delenv("LOGAN_NARROWING_MODE", raising=False)
+    else:
+        monkeypatch.setenv("LOGAN_NARROWING_MODE", raw)
     get_settings.cache_clear()
-    assert get_settings().LOGAN_NARROWING_MODE == "tool"
+    with caplog.at_level("WARNING", logger="app.core.config"):
+        mode = get_settings().LOGAN_NARROWING_MODE
+    assert mode == (raw or "off").strip().lower()
+    assert "LOGAN_NARROWING_MODE" not in caplog.text
+
+
+def test_the_dataset_labels_a_run_with_the_mode_the_server_runs(monkeypatch):
+    # The dataset used to parse the variable itself, without stripping it.
+    from evals.datasets import logan_narrowing as ds
+
+    monkeypatch.setenv("LOGAN_NARROWING_MODE", "tool ")
+    get_settings.cache_clear()
+    monkeypatch.setattr(ds, "make_logan_conversation_task", lambda deps, entry: None)
+    dataset, _task, _primary = ds.build(None, None, None, only=["count_score"])
+    assert dataset.cases[0].metadata["mode"] == "tool"
 
 
 class TestToolMode:

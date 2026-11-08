@@ -35,7 +35,7 @@ from tenacity import (
 )
 
 from app.core.cache import CacheService
-from app.core.config import get_settings
+from app.core.config import NarrowingMode, get_settings
 from app.models.assistant import (
     AnalysisSchema,
     AnalysisStateUpdate,
@@ -593,7 +593,7 @@ class AssistantAgent:
     """High-level wrapper around the pydantic-ai Agent for the analysis assistant."""
 
     # Class-level default: some tests assemble the agent without __init__.
-    narrowing_mode: str = "off"
+    narrowing_mode: NarrowingMode = "off"
 
     def __init__(
         self,
