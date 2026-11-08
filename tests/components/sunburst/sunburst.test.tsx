@@ -88,16 +88,17 @@ describe("Sunburst", () => {
     });
   });
 
-  it("says so if the chart can't be loaded", async () => {
+  it("says so if the chart can't be loaded, and logs why", async () => {
+    const logged = jest.spyOn(console, "error").mockImplementation(() => {});
+    const error = new Error("offline");
     renderThemed(
-      <Sunburst
-        loadData={() => Promise.reject(new Error("offline"))}
-        logoPath="/logo.svg"
-      />
+      <Sunburst loadData={() => Promise.reject(error)} logoPath="/logo.svg" />
     );
     expect(
       await screen.findByText("The taxonomy chart could not be loaded.")
     ).toBeTruthy();
+    expect(logged).toHaveBeenCalledWith(expect.any(String), error);
+    logged.mockRestore();
   });
 
   it("offers the panel's subcategories as buttons", async () => {
@@ -206,6 +207,10 @@ describe("Sunburst", () => {
     expect(chart.getAttribute("aria-label")).toBe(
       "Assemblies by taxonomic lineage"
     );
+    // Focus returns to the arc just zoomed out of, not the page.
+    expect(document.activeElement).toBe(
+      within(chart).getByRole("button", { name: "Beta, domain · 1 assembly" })
+    );
   });
 
   it("shows the lineage of the centred taxon with links back up it", async () => {
@@ -258,6 +263,51 @@ describe("Sunburst", () => {
       act(() => trigger?.());
       expect(loadData).toHaveBeenCalledTimes(1);
       await waitFor(() => expect(arcs(container)).toHaveLength(11));
+    });
+  });
+
+  describe("with ResizeObserver", () => {
+    let resize: (() => void) | null = null;
+    let width = 800;
+    const original = window.ResizeObserver;
+    const originalRect = SVGElement.prototype.getBoundingClientRect;
+
+    beforeEach(() => {
+      resize = null;
+      width = 800;
+      window.ResizeObserver = class {
+        constructor(callback: ResizeObserverCallback) {
+          resize = (): void => callback([], this as unknown as ResizeObserver);
+        }
+        disconnect(): void {}
+        observe(): void {}
+      } as unknown as typeof ResizeObserver;
+      SVGElement.prototype.getBoundingClientRect = function (): DOMRect {
+        return { width } as DOMRect;
+      };
+    });
+
+    afterEach(() => {
+      window.ResizeObserver = original;
+      SVGElement.prototype.getBoundingClientRect = originalRect;
+    });
+
+    it("enlarges the labels when the chart is drawn smaller", async () => {
+      renderThemed(
+        <Sunburst
+          loadData={() => Promise.resolve(sampleTree())}
+          logoPath="/logo.svg"
+        />
+      );
+      const chart = await screen.findByRole("group");
+      const labelSize = (): string | undefined =>
+        within(chart).getByText("Alpha").closest<SVGGElement>("g")?.style
+          .fontSize;
+      expect(labelSize()).toBe("11px");
+      // At half size, labels grow so they still render 9px on screen.
+      width = 400;
+      act(() => resize?.());
+      expect(labelSize()).toBe("18px");
     });
   });
 

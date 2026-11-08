@@ -59,7 +59,8 @@ export const Sunburst = ({
         .then(([module, data]) => {
           if (!cancelled) setLoaded({ Chart: module.SunburstChart, data });
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error("Failed to load the taxonomy chart:", error);
           if (!cancelled) setFailed(true);
         });
     };
