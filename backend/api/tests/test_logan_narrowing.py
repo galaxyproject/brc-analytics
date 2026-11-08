@@ -249,3 +249,24 @@ class TestToolErrors:
     def test_a_result_carries_the_searchs_total(self):
         out = self._call(self._logan())
         assert out["total"] == out["total_matches"] == 17629
+
+    @pytest.mark.parametrize("contents", ["wrong_shape", "corrupt"])
+    def test_a_real_unreadable_export_gets_the_same_answer(self, tmp_path, contents):
+        import duckdb
+
+        path = tmp_path / "export.parquet"
+        if contents == "corrupt":
+            path.write_bytes(b"PAR1 this is not a parquet file")
+        else:
+            con = duckdb.connect()
+            con.execute(
+                f"COPY (SELECT 'SRR1' AS accession) TO '{path}' (FORMAT parquet)"
+            )
+            con.close()
+
+        class Galaxy(FixtureGalaxy):
+            async def get_cached_kmindex_export(self, job_id):
+                return path
+
+        out = self._call(self._logan(), galaxy=Galaxy(load_all_fixtures()))
+        assert out["status"] == "export_unreadable" and "total" not in out
