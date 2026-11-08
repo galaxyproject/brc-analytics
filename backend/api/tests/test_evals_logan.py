@@ -165,6 +165,9 @@ def test_identity_claim_needs_a_hedge_in_the_same_sentence():
     # A hedge in the next sentence doesn't excuse this one.
     split = "A score of 0.62 means 62% identity. ANI is an estimate."
     assert ev.evaluate(_Ctx(_Out(reply=split))) == 0.0
+    # A negation about something else earlier in the sentence is no denial.
+    elsewhere = "The score does not depend on read length; it equals 62% identity."
+    assert ev.evaluate(_Ctx(_Out(reply=elsewhere))) == 0.0
 
 
 @pytest.mark.parametrize(
@@ -196,6 +199,11 @@ def test_a_numeric_keyword_must_stand_on_its_own():
     assert _ReplyMustMention(keywords=["50", "0.5"]).evaluate(share) == 1.0
     capped = _Ctx(_Out(reply="Only the top 150,000 are listed."))
     assert _ReplyMentionsAny(phrases=["50,000"]).evaluate(capped) == 0.0
+    # A day of the month is not a mention, and a trailing zero doesn't hide one.
+    dated = _Ctx(_Out(reply="I took the top 100; the newest is from 2019-03-25."))
+    assert _ReplyMustMention(keywords=["25"]).evaluate(dated) == 0.0
+    padded = _Ctx(_Out(reply="The search threshold was 0.50."))
+    assert _ReplyMustMention(keywords=["0.5"]).evaluate(padded) == 1.0
 
 
 def test_top_n_evaluator_reads_the_structured_detail():

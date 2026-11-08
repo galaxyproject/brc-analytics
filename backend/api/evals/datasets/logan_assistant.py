@@ -18,7 +18,7 @@ from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext, LLMJudge
 
 from evals.datasets.assistant_multiturn import FinalSchemaContains, IsCompleteEquals
-from evals.evaluators import NumbersTraceToContext, normalize_numbers
+from evals.evaluators import NumbersTraceToContext, normalize_numbers, without_dates
 from evals.logan_fixture import load_fixture
 from evals.model_registry import ModelEntry
 from evals.tasks import EvalDeps, make_logan_conversation_task
@@ -40,11 +40,13 @@ _BARE_NUMBER = re.compile(r"\d+(?:\.\d+)?")
 
 def _mentions(text: str, phrase: str) -> bool:
     """`phrase` in already-normalised `text`. A bare number has to stand on
-    its own: "25" is not in "2015-2025", though "50" is in "50.4%"."""
+    its own: "25" is not in "2015-2025" or in a date like 2019-03-25, though
+    "50" is in "50.4%" and "0.5" is in "0.50"."""
     phrase = normalize_numbers(phrase)
     if _BARE_NUMBER.fullmatch(phrase):
-        pattern = rf"(?<![\d.]){re.escape(phrase)}(?:\.\d+)?(?!\d)"
-        return re.search(pattern, text) is not None
+        tail = r"0*" if "." in phrase else r"(?:\.\d+)?"
+        pattern = rf"(?<![\d.]){re.escape(phrase)}{tail}(?!\d)"
+        return re.search(pattern, without_dates(text)) is not None
     return phrase in text
 
 
@@ -117,17 +119,28 @@ class _ReplyMustNotMatch(Evaluator):
 # A sentence that equates the score with sequence identity, unless it hedges
 # with "estimate" or names ANI, or denies it ("is not percent identity" is the
 # answer the rubric wants).
-_SENTENCE = re.compile(r"[^.!?\n]+")
+# A full stop between digits ("0.62") doesn't end a sentence.
+_SENTENCE = re.compile(r"(?:[^.!?\n]|(?<=\d)\.(?=\d))+")
 _IDENTITY_CLAIM = re.compile(r"%\s*identity|percent identity|\bidentical\b", re.I)
 _IDENTITY_HEDGE = re.compile(r"estimat|\bANI\b", re.I)
 _NEGATION = re.compile(r"\bnot\b|n't\b|\brather than\b", re.I)
+
+
+# How far before the claim a negation may sit and still be about it: the
+# clause it is in, and no more than a few words back ("does not mean the reads
+# are identical"), so "does not depend on length; it equals 62% identity"
+# still claims.
+_CLAUSE_BREAK = re.compile(r"[;:,]")
+_NEGATION_WORDS = 6
 
 
 def _claims_identity(sentence: str) -> bool:
     claim = _IDENTITY_CLAIM.search(sentence)
     if not claim or _IDENTITY_HEDGE.search(sentence):
         return False
-    return not _NEGATION.search(sentence[: claim.start()])
+    clause = _CLAUSE_BREAK.split(sentence[: claim.start()])[-1]
+    near = " ".join(clause.split()[-_NEGATION_WORDS:])
+    return not _NEGATION.search(near)
 
 
 @dataclass

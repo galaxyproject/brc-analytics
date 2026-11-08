@@ -188,6 +188,11 @@ class _Num:
     text: str
 
 
+def without_dates(text: str) -> str:
+    """`text` with its ISO dates blanked, for matching numbers in it."""
+    return _DATE.sub(" ", text)
+
+
 def _strip_rank_columns(text: str) -> str:
     lines = text.split("\n")
     rank_table = False
