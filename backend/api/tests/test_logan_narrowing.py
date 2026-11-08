@@ -209,3 +209,55 @@ def test_every_logan_hit_field_is_named_everywhere():
     for name in ENTITY_SCHEMA["logan_hit"].fields:
         for text in (ln.TOOL_HINT, ln.TOOL_DESCRIPTION):
             assert name in text, name
+
+
+class TestToolErrors:
+    """What query_logan_hits answers when it can't count. The eval's scorers
+    rely on an error carrying no total."""
+
+    def _call(self, logan, galaxy=None):
+        from app.services.logan_narrowing import query_logan_hits
+        from app.services.tools.catalog_query import LoganHitQuery
+        from app.services.tools.catalog_tools import AssistantDeps
+
+        deps = AssistantDeps(
+            catalog=None,
+            galaxy=galaxy or FixtureGalaxy(load_all_fixtures()),
+            logan=logan,
+        )
+        return json.loads(asyncio.run(query_logan_hits(deps, LoganHitQuery())))
+
+    def _logan(self):
+        return dict(load_fixture(F1).snapshot)
+
+    @pytest.mark.parametrize("logan", [None, {}, {"job_id": ""}])
+    def test_no_search_is_an_error(self, logan):
+        out = self._call(logan)
+        assert "error" in out and "total" not in out
+
+    def test_a_failed_query_is_an_error_without_a_total(self, monkeypatch):
+        import app.services.logan_narrowing as ln
+
+        def boom(q, con):
+            raise RuntimeError("disk on fire")
+
+        monkeypatch.setattr(ln, "execute", boom)
+        out = self._call(self._logan())
+        assert out == {"error": "Query failed; try a simpler filter."}
+
+    def test_an_unreadable_export_is_not_worth_retrying(self, monkeypatch):
+        import app.services.logan_narrowing as ln
+        from app.services.tools.catalog_query import LoganExportMismatch
+
+        def mismatch(q, con):
+            raise LoganExportMismatch("missing ['score']")
+
+        monkeypatch.setattr(ln, "execute", mismatch)
+        out = self._call(self._logan())
+        assert out["status"] == "export_unreadable"
+        assert "total" not in out and "simpler filter" not in out["message"]
+        assert out["results_url"].startswith("/logan-search?job=")
+
+    def test_a_result_carries_the_searchs_total(self):
+        out = self._call(self._logan())
+        assert out["total"] == out["total_matches"] == 17629

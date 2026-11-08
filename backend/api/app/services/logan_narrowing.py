@@ -21,7 +21,12 @@ from pydantic_ai import RunContext
 from pydantic_ai.tools import ToolDefinition
 
 from app.services.logan_export_query import run_export_query
-from app.services.tools.catalog_query import ENTITY_SCHEMA, LoganHitQuery, execute
+from app.services.tools.catalog_query import (
+    ENTITY_SCHEMA,
+    LoganExportMismatch,
+    LoganHitQuery,
+    execute,
+)
 from app.services.tools.catalog_tools import AssistantDeps
 
 logger = logging.getLogger(__name__)
@@ -62,7 +67,7 @@ async def only_in_logan_sessions(
     ctx: RunContext[AssistantDeps], tool_def: ToolDefinition
 ) -> Optional[ToolDefinition]:
     """Offer query_logan_hits only in a session opened from a search."""
-    return tool_def if getattr(ctx.deps, "logan", None) else None
+    return tool_def if ctx.deps.logan else None
 
 
 async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
@@ -73,7 +78,8 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
     """
     logan = deps.logan or {}
     job_id = logan.get("job_id")
-    if not job_id or deps.galaxy is None:
+    # The tool is registered only with a Galaxy service, so deps.galaxy is set.
+    if not job_id:
         return json.dumps({"error": "This conversation has no Logan search."})
     path = await deps.galaxy.get_cached_kmindex_export(job_id)
     if path is None:
@@ -87,6 +93,19 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
         )
     try:
         result = await run_export_query(path, lambda con: execute(query, con))
+    except LoganExportMismatch:
+        # No filter can work on this file, so retry advice would only send the
+        # model round again.
+        logger.exception("query_logan_hits: unreadable export for job %s", job_id)
+        return json.dumps(
+            {
+                "status": "export_unreadable",
+                "results_url": logan.get("results_url") or "",
+                "message": "This search's saved match set can't be read, so its "
+                "subsets can't be counted. Answer from the cohort numbers above, "
+                "and say a breakdown isn't available.",
+            }
+        )
     except Exception:
         logger.exception("query_logan_hits failed for job %s", job_id)
         return json.dumps({"error": "Query failed; try a simpler filter."})
