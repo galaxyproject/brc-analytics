@@ -24,7 +24,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, TypeVar, Union
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -372,7 +372,11 @@ class CatalogQuery(BaseModel):
         return _validate_query(self)
 
 
-def _validate_query(q: "CatalogQuery | LoganHitQuery"):
+# Either query model; the validator hands back the instance it was given.
+Q = TypeVar("Q", "CatalogQuery", "LoganHitQuery")
+
+
+def _validate_query(q: Q) -> Q:
     """The checks every query model runs, whatever its entity.
 
     A function rather than a shared base class, so CatalogQuery's own fields
