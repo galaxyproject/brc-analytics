@@ -2533,11 +2533,18 @@ class TestCachedKmindexExport:
         service._agg_cache_key = lambda job_id: f"agg:{job_id}"
         orig_key = "agg:orig1"
 
+        status_key = service.cache.make_key("galaxy:job_status", {"job_id": "copy1"})
+
         async def get(key):
-            return aggregate if key == orig_key else None
+            if key == orig_key:
+                return aggregate
+            # The copy's cached status names its original, as Galaxy's job
+            # cache records it.
+            if key == status_key:
+                return {"copied_from_job_id": "orig1"}
+            return None
 
         service.cache.get = AsyncMock(side_effect=get)
-        service._cached_copied_from = AsyncMock(return_value="orig1")
         self._forbid_cold_path(service)
 
         assert await service.get_cached_kmindex_export("copy1") == (
