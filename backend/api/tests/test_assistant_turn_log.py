@@ -857,6 +857,16 @@ class TestLoganJobIdIsRecorded:
 
     JOB = "806580fd1ed1cc90"
 
+    @staticmethod
+    def _session_metadata():
+        """What production stores: a real snapshot, dumped the way the
+        session saves it, so a renamed field can't leave this test green."""
+        from app.services.logan_snapshot import build_logan_snapshot
+        from tests.test_logan_snapshot import results
+
+        snapshot = build_logan_snapshot(results(), captured_at="t")
+        return {"logan": snapshot.model_dump(mode="json")}
+
     def _agent(self, metadata):
         from app.models.assistant import AnalysisSchema, SessionState
 
@@ -878,12 +888,13 @@ class TestLoganJobIdIsRecorded:
     @pytest.mark.asyncio
     async def test_a_logan_bound_turn_records_the_job(self):
         recorded = []
-        agent = self._agent({"logan": {"job_id": self.JOB}})
+        metadata = self._session_metadata()
+        agent = self._agent(metadata)
         agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
 
         await agent.chat_with_telemetry("hello", on_turn=recorded.append)
 
-        assert recorded[0].logan_job_id == self.JOB
+        assert recorded[0].logan_job_id == metadata["logan"]["job_id"]
 
     @pytest.mark.asyncio
     async def test_an_ordinary_turn_records_null(self):
@@ -895,6 +906,36 @@ class TestLoganJobIdIsRecorded:
 
         assert recorded[0].logan_job_id is None
 
+    @pytest.mark.parametrize(
+        "metadata",
+        [
+            {},
+            None,
+            {"logan": None},
+            # A hand-edited snapshot that isn't a dict must not fail the turn.
+            {"logan": "806580fd1ed1cc90"},
+            {"logan": {}},
+            {"logan": {"job_id": 806580}},
+            {"logan": {"job_id": "806580fd1ed1cc9"}},
+            {"logan": {"job_id": "806580fd1ed1cc900"}},
+            # Galaxy ids are lower-case, and kmindex_submissions stores them so.
+            {"logan": {"job_id": "806580FD1ED1CC90"}},
+            # "$" matches before a final newline, so a plain match would let a
+            # 17-character value through to a String(16) column.
+            {"logan": {"job_id": "806580fd1ed1cc90\n"}},
+            {"logan": {"job_id": "not-a-job; DROP TABLE"}},
+        ],
+    )
+    def test_anything_but_a_well_formed_id_is_null(self, metadata):
+        from app.services.assistant_agent import _logan_job_id
+
+        assert _logan_job_id(metadata) is None
+
+    def test_a_well_formed_id_is_kept(self):
+        from app.services.assistant_agent import _logan_job_id
+
+        assert _logan_job_id({"logan": {"job_id": self.JOB}}) == self.JOB
+
     @pytest.mark.asyncio
     async def test_a_malformed_job_id_records_null(self):
         recorded = []
@@ -904,14 +945,6 @@ class TestLoganJobIdIsRecorded:
         await agent.chat_with_telemetry("hello", on_turn=recorded.append)
 
         assert recorded[0].logan_job_id is None
-
-    def test_a_trailing_newline_is_not_a_job_id(self):
-        # "$" matches before a final newline, so a plain match would let a
-        # 17-character value through to a String(16) column.
-        from app.services.assistant_agent import _logan_job_id
-
-        assert _logan_job_id({"logan": {"job_id": self.JOB}}) == self.JOB
-        assert _logan_job_id({"logan": {"job_id": self.JOB + "\n"}}) is None
 
     @pytest.mark.asyncio
     async def test_a_failed_logan_turn_still_records_the_job(self):
