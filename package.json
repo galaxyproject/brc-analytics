@@ -153,6 +153,9 @@
     "node": "22.13.0"
   },
   "overrides": {
+    "@sentry/bundler-plugins": {
+      "glob": "^14.0.2"
+    },
     "serve": {
       "compression": "^1.8.2"
     }
