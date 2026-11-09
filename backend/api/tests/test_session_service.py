@@ -30,19 +30,18 @@ class FakeCache:
         self.values[key] = value
         return True
 
-    async def set_strict(self, key: str, value, ttl: int) -> None:
+    async def add_to_set(self, key: str, member: str, ttl: int) -> None:
         if self.fail_reads:
             raise redis.RedisError("redis is unreachable")
-        self.values[key] = value
+        self.values.setdefault(key, set()).add(member)
         self.expired[key] = ttl
 
-    async def expire_strict(self, key: str, ttl: int) -> bool:
+    async def is_in_set(self, key: str, member: str, ttl: int) -> bool:
         if self.fail_reads:
             raise redis.RedisError("redis is unreachable")
-        if key not in self.values:
-            return False
-        self.expired[key] = ttl
-        return True
+        if key in self.values:
+            self.expired[key] = ttl
+        return member in self.values.get(key, set())
 
 
 @pytest.mark.asyncio
@@ -241,17 +240,14 @@ async def test_binding_checks_surface_redis_failure_instead_of_refusing():
 
 @pytest.mark.asyncio
 async def test_unbind_browser_drops_every_session_that_browser_holds():
-    cache = FakeCache()
-    cache.cleared_patterns = []
-
-    async def clear_pattern(pattern: str) -> int:
-        cache.cleared_patterns.append(pattern)
-        return 0
-
-    cache.clear_pattern = clear_pattern
-    service = SessionService(cache)
+    # One key per browser: logout costs a single delete, never a scan.
+    service = SessionService(FakeCache())
+    await service.bind_browser("s1", "binding")
+    await service.bind_browser("s2", "binding")
+    await service.bind_browser("s1", "other-binding")
 
     await service.unbind_browser("binding")
 
-    # Keys are browser-first, so one pattern reaches all of them.
-    assert cache.cleared_patterns == ["assistant:binding:binding:*"]
+    assert not await service.is_browser_bound("s1", "binding")
+    assert not await service.is_browser_bound("s2", "binding")
+    assert await service.is_browser_bound("s1", "other-binding")
