@@ -28,25 +28,7 @@ export const AssistantView = ({
   introText,
   sessionKey,
 }: Props): JSX.Element => {
-  const {
-    clearField,
-    error,
-    handoffUrl,
-    isRestoring,
-    isSaved,
-    lastSave,
-    loading,
-    logan,
-    messages,
-    onRetry,
-    resetSession,
-    retryRestore,
-    savedAnalysisId,
-    schema,
-    sendMessage,
-    shownSessionId,
-    suggestions,
-  } = useAssistantChat({
+  const { actions, state } = useAssistantChat({
     initialLoganJobId,
     initialMessage,
     initialSessionId,
@@ -56,8 +38,9 @@ export const AssistantView = ({
   // A conversation opening from the history: until its restore takes over,
   // nothing else may start or send, or the open would wipe it.
   const [isOpening, setIsOpening] = useState(false);
-  const { conversationKey, onNewAnalysis, onOpened } =
-    useConversationKey(resetSession);
+  const { conversationKey, onNewAnalysis, onOpened } = useConversationKey(
+    actions.onResetSession
+  );
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -101,16 +84,16 @@ export const AssistantView = ({
               // user into the next one.
               <Conversation
                 key={conversationKey}
-                error={error}
-                handoffUrl={handoffUrl}
+                error={state.error}
+                handoffUrl={state.handoffUrl}
                 introText={introText}
-                isRestoring={isRestoring || isOpening}
-                loading={loading}
-                messages={messages}
-                onRetry={onRetry}
-                onSend={sendMessage}
-                schema={schema}
-                suggestions={suggestions}
+                isRestoring={state.isRestoring || isOpening}
+                loading={state.loading}
+                messages={state.messages}
+                onRetry={actions.onRetry}
+                onSend={actions.onSendMessage}
+                schema={state.schema}
+                suggestions={state.suggestions}
               />
             ),
             tabLabel: "Chat",
@@ -118,15 +101,15 @@ export const AssistantView = ({
           history: {
             children: (
               <Sidebar
-                disabled={loading || isRestoring || isOpening}
+                disabled={state.loading || state.isRestoring || isOpening}
                 disclaimer={disclaimer}
-                lastSave={lastSave}
+                lastSave={state.lastSave}
                 onNewAnalysis={onNewAnalysis}
                 onOpened={onOpened}
                 onOpeningChange={setIsOpening}
-                onRetryRestore={retryRestore}
-                savedAnalysisId={savedAnalysisId}
-                sessionId={shownSessionId}
+                onRetryRestore={actions.onRetryRestore}
+                savedAnalysisId={state.savedAnalysisId}
+                sessionId={state.shownSessionId}
                 supportUrl={supportUrl}
               />
             ),
@@ -136,13 +119,18 @@ export const AssistantView = ({
             // The new UI leaves out the Logan cohort card for now.
             children: (
               <AnalysisSetup
-                handoffUrl={handoffUrl}
-                loading={loading || isRestoring || isOpening}
-                onClearField={clearField}
-                schema={schema}
+                handoffUrl={state.handoffUrl}
+                loading={state.loading || state.isRestoring || isOpening}
+                onClearField={actions.onClearField}
+                schema={state.schema}
               />
             ),
-            tabLabel: <SetupTabLabel handoffUrl={handoffUrl} schema={schema} />,
+            tabLabel: (
+              <SetupTabLabel
+                handoffUrl={state.handoffUrl}
+                schema={state.schema}
+              />
+            ),
           },
         }}
       />
@@ -151,7 +139,8 @@ export const AssistantView = ({
 
   // On error there are no messages and no schema, which would hide Reset
   // exactly when it's the only way to clear a bad session id.
-  const showReset = messages.length > 0 || schema !== null || error !== null;
+  const showReset =
+    state.messages.length > 0 || state.schema !== null || state.error !== null;
 
   return (
     <LegacyLayout
@@ -159,15 +148,15 @@ export const AssistantView = ({
         chat: {
           children: (
             <ChatPanel
-              error={error}
+              error={state.error}
               introText={introText}
-              isRestoring={isRestoring || isOpening}
-              isSaved={isSaved}
-              loading={loading}
-              messages={messages}
-              onRetry={onRetry}
-              onSend={sendMessage}
-              suggestions={suggestions}
+              isRestoring={state.isRestoring || isOpening}
+              isSaved={state.isSaved}
+              loading={state.loading}
+              messages={state.messages}
+              onRetry={actions.onRetry}
+              onSend={actions.onSendMessage}
+              suggestions={state.suggestions}
             />
           ),
         },
@@ -191,8 +180,8 @@ export const AssistantView = ({
             // Not mid-reply: the late reply would re-bind the session cookie
             // to the conversation left behind, locking out the new one.
             <Button
-              disabled={loading}
-              onClick={resetSession}
+              disabled={state.loading}
+              onClick={actions.onResetSession}
               size="small"
               startIcon={<RestartAltIcon />}
               sx={{ visibility: showReset ? "visible" : "hidden" }}
@@ -205,8 +194,11 @@ export const AssistantView = ({
         setup: {
           children: (
             <>
-              {logan && <LoganCohortCard logan={logan} />}
-              <SchemaPanel handoffUrl={handoffUrl} schema={schema} />
+              {state.logan && <LoganCohortCard logan={state.logan} />}
+              <SchemaPanel
+                handoffUrl={state.handoffUrl}
+                schema={state.schema}
+              />
             </>
           ),
         },

@@ -65,7 +65,7 @@ describe("useAssistantChat initial message", () => {
         expect.objectContaining({ message: QUESTION })
       )
     );
-    expect(result.current.messages[0]).toEqual({
+    expect(result.current.state.messages[0]).toEqual({
       content: QUESTION,
       role: "user",
     });
@@ -130,7 +130,7 @@ describe("useAssistantChat initial message", () => {
     rerender({ initialMessage: undefined });
 
     await waitFor(() =>
-      expect(result.current.messages[0]).toEqual({
+      expect(result.current.state.messages[0]).toEqual({
         content: QUESTION,
         role: "user",
       })

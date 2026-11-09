@@ -1,16 +1,21 @@
-import type { UseAssistantChatReturn } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
+import type {
+  UseAssistantChatActions,
+  UseAssistantChatState,
+} from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 
-export interface ConversationProps extends Pick<
-  UseAssistantChatReturn,
-  | "error"
-  | "handoffUrl"
-  | "isRestoring"
-  | "loading"
-  | "messages"
-  | "onRetry"
-  | "schema"
-  | "suggestions"
-> {
+export interface ConversationProps
+  extends
+    Pick<UseAssistantChatActions, "onRetry">,
+    Pick<
+      UseAssistantChatState,
+      | "error"
+      | "handoffUrl"
+      | "isRestoring"
+      | "loading"
+      | "messages"
+      | "schema"
+      | "suggestions"
+    > {
   introText: string;
-  onSend: (message: string) => void;
+  onSend: UseAssistantChatActions["onSendMessage"];
 }
