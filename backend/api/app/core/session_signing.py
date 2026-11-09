@@ -35,6 +35,8 @@ async def bind_session(
         key=browser_cookie_name(),
         value=browser_id,
         max_age=BROWSER_COOKIE_MAX_AGE,
+        # Required of a __Host- cookie, along with no Domain.
+        path="/",
         httponly=True,
         samesite="strict",
         secure=_is_secure(),
@@ -86,7 +88,9 @@ async def require_bound(
     if not browser_id or not await session_service.is_browser_bound(
         session_id, sign_browser_id(browser_id)
     ):
-        raise HTTPException(status_code=403, detail="Invalid session cookie")
+        raise HTTPException(
+            status_code=403, detail="This browser is not bound to that session"
+        )
 
 
 def sign_browser_id(browser_id: str) -> str:
