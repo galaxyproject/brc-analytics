@@ -341,20 +341,23 @@ export const useAssistantChat = ({
     if (saveAttemptRef.current === currentSessionId) return;
     saveAttemptRef.current = currentSessionId;
 
-    let cancelled = false;
     assistantAPIClient
       .assistantSaveSession(currentSessionId)
       .then(({ saved_analysis_id }) => {
         // On disk whether or not this run is still current.
         setLastSave({ savedAnalysisId: saved_analysis_id });
-        // Checked against the session, not this run: a turn starting cancels
-        // the run, but the session is still the one just written, and a turn
-        // that fails would never say so. A conversation that replaced it has
-        // moved the session on.
-        if (sessionIdRef.current === currentSessionId) {
+        // Checked against the session, not this run: a turn or an open
+        // starting cancels the run, but the session is still the one just
+        // written, and a turn or open that fails would never say so. A
+        // conversation that replaced it has moved the session on, and signing
+        // out has dropped the latch.
+        if (
+          sessionIdRef.current === currentSessionId &&
+          saveAttemptRef.current === currentSessionId
+        ) {
           setSavedAnalysisId(saved_analysis_id);
+          setIsSaved(true);
         }
-        if (!cancelled) setIsSaved(true);
       })
       .catch((error: unknown) => {
         // The label stays off, which is the honest reading. But the latch was
@@ -375,10 +378,6 @@ export const useAssistantChat = ({
         clearSaveRetry(saveRetryTimerRef);
         saveRetryTimerRef.current = setTimeout(retrySave, delay);
       });
-
-    return (): void => {
-      cancelled = true;
-    };
   }, [
     isAuthLoading,
     isAuthenticated,

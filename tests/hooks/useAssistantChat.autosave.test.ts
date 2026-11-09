@@ -498,4 +498,53 @@ describe("useAssistantChat auto-save", () => {
 
     expect(result.current.state.savedAnalysisId).toBe("analysis-1");
   });
+
+  test("a save that lands after a failed open still marks the conversation saved", async () => {
+    // The open cancels the save's effect run, but the conversation on screen
+    // is still the one just saved -- and an open that fails never says so.
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+    mockApiClient.openSavedAnalysis.mockRejectedValueOnce(new Error("500"));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    await act(async () => {
+      await expect(
+        result.current.actions.onOpenConversation("analysis-opened")
+      ).rejects.toThrow("500");
+    });
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+
+    expect(result.current.state.isSaved).toBe(true);
+    expect(result.current.state.savedAnalysisId).toBe("analysis-1");
+  });
+
+  test("a save that lands after signing out does not mark the conversation saved", async () => {
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+
+    expect(result.current.state.isSaved).toBe(false);
+  });
 });
