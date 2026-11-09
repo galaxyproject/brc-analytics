@@ -120,10 +120,18 @@ class CacheService:
     async def expire(self, key: str, ttl: int) -> bool:
         """Reset a key's TTL without rewriting its value"""
         try:
-            return bool(await self.redis.expire(key, ttl))
+            return await self.expire_strict(key, ttl)
         except redis.RedisError as e:
             logger.error(f"Cache expire error for key {key}: {e}")
             return False
+
+    async def expire_strict(self, key: str, ttl: int) -> bool:
+        """Reset a key's TTL; False if it is absent. Raises, unlike expire()."""
+        return bool(await self.redis.expire(key, ttl))
+
+    async def set_strict(self, key: str, value: Any, ttl: int) -> None:
+        """Set a value with a TTL. Raises RedisError, unlike set()."""
+        await self.redis.setex(key, ttl, json.dumps(value, default=str))
 
     async def clear_pattern(self, pattern: str) -> int:
         """Clear all keys matching a pattern.

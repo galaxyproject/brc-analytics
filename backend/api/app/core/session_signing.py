@@ -1,61 +1,87 @@
-"""HMAC-based signing for assistant session IDs.
+"""Binding assistant sessions to the browsers that hold them.
 
-The session_id is a 128-bit random UUID, but it travels in the response
-body and ends up in browser localStorage. To prevent a leaked session_id
-from being usable on its own, we set an httpOnly Same-Site=Strict cookie
-containing an HMAC of the session_id keyed by SESSION_COOKIE_SECRET. The
-GET/DELETE session endpoints verify the cookie before returning data.
+A session_id travels in URLs and localStorage, so knowing it must not be
+enough to use it. Each browser gets one random, httpOnly id cookie, issued once
+and only refreshed after; each session it may use is recorded as a binding (an
+HMAC of that id) in a Redis key of its own. No response rewrites another
+session's binding, so one landing late can't lock the browser out.
 """
 
 from __future__ import annotations
 
 import hashlib
 import hmac
-from typing import Optional
+import secrets
+from collections.abc import Mapping
 
 from fastapi import HTTPException, Response
 
-from app.core.config import DEV_ENVIRONMENTS, SESSION_COOKIE_NAME, get_settings
+from app.core.config import BROWSER_COOKIE_NAME, DEV_ENVIRONMENTS, get_settings
+from app.services.session_service import SessionService
+
+# Long enough to outlive any session left idle; it vouches for nothing alone.
+BROWSER_COOKIE_MAX_AGE = 30 * 24 * 60 * 60
 
 
-def sign_session_id(session_id: str, secret: str) -> str:
-    """Return a hex-encoded HMAC-SHA256 of session_id keyed by secret."""
-    mac = hmac.new(
-        secret.encode("utf-8"),
-        session_id.encode("utf-8"),
-        hashlib.sha256,
+async def bind_session(
+    session_service: SessionService,
+    cookies: Mapping[str, str],
+    response: Response,
+    session_id: str,
+) -> None:
+    """Bind the session to this browser, issuing its id cookie if it has none yet."""
+    browser_id = cookies.get(browser_cookie_name()) or secrets.token_urlsafe(32)
+    response.set_cookie(
+        key=browser_cookie_name(),
+        value=browser_id,
+        max_age=BROWSER_COOKIE_MAX_AGE,
+        httponly=True,
+        samesite="strict",
+        secure=_is_secure(),
     )
-    return mac.hexdigest()
+    await session_service.bind_browser(session_id, sign_browser_id(browser_id))
 
 
-def verify_session_id(session_id: str, signature: str, secret: str) -> bool:
-    """Verify a signature against a session_id in constant time."""
-    if not signature or not session_id:
-        return False
-    expected = sign_session_id(session_id, secret)
-    return hmac.compare_digest(expected, signature)
+def browser_cookie_name() -> str:
+    """The browser id cookie's name.
+
+    Where cookies are Secure it carries the __Host- prefix, so the browser
+    refuses one planted from a subdomain or over HTTP -- a planted id would
+    let whoever chose it use the sessions it gets bound to.
+    """
+    return f"__Host-{BROWSER_COOKIE_NAME}" if _is_secure() else BROWSER_COOKIE_NAME
 
 
-def require_session_cookie(session_id: str, cookie_value: Optional[str]) -> None:
-    """Raise 403 unless the cookie's HMAC matches session_id."""
-    settings = get_settings()
-    if not verify_session_id(
-        session_id, cookie_value or "", settings.SESSION_COOKIE_SECRET
+def clear_browser_cookie(response: Response) -> None:
+    """Expire this browser's id cookie, unbinding it from every session."""
+    response.delete_cookie(
+        browser_cookie_name(),
+        path="/",
+        secure=_is_secure(),
+        httponly=True,
+        samesite="strict",
+    )
+
+
+async def require_bound(
+    session_service: SessionService, cookies: Mapping[str, str], session_id: str
+) -> None:
+    """Raise 403 unless this browser is bound to the session."""
+    browser_id = cookies.get(browser_cookie_name())
+    if not browser_id or not await session_service.is_browser_bound(
+        session_id, sign_browser_id(browser_id)
     ):
         raise HTTPException(status_code=403, detail="Invalid session cookie")
 
 
-def set_session_cookie(response: Response, session_id: str) -> None:
-    """Issue an httpOnly Same-Site=Strict cookie binding the session to this client."""
-    settings = get_settings()
-    # Only allow plain-HTTP cookies in DEV_ENVIRONMENTS. Anywhere else
-    # (staging, prod, anything that could ever see a non-TLS hop) must
-    # mark the cookie Secure so the browser refuses to send it over HTTP.
-    response.set_cookie(
-        key=SESSION_COOKIE_NAME,
-        value=sign_session_id(session_id, settings.SESSION_COOKIE_SECRET),
-        max_age=settings.SESSION_COOKIE_TTL,
-        httponly=True,
-        samesite="strict",
-        secure=settings.ENVIRONMENT.lower() not in DEV_ENVIRONMENTS,
-    )
+def sign_browser_id(browser_id: str) -> str:
+    """Hex HMAC-SHA256 of browser_id, so Redis never holds the cookie value."""
+    secret = get_settings().SESSION_COOKIE_SECRET
+    return hmac.new(
+        secret.encode("utf-8"), browser_id.encode("utf-8"), hashlib.sha256
+    ).hexdigest()
+
+
+def _is_secure() -> bool:
+    """Whether cookies are Secure: everywhere but DEV_ENVIRONMENTS (maybe HTTP)."""
+    return get_settings().ENVIRONMENT.lower() not in DEV_ENVIRONMENTS

@@ -2,7 +2,7 @@ import pytest
 import redis.asyncio as redis
 
 from app.models.assistant import AnalysisSchema, ChatMessage, MessageRole
-from app.services.session_service import SESSION_TTL, SessionService
+from app.services.session_service import BINDING_TTL, SESSION_TTL, SessionService
 
 
 class FakeCache:
@@ -28,6 +28,20 @@ class FakeCache:
 
     async def set(self, key: str, value, ttl: int = 3600) -> bool:
         self.values[key] = value
+        return True
+
+    async def set_strict(self, key: str, value, ttl: int) -> None:
+        if self.fail_reads:
+            raise redis.RedisError("redis is unreachable")
+        self.values[key] = value
+        self.expired[key] = ttl
+
+    async def expire_strict(self, key: str, ttl: int) -> bool:
+        if self.fail_reads:
+            raise redis.RedisError("redis is unreachable")
+        if key not in self.values:
+            return False
+        self.expired[key] = ttl
         return True
 
 
@@ -142,6 +156,8 @@ async def test_eval_harness_cache_double_satisfies_session_service():
 
     assert loaded is not None
     assert loaded.messages[0].content == "hello"
+    await service.bind_browser(state.session_id, "binding")
+    assert await service.is_browser_bound(state.session_id, "binding")
 
 
 @pytest.mark.asyncio
@@ -175,3 +191,49 @@ async def test_touch_session_reports_a_session_that_is_already_gone():
     service = SessionService(FakeCache())
 
     assert await service.touch_session("expired-session") is False
+
+
+@pytest.mark.asyncio
+async def test_a_binding_survives_the_session_being_saved_over():
+    # Bindings live in keys of their own: a turn saving back the copy of the
+    # session it read can't drop a browser bound in the meantime.
+    service = SessionService(FakeCache())
+    state = await service.create_session()
+
+    await service.bind_browser(state.session_id, "binding")
+    await service.save_session(state)
+
+    assert await service.is_browser_bound(state.session_id, "binding")
+
+
+@pytest.mark.asyncio
+async def test_is_browser_bound_refuses_another_browser_or_session():
+    service = SessionService(FakeCache())
+    await service.bind_browser("s1", "binding")
+
+    assert not await service.is_browser_bound("s1", "other-binding")
+    assert not await service.is_browser_bound("s2", "binding")
+
+
+@pytest.mark.asyncio
+async def test_is_browser_bound_keeps_the_binding_alive():
+    cache = FakeCache()
+    service = SessionService(cache)
+    await service.bind_browser("s1", "binding")
+    cache.expired.clear()
+
+    await service.is_browser_bound("s1", "binding")
+
+    assert list(cache.expired.values()) == [BINDING_TTL]
+
+
+@pytest.mark.asyncio
+async def test_binding_checks_surface_redis_failure_instead_of_refusing():
+    # A refusal makes the client drop the conversation for good; an outage
+    # must read as an error it can retry.
+    service = SessionService(FakeCache(fail_reads=True))
+
+    with pytest.raises(redis.RedisError):
+        await service.is_browser_bound("s1", "binding")
+    with pytest.raises(redis.RedisError):
+        await service.bind_browser("s1", "binding")

@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 SESSION_PREFIX = "assistant:session"
 SESSION_TTL = 7200  # 2 hours
+BINDING_PREFIX = "assistant:binding"
+# Outlives the session it guards, so a browser coming back to one that has just
+# expired is still recognised and gets a fresh session rather than a refusal.
+BINDING_TTL = 24 * 60 * 60
 
 
 class SessionService:
@@ -22,6 +26,9 @@ class SessionService:
 
     def _key(self, session_id: str) -> str:
         return f"{SESSION_PREFIX}:{session_id}"
+
+    def _binding_key(self, session_id: str, binding: str) -> str:
+        return f"{BINDING_PREFIX}:{session_id}:{binding}"
 
     async def create_session(
         self,
@@ -90,7 +97,8 @@ class SessionService:
 
         Use when an authenticated user touches a session that was started
         anonymously -- the caller MUST have separately verified possession
-        (e.g. via the signed session cookie) before invoking this.
+        (the browser binding, see app/core/session_signing.py) before invoking
+        this.
 
         Returns the (possibly updated) session. Raises KeyError if the
         session is missing and PermissionError if it is already owned by
@@ -106,6 +114,25 @@ class SessionService:
         elif state.owner_keycloak_sub != owner_keycloak_sub:
             raise PermissionError(session_id)
         return state
+
+    async def bind_browser(self, session_id: str, binding: str) -> None:
+        """Let the browser with this binding use the session.
+
+        A key of its own, so no rewrite of the session can drop it. Raises
+        RedisError: a binding that silently failed would refuse the next request.
+        """
+        await self.cache.set_strict(
+            self._binding_key(session_id, binding), 1, BINDING_TTL
+        )
+
+    async def is_browser_bound(self, session_id: str, binding: str) -> bool:
+        """Whether the browser may use the session, keeping its binding alive if so.
+
+        Raises RedisError, so an outage isn't mistaken for "not yours".
+        """
+        return await self.cache.expire_strict(
+            self._binding_key(session_id, binding), BINDING_TTL
+        )
 
     async def delete_session(self, session_id: str) -> bool:
         return await self.cache.delete(self._key(session_id))

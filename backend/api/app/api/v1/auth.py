@@ -4,8 +4,9 @@ from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import SESSION_COOKIE_NAME, get_settings
+from app.core.config import get_settings
 from app.core.dependencies import get_auth_service
+from app.core.session_signing import clear_browser_cookie
 from app.db.crud import upsert_user_from_claims
 from app.db.session import get_db_session
 from app.services.auth_service import COOKIE_NAME, AuthService
@@ -139,8 +140,8 @@ async def logout(
 ) -> JSONResponse:
     """Clear the user's session from Redis and remove the auth cookie.
 
-    Also clears the assistant session cookie so a shared browser doesn't
-    leave the prior user's assistant session reachable after logout (the
+    Also clears the assistant browser cookie so a shared browser doesn't
+    leave the prior user's assistant sessions reachable after logout (the
     restore/delete endpoints gate purely on possession of that cookie).
     """
     if brc_session:
@@ -148,5 +149,5 @@ async def logout(
 
     resp = JSONResponse(content={"message": "Logged out"})
     resp.delete_cookie(COOKIE_NAME, path="/")
-    resp.delete_cookie(SESSION_COOKIE_NAME, path="/")
+    clear_browser_cookie(resp)
     return resp

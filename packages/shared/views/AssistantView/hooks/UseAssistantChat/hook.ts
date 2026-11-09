@@ -224,9 +224,8 @@ export const useAssistantChat = ({
             return;
           }
           // Any other 4xx and this browser is never getting that session back
-          // -- 404 it's gone, 403 the signing cookie no longer matches it. Drop
-          // the id so the next message opens a fresh session instead of
-          // re-failing.
+          // -- 404 it's gone, 403 this browser is no longer bound to it. Drop the
+          // id so the next message opens a fresh session instead of re-failing.
           sessionIdRef.current = null;
           // Only clear the pointer if it's still the one that failed -- a newer
           // session may have replaced it while this request was in flight.

@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import uuid4
 
 import sentry_sdk
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic_ai.exceptions import (
     AgentRunError,
     ConcurrencyLimitExceeded,
@@ -11,14 +11,14 @@ from pydantic_ai.exceptions import (
     UsageLimitExceeded,
 )
 
-from app.core.config import SESSION_COOKIE_NAME, get_settings
+from app.core.config import get_settings
 from app.core.dependencies import (
     check_rate_limit,
     get_assistant_agent,
     get_current_user,
     get_optional_current_user,
 )
-from app.core.session_signing import require_session_cookie, set_session_cookie
+from app.core.session_signing import bind_session, require_bound
 from app.models.assistant import (
     AssistantInfoResponse,
     ChatRequest,
@@ -45,6 +45,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+async def bound_session_id(
+    session_id: str,
+    request: Request,
+    agent=Depends(get_assistant_agent),
+) -> str:
+    """The session the path names, once this browser is shown to be bound to it.
+
+    Checked before the session is read, so a caller without a binding gets
+    the same 403 whether or not the session still exists.
+    """
+    await require_bound(agent.session_service, request.cookies, session_id)
+    return session_id
+
+
 @router.get("/info", response_model=AssistantInfoResponse)
 async def assistant_info(
     agent=Depends(get_assistant_agent),
@@ -66,10 +80,10 @@ async def assistant_info(
 async def assistant_chat(
     request: ChatRequest,
     response: Response,
+    http_request: Request,
     agent=Depends(get_assistant_agent),
     _rate_limit=Depends(check_rate_limit),
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
 ):
     """Send a message to the analysis assistant and get a reply.
 
@@ -83,12 +97,14 @@ async def assistant_chat(
         )
 
     # Continuing an existing session requires proof the same browser holds
-    # it -- possession of the signed session cookie. Session IDs travel in
-    # URLs (e.g. the assistantSessionId handoff param), so knowing the id
-    # alone must not let a caller continue or mutate a session, anonymous or
-    # owned.
+    # it. Session IDs travel in URLs (e.g. the assistantSessionId handoff
+    # param), so knowing the id alone must not let a caller continue or mutate
+    # a session, anonymous or owned. A binding outlives its session, so a
+    # browser continuing one that just expired is let through to a fresh one.
     if request.session_id:
-        require_session_cookie(request.session_id, session_cookie)
+        await require_bound(
+            agent.session_service, http_request.cookies, request.session_id
+        )
 
     # If an authenticated user is continuing a session that started
     # anonymously, claim it on their behalf.
@@ -200,7 +216,17 @@ async def assistant_chat(
     # Read after the auto-save, whose stamp teaches the state an id a first save
     # just minted. Signed out, it is whatever the session already knew.
     chat_response.saved_analysis_id = turn_state.saved_analysis_id
-    set_session_cookie(response, chat_response.session_id)
+    try:
+        await bind_session(
+            agent.session_service,
+            http_request.cookies,
+            response,
+            chat_response.session_id,
+        )
+    except Exception:
+        # The reply already succeeded; failing the turn over the binding would
+        # cost the user it. Unbound, their next message is refused instead.
+        logger.exception("Failed to bind session %s", chat_response.session_id)
     return chat_response
 
 
@@ -215,6 +241,7 @@ def _logan_error(status_code: int, code: str, err: LoganJobError) -> HTTPExcepti
 async def create_session(
     request: LoganSessionRequest,
     response: Response,
+    http_request: Request,
     agent=Depends(get_assistant_agent),
     _rate_limit=Depends(check_rate_limit),
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
@@ -262,7 +289,9 @@ async def create_session(
     is_complete, handoff_url = agent.compute_handoff(
         schema_state, session_id=state.session_id
     )
-    set_session_cookie(response, state.session_id)
+    await bind_session(
+        agent.session_service, http_request.cookies, response, state.session_id
+    )
     return SessionRestoreResponse(
         session_id=state.session_id,
         messages=state.messages,
@@ -292,13 +321,11 @@ async def _stamp_analysis_id(
 
 @router.get("/session/{session_id}", response_model=SessionRestoreResponse)
 async def restore_session(
-    session_id: str,
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    session_id: str = Depends(bound_session_id),
     current_user: UserMeResponse | None = Depends(get_optional_current_user),
     agent=Depends(get_assistant_agent),
 ):
     """Restore a previous assistant session (messages, schema, suggestions)."""
-    require_session_cookie(session_id, session_cookie)
     try:
         state = await agent.session_service.get_session(session_id)
     except Exception as e:
@@ -347,7 +374,7 @@ async def restore_session(
 @router.post("/session/{session_id}/save", response_model=SessionSaveResponse)
 async def save_session_to_account(
     session_id: str,
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    request: Request,
     current_user: UserMeResponse = Depends(get_current_user),
     agent=Depends(get_assistant_agent),
 ) -> SessionSaveResponse:
@@ -359,7 +386,6 @@ async def save_session_to_account(
     the session dies with its two-hour Redis TTL. This closes that gap, and
     unlike the per-turn write it reports failure rather than swallowing it.
     """
-    require_session_cookie(session_id, session_cookie)
 
     if not get_settings().DATABASE_URL:
         # A deployment can have OIDC on and no database -- the chat endpoint
@@ -370,6 +396,7 @@ async def save_session_to_account(
         raise HTTPException(
             status_code=501, detail="Saving conversations is not configured"
         )
+    await require_bound(agent.session_service, request.cookies, session_id)
 
     try:
         state = await agent.session_service.claim_session(session_id, current_user.sub)
@@ -415,14 +442,11 @@ async def save_session_to_account(
 
 @router.delete("/session/{session_id}", status_code=204)
 async def delete_session(
-    session_id: str,
-    session_cookie: Optional[str] = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    session_id: str = Depends(bound_session_id),
     agent=Depends(get_assistant_agent),
 ):
     """Delete an assistant session."""
-    require_session_cookie(session_id, session_cookie)
     try:
         await agent.session_service.delete_session(session_id)
     except Exception:
         logger.exception("Failed to delete session %s", session_id)
-    return Response(status_code=204)

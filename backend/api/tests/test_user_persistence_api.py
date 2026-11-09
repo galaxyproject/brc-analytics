@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.core.config import SESSION_COOKIE_NAME, get_settings
-from app.core.session_signing import sign_session_id
+from app.core.config import get_settings
+from app.core.session_signing import browser_cookie_name
 from app.db.crud import (
     get_user_by_keycloak_sub,
     repoint_saved_analysis_session,
@@ -30,11 +30,13 @@ from app.models.assistant import (
     TurnTelemetry,
 )
 from app.models.user_data import UserMeResponse
+from tests.conftest import FakeBrowserBindings, bind_browser
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 
-class FakeSessionService:
+class FakeSessionService(FakeBrowserBindings):
     def __init__(self):
+        super().__init__()
         self.sessions: dict[str, SessionState] = {}
         self.get_session_calls = 0
         self.touched: list[str] = []
@@ -604,16 +606,6 @@ async def _repoint_analysis(session_factory, analysis_id: str, source_session: s
         await repoint_saved_analysis_session(session, user, analysis_id, source_session)
 
 
-def _bind_cookie(client, session_id: str) -> None:
-    """Hold the signed cookie for a session the test planted directly in the
-    store, the way a browser that started it with /chat would."""
-    secret = get_settings().SESSION_COOKIE_SECRET
-    # Drop the cookie /chat set first; two same-name cookies leave the server
-    # picking whichever the client happens to send last.
-    client.cookies.delete(SESSION_COOKIE_NAME)
-    client.cookies.set(SESSION_COOKIE_NAME, sign_session_id(session_id, secret))
-
-
 @contextmanager
 def _signed_out(client):
     """Run a block with nobody signed in, then put the test user back.
@@ -686,7 +678,7 @@ def test_restore_reports_whether_the_conversation_is_already_saved(
         messages=[ChatMessage(role=MessageRole.USER, content="hello")],
     )
 
-    _bind_cookie(client, unsaved_id)
+    bind_browser(client, agent.session_service, unsaved_id)
     unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
     assert unsaved.json()["saved"] is False
 
@@ -758,7 +750,7 @@ def test_restore_reports_the_saved_analysis_id_to_any_caller(persistence_client)
         session_id=unsaved_id,
         messages=[ChatMessage(role=MessageRole.USER, content="hello")],
     )
-    _bind_cookie(client, unsaved_id)
+    bind_browser(client, agent.session_service, unsaved_id)
     unsaved = client.get(f"/api/v1/assistant/session/{unsaved_id}")
     assert unsaved.json()["saved_analysis_id"] is None
 
@@ -838,14 +830,14 @@ def test_saving_enforces_the_session_cookie_when_secret_set(
     assert missing.status_code == 403
     assert agent.session_service.sessions["session-anon"].owner_keycloak_sub is None
 
-    # Wrong signature -> rejected.
-    client.cookies.set(SESSION_COOKIE_NAME, "not-a-valid-signature")
+    # A browser the session isn't bound to -> rejected.
+    client.cookies.set(browser_cookie_name(), "a-browser-it-isnt-bound-to")
     wrong = client.post(save_url)
     assert wrong.status_code == 403
     client.cookies.clear()
 
-    # Valid signed cookie -> the session is claimed and saved.
-    client.cookies.set(SESSION_COOKIE_NAME, sign_session_id("session-anon", secret))
+    # The bound browser -> the session is claimed and saved.
+    bind_browser(client, agent.session_service, "session-anon")
     ok = client.post(save_url)
     assert ok.status_code == 200, ok.text
     assert agent.session_service.sessions["session-anon"].owner_keycloak_sub == "user-a"
@@ -858,7 +850,7 @@ def test_saving_an_empty_session_is_not_reported_as_saved(persistence_client):
 
     session_id = uuid4().hex
     agent.session_service.sessions[session_id] = SessionState(session_id=session_id)
-    _bind_cookie(client, session_id)
+    bind_browser(client, agent.session_service, session_id)
 
     response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
@@ -883,7 +875,7 @@ def test_saving_without_a_user_row_is_not_reported_as_nothing_to_save(
     # Authenticated as the session's own owner -- the JWT is valid, the users
     # row it names is not there.
     current_sub["value"] = "user-gone"
-    _bind_cookie(client, session_id)
+    bind_browser(client, agent.session_service, session_id)
 
     response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
@@ -892,10 +884,11 @@ def test_saving_without_a_user_row_is_not_reported_as_nothing_to_save(
 
 
 def test_saving_an_expired_session_is_a_404(persistence_client):
-    client, _session_factory, _current_sub, _agent = persistence_client
+    client, _session_factory, _current_sub, agent = persistence_client
 
+    # The binding outlives the session, so it's the session that is missing.
     session_id = uuid4().hex
-    _bind_cookie(client, session_id)
+    bind_browser(client, agent.session_service, session_id)
 
     response = client.post(f"/api/v1/assistant/session/{session_id}/save")
 
