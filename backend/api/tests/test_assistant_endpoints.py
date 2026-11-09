@@ -99,6 +99,28 @@ class TestSessionBrowserBinding:
             "set-cookie"
         )
 
+    def test_logout_does_not_hinge_on_the_assistant(self, client):
+        # Unbinding is best effort: the auth side is done and the cookie goes
+        # even when the assistant's store can't be reached.
+        from app.api.v1 import auth as auth_module
+
+        fake_auth = MagicMock()
+        fake_auth.revoke_session_tokens = AsyncMock()
+        client.app.dependency_overrides[auth_module.get_auth_service] = (
+            lambda: fake_auth
+        )
+        _agent(client).session_service.unbind_browser = AsyncMock(
+            side_effect=RuntimeError("redis is unreachable")
+        )
+        client.cookies.set("brc_session", "auth-session")
+        bind_browser(client)
+
+        resp = client.post("/api/v1/auth/logout")
+
+        assert resp.status_code == 200, resp.text
+        fake_auth.revoke_session_tokens.assert_awaited_once()
+        assert _cleared(resp, browser_cookie_name())
+
     def test_a_response_landing_after_logout_brings_back_only_its_session(self, client):
         # A chat sent before logout re-issues the old browser id when it lands.
         # Logout dropped the bindings too, so that id holds only the session
