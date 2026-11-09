@@ -128,11 +128,11 @@ class _InMemoryCache:
         self._store[key] = value
         return True
 
-    async def set_strict(self, key: str, value: Any, ttl: int) -> None:  # noqa: ARG002
-        self._store[key] = value
+    async def add_to_set(self, key: str, member: str, ttl: int) -> None:  # noqa: ARG002
+        self._store.setdefault(key, set()).add(member)
 
-    async def expire_strict(self, key: str, ttl: int) -> bool:  # noqa: ARG002
-        return key in self._store
+    async def is_in_set(self, key: str, member: str, ttl: int) -> bool:  # noqa: ARG002
+        return member in self._store.get(key, set())
 
     async def delete(self, key: str) -> bool:
         return self._store.pop(key, None) is not None

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 SESSION_PREFIX = "assistant:session"
 SESSION_TTL = 7200  # 2 hours
-BINDING_PREFIX = "assistant:binding"
+BINDING_PREFIX = "assistant:browser"
 # Outlives the session it guards, so a browser coming back to one that has just
 # expired is still recognised and gets a fresh session rather than a refusal.
 BINDING_TTL = 24 * 60 * 60
@@ -27,9 +27,9 @@ class SessionService:
     def _key(self, session_id: str) -> str:
         return f"{SESSION_PREFIX}:{session_id}"
 
-    def _binding_key(self, session_id: str, binding: str) -> str:
-        # Browser first, so one pattern finds every session a browser holds.
-        return f"{BINDING_PREFIX}:{binding}:{session_id}"
+    def _browser_key(self, binding: str) -> str:
+        # One set per browser: the sessions it holds.
+        return f"{BINDING_PREFIX}:{binding}"
 
     async def create_session(
         self,
@@ -119,28 +119,26 @@ class SessionService:
     async def bind_browser(self, session_id: str, binding: str) -> None:
         """Let the browser with this binding use the session.
 
-        A key of its own, so no rewrite of the session can drop it. Raises
-        RedisError: a binding that silently failed would refuse the next request.
+        Kept apart from the session, so no rewrite of it can drop the binding.
+        Raises RedisError: one that silently failed would refuse the next request.
         """
-        await self.cache.set_strict(
-            self._binding_key(session_id, binding), 1, BINDING_TTL
-        )
+        await self.cache.add_to_set(self._browser_key(binding), session_id, BINDING_TTL)
 
     async def is_browser_bound(self, session_id: str, binding: str) -> bool:
         """Whether the browser may use the session, keeping its binding alive if so.
 
         Raises RedisError, so an outage isn't mistaken for "not yours".
         """
-        return await self.cache.expire_strict(
-            self._binding_key(session_id, binding), BINDING_TTL
+        return await self.cache.is_in_set(
+            self._browser_key(binding), session_id, BINDING_TTL
         )
 
-    async def unbind_browser(self, binding: str) -> int:
-        """Drop every session binding the browser holds; returns how many.
+    async def unbind_browser(self, binding: str) -> bool:
+        """Drop every session binding the browser holds, in one key.
 
         Best effort: a Redis error is logged, and bindings left behind expire.
         """
-        return await self.cache.clear_pattern(f"{BINDING_PREFIX}:{binding}:*")
+        return await self.cache.delete(self._browser_key(binding))
 
     async def delete_session(self, session_id: str) -> bool:
         return await self.cache.delete(self._key(session_id))

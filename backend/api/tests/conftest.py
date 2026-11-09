@@ -169,10 +169,10 @@ class FakeBrowserBindings:
     async def is_browser_bound(self, session_id: str, binding: str) -> bool:
         return (session_id, binding) in self.bindings
 
-    async def unbind_browser(self, binding: str) -> int:
+    async def unbind_browser(self, binding: str) -> bool:
         held = {pair for pair in self.bindings if pair[1] == binding}
         self.bindings -= held
-        return len(held)
+        return bool(held)
 
 
 def bind_browser(client: TestClient, session_service=None, session_id=None) -> None:
