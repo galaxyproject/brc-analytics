@@ -100,6 +100,11 @@ export const useAssistantChat = ({
   // started under an older value answers for a conversation no longer shown,
   // and its result is dropped rather than landing in the one that replaced it.
   const conversationRef = useRef(0);
+  // Cleared when the page unmounts. A request still in flight then answers for
+  // a page no longer there, and must not write the stored pointer or the URL.
+  // Strict mode's effect replay sets it again before anything can settle, so
+  // work in flight across the replay still lands.
+  const isMountedRef = useRef(true);
   // The session whose conversation is on screen, once a restore or turn has
   // put it there -- not merely the one requested, which a failed restore
   // leaves behind. Opening it again would wipe the screen and drop a reply
@@ -177,7 +182,8 @@ export const useAssistantChat = ({
     (sourceId: string, { isNamed }: RestoreOptions): void => {
       const conversation = startConversation();
       // A reset or another restore since this one started has moved on from it.
-      const isCurrent = (): boolean => conversationRef.current === conversation;
+      const isCurrent = (): boolean =>
+        isMountedRef.current && conversationRef.current === conversation;
       // Adopt before the round trip: an unset ref sends session_id: undefined,
       // so a failed restore would open a new session and overwrite the kept
       // pointer.
@@ -266,16 +272,12 @@ export const useAssistantChat = ({
     sessionKey,
   ]);
 
-  // Leaving the page leaves its conversation: a restore, open or turn still in
-  // flight answers for a page no longer there, and must not write the stored
-  // pointer or the URL. A remount -- strict mode's included -- hydrates afresh.
-  useEffect(
-    () => (): void => {
-      conversationRef.current += 1;
-      hasHydratedRef.current = false;
-    },
-    []
-  );
+  useEffect(() => {
+    isMountedRef.current = true;
+    return (): void => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Opening from a Logan search wins over a URL session id and localStorage:
   // the person just clicked "ask the assistant about this cohort", so a new
@@ -419,7 +421,8 @@ export const useAssistantChat = ({
         return;
       sendingRef.current = true;
       const conversation = conversationRef.current;
-      const isCurrent = (): boolean => conversationRef.current === conversation;
+      const isCurrent = (): boolean =>
+        isMountedRef.current && conversationRef.current === conversation;
 
       setLoading(true);
       setError(null);
@@ -537,7 +540,8 @@ export const useAssistantChat = ({
   }, [onSendMessage, question, router, sessionKey]);
 
   const onRetryTurn = useCallback(async (): Promise<void> => {
-    if (!lastFailedRequest) return;
+    // An open in flight is replacing the conversation the failure belongs to.
+    if (!lastFailedRequest || openingRef.current) return;
     const request = lastFailedRequest;
     setLastFailedRequest(null);
     setError(null);
@@ -549,8 +553,9 @@ export const useAssistantChat = ({
   // Reached through onRetry, which offers it once a restore has failed.
   const onRetryRestore = useCallback((): Promise<void> => {
     // A transient failure keeps the session it was restoring; anything else
-    // dropped it, and there is nothing left to retry.
-    if (sessionIdRef.current) {
+    // dropped it, and there is nothing left to retry. An open in flight would
+    // be discarded by a restore started over it.
+    if (sessionIdRef.current && !openingRef.current) {
       restoreSession(sessionIdRef.current, {
         isNamed: restoreIsNamedRef.current,
       });
@@ -571,8 +576,11 @@ export const useAssistantChat = ({
         // A failure leaves the conversation on screen as it was, and is the
         // caller's to report.
         const { session_id } = await apiClient.openSavedAnalysis(id);
-        // Left the page since: the open answers for nothing on screen.
-        if (conversationRef.current !== conversation) return false;
+        // Left the page, or moved on, since: the open answers for nothing on
+        // screen.
+        if (!isMountedRef.current || conversationRef.current !== conversation) {
+          return false;
+        }
         // Already showing: restoring it again would wipe the screen for nothing.
         if (session_id === shownSessionRef.current) return false;
         restoreSession(session_id, { isNamed: true });

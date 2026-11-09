@@ -72,6 +72,8 @@ function httpError(status: number): Error & { response: { status: number } } {
 describe("useAssistantChat restore", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Drops responses a test queued for an open it then refused.
+    mockApiClient.openSavedAnalysis.mockReset();
     localStorage.clear();
     mockQuery = {};
     mockIsReady = true;
@@ -184,6 +186,7 @@ describe("useAssistantChat restore", () => {
 });
 
 const OPENED_ID = "opened111122223333444455556666777";
+const SECOND_ID = "second111122223333444455556666777";
 
 /**
  * A promise whose settling the test controls, to hold a request in flight.
@@ -283,6 +286,8 @@ async function openConversation(
 describe("useAssistantChat switching conversations on the page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Drops responses a test queued for an open it then refused.
+    mockApiClient.openSavedAnalysis.mockReset();
     localStorage.clear();
     mockQuery = {};
     mockIsReady = true;
@@ -492,6 +497,8 @@ describe("useAssistantChat switching conversations on the page", () => {
 describe("useAssistantChat opening a saved conversation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Drops responses a test queued for an open it then refused.
+    mockApiClient.openSavedAnalysis.mockReset();
     localStorage.clear();
     mockQuery = {};
     mockIsReady = true;
@@ -635,7 +642,12 @@ describe("useAssistantChat opening a saved conversation", () => {
       sending = result.current.actions.onSendMessage("still there?");
     });
 
-    const opened = await openConversation(result, OPENED_ID);
+    let opened = true;
+    await act(async () => {
+      opened = await result.current.actions.onOpenConversation(
+        `analysis-${OPENED_ID}`
+      );
+    });
     await act(async () => {
       turn.resolve(chatResponse(STORED_ID, "reply"));
       await sending;
@@ -727,5 +739,82 @@ describe("useAssistantChat opening a saved conversation", () => {
 
     await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(result.current.state.error).toBeNull();
+  });
+  test("a mount restore lands through strict mode's effect replay", async () => {
+    localStorage.setItem(SESSION_KEY, STORED_ID);
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(STORED_ID, "stored reply")
+    );
+
+    const { result } = renderHook(
+      () => useAssistantChat({ sessionKey: SESSION_KEY }),
+      { reactStrictMode: true }
+    );
+
+    await waitFor(() =>
+      expect(result.current.state.messages[1]?.content).toBe("stored reply")
+    );
+    expect(result.current.state.isRestoring).toBe(false);
+  });
+
+  test("retrying a failure does nothing while a conversation is opening", async () => {
+    // A restore retried over the open would discard it, though the server has
+    // already moved the session cookie to the conversation being opened.
+    const { result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
+    await openConversation(result, OPENED_ID);
+    await waitFor(() => expect(result.current.actions.onRetry).toBeDefined());
+
+    const opening =
+      deferred<Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>>();
+    mockApiClient.openSavedAnalysis.mockReturnValueOnce(opening.promise);
+    mockClient.assistantRestore.mockResolvedValueOnce(
+      restoredConversation(SECOND_ID, "second reply")
+    );
+    let open!: Promise<boolean>;
+    act(() => {
+      open = result.current.actions.onOpenConversation(`analysis-${SECOND_ID}`);
+    });
+    await act(async () => {
+      await result.current.actions.onRetry?.();
+    });
+    expect(mockClient.assistantRestore).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      opening.resolve({ session_id: SECOND_ID } as Awaited<
+        ReturnType<typeof mockApiClient.openSavedAnalysis>
+      >);
+      await open;
+    });
+
+    await waitFor(() =>
+      expect(result.current.state.messages[1]?.content).toBe("second reply")
+    );
+    expect(result.current.state.shownSessionId).toBe(SECOND_ID);
+  });
+
+  test("retrying a failed message does nothing while a conversation is opening", async () => {
+    // Retrying would drop the failed message and its error, then find the send
+    // refused -- losing both with nothing sent.
+    const { result } = await renderRestored();
+    mockClient.assistantChat.mockRejectedValueOnce(httpError(500));
+    await act(async () => {
+      await result.current.actions.onSendMessage("still there?");
+    });
+    expect(result.current.state.error).not.toBeNull();
+
+    const opening =
+      deferred<Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>>();
+    mockApiClient.openSavedAnalysis.mockReturnValueOnce(opening.promise);
+    act(() => {
+      void result.current.actions.onOpenConversation(`analysis-${OPENED_ID}`);
+    });
+    await act(async () => {
+      await result.current.actions.onRetry?.();
+    });
+
+    expect(mockClient.assistantChat).toHaveBeenCalledTimes(1);
+    expect(result.current.state.error).not.toBeNull();
+    expect(result.current.state.messages.at(-1)?.content).toBe("still there?");
   });
 });
