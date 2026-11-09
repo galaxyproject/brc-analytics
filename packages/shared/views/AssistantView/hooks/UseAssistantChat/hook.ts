@@ -569,18 +569,17 @@ export const useAssistantChat = ({
       // open, or one mid-reply, would race for it and lock out the loser.
       if (openingRef.current || sendingRef.current) return false;
       openingRef.current = true;
-      const conversation = conversationRef.current;
       setIsRestoring(true);
       let isHandedOver = false;
       try {
         // A failure leaves the conversation on screen as it was, and is the
         // caller's to report.
         const { session_id } = await apiClient.openSavedAnalysis(id);
-        // Left the page, or moved on, since: the open answers for nothing on
-        // screen.
-        if (!isMountedRef.current || conversationRef.current !== conversation) {
-          return false;
-        }
+        // Left the page since: the open answers for nothing on screen. The
+        // page itself can't move on meanwhile -- an open holds off sends,
+        // resets, retries and other opens, and the history can't start one
+        // until the page's own restore or Logan session has settled.
+        if (!isMountedRef.current) return false;
         // Already showing: restoring it again would wipe the screen for nothing.
         if (session_id === shownSessionRef.current) return false;
         restoreSession(session_id, { isNamed: true });
@@ -598,9 +597,7 @@ export const useAssistantChat = ({
         openingRef.current = false;
         // A restore that took over settles the flag; anything else hands the
         // screen back as it was.
-        if (!isHandedOver && conversationRef.current === conversation) {
-          setIsRestoring(false);
-        }
+        if (!isHandedOver) setIsRestoring(false);
       }
     },
     [restoreSession, router]

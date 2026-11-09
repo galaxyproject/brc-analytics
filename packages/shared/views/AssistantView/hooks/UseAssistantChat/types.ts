@@ -45,9 +45,10 @@ export interface UseAssistantChatActions {
    * Opens a saved conversation in place of the one showing, and names its
    * session in the URL so a reload restores it. Resolves true once it has
    * replaced the conversation showing and its restore is under way, or false
-   * when nothing was replaced: it was already showing, or a reply or another
-   * open is in flight. Rejects when the server can't open it, leaving the
-   * screen as it was.
+   * when nothing was replaced on screen: it was already showing, a reply or
+   * another open is in flight, or the page was left before the server
+   * answered (the server has still opened it). Rejects when the server can't
+   * open it, leaving the screen as it was.
    */
   onOpenConversation: (id: string) => Promise<boolean>;
   /** Starts a new conversation; false when an open in flight held it off. */

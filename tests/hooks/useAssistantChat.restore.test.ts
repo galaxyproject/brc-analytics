@@ -679,6 +679,48 @@ describe("useAssistantChat opening a saved conversation", () => {
     );
   });
 
+  test("a second open while one is in flight is refused", async () => {
+    // Two opens would race for the session cookie and lock out the loser.
+    const { result } = await renderRestored();
+    const opening =
+      deferred<Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>>();
+    mockApiClient.openSavedAnalysis.mockReturnValueOnce(opening.promise);
+    act(() => {
+      void result.current.actions.onOpenConversation(`analysis-${OPENED_ID}`);
+    });
+
+    let second = true;
+    await act(async () => {
+      second = await result.current.actions.onOpenConversation(
+        `analysis-${SECOND_ID}`
+      );
+    });
+
+    expect(second).toBe(false);
+    expect(mockApiClient.openSavedAnalysis).toHaveBeenCalledTimes(1);
+  });
+
+  test("a reply that settles after the page is left keeps the stored pointer", async () => {
+    // Another mount may have stored a different conversation since; a late
+    // reply for the page left behind must not overwrite it.
+    const { result, unmount } = await renderRestored();
+    const turn = deferred<ChatResponse>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.actions.onSendMessage("still there?");
+    });
+
+    unmount();
+    localStorage.setItem(SESSION_KEY, OPENED_ID);
+    await act(async () => {
+      turn.resolve(chatResponse(SECOND_ID, "late reply"));
+      await sending;
+    });
+
+    expect(localStorage.getItem(SESSION_KEY)).toBe(OPENED_ID);
+  });
+
   test("an open that settles after the page is left neither restores nor writes the URL", async () => {
     const { result, unmount } = await renderRestored();
     const opening =
