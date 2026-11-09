@@ -53,7 +53,7 @@ def browser_cookie_name() -> str:
 
 
 def clear_browser_cookie(response: Response) -> None:
-    """Expire this browser's id cookie, unbinding it from every session."""
+    """Expire this browser's id cookie."""
     response.delete_cookie(
         browser_cookie_name(),
         path="/",
@@ -61,6 +61,21 @@ def clear_browser_cookie(response: Response) -> None:
         httponly=True,
         samesite="strict",
     )
+
+
+async def forget_browser(
+    session_service: SessionService, cookies: Mapping[str, str], response: Response
+) -> None:
+    """Unbind this browser from every session and expire its id cookie.
+
+    The bindings go too, not just the cookie: a response already in flight
+    re-issues the id from its request, and would otherwise bring back every
+    conversation the browser held rather than only its own.
+    """
+    browser_id = cookies.get(browser_cookie_name())
+    if browser_id:
+        await session_service.unbind_browser(sign_browser_id(browser_id))
+    clear_browser_cookie(response)
 
 
 async def require_bound(

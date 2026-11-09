@@ -1,12 +1,12 @@
 import logging
 
-from fastapi import APIRouter, Cookie, Depends, Response
+from fastapi import APIRouter, Cookie, Depends, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.dependencies import get_auth_service
-from app.core.session_signing import clear_browser_cookie
+from app.core.dependencies import get_assistant_agent, get_auth_service
+from app.core.session_signing import forget_browser
 from app.db.crud import upsert_user_from_claims
 from app.db.session import get_db_session
 from app.services.auth_service import COOKIE_NAME, AuthService
@@ -135,19 +135,21 @@ async def me(
 
 @router.post("/logout")
 async def logout(
+    request: Request,
     brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
     auth: AuthService = Depends(get_auth_service),
+    agent=Depends(get_assistant_agent),
 ) -> JSONResponse:
     """Clear the user's session from Redis and remove the auth cookie.
 
-    Also clears the assistant browser cookie so a shared browser doesn't
-    leave the prior user's assistant sessions reachable after logout (the
-    restore/delete endpoints gate purely on possession of that cookie).
+    Also unbinds the browser from its assistant sessions and clears its
+    cookie, so a shared browser doesn't leave the prior user's conversations
+    reachable after logout.
     """
     if brc_session:
         await auth.revoke_session_tokens(brc_session)
 
     resp = JSONResponse(content={"message": "Logged out"})
     resp.delete_cookie(COOKIE_NAME, path="/")
-    clear_browser_cookie(resp)
+    await forget_browser(agent.session_service, request.cookies, resp)
     return resp

@@ -237,3 +237,21 @@ async def test_binding_checks_surface_redis_failure_instead_of_refusing():
         await service.is_browser_bound("s1", "binding")
     with pytest.raises(redis.RedisError):
         await service.bind_browser("s1", "binding")
+
+
+@pytest.mark.asyncio
+async def test_unbind_browser_drops_every_session_that_browser_holds():
+    cache = FakeCache()
+    cache.cleared_patterns = []
+
+    async def clear_pattern(pattern: str) -> int:
+        cache.cleared_patterns.append(pattern)
+        return 0
+
+    cache.clear_pattern = clear_pattern
+    service = SessionService(cache)
+
+    await service.unbind_browser("binding")
+
+    # Keys are browser-first, so one pattern reaches all of them.
+    assert cache.cleared_patterns == ["assistant:binding:binding:*"]

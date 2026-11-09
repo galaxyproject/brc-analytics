@@ -28,7 +28,8 @@ class SessionService:
         return f"{SESSION_PREFIX}:{session_id}"
 
     def _binding_key(self, session_id: str, binding: str) -> str:
-        return f"{BINDING_PREFIX}:{session_id}:{binding}"
+        # Browser first, so one pattern finds every session a browser holds.
+        return f"{BINDING_PREFIX}:{binding}:{session_id}"
 
     async def create_session(
         self,
@@ -133,6 +134,13 @@ class SessionService:
         return await self.cache.expire_strict(
             self._binding_key(session_id, binding), BINDING_TTL
         )
+
+    async def unbind_browser(self, binding: str) -> int:
+        """Drop every session binding the browser holds; returns how many.
+
+        Best effort: a Redis error is logged, and bindings left behind expire.
+        """
+        return await self.cache.clear_pattern(f"{BINDING_PREFIX}:{binding}:*")
 
     async def delete_session(self, session_id: str) -> bool:
         return await self.cache.delete(self._key(session_id))

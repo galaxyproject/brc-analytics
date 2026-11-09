@@ -99,6 +99,28 @@ class TestSessionBrowserBinding:
             "set-cookie"
         )
 
+    def test_a_response_landing_after_logout_brings_back_only_its_session(self, client):
+        # A chat sent before logout re-issues the old browser id when it lands.
+        # Logout dropped the bindings too, so that id holds only the session
+        # the late response re-binds, not every one the browser had.
+        from app.api.v1 import auth as auth_module
+
+        fake_auth = MagicMock()
+        fake_auth.revoke_session_tokens = AsyncMock()
+        client.app.dependency_overrides[auth_module.get_auth_service] = (
+            lambda: fake_auth
+        )
+        bindings = _agent(client).session_service.bindings
+        bind_browser(client, _agent(client).session_service, "sess-other")
+
+        client.post("/api/v1/auth/logout")
+        assert not bindings
+        client.cookies.set(browser_cookie_name(), TEST_BROWSER)
+        client.post("/api/v1/assistant/chat", json={"message": "sent earlier"})
+
+        assert client.get("/api/v1/assistant/session/sess-abc").status_code == 200
+        assert client.get("/api/v1/assistant/session/sess-other").status_code == 403
+
     def test_anonymous_chat_with_session_id_requires_cookie(self, client):
         # Continuing a session by id must require the bound browser even for
         # anonymous callers -- session ids leak via URLs (assistantSessionId).

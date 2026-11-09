@@ -126,6 +126,7 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     fake_agent.session_service.bindings = bindings.bindings
     fake_agent.session_service.bind_browser = bindings.bind_browser
     fake_agent.session_service.is_browser_bound = bindings.is_browser_bound
+    fake_agent.session_service.unbind_browser = bindings.unbind_browser
     fake_agent.session_service.delete_session = AsyncMock(return_value=True)
     fake_agent.compute_handoff = MagicMock(return_value=(False, None))
     # restore_session reconciles persisted state before handoff and re-derives
@@ -167,6 +168,11 @@ class FakeBrowserBindings:
 
     async def is_browser_bound(self, session_id: str, binding: str) -> bool:
         return (session_id, binding) in self.bindings
+
+    async def unbind_browser(self, binding: str) -> int:
+        held = {pair for pair in self.bindings if pair[1] == binding}
+        self.bindings -= held
+        return len(held)
 
 
 def bind_browser(client: TestClient, session_service=None, session_id=None) -> None:
