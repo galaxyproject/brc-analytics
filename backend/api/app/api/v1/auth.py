@@ -5,11 +5,12 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.dependencies import get_assistant_agent, get_auth_service
-from app.core.session_signing import forget_browser
+from app.core.dependencies import get_auth_service, get_session_service
+from app.core.session_signing import clear_browser_cookie, forget_browser
 from app.db.crud import upsert_user_from_claims
 from app.db.session import get_db_session
 from app.services.auth_service import COOKIE_NAME, AuthService
+from app.services.session_service import SessionService
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +139,7 @@ async def logout(
     request: Request,
     brc_session: str | None = Cookie(default=None, alias=COOKIE_NAME),
     auth: AuthService = Depends(get_auth_service),
-    agent=Depends(get_assistant_agent),
+    session_service: SessionService = Depends(get_session_service),
 ) -> JSONResponse:
     """Clear the user's session from Redis and remove the auth cookie.
 
@@ -151,5 +152,11 @@ async def logout(
 
     resp = JSONResponse(content={"message": "Logged out"})
     resp.delete_cookie(COOKIE_NAME, path="/")
-    await forget_browser(agent.session_service, request.cookies, resp)
+    try:
+        await forget_browser(session_service, request.cookies, resp)
+    except Exception:
+        # Signing out must not hinge on the assistant: the auth side is done,
+        # and bindings left behind expire on their own.
+        logger.exception("Failed to unbind the assistant browser at logout")
+        clear_browser_cookie(resp)
     return resp

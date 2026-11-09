@@ -141,12 +141,17 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
 
     # FastAPI binds Depends() to the original function reference at import
     # time, so we override via app.dependency_overrides rather than monkeypatching.
-    from app.core.dependencies import check_rate_limit, get_assistant_agent
+    from app.core.dependencies import (
+        check_rate_limit,
+        get_assistant_agent,
+        get_session_service,
+    )
 
     async def _no_rate_limit():
         return {"limit": 100, "remaining": 100, "reset": 60}
 
     app.dependency_overrides[get_assistant_agent] = lambda: fake_agent
+    app.dependency_overrides[get_session_service] = lambda: fake_agent.session_service
     app.dependency_overrides[check_rate_limit] = _no_rate_limit
 
     yield app
