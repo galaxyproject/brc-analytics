@@ -547,4 +547,72 @@ describe("useAssistantChat auto-save", () => {
 
     expect(result.current.state.isSaved).toBe(false);
   });
+
+  test("a save from before signing out does not count after signing back in", async () => {
+    // The session id is the same both times; only the attempt tells them apart.
+    auth(true);
+    const first = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(first.promise);
+    mockClient.assistantSaveSession.mockRejectedValueOnce(httpError(409));
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
+    );
+
+    auth(false);
+    rerender();
+    auth(true);
+    rerender();
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(2)
+    );
+    await act(async () => {
+      first.resolve({ saved_analysis_id: "analysis-before-sign-out" });
+    });
+
+    expect(result.current.state.isSaved).toBe(false);
+    expect(result.current.state.savedAnalysisId).toBeNull();
+  });
+
+  test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+    const turn =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantChat>>>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+    // The new session's own sign-in save can't land, so only the reply speaks
+    // for it.
+    mockClient.assistantSaveSession.mockRejectedValueOnce(httpError(409));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.actions.onSendMessage("still there?");
+    });
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+    expect(result.current.state.isSaved).toBe(true);
+
+    await act(async () => {
+      turn.resolve({
+        ...chatReply(),
+        saved: false,
+        saved_analysis_id: null,
+        session_id: OPENED_ID,
+      });
+      await sending;
+    });
+
+    expect(result.current.state.isSaved).toBe(false);
+  });
 });

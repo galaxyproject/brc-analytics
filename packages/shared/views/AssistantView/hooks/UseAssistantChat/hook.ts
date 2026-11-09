@@ -132,6 +132,10 @@ export const useAssistantChat = ({
   const [lastSave, setLastSave] = useState<LastSave | null>(null);
   const initialMessageSentRef = useRef(false);
   const saveAttemptRef = useRef<string | null>(null);
+  // The sign-in save whose answer still counts. A fresh object per request,
+  // so a save fired before a sign-out, for the same session, can't stand in
+  // for the one fired after signing back in.
+  const pendingSaveRef = useRef<object | null>(null);
   const saveRetriesRef = useRef<{ count: number; sessionId: string | null }>({
     count: 0,
     sessionId: null,
@@ -340,20 +344,23 @@ export const useAssistantChat = ({
     // (no database configured) would fire a doomed request every turn.
     if (saveAttemptRef.current === currentSessionId) return;
     saveAttemptRef.current = currentSessionId;
+    const attempt = {};
+    pendingSaveRef.current = attempt;
 
     assistantAPIClient
       .assistantSaveSession(currentSessionId)
       .then(({ saved_analysis_id }) => {
-        // On disk whether or not this run is still current.
+        // On disk whatever has happened on the page since.
         setLastSave({ savedAnalysisId: saved_analysis_id });
-        // Checked against the session, not this run: a turn or an open
-        // starting cancels the run, but the session is still the one just
-        // written, and a turn or open that fails would never say so. A
-        // conversation that replaced it has moved the session on, and signing
-        // out has dropped the latch.
+        // It counts while it is still the save in force and its session the
+        // one on screen -- not only while nothing re-ran this effect: a turn
+        // or an open starting does, though the conversation is still the one
+        // just written, and one that fails would never say so. Signing out
+        // retires the attempt; a conversation that replaced it has moved the
+        // session on.
         if (
-          sessionIdRef.current === currentSessionId &&
-          saveAttemptRef.current === currentSessionId
+          pendingSaveRef.current === attempt &&
+          sessionIdRef.current === currentSessionId
         ) {
           setSavedAnalysisId(saved_analysis_id);
           setIsSaved(true);
@@ -401,6 +408,7 @@ export const useAssistantChat = ({
   useEffect(() => {
     if (isAuthLoading || !isConfigured || isAuthenticated) return;
     saveAttemptRef.current = null;
+    pendingSaveRef.current = null;
     saveRetriesRef.current = { count: 0, sessionId: null };
     clearSaveRetry(saveRetryTimerRef);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
@@ -479,8 +487,10 @@ export const useAssistantChat = ({
         setLogan(response.logan ?? null);
         // Latched, not mirrored: a later turn whose write fails does not
         // un-save the turns already on disk, and flickering the label would
-        // say something worse than either state on its own.
-        if (response.saved) setIsSaved(true);
+        // say something worse than either state on its own. A reply that
+        // moved to another session starts the latch over for it.
+        if (!isSameSession) setIsSaved(response.saved);
+        else if (response.saved) setIsSaved(true);
       } catch (err) {
         if (!isCurrent()) return;
         const errorMessage = handleChatError(err);
