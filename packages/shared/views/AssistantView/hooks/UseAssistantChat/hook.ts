@@ -1,4 +1,5 @@
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
 import type {
   AnalysisSchema,
   AssistantChatResponse,
@@ -8,7 +9,6 @@ import type {
 } from "@repo/shared/services/api-client/types";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { ASSISTANT_QUERY_PARAM } from "@repo/shared/views/AssistantView/constants";
-import type { NextRouter } from "next/router";
 import { useRouter } from "next/router";
 import {
   type MutableRefObject,
@@ -20,11 +20,12 @@ import {
 import type {
   ChatMessageDisplay,
   LastSave,
+  RestoreOptions,
   TurnRequest,
   UseAssistantChatOptions,
   UseAssistantChatReturn,
 } from "./types";
-import { keepSavedAnalysisId } from "./utils";
+import { keepSavedAnalysisId, replaceQuery, stripQueryParam } from "./utils";
 
 // A save that failed for one of these will fail the same way next time: the
 // deployment cannot save at all, there is nothing to save, the session is not
@@ -56,13 +57,14 @@ function isRetryableSaveFailure(error: unknown): boolean {
  * An `initialMessage` opens a new conversation with that question instead, and
  * `initialLoganJobId` outranks both -- it opens a new conversation bound to
  * that search, which is the more specific intent when a person has just
- * clicked through from a cohort.
+ * clicked through from a cohort. All of that happens once, on mount; a saved
+ * conversation opened afterwards comes through `onOpenConversation`.
  * @param root0 - Hook options.
  * @param root0.initialLoganJobId - Logan job to open a new session from.
  * @param root0.initialMessage - Question to open a new conversation with.
  * @param root0.initialSessionId - Existing assistant session to continue.
  * @param root0.sessionKey - localStorage key under which the session id is stored.
- * @returns Chat actions (send, clear a field, reset, retry) and chat state, including the session and saved analysis on screen and the last save.
+ * @returns Chat actions (send, clear a field, open a saved conversation, reset, retry) and chat state, including the session and saved analysis on screen and the last save.
  */
 export const useAssistantChat = ({
   initialLoganJobId,
@@ -81,11 +83,17 @@ export const useAssistantChat = ({
   const [error, setError] = useState<string | null>(null);
   const [lastFailedRequest, setLastFailedRequest] =
     useState<TurnRequest | null>(null);
-  // A restore that failed for a reason a retry could fix, and the count of
-  // retries asked for: bumping it re-runs the restore, which a URL already
-  // naming the session would not do on its own.
+  // A restore that failed for a reason a retry could fix, and whether it was
+  // for a conversation someone asked for -- which the retry reports alike.
   const [isRestoreFailed, setIsRestoreFailed] = useState(false);
-  const [restoreAttempt, setRestoreAttempt] = useState(0);
+  const restoreIsNamedRef = useRef(false);
+  // A saved conversation being opened, from asking the server for it until its
+  // restore takes over -- shown as restoring throughout. Until then nothing may
+  // send or start over it: the open would wipe whatever they put on screen.
+  const openingRef = useRef(false);
+  // Set once the mount's restore has had its say, so a URL change afterwards --
+  // a parameter dropped, or one written by an open -- restores nothing.
+  const hasHydratedRef = useRef(false);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
   const sendingRef = useRef(false);
   // Bumped each time a different conversation takes the screen. A request
@@ -94,7 +102,7 @@ export const useAssistantChat = ({
   const conversationRef = useRef(0);
   // The session whose conversation is on screen, once a restore or turn has
   // put it there -- not merely the one requested, which a failed restore
-  // leaves behind. Restoring it again would wipe the screen and drop a reply
+  // leaves behind. Opening it again would wipe the screen and drop a reply
   // still in flight for it. Mirrored to state for rendering, since a ref
   // change re-renders nothing.
   const shownSessionRef = useRef<string | null>(null);
@@ -118,10 +126,6 @@ export const useAssistantChat = ({
   // saved-conversation list can refresh without guessing.
   const [lastSave, setLastSave] = useState<LastSave | null>(null);
   const initialMessageSentRef = useRef(false);
-  // Set once this mount has opened a Logan-bound session. Dropping the
-  // ?loganJob= param re-renders the page without it, which would otherwise
-  // re-arm the restore effect against the id we just wrote.
-  const loganOpenedRef = useRef(false);
   const saveAttemptRef = useRef<string | null>(null);
   const saveRetriesRef = useRef<{ count: number; sessionId: string | null }>({
     count: 0,
@@ -164,116 +168,114 @@ export const useAssistantChat = ({
     return conversationRef.current;
   }, []);
 
-  // Hydrate from either an explicit initialSessionId (URL param, set by the
-  // saved-analysis restore flow) or a localStorage-stored session. URL wins.
-  // Either way we call the restore endpoint so we get computed handoff state
-  // (handoff_url, suggestions), not just messages + schema.
+  // Restores a session as the conversation on screen, in place of whatever was
+  // there -- which must not outlive a failed restore, nor be answered by a turn
+  // still in flight for it. Goes through the restore endpoint, so the computed
+  // handoff state (handoff_url, suggestions) comes back too, not just messages
+  // and schema.
+  const restoreSession = useCallback(
+    (sourceId: string, { isNamed }: RestoreOptions): void => {
+      const conversation = startConversation();
+      // A reset or another restore since this one started has moved on from it.
+      const isCurrent = (): boolean => conversationRef.current === conversation;
+      // Adopt before the round trip: an unset ref sends session_id: undefined,
+      // so a failed restore would open a new session and overwrite the kept
+      // pointer.
+      sessionIdRef.current = sourceId;
+      restoreIsNamedRef.current = isNamed;
+      setIsRestoring(true);
+
+      assistantAPIClient
+        .assistantRestore(sourceId)
+        .then((restored) => {
+          if (!isCurrent()) return;
+          showSession(restored.session_id);
+          setSavedAnalysisId(restored.saved_analysis_id);
+          setMessages(restored.messages);
+          setSchema(restored.schema_state);
+          setSuggestions(restored.suggestions);
+          setHandoffUrl(restored.handoff_url);
+          setLogan(restored.logan ?? null);
+          // Whether this is already on disk is the server's to answer.
+          // Inferring it from auth state instead would re-save every signed-in
+          // session on every mount just to find out.
+          setIsSaved(restored.saved);
+        })
+        .catch((error: unknown) => {
+          if (!isCurrent()) return;
+          const status = httpStatus(error);
+          // No response, a server error, or a throttle: the session is probably
+          // still there, so keep the pointer and let a reload pick it up.
+          // Dropping it here would turn a blip into permanent loss.
+          if (
+            status === undefined ||
+            status >= 500 ||
+            status === 408 ||
+            status === 429
+          ) {
+            setError("Couldn't load that conversation.");
+            setIsRestoreFailed(true);
+            return;
+          }
+          // Any other 4xx and this browser is never getting that session back
+          // -- 404 it's gone, 403 the signing cookie no longer matches it. Drop
+          // the id so the next message opens a fresh session instead of
+          // re-failing.
+          sessionIdRef.current = null;
+          // Only clear the pointer if it's still the one that failed -- a newer
+          // session may have replaced it while this request was in flight.
+          if (localStorage.getItem(sessionKey) === sourceId) {
+            localStorage.removeItem(sessionKey);
+          }
+          // Only worth mentioning for a conversation someone asked for; a stale
+          // localStorage pointer going bad is routine.
+          if (isNamed) {
+            setError("That conversation is no longer available.");
+          }
+        })
+        .finally(() => {
+          if (isCurrent()) setIsRestoring(false);
+        });
+    },
+    [sessionKey, showSession, startConversation]
+  );
+
+  // Hydrate, once, from either an explicit initialSessionId (URL param, set by
+  // the saved-analysis open) or a localStorage-stored session. URL wins.
   useEffect(() => {
     // Until the query settles a handed-over question is invisible, and
     // restoring on that first pass would race the question to the message list.
-    if (!router.isReady) return;
+    if (!router.isReady || hasHydratedRef.current) return;
+    hasHydratedRef.current = true;
     // A Logan job opens its own session below and outranks both sources.
     if (initialLoganJobId) return;
-    // Once it has, the stored pointer is that session -- but a session the URL
-    // names afterwards is one the user has since navigated to, and restores.
-    if (loganOpenedRef.current && !initialSessionId) return;
     // A question handed over from elsewhere on the site opens a conversation of
     // its own; restoring here would graft it onto whatever came before.
     if (question) return;
 
-    // Once that question has been asked, the stored pointer is the conversation
-    // it just opened -- restoring it would only re-fetch what is already on
-    // screen. A session the URL names is a different matter: it is somewhere the
-    // user has navigated to, and it still restores.
-    const storedId = initialMessageSentRef.current
-      ? null
-      : localStorage.getItem(sessionKey);
-    const sourceId = initialSessionId ?? storedId;
+    const sourceId = initialSessionId ?? localStorage.getItem(sessionKey);
     if (!sourceId) return;
-    // Already on screen -- e.g. back to the bare page, whose stored pointer is
-    // the conversation showing.
-    if (sourceId === shownSessionRef.current) return;
-
-    let cancelled = false;
-    // Opening a conversation from the history list restores it on this page,
-    // over whatever was on screen -- which must not outlive a failed restore,
-    // nor be answered by a turn still in flight for it.
-    const conversation = startConversation();
-    // A reset or another restore since this one started has moved on from it.
-    const isCurrent = (): boolean => conversationRef.current === conversation;
-    const isStale = (): boolean => cancelled || !isCurrent();
-    // Adopt before the round trip: an unset ref sends session_id: undefined, so
-    // a failed restore would open a new session and overwrite the kept pointer.
-    sessionIdRef.current = sourceId;
-    setIsRestoring(true);
-
-    assistantAPIClient
-      .assistantRestore(sourceId)
-      .then((restored) => {
-        if (isStale()) return;
-        showSession(restored.session_id);
-        setSavedAnalysisId(restored.saved_analysis_id);
-        setMessages(restored.messages);
-        setSchema(restored.schema_state);
-        setSuggestions(restored.suggestions);
-        setHandoffUrl(restored.handoff_url);
-        setLogan(restored.logan ?? null);
-        // Whether this is already on disk is the server's to answer. Inferring
-        // it from auth state instead would re-save every signed-in session on
-        // every mount just to find out.
-        setIsSaved(restored.saved);
-      })
-      .catch((error: unknown) => {
-        if (isStale()) return;
-        const status = httpStatus(error);
-        // No response, a server error, or a throttle: the session is probably
-        // still there, so keep the pointer and let a reload pick it up. Dropping
-        // it here would turn a blip into permanent loss.
-        if (
-          status === undefined ||
-          status >= 500 ||
-          status === 408 ||
-          status === 429
-        ) {
-          setError("Couldn't load that conversation.");
-          setIsRestoreFailed(true);
-          return;
-        }
-        // Any other 4xx and this browser is never getting that session back --
-        // 404 it's gone, 403 the signing cookie no longer matches it. Drop the
-        // id so the next message opens a fresh session instead of re-failing.
-        sessionIdRef.current = null;
-        // Only clear the pointer if it's still the one that failed -- a newer
-        // session may have replaced it while this request was in flight.
-        if (localStorage.getItem(sessionKey) === sourceId) {
-          localStorage.removeItem(sessionKey);
-        }
-        // Only worth mentioning if the id came from the URL; a stale
-        // localStorage pointer going bad is routine.
-        if (initialSessionId) {
-          setError("That conversation is no longer available.");
-        }
-      })
-      .finally(() => {
-        // Settled by the conversation, not the effect run: one cancelled by a
-        // URL change that starts nothing new (a reset dropping ?sessionId=) is
-        // still the restore on screen, and left set it would hold the input.
-        if (isCurrent()) setIsRestoring(false);
-      });
-
-    return (): void => {
-      cancelled = true;
-    };
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
+    restoreSession(sourceId, { isNamed: Boolean(initialSessionId) });
   }, [
     initialLoganJobId,
     initialSessionId,
     question,
-    restoreAttempt,
+    restoreSession,
     router.isReady,
     sessionKey,
-    showSession,
-    startConversation,
   ]);
+
+  // Leaving the page leaves its conversation: a restore, open or turn still in
+  // flight answers for a page no longer there, and must not write the stored
+  // pointer or the URL. A remount -- strict mode's included -- hydrates afresh.
+  useEffect(
+    () => (): void => {
+      conversationRef.current += 1;
+      hasHydratedRef.current = false;
+    },
+    []
+  );
 
   // Opening from a Logan search wins over a URL session id and localStorage:
   // the person just clicked "ask the assistant about this cohort", so a new
@@ -291,7 +293,6 @@ export const useAssistantChat = ({
       .then((created) => {
         if (cancelled) return;
         sessionIdRef.current = created.session_id;
-        loganOpenedRef.current = true;
         localStorage.setItem(sessionKey, created.session_id);
         setSavedAnalysisId(created.saved_analysis_id);
         setMessages(created.messages);
@@ -410,7 +411,11 @@ export const useAssistantChat = ({
   // hinge on how the model reads a message and the assistant still answers it.
   const runTurn = useCallback(
     async ({ clearFields, message }: TurnRequest): Promise<void> => {
-      if ((!message?.trim() && !clearFields?.length) || sendingRef.current)
+      if (
+        (!message?.trim() && !clearFields?.length) ||
+        sendingRef.current ||
+        openingRef.current
+      )
         return;
       sendingRef.current = true;
       const conversation = conversationRef.current;
@@ -541,12 +546,61 @@ export const useAssistantChat = ({
     await runTurn(request);
   }, [lastFailedRequest, runTurn]);
 
+  // Reached through onRetry, which offers it once a restore has failed.
   const onRetryRestore = useCallback((): Promise<void> => {
-    setRestoreAttempt((attempt) => attempt + 1);
+    // A transient failure keeps the session it was restoring; anything else
+    // dropped it, and there is nothing left to retry.
+    if (sessionIdRef.current) {
+      restoreSession(sessionIdRef.current, {
+        isNamed: restoreIsNamedRef.current,
+      });
+    }
     return Promise.resolve();
-  }, []);
+  }, [restoreSession]);
 
-  const onResetSession = useCallback((): void => {
+  const onOpenConversation = useCallback(
+    async (id: string): Promise<boolean> => {
+      // The session cookie vouches for one conversation at a time, so a second
+      // open, or one mid-reply, would race for it and lock out the loser.
+      if (openingRef.current || sendingRef.current) return false;
+      openingRef.current = true;
+      const conversation = conversationRef.current;
+      setIsRestoring(true);
+      let isHandedOver = false;
+      try {
+        // A failure leaves the conversation on screen as it was, and is the
+        // caller's to report.
+        const { session_id } = await apiClient.openSavedAnalysis(id);
+        // Left the page since: the open answers for nothing on screen.
+        if (conversationRef.current !== conversation) return false;
+        // Already showing: restoring it again would wipe the screen for nothing.
+        if (session_id === shownSessionRef.current) return false;
+        restoreSession(session_id, { isNamed: true });
+        isHandedOver = true;
+        // An output of the open, not its trigger: the URL is what a reload
+        // restores, so it names the conversation opened and nothing else. A
+        // replace, not a push: the session cookie vouches for one conversation
+        // at a time, so an entry for the one left behind could not be restored
+        // by Back.
+        replaceQuery(router, {
+          [ASSISTANT_QUERY_PARAM.SESSION_ID]: session_id,
+        });
+        return true;
+      } finally {
+        openingRef.current = false;
+        // A restore that took over settles the flag; anything else hands the
+        // screen back as it was.
+        if (!isHandedOver && conversationRef.current === conversation) {
+          setIsRestoring(false);
+        }
+      }
+    },
+    [restoreSession, router]
+  );
+
+  const onResetSession = useCallback((): boolean => {
+    // Opening a conversation is starting one: a reset would only race it.
+    if (openingRef.current) return false;
     // The conversation left behind isn't deleted: it may be saved, which the
     // page can't always tell, and reopening a saved one would race the delete.
     // Unsaved, its live session simply expires.
@@ -555,7 +609,6 @@ export const useAssistantChat = ({
     // result would otherwise bring back the conversation just walked away from.
     startConversation();
     sessionIdRef.current = null;
-    loganOpenedRef.current = false;
     localStorage.removeItem(sessionKey);
     // Drop ?sessionId= as well. It outranks localStorage on mount, so leaving it
     // means a reload restores the conversation we just walked away from and
@@ -563,6 +616,7 @@ export const useAssistantChat = ({
     if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
       stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
     }
+    return true;
   }, [router, sessionKey, startConversation]);
 
   // A failed message retries that message; a failed restore, the restore.
@@ -573,9 +627,9 @@ export const useAssistantChat = ({
   return {
     actions: {
       onClearField,
+      onOpenConversation,
       onResetSession,
       onRetry,
-      onRetryRestore,
       onSendMessage,
     },
     state: {
@@ -594,22 +648,6 @@ export const useAssistantChat = ({
     },
   };
 };
-
-/**
- * Drops query parameters from the current URL, leaving the rest of the route
- * untouched.
- * @param router - Next router.
- * @param names - Query parameters to drop.
- */
-function stripQueryParam(router: NextRouter, names: string[]): void {
-  const query = { ...router.query };
-  for (const name of names) delete query[name];
-  router
-    .replace({ pathname: router.pathname, query }, undefined, { shallow: true })
-    .catch(() => {
-      // Cosmetic: whatever the parameter carried has already been consumed.
-    });
-}
 
 /**
  * Copy for a failed Logan session open. The error is a string today, so the

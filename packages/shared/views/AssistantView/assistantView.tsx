@@ -35,12 +35,11 @@ export const AssistantView = ({
     sessionKey,
   });
   const [info, setInfo] = useState<AssistantInfoResponse | null>(null);
-  // A conversation opening from the history: until its restore takes over,
-  // nothing else may start or send, or the open would wipe it.
-  const [isOpening, setIsOpening] = useState(false);
-  const { conversationKey, onNewAnalysis, onOpened } = useConversationKey(
-    actions.onResetSession
-  );
+  // Busy with a reply, or with a conversation restoring or opening: no
+  // switching conversations or editing the setup over it.
+  const isBusy = state.loading || state.isRestoring;
+  const { conversationKey, onNewAnalysis, onOpenConversation } =
+    useConversationKey(actions);
   const isAssistantUIEnabled = useFeatureFlag(FEATURE_FLAGS.ASSISTANT_UI);
   // Read per-site via findable-ui's getConfig rather than importing one site's
   // config, so the button can never point at another tenant's form. supportUrl
@@ -84,16 +83,9 @@ export const AssistantView = ({
               // user into the next one.
               <Conversation
                 key={conversationKey}
-                error={state.error}
-                handoffUrl={state.handoffUrl}
+                actions={actions}
                 introText={introText}
-                isRestoring={state.isRestoring || isOpening}
-                loading={state.loading}
-                messages={state.messages}
-                onRetry={actions.onRetry}
-                onSend={actions.onSendMessage}
-                schema={state.schema}
-                suggestions={state.suggestions}
+                state={state}
               />
             ),
             tabLabel: "Chat",
@@ -101,13 +93,11 @@ export const AssistantView = ({
           history: {
             children: (
               <Sidebar
-                disabled={state.loading || state.isRestoring || isOpening}
+                disabled={isBusy}
                 disclaimer={disclaimer}
                 lastSave={state.lastSave}
                 onNewAnalysis={onNewAnalysis}
-                onOpened={onOpened}
-                onOpeningChange={setIsOpening}
-                onRetryRestore={actions.onRetryRestore}
+                onOpenConversation={onOpenConversation}
                 savedAnalysisId={state.savedAnalysisId}
                 sessionId={state.shownSessionId}
                 supportUrl={supportUrl}
@@ -120,7 +110,7 @@ export const AssistantView = ({
             children: (
               <AnalysisSetup
                 handoffUrl={state.handoffUrl}
-                loading={state.loading || state.isRestoring || isOpening}
+                loading={isBusy}
                 onClearField={actions.onClearField}
                 schema={state.schema}
               />
@@ -147,17 +137,7 @@ export const AssistantView = ({
       slotProps={{
         chat: {
           children: (
-            <ChatPanel
-              error={state.error}
-              introText={introText}
-              isRestoring={state.isRestoring || isOpening}
-              isSaved={state.isSaved}
-              loading={state.loading}
-              messages={state.messages}
-              onRetry={actions.onRetry}
-              onSend={actions.onSendMessage}
-              suggestions={state.suggestions}
-            />
+            <ChatPanel actions={actions} introText={introText} state={state} />
           ),
         },
         history: {

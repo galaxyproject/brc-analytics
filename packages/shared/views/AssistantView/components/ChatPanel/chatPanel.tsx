@@ -7,53 +7,28 @@ import {
   Typography,
 } from "@mui/material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
-import type {
-  ChatMessage as ChatMessageDisplay,
-  SuggestionChip,
-} from "@repo/shared/services/api-client/types";
 import { ChatMessage } from "@repo/shared/views/AssistantView/components/ChatMessage/chatMessage";
 import { SuggestionChips } from "@repo/shared/views/AssistantView/components/SuggestionChips/suggestionChips";
 import { ASSISTANT_INPUT_PLACEHOLDER } from "@repo/shared/views/AssistantView/constants";
 import { type JSX, useEffect, useRef, useState } from "react";
 import { ChatContainer, InputRow, MessagesContainer } from "./chatPanel.styles";
-
-interface ChatPanelProps {
-  error: string | null;
-  introText: string;
-  isRestoring?: boolean;
-  isSaved: boolean;
-  loading: boolean;
-  messages: ChatMessageDisplay[];
-  onRetry?: () => Promise<void>;
-  onSend: (message: string) => void;
-  suggestions: SuggestionChip[];
-}
+import type { ChatPanelProps } from "./types";
 
 /**
  * The main chat interface with message list, input, and suggestion chips.
  * @param props - Component props
- * @param props.error - Error message to display
+ * @param props.actions - Chat actions: sending a message and retrying a failed request
  * @param props.introText - Welcome/intro text shown before any messages
- * @param props.isRestoring - Whether a previous session is being restored
- * @param props.isSaved - Whether the backend has confirmed this conversation is persisted
- * @param props.loading - Whether the assistant is processing
- * @param props.messages - Chat message history
- * @param props.onRetry - Callback to retry the last failed request
- * @param props.onSend - Callback to send a message
- * @param props.suggestions - Suggestion chips to display
+ * @param props.state - The conversation on screen: its messages, suggestions, any error, whether it is saved, and whether it is busy
  * @returns Chat panel element
  */
 export const ChatPanel = ({
-  error,
+  actions,
   introText,
-  isRestoring,
-  isSaved,
-  loading,
-  messages,
-  onRetry,
-  onSend,
-  suggestions,
+  state,
 }: ChatPanelProps): JSX.Element => {
+  const { onRetry, onSendMessage: onSend } = actions;
+  const { error, isRestoring, isSaved, loading, messages, suggestions } = state;
   const {
     isAuthenticated,
     isConfigured,
@@ -93,7 +68,7 @@ export const ChatPanel = ({
     }
   };
 
-  const inputDisabled = loading || !!isRestoring;
+  const inputDisabled = loading || isRestoring;
 
   return (
     <ChatContainer>

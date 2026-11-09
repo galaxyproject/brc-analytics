@@ -14,6 +14,11 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
     assistantRestore: jest.fn(),
   },
 }));
+// Keeps ESM-only ky out of the jest module graph, which it enters through the
+// shared client the hook imports for saved analyses.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: { openSavedAnalysis: jest.fn() },
+}));
 jest.mock("next/router", () => ({
   useRouter: (): {
     isReady: boolean;

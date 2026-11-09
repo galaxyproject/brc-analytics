@@ -3,19 +3,8 @@ import type {
   UseAssistantChatState,
 } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 
-export interface ConversationProps
-  extends
-    Pick<UseAssistantChatActions, "onRetry">,
-    Pick<
-      UseAssistantChatState,
-      | "error"
-      | "handoffUrl"
-      | "isRestoring"
-      | "loading"
-      | "messages"
-      | "schema"
-      | "suggestions"
-    > {
+export interface ConversationProps {
+  actions: UseAssistantChatActions;
   introText: string;
-  onSend: UseAssistantChatActions["onSendMessage"];
+  state: UseAssistantChatState;
 }

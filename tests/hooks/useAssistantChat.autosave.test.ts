@@ -1,4 +1,5 @@
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
 import { act, renderHook, waitFor } from "@testing-library/react";
@@ -13,6 +14,11 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
 }));
 jest.mock("@repo/shared/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
+}));
+// Keeps ESM-only ky out of the jest module graph, which it enters through the
+// shared client the hook imports for saved analyses.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: { openSavedAnalysis: jest.fn() },
 }));
 jest.mock("next/router", () => ({
   useRouter: (): {
@@ -29,6 +35,7 @@ jest.mock("next/router", () => ({
 }));
 
 const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
+const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -434,10 +441,8 @@ describe("useAssistantChat auto-save", () => {
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
 
-    const { rerender, result } = renderHook(
-      ({ initialSessionId }: { initialSessionId?: string }) =>
-        useAssistantChat({ initialSessionId, sessionKey: SESSION_KEY }),
-      { initialProps: {} }
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
     );
     await waitFor(() =>
       expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
@@ -449,7 +454,12 @@ describe("useAssistantChat auto-save", () => {
       saved_analysis_id: "analysis-opened",
       session_id: OPENED_ID,
     } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
-    rerender({ initialSessionId: OPENED_ID });
+    mockApiClient.openSavedAnalysis.mockResolvedValueOnce({
+      session_id: OPENED_ID,
+    } as Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>);
+    await act(async () => {
+      await result.current.actions.onOpenConversation("analysis-opened");
+    });
     await waitFor(() =>
       expect(result.current.state.savedAnalysisId).toBe("analysis-opened")
     );

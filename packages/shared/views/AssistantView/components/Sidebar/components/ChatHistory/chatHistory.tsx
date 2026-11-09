@@ -13,9 +13,7 @@ import type { ChatHistoryProps } from "./types";
  * @param props - Component props.
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the saved analysis written.
- * @param props.onOpened - Reports that the history opened a different conversation.
- * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
- * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
+ * @param props.onOpenConversation - Opens a saved conversation in the chat; rejects when it can't be opened.
  * @param props.savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns The chat history section element, or null when login is not enabled.
@@ -23,9 +21,7 @@ import type { ChatHistoryProps } from "./types";
 export const ChatHistory = ({
   disabled,
   lastSave,
-  onOpened,
-  onOpeningChange,
-  onRetryRestore,
+  onOpenConversation,
   savedAnalysisId,
   sessionId,
 }: ChatHistoryProps): JSX.Element | null => {
@@ -45,9 +41,7 @@ export const ChatHistory = ({
         <ChatHistorySelector
           disabled={disabled}
           lastSave={lastSave}
-          onOpened={onOpened}
-          onOpeningChange={onOpeningChange}
-          onRetryRestore={onRetryRestore}
+          onOpenConversation={onOpenConversation}
           savedAnalysisId={savedAnalysisId}
           sessionId={sessionId}
         />

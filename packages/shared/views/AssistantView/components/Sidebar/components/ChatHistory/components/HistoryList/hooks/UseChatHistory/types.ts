@@ -1,3 +1,4 @@
+import type { UseAssistantChatActions } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import type { Dispatch, SetStateAction } from "react";
 
 /**
@@ -11,12 +12,10 @@ export interface HistoryItem {
 }
 
 /**
- * What opening a saved conversation reports to as it goes.
+ * What opens a saved conversation, and where a failure goes.
  */
 export interface OpenAnalysisHandlers {
-  onOpened: () => void;
-  onOpeningChange: (isOpening: boolean) => void;
-  onRetryRestore: () => void;
+  onOpenConversation: UseAssistantChatActions["onOpenConversation"];
   setOpenError: Dispatch<SetStateAction<OpenError | null>>;
 }
 

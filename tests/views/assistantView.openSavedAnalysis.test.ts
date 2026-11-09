@@ -8,12 +8,10 @@ jest.mock("@repo/shared/services/api-client/api-client", () => ({
 }));
 
 const push = jest.fn();
-const replace = jest.fn();
 jest.mock("next/router", () => ({
   __esModule: true,
   default: {
     push: (...args: unknown[]): unknown => push(...args),
-    replace: (...args: unknown[]): unknown => replace(...args),
   },
 }));
 
@@ -32,38 +30,13 @@ describe("openSavedAnalysis", () => {
   test("opens the restored session on the assistant page", async () => {
     push.mockResolvedValue(true);
 
-    await expect(openSavedAnalysis("analysis-1")).resolves.toBe(
-      LIVE_SESSION_ID
-    );
+    await openSavedAnalysis("analysis-1");
 
     expect(mockClient.openSavedAnalysis).toHaveBeenCalledWith("analysis-1");
     expect(push).toHaveBeenCalledWith({
       pathname: "/assistant",
       query: { sessionId: LIVE_SESSION_ID },
     });
-  });
-
-  test("replaces the history entry when asked, rather than pushing one", async () => {
-    // Opened from the assistant page itself: the cookie vouches for one
-    // conversation at a time, so an entry for the one left behind could not be
-    // restored by Back.
-    replace.mockResolvedValue(true);
-
-    await openSavedAnalysis("analysis-1", { replace: true });
-
-    expect(replace).toHaveBeenCalledWith(
-      { pathname: "/assistant", query: { sessionId: LIVE_SESSION_ID } },
-      undefined,
-      { shallow: true }
-    );
-    expect(push).not.toHaveBeenCalled();
-  });
-
-  test("a navigation cancelled by a later one is not reported as opened", async () => {
-    // Next resolves a cancelled navigation to false rather than rejecting.
-    push.mockResolvedValue(false);
-
-    await expect(openSavedAnalysis("analysis-1")).resolves.toBeNull();
   });
 
   test("a navigation failure is passed on", async () => {

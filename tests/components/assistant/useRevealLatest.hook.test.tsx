@@ -4,6 +4,7 @@ import { Conversation as ChatConversation } from "@repo/shared/views/AssistantVi
 import { useRevealLatest } from "@repo/shared/views/AssistantView/components/Conversation/hooks/UseRevealLatest/hook";
 import { act, render } from "@testing-library/react";
 import { type JSX, type ReactNode } from "react";
+import { chatActions, chatState } from "./chatFixtures";
 
 // findable-ui's MarkdownRenderer runs a unified/rehype pipeline whose packages
 // are ESM-only, which Jest can't parse. A plain renderer stands in for it.
@@ -167,19 +168,14 @@ describe("useRevealLatest", () => {
   test("watches the newest message in the chat's own conversation", () => {
     render(
       <ChatConversation
-        error={null}
-        handoffUrl={null}
+        actions={chatActions()}
         introText="Welcome"
-        isRestoring={false}
-        loading={false}
-        messages={[
-          { content: "Which assemblies exist?", role: "user" },
-          { content: "And which workflows?", role: "user" },
-        ]}
-        onRetry={jest.fn()}
-        onSend={jest.fn()}
-        schema={null}
-        suggestions={[]}
+        state={chatState({
+          messages: [
+            { content: "Which assemblies exist?", role: "user" },
+            { content: "And which workflows?", role: "user" },
+          ],
+        })}
       />,
       { wrapper }
     );
