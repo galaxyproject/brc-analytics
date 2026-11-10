@@ -26,7 +26,12 @@ def _unavailable() -> str:
 
 def _bad_job(job_id: str) -> str:
     return json.dumps(
-        {"error": f"Invalid job id {job_id!r}; expected 16 hex characters."}
+        {
+            "error": (
+                f"Invalid job id {job_id!r}; expected 16 or 32 lowercase hex "
+                "characters."
+            )
+        }
     )
 
 
@@ -57,12 +62,12 @@ async def logan_job_status(deps: AssistantDeps, job_id: str) -> str:
     """Check whether a Logan sequence search (kmindex job) has finished.
 
     Args:
-        job_id: the 16-character Galaxy job id from a Logan results URL
-            (/logan-search?job=<id>).
+        job_id: the Galaxy job id (16 or 32 hex characters) from a Logan
+            results URL (/logan-search?job=<id>).
     """
     if not deps.galaxy or not deps.galaxy.is_available():
         return _unavailable()
-    if not _JOB_ID.match(job_id or ""):
+    if not _JOB_ID.fullmatch(job_id or ""):
         return _bad_job(job_id)
     status = await deps.galaxy.get_job_status(job_id)
     state = status.state
@@ -88,11 +93,12 @@ async def logan_cohort(deps: AssistantDeps, job_id: str) -> str:
     list is capped and its composition is not representative.
 
     Args:
-        job_id: the 16-character Galaxy job id from a Logan results URL.
+        job_id: the Galaxy job id (16 or 32 hex characters) from a Logan
+            results URL.
     """
     if not deps.galaxy or not deps.galaxy.is_available():
         return _unavailable()
-    if not _JOB_ID.match(job_id or ""):
+    if not _JOB_ID.fullmatch(job_id or ""):
         return _bad_job(job_id)
     page = await deps.galaxy.get_cached_kmindex_results(job_id, limit=1, offset=0)
     if page is None:
@@ -132,13 +138,14 @@ async def logan_hits(
     logan_cohort for that.
 
     Args:
-        job_id: the 16-character Galaxy job id from a Logan results URL.
+        job_id: the Galaxy job id (16 or 32 hex characters) from a Logan
+            results URL.
         offset: first hit to return (0-based).
         limit: hits per page (default 25, capped at 100).
     """
     if not deps.galaxy or not deps.galaxy.is_available():
         return _unavailable()
-    if not _JOB_ID.match(job_id or ""):
+    if not _JOB_ID.fullmatch(job_id or ""):
         return _bad_job(job_id)
     limit = max(1, min(int(limit), LOGAN_HITS_MAX_LIMIT))
     offset = max(0, int(offset))
