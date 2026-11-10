@@ -275,12 +275,17 @@ describe("Sunburst", () => {
     beforeEach(() => {
       resize = null;
       width = 800;
+      // Armed in observe(), so the test also fails if the chart never observes.
       window.ResizeObserver = class {
+        callback: ResizeObserverCallback;
         constructor(callback: ResizeObserverCallback) {
-          resize = (): void => callback([], this as unknown as ResizeObserver);
+          this.callback = callback;
         }
         disconnect(): void {}
-        observe(): void {}
+        observe(): void {
+          resize = (): void =>
+            this.callback([], this as unknown as ResizeObserver);
+        }
       } as unknown as typeof ResizeObserver;
       SVGElement.prototype.getBoundingClientRect = function (): DOMRect {
         return { width } as DOMRect;
