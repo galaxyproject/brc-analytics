@@ -158,6 +158,12 @@ service key. Everything else goes to the primary: every submit, the index list
 and queue, and every 32-character id. A signed-in user's bearer is never sent
 to the legacy Galaxy.
 
+Because legacy reads use the service key, they cover the searches that ran on
+the service account there: anonymous, partner and MCP ones. A search a
+signed-in user ran on the old Galaxy under their own account belongs to that
+user there, and the service key can't see it. Prod had login off while it was
+on Galaxy Test, so it has none of those.
+
 The rule is the length of the encoded id. Galaxy encodes ids as Blowfish
 blocks, so a database id of up to eight digits comes out as 16 hex characters
 and anything larger as 32. Galaxy Test's job ids are all 16 characters and
