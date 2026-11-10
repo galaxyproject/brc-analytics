@@ -311,7 +311,7 @@ class AssistantTurnLog(Base):
     provider: Mapped[str | None] = mapped_column(String(64), nullable=True)
     # The Logan search the session was opened from, so those turns can be
     # found without reading transcripts. Null for every other conversation.
-    logan_job_id: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    logan_job_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utcnow,

@@ -558,7 +558,7 @@ def _logan_job_id(metadata: Optional[Dict[str, Any]]) -> Optional[str]:
     """The Logan job a session was opened from, when it is a well-formed id.
 
     Read off the stored snapshot, which a saved session can carry back in
-    hand-edited; anything but 16 hex characters is not worth a column.
+    hand-edited; anything but a well-formed Galaxy job id is not worth a column.
     """
     logan = (metadata or {}).get("logan")
     job_id = logan.get("job_id") if isinstance(logan, dict) else None

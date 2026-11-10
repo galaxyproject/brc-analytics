@@ -10,12 +10,13 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # 32 wide: Galaxy Test's job ids are 16 hex characters, usegalaxy.org's 32.
     # Nullable: only turns in a session opened from a Logan search have one,
     # and every row written before this has none. Indexed because the reason
     # it exists is finding those turns without scanning transcripts.
     op.add_column(
         "assistant_turn_log",
-        sa.Column("logan_job_id", sa.String(length=16), nullable=True),
+        sa.Column("logan_job_id", sa.String(length=32), nullable=True),
     )
     op.create_index(
         "ix_assistant_turn_log_logan_job_id",

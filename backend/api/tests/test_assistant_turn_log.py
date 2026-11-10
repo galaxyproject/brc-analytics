@@ -921,7 +921,7 @@ class TestLoganJobIdIsRecorded:
             # Galaxy ids are lower-case, and kmindex_submissions stores them so.
             {"logan": {"job_id": "806580FD1ED1CC90"}},
             # "$" matches before a final newline, so a plain match would let a
-            # 17-character value through to a String(16) column.
+            # malformed value through to the column.
             {"logan": {"job_id": "806580fd1ed1cc90\n"}},
             {"logan": {"job_id": "not-a-job; DROP TABLE"}},
         ],
