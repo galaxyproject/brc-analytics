@@ -219,6 +219,11 @@ Configure it with these backend env vars:
 
 - **Galaxy.** Jobs run on the BRC service account, in a history called
   "BRC Logan Partner - <partner_id>".
+- **Job ids.** A job id is 16 or 32 lowercase hex characters, depending on
+  which Galaxy ran it. When the deployment has moved Galaxy servers, the
+  16-character ids from before the move are still read from the old one
+  (`GALAXY_LEGACY_API_URL`, see the backend README), so a partner can switch
+  its base URL without losing jobs it already started.
 - **Analytics.** Every submission, native or partner, lands in
   `kmindex_submissions` with `source` and `partner_id`.
 - **Rotating a key.** Add the new entry alongside the old, hand over the new
