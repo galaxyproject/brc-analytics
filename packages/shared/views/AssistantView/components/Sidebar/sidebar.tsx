@@ -14,9 +14,7 @@ import type { SidebarProps } from "./types";
  * @param props.disclaimer - AI disclaimer text.
  * @param props.lastSave - Most recent confirmed save, naming the saved analysis written.
  * @param props.onNewAnalysis - Starts a new conversation.
- * @param props.onOpened - Reports that the history opened a different conversation.
- * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
- * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
+ * @param props.onOpenConversation - Opens a saved conversation in the chat; rejects when it can't be opened.
  * @param props.savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @param props.supportUrl - Feedback form URL; the feedback button is hidden without one.
@@ -27,9 +25,7 @@ export const Sidebar = ({
   disclaimer,
   lastSave,
   onNewAnalysis,
-  onOpened,
-  onOpeningChange,
-  onRetryRestore,
+  onOpenConversation,
   savedAnalysisId,
   sessionId,
   supportUrl,
@@ -41,9 +37,7 @@ export const Sidebar = ({
       <ChatHistory
         disabled={disabled}
         lastSave={lastSave}
-        onOpened={onOpened}
-        onOpeningChange={onOpeningChange}
-        onRetryRestore={onRetryRestore}
+        onOpenConversation={onOpenConversation}
         savedAnalysisId={savedAnalysisId}
         sessionId={sessionId}
       />

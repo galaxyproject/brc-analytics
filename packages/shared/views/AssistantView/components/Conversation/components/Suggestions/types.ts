@@ -1,4 +1,7 @@
-import type { ConversationProps } from "@repo/shared/views/AssistantView/components/Conversation/types";
+import type {
+  UseAssistantChatActions,
+  UseAssistantChatState,
+} from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import type { MouseEvent } from "react";
 
 export interface StyledStackProps {
@@ -16,11 +19,12 @@ export interface SuggestionItem {
 }
 
 export interface SuggestionsProps extends Pick<
-  ConversationProps,
-  "onSend" | "suggestions"
+  UseAssistantChatState,
+  "suggestions"
 > {
   isBusy: boolean;
   isSetupComplete: boolean;
   onFocusComposer: () => void;
   onFocusLog: () => void;
+  onSend: UseAssistantChatActions["onSendMessage"];
 }

@@ -25,30 +25,26 @@ import type { ConversationProps } from "./types";
  * with what the column brings into view kept clear of them; on narrow
  * screens the whole chat tab scrolls, composer included.
  * @param props - Component props.
- * @param props.error - Error from the last request, if any.
- * @param props.handoffUrl - Workflow setup URL, or null until the setup is complete.
+ * @param props.actions - Chat actions: sending a message and retrying a failed request.
  * @param props.introText - Welcome text shown before any messages.
- * @param props.isRestoring - Whether a conversation is being restored or opened.
- * @param props.loading - Whether a reply to the last message is in flight.
- * @param props.messages - Messages in the conversation.
- * @param props.onRetry - Retries the last failed request.
- * @param props.onSend - Sends a message to the assistant.
- * @param props.schema - Current analysis schema, or null before the assistant has returned one.
- * @param props.suggestions - Suggested next steps.
+ * @param props.state - The conversation on screen: its messages, setup, suggestions and any error, and whether it is busy.
  * @returns The conversation element.
  */
 export const Conversation = ({
-  error,
-  handoffUrl,
+  actions,
   introText,
-  isRestoring,
-  loading,
-  messages,
-  onRetry,
-  onSend,
-  schema,
-  suggestions,
+  state,
 }: ConversationProps): JSX.Element => {
+  const { onRetry, onSendMessage: onSend } = actions;
+  const {
+    error,
+    handoffUrl,
+    isRestoring,
+    loading,
+    messages,
+    schema,
+    suggestions,
+  } = state;
   const disabled = loading || isRestoring;
   const { inputRef, onFocusComposer } = useComposerFocus();
   const { logRef, onFocusLog } = useLogFocus();

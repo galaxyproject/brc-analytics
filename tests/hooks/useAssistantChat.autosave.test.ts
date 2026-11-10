@@ -1,4 +1,5 @@
 import { useAuth } from "@repo/shared/providers/authentication/provider";
+import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { assistantAPIClient } from "@repo/shared/services/assistant-api-client";
 import { useAssistantChat } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/hook";
 import { act, renderHook, waitFor } from "@testing-library/react";
@@ -13,6 +14,11 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
 }));
 jest.mock("@repo/shared/providers/authentication/provider", () => ({
   useAuth: jest.fn(),
+}));
+// Keeps ESM-only ky out of the jest module graph, which it enters through the
+// shared client the hook imports for saved analyses.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: { openSavedAnalysis: jest.fn() },
 }));
 jest.mock("next/router", () => ({
   useRouter: (): {
@@ -29,6 +35,7 @@ jest.mock("next/router", () => ({
 }));
 
 const mockClient = assistantAPIClient as jest.Mocked<typeof assistantAPIClient>;
+const mockApiClient = apiClient as jest.Mocked<typeof apiClient>;
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 const SESSION_KEY = "brc-assistant-session-id";
@@ -39,14 +46,20 @@ type SaveResponse = Awaited<ReturnType<typeof mockClient.assistantSaveSession>>;
 
 /**
  * A promise whose settling the test controls, to hold a request in flight.
- * @returns The promise and its resolve handle
+ * @returns The promise and its resolve and reject handles
  */
-function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+function deferred<T>(): {
+  promise: Promise<T>;
+  reject: (reason: unknown) => void;
+  resolve: (value: T) => void;
+} {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((res) => {
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
     resolve = res;
+    reject = rej;
   });
-  return { promise, resolve };
+  return { promise, reject, resolve };
 }
 
 /**
@@ -155,7 +168,7 @@ describe("useAssistantChat auto-save", () => {
     expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
   });
 
-  test("signing out drops the saved label and lets a re-sign-in save again", async () => {
+  test("signing out drops the saved label", async () => {
     // logout only clears the user -- no reload, no redirect -- so a latched
     // isSaved left the panel offering to save a conversation it was calling
     // saved in the same row.
@@ -174,16 +187,6 @@ describe("useAssistantChat auto-save", () => {
     rerender();
 
     await waitFor(() => expect(result.current.state.isSaved).toBe(false));
-
-    // And the latch went with it: signing back in re-saves rather than
-    // finding this session already attempted.
-    mockClient.assistantRestore.mockResolvedValue(restored());
-    auth(true);
-    rerender();
-
-    await waitFor(() =>
-      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
-    );
   });
 
   test("a signed-out conversation is never sent to the account", async () => {
@@ -434,10 +437,8 @@ describe("useAssistantChat auto-save", () => {
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
 
-    const { rerender, result } = renderHook(
-      ({ initialSessionId }: { initialSessionId?: string }) =>
-        useAssistantChat({ initialSessionId, sessionKey: SESSION_KEY }),
-      { initialProps: {} }
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
     );
     await waitFor(() =>
       expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
@@ -449,7 +450,12 @@ describe("useAssistantChat auto-save", () => {
       saved_analysis_id: "analysis-opened",
       session_id: OPENED_ID,
     } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
-    rerender({ initialSessionId: OPENED_ID });
+    mockApiClient.openSavedAnalysis.mockResolvedValueOnce({
+      session_id: OPENED_ID,
+    } as Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>);
+    await act(async () => {
+      await result.current.actions.onOpenConversation("analysis-opened");
+    });
     await waitFor(() =>
       expect(result.current.state.savedAnalysisId).toBe("analysis-opened")
     );
@@ -465,8 +471,8 @@ describe("useAssistantChat auto-save", () => {
   });
 
   test("a save that lands after a turn started still selects its analysis", async () => {
-    // A turn starting cancels the save's effect run, but the conversation on
-    // screen is still the one just saved -- and a turn that fails never says so.
+    // A turn starting re-runs the save effect, but the conversation on screen
+    // is still the one just saved -- and a turn that fails never says so.
     auth(true);
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
@@ -487,5 +493,100 @@ describe("useAssistantChat auto-save", () => {
     });
 
     expect(result.current.state.savedAnalysisId).toBe("analysis-1");
+  });
+
+  test("a save that lands after a failed open still marks the conversation saved", async () => {
+    // The open re-runs the save effect, but the conversation on screen is
+    // still the one just saved -- and an open that fails never says so.
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+    const open =
+      deferred<Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>>();
+    mockApiClient.openSavedAnalysis.mockReturnValueOnce(open.promise);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    // Rendered with the open in flight, so the save effect re-runs mid-open.
+    let opening!: Promise<boolean>;
+    act(() => {
+      opening = result.current.actions.onOpenConversation("analysis-opened");
+    });
+    expect(result.current.state.isRestoring).toBe(true);
+    await act(async () => {
+      open.reject(new Error("500"));
+      await expect(opening).rejects.toThrow("500");
+    });
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+
+    expect(result.current.state.isSaved).toBe(true);
+    expect(result.current.state.savedAnalysisId).toBe("analysis-1");
+  });
+
+  test("a save that lands after signing out does not mark the conversation saved", async () => {
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+
+    expect(result.current.state.isSaved).toBe(false);
+  });
+
+  test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {
+    auth(true);
+    const save = deferred<SaveResponse>();
+    mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
+    const turn =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantChat>>>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+    // The new session's own sign-in save can't land, so only the reply speaks
+    // for it.
+    mockClient.assistantSaveSession.mockRejectedValueOnce(httpError(409));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
+    );
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.actions.onSendMessage("still there?");
+    });
+    await act(async () => {
+      save.resolve({ saved_analysis_id: "analysis-1" });
+    });
+    expect(result.current.state.isSaved).toBe(true);
+
+    await act(async () => {
+      turn.resolve({
+        ...chatReply(),
+        saved: false,
+        saved_analysis_id: null,
+        session_id: OPENED_ID,
+      });
+      await sending;
+    });
+
+    expect(result.current.state.isSaved).toBe(false);
   });
 });

@@ -1,10 +1,3 @@
-/**
- * Navigation options for opening a saved conversation.
- */
-export interface OpenSavedAnalysisOptions {
-  replace?: boolean;
-}
-
 export interface Props {
   initialLoganJobId?: string;
   initialMessage?: string;

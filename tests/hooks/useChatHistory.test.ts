@@ -65,9 +65,7 @@ function props(overrides: Partial<ChatHistoryProps> = {}): ChatHistoryProps {
   return {
     disabled: false,
     lastSave: null,
-    onOpened: jest.fn(),
-    onOpeningChange: jest.fn(),
-    onRetryRestore: jest.fn(),
+    onOpenConversation: jest.fn().mockResolvedValue(true),
     savedAnalysisId: null,
     sessionId: null,
     ...overrides,
