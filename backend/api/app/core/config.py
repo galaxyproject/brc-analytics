@@ -256,6 +256,20 @@ class Settings:
         if self.PARTNER_API_ENABLED and not self.GALAXY_API_KEY:
             raise ValueError("PARTNER_API_ENABLED needs GALAXY_API_KEY")
 
+        # The Galaxy this deployment submitted to before GALAXY_API_URL was
+        # re-pointed, kept so job ids handed out back then still resolve. Only
+        # ever read from, on its own service key, and chosen by job id length
+        # (see app/core/galaxy_target.py). Unset means no fallback.
+        self.GALAXY_LEGACY_API_URL: str = os.getenv("GALAXY_LEGACY_API_URL", "")
+        self.GALAXY_LEGACY_BASE_URL: str = self.GALAXY_LEGACY_API_URL.rstrip(
+            "/"
+        ).removesuffix("/api")
+        self.GALAXY_LEGACY_API_KEY: str = os.getenv("GALAXY_LEGACY_API_KEY", "")
+        # A user's bearer is no good there, so without the key every legacy
+        # read would fail.
+        if self.GALAXY_LEGACY_API_URL and not self.GALAXY_LEGACY_API_KEY:
+            raise ValueError("GALAXY_LEGACY_API_URL needs GALAXY_LEGACY_API_KEY")
+
         # Galaxy tool IDs
         self.GALAXY_UPLOAD_TOOL_ID: str = os.getenv("GALAXY_UPLOAD_TOOL_ID", "upload1")
         self.GALAXY_RANDOM_LINES_TOOL_ID: str = os.getenv(

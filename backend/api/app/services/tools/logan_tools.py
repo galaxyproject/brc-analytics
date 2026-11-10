@@ -13,6 +13,7 @@ import json
 import re
 
 from app.models.logan import JOB_ID_PATTERN
+from app.services.galaxy_service import galaxy_for_job
 from app.services.logan_snapshot import results_url_for
 from app.services.tools.catalog_tools import AssistantDeps
 
@@ -38,7 +39,7 @@ def _bad_job(job_id: str) -> str:
 async def _miss(deps: AssistantDeps, job_id: str) -> str:
     """Why a cached read came back empty: still running, or gone."""
     try:
-        status = await deps.galaxy.get_job_status(job_id)
+        status = await galaxy_for_job(deps.galaxy, job_id).get_job_status(job_id)
         ready = bool(status.is_complete)
     except Exception:
         ready = True  # can't tell; "expired" sends them somewhere useful
@@ -69,7 +70,7 @@ async def logan_job_status(deps: AssistantDeps, job_id: str) -> str:
         return _unavailable()
     if not _JOB_ID.fullmatch(job_id or ""):
         return _bad_job(job_id)
-    status = await deps.galaxy.get_job_status(job_id)
+    status = await galaxy_for_job(deps.galaxy, job_id).get_job_status(job_id)
     state = status.state
     return json.dumps(
         {

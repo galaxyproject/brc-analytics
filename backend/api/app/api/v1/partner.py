@@ -62,12 +62,18 @@ JobId = Path(..., pattern=JOB_ID_PATTERN)
 
 
 async def get_partner_galaxy_service(
+    request: Request,
     partner: Partner = Depends(get_partner),
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
 ) -> GalaxyService:
-    """A GalaxyService on the BRC service account, in the partner's own history."""
-    return partner_galaxy_service(partner, cache, sra_mirror)
+    """A GalaxyService on the BRC service account, in the partner's own history.
+
+    On the Galaxy the job_id path parameter's job lives on, when there is one.
+    """
+    return partner_galaxy_service(
+        partner, cache, sra_mirror, job_id=request.path_params.get("job_id")
+    )
 
 
 def _created(job_id: str) -> PartnerJobCreated:
