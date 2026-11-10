@@ -26,6 +26,9 @@ class AssistantDeps:
     # The session's Logan snapshot (LoganSnapshot as a dict), when the
     # conversation was opened from a search. Rendered into instructions.
     logan: Optional[dict] = None
+    # What LOGAN_NARROWING_MODE adds after the Logan block on this turn only;
+    # never stored on the session. None in the default mode.
+    logan_note: Optional[str] = None
 
 
 def search_organisms(deps: AssistantDeps, query: str) -> str:

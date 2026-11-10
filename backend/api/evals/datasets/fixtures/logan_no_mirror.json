@@ -1,0 +1,627 @@
+{
+  "job_id": "4d1050c71d46e982",
+  "query_name": "Plasmodium_falciparum_18S",
+  "results_url": "/logan-search?job=4d1050c71d46e982",
+  "total_matches": 17629,
+  "total_hits": 17629,
+  "truncated": false,
+  "shards_searched": 35,
+  "shards_with_hits": 17,
+  "shards_failed": 0,
+  "per_index": [
+    {
+      "hits_after_cap": 17629,
+      "hits_before_cap": 17629,
+      "index": "GENOMIC_INV"
+    }
+  ],
+  "cohort": null,
+  "sra_mirror_available": false,
+  "top_hits": [
+    {
+      "rank": 1,
+      "accession": "ERR662077",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 2,
+      "accession": "SRR7590703",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 3,
+      "accession": "ERR450106",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 4,
+      "accession": "ERR072010",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 5,
+      "accession": "ERR426114",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 6,
+      "accession": "ERR3467358",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 7,
+      "accession": "ERR1138792",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 8,
+      "accession": "ERR063617",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 9,
+      "accession": "ERR013250",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 10,
+      "accession": "ERR701726",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 11,
+      "accession": "ERR211511",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 12,
+      "accession": "ERR3486320",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 13,
+      "accession": "ERR020115",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 14,
+      "accession": "SRR629181",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 15,
+      "accession": "ERR1818201",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 16,
+      "accession": "SRR8802085",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 17,
+      "accession": "ERR586196",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 18,
+      "accession": "ERR636271",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 19,
+      "accession": "ERR3337039",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 20,
+      "accession": "ERR376195",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 21,
+      "accession": "ERR6226910",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 22,
+      "accession": "ERR6227185",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 23,
+      "accession": "ERR586105",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 24,
+      "accession": "ERR586091",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    },
+    {
+      "rank": 25,
+      "accession": "ERR1214194",
+      "score": 1.0,
+      "organism": null,
+      "platform": null,
+      "assay_type": null,
+      "library_layout": null,
+      "instrument": null,
+      "country": null,
+      "release_date": null,
+      "bioproject": null,
+      "study": null
+    }
+  ],
+  "captured_at": "2026-11-07T14:28:28.794391+00:00",
+  "_fixture": {
+    "source": {
+      "base_url": "https://dev.brc-analytics.org",
+      "job_id": "806580fd1ed1cc90",
+      "captured_at": "2026-11-07T14:28:28.794391+00:00",
+      "endpoints": ["/results?limit=25", "/summary", "/export?format=parquet"]
+    },
+    "search": {
+      "indexes": ["GENOMIC_INV"],
+      "query_name": "Plasmodium_falciparum_18S",
+      "threshold": "unknown",
+      "query_bases": "unknown"
+    },
+    "geography": null,
+    "results": {
+      "job_id": "4d1050c71d46e982",
+      "query_name": "Plasmodium_falciparum_18S",
+      "total_hits": 17629,
+      "total_matches": 17629,
+      "shards_searched": 35,
+      "shards_with_hits": 17,
+      "shards_failed": 0,
+      "truncated": false,
+      "per_index": [
+        {
+          "hits_after_cap": 17629,
+          "hits_before_cap": 17629,
+          "index": "GENOMIC_INV"
+        }
+      ],
+      "cohort": null,
+      "geography": null,
+      "export_bytes": 210461,
+      "export_rows": 17629,
+      "export_status": "available",
+      "limit": 25,
+      "offset": 0,
+      "sort": "score",
+      "order": "desc",
+      "sra_mirror_available": false,
+      "sra_annotated": 0,
+      "filtered": false,
+      "filtered_matches": null,
+      "hits": [
+        {
+          "accession": "ERR662077",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "SRR7590703",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_23_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR450106",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR072010",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR426114",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_24_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR3467358",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR1138792",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR063617",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR013250",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_23_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR701726",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR211511",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR3486320",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR020115",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "SRR629181",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_24_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR1818201",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "SRR8802085",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR586196",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR636271",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR3337039",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR376195",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR6226910",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_26_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR6227185",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR586105",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR586091",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        },
+        {
+          "accession": "ERR1214194",
+          "score": 1.0,
+          "shard": "GENOMIC_INV_25_0",
+          "fp_correction": null,
+          "sra": null,
+          "ani": 1.0
+        }
+      ]
+    },
+    "parquet": null,
+    "trim": null,
+    "derived": {
+      "from": "logan_pfal_18s",
+      "from_job_id": "806580fd1ed1cc90",
+      "transform": "no_mirror"
+    }
+  }
+}

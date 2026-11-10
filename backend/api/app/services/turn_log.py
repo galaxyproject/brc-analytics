@@ -119,6 +119,7 @@ async def _write(telemetry: TurnTelemetry) -> None:
             latency_ms=telemetry.latency_ms,
             model=telemetry.model,
             provider=telemetry.provider,
+            logan_job_id=telemetry.logan_job_id,
         )
 
 

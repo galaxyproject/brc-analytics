@@ -13,18 +13,21 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any, Callable, NamedTuple, Optional
 
 from pydantic_ai.messages import ModelResponse, ToolCallPart
 
 from app.core.cache import CacheService
 from app.core.config import Settings, get_settings
 from app.models.assistant import AnalysisSchema
+from app.models.logan import LoganSnapshot
 from app.services.assistant_agent import AssistantAgent
+from app.services.logan_prompt import render_logan_instructions
 from app.services.sra_mirror import SRAMirrorService
 from app.services.tools.catalog_data import CatalogData
 from app.services.tools.catalog_tools import AssistantDeps
 from evals.judge import build_pydantic_ai_model
+from evals.logan_fixture import FixtureGalaxy, load_all_fixtures
 from evals.model_registry import ModelEntry
 
 # AssistantAgent's eager init calls pydantic-ai with a model-name string when
@@ -426,28 +429,157 @@ def make_structured_channel_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
     return task
 
 
-def make_logan_conversation_task(deps: EvalDeps, entry: ModelEntry) -> Callable:
-    """Replay a scripted conversation inside a session opened from a Logan
-    snapshot fixture, and report the final state. The snapshot is injected,
-    not fetched, so the eval needs no Galaxy and no Redis aggregate."""
-    from app.models.logan import LoganSnapshot
+@dataclass
+class LoganTurnTrace:
+    """One turn of a Logan-bound conversation, as the model saw and answered it."""
 
-    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror)
+    message: str
+    reply: str
+    # What render_logan_instructions (and anything else on the instructions
+    # channel) handed the model on this turn's first request.
+    instructions: str
+    tool_calls: list[tuple[str, dict]]
+    tool_returns: list[str]
+    latency_s: float
+    # One per tool call: that call's return, or None when it got none.
+    call_returns: list[Optional[str]] = field(default_factory=list)
+
+
+@dataclass
+class LoganConversationOutput(ConversationOutput):
+    # The instructions block of the final turn: the Logan context proper.
+    instructions: str
+    # Everything the final reply could have drawn a number from: every turn's
+    # instructions, the session's intro message, the user's own messages and
+    # every tool return. NumbersTraceToContext checks the reply against this.
+    context: str
+    turns: list[LoganTurnTrace]
+    # Flattened across turns, so ToolCallMatch / QueryCatalogShape apply as-is.
+    tool_calls: list[tuple[str, dict]]
+    session_metadata: dict
+
+
+def _turn_messages(history: list[dict]) -> list[dict]:
+    """This turn's slice of a serialized pydantic-ai history: everything from
+    the last request that carries a user prompt."""
+    for i in range(len(history) - 1, -1, -1):
+        msg = history[i]
+        if msg.get("kind") != "request":
+            continue
+        if any(p.get("part_kind") == "user-prompt" for p in msg.get("parts", [])):
+            return history[i:]
+    return []
+
+
+class _TurnParts(NamedTuple):
+    instructions: str  # the first request's
+    tool_calls: list[tuple[str, dict]]
+    tool_returns: list[str]
+    # One per tool call, matched by tool_call_id: that call's own return, or
+    # None when it got none (a validation retry, or nothing at all).
+    call_returns: list[Optional[str]]
+
+
+def _content_text(content: Any) -> str:
+    return content if isinstance(content, str) else json.dumps(content, default=str)
+
+
+def _trace_parts(messages: list[dict]) -> _TurnParts:
+    """What one walk over a turn's messages says about the turn."""
+    instructions = ""
+    calls: list[tuple[str, dict]] = []
+    call_ids: list[str] = []
+    returns: list[str] = []
+    by_id: dict[str, str] = {}
+    for msg in messages:
+        if msg.get("kind") == "request" and not instructions:
+            instructions = msg.get("instructions") or ""
+        for part in msg.get("parts", []):
+            kind = part.get("part_kind")
+            if kind == "tool-call":
+                args = part.get("args")
+                if isinstance(args, str):
+                    try:
+                        args = json.loads(args)
+                    except Exception:
+                        args = {"_raw": args}
+                calls.append((part.get("tool_name", ""), args or {}))
+                call_ids.append(part.get("tool_call_id") or "")
+            elif kind == "tool-return":
+                text = _content_text(part.get("content"))
+                returns.append(text)
+                if part.get("tool_call_id"):
+                    by_id[part["tool_call_id"]] = text
+    return _TurnParts(
+        instructions, calls, returns, [by_id.get(i) if i else None for i in call_ids]
+    )
+
+
+def make_logan_conversation_task(
+    deps: EvalDeps, entry: ModelEntry, galaxy: Any = None
+) -> Callable:
+    """Replay a scripted conversation inside a session opened from a Logan
+    snapshot fixture, and report the final state plus a per-turn trace.
+
+    The snapshot is injected, not fetched: a case names its fixture, and the
+    snapshot comes from the same `galaxy` that serves the job's reads.
+    `galaxy` is a fixture-backed stand-in
+    (evals.logan_fixture.FixtureGalaxy) by default, so the session has the same
+    Logan tools it has in production and every read they make is served from
+    the fixtures -- no network, and an unknown job id is a cache miss.
+    """
+    if galaxy is None:
+        galaxy = FixtureGalaxy(load_all_fixtures())
+    aa = AssistantAgent(deps.cache, sra_mirror=deps.sra_mirror, galaxy=galaxy)
     _prepare_service(aa, entry)
 
-    async def task(case_input: dict) -> ConversationOutput:
-        snapshot = LoganSnapshot.model_validate(case_input["snapshot"])
+    async def task(case_input: dict) -> LoganConversationOutput:
+        fixture = galaxy.fixture_named(case_input["fixture"])
+        snapshot = LoganSnapshot.model_validate(fixture.snapshot)
         state = await aa.create_logan_session_from_snapshot(snapshot, None)
         session_id = state.session_id
+        intro = state.messages[0].content if state.messages else ""
         last_resp = None
+        turns: list[LoganTurnTrace] = []
         for turn in case_input["turns"]:
-            last_resp = await aa.chat(turn, session_id=session_id)
+            started = time.monotonic()
+            last_resp, _telemetry, state = await aa.chat_with_telemetry(
+                turn, session_id=session_id
+            )
+            latency = time.monotonic() - started
+            messages = _turn_messages(state.agent_message_history)
+            parts = _trace_parts(messages)
+            turns.append(
+                LoganTurnTrace(
+                    message=turn,
+                    reply=last_resp.reply,
+                    instructions=parts.instructions,
+                    tool_calls=parts.tool_calls,
+                    tool_returns=parts.tool_returns,
+                    latency_s=latency,
+                    call_returns=parts.call_returns,
+                )
+            )
         assert last_resp is not None
-        return ConversationOutput(
+        final_instructions = turns[-1].instructions or (
+            render_logan_instructions(state.metadata.get("logan")) or ""
+        )
+        context = "\n\n".join(
+            [t.instructions for t in turns]
+            + [intro]
+            + [t.message for t in turns]
+            + [r for t in turns for r in t.tool_returns]
+        )
+        return LoganConversationOutput(
             final_schema=last_resp.schema_state.model_dump(),
             is_complete=last_resp.is_complete,
             reply=last_resp.reply,
             handoff_url=last_resp.handoff_url,
+            instructions=final_instructions,
+            context=context,
+            turns=turns,
+            tool_calls=[c for t in turns for c in t.tool_calls],
+            session_metadata=dict(state.metadata),
         )
 
     return task

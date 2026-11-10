@@ -149,7 +149,9 @@ there is no record of what users asked or how the assistant answered. When
 `DATABASE_URL` is set, each turn is also written to the `assistant_turn_log`
 table: the user's message, the reply, this turn's tool calls and their returns,
 the analysis-tracker snapshot, token counts, latency, and the model that
-produced it.
+produced it. A turn in a session opened from a Logan search also records that
+search's Galaxy job id in `logan_job_id` (indexed; NULL otherwise), so every
+turn about one search can be found without reading transcripts.
 
 Failed turns are recorded too, with `outcome='error'` and the exception class
 in `error_kind` -- otherwise the corpus would only contain the requests that
@@ -204,7 +206,12 @@ the table is treated as user data: it lives in the app database under the same
 access controls as `saved_analyses`, is not exposed through any API endpoint,
 and is readable only by maintainers with direct database access. Authenticated
 turns carry a `user_id`; anonymous turns are grouped by `session_id` only, with
-no IP or other network identifier stored. Deleting a user nulls the `user_id`
+no IP or other network identifier stored. `logan_job_id` is the same id as
+`kmindex_submissions.galaxy_job_id`, so an anonymous turn about a search can be
+joined to that submission and, when the search was submitted signed in, to the
+submitter's `user_id`. Anyone holding a search's results link can open an
+assistant session about it, so turns that share a job id may come from
+different people, and need not be the submitter's. Deleting a user nulls the `user_id`
 rather than deleting the rows, matching `workflow_runs`. Users are told
 conversations are logged during the beta on the assistant page and in
 `/learn/assistant`.
@@ -223,6 +230,12 @@ LIMIT 50;
 SELECT created_at, outcome, user_message, assistant_reply
 FROM assistant_turn_log
 WHERE session_id = :session_id
+ORDER BY created_at;
+
+-- Every turn about one Logan search
+SELECT created_at, session_id, user_message, assistant_reply
+FROM assistant_turn_log
+WHERE logan_job_id = :job_id
 ORDER BY created_at;
 
 -- What's breaking, and on which prompts

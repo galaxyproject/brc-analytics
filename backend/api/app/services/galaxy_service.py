@@ -1627,22 +1627,51 @@ class GalaxyService:
         Needs no Galaxy connection -- paging a cached aggregate is Redis plus
         the mirror -- so it is deliberately not gated on is_available().
         """
-        export_job_id = job_id
-        aggregate = await self.cache.get(self._agg_cache_key(job_id))
-        if aggregate is None:
-            # A job-cache copy's aggregate lives under its original. Only the
-            # cached status is consulted, so this still never touches Galaxy.
-            source = await self._cached_copied_from(job_id)
-            if source:
-                aggregate = await self.cache.get(self._agg_cache_key(source))
-                export_job_id = source
-        if aggregate is None:
+        cached = await self._cached_aggregate(job_id)
+        if cached is None:
             return None
+        aggregate, export_job_id = cached
         return await self._annotate_with_sra(
             self._page_kmindex(
                 aggregate, job_id, limit, offset, export_job_id=export_job_id
             )
         )
+
+    async def _cached_aggregate(self, job_id: str) -> Optional[Tuple[dict, str]]:
+        """A job's aggregate from Redis alone, and the job it lives under.
+
+        A job-cache copy's aggregate lives under its original; only the
+        cached status is consulted to find it, so this never touches Galaxy.
+        """
+        aggregate = await self.cache.get(self._agg_cache_key(job_id))
+        if aggregate is not None:
+            return aggregate, job_id
+        source = await self._cached_copied_from(job_id)
+        if source:
+            aggregate = await self.cache.get(self._agg_cache_key(source))
+            if aggregate is not None:
+                return aggregate, source
+        return None
+
+    async def get_cached_kmindex_export(self, job_id: str) -> Optional[Path]:
+        """The job's current export parquet, if -- and only if -- its
+        aggregate is already cached and the file behind it is on disk.
+
+        The assistant's way onto the whole match set. The results page reaches
+        the export through _load_aggregate, which merges every shard on a miss;
+        a chat turn can't wait for that, and the page is what pays for it. So
+        this reads Redis, then asks _filterable_export (a stat and a footer
+        read), and a miss of either is None -- the caller sends the user to the
+        results page.
+        """
+        cached = await self._cached_aggregate(job_id)
+        if cached is None:
+            return None
+        aggregate, export_job_id = cached
+        try:
+            return await self._filterable_export(aggregate, export_job_id)
+        except KmindexFiltersUnavailable:
+            return None
 
     async def source_job_id(self, job_id: str) -> str:
         """

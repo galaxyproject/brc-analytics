@@ -1,0 +1,495 @@
+"""Chat-side narrowing of a Logan search with the query_logan_hits tool.
+
+Ten questions about subsets of one search, run with LOGAN_NARROWING_MODE=tool
+(with "off" the model has no tool, which is the baseline to compare against).
+Each case is scored on:
+
+- LoganQueryShape -- the last query that answered the last turn (the last
+  query_logan_hits call that returned a count) has exactly the expected
+  filters: the right fields, ops and values, nothing missing and nothing
+  extra.
+  Equivalent spellings agree: eq x == in [x], and on the integer fields
+  gt 2019 == gte 2020.
+- _ReplyHasCount -- the final reply states the ground-truth count, computed
+  here with plain SQL over the fixture parquet (never through the engine
+  under test), states no other run total as the matching count, and
+  mentions no total it couldn't have been given;
+- NumbersTraceToContext -- nothing else in the reply is invented.
+
+Latency is not a score: it is in every turn's trace (--dump-dir), and the
+write-up reads it from there.
+
+Every case runs over F1, whose export is kept whole, so the ground truth is
+the job's real count and agrees with the cohort numbers in the same prompt
+(`build` refuses a trimmed fixture).
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from functools import lru_cache
+from typing import Any, Callable, Optional
+
+import duckdb
+from pydantic_ai.models import Model
+from pydantic_evals import Case, Dataset
+from pydantic_evals.evaluators import Evaluator, EvaluatorContext
+
+from app.core.config import get_settings
+from evals.evaluators import (
+    NumbersTraceToContext,
+    extract_numbers,
+    normalize_numbers,
+)
+from evals.logan_fixture import load_fixture
+from evals.model_registry import ModelEntry
+from evals.tasks import EvalDeps, make_logan_conversation_task
+
+FIXTURE = "logan_pfal_18s"
+TOOL_NAME = "query_logan_hits"
+
+# logan_hit fields holding whole numbers, where gt n and gte n+1 say the same.
+_INTEGER_FIELDS = {"release_year", "mbases"}
+
+
+def canonical_filters(filters: Any) -> Optional[frozenset]:
+    """A filter list as a set of (field, op, value) that ignores spelling:
+    eq x is in [x], and on an integer field gt n is gte n+1 (lt n, lte n-1).
+    None when the list isn't a list of filter objects at all."""
+    if not isinstance(filters, list):
+        return None
+    out = set()
+    for f in filters:
+        if not isinstance(f, dict):
+            return None
+        name, op, value = f.get("field"), str(f.get("op", "")).lower(), f.get("value")
+        if op in ("eq", "in"):
+            values = value if isinstance(value, list) else [value]
+            out.add((name, "in", frozenset(str(v) for v in values)))
+        elif op in ("gt", "gte", "lt", "lte"):
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                return None
+            if name in _INTEGER_FIELDS and number.is_integer():
+                if op == "gt":
+                    op, number = "gte", number + 1
+                elif op == "lt":
+                    op, number = "lte", number - 1
+            out.add((name, op, number))
+        else:
+            out.add((name, op, json.dumps(value, sort_keys=True, default=str)))
+    return frozenset(out)
+
+
+def _counted(ret: Any) -> bool:
+    """Whether a query_logan_hits return is a result, not an error, a missing
+    export or a query that failed."""
+    if not isinstance(ret, str):
+        return False
+    try:
+        body = json.loads(ret)
+    except ValueError:
+        return False
+    return isinstance(body, dict) and isinstance(body.get("total"), int)
+
+
+def _tool_queries(turn: Any) -> list[dict]:
+    """The turn's query_logan_hits calls that ran and returned a result.
+
+    Each call is matched to its own return. A trace without that pairing (an
+    older dump) is paired by position when the counts agree, which holds when
+    query_logan_hits is the only tool the turn used; otherwise nothing counts.
+    """
+    calls = list(getattr(turn, "tool_calls", None) or [])
+    returns = getattr(turn, "call_returns", None)
+    if not returns:
+        returns = list(getattr(turn, "tool_returns", None) or [])
+        if len(returns) != len(calls):
+            return []
+    out = []
+    for (name, args), ret in zip(calls, returns, strict=False):
+        if name != TOOL_NAME or not _counted(ret):
+            continue
+        # pydantic-ai flattens a single-model parameter into the tool's own
+        # schema, but a model may still nest it under the parameter's name.
+        out.append(args.get("query") if isinstance(args.get("query"), dict) else args)
+    return out
+
+
+def last_effective_query(output: Any) -> Optional[dict]:
+    """The query that answered the last turn: the last query_logan_hits call
+    that ran and returned a count. A turn with none has none."""
+    turns = getattr(output, "turns", None) or []
+    ran = _tool_queries(turns[-1]) if turns else []
+    return ran[-1] if ran else None
+
+
+@dataclass
+class LoganQueryShape(Evaluator):
+    """1.0 if the last effective query has exactly the expected filters."""
+
+    expect: list[dict] = field(default_factory=list)
+
+    def evaluate(self, ctx: EvaluatorContext) -> float:
+        query = last_effective_query(ctx.output)
+        if query is None:
+            return 0.0
+        got = canonical_filters(query.get("filters") or [])
+        return 1.0 if got is not None and got == canonical_filters(self.expect) else 0.0
+
+
+# A run total as people write one: "181 runs", "181 matching runs", "runs: 181".
+_RUN_WORD = r"(?:runs?|matches|matching runs|results|samples|accessions)"
+_NUM = r"(?<![\w.%])(\d+)"
+# "181 of the 231", "7,744 out of 17,629": a claim of the first number.
+_OF = _NUM + r"\s+(?:out\s+)?of\s+(?:the\s+|these\s+|those\s+)?\d+"
+
+
+def _verb(words: str) -> str:
+    """ "181 are WGS". When the number before the verb is one the user said
+    ("released after 2019 are 42"), the claim is the number after it, so
+    that one is captured too."""
+    return (
+        rf"(?<![\w.%])(?P<before>\d+)\s+(?:{words})\b"
+        r"(?:\s+(?P<after>\d+)(?![\w%]|\.\d))?"
+    )
+
+
+def _words(said: frozenset[int]) -> str:
+    """Up to three words between a number and its noun ("181 WGS runs", "5
+    Plasmodium vivax runs"). A number the user said counts as a word there,
+    so "169 NovaSeq 6000 runs" is a claim of 169, not of 6000."""
+    numbers = "".join(f"|{n}" for n in sorted(said))
+    return rf"(?:(?:[A-Za-z][\w.-]*{numbers})\s+){{0,3}}?"
+
+
+@lru_cache(maxsize=32)
+def _total_claim(said: frozenset[int]) -> re.Pattern:
+    return re.compile(
+        rf"{_NUM}\s+{_words(said)}{_RUN_WORD}\b"
+        rf"|\b{_RUN_WORD}\s*(?:matched|matching|found|total)?\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
+        rf"|{_OF}"
+        rf"|{_verb('are|were|is|match|matched')}"
+    )
+
+
+_ZERO_CLAIM = re.compile(
+    rf"\b(?:no|zero|none of the)\s+(?:\w+\s+){{0,3}}?{_RUN_WORD}\b"
+    rf"|\bno\s+(?:\w+\s+){{0,3}}?(?:match|matches)\b"
+)
+
+
+# A total stated as the answer -- the count of runs that match -- rather than
+# as a reference point beside it: "181 of the 231", "7,744 out of 17,629",
+# "181 are WGS", "999 matching runs", "999 runs match", "matching runs: 12".
+# "matched" and "results" are left out: replies use them for the search's own
+# total ("17,629 matched runs", "in your search results").
+@lru_cache(maxsize=32)
+def _answer_claim(said: frozenset[int]) -> re.Pattern:
+    return re.compile(
+        rf"{_OF}"
+        rf"|{_verb('are|were|match')}"
+        rf"|{_NUM}\s+{_words(said)}matching\s+runs?\b"
+        rf"|{_NUM}\s+{_words(said)}runs?\s+match\b"
+        r"|\b(?:matching\s+runs?|runs?\s+matching)\s*[:=]\s*(\d+)(?![\w%]|\.\d)"
+    )
+
+
+# "all 460 are WGS", "of the 999 matching runs": a group the answer is set
+# against, not the answer.
+_REFERENCE_BEFORE = re.compile(
+    r"\b(?:all|of|out\s+of)\s+(?:the\s+|these\s+|those\s+)?$"
+)
+
+
+def _plain(reply: str) -> str:
+    return normalize_numbers(reply or "").replace("*", "").replace("_", " ")
+
+
+def _claims(
+    pattern: re.Pattern, reply: str, said: frozenset[int], skip_references: bool
+) -> list[int]:
+    text = _plain(reply)
+    claims = []
+    for m in pattern.finditer(text):
+        if skip_references and _REFERENCE_BEFORE.search(text[: m.start()]):
+            continue
+        before = m.group("before")
+        if before is not None and int(before) in said:
+            # The user's own number before the verb: the claim, if any, is
+            # the one after it.
+            if m.group("after") is not None:
+                claims.append(int(m.group("after")))
+            continue
+        claims.append(int(next(g for g in m.groups() if g is not None)))
+    return claims
+
+
+def run_total_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
+    """Every run total the reply states, in order. `said` holds the numbers
+    the user's own messages contain."""
+    return _claims(_total_claim(said), reply, said, skip_references=False)
+
+
+def answer_claims(reply: str, said: frozenset[int] = frozenset()) -> list[int]:
+    """The run totals the reply states as the matching count, in order."""
+    return _claims(_answer_claim(said), reply, said, skip_references=True)
+
+
+def _context_counts(context: str) -> set[int]:
+    """Whole numbers the model was handed (cohort counts, tool returns)."""
+    return {
+        int(n.value)
+        for n in extract_numbers(context or "")
+        if not n.percent and not n.decimals
+    }
+
+
+@dataclass
+class _ReplyHasCount(Evaluator):
+    """1.0 if the reply states the expected count as a run total (or, for
+    zero, says there are none) and states no other total -- except ones the
+    case allows (the selection's own size, the search's total), numbers the
+    user said, and whole numbers the model's context holds ("Mozambique has
+    460 runs"). The last means a wrong total that happens to equal some count
+    in the context passes this check; the shape check still catches the
+    query behind it."""
+
+    expected: int = 0
+    also_ok: list[int] = field(default_factory=list)
+    said: list[int] = field(default_factory=list)
+
+    def evaluate(self, ctx: EvaluatorContext) -> float:
+        reply = getattr(ctx.output, "reply", "") or ""
+        said = frozenset(self.said)
+        claims = run_total_claims(reply, said)
+        allowed = {
+            self.expected,
+            *self.also_ok,
+            *said,
+            *_context_counts(getattr(ctx.output, "context", "") or ""),
+        }
+        if any(c not in allowed for c in claims):
+            return 0.0
+        # The search's total or a selection's size is fine beside the answer,
+        # not as it: "42 runs were expected; actually 999 matching runs".
+        # Only those, and the user's own numbers ("in total 2019 matching
+        # runs" is not an answer to "after 2019"): a breakdown beside the
+        # answer ("181 are WGS and 279 are WGA") is held to the rule above.
+        others = (set(self.also_ok) | said) - {self.expected}
+        if any(c in others for c in answer_claims(reply, said)):
+            return 0.0
+        if self.expected in claims:
+            return 1.0
+        if self.expected == 0:
+            return 1.0 if _ZERO_CLAIM.search(_plain(reply).lower()) else 0.0
+        return 0.0
+
+
+def _f(field_name: str, op: str, value: Any) -> dict:
+    return {"field": field_name, "op": op, "value": value}
+
+
+SELECT_THAILAND = "Select only the runs from Thailand."
+THAILAND = _f("country", "eq", "Thailand")
+
+# `expect` is the exact filter set the answering query must have; `truth` is
+# the same subset as a WHERE clause over the export, run with plain DuckDB
+# below for the reply's count. `selection_truth` names the subset an earlier
+# turn selected, whose size the reply may also quote.
+_CASES = [
+    {
+        "name": "count_country_instrument",
+        "turns": [
+            "How many runs from Senegal were sequenced on an Illumina NovaSeq 6000?"
+        ],
+        "expect": [
+            _f("country", "eq", "Senegal"),
+            _f("instrument", "eq", "Illumina NovaSeq 6000"),
+        ],
+        "truth": "country = 'Senegal' AND instrument = 'Illumina NovaSeq 6000'",
+    },
+    {
+        "name": "count_organism_year",
+        "turns": ["How many Plasmodium vivax runs were released after 2019?"],
+        "expect": [
+            _f("organism", "eq", "Plasmodium vivax"),
+            _f("release_year", "gt", 2019),
+        ],
+        "truth": "organism = 'Plasmodium vivax' AND year(release_date) > 2019",
+    },
+    {
+        "name": "count_score",
+        "turns": ["How many runs scored at least 0.9?"],
+        "expect": [_f("score", "gte", 0.9)],
+        "truth": "score >= 0.9",
+    },
+    {
+        "name": "count_platform_year",
+        "turns": ["How many Oxford Nanopore runs were released in 2020 or later?"],
+        "expect": [
+            _f("platform", "eq", "OXFORD_NANOPORE"),
+            _f("release_year", "gte", 2020),
+        ],
+        "truth": "platform = 'OXFORD_NANOPORE' AND year(release_date) >= 2020",
+    },
+    {
+        "name": "select_country",
+        "turns": [SELECT_THAILAND],
+        "expect": [THAILAND],
+        "truth": "country = 'Thailand'",
+    },
+    {
+        "name": "follow_up_narrows_selection",
+        "turns": [SELECT_THAILAND, "Of those, how many are WGS?"],
+        "expect": [THAILAND, _f("assay_type", "eq", "WGS")],
+        "truth": "country = 'Thailand' AND assay_type = 'WGS'",
+        "selection_truth": "country = 'Thailand'",
+    },
+    {
+        "name": "explicit_clear",
+        "turns": [
+            SELECT_THAILAND,
+            "Forget that selection and go back to all of the runs. How many "
+            "are WGS and were released after 2019?",
+        ],
+        "expect": [_f("assay_type", "eq", "WGS"), _f("release_year", "gt", 2019)],
+        "truth": "assay_type = 'WGS' AND year(release_date) > 2019",
+        "selection_truth": "country = 'Thailand'",
+    },
+    {
+        # "Kenia": the cohort's vocabulary has Kenya, which is what to apply.
+        "name": "misspelt_value",
+        "turns": ["How many runs are from Kenia?"],
+        "expect": [_f("country", "eq", "Kenya")],
+        "truth": "country = 'Kenya'",
+    },
+    {
+        # Both values exist in the search; together they match nothing. (A
+        # value the search doesn't have is reported, not counted.)
+        "name": "empty_result",
+        "turns": ["How many WGA runs are there from Mozambique?"],
+        "expect": [_f("country", "eq", "Mozambique"), _f("assay_type", "eq", "WGA")],
+        "truth": "country = 'Mozambique' AND assay_type = 'WGA'",
+    },
+    {
+        # A question about the whole search must not narrow (or replace) the
+        # current selection.
+        "name": "question_is_not_a_selection",
+        "turns": [
+            SELECT_THAILAND,
+            "Separately, how many runs in the whole search are from Cambodia "
+            "and paired-end?",
+        ],
+        "expect": [
+            _f("country", "eq", "Cambodia"),
+            _f("library_layout", "eq", "PAIRED"),
+        ],
+        "truth": "country = 'Cambodia' AND library_layout = 'PAIRED'",
+        "selection_truth": "country = 'Thailand'",
+    },
+]
+
+
+def ground_truth(where: str, fixture: str = FIXTURE) -> int:
+    """Count the fixture export's rows matching `where`, in plain DuckDB."""
+    parquet = load_fixture(fixture).parquet
+    if parquet is None:
+        raise RuntimeError(f"fixture {fixture} has no parquet")
+    con = duckdb.connect()
+    try:
+        return con.execute(
+            f"SELECT count(*) FROM read_parquet(?) WHERE {where}", [str(parquet)]
+        ).fetchone()[0]
+    finally:
+        con.close()
+
+
+def require_whole_export(fixture: str = FIXTURE) -> None:
+    """Counts over a trimmed export are a sample's, not the job's.
+
+    Missing provenance is not taken as whole: the fixture has to say it kept
+    every row, and the parquet has to hold that many, which is also the
+    search's own total.
+    """
+    fx = load_fixture(fixture)
+    trim = fx.extras.get("trim")
+    if not isinstance(trim, dict):
+        raise RuntimeError(f"{fixture} has no trim record; can't tell it is whole")
+    kept, total = trim.get("rows_kept"), trim.get("rows_total")
+    if not (isinstance(kept, int) and isinstance(total, int)):
+        raise RuntimeError(f"{fixture}'s trim record lacks its row counts")
+    if kept != total:
+        raise RuntimeError(f"{fixture}'s export is trimmed; counts would be wrong")
+    if fx.parquet is None:
+        raise RuntimeError(f"fixture {fixture} has no parquet")
+    con = duckdb.connect()
+    try:
+        rows = con.execute(
+            "SELECT count(*) FROM read_parquet(?)", [str(fx.parquet)]
+        ).fetchone()[0]
+    finally:
+        con.close()
+    if rows != total or rows != fx.snapshot.get("total_matches"):
+        raise RuntimeError(
+            f"{fixture}'s parquet has {rows} rows; its trim record says {total} "
+            f"and the search matched {fx.snapshot.get('total_matches')}"
+        )
+
+
+def allowed_totals(case: dict, total_matches: int) -> list[int]:
+    """Run totals a correct reply may quote besides the answer: the search's
+    total and a selection's size."""
+    ok = [total_matches]
+    if case.get("selection_truth"):
+        ok.append(ground_truth(case["selection_truth"]))
+    return ok
+
+
+def user_numbers(case: dict) -> list[int]:
+    """Whole numbers in the user's messages ("after 2019"), which a reply may
+    repeat without claiming them as a total."""
+    return [
+        int(n)
+        for turn in case["turns"]
+        for n in re.findall(r"(?<![\w.])\d+(?![\w.])", turn)
+    ]
+
+
+def build(
+    deps: EvalDeps, entry: ModelEntry, judge_model: Model, only: list[str] | None = None
+) -> tuple[Dataset, Callable, str]:
+    require_whole_export()
+    # What the in-process server will run, parsed by the server's own rule.
+    mode = get_settings().LOGAN_NARROWING_MODE
+    total_matches = load_fixture(FIXTURE).snapshot["total_matches"]
+    cases = []
+    for c in _CASES:
+        if only and c["name"] not in only:
+            continue
+        expected = ground_truth(c["truth"])
+        evaluators: list[Evaluator] = [
+            LoganQueryShape(expect=c["expect"]),
+            _ReplyHasCount(
+                expected=expected,
+                also_ok=allowed_totals(c, total_matches),
+                said=user_numbers(c),
+            ),
+            NumbersTraceToContext(),
+        ]
+        cases.append(
+            Case(
+                name=c["name"],
+                inputs={"fixture": FIXTURE, "turns": c["turns"]},
+                metadata={**c, "expected_count": expected, "mode": mode},
+                evaluators=evaluators,
+            )
+        )
+    return (
+        Dataset(cases=cases),
+        make_logan_conversation_task(deps, entry),
+        LoganQueryShape.__name__,
+    )

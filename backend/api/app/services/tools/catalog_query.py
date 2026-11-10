@@ -11,7 +11,10 @@ A typed, column-agnostic query the model authors and the backend compiles to SQL
     absent even when truncated) so the model can offer narrowing instead of paging.
 
 Assembly and organism entities are queryable; workflows stay on their dedicated
-tools.
+tools. A third entity, `logan_hit`, is the export of one Logan search: it has
+no table in the shared catalog connection, and is queried through
+`LoganHitQuery` / `execute_logan_hits` over the job's parquet on a private,
+capped connection opened per call.
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, TypeVar, Union
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -64,12 +67,17 @@ class EntitySchema:
     # Catalog JSON file backing this entity's DuckDB table. The table is named for
     # the entity (execute() interpolates the allowlist-validated entity as the
     # table identifier). Kept here so the schema is the single source of truth —
-    # no parallel entity->file map to drift out of sync.
+    # no parallel entity->file map to drift out of sync. Empty for a per-call
+    # entity, whose source is supplied with each query.
     source: str
     # Default ordering for a `list` with no explicit sort, as (field, desc) terms.
     default_order: tuple[tuple[str, bool], ...] = ()
     # Facets auto-returned on a truncated list so the model can offer narrowing.
     auto_facets: tuple[str, ...] = ()
+    # True when the entity is not part of the shared catalog connection: its
+    # rows come from a file named per call (see execute_logan_hits), so
+    # connect() neither loads nor requires it.
+    per_call: bool = False
 
     def __post_init__(self) -> None:
         self.field_names: set[str] = set(self.fields)
@@ -88,7 +96,7 @@ class EntitySchema:
         # SQL or an IndexError: a `list` always needs a projection, and every
         # column named for ordering/faceting must be a configured column (so the
         # connect() drift check guarantees it exists in the table).
-        if not self.source:
+        if not self.source and not self.per_call:
             raise ValueError("EntitySchema.source (backing file) must be set")
         if not self.display:
             raise ValueError("EntitySchema.display must be non-empty")
@@ -192,7 +200,51 @@ ENTITY_SCHEMA: dict[str, EntitySchema] = {
         default_order=(("assemblyCount", True), ("ncbiTaxonomyId", False)),
         auto_facets=("taxonomicLevelDomain",),
     ),
+    # One Logan search's export: every matched run, joined to the SRA mirror.
+    # Per call, because each job is its own file. release_year is not an
+    # export column -- it is derived in the per-call view so a year range is a
+    # numeric filter rather than a date the model would have to spell.
+    "logan_hit": EntitySchema(
+        source="",
+        per_call=True,
+        fields={
+            "accession": SCALAR,
+            "score": NUMERIC,
+            "ani": NUMERIC,
+            "fp_correction": NUMERIC,
+            "organism": SCALAR,
+            "assay_type": SCALAR,
+            "platform": SCALAR,
+            "instrument": SCALAR,
+            "library_layout": SCALAR,
+            "country": SCALAR,
+            "release_year": NUMERIC,
+            "bioproject": SCALAR,
+            "study": SCALAR,
+            "mbases": NUMERIC,
+        },
+        display=(
+            "accession",
+            "score",
+            "organism",
+            "platform",
+            "library_layout",
+            "country",
+            "release_date",
+            "bioproject",
+        ),
+        default_order=(("score", True), ("accession", False)),
+        auto_facets=("platform", "library_layout", "country", "organism"),
+    ),
 }
+
+# The entities in the shared, in-memory catalog connection. Everything that
+# describes query_catalog -- its facet enum, connect()'s load -- is built from
+# these alone, so adding a per-call entity changes nothing the catalog tool
+# advertises.
+CATALOG_ENTITIES: tuple[str, ...] = tuple(
+    name for name, schema in ENTITY_SCHEMA.items() if not schema.per_call
+)
 
 # Cap on buckets returned per faceted column (top-N by count) — keeps a facet on
 # a high-cardinality field from returning thousands of rows.
@@ -276,9 +328,14 @@ Scalar = Union[str, int, float, bool]
 # deliberate: the per-entity check below still catches an assembly field asked of
 # organisms, and it does so with a message naming the valid ones.
 FACETABLE_FIELDS: tuple[str, ...] = tuple(
-    sorted({f for s in ENTITY_SCHEMA.values() for f in s.facetable_fields})
+    sorted({f for e in CATALOG_ENTITIES for f in ENTITY_SCHEMA[e].facetable_fields})
 )
 FacetField = Literal[*FACETABLE_FIELDS]  # type: ignore[valid-type]
+
+LOGAN_FACETABLE_FIELDS: tuple[str, ...] = tuple(
+    sorted(ENTITY_SCHEMA["logan_hit"].facetable_fields)
+)
+LoganFacetField = Literal[*LOGAN_FACETABLE_FIELDS]  # type: ignore[valid-type]
 
 
 class Filter(BaseModel):
@@ -312,84 +369,95 @@ class CatalogQuery(BaseModel):
 
     @model_validator(mode="after")
     def _validate(self) -> "CatalogQuery":
-        # entity/operation are Literals — pydantic already rejects bad values and
-        # advertises the allowed set in the tool schema.
-        if self.operation == "facets" and not self.facet_by:
-            raise ValueError("operation 'facets' needs at least one facet_by field")
-        schema = ENTITY_SCHEMA[self.entity]
-        allowed = schema.field_names
-        # facet_by is checked first, and against this entity's facetable set
-        # rather than its full field list. The enum spans both entities, so an
-        # assembly-only scalar reaches here on an organism query; answering that
-        # with the generic "valid fields" list would offer taxonomicGroup, the
-        # model would take the suggestion, and the Literal would reject it on the
-        # retry -- the exact exhaustion this branch exists to stop. Every field
-        # named here is one that would actually work.
-        bad_facets = sorted(
-            {c for c in self.facet_by if c not in schema.facetable_fields}
+        return _validate_query(self)
+
+
+# Either query model; the validator hands back the instance it was given.
+Q = TypeVar("Q", "CatalogQuery", "LoganHitQuery")
+
+
+def _validate_query(q: Q) -> Q:
+    """The checks every query model runs, whatever its entity.
+
+    A function rather than a shared base class, so CatalogQuery's own fields
+    -- and the query_catalog tool schema built from them -- stay as they were.
+    """
+    # entity/operation are Literals -- pydantic already rejects bad values and
+    # advertises the allowed set in the tool schema.
+    if q.operation == "facets" and not q.facet_by:
+        raise ValueError("operation 'facets' needs at least one facet_by field")
+    schema = ENTITY_SCHEMA[q.entity]
+    allowed = schema.field_names
+    # facet_by is checked first, and against this entity's facetable set
+    # rather than its full field list. CatalogQuery's enum spans both catalog
+    # entities, so an assembly-only scalar reaches here on an organism query;
+    # answering that with the generic "valid fields" list would offer
+    # taxonomicGroup, the model would take the suggestion, and the Literal
+    # would reject it on the retry -- the exact exhaustion this branch exists
+    # to stop. Every field named here is one that would actually work.
+    bad_facets = sorted({c for c in q.facet_by if c not in schema.facetable_fields})
+    if bad_facets:
+        raise ValueError(
+            f"cannot facet on {bad_facets} for entity {q.entity!r}; "
+            f"group-by needs a scalar field of that entity. Valid facet "
+            f"fields: {sorted(schema.facetable_fields)}"
         )
-        if bad_facets:
-            raise ValueError(
-                f"cannot facet on {bad_facets} for entity {self.entity!r}; "
-                f"group-by needs a scalar field of that entity. Valid facet "
-                f"fields: {sorted(schema.facetable_fields)}"
-            )
-        referenced = [f.field for f in self.filters] + [s.field for s in self.sort]
-        unknown = sorted({f for f in referenced if f not in allowed})
-        if unknown:
-            raise ValueError(
-                f"unknown field(s) {unknown} for entity {self.entity!r}; "
-                f"valid fields: {sorted(allowed)}"
-            )
-        list_fields = schema.list_fields
-        numeric_fields = schema.numeric_fields
-        for f in self.filters:
-            # Every op except the null checks needs a value; without this, a None
-            # compiles to a comparison against NULL that silently matches nothing.
-            if f.op not in (Op.is_null, Op.not_null) and f.value is None:
-                raise ValueError(f"{f.op.value} needs a value")
-            # (A None *inside* a value list — IN (NULL, ...) — is already rejected
-            # by the Filter type: list[Scalar] excludes None, so it can't occur.)
-            if f.op in (Op.gt, Op.gte, Op.lt, Op.lte):
-                if f.field not in numeric_fields:
-                    raise ValueError(
-                        f"range op {f.op.value} needs a numeric field, got {f.field!r}"
-                    )
-                # bool is an int subclass, so guard it explicitly.
-                if isinstance(f.value, bool) or not isinstance(f.value, (int, float)):
-                    raise ValueError(
-                        f"range op {f.op.value} needs a numeric value, got {f.value!r}"
-                    )
-            # eq/ne on a scalar field take a scalar; a list value would compile to
-            # `col = [..]` and error at execution. (On a list field, eq/ne coerce
-            # to membership, so a list there is fine.)
-            if (
-                f.op in (Op.eq, Op.ne)
-                and f.field not in list_fields
-                and isinstance(f.value, list)
-            ):
+    referenced = [f.field for f in q.filters] + [s.field for s in q.sort]
+    unknown = sorted({f for f in referenced if f not in allowed})
+    if unknown:
+        raise ValueError(
+            f"unknown field(s) {unknown} for entity {q.entity!r}; "
+            f"valid fields: {sorted(allowed)}"
+        )
+    list_fields = schema.list_fields
+    numeric_fields = schema.numeric_fields
+    for f in q.filters:
+        # Every op except the null checks needs a value; without this, a None
+        # compiles to a comparison against NULL that silently matches nothing.
+        if f.op not in (Op.is_null, Op.not_null) and f.value is None:
+            raise ValueError(f"{f.op.value} needs a value")
+        # (A None *inside* a value list -- IN (NULL, ...) -- is already rejected
+        # by the Filter type: list[Scalar] excludes None, so it can't occur.)
+        if f.op in (Op.gt, Op.gte, Op.lt, Op.lte):
+            if f.field not in numeric_fields:
                 raise ValueError(
-                    f"{f.op.value} on {f.field!r} needs a scalar value; "
-                    "use in/not_in for multiple values"
+                    f"range op {f.op.value} needs a numeric field, got {f.field!r}"
                 )
-            if f.op in (Op.contains, Op.contains_any) and f.field not in list_fields:
-                raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
-            # `contains` tests one scalar element (list_contains needs a scalar);
-            # a list value belongs to `contains_any`.
-            if f.op is Op.contains and isinstance(f.value, list):
+            # bool is an int subclass, so guard it explicitly.
+            if isinstance(f.value, bool) or not isinstance(f.value, (int, float)):
                 raise ValueError(
-                    "contains needs a scalar value; use contains_any for a list"
+                    f"range op {f.op.value} needs a numeric value, got {f.value!r}"
                 )
-            # An empty list value is never meaningful: invalid SQL (IN ()) or a
-            # silent match-nothing/everything. Reject it for every op that
-            # consumes a list — in/not_in/contains_any always, plus eq/ne when
-            # they coerce to list membership on a list field.
-            consumes_list = f.op in (Op.in_, Op.not_in, Op.contains_any) or (
-                f.op in (Op.eq, Op.ne) and f.field in list_fields
+        # eq/ne on a scalar field take a scalar; a list value would compile to
+        # `col = [..]` and error at execution. (On a list field, eq/ne coerce
+        # to membership, so a list there is fine.)
+        if (
+            f.op in (Op.eq, Op.ne)
+            and f.field not in list_fields
+            and isinstance(f.value, list)
+        ):
+            raise ValueError(
+                f"{f.op.value} on {f.field!r} needs a scalar value; "
+                "use in/not_in for multiple values"
             )
-            if consumes_list and isinstance(f.value, list) and not f.value:
-                raise ValueError(f"{f.op.value} needs a non-empty value list")
-        return self
+        if f.op in (Op.contains, Op.contains_any) and f.field not in list_fields:
+            raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
+        # `contains` tests one scalar element (list_contains needs a scalar);
+        # a list value belongs to `contains_any`.
+        if f.op is Op.contains and isinstance(f.value, list):
+            raise ValueError(
+                "contains needs a scalar value; use contains_any for a list"
+            )
+        # An empty list value is never meaningful: invalid SQL (IN ()) or a
+        # silent match-nothing/everything. Reject it for every op that
+        # consumes a list -- in/not_in/contains_any always, plus eq/ne when
+        # they coerce to list membership on a list field.
+        consumes_list = f.op in (Op.in_, Op.not_in, Op.contains_any) or (
+            f.op in (Op.eq, Op.ne) and f.field in list_fields
+        )
+        if consumes_list and isinstance(f.value, list) and not f.value:
+            raise ValueError(f"{f.op.value} needs a non-empty value list")
+    return q
 
 
 _SQL_BINOP = {
@@ -518,7 +586,8 @@ def connect(catalog_dir: str):
     import duckdb
 
     catalog = Path(catalog_dir)
-    for entity, schema in ENTITY_SCHEMA.items():
+    for entity in CATALOG_ENTITIES:
+        schema = ENTITY_SCHEMA[entity]
         if not (catalog / schema.source).is_file():
             logger.warning(
                 "Catalog %s not found at %s — query engine disabled",
@@ -534,7 +603,8 @@ def connect(catalog_dir: str):
     try:
         con = duckdb.connect()
         counts: dict[str, int] = {}
-        for entity, schema in ENTITY_SCHEMA.items():
+        for entity in CATALOG_ENTITIES:
+            schema = ENTITY_SCHEMA[entity]
             # Bind the path as a parameter so DuckDB handles any special characters
             # (no bespoke quoting needed). The table name is the entity, matching
             # execute()'s _qi(q.entity) projection.
@@ -586,11 +656,12 @@ def connect(catalog_dir: str):
     return None
 
 
-def execute(q: CatalogQuery, con) -> dict:
-    """Run a CatalogQuery against DuckDB; return the summary contract.
+def execute(q: "CatalogQuery | LoganHitQuery", con) -> dict:
+    """Run a CatalogQuery or LoganHitQuery against DuckDB; return the summary
+    contract.
 
     Entity/column/sort identifiers are interpolated into SQL, not parameterized
-    (SQL identifiers can't be) — the CatalogQuery allowlist validator is what
+    (SQL identifiers can't be) -- the query models' allowlist validator is what
     gates that interpolation, so don't loosen it without revisiting this.
     """
     where, params = _compile_where(q)
@@ -667,3 +738,78 @@ def execute(q: CatalogQuery, con) -> dict:
         if auto:
             result["facets"] = auto
     return result
+
+
+class LoganHitQuery(BaseModel):
+    """A structured query over one Logan search's matched runs (its export).
+
+    Same filter language as CatalogQuery -- {field, op, value} predicates,
+    AND across fields, in/not_in for OR within one -- over the `logan_hit`
+    fields. The job is the session's, so there is no job id to pass.
+    """
+
+    entity: Literal["logan_hit"] = "logan_hit"
+    filters: list[Filter] = Field(default_factory=list)
+    operation: Literal["count", "list", "facets"] = "count"
+    facet_by: list[LoganFacetField] = Field(default_factory=list, max_length=4)
+    limit: int = Field(default=10, ge=1, le=10)
+    offset: int = Field(default=0, ge=0)
+    sort: list[Sort] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _validate(self) -> "LoganHitQuery":
+        return _validate_query(self)
+
+
+class LoganExportMismatch(RuntimeError):
+    """The export file lacks a column logan_hit declares, or types it wrong."""
+
+
+def create_logan_view(con, parquet: Path) -> None:
+    """Register the job's export on `con` as the `logan_hit` view, after
+    checking it is the shape declared above.
+
+    @raises LoganExportMismatch: when the file can't be read, or is not that
+        shape -- a writer change to fix, not something to answer around.
+    """
+    import duckdb
+
+    try:
+        rel = con.read_parquet(str(parquet))
+    except duckdb.Error as e:
+        # A truncated or corrupt file can no more be counted than a
+        # wrong-shaped one, and retrying with another filter won't help.
+        raise LoganExportMismatch(f"export can't be read: {e}") from e
+    coltypes = {
+        name: str(kind).upper()
+        for name, kind in zip(rel.columns, rel.types, strict=True)
+    }
+    # Checked before the view is built, so a file without release_date is
+    # reported as a mismatch rather than failing to bind.
+    if "release_date" in coltypes:
+        coltypes["release_year"] = "INTEGER"
+    missing, mistyped = _schema_issues(coltypes, "logan_hit")
+    if missing or mistyped:
+        raise LoganExportMismatch(
+            f"export does not match logan_hit: missing {missing}, mistyped {mistyped}"
+        )
+    rel = rel.project("*, CAST(year(release_date) AS INTEGER) AS release_year")
+    rel.create_view("logan_hit", replace=True)
+
+
+def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
+    """Run a LoganHitQuery over one job's export; same summary as execute().
+
+    Blocking, on a private connection with the results page's thread and
+    memory caps (kmindex_filters' capped connection -- imported here so duckdb
+    stays a lazy import, as in connect()). From async code use
+    logan_export_query.run_export_query, which also bounds and cancels it.
+    """
+    from app.services.kmindex_filters import _connect
+
+    con = _connect()
+    try:
+        create_logan_view(con, parquet)
+        return execute(q, con)
+    finally:
+        con.close()

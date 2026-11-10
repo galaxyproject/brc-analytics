@@ -849,3 +849,139 @@ async def test_an_unresolved_session_is_recorded_as_null_not_as_the_request_id()
         )
 
     assert recorded[0].session_id is None
+
+
+class TestLoganJobIdIsRecorded:
+    """Turns in a session opened from a Logan search carry its job id, so
+    they can be found in the log without reading transcripts."""
+
+    JOB = "806580fd1ed1cc90"
+
+    @staticmethod
+    def _session_metadata():
+        """What production stores: a real snapshot, dumped the way the
+        session saves it, so a renamed field can't leave this test green."""
+        from app.services.logan_snapshot import build_logan_snapshot
+        from tests.test_logan_snapshot import results
+
+        snapshot = build_logan_snapshot(results(), captured_at="t")
+        return {"logan": snapshot.model_dump(mode="json")}
+
+    def _agent(self, metadata):
+        from app.models.assistant import AnalysisSchema, SessionState
+
+        agent = _stub_agent()
+        state = SessionState(
+            session_id="sess-logan",
+            schema_state=AnalysisSchema(),
+            messages=[],
+            metadata=metadata,
+        )
+        agent.session_service = SimpleNamespace(
+            create_session=AsyncMock(return_value=state),
+            require_session=AsyncMock(return_value=state),
+            save_session=AsyncMock(),
+        )
+        agent._extract_state = AsyncMock(return_value=({}, None))
+        return agent
+
+    @pytest.mark.asyncio
+    async def test_a_logan_bound_turn_records_the_job(self):
+        recorded = []
+        metadata = self._session_metadata()
+        agent = self._agent(metadata)
+        agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+
+        await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert recorded[0].logan_job_id == metadata["logan"]["job_id"]
+
+    @pytest.mark.asyncio
+    async def test_an_ordinary_turn_records_null(self):
+        recorded = []
+        agent = self._agent({})
+        agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+
+        await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert recorded[0].logan_job_id is None
+
+    @pytest.mark.parametrize(
+        "metadata",
+        [
+            {},
+            None,
+            {"logan": None},
+            # A hand-edited snapshot that isn't a dict must not fail the turn.
+            {"logan": "806580fd1ed1cc90"},
+            {"logan": {}},
+            {"logan": {"job_id": 806580}},
+            {"logan": {"job_id": "806580fd1ed1cc9"}},
+            {"logan": {"job_id": "806580fd1ed1cc900"}},
+            # Galaxy ids are lower-case, and kmindex_submissions stores them so.
+            {"logan": {"job_id": "806580FD1ED1CC90"}},
+            # "$" matches before a final newline, so a plain match would let a
+            # 17-character value through to a String(16) column.
+            {"logan": {"job_id": "806580fd1ed1cc90\n"}},
+            {"logan": {"job_id": "not-a-job; DROP TABLE"}},
+        ],
+    )
+    def test_anything_but_a_well_formed_id_is_null(self, metadata):
+        from app.services.assistant_agent import _logan_job_id
+
+        assert _logan_job_id(metadata) is None
+
+    def test_a_well_formed_id_is_kept(self):
+        from app.services.assistant_agent import _logan_job_id
+
+        assert _logan_job_id({"logan": {"job_id": self.JOB}}) == self.JOB
+
+    @pytest.mark.asyncio
+    async def test_a_malformed_job_id_records_null(self):
+        recorded = []
+        agent = self._agent({"logan": {"job_id": "not-a-job; DROP TABLE"}})
+        agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+
+        await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert recorded[0].logan_job_id is None
+
+    @pytest.mark.asyncio
+    async def test_a_failed_logan_turn_still_records_the_job(self):
+        recorded = []
+        agent = self._agent({"logan": {"job_id": self.JOB}})
+        agent._run_agent_with_retry = AsyncMock(side_effect=RuntimeError("upstream"))
+
+        with pytest.raises(RuntimeError):
+            await agent.chat_with_telemetry("hello", on_turn=recorded.append)
+
+        assert recorded[0].outcome == TurnOutcome.ERROR
+        assert recorded[0].logan_job_id == self.JOB
+
+
+@pytest.mark.asyncio
+async def test_write_stores_the_logan_job_id(monkeypatch):
+    from contextlib import asynccontextmanager
+
+    session_factory = await _create_session_factory()
+    async with session_factory() as session:
+
+        @asynccontextmanager
+        async def _fake_session():
+            yield session
+
+        monkeypatch.setattr(turn_log, "db_session", _fake_session)
+        await turn_log._write(
+            TurnTelemetry(
+                session_id="with-job",
+                user_message="what is this?",
+                logan_job_id="806580fd1ed1cc90",
+            )
+        )
+        await turn_log._write(TurnTelemetry(session_id="no-job", user_message="hi"))
+
+        rows = {
+            r.session_id: r.logan_job_id
+            for r in (await session.execute(select(AssistantTurnLog))).scalars()
+        }
+        assert rows == {"with-job": "806580fd1ed1cc90", "no-job": None}
