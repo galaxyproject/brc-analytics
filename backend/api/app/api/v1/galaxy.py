@@ -832,6 +832,8 @@ async def cancel_job(
     job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
 ):
     """Cancel a running Galaxy job (future implementation)."""
+    # get_galaxy_service hands a 16-character id the legacy Galaxy, which is
+    # read-only: a real cancel has to refuse those rather than act there.
     # Note: This would require implementing job cancellation in GalaxyService
     # For now, just return a placeholder response
     raise HTTPException(status_code=501, detail="Job cancellation not yet implemented")

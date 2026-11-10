@@ -22,6 +22,7 @@ from app.services import logan_jobs
 from app.services.galaxy_service import GalaxyService, galaxy_for_job
 from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_cohort, logan_job_status
+from tests.test_galaxy_submit_ownership import app_client  # noqa: F401
 
 PRIMARY_API = "https://usegalaxy.org/api"
 LEGACY_API = "https://test.galaxyproject.org/api"
@@ -283,3 +284,40 @@ class TestTools:
         )
         assert out["status"] == "not_ready"
         assert seen == [(TEST_JOB, LEGACY_API, "test-key")]
+
+
+class TestOverHttp:
+    """Through the real route, so a renamed job_id path param is caught."""
+
+    @pytest.mark.parametrize(
+        "job_id, api, key",
+        [(TEST_JOB, LEGACY_API, "test-key"), (MAIN_JOB, PRIMARY_API, "main-key")],
+    )
+    def test_kmindex_results_follow_the_id(
+        self,
+        with_legacy,
+        app_client,  # noqa: F811
+        monkeypatch,
+        job_id,
+        api,
+        key,
+    ):
+        from app.services.galaxy_service import GalaxyJobNotFound
+
+        app, client = app_client
+        app.dependency_overrides[galaxy_router.get_cache_service] = FakeCache
+        app.dependency_overrides[galaxy_router.get_sra_mirror_service] = lambda: None
+        app.dependency_overrides[galaxy_router.get_galaxy_credential] = lambda: USER
+        calls = []
+
+        async def get_kmindex_results(self, job_id, *args, **kwargs):
+            calls.append((job_id, self.target.api_url, self.credential.secret))
+            raise GalaxyJobNotFound(job_id)
+
+        monkeypatch.setattr(GalaxyService, "get_kmindex_results", get_kmindex_results)
+
+        response = client.get(f"/api/v1/galaxy/kmindex/jobs/{job_id}/results")
+
+        assert response.status_code == 404
+        # The 32-character read keeps the signed-in user's bearer.
+        assert calls == [(job_id, api, key if api == LEGACY_API else "bearer")]
