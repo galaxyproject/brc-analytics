@@ -471,8 +471,8 @@ describe("useAssistantChat auto-save", () => {
   });
 
   test("a save that lands after a turn started still selects its analysis", async () => {
-    // A turn starting cancels the save's effect run, but the conversation on
-    // screen is still the one just saved -- and a turn that fails never says so.
+    // A turn starting re-runs the save effect, but the conversation on screen
+    // is still the one just saved -- and a turn that fails never says so.
     auth(true);
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
@@ -496,8 +496,8 @@ describe("useAssistantChat auto-save", () => {
   });
 
   test("a save that lands after a failed open still marks the conversation saved", async () => {
-    // The open cancels the save's effect run, but the conversation on screen
-    // is still the one just saved -- and an open that fails never says so.
+    // The open re-runs the save effect, but the conversation on screen is
+    // still the one just saved -- and an open that fails never says so.
     auth(true);
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
