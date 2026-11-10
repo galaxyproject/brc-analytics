@@ -18,6 +18,9 @@ const customJestConfig = {
   // the other sites' aliases for site isolation); the central test suite spans
   // every site, so map those explicitly here.
   moduleNameMapper: {
+    // d3's packages ship as ESM, which Jest won't load from node_modules;
+    // each also ships a UMD build that it will.
+    "^(d3-[a-z]+)$": "<rootDir>/node_modules/$1/dist/$1.js",
     "^@ga2/(.*)$": "<rootDir>/sites/ga2/$1",
     "^@logan/(.*)$": "<rootDir>/sites/logan-search/$1",
   },
