@@ -132,10 +132,6 @@ export const useAssistantChat = ({
   const [lastSave, setLastSave] = useState<LastSave | null>(null);
   const initialMessageSentRef = useRef(false);
   const saveAttemptRef = useRef<string | null>(null);
-  // The sign-in save whose answer still counts. A fresh object per request,
-  // so a save fired before a sign-out, for the same session, can't stand in
-  // for the one fired after signing back in.
-  const pendingSaveRef = useRef<object | null>(null);
   const saveRetriesRef = useRef<{ count: number; sessionId: string | null }>({
     count: 0,
     sessionId: null,
@@ -344,23 +340,20 @@ export const useAssistantChat = ({
     // (no database configured) would fire a doomed request every turn.
     if (saveAttemptRef.current === currentSessionId) return;
     saveAttemptRef.current = currentSessionId;
-    const attempt = {};
-    pendingSaveRef.current = attempt;
 
     assistantAPIClient
       .assistantSaveSession(currentSessionId)
       .then(({ saved_analysis_id }) => {
         // On disk whatever has happened on the page since.
         setLastSave({ savedAnalysisId: saved_analysis_id });
-        // It counts while it is still the save in force and its session the
-        // one on screen -- not only while nothing re-ran this effect: a turn
-        // or an open starting does, though the conversation is still the one
-        // just written, and one that fails would never say so. Signing out
-        // retires the attempt; a conversation that replaced it has moved the
-        // session on.
+        // Checked against the session, not this effect run: a turn or an open
+        // starting re-runs the effect, though the conversation is still the
+        // one just written, and one that fails would never say so. A
+        // conversation that replaced it has moved the session on, and signing
+        // out has dropped the latch.
         if (
-          pendingSaveRef.current === attempt &&
-          sessionIdRef.current === currentSessionId
+          sessionIdRef.current === currentSessionId &&
+          saveAttemptRef.current === currentSessionId
         ) {
           setSavedAnalysisId(saved_analysis_id);
           setIsSaved(true);
@@ -403,12 +396,11 @@ export const useAssistantChat = ({
   // browser's claim to the conversation: AuthProvider.logout only clears the
   // user, with no reload, so the panel was left rendering "Saved to your
   // account" and "Sign in to keep this conversation" side by side. The latch
-  // goes too, or signing back in would find the session already attempted and
-  // never re-save it.
+  // goes too, so a save still in flight no longer counts once it lands; signing
+  // back in is a full-page redirect, so it never meets this hook's refs.
   useEffect(() => {
     if (isAuthLoading || !isConfigured || isAuthenticated) return;
     saveAttemptRef.current = null;
-    pendingSaveRef.current = null;
     saveRetriesRef.current = { count: 0, sessionId: null };
     clearSaveRetry(saveRetryTimerRef);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)

@@ -46,14 +46,20 @@ type SaveResponse = Awaited<ReturnType<typeof mockClient.assistantSaveSession>>;
 
 /**
  * A promise whose settling the test controls, to hold a request in flight.
- * @returns The promise and its resolve handle
+ * @returns The promise and its resolve and reject handles
  */
-function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+function deferred<T>(): {
+  promise: Promise<T>;
+  reject: (reason: unknown) => void;
+  resolve: (value: T) => void;
+} {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((res) => {
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
     resolve = res;
+    reject = rej;
   });
-  return { promise, resolve };
+  return { promise, reject, resolve };
 }
 
 /**
@@ -162,7 +168,7 @@ describe("useAssistantChat auto-save", () => {
     expect(mockClient.assistantSaveSession).not.toHaveBeenCalled();
   });
 
-  test("signing out drops the saved label and lets a re-sign-in save again", async () => {
+  test("signing out drops the saved label", async () => {
     // logout only clears the user -- no reload, no redirect -- so a latched
     // isSaved left the panel offering to save a conversation it was calling
     // saved in the same row.
@@ -181,16 +187,6 @@ describe("useAssistantChat auto-save", () => {
     rerender();
 
     await waitFor(() => expect(result.current.state.isSaved).toBe(false));
-
-    // And the latch went with it: signing back in re-saves rather than
-    // finding this session already attempted.
-    mockClient.assistantRestore.mockResolvedValue(restored());
-    auth(true);
-    rerender();
-
-    await waitFor(() =>
-      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
-    );
   });
 
   test("a signed-out conversation is never sent to the account", async () => {
@@ -505,7 +501,9 @@ describe("useAssistantChat auto-save", () => {
     auth(true);
     const save = deferred<SaveResponse>();
     mockClient.assistantSaveSession.mockReturnValueOnce(save.promise);
-    mockApiClient.openSavedAnalysis.mockRejectedValueOnce(new Error("500"));
+    const open =
+      deferred<Awaited<ReturnType<typeof mockApiClient.openSavedAnalysis>>>();
+    mockApiClient.openSavedAnalysis.mockReturnValueOnce(open.promise);
 
     const { result } = renderHook(() =>
       useAssistantChat({ sessionKey: SESSION_KEY })
@@ -514,10 +512,15 @@ describe("useAssistantChat auto-save", () => {
       expect(mockClient.assistantSaveSession).toHaveBeenCalledWith(STORED_ID)
     );
 
+    // Rendered with the open in flight, so the save effect re-runs mid-open.
+    let opening!: Promise<boolean>;
+    act(() => {
+      opening = result.current.actions.onOpenConversation("analysis-opened");
+    });
+    expect(result.current.state.isRestoring).toBe(true);
     await act(async () => {
-      await expect(
-        result.current.actions.onOpenConversation("analysis-opened")
-      ).rejects.toThrow("500");
+      open.reject(new Error("500"));
+      await expect(opening).rejects.toThrow("500");
     });
     await act(async () => {
       save.resolve({ saved_analysis_id: "analysis-1" });
@@ -546,35 +549,6 @@ describe("useAssistantChat auto-save", () => {
     });
 
     expect(result.current.state.isSaved).toBe(false);
-  });
-
-  test("a save from before signing out does not count after signing back in", async () => {
-    // The session id is the same both times; only the attempt tells them apart.
-    auth(true);
-    const first = deferred<SaveResponse>();
-    mockClient.assistantSaveSession.mockReturnValueOnce(first.promise);
-    mockClient.assistantSaveSession.mockRejectedValueOnce(httpError(409));
-
-    const { rerender, result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() =>
-      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(1)
-    );
-
-    auth(false);
-    rerender();
-    auth(true);
-    rerender();
-    await waitFor(() =>
-      expect(mockClient.assistantSaveSession).toHaveBeenCalledTimes(2)
-    );
-    await act(async () => {
-      first.resolve({ saved_analysis_id: "analysis-before-sign-out" });
-    });
-
-    expect(result.current.state.isSaved).toBe(false);
-    expect(result.current.state.savedAnalysisId).toBeNull();
   });
 
   test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {
