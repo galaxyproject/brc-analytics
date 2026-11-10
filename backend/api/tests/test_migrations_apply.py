@@ -203,3 +203,79 @@ def test_orm_json_columns_match_what_the_migrations_create():
         where = f"{name}.{column.name}"
         assert column.type.compile(postgresql.dialect()) == "JSONB", where
         assert column.type.compile(sqlite.dialect()) == "JSON", where
+
+
+def test_turn_log_logan_job_id_upgrades_and_downgrades(migrated_db, monkeypatch):
+    """0008 adds an indexed, nullable logan_job_id; its downgrade removes both
+    and leaves the table's other indexes alone (SQLite rebuilds the table to
+    drop a column, which is where an index could get lost)."""
+
+    def _columns_and_indexes():
+        engine = create_engine(migrated_db)
+        try:
+            inspector = inspect(engine)
+            columns = {
+                c["name"]: c for c in inspector.get_columns("assistant_turn_log")
+            }
+            indexes = {
+                i["name"]: i["column_names"]
+                for i in inspector.get_indexes("assistant_turn_log")
+            }
+            return columns, indexes
+        finally:
+            engine.dispose()
+
+    columns, indexes = _columns_and_indexes()
+    assert columns["logan_job_id"]["nullable"] is True
+    assert indexes["ix_assistant_turn_log_logan_job_id"] == ["logan_job_id"]
+    before = {k: v for k, v in indexes.items() if "logan" not in k}
+
+    async_url = migrated_db.replace("sqlite:///", "sqlite+aiosqlite:///")
+    monkeypatch.setenv("DATABASE_URL", async_url)
+    get_settings.cache_clear()
+    cfg = Config(str(_alembic_ini_path()))
+    cfg.set_main_option("sqlalchemy.url", async_url)
+    with _logging_restored():
+        command.downgrade(cfg, "20261005_0007")
+    columns, indexes = _columns_and_indexes()
+    assert "logan_job_id" not in columns
+    assert indexes == before
+
+    with _logging_restored():
+        command.upgrade(cfg, "head")
+    columns, indexes = _columns_and_indexes()
+    assert "logan_job_id" in columns
+    assert indexes["ix_assistant_turn_log_logan_job_id"] == ["logan_job_id"]
+
+
+def test_turn_log_logan_job_id_matches_the_model(migrated_db):
+    """Every other DB test builds its schema from the ORM, so a migration that
+    drifted from it would go unnoticed there. The column's length and its
+    index must agree between the two."""
+    from app.db.models import AssistantTurnLog
+
+    engine = create_engine(migrated_db)
+    try:
+        inspector = inspect(engine)
+        column = next(
+            c
+            for c in inspector.get_columns("assistant_turn_log")
+            if c["name"] == "logan_job_id"
+        )
+        migrated_indexes = {
+            i["name"]: (tuple(i["column_names"]), bool(i["unique"]))
+            for i in inspector.get_indexes("assistant_turn_log")
+            if "logan_job_id" in i["column_names"]
+        }
+    finally:
+        engine.dispose()
+
+    model_column = AssistantTurnLog.__table__.c.logan_job_id
+    assert column["type"].length == model_column.type.length
+    assert column["nullable"] == model_column.nullable
+    model_indexes = {
+        i.name: (tuple(c.name for c in i.columns), bool(i.unique))
+        for i in AssistantTurnLog.__table__.indexes
+        if "logan_job_id" in i.columns
+    }
+    assert migrated_indexes == model_indexes
