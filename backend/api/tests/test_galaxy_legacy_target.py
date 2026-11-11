@@ -30,6 +30,7 @@ from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_cohort, logan_job_status
 from tests.test_galaxy_credential import FakeCache
 from tests.test_galaxy_submit_ownership import app_client  # noqa: F401
+from tests.test_partner_api import BASE, HEADERS, partner_env  # noqa: F401
 
 PRIMARY_API = "https://usegalaxy.org/api"
 LEGACY_API = "https://test.galaxyproject.org/api"
@@ -173,22 +174,6 @@ class TestNativeRoutes:
 
 class TestPartner:
     @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        "job_id, api, key",
-        [(TEST_JOB, LEGACY_API, "test-key"), (MAIN_JOB, PRIMARY_API, "main-key")],
-    )
-    async def test_job_reads_follow_the_id(self, with_legacy, job_id, api, key):
-        g = await partner_router.get_partner_galaxy_service(
-            request=_request(job_id=job_id),
-            partner=PARTNER,
-            cache=FakeCache(),
-            sra_mirror=None,
-        )
-        assert g.target.api_url == api
-        assert g.credential.secret == key
-        assert g.history_name == "BRC Logan Partner - example-partner"
-
-    @pytest.mark.asyncio
     async def test_a_submit_is_primary(self, with_legacy):
         g = await partner_router.get_partner_galaxy_service(
             request=_request(), partner=PARTNER, cache=FakeCache(), sra_mirror=None
@@ -309,3 +294,38 @@ class TestOverHttp:
         assert response.status_code == 404
         # The 32-character read keeps the signed-in user's bearer.
         assert calls == [(job_id, api, key if api == LEGACY_API else "bearer")]
+
+
+class TestPartnerOverHttp:
+    """The partner job routes, with the real get_partner_galaxy_service."""
+
+    @pytest.mark.parametrize("path", ["", "/results"])
+    @pytest.mark.parametrize(
+        "job_id, api, key",
+        [(TEST_JOB, LEGACY_API, "test-key"), (MAIN_JOB, PRIMARY_API, "main-key")],
+    )
+    def test_job_reads_follow_the_id(
+        self,
+        partner_env,  # noqa: F811
+        with_legacy,
+        monkeypatch,
+        path,
+        job_id,
+        api,
+        key,
+    ):
+        client, _, _ = partner_env
+        client.app.dependency_overrides.pop(partner_router.get_partner_galaxy_service)
+        calls = []
+
+        async def read(self, job_id, *args, **kwargs):
+            calls.append((job_id, self.target.api_url, self.credential.secret))
+            raise GalaxyJobNotFound(job_id)
+
+        monkeypatch.setattr(GalaxyService, "get_job_status", read)
+        monkeypatch.setattr(GalaxyService, "get_kmindex_results", read)
+
+        response = client.get(f"{BASE}/jobs/{job_id}{path}", headers=HEADERS)
+
+        assert response.status_code == 404, response.text
+        assert calls == [(job_id, api, key)]
