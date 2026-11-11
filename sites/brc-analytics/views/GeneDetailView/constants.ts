@@ -13,9 +13,6 @@ export const NCBI_GENE_ID_ALIAS_TYPE = "ncbi_gene_id";
 // NCBI Gene's address for a gene, before its GeneID.
 export const NCBI_GENE_URL = "https://www.ncbi.nlm.nih.gov/gene";
 
-// What the gene page shows for an empty value.
-export const EMPTY_VALUE = "—";
-
 // Display names for the gene types NCBI writes in a GFF3's `gene_biotype`:
 // every value NCBI's writer can give (sGetFeatureGeneBiotypeWrapper in
 // ncbi-cxx-toolkit-public's src/objmgr/util/feature.cpp, at the commit the
