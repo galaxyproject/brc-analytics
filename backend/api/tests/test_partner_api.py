@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -498,6 +499,7 @@ def test_the_galaxy_service_ignores_any_session_and_uses_its_own_history(
 
     galaxy = asyncio.run(
         partner_module.get_partner_galaxy_service(
+            request=SimpleNamespace(path_params={}),
             cache=MagicMock(),
             partner=Partner(key_id="k1", partner_id="example-partner"),
             sra_mirror=None,

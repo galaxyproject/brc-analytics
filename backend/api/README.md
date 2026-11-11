@@ -142,6 +142,45 @@ CORS_ORIGINS=http://localhost:3000,http://localhost
 LOG_LEVEL=INFO
 ```
 
+### Galaxy
+
+`GALAXY_API_URL` and `GALAXY_API_KEY` name the Galaxy that kmindex/Logan
+searches are submitted to and the service-account key BRC holds there. Leaving
+the key empty turns the Galaxy endpoints (and the Logan MCP tools) off.
+
+`GALAXY_LEGACY_API_URL` and `GALAXY_LEGACY_API_KEY` are optional and only
+matter after `GALAXY_API_URL` has been moved to a different server: they name
+the Galaxy jobs used to be submitted to, so the job ids handed out back then
+keep answering. With them set, any request about an existing job whose id is
+16 characters -- status, results, summary, export, the partner API, the MCP
+and assistant Logan tools -- is read from the legacy Galaxy with the legacy
+service key. Everything else goes to the primary: every submit, the index list
+and queue, and every 32-character id. A signed-in user's bearer is never sent
+to the legacy Galaxy.
+
+Because legacy reads use the service key, they cover the searches that ran on
+the service account there: anonymous, partner and MCP ones. A search a
+signed-in user ran on the old Galaxy under their own account belongs to that
+user there, and the service key can't see it. Prod had login off while it was
+on Galaxy Test, so it has none of those.
+
+The rule is the length of the encoded id. Galaxy encodes ids as Blowfish
+blocks, so a database id of up to eight digits comes out as 16 hex characters
+and anything larger as 32. Galaxy Test's job ids are all 16 characters and
+usegalaxy.org's are all 32, so length says which server holds a job without
+trying one and falling back to the other. That only holds while the legacy
+server's ids are shorter than the primary's; don't point the legacy settings
+at a Galaxy that hands out 32-character ids. Setting the URL without the key
+refuses to start.
+
+```bash
+GALAXY_API_URL=https://usegalaxy.org/api
+GALAXY_API_KEY=...
+# Optional: keep Galaxy Test job ids readable after the move
+GALAXY_LEGACY_API_URL=https://test.galaxyproject.org/api
+GALAXY_LEGACY_API_KEY=...
+```
+
 ## Assistant conversation logging
 
 Assistant sessions live in Redis with a 2 hour TTL, so without a durable sink

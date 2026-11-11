@@ -36,6 +36,7 @@ from app.services.galaxy_service import (
     GalaxyService,
     GalaxySubmitNotStarted,
     KmindexUnknownIndex,
+    galaxy_for_job,
 )
 from app.services.logan_snapshot import results_url_for
 
@@ -158,7 +159,7 @@ async def logan_submit(
 
 async def _job_failed(galaxy: GalaxyService, job_id: str) -> bool:
     try:
-        status = await galaxy.get_job_status(job_id)
+        status = await galaxy_for_job(galaxy, job_id).get_job_status(job_id)
     except Exception:
         return False  # can't tell; reusing is the cheaper mistake
     return bool(status.is_complete and not status.is_successful)
@@ -275,6 +276,7 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
     """
     if out.get("status") != "expired":
         return out
+    galaxy = galaxy_for_job(galaxy, job_id)
     request = current_request()
     try:
         partner = resolve_partner(request) if request is not None else None

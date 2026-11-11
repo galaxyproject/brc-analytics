@@ -65,10 +65,27 @@ describe("useAssistantChat initial message", () => {
         expect.objectContaining({ message: QUESTION })
       )
     );
-    expect(result.current.messages[0]).toEqual({
+    expect(result.current.state.messages[0]).toEqual({
       content: QUESTION,
       role: "user",
     });
+  });
+
+  test("lands the answer through strict mode's effect replay", async () => {
+    // The replay runs every effect's cleanup and then the effect again. The
+    // question is asked once, so a replay that wrote off the turn in flight
+    // would drop the answer and leave the composer disabled.
+    const { result } = renderHook(
+      () =>
+        useAssistantChat({ initialMessage: QUESTION, sessionKey: SESSION_KEY }),
+      { reactStrictMode: true }
+    );
+
+    await waitFor(() => expect(result.current.state.loading).toBe(false));
+    expect(mockClient.assistantChat).toHaveBeenCalledTimes(1);
+    expect(result.current.state.messages.map(({ content }) => content)).toEqual(
+      [QUESTION, "ok"]
+    );
   });
 
   test("asks it once, however often the hook re-renders", async () => {
@@ -130,7 +147,7 @@ describe("useAssistantChat initial message", () => {
     rerender({ initialMessage: undefined });
 
     await waitFor(() =>
-      expect(result.current.messages[0]).toEqual({
+      expect(result.current.state.messages[0]).toEqual({
         content: QUESTION,
         role: "user",
       })

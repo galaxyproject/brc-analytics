@@ -1,9 +1,10 @@
 import type { InputElement } from "@databiosphere/findable-ui/lib/views/ResearchView/assistant/components/Input/hooks/UseControlledInput/types";
-import type { ConversationProps } from "@repo/shared/views/AssistantView/components/Conversation/types";
+import type { UseAssistantChatActions } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import type { RefObject } from "react";
 
-export interface ComposerProps extends Pick<ConversationProps, "onSend"> {
+export interface ComposerProps {
   disabled: boolean;
   hasMessages: boolean;
   inputRef: RefObject<InputElement | null>;
+  onSend: UseAssistantChatActions["onSendMessage"];
 }

@@ -1,7 +1,9 @@
 import { useAuth } from "@repo/shared/providers/authentication/provider";
 import { ChatPanel } from "@repo/shared/views/AssistantView/components/ChatPanel/chatPanel";
+import type { UseAssistantChatState } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import { render, screen } from "@testing-library/react";
-import { type ComponentProps, type JSX } from "react";
+import { type JSX } from "react";
+import { chatActions, chatState } from "./chatFixtures";
 // jest-dom matchers (toBeInTheDocument) aren't registered globally in this
 // repo's jest config; opt in locally as the sibling suites do.
 import "@testing-library/jest-dom";
@@ -23,8 +25,6 @@ jest.mock(
 );
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-
-const noop = (): void => undefined;
 
 const TURN = [
   { content: "hi", role: "user" as const },
@@ -49,22 +49,15 @@ function authLoading(): void {
 
 /**
  * Builds the panel with a two-message conversation, unsaved and idle.
- * @param props - Props to override.
+ * @param state - Chat state to override.
  * @returns The panel element.
  */
-function buildPanel(
-  props: Partial<ComponentProps<typeof ChatPanel>> = {}
-): JSX.Element {
+function buildPanel(state: Partial<UseAssistantChatState> = {}): JSX.Element {
   return (
     <ChatPanel
-      error={null}
+      actions={chatActions()}
       introText="Ask away"
-      isSaved={false}
-      loading={false}
-      messages={TURN}
-      onSend={noop}
-      suggestions={[]}
-      {...props}
+      state={chatState({ messages: TURN, ...state })}
     />
   );
 }

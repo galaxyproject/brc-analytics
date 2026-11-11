@@ -19,9 +19,7 @@ import {
  * @param props - Hook props.
  * @param props.disabled - Whether the chat is busy, so switching conversations is blocked.
  * @param props.lastSave - Most recent confirmed save, naming the saved analysis written.
- * @param props.onOpened - Reports that the history opened a different conversation.
- * @param props.onOpeningChange - Reports whether a conversation is opening from the history.
- * @param props.onRetryRestore - Restores the conversation the URL names again, after a failed load.
+ * @param props.onOpenConversation - Opens a saved conversation in the chat; rejects when it can't be opened.
  * @param props.savedAnalysisId - Saved analysis the conversation on screen belongs to, or null while it has none.
  * @param props.sessionId - Session of the conversation on screen, or null while none is.
  * @returns Chat history state and list items.
@@ -29,9 +27,7 @@ import {
 export const useChatHistory = ({
   disabled,
   lastSave,
-  onOpened,
-  onOpeningChange,
-  onRetryRestore,
+  onOpenConversation,
   savedAnalysisId,
   sessionId,
 }: ChatHistoryProps): UseChatHistory => {
@@ -71,13 +67,11 @@ export const useChatHistory = ({
       // next click is handled, so a double-click finds it already set.
       if (disabled) return;
       void openAnalysis(analysis.id, sessionId, {
-        onOpened,
-        onOpeningChange,
-        onRetryRestore,
+        onOpenConversation,
         setOpenError,
       });
     },
-    [disabled, onOpened, onOpeningChange, onRetryRestore, sessionId]
+    [disabled, onOpenConversation, sessionId]
   );
 
   const historyItems = useMemo(

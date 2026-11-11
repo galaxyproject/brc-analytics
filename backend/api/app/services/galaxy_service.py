@@ -21,6 +21,11 @@ from bioblend.galaxy import GalaxyInstance
 from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
+from app.core.galaxy_target import (
+    GalaxyTarget,
+    galaxy_target_for_job,
+    primary_galaxy_target,
+)
 from app.models.galaxy import (
     SETTLED_JOB_STATES,
     TERMINAL_JOB_STATES,
@@ -890,24 +895,33 @@ class GalaxyService:
         sra_mirror: Optional[SRAMirrorService] = None,
         credential: Optional[GalaxyCredential] = None,
         history_name: Optional[str] = None,
+        target: Optional[GalaxyTarget] = None,
     ):
         """
         @param history_name: where service-account jobs land, in place of the
             shared "BRC ANALYTICS JOBS"; either way the UTC date is appended.
             Ignored for a user credential, whose jobs always go to their own
             account's history.
+        @param target: the Galaxy to talk to, the primary one by default. Every
+            URL this instance uses or keys a cache entry on comes from here.
         """
         self.cache = cache
         self.history_name = history_name
         self.sra_mirror = sra_mirror
         self.settings = get_settings()
+        self.target = target or primary_galaxy_target()
 
-        if credential is None and self.settings.GALAXY_API_KEY:
+        if self.target.legacy:
+            # A signed-in user's bearer is only valid on the primary Galaxy.
+            credential = (
+                GalaxyCredential(kind="service", secret=self.target.api_key)
+                if self.target.api_key
+                else None
+            )
+        elif credential is None and self.target.api_key:
             # Back-compat construction path (tests, scripts): same behavior as
             # before credentials existed -- the service key from settings.
-            credential = GalaxyCredential(
-                kind="service", secret=self.settings.GALAXY_API_KEY
-            )
+            credential = GalaxyCredential(kind="service", secret=self.target.api_key)
         self.credential = credential
 
         if credential is None:
@@ -918,7 +932,7 @@ class GalaxyService:
             self.gi = None
         else:
             self._galaxy_available = True
-            base_url = self.settings.GALAXY_BASE_URL
+            base_url = self.target.base_url
             if credential.kind == "user":
                 # bioblend sends token as "Authorization: Bearer <token>"
                 self.gi = GalaxyInstance(url=base_url, token=credential.secret)
@@ -930,7 +944,7 @@ class GalaxyService:
             logger.debug(
                 "Galaxy service initialized (%s) for URL: %s",
                 credential.kind,
-                self.settings.GALAXY_API_URL,
+                self.target.api_url,
             )
 
         # The cache key the last resolved history id lives under, so a submit
@@ -943,7 +957,7 @@ class GalaxyService:
 
     def galaxy_login_url(self) -> str:
         """The Galaxy OIDC login URL that links the user's account (302 flow)."""
-        base = self.settings.GALAXY_BASE_URL
+        base = self.target.base_url
         return f"{base}/authnz/{self.settings.GALAXY_OIDC_PROVIDER}/login?redirect=true"
 
     async def submit_job(self, submission: GalaxyJobSubmission) -> GalaxyJobResponse:
@@ -996,7 +1010,7 @@ class GalaxyService:
         return self.cache.make_key(
             prefix,
             {
-                "url": self.settings.GALAXY_API_URL,
+                "url": self.target.api_url,
                 "tool": self.settings.GALAXY_KMINDEX_TOOL_ID,
             },
         )
@@ -2644,7 +2658,7 @@ class GalaxyService:
         """
         if self.credential is not None and self.credential.kind != "service":
             raise Exception("The kmindex queue is read as the service account")
-        url = self.settings.GALAXY_API_URL
+        url = self.target.api_url
         if url in _SERVICE_USER_IDS:
             return _SERVICE_USER_IDS[url]
         user = await asyncio.to_thread(self.gi.users.get_current_user)
@@ -2740,7 +2754,7 @@ class GalaxyService:
         for job in jobs:
             key = self.cache.make_key(
                 KMINDEX_QUEUE_TIMING_PREFIX,
-                {"job": job["id"], "url": self.settings.GALAXY_API_URL},
+                {"job": job["id"], "url": self.target.api_url},
             )
             entry = await self.cache.get(key)
             if entry is None:
@@ -2807,7 +2821,7 @@ class GalaxyService:
             {
                 "hours": hours,
                 "tool": self.settings.GALAXY_KMINDEX_TOOL_ID,
-                "url": self.settings.GALAXY_API_URL,
+                "url": self.target.api_url,
             },
         )
         cached = await self.cache.get(key)
@@ -3225,7 +3239,7 @@ class GalaxyService:
             {
                 "account": list(account) if isinstance(account, tuple) else account,
                 "name": name,
-                "url": self.settings.GALAXY_API_URL,
+                "url": self.target.api_url,
             },
         )
 
@@ -3326,3 +3340,25 @@ class GalaxyService:
         # Several only if someone made one by hand; the busiest is the one
         # jobs have been going to.
         return max(matches, key=lambda h: h.get("update_time") or "")["id"]
+
+
+def galaxy_for_job(galaxy: GalaxyService, job_id: str) -> GalaxyService:
+    """The service to read an existing job with: this one, or a legacy sibling.
+
+    A sibling shares the cache, mirror and history name, so only the Galaxy
+    it talks to differs. It is built per call, which is cheap: bioblend opens
+    no connection until a request is made.
+
+    @param galaxy: the service the caller was given, on the primary Galaxy.
+    @param job_id: the job about to be read.
+    @returns: galaxy itself unless the job lives on the legacy Galaxy.
+    """
+    target = galaxy_target_for_job(job_id)
+    if not target.legacy:
+        return galaxy
+    return GalaxyService(
+        galaxy.cache,
+        sra_mirror=galaxy.sra_mirror,
+        history_name=galaxy.history_name,
+        target=target,
+    )

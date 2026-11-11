@@ -4,9 +4,7 @@ export type ChatHistoryProps = Pick<
   SidebarProps,
   | "disabled"
   | "lastSave"
-  | "onOpened"
-  | "onOpeningChange"
-  | "onRetryRestore"
+  | "onOpenConversation"
   | "savedAnalysisId"
   | "sessionId"
 >;

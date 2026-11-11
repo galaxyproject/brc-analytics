@@ -1,7 +1,7 @@
-import type { ConversationProps } from "@repo/shared/views/AssistantView/components/Conversation/types";
+import type { UseAssistantChatState } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 
 export interface CompletionProps extends Pick<
-  ConversationProps,
+  UseAssistantChatState,
   "handoffUrl" | "schema"
 > {
   disabled: boolean;

@@ -1,4 +1,7 @@
-import type { LastSave } from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
+import type {
+  LastSave,
+  UseAssistantChatActions,
+} from "@repo/shared/views/AssistantView/hooks/UseAssistantChat/types";
 import { type ReactNode } from "react";
 
 export interface SidebarProps {
@@ -6,9 +9,7 @@ export interface SidebarProps {
   disclaimer: ReactNode;
   lastSave: LastSave | null;
   onNewAnalysis: () => void;
-  onOpened: () => void;
-  onOpeningChange: (isOpening: boolean) => void;
-  onRetryRestore: () => void;
+  onOpenConversation: UseAssistantChatActions["onOpenConversation"];
   savedAnalysisId: string | null;
   sessionId: string | null;
   supportUrl?: string;

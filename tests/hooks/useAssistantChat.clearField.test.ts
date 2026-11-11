@@ -14,6 +14,11 @@ jest.mock("@repo/shared/services/assistant-api-client", () => ({
     assistantRestore: jest.fn(),
   },
 }));
+// Keeps ESM-only ky out of the jest module graph, which it enters through the
+// shared client the hook imports for saved analyses.
+jest.mock("@repo/shared/services/api-client/api-client", () => ({
+  apiClient: { openSavedAnalysis: jest.fn() },
+}));
 jest.mock("next/router", () => ({
   useRouter: (): {
     isReady: boolean;
@@ -115,11 +120,13 @@ async function renderRestored(): Promise<
   const rendered = renderHook(() =>
     useAssistantChat({ sessionKey: SESSION_KEY })
   );
-  await waitFor(() => expect(rendered.result.current.schema).not.toBeNull());
+  await waitFor(() =>
+    expect(rendered.result.current.state.schema).not.toBeNull()
+  );
   return rendered;
 }
 
-describe("useAssistantChat clearField", () => {
+describe("useAssistantChat onClearField", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
@@ -130,7 +137,7 @@ describe("useAssistantChat clearField", () => {
     mockClient.assistantChat.mockResolvedValue(turn());
 
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
 
     expect(mockClient.assistantChat).toHaveBeenCalledWith({
@@ -147,30 +154,30 @@ describe("useAssistantChat clearField", () => {
     );
 
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
 
-    expect(result.current.messages.slice(2)).toEqual([
+    expect(result.current.state.messages.slice(2)).toEqual([
       { content: NOTE, role: "system" },
       { content: "Which organism instead?", role: "assistant" },
     ]);
-    expect(result.current.schema).toEqual(CLEARED);
-    expect(result.current.loading).toBe(false);
+    expect(result.current.state.schema).toEqual(CLEARED);
+    expect(result.current.state.loading).toBe(false);
   });
 
   test("a clear that changed nothing adds no lines but syncs the schema", async () => {
     const { result } = await renderRestored();
-    const before = result.current.messages;
+    const before = result.current.state.messages;
     mockClient.assistantChat.mockResolvedValue(
       turn({ reply: "", schema_state: CLEARED })
     );
 
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
 
-    expect(result.current.messages).toEqual(before);
-    expect(result.current.schema).toEqual(CLEARED);
+    expect(result.current.state.messages).toEqual(before);
+    expect(result.current.state.schema).toEqual(CLEARED);
   });
 
   test("a message turn with a note puts the note before the user's line", async () => {
@@ -178,10 +185,10 @@ describe("useAssistantChat clearField", () => {
     mockClient.assistantChat.mockResolvedValue(turn({ note: NOTE }));
 
     await act(async () => {
-      await result.current.sendMessage("try yeast");
+      await result.current.actions.onSendMessage("try yeast");
     });
 
-    expect(result.current.messages.slice(2).map((m) => m.role)).toEqual([
+    expect(result.current.state.messages.slice(2).map((m) => m.role)).toEqual([
       "system",
       "user",
       "assistant",
@@ -193,32 +200,32 @@ describe("useAssistantChat clearField", () => {
     mockClient.assistantChat.mockRejectedValueOnce(new Error("network"));
 
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
 
-    expect(result.current.error).not.toBeNull();
-    expect(result.current.schema).toEqual(SCHEMA);
+    expect(result.current.state.error).not.toBeNull();
+    expect(result.current.state.schema).toEqual(SCHEMA);
     // A clear adds no line of its own, so nothing is left to pop on retry.
-    expect(result.current.messages).toHaveLength(2);
-    expect(result.current.onRetry).toBeDefined();
+    expect(result.current.state.messages).toHaveLength(2);
+    expect(result.current.actions.onRetry).toBeDefined();
 
     mockClient.assistantChat.mockResolvedValue(
       turn({ note: NOTE, schema_state: CLEARED })
     );
     await act(async () => {
-      await result.current.onRetry?.();
+      await result.current.actions.onRetry?.();
     });
 
     expect(mockClient.assistantChat).toHaveBeenLastCalledWith(
       expect.objectContaining({ clear_fields: ["organism"] })
     );
-    expect(result.current.messages.map((m) => m.content)).toEqual([
+    expect(result.current.state.messages.map((m) => m.content)).toEqual([
       "Variant calling in P. falciparum",
       "Sounds good.",
       NOTE,
       "Which organism instead?",
     ]);
-    expect(result.current.schema).toEqual(CLEARED);
+    expect(result.current.state.schema).toEqual(CLEARED);
   });
 
   test("does nothing without a session to clear on", async () => {
@@ -227,7 +234,7 @@ describe("useAssistantChat clearField", () => {
     );
 
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
 
     expect(mockClient.assistantChat).not.toHaveBeenCalled();
@@ -244,10 +251,10 @@ describe("useAssistantChat clearField", () => {
 
     let pending: Promise<void> = Promise.resolve();
     act(() => {
-      pending = result.current.sendMessage("hello");
+      pending = result.current.actions.onSendMessage("hello");
     });
     await act(async () => {
-      await result.current.clearField("organism");
+      await result.current.actions.onClearField("organism");
     });
     expect(mockClient.assistantChat).toHaveBeenCalledTimes(1);
 
