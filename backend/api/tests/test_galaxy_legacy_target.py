@@ -6,7 +6,6 @@ Galaxy configured a 16-character job is read there, on its own service key,
 and everything else stays on the primary Galaxy.
 """
 
-import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -29,6 +28,7 @@ from app.services.galaxy_service import (
 from app.services.tools import logan_mcp
 from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_cohort, logan_job_status
+from tests.test_galaxy_credential import FakeCache
 from tests.test_galaxy_submit_ownership import app_client  # noqa: F401
 
 PRIMARY_API = "https://usegalaxy.org/api"
@@ -37,17 +37,6 @@ TEST_JOB = "0123456789abcdef"
 MAIN_JOB = "bbd44e69cb8906b58abb1bc0bf72e0ce"
 PARTNER = Partner(key_id="k1", partner_id="example-partner")
 USER = GalaxyCredential(kind="user", secret="bearer", user_sub="u1")
-
-
-class FakeCache:
-    def make_key(self, prefix, params):
-        return f"{prefix}:{json.dumps(params, sort_keys=True)}"
-
-    async def get(self, key):
-        return None
-
-    async def set(self, key, value, ttl=3600):
-        return True
 
 
 @pytest.fixture()
