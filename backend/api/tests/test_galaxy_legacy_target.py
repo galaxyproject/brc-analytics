@@ -6,7 +6,6 @@ Galaxy configured a 16-character job is read there, on its own service key,
 and everything else stays on the primary Galaxy.
 """
 
-from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
@@ -17,13 +16,17 @@ from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
 from app.core.galaxy_target import galaxy_target_for_job
 from app.core.partner_keys import Partner
-from app.models.galaxy import GalaxyJobState, GalaxyJobStatus
+from app.models.galaxy import (
+    GalaxyJobState,
+    GalaxyJobStatus,
+    KmindexQuerySubmission,
+)
 from app.services import logan_jobs
 from app.services.assistant_agent import AssistantAgent, LoganJobNotReadyError
 from app.services.galaxy_service import (
     GalaxyJobNotFound,
+    GalaxyReadOnlyError,
     GalaxyService,
-    galaxy_for_job,
 )
 from app.services.tools import logan_mcp
 from app.services.tools.catalog_tools import AssistantDeps
@@ -56,10 +59,6 @@ def with_legacy(primary_only, monkeypatch):
     monkeypatch.setenv("GALAXY_LEGACY_API_URL", LEGACY_API)
     monkeypatch.setenv("GALAXY_LEGACY_API_KEY", "test-key")
     get_settings.cache_clear()
-
-
-def _request(**path_params):
-    return SimpleNamespace(path_params=path_params)
 
 
 class TestConfig:
@@ -95,24 +94,35 @@ class TestService:
             "acct", "h"
         )
 
-    def test_galaxy_for_job_reroutes_only_short_ids(self, with_legacy):
-        primary = GalaxyService(FakeCache(), history_name="H")
-        assert galaxy_for_job(primary, MAIN_JOB) is primary
-        legacy = galaxy_for_job(primary, TEST_JOB)
+    def test_for_job_reroutes_only_short_ids(self, with_legacy):
+        primary = GalaxyService(FakeCache(), credential=USER, history_name="H")
+        assert primary.for_job(MAIN_JOB) is primary
+        legacy = primary.for_job(TEST_JOB)
         assert legacy.target.legacy
         assert legacy.cache is primary.cache
         assert legacy.history_name == "H"
+        # The user's bearer stays behind on the primary Galaxy.
+        assert legacy.credential == GalaxyCredential(kind="service", secret="test-key")
 
-    def test_galaxy_for_job_is_a_no_op_without_legacy(self, primary_only):
+    def test_for_job_is_a_no_op_without_legacy(self, primary_only):
         primary = GalaxyService(FakeCache())
-        assert galaxy_for_job(primary, TEST_JOB) is primary
+        assert primary.for_job(TEST_JOB) is primary
+
+    @pytest.mark.asyncio
+    async def test_a_legacy_service_refuses_to_submit(self, with_legacy):
+        legacy = GalaxyService(FakeCache()).for_job(TEST_JOB)
+        submission = KmindexQuerySubmission(sequence="ACGT" * 10, indexes=["idx"])
+        with pytest.raises(GalaxyReadOnlyError):
+            await legacy.submit_kmindex_query(submission)
+        with pytest.raises(GalaxyReadOnlyError):
+            await legacy._get_or_create_shared_history()
 
 
 class TestNativeRoutes:
     @pytest.mark.asyncio
     async def test_a_submit_route_is_primary(self, with_legacy):
         g = await galaxy_router.get_galaxy_service(
-            request=_request(), cache=FakeCache(), sra_mirror=None, credential=USER
+            cache=FakeCache(), sra_mirror=None, credential=USER
         )
         assert g.target.api_url == PRIMARY_API
         assert g.credential == USER
@@ -122,7 +132,7 @@ class TestPartner:
     @pytest.mark.asyncio
     async def test_a_submit_is_primary(self, with_legacy):
         g = await partner_router.get_partner_galaxy_service(
-            request=_request(), partner=PARTNER, cache=FakeCache(), sra_mirror=None
+            partner=PARTNER, cache=FakeCache(), sra_mirror=None
         )
         assert g.target.api_url == PRIMARY_API
         assert g.credential.secret == "main-key"

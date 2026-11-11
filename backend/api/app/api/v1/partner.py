@@ -62,18 +62,24 @@ JobId = Path(..., pattern=JOB_ID_PATTERN)
 
 
 async def get_partner_galaxy_service(
-    request: Request,
     partner: Partner = Depends(get_partner),
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
 ) -> GalaxyService:
-    """A GalaxyService on the BRC service account, in the partner's own history.
+    """A GalaxyService on the BRC service account, in the partner's own history."""
+    return partner_galaxy_service(partner, cache, sra_mirror)
 
-    On the Galaxy the job_id path parameter's job lives on, when there is one.
+
+async def get_partner_job_galaxy_service(
+    job_id: str = JobId,
+    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+) -> GalaxyService:
+    """The partner's service, on the Galaxy that holds the route's job.
+
+    Only for routes that read an existing job: a write must stay on
+    get_partner_galaxy_service, which is always the primary Galaxy.
     """
-    return partner_galaxy_service(
-        partner, cache, sra_mirror, job_id=request.path_params.get("job_id")
-    )
+    return galaxy.for_job(job_id)
 
 
 def _created(job_id: str) -> PartnerJobCreated:
@@ -143,7 +149,7 @@ async def submit_job(
 async def job_status(
     response: Response,
     job_id: str = JobId,
-    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+    galaxy: GalaxyService = Depends(get_partner_job_galaxy_service),
 ):
     """Where the search has got to: 202 with Retry-After until it finishes."""
     require_galaxy(galaxy)
@@ -180,7 +186,7 @@ async def job_results(
     offset: int = Query(default=0, ge=0),
     sort: KmindexSort = Query(default="score"),
     order: Optional[KmindexOrder] = Query(default=None),
-    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+    galaxy: GalaxyService = Depends(get_partner_job_galaxy_service),
 ):
     """
     A page of the merged, FP-corrected hits, joined to SRA metadata.
@@ -214,7 +220,7 @@ async def job_results(
 async def job_export(
     job_id: str = JobId,
     format: str = Query(default="tsv", pattern="^(parquet|tsv)$"),
-    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+    galaxy: GalaxyService = Depends(get_partner_job_galaxy_service),
 ) -> Response:
     """
     Every hit the search matched, not just the pages results serves.

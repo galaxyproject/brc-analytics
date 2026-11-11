@@ -55,6 +55,7 @@ def _status(job_id):
 
 def _galaxy(job_id):
     g = MagicMock()
+    g.for_job.return_value = g
     g.is_available.return_value = True
     g.get_job_status = AsyncMock(return_value=_status(job_id))
     return g

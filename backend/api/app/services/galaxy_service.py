@@ -101,6 +101,10 @@ class KmindexFiltersUnavailable(Exception):
     """
 
 
+class GalaxyReadOnlyError(Exception):
+    """A write was asked of the legacy Galaxy, which only serves old reads."""
+
+
 class GalaxySubmitNotStarted(Exception):
     """A submission failed before Galaxy queued anything.
 
@@ -960,12 +964,42 @@ class GalaxyService:
         base = self.target.base_url
         return f"{base}/authnz/{self.settings.GALAXY_OIDC_PROVIDER}/login?redirect=true"
 
+    def for_job(self, job_id: str) -> "GalaxyService":
+        """The service to read an existing job with: this one, or a legacy sibling.
+
+        The one place that decides which Galaxy holds a job. A sibling shares
+        the cache, mirror and history name, so only the Galaxy it talks to
+        differs. It is built per call, which is cheap: bioblend opens no
+        connection until a request is made.
+
+        @param job_id: the job about to be read.
+        @returns: this service unless the job lives on the legacy Galaxy.
+        """
+        target = galaxy_target_for_job(job_id)
+        if not target.legacy or self.target.legacy:
+            return self
+        # No credential: a legacy service only ever uses its own service key.
+        return GalaxyService(
+            self.cache,
+            sra_mirror=self.sra_mirror,
+            history_name=self.history_name,
+            target=target,
+        )
+
+    def _require_writable(self) -> None:
+        """Refuse a write aimed at the legacy Galaxy, which is read-only."""
+        if self.target.legacy:
+            raise GalaxyReadOnlyError(
+                "The legacy Galaxy is read-only: jobs are submitted to the primary"
+            )
+
     async def submit_job(self, submission: GalaxyJobSubmission) -> GalaxyJobResponse:
         """
         Submit a complete job: upload data and run the random lines tool.
 
         Returns job ID for tracking the random lines tool execution.
         """
+        self._require_writable()
         if not self.is_available():
             raise Exception(
                 "Galaxy service not available - check API key configuration"
@@ -1126,6 +1160,7 @@ class GalaxyService:
         self, submission: KmindexQuerySubmission
     ) -> GalaxyJobResponse:
         """Run kmindex against Logan indexes for a FASTA query."""
+        self._require_writable()
         if not self.is_available():
             raise Exception(
                 "Galaxy service not available - check API key configuration"
@@ -3250,6 +3285,7 @@ class GalaxyService:
         before anything ran, so the submit is safe to retry, and a timestamped
         stray per failure only made the account's history list longer.
         """
+        self._require_writable()
         today = _today()
         name, account, ttl = self._history_target(today)
         key = self._history_cache_key(account, name)
@@ -3340,25 +3376,3 @@ class GalaxyService:
         # Several only if someone made one by hand; the busiest is the one
         # jobs have been going to.
         return max(matches, key=lambda h: h.get("update_time") or "")["id"]
-
-
-def galaxy_for_job(galaxy: GalaxyService, job_id: str) -> GalaxyService:
-    """The service to read an existing job with: this one, or a legacy sibling.
-
-    A sibling shares the cache, mirror and history name, so only the Galaxy
-    it talks to differs. It is built per call, which is cheap: bioblend opens
-    no connection until a request is made.
-
-    @param galaxy: the service the caller was given, on the primary Galaxy.
-    @param job_id: the job about to be read.
-    @returns: galaxy itself unless the job lives on the legacy Galaxy.
-    """
-    target = galaxy_target_for_job(job_id)
-    if not target.legacy:
-        return galaxy
-    return GalaxyService(
-        galaxy.cache,
-        sra_mirror=galaxy.sra_mirror,
-        history_name=galaxy.history_name,
-        target=target,
-    )

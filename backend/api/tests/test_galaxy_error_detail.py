@@ -100,6 +100,7 @@ def test_plain_text_is_kept_and_bounded():
 def test_job_status_route_does_not_relay_the_html(app_client):  # noqa: F811
     app, client = app_client
     service = MagicMock()
+    service.for_job.return_value = service
     service.is_available.return_value = True
     service.get_job_status = AsyncMock(side_effect=_wrapped_bioblend(502))
     app.dependency_overrides[get_galaxy_service] = lambda: service
