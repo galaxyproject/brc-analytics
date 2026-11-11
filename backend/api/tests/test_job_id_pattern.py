@@ -1,7 +1,7 @@
 """Galaxy job ids come in two lengths, and every Logan entry point takes both.
 
 An encoded id is one or two Blowfish blocks: 16 hex characters for a database
-id up to eight digits (Galaxy Test), 32 above that (usegalaxy.org).
+id up to seven digits (Galaxy Test), 32 above that (usegalaxy.org).
 """
 
 import json
