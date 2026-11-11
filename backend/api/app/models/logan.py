@@ -12,7 +12,10 @@ from pydantic import BaseModel, Field
 
 from app.models.galaxy import KmindexCohort, KmindexIndexSummary
 
-JOB_ID_PATTERN = r"^[0-9a-f]{16}$"
+# An encoded Galaxy id is one Blowfish block (16 hex) for a database id up to
+# eight digits, two (32 hex) above that: Galaxy Test's jobs are the first,
+# usegalaxy.org's the second.
+JOB_ID_PATTERN = r"^(?:[0-9a-f]{16}){1,2}$"
 
 
 class LoganTopHit(BaseModel):

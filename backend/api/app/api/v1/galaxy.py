@@ -20,6 +20,7 @@ from app.core.dependencies import (
     get_sra_mirror_service,
 )
 from app.core.galaxy_credential import GalaxyCredential
+from app.core.galaxy_target import galaxy_target_for_job
 from app.db.crud import create_galaxy_job, get_user_by_keycloak_sub
 from app.db.session import db_session
 from app.models.galaxy import (
@@ -143,12 +144,23 @@ def error_detail(prefix: str, e: BaseException) -> str:
 
 
 async def get_galaxy_service(
+    request: Request,
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
     credential: Optional[GalaxyCredential] = Depends(get_galaxy_credential),
 ) -> GalaxyService:
-    """Dependency to get Galaxy service instance."""
-    return GalaxyService(cache, sra_mirror=sra_mirror, credential=credential)
+    """Dependency to get Galaxy service instance.
+
+    A route about an existing job (a job_id path parameter) talks to the
+    Galaxy that job lives on; every other route, submits included, to the
+    primary one.
+    """
+    return GalaxyService(
+        cache,
+        sra_mirror=sra_mirror,
+        credential=credential,
+        target=galaxy_target_for_job(request.path_params.get("job_id")),
+    )
 
 
 def get_kmindex_filters(request: Request) -> Optional[KmindexFilters]:
@@ -187,7 +199,7 @@ async def galaxy_health(galaxy_service: GalaxyService = Depends(get_galaxy_servi
     return {
         "status": "healthy" if galaxy_service.is_available() else "unavailable",
         "galaxy_configured": galaxy_service.is_available(),
-        "api_url": galaxy_service.settings.GALAXY_API_URL,
+        "api_url": galaxy_service.target.api_url,
         "upload_tool_id": galaxy_service.settings.GALAXY_UPLOAD_TOOL_ID,
         "random_lines_tool_id": galaxy_service.settings.GALAXY_RANDOM_LINES_TOOL_ID,
     }
@@ -402,9 +414,7 @@ async def submit_kmindex_query(
                             db,
                             user_id=user.id,
                             galaxy_job_id=response.job_id,
-                            galaxy_instance_url=(
-                                galaxy_service.settings.GALAXY_BASE_URL
-                            ),
+                            galaxy_instance_url=(galaxy_service.target.base_url),
                             tool="kmindex",
                             params={"indexes": submission.indexes},
                         )
@@ -822,6 +832,8 @@ async def cancel_job(
     job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
 ):
     """Cancel a running Galaxy job (future implementation)."""
+    # get_galaxy_service hands a 16-character id the legacy Galaxy, which is
+    # read-only: a real cancel has to refuse those rather than act there.
     # Note: This would require implementing job cancellation in GalaxyService
     # For now, just return a placeholder response
     raise HTTPException(status_code=501, detail="Job cancellation not yet implemented")
@@ -848,7 +860,7 @@ async def test_galaxy_connection(
             "status": "success",
             "message": "Galaxy service is configured and available",
             "configured": True,
-            "api_url": galaxy_service.settings.GALAXY_API_URL,
+            "api_url": galaxy_service.target.api_url,
         }
 
     except Exception as e:

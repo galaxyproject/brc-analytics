@@ -51,6 +51,7 @@ from app.models.assistant import (
     TurnTelemetry,
 )
 from app.models.logan import LoganSnapshot
+from app.services.galaxy_service import galaxy_for_job
 from app.services.logan_prompt import (
     LOGAN_TOOLS_PROMPT,
     render_logan_instructions,
@@ -1747,7 +1748,7 @@ class AssistantAgent:
             job_id, "This search's results are not cached; re-run it"
         )
         try:
-            status = await self.galaxy.get_job_status(job_id)
+            status = await galaxy_for_job(self.galaxy, job_id).get_job_status(job_id)
         except Exception:
             logger.info(
                 "Logan job %s: status unreadable with the service credential; "

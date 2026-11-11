@@ -285,8 +285,8 @@ def create_mcp_server(
             """Check whether a Logan sequence search (kmindex job) has finished.
 
             Args:
-                job_id: the 16-character Galaxy job id from a Logan results
-                    URL (/logan-search?job=<id>).
+                job_id: the Galaxy job id (16 or 32 hex characters) from a
+                    Logan results URL (/logan-search?job=<id>).
             """
             return json.loads(await logan_tools.logan_job_status(_deps, job_id))
 
@@ -299,7 +299,8 @@ def create_mcp_server(
             with; the pageable hit list is capped and not representative.
 
             Args:
-                job_id: the 16-character Galaxy job id from a Logan results URL.
+                job_id: the Galaxy job id (16 or 32 hex characters) from a
+                    Logan results URL.
             """
             out = json.loads(await logan_tools.logan_cohort(_deps, job_id))
             return await logan_mcp.with_rebuild(galaxy, job_id, out)
@@ -311,7 +312,8 @@ def create_mcp_server(
             logan_cohort.
 
             Args:
-                job_id: the 16-character Galaxy job id from a Logan results URL.
+                job_id: the Galaxy job id (16 or 32 hex characters) from a
+                    Logan results URL.
                 offset: first hit to return (0-based).
                 limit: hits per page (default 25, capped at 100).
             """
