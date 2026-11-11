@@ -15,7 +15,7 @@ from app.api.v1 import galaxy as galaxy_router
 from app.api.v1 import partner as partner_router
 from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
-from app.core.galaxy_target import galaxy_target_for_job, primary_galaxy_target
+from app.core.galaxy_target import galaxy_target_for_job
 from app.core.partner_keys import Partner
 from app.models.galaxy import GalaxyJobState, GalaxyJobStatus
 from app.services import logan_jobs
@@ -63,16 +63,6 @@ def _request(**path_params):
 
 
 class TestConfig:
-    def test_legacy_is_off_by_default(self, primary_only):
-        settings = get_settings()
-        assert settings.GALAXY_LEGACY_API_URL == ""
-        assert settings.GALAXY_LEGACY_BASE_URL == ""
-
-    def test_legacy_base_url_is_derived_like_the_primary(self, with_legacy):
-        assert get_settings().GALAXY_LEGACY_BASE_URL == (
-            "https://test.galaxyproject.org"
-        )
-
     def test_a_legacy_url_without_its_key_refuses_to_start(
         self, primary_only, monkeypatch
     ):
@@ -80,28 +70,6 @@ class TestConfig:
         get_settings.cache_clear()
         with pytest.raises(ValueError, match="GALAXY_LEGACY_API_KEY"):
             get_settings()
-
-
-class TestRouting:
-    def test_without_legacy_every_job_is_primary(self, primary_only):
-        for job in (TEST_JOB, MAIN_JOB, None):
-            assert galaxy_target_for_job(job) == primary_galaxy_target()
-
-    def test_a_short_id_goes_to_legacy(self, with_legacy):
-        target = galaxy_target_for_job(TEST_JOB)
-        assert target.legacy
-        assert target.api_url == LEGACY_API
-        assert target.base_url == "https://test.galaxyproject.org"
-        assert target.api_key == "test-key"
-
-    def test_a_long_id_goes_to_primary(self, with_legacy):
-        target = galaxy_target_for_job(MAIN_JOB)
-        assert not target.legacy
-        assert target.api_url == PRIMARY_API
-        assert target.api_key == "main-key"
-
-    def test_no_job_is_primary(self, with_legacy):
-        assert galaxy_target_for_job(None) == primary_galaxy_target()
 
 
 class TestService:
@@ -141,28 +109,6 @@ class TestService:
 
 
 class TestNativeRoutes:
-    @pytest.mark.asyncio
-    async def test_a_short_job_route_reads_legacy(self, with_legacy):
-        g = await galaxy_router.get_galaxy_service(
-            request=_request(job_id=TEST_JOB),
-            cache=FakeCache(),
-            sra_mirror=None,
-            credential=USER,
-        )
-        assert g.target.api_url == LEGACY_API
-        assert g.credential.secret == "test-key"
-
-    @pytest.mark.asyncio
-    async def test_a_long_job_route_reads_primary_as_the_user(self, with_legacy):
-        g = await galaxy_router.get_galaxy_service(
-            request=_request(job_id=MAIN_JOB),
-            cache=FakeCache(),
-            sra_mirror=None,
-            credential=USER,
-        )
-        assert g.target.api_url == PRIMARY_API
-        assert g.credential == USER
-
     @pytest.mark.asyncio
     async def test_a_submit_route_is_primary(self, with_legacy):
         g = await galaxy_router.get_galaxy_service(
