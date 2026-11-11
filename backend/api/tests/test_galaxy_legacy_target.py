@@ -6,6 +6,7 @@ Galaxy configured a 16-character job is read there, on its own service key,
 and everything else stays on the primary Galaxy.
 """
 
+import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -19,7 +20,13 @@ from app.core.galaxy_target import galaxy_target_for_job, primary_galaxy_target
 from app.core.partner_keys import Partner
 from app.models.galaxy import GalaxyJobState, GalaxyJobStatus
 from app.services import logan_jobs
-from app.services.galaxy_service import GalaxyService, galaxy_for_job
+from app.services.assistant_agent import AssistantAgent, LoganJobNotReadyError
+from app.services.galaxy_service import (
+    GalaxyJobNotFound,
+    GalaxyService,
+    galaxy_for_job,
+)
+from app.services.tools import logan_mcp
 from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_cohort, logan_job_status
 from tests.test_galaxy_submit_ownership import app_client  # noqa: F401
@@ -34,8 +41,6 @@ USER = GalaxyCredential(kind="user", secret="bearer", user_sub="u1")
 
 class FakeCache:
     def make_key(self, prefix, params):
-        import json
-
         return f"{prefix}:{json.dumps(params, sort_keys=True)}"
 
     async def get(self, key):
@@ -264,8 +269,6 @@ class TestTools:
 
     @pytest.mark.asyncio
     async def test_the_assistant_snapshot_miss_asks_legacy(self, with_legacy, seen):
-        from app.services.assistant_agent import AssistantAgent, LoganJobNotReadyError
-
         agent = AssistantAgent.__new__(AssistantAgent)
         agent.galaxy = GalaxyService(FakeCache())
         with pytest.raises(LoganJobNotReadyError):
@@ -276,8 +279,6 @@ class TestTools:
     async def test_an_mcp_rebuild_reads_legacy_status(
         self, with_legacy, seen, monkeypatch
     ):
-        from app.services.tools import logan_mcp
-
         monkeypatch.setattr(logan_mcp, "current_request", lambda: None)
         out = await logan_mcp.with_rebuild(
             GalaxyService(FakeCache()), TEST_JOB, {"status": "expired"}
@@ -302,8 +303,6 @@ class TestOverHttp:
         api,
         key,
     ):
-        from app.services.galaxy_service import GalaxyJobNotFound
-
         app, client = app_client
         app.dependency_overrides[galaxy_router.get_cache_service] = FakeCache
         app.dependency_overrides[galaxy_router.get_sra_mirror_service] = lambda: None
