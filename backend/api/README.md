@@ -85,6 +85,40 @@ Services:
 - `GET /api/docs` - Interactive Swagger UI
 - `GET /api/redoc` - ReDoc API documentation
 
+### Logan search downloads
+
+- `GET /api/v1/galaxy/kmindex/jobs/{job_id}/export?format=tsv|parquet` - every
+  run a search matched, joined to its SRA metadata. Written when the results
+  are first merged, and only when `KMINDEX_EXPORT_DIR` is set and the SRA
+  mirror is available.
+- `GET /api/v1/galaxy/kmindex/jobs/{job_id}/query.fasta` - the FASTA the search
+  ran, exactly as it went to Galaxy, as `logan-<job_id>-query.fasta`. Read back
+  off the Galaxy job (we don't store query sequences) and cached; it never
+  needs the export and never starts a merge. A job-cache copy answers with its
+  original's query.
+
+The parquet export also carries the search's provenance in its footer
+key-value metadata, so the columns and the TSV are unaffected:
+
+| Key                      | Value                                                    |
+| ------------------------ | -------------------------------------------------------- |
+| `logan.metadata_version` | `1`                                                      |
+| `logan.query_fasta`      | The query FASTA, header and sequence, as Galaxy holds it |
+| `logan.indexes`          | The indexes searched, as a JSON array                    |
+| `logan.threshold`        | Minimum shared k-mer fraction                            |
+| `logan.zvalue`           | kmindex z-value                                          |
+| `logan.kmer_size`        | k-mer size (31)                                          |
+| `logan.tool_id`          | The kmindex_query tool id                                |
+| `logan.tool_version`     | Its version                                              |
+| `logan.galaxy_url`       | The Galaxy the search ran on                             |
+| `logan.search_date`      | When Galaxy created the job, ISO 8601 UTC                |
+
+A value Galaxy didn't report is left out rather than written empty. The job
+id is deliberately not there: it's in the filename already, and it opens the
+search's results page. Exports written before this shipped have no footer and
+keep serving as they are; they pick one up the next time the job is merged.
+`query.fasta` covers them in the meantime.
+
 ## MCP Server
 
 The API embeds a Model Context Protocol server at `/api/v1/mcp/`, giving AI
