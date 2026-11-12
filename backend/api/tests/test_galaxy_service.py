@@ -5013,9 +5013,26 @@ class TestQueryEndpoint:
     @staticmethod
     def _galaxy(**kwargs):
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.is_available.return_value = True
         galaxy.get_kmindex_query = AsyncMock(**kwargs)
         return galaxy
+
+    def test_the_query_is_read_from_the_galaxy_that_holds_the_job(self):
+        # A 16-character id is a Galaxy Test job; asking the primary Galaxy for
+        # it would 404 a query that exists.
+        primary = self._galaxy(side_effect=AssertionError("asked the primary"))
+        legacy = self._galaxy(return_value={"query_fasta": ">q\nACGT\n"})
+        primary.for_job.return_value = legacy
+
+        response = self._client(primary).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 200
+        primary.for_job.assert_called_once_with(self.JOB)
+        legacy.get_kmindex_query.assert_awaited_once_with(self.JOB)
+        primary.get_kmindex_query.assert_not_awaited()
 
     def test_the_query_downloads_as_a_named_fasta(self):
         fasta = f">{UNNAMED_QUERY}\nACGTACGTAC\n"

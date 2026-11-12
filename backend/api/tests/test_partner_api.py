@@ -593,6 +593,24 @@ def test_the_query_downloads_with_a_partner_key(partner_env):
     galaxy.get_kmindex_query.assert_awaited_once_with(JOB_ID)
 
 
+def test_the_query_is_read_from_the_galaxy_that_holds_the_job(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(side_effect=AssertionError("primary"))
+    legacy = MagicMock()
+    legacy.is_available.return_value = True
+    legacy.get_kmindex_query = AsyncMock(
+        return_value={"query_fasta": PAYLOAD["sequence"]}
+    )
+    galaxy.for_job.return_value = legacy
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 200
+    galaxy.for_job.assert_called_once_with(JOB_ID)
+    legacy.get_kmindex_query.assert_awaited_once_with(JOB_ID)
+    galaxy.get_kmindex_query.assert_not_awaited()
+
+
 def test_the_query_of_an_unknown_job_is_a_404(partner_env):
     client, galaxy, _ = partner_env
     galaxy.get_kmindex_query = AsyncMock(side_effect=GalaxyJobNotFound("no job"))

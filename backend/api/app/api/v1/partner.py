@@ -235,7 +235,7 @@ async def job_export(
 @router.get("/jobs/{job_id}/query.fasta")
 async def job_query(
     job_id: str = JobId,
-    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+    galaxy: GalaxyService = Depends(get_partner_job_galaxy_service),
 ) -> Response:
     """
     The FASTA the search ran, exactly as it went to Galaxy.

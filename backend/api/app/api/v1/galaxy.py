@@ -621,7 +621,7 @@ async def export_kmindex_results(
 @router.get("/kmindex/jobs/{job_id}/query.fasta")
 async def kmindex_query_fasta(
     job_id: str = PathParam(..., pattern=JOB_ID_PATTERN),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
