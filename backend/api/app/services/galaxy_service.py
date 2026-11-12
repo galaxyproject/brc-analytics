@@ -1829,15 +1829,14 @@ class GalaxyService:
         """
         if not self.is_available():
             raise Exception("Galaxy service not available")
-        key = self._query_cache_key(job_id)
-        cached = await self.cache.get(key)
+        # One record, under the original. An original or an already-resolved
+        # copy finds it from Redis alone, so a repeat ask costs no status read.
+        cached = await self.cache.get(
+            self._query_cache_key(await self._known_copy_of(job_id) or job_id)
+        )
         if cached:
             return cached
-        source = await self.source_job_id(job_id)
-        query = await self._kmindex_query_record(source)
-        if source != job_id:
-            await self.cache.set(key, query, CacheTTL.THIRTY_DAYS)
-        return query
+        return await self._kmindex_query_record(await self.source_job_id(job_id))
 
     def _query_cache_key(self, job_id: str) -> str:
         return self.cache.make_key(

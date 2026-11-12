@@ -4708,6 +4708,8 @@ class TestKmindexQuery:
 
         assert first == second
         assert service.gi.make_get_request.call_count == 1
+        # The repeat answers from Redis without even a status read.
+        assert service.get_job_status.await_count == 1
 
     @pytest.mark.asyncio
     async def test_a_copy_answers_with_its_originals_query(self, wired):
@@ -4728,6 +4730,28 @@ class TestKmindexQuery:
         # When the search ran is when the original did: its results are the
         # ones the copy serves.
         assert query["search_date"] == "2026-10-01T09:00:00+00:00"
+
+    @pytest.mark.asyncio
+    async def test_a_copy_asked_after_its_original_reads_galaxy_once(self, wired):
+        service, jobs = wired
+        store = _store_cache(service)
+        jobs["orig"] = _kmindex_job(fasta_id="orig_query")
+        jobs["copy1"] = _kmindex_job(fasta_id="copy_query", copied_from="orig")
+        service.gi.make_get_request = _display({"orig_query": self.FASTA})
+
+        original = await service.get_kmindex_query("orig")
+        copy = await service.get_kmindex_query("copy1")
+        again = await service.get_kmindex_query("copy1")
+
+        assert copy == again == original
+        assert service.gi.jobs.show_job.call_count == 1
+        assert service.gi.make_get_request.call_count == 1
+        # One record, under the original; the copy only keeps its link to it.
+        assert [
+            k for k in store if k.startswith(galaxy_service.KMINDEX_QUERY_PREFIX)
+        ] == [f"{galaxy_service.KMINDEX_QUERY_PREFIX}:orig"]
+        # The second ask of the copy resolved from Redis alone.
+        assert service.get_job_status.await_count == 3
 
     @pytest.mark.asyncio
     async def test_an_unknown_job_is_not_found(self, service):
