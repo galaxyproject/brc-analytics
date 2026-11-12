@@ -542,6 +542,20 @@ describe("the summary's export", () => {
     expect(parquet.tagName).toBe("A");
   });
 
+  test("offers the query beside the match set, as FASTA", () => {
+    renderSummary(WITH_EXPORT);
+
+    const query = screen.getByRole("link", {
+      name: "Download the query this search ran, as FASTA",
+    });
+
+    expect(query.getAttribute("href")).toBe(
+      `${API_BASE_URL}/galaxy/kmindex/jobs/${JOB_ID}/query.fasta`
+    );
+    expect(query.hasAttribute("download")).toBe(true);
+    expect(query.textContent).toBe("Query (FASTA)");
+  });
+
   test("states the parquet size and marks the TSV size as derived", () => {
     const { container } = renderSummary(WITH_EXPORT);
 

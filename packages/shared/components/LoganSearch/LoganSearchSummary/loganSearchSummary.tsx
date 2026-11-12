@@ -173,7 +173,8 @@ function SummaryExport({
     );
   }
 
-  const exportUrl = `${API_BASE_URL}/galaxy/kmindex/jobs/${results.job_id}/export`;
+  const jobUrl = `${API_BASE_URL}/galaxy/kmindex/jobs/${results.job_id}`;
+  const exportUrl = `${jobUrl}/export`;
   // The parquet's real size, so it goes on the button unqualified. A backend
   // that reports availability without a size gets a bare "Parquet" rather
   // than a fabricated number or a "0 kB".
@@ -215,6 +216,19 @@ function SummaryExport({
           variant="outlined"
         >
           Parquet{parquetSize}
+        </Button>
+        {/* The other half of reproducing the file: the parquet's footer
+            carries the query too, but the TSV has nowhere to put it. */}
+        <Button
+          aria-label="Download the query this search ran, as FASTA"
+          component="a"
+          download
+          href={`${jobUrl}/query.fasta`}
+          size="small"
+          startIcon={<Download />}
+          variant="outlined"
+        >
+          Query (FASTA)
         </Button>
       </ControlRow>
       <Typography color="textSecondary" component="div" variant="caption">
