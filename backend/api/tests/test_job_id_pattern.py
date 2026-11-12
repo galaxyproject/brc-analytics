@@ -1,11 +1,10 @@
 """Galaxy job ids come in two lengths, and every Logan entry point takes both.
 
 An encoded id is one or two Blowfish blocks: 16 hex characters for a database
-id up to eight digits (Galaxy Test), 32 above that (usegalaxy.org).
+id up to seven digits (Galaxy Test), 32 above that (usegalaxy.org).
 """
 
 import json
-import re
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -13,7 +12,7 @@ from pydantic import ValidationError
 
 from app.core.sentry import _VOLATILE
 from app.models.galaxy import GalaxyJobState, GalaxyJobStatus
-from app.models.logan import JOB_ID_PATTERN, LoganSessionRequest
+from app.models.logan import LoganSessionRequest
 from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_job_status
 from tests.test_partner_api import BASE, HEADERS, partner_env  # noqa: F401
@@ -30,16 +29,6 @@ INVALID = [
     MAIN_JOB.upper(),
     "",
 ]
-
-
-@pytest.mark.parametrize("job_id", VALID)
-def test_the_pattern_takes_both_lengths(job_id):
-    assert re.match(JOB_ID_PATTERN, job_id)
-
-
-@pytest.mark.parametrize("job_id", INVALID)
-def test_the_pattern_refuses_anything_else(job_id):
-    assert not re.match(JOB_ID_PATTERN, job_id)
 
 
 @pytest.mark.parametrize("job_id", VALID)
@@ -66,6 +55,7 @@ def _status(job_id):
 
 def _galaxy(job_id):
     g = MagicMock()
+    g.for_job.return_value = g
     g.is_available.return_value = True
     g.get_job_status = AsyncMock(return_value=_status(job_id))
     return g

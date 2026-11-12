@@ -25,8 +25,6 @@ from app.core import dependencies
 from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 from app.core.dependencies import check_partner_submit_rate_limit
-from app.core.galaxy_credential import GalaxyCredential
-from app.core.galaxy_target import galaxy_target_for_job
 from app.core.partner_keys import Partner
 from app.models.galaxy import KmindexQuerySubmission
 from app.services.galaxy_service import (
@@ -61,38 +59,25 @@ def _service_account_galaxy(
     cache: CacheService,
     sra_mirror: Optional[SRAMirrorService],
     history_name: str,
-    job_id: Optional[str] = None,
 ) -> GalaxyService:
     """A GalaxyService on the BRC service account, in the given history.
 
-    Built from the service key directly, never from get_galaxy_credential:
-    that one prefers a signed-in user's bearer, so a stray session cookie on a
-    partner or MCP request would otherwise run the job as that user.
-
-    @param job_id: the existing job this service will read, if any, which
-        picks the Galaxy it lives on. None -- a submit -- is always primary.
+    No credential is passed, so GalaxyService uses the primary Galaxy's
+    service key. Never take one from get_galaxy_credential: that one prefers a
+    signed-in user's bearer, so a stray session cookie on a partner or MCP
+    request would otherwise run the job as that user.
     """
-    target = galaxy_target_for_job(job_id)
-    key = target.api_key
-    credential = GalaxyCredential(kind="service", secret=key) if key else None
-    return GalaxyService(
-        cache,
-        credential=credential,
-        history_name=history_name,
-        sra_mirror=sra_mirror,
-        target=target,
-    )
+    return GalaxyService(cache, history_name=history_name, sra_mirror=sra_mirror)
 
 
 def partner_galaxy_service(
     partner: Partner,
     cache: CacheService,
     sra_mirror: Optional[SRAMirrorService],
-    job_id: Optional[str] = None,
 ) -> GalaxyService:
     """A service-account GalaxyService in the partner's own history."""
     return _service_account_galaxy(
-        cache, sra_mirror, f"BRC Logan Partner - {partner.partner_id}", job_id
+        cache, sra_mirror, f"BRC Logan Partner - {partner.partner_id}"
     )
 
 
