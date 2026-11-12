@@ -4,8 +4,8 @@ These cover the failure modes where an incomplete result could be presented --
 or worse, cached -- as a complete one, plus the merge-time bookkeeping. They
 stub bioblend rather than touching a real Galaxy instance.
 
-Mocked job statuses carry params=None, which models a status that did not come
-with the job's parameters -- one served from the status cache, where the field
+Mocked job statuses carry job=None, which models a status that did not come
+with the job's dict -- one served from the status cache, where the field
 is excluded. The code under test then falls back to the stubbed show_job, which
 is the path most of these tests are exercising. TestJobMetadataIsFetchedOnce
 covers the other side, where the parameters are carried and no fetch happens.
@@ -397,7 +397,7 @@ class TestMergeBookkeeping:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @pytest.mark.asyncio
@@ -655,7 +655,7 @@ class TestTieBreakIsArchiveNeutral:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @pytest.mark.asyncio
@@ -714,7 +714,7 @@ class TestCapReporting:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -910,7 +910,7 @@ class TestIndexAttribution:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1121,7 +1121,7 @@ class TestVersionedAggregateCacheKey:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1297,7 +1297,7 @@ class TestCohortOverTheFullHitSet:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1870,7 +1870,7 @@ class TestJobMetadataIsFetchedOnce:
         service.sra_mirror = None
         self._wire(service)
         cached_shape = (await service.get_job_status("job1")).model_copy(
-            update={"params": None}
+            update={"job": None}
         )
         service.gi.jobs.show_job.reset_mock()
         service.get_job_status = AsyncMock(return_value=cached_shape)
@@ -1886,15 +1886,15 @@ class TestJobMetadataIsFetchedOnce:
             state=GalaxyJobState.OK,
             created_time="t0",
             updated_time="t1",
-            params={"db_opts|kmindex": ["GENOMIC_BCT"]},
+            job={"params": {"db_opts|kmindex": ["GENOMIC_BCT"]}},
         )
 
         # Carried in-process for the aggregation path...
-        assert status.params == {"db_opts|kmindex": ["GENOMIC_BCT"]}
+        assert status.job == {"params": {"db_opts|kmindex": ["GENOMIC_BCT"]}}
         # ...but excluded from the public response model and from the dict the
         # status cache stores, so a job's raw tool parameters stay internal.
-        assert "params" not in status.model_dump()
-        assert "params" not in status.model_dump_json()
+        assert "job" not in status.model_dump()
+        assert "GENOMIC_BCT" not in status.model_dump_json()
 
 
 class TestExportOfTheFullMatchSet:
@@ -1920,7 +1920,7 @@ class TestExportOfTheFullMatchSet:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -2788,7 +2788,7 @@ class TestFalsePositiveCorrection:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=params,
+            job=None if params is None else {"params": params},
         )
 
     @pytest.mark.asyncio
@@ -3954,7 +3954,7 @@ class TestCollectionDownload:
     async def test_the_merge_falls_back_when_the_archive_fails(self, service):
         service.sra_mirror = None
         service.get_job_status = AsyncMock(return_value=self._status(2))
-        service._job_params = AsyncMock(return_value=None)
+        service._job_dict = AsyncMock(return_value=None)
         service._download_collection = AsyncMock(return_value=None)
         service._download_shard = AsyncMock(
             side_effect=lambda ds_id, sem: {
@@ -3963,7 +3963,7 @@ class TestCollectionDownload:
         )
         service.get_job_status.return_value.is_complete = True
         service.get_job_status.return_value.is_successful = True
-        service.get_job_status.return_value.params = None
+        service.get_job_status.return_value.job = None
 
         aggregate = await service._aggregate_shards("job1")
 
@@ -4010,15 +4010,17 @@ class TestMergedOutput:
         service.sra_mirror = None
         service.gi.url = "https://galaxy.example/api"
         service.get_job_status = AsyncMock(return_value=_merged_status())
-        service._job_params = AsyncMock(
+        service._job_dict = AsyncMock(
             return_value={
-                "db_opts": json.dumps(
-                    {
-                        "db_opts_selector": "db",
-                        "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
-                    }
-                ),
-                "threshold": '"0.5"',
+                "params": {
+                    "db_opts": json.dumps(
+                        {
+                            "db_opts_selector": "db",
+                            "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
+                        }
+                    ),
+                    "threshold": '"0.5"',
+                }
             }
         )
         # None, so a dispatch slip falls through to the per-shard path and
@@ -4900,6 +4902,64 @@ class TestExportFooter:
 
         mirror.export_hits.assert_called_once()
         assert mirror.export_hits.call_args.kwargs["metadata"] is None
+
+    def _cold(self, service, monkeypatch, tmp_path):
+        """A finished search whose show_job answers status, outputs and query."""
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        _store_cache(service)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.jobs.show_job = MagicMock(
+            return_value=_kmindex_job(outputs={"out0": {"id": "ds0", "src": "hda"}})
+        )
+        service.gi.datasets.show_dataset = MagicMock(
+            side_effect=lambda ds_id: {
+                "id": ds_id,
+                "name": ds_id,
+                "state": "ok",
+                "file_ext": "json",
+            }
+        )
+        service.gi.make_get_request = _display({"query1": self.FASTA})
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_10_null": {"q": {"SRR000001": 1.0}}}
+        )
+        return TestExportOfTheFullMatchSet()._mirror(
+            service, {"rows": 1, "status": "available"}
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_cold_merge_reads_the_job_once(
+        self, service, monkeypatch, tmp_path
+    ):
+        # The status read already holds the job dict the footer is built from;
+        # the merge's parameters and the footer's come off that one copy.
+        mirror = self._cold(service, monkeypatch, tmp_path)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        footer = mirror.export_hits.call_args.kwargs["metadata"]
+        assert footer["logan.query_fasta"] == self.FASTA
+        assert footer["logan.indexes"] == '["GENOMIC_BCT", "METAGENOMIC_ENV"]'
+        assert {s["index"] for s in aggregate["per_index"]} == {
+            "GENOMIC_BCT",
+            "METAGENOMIC_ENV",
+        }
+
+    @pytest.mark.asyncio
+    async def test_a_cached_status_still_reads_the_job_once(
+        self, service, monkeypatch, tmp_path
+    ):
+        # The results page polls status to completion first, so the merge
+        # usually starts from the status cache, which carries no job dict.
+        mirror = self._cold(service, monkeypatch, tmp_path)
+        await service.get_job_status("job1")
+        service.gi.jobs.show_job.reset_mock()
+
+        await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        assert mirror.export_hits.call_args.kwargs["metadata"]["logan.zvalue"] == "5"
 
     @pytest.mark.asyncio
     async def test_no_export_asks_galaxy_for_no_query(self, service):

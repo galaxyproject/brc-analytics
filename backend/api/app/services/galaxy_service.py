@@ -1843,20 +1843,27 @@ class GalaxyService:
             KMINDEX_QUERY_PREFIX, {"job_id": job_id, "url": self.target.api_url}
         )
 
-    async def _kmindex_query_record(self, job_id: str) -> dict:
-        """get_kmindex_query for exactly this job, copy or not."""
+    async def _kmindex_query_record(
+        self, job_id: str, job: Optional[dict] = None
+    ) -> dict:
+        """get_kmindex_query for exactly this job, copy or not.
+
+        @param job_id: the job.
+        @param job: its show_job dict, when the caller already holds it.
+        """
         key = self._query_cache_key(job_id)
         cached = await self.cache.get(key)
         if cached:
             return cached
-        try:
-            # Not full_details: the plain job dict already carries tool_id,
-            # tool_version, params, inputs and create_time.
-            job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
-        except BioblendConnectionError as e:
-            if is_missing_job_error(e):
-                raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
-            raise
+        if not isinstance(job, dict):
+            try:
+                # Not full_details: the plain job dict already carries tool_id,
+                # tool_version, params, inputs and create_time.
+                job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+            except BioblendConnectionError as e:
+                if is_missing_job_error(e):
+                    raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
+                raise
         tool_id = job.get("tool_id") if isinstance(job, dict) else None
         if not isinstance(tool_id, str) or "kmindex_query" not in tool_id:
             raise KmindexQueryUnavailable(f"Job {job_id} is not a Logan search")
@@ -2247,7 +2254,9 @@ class GalaxyService:
             CAPABILITY_EXPORT
         )
 
-    async def _export_metadata(self, job_id: str) -> Optional[Dict[str, str]]:
+    async def _export_metadata(
+        self, job_id: str, job: Optional[dict] = None
+    ) -> Optional[Dict[str, str]]:
         """
         The search's provenance for its export's footer, or None.
 
@@ -2255,10 +2264,11 @@ class GalaxyService:
         the file its footer, not the file.
 
         @param job_id: the job being aggregated, never a copy.
+        @param job: its show_job dict, when the aggregation already read it.
         @returns: logan.* footer key-values, or None.
         """
         try:
-            return export_metadata(await self._kmindex_query_record(job_id))
+            return export_metadata(await self._kmindex_query_record(job_id, job))
         except Exception as e:
             logger.warning(
                 f"kmindex job {job_id}: export goes out without its query: {e}"
@@ -2543,22 +2553,26 @@ class GalaxyService:
                 f"Job {job_id} reported success but exposed no output datasets"
             )
 
-        # Read the job's parameters up front. They carry the submitted index
+        # Read the job up front. Its parameters carry the submitted index
         # list, which attributes the shard keys, and the threshold the job ran
         # at, which is re-applied to the corrected scores; one fetch serves
         # both, so neither can end up thinking the parameters were readable
         # while the other did not. Taking it before the downloads keeps the
         # round trip off the span where both the full and the capped hit list
-        # are alive. get_job_status already fetched the job dict this comes out
-        # of, so on a cold read it is handed over rather than fetched again.
-        params = await self._job_params(job_id, status.params)
+        # are alive. get_job_status already fetched the job dict, so on a cold
+        # read it is handed over rather than fetched again.
+        job = await self._job_dict(job_id, status.job)
+        params = job.get("params") if isinstance(job, dict) else None
+        params = params if isinstance(params, dict) else None
         submitted_indexes = _submitted_index_names(params)
         threshold = _submitted_threshold(params)
-        # The query and parameters the export's footer carries, up front for
-        # the same reason. Cached for a month, so a re-aggregation or a copy's
-        # first read doesn't ask Galaxy again.
+        # The query and parameters the export's footer carries, built from the
+        # same job dict so the footer and the merge agree. Cached for a month,
+        # so a re-aggregation or a copy's first read doesn't ask Galaxy again.
         footer = (
-            await self._export_metadata(job_id) if self._exports_enabled() else None
+            await self._export_metadata(job_id, job)
+            if self._exports_enabled()
+            else None
         )
 
         merged_id = _merged_output_id(status.outputs)
@@ -2724,18 +2738,18 @@ class GalaxyService:
 
         return aggregate
 
-    async def _job_params(
-        self, job_id: str, params: Optional[dict] = None
+    async def _job_dict(
+        self, job_id: str, job: Optional[dict] = None
     ) -> Optional[dict]:
         """
-        The job's echoed tool parameters, fetching them when the caller has none.
+        The job's show_job dict, fetching it when the caller has none.
 
-        GalaxyJobStatus drops params on the way into the status cache, so a
-        status read after the job completed -- which is every read the results
-        page makes, since it polls status to completion first -- arrives with
-        none. One show_job here serves both the index list and the threshold,
-        which used to be read separately and disagree about whether the job's
-        parameters were readable at all.
+        GalaxyJobStatus drops the job dict on the way into the status cache, so
+        a status read after the job completed -- which is every read the
+        results page makes, since it polls status to completion first --
+        arrives with none. One show_job here serves the index list, the
+        threshold and the export's footer, which used to be read separately and
+        disagree about whether the job's parameters were readable at all.
 
         The job's own echoed parameters rather than the tool's option list:
         building that form needs a history, and the history lookup's error path
@@ -2744,24 +2758,23 @@ class GalaxyService:
         unrelated lookup failing, and answer for this job rather than for
         whatever the instance offers today.
 
-        @param job_id: the job whose parameters to read.
-        @param params: parameters the caller already holds. Passing them avoids
-            a show_job round trip per cold results request -- and with it a
+        @param job_id: the job to read.
+        @param job: the dict the caller already holds. Passing it avoids a
+            show_job round trip per cold results request -- and with it a
             metadata call that has no retry budget, unlike the seven attempts
             plus straggler sweep every shard download gets, and whose failure
             used to discard the whole aggregation. None means "not carried", so
             fall back to fetching.
-        @returns: the params dict, or None if they could not be read.
+        @returns: the job dict, or None if it could not be read.
         """
-        if params is not None:
-            return params
+        if isinstance(job, dict):
+            return job
         try:
             job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
         except Exception as e:
             logger.warning(f"kmindex job {job_id}: could not read job parameters: {e}")
             return None
-        params = job.get("params") if isinstance(job, dict) else None
-        return params if isinstance(params, dict) else None
+        return job if isinstance(job, dict) else None
 
     def _export_state(self, aggregate: dict, job_id: str) -> dict:
         """
@@ -3234,7 +3247,7 @@ class GalaxyService:
                 copied_from_job_id=job_data.get("copied_from_job_id"),
                 # Carried for in-process callers (see the field's comment);
                 # excluded from both the response and the cached model_dump.
-                params=job_data.get("params"),
+                job=job_data,
             )
 
             logger.debug(
