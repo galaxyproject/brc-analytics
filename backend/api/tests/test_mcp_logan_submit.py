@@ -101,6 +101,7 @@ def env(monkeypatch):
     )
 
     galaxy = MagicMock()
+    galaxy.for_job.return_value = galaxy
     galaxy.is_available.return_value = True
     galaxy.credential = MagicMock(kind="service")
     galaxy.submit_kmindex_query = AsyncMock(
@@ -461,6 +462,7 @@ class TestIndexesAndQueue:
 
     def _galaxy(self):
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.is_available.return_value = True
         return galaxy
 
@@ -524,6 +526,7 @@ class TestRebuild:
 
     def _galaxy(self, is_successful=True, stderr=None):
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.is_available.return_value = True
         galaxy.get_job_status = AsyncMock(
             return_value=MagicMock(

@@ -690,17 +690,17 @@ class GalaxyJobStatus(BaseModel):
     # Set when Galaxy answered the request from its job cache: this job is a
     # copy of that one and shares its outputs.
     copied_from_job_id: Optional[str] = None
-    # The job's tool parameters, carried in-process so callers that need them
-    # don't have to re-fetch a job dict this status was already built from.
+    # The show_job dict this status was built from, carried in-process so
+    # callers that need its params, inputs or tool don't have to re-fetch it.
     # excluded, so it reaches neither the HTTP response (this is a public
     # response_model) nor the status cache, which is written via model_dump().
     # A reader therefore has to treat None as "not carried here", not as
-    # "this job has no parameters".
-    # Deliberately Any rather than Dict: the only consumer already opens with an
-    # isinstance check, and validating the shape here would turn a params value
+    # "Galaxy had nothing to say about this job".
+    # Deliberately Any rather than Dict: every consumer already opens with an
+    # isinstance check, and validating the shape here would turn a job dict
     # Galaxy shaped unexpectedly from inert into a 500 on every job endpoint,
     # not just on index attribution.
-    params: Optional[Any] = Field(default=None, exclude=True)
+    job: Optional[Any] = Field(default=None, exclude=True)
 
 
 class GalaxyJobResult(BaseModel):

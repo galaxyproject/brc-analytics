@@ -493,6 +493,7 @@ LOGAN_TOOL_NAMES = {"logan_job_status", "logan_cohort", "logan_hits"}
 
 def _fake_galaxy(available=True, cached=None):
     g = MagicMock()
+    g.for_job.return_value = g
     g.is_available.return_value = available
     g.get_cached_kmindex_results = AsyncMock(return_value=cached)
     g.get_job_status = AsyncMock()

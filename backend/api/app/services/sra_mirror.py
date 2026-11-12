@@ -831,7 +831,7 @@ def _shape_geography(
     return geography
 
 
-def _export_sql(with_coordinates: bool) -> str:
+def _export_sql(with_coordinates: bool, with_metadata: bool = False) -> str:
     """Materialize a complete hit list, joined to the mirror, as one parquet.
 
     The hits arrive as a staging file read inline for the same reason
@@ -875,8 +875,11 @@ def _export_sql(with_coordinates: bool) -> str:
         are appended rather than always selected, because a mirror older than
         schema_version 6 would fail the whole write for them -- and an export
         of 13 columns is worth far more than no export at all.
+    @param with_metadata: whether $3 binds a MAP of footer key-values. Bound
+        rather than spliced in, since one of them is a user's FASTA header.
     """
     coordinates = ", r.lat AS latitude, r.lon AS longitude" if with_coordinates else ""
+    metadata = ", KV_METADATA $3" if with_metadata else ""
     return f"""
         COPY (
           SELECT h.accession, h.score,
@@ -898,7 +901,7 @@ def _export_sql(with_coordinates: bool) -> str:
                             'fp_correction':'DOUBLE'}}) h
           LEFT JOIN runs r ON r.acc = h.accession
           ORDER BY h.ordinal
-        ) TO $2 (FORMAT parquet, COMPRESSION zstd)
+        ) TO $2 (FORMAT parquet, COMPRESSION zstd{metadata})
     """
 
 
@@ -2052,7 +2055,11 @@ class SRAMirrorService:
     # download. The cursor gives it its own connection onto the open database;
     # the lock covers only the handoff.
     def export_hits(
-        self, job_id: str, hits: List[Dict[str, Any]], export_dir: str
+        self,
+        job_id: str,
+        hits: List[Dict[str, Any]],
+        export_dir: str,
+        metadata: Optional[Dict[str, str]] = None,
     ) -> Optional[Dict[str, Any]]:
         """
         Write a search's complete hit list, enriched from the mirror, to disk.
@@ -2070,6 +2077,9 @@ class SRAMirrorService:
         @param hits: every hit, before the display cap, as accession/score/shard
             dicts in ranked order.
         @param export_dir: configured export directory.
+        @param metadata: key-values for the parquet footer -- the search's
+            query and parameters -- or None for none. The footer leaves the
+            columns, and so the TSV, exactly as they were.
         @returns: {"rows": n, "status": ...} describing what a caller may now
             advertise, or None when nothing was written and nothing should be
             said about it -- the mirror is unavailable, the feature is off, or
@@ -2132,9 +2142,14 @@ class SRAMirrorService:
                     f"{'' if correction is None else correction}\n"
                 )
             staging.close()
+            parameters: List[Any] = [staging.name, str(partial)]
+            if metadata:
+                parameters.append(metadata)
             cursor.execute(
-                _export_sql(self.has_capability(CAPABILITY_COORDINATES)),
-                [staging.name, str(partial)],
+                _export_sql(
+                    self.has_capability(CAPABILITY_COORDINATES), bool(metadata)
+                ),
+                parameters,
             )
             partial.replace(destination)
         except Exception:

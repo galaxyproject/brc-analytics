@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 
 from bioblend import ConnectionError as BioblendConnectionError
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import Path as PathParam
 from fastapi.responses import FileResponse, StreamingResponse
 
 from app.core.cache import CacheService
@@ -20,7 +21,6 @@ from app.core.dependencies import (
     get_sra_mirror_service,
 )
 from app.core.galaxy_credential import GalaxyCredential
-from app.core.galaxy_target import galaxy_target_for_job
 from app.db.crud import create_galaxy_job, get_user_by_keycloak_sub
 from app.db.session import db_session
 from app.models.galaxy import (
@@ -37,6 +37,7 @@ from app.models.galaxy import (
     KmindexSort,
     KmindexSummary,
 )
+from app.models.logan import JOB_ID_PATTERN
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
     GalaxyJobAggregating,
@@ -45,6 +46,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotFound,
     GalaxyService,
     KmindexFiltersUnavailable,
+    KmindexQueryUnavailable,
     KmindexUnknownIndex,
     ShardFetchError,
     is_unlinked_account_error,
@@ -144,23 +146,24 @@ def error_detail(prefix: str, e: BaseException) -> str:
 
 
 async def get_galaxy_service(
-    request: Request,
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
     credential: Optional[GalaxyCredential] = Depends(get_galaxy_credential),
 ) -> GalaxyService:
-    """Dependency to get Galaxy service instance.
+    """Dependency to get Galaxy service instance, on the primary Galaxy."""
+    return GalaxyService(cache, sra_mirror=sra_mirror, credential=credential)
 
-    A route about an existing job (a job_id path parameter) talks to the
-    Galaxy that job lives on; every other route, submits included, to the
-    primary one.
+
+async def get_job_galaxy_service(
+    job_id: str,
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+) -> GalaxyService:
+    """The Galaxy service for the Galaxy that holds the route's job.
+
+    Only for routes that read an existing job: a write must stay on
+    get_galaxy_service, which is always the primary Galaxy.
     """
-    return GalaxyService(
-        cache,
-        sra_mirror=sra_mirror,
-        credential=credential,
-        target=galaxy_target_for_job(request.path_params.get("job_id")),
-    )
+    return galaxy_service.for_job(job_id)
 
 
 def get_kmindex_filters(request: Request) -> Optional[KmindexFilters]:
@@ -473,7 +476,7 @@ async def get_kmindex_results(
         description="asc or desc; defaults to desc for score and asc otherwise",
     ),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -529,7 +532,7 @@ async def get_kmindex_results(
 async def get_kmindex_summary(
     job_id: str,
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -577,7 +580,7 @@ async def export_kmindex_results(
     job_id: str,
     format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
@@ -613,6 +616,66 @@ async def export_kmindex_results(
             job_id, format, galaxy_service, filters=filters
         )
     return await serve_kmindex_export(job_id, format, galaxy_service)
+
+
+@router.get("/kmindex/jobs/{job_id}/query.fasta")
+async def kmindex_query_fasta(
+    job_id: str = PathParam(..., pattern=JOB_ID_PATTERN),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+) -> Response:
+    """
+    The FASTA a kmindex search ran, exactly as it went to Galaxy.
+
+    Read from the job rather than from the export, so it is there before the
+    results are merged and after the export is swept, and asking never starts
+    a merge. A job-cache copy answers with its original's query, which is the
+    same query.
+
+    @param job_id: the kmindex job.
+    @returns: the FASTA as an attachment named for the job.
+    """
+    return await serve_kmindex_query(job_id, galaxy_service)
+
+
+def query_download_name(job_id: str) -> str:
+    """Filename for a downloaded query, beside the export's."""
+    return f"logan-{job_id}-query.fasta"
+
+
+async def serve_kmindex_query(job_id: str, galaxy_service: GalaxyService) -> Response:
+    """
+    A search's query as a FASTA attachment, or a 404 when Galaxy has none.
+
+    Shared with the partner API. job_id must already match JOB_ID_PATTERN,
+    since it goes into a header.
+
+    @param job_id: the kmindex job.
+    @param galaxy_service: on the Galaxy that job lives on.
+    @returns: the response.
+    """
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        query = await galaxy_service.get_kmindex_query(job_id)
+    except (GalaxyJobNotFound, KmindexQueryUnavailable) as e:
+        raise HTTPException(
+            status_code=404, detail=f"No query to download for job {job_id}"
+        ) from e
+    except Exception as e:
+        logger.error(f"Failed to read the query for kmindex job {job_id}: {e}")
+        raise HTTPException(
+            status_code=502, detail=error_detail("Failed to read the query", e)
+        ) from e
+    return Response(
+        query["query_fasta"],
+        media_type="text/x-fasta",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{query_download_name(job_id)}"'
+            )
+        },
+    )
 
 
 def _usable_export(path: Path) -> bool:
@@ -725,7 +788,7 @@ async def serve_kmindex_export(
 @router.get("/jobs/{job_id}/status", response_model=GalaxyJobStatus)
 async def get_job_status(
     job_id: str,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """Get the current status of a Galaxy job."""
@@ -752,7 +815,7 @@ async def get_job_status(
 @router.get("/jobs/{job_id}/results", response_model=GalaxyJobResult)
 async def get_job_results(
     job_id: str,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """Get the complete results from a finished Galaxy job."""
@@ -786,7 +849,7 @@ async def get_job_results(
 async def get_job_details(
     job_id: str,
     include_results: bool = False,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -832,8 +895,6 @@ async def cancel_job(
     job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
 ):
     """Cancel a running Galaxy job (future implementation)."""
-    # get_galaxy_service hands a 16-character id the legacy Galaxy, which is
-    # read-only: a real cancel has to refuse those rather than act there.
     # Note: This would require implementing job cancellation in GalaxyService
     # For now, just return a placeholder response
     raise HTTPException(status_code=501, detail="Job cancellation not yet implemented")

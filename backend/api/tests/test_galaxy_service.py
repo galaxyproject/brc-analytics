@@ -4,8 +4,8 @@ These cover the failure modes where an incomplete result could be presented --
 or worse, cached -- as a complete one, plus the merge-time bookkeeping. They
 stub bioblend rather than touching a real Galaxy instance.
 
-Mocked job statuses carry params=None, which models a status that did not come
-with the job's parameters -- one served from the status cache, where the field
+Mocked job statuses carry job=None, which models a status that did not come
+with the job's dict -- one served from the status cache, where the field
 is excluded. The code under test then falls back to the stubbed show_job, which
 is the path most of these tests are exercising. TestJobMetadataIsFetchedOnce
 covers the other side, where the parameters are carried and no fetch happens.
@@ -53,6 +53,7 @@ from app.services.galaxy_service import (
     _default_order,
     _submitted_index_names,
     _submitted_threshold,
+    _submitted_zvalue,
 )
 from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
@@ -396,7 +397,7 @@ class TestMergeBookkeeping:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @pytest.mark.asyncio
@@ -654,7 +655,7 @@ class TestTieBreakIsArchiveNeutral:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @pytest.mark.asyncio
@@ -713,7 +714,7 @@ class TestCapReporting:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -909,7 +910,7 @@ class TestIndexAttribution:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1120,7 +1121,7 @@ class TestVersionedAggregateCacheKey:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1296,7 +1297,7 @@ class TestCohortOverTheFullHitSet:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -1869,7 +1870,7 @@ class TestJobMetadataIsFetchedOnce:
         service.sra_mirror = None
         self._wire(service)
         cached_shape = (await service.get_job_status("job1")).model_copy(
-            update={"params": None}
+            update={"job": None}
         )
         service.gi.jobs.show_job.reset_mock()
         service.get_job_status = AsyncMock(return_value=cached_shape)
@@ -1885,15 +1886,15 @@ class TestJobMetadataIsFetchedOnce:
             state=GalaxyJobState.OK,
             created_time="t0",
             updated_time="t1",
-            params={"db_opts|kmindex": ["GENOMIC_BCT"]},
+            job={"params": {"db_opts|kmindex": ["GENOMIC_BCT"]}},
         )
 
         # Carried in-process for the aggregation path...
-        assert status.params == {"db_opts|kmindex": ["GENOMIC_BCT"]}
+        assert status.job == {"params": {"db_opts|kmindex": ["GENOMIC_BCT"]}}
         # ...but excluded from the public response model and from the dict the
         # status cache stores, so a job's raw tool parameters stay internal.
-        assert "params" not in status.model_dump()
-        assert "params" not in status.model_dump_json()
+        assert "job" not in status.model_dump()
+        assert "GENOMIC_BCT" not in status.model_dump_json()
 
 
 class TestExportOfTheFullMatchSet:
@@ -1919,7 +1920,7 @@ class TestExportOfTheFullMatchSet:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=None,
+            job=None,
         )
 
     @staticmethod
@@ -2032,7 +2033,9 @@ class TestExportOfTheFullMatchSet:
         seen = {}
         mirror = self._mirror(service, {"rows": 5, "status": "available"})
         mirror.export_hits = MagicMock(
-            side_effect=lambda *args: seen.setdefault("thread", threading.get_ident())
+            side_effect=lambda *args, **kwargs: seen.setdefault(
+                "thread", threading.get_ident()
+            )
             and {"rows": 5, "status": "available"}
         )
         self._wire(service, hits=5)
@@ -2218,6 +2221,7 @@ class TestExportEndpoint:
 
         if galaxy is None:
             galaxy = MagicMock()
+            galaxy.for_job.return_value = galaxy
             galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
@@ -2229,12 +2233,14 @@ class TestExportEndpoint:
     def _copy_of(original):
         """A service that knows every job asked about is a copy of original."""
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.source_job_id = AsyncMock(return_value=original)
         return galaxy
 
     @staticmethod
     def _never_asked():
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.source_job_id = AsyncMock(side_effect=AssertionError("asked Galaxy"))
         return galaxy
 
@@ -2741,6 +2747,27 @@ class TestSubmittedThreshold:
         assert _submitted_threshold({"threshold": "1.5"}) is None
 
 
+class TestSubmittedZvalue:
+    """The z-value comes back off the job the way the threshold does."""
+
+    def test_reads_a_json_encoded_int(self):
+        assert _submitted_zvalue({"zvalue": "5"}) == 5
+
+    def test_reads_a_bare_int(self):
+        assert _submitted_zvalue({"zvalue": 3}) == 3
+
+    def test_missing_or_garbage_is_none(self):
+        assert _submitted_zvalue(None) is None
+        assert _submitted_zvalue({}) is None
+        assert _submitted_zvalue({"zvalue": "high"}) is None
+
+    def test_a_boolean_is_not_a_zvalue(self):
+        # int(True) is 1, which would put a z-value in the footer the job
+        # never ran at.
+        assert _submitted_zvalue({"zvalue": "true"}) is None
+        assert _submitted_zvalue({"zvalue": True}) is None
+
+
 class TestFalsePositiveCorrection:
     """
     227 saturated samples match any query at an inflated ratio. Logan's site
@@ -2761,7 +2788,7 @@ class TestFalsePositiveCorrection:
             is_successful=True,
             state="ok",
             outputs=outputs,
-            params=params,
+            job=None if params is None else {"params": params},
         )
 
     @pytest.mark.asyncio
@@ -3927,7 +3954,7 @@ class TestCollectionDownload:
     async def test_the_merge_falls_back_when_the_archive_fails(self, service):
         service.sra_mirror = None
         service.get_job_status = AsyncMock(return_value=self._status(2))
-        service._job_params = AsyncMock(return_value=None)
+        service._job_dict = AsyncMock(return_value=None)
         service._download_collection = AsyncMock(return_value=None)
         service._download_shard = AsyncMock(
             side_effect=lambda ds_id, sem: {
@@ -3936,7 +3963,7 @@ class TestCollectionDownload:
         )
         service.get_job_status.return_value.is_complete = True
         service.get_job_status.return_value.is_successful = True
-        service.get_job_status.return_value.params = None
+        service.get_job_status.return_value.job = None
 
         aggregate = await service._aggregate_shards("job1")
 
@@ -3983,15 +4010,17 @@ class TestMergedOutput:
         service.sra_mirror = None
         service.gi.url = "https://galaxy.example/api"
         service.get_job_status = AsyncMock(return_value=_merged_status())
-        service._job_params = AsyncMock(
+        service._job_dict = AsyncMock(
             return_value={
-                "db_opts": json.dumps(
-                    {
-                        "db_opts_selector": "db",
-                        "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
-                    }
-                ),
-                "threshold": '"0.5"',
+                "params": {
+                    "db_opts": json.dumps(
+                        {
+                            "db_opts_selector": "db",
+                            "kmindex": ["GENOMIC_BCT", "GENOMIC_PHG"],
+                        }
+                    ),
+                    "threshold": '"0.5"',
+                }
             }
         )
         # None, so a dispatch slip falls through to the per-shard path and
@@ -4526,3 +4555,530 @@ class TestCopyLinkIsRemembered:
         orig_down = False
         assert await service.source_job_id("c2") == "orig"
         assert list(store.values()) == ["orig"]
+
+
+KMINDEX_TOOL = "toolshed.g2.bx.psu.edu/repos/iuc/kmindex/kmindex_query/0.7.1+galaxy0"
+
+
+def _kmindex_job(fasta_id="query1", copied_from=None, **overrides):
+    """A kmindex job dict as a plain show_job returns it."""
+    job = {
+        "copied_from_job_id": copied_from,
+        "create_time": "2026-11-01T12:34:56.789012",
+        "id": "job1",
+        "inputs": {"fastx": {"id": fasta_id, "src": "hda", "uuid": "u"}},
+        "outputs": {"output_merged_json": {"id": "merged1", "src": "hda"}},
+        "params": {
+            "db_opts": json.dumps(
+                {
+                    "__current_case__": 0,
+                    "db_opts_selector": "db",
+                    "kmindex": ["GENOMIC_BCT", "METAGENOMIC_ENV"],
+                }
+            ),
+            "format": '"json"',
+            "threshold": "0.7",
+            "zvalue": "5",
+        },
+        "state": "ok",
+        "tool_id": KMINDEX_TOOL,
+        "tool_version": "0.7.1+galaxy0",
+        "update_time": "2026-11-01T12:40:00",
+    }
+    job.update(overrides)
+    return job
+
+
+class _Displayed:
+    """A dataset display response, read whole or streamed in chunks."""
+
+    def __init__(self, status_code, body, chunk=1024):
+        self.status_code = status_code
+        self.content = body
+        self.text = body.decode("utf-8", "replace")
+        self.chunks_read = 0
+        self._chunk = chunk
+
+    def iter_content(self, chunk_size=1):
+        for start in range(0, len(self.content), self._chunk):
+            self.chunks_read += 1
+            yield self.content[start : start + self._chunk]
+
+    def close(self):
+        pass
+
+
+def _display(contents):
+    """make_get_request, answering a dataset display from `contents` by id."""
+
+    def _get(url, params=None, **kwargs):
+        dataset_id = url.rsplit("/", 2)[-2]
+        if dataset_id not in contents:
+            return _Displayed(404, b"No such dataset")
+        body = contents[dataset_id]
+        return _Displayed(200, body if isinstance(body, bytes) else body.encode())
+
+    return MagicMock(side_effect=_get)
+
+
+def _store_cache(service):
+    """Give the service a dict-backed cache, and return the dict."""
+    store = {}
+    service.cache.make_key = MagicMock(
+        side_effect=lambda prefix, params: f"{prefix}:{params['job_id']}"
+    )
+    service.cache.get = AsyncMock(side_effect=lambda key: store.get(key))
+
+    async def _set(key, value, ttl=None):
+        store[key] = value
+        return True
+
+    service.cache.set = AsyncMock(side_effect=_set)
+    return store
+
+
+class TestKmindexQuery:
+    """
+    The query a search ran, and the parameters it ran at, read back off Galaxy.
+
+    We keep no query sequences ourselves, so the job's own input dataset is
+    the record of what was searched -- the same bytes kmindex saw.
+    """
+
+    FASTA = ">16S fragment\nACGTACGTACGTACGTACGTACGTACGTACGTACGT\n"
+
+    @pytest.fixture()
+    def wired(self, service):
+        jobs = {"job1": _kmindex_job()}
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.jobs.show_job = MagicMock(side_effect=lambda job_id: jobs[job_id])
+        service.gi.make_get_request = _display({"query1": self.FASTA})
+        service.get_job_status = AsyncMock(
+            side_effect=lambda job_id: _status_of(
+                job_id, copied_from=jobs[job_id].get("copied_from_job_id")
+            )
+        )
+        _store_cache(service)
+        return service, jobs
+
+    @pytest.mark.asyncio
+    async def test_the_query_and_every_parameter_come_off_the_job(self, wired):
+        service, _ = wired
+
+        query = await service.get_kmindex_query("job1")
+
+        assert query == {
+            "galaxy_url": service.target.base_url,
+            "indexes": ["GENOMIC_BCT", "METAGENOMIC_ENV"],
+            "kmer_size": 31,
+            "query_fasta": self.FASTA,
+            "search_date": "2026-11-01T12:34:56.789012+00:00",
+            "threshold": 0.7,
+            "tool_id": KMINDEX_TOOL,
+            "tool_version": "0.7.1+galaxy0",
+            "zvalue": 5,
+        }
+        # The input dataset, displayed raw rather than as a preview.
+        url = service.gi.make_get_request.call_args.args[0]
+        assert url == "https://galaxy.example/api/datasets/query1/display"
+        assert service.gi.make_get_request.call_args.kwargs["params"] == {
+            "preview": "false"
+        }
+
+    @pytest.mark.asyncio
+    async def test_an_unnamed_query_comes_back_under_the_header_it_was_given(
+        self, wired
+    ):
+        service, _ = wired
+        sent = galaxy_service._normalized_fasta(
+            KmindexQuerySubmission(
+                indexes=["GENOMIC_BCT"], sequence="ACGTACGTAC\nGTACGT"
+            ).sequence
+        )
+        service.gi.make_get_request = _display({"query1": sent})
+
+        query = await service.get_kmindex_query("job1")
+
+        assert query["query_fasta"] == f">{UNNAMED_QUERY}\nACGTACGTAC\nGTACGT\n"
+
+    @pytest.mark.asyncio
+    async def test_it_is_read_from_galaxy_once(self, wired):
+        service, _ = wired
+
+        first = await service.get_kmindex_query("job1")
+        second = await service.get_kmindex_query("job1")
+
+        assert first == second
+        assert service.gi.make_get_request.call_count == 1
+        # The repeat answers from Redis without even a status read.
+        assert service.get_job_status.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_a_copy_answers_with_its_originals_query(self, wired):
+        service, jobs = wired
+        jobs["orig"] = _kmindex_job(
+            fasta_id="orig_query", create_time="2026-10-01T09:00:00"
+        )
+        jobs["copy1"] = _kmindex_job(
+            fasta_id="copy_query",
+            copied_from="orig",
+            create_time="2026-11-02T09:00:00",
+        )
+        service.gi.make_get_request = _display({"orig_query": self.FASTA})
+
+        query = await service.get_kmindex_query("copy1")
+
+        assert query["query_fasta"] == self.FASTA
+        # When the search ran is when the original did: its results are the
+        # ones the copy serves.
+        assert query["search_date"] == "2026-10-01T09:00:00+00:00"
+
+    @pytest.mark.asyncio
+    async def test_a_copy_asked_after_its_original_reads_galaxy_once(self, wired):
+        service, jobs = wired
+        store = _store_cache(service)
+        jobs["orig"] = _kmindex_job(fasta_id="orig_query")
+        jobs["copy1"] = _kmindex_job(fasta_id="copy_query", copied_from="orig")
+        service.gi.make_get_request = _display({"orig_query": self.FASTA})
+
+        original = await service.get_kmindex_query("orig")
+        copy = await service.get_kmindex_query("copy1")
+        again = await service.get_kmindex_query("copy1")
+
+        assert copy == again == original
+        assert service.gi.jobs.show_job.call_count == 1
+        assert service.gi.make_get_request.call_count == 1
+        # One record, under the original; the copy only keeps its link to it.
+        assert [
+            k for k in store if k.startswith(galaxy_service.KMINDEX_QUERY_PREFIX)
+        ] == [f"{galaxy_service.KMINDEX_QUERY_PREFIX}:orig"]
+        # The second ask of the copy resolved from Redis alone.
+        assert service.get_job_status.await_count == 3
+
+    @pytest.mark.asyncio
+    async def test_an_unknown_job_is_not_found(self, service):
+        from bioblend import ConnectionError as BioblendConnectionError
+
+        _store_cache(service)
+        service.gi.jobs.show_job = MagicMock(
+            side_effect=BioblendConnectionError("gone", status_code=404, body="")
+        )
+
+        with pytest.raises(GalaxyJobNotFound):
+            await service.get_kmindex_query("0123456789abcdef")
+
+    @pytest.mark.asyncio
+    async def test_a_job_that_is_not_a_search_has_no_query(self, wired):
+        service, jobs = wired
+        jobs["job1"] = _kmindex_job(tool_id="random_lines1")
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+    @pytest.mark.asyncio
+    async def test_a_purged_query_dataset_is_unavailable(self, wired):
+        service, _ = wired
+        service.gi.make_get_request = _display({})
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+    @pytest.mark.asyncio
+    async def test_an_oversized_query_is_unavailable_without_reading_it_all(
+        self, wired
+    ):
+        # Any kmindex job the credential can read is served, not only ones
+        # submitted through our 5,000-base form, so the read has to be bounded.
+        service, _ = wired
+        responses = []
+        display = _display({"query1": b">big\n" + b"A" * (1 << 20)})
+
+        def _get(*args, **kwargs):
+            responses.append(display(*args, **kwargs))
+            return responses[-1]
+
+        service.gi.make_get_request = MagicMock(side_effect=_get)
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+        assert service.gi.make_get_request.call_args.kwargs["stream"] is True
+        limit = galaxy_service.KMINDEX_QUERY_MAX_BYTES
+        assert responses[0].chunks_read <= limit // 1024 + 1
+        # Nothing worth a month in Redis came of it.
+        assert not service.cache.set.await_count
+
+    @pytest.mark.asyncio
+    async def test_a_query_just_under_the_cap_is_served(self, wired):
+        service, _ = wired
+        body = ">q\n" + "A" * (galaxy_service.KMINDEX_QUERY_MAX_BYTES - 4) + "\n"
+        service.gi.make_get_request = _display({"query1": body})
+
+        query = await service.get_kmindex_query("job1")
+
+        assert query["query_fasta"] == body
+
+    @pytest.mark.asyncio
+    async def test_a_query_that_is_not_text_is_unavailable(self, wired):
+        # kmindex_query accepts gzip'd FASTA, which isn't a query we can hand
+        # back as text; that is "no query to download", not Galaxy failing.
+        service, _ = wired
+        service.gi.make_get_request = _display({"query1": b"\x1f\x8b\x08\xff"})
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+    @pytest.mark.asyncio
+    async def test_asking_never_merges(self, wired):
+        service, _ = wired
+        service._aggregate_shards = AsyncMock(side_effect=AssertionError("merged"))
+
+        await service.get_kmindex_query("job1")
+
+        service._aggregate_shards.assert_not_awaited()
+
+
+class TestExportFooter:
+    """The export is written with its search's query and parameters."""
+
+    FASTA = ">16S fragment\nACGTACGTAC\n"
+
+    @pytest.mark.asyncio
+    async def test_the_footer_carries_the_query_and_parameters_but_no_job_id(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        _store_cache(service)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.jobs.show_job = MagicMock(return_value=_kmindex_job())
+        service.gi.make_get_request = _display({"query1": self.FASTA})
+        service.get_job_status = AsyncMock(
+            return_value=TestExportOfTheFullMatchSet._status(1)
+        )
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_10_null": {"q": {"SRR000001": 1.0}}}
+        )
+        mirror = TestExportOfTheFullMatchSet()._mirror(
+            service, {"rows": 1, "status": "available"}
+        )
+
+        await service._aggregate_shards("2f780abfeae3f54e")
+
+        footer = mirror.export_hits.call_args.kwargs["metadata"]
+        assert footer == {
+            "logan.galaxy_url": service.target.base_url,
+            "logan.indexes": '["GENOMIC_BCT", "METAGENOMIC_ENV"]',
+            "logan.kmer_size": "31",
+            "logan.metadata_version": "1",
+            "logan.query_fasta": self.FASTA,
+            "logan.search_date": "2026-11-01T12:34:56.789012+00:00",
+            "logan.threshold": "0.7",
+            "logan.tool_id": KMINDEX_TOOL,
+            "logan.tool_version": "0.7.1+galaxy0",
+            "logan.zvalue": "5",
+        }
+        assert not any("2f780abfeae3f54e" in value for value in footer.values())
+        assert not any("job" in key for key in footer)
+
+    @pytest.mark.asyncio
+    async def test_a_query_galaxy_wont_return_costs_the_footer_not_the_file(
+        self, service, monkeypatch, tmp_path
+    ):
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        _store_cache(service)
+        service.gi.jobs.show_job = MagicMock(return_value=_kmindex_job())
+        service.gi.make_get_request = _display({})
+        service.get_job_status = AsyncMock(
+            return_value=TestExportOfTheFullMatchSet._status(1)
+        )
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_10_null": {"q": {"SRR000001": 1.0}}}
+        )
+        mirror = TestExportOfTheFullMatchSet()._mirror(
+            service, {"rows": 1, "status": "available"}
+        )
+
+        await service._aggregate_shards("job1")
+
+        mirror.export_hits.assert_called_once()
+        assert mirror.export_hits.call_args.kwargs["metadata"] is None
+
+    def _cold(self, service, monkeypatch, tmp_path):
+        """A finished search whose show_job answers status, outputs and query."""
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        _store_cache(service)
+        service.gi.url = "https://galaxy.example/api"
+        service.gi.jobs.show_job = MagicMock(
+            return_value=_kmindex_job(outputs={"out0": {"id": "ds0", "src": "hda"}})
+        )
+        service.gi.datasets.show_dataset = MagicMock(
+            side_effect=lambda ds_id: {
+                "id": ds_id,
+                "name": ds_id,
+                "state": "ok",
+                "file_ext": "json",
+            }
+        )
+        service.gi.make_get_request = _display({"query1": self.FASTA})
+        service._download_shard = AsyncMock(
+            return_value={"GENOMIC_BCT_10_null": {"q": {"SRR000001": 1.0}}}
+        )
+        return TestExportOfTheFullMatchSet()._mirror(
+            service, {"rows": 1, "status": "available"}
+        )
+
+    @pytest.mark.asyncio
+    async def test_a_cold_merge_reads_the_job_once(
+        self, service, monkeypatch, tmp_path
+    ):
+        # The status read already holds the job dict the footer is built from;
+        # the merge's parameters and the footer's come off that one copy.
+        mirror = self._cold(service, monkeypatch, tmp_path)
+
+        aggregate = await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        footer = mirror.export_hits.call_args.kwargs["metadata"]
+        assert footer["logan.query_fasta"] == self.FASTA
+        assert footer["logan.indexes"] == '["GENOMIC_BCT", "METAGENOMIC_ENV"]'
+        assert {s["index"] for s in aggregate["per_index"]} == {
+            "GENOMIC_BCT",
+            "METAGENOMIC_ENV",
+        }
+
+    @pytest.mark.asyncio
+    async def test_a_cached_status_still_reads_the_job_once(
+        self, service, monkeypatch, tmp_path
+    ):
+        # The results page polls status to completion first, so the merge
+        # usually starts from the status cache, which carries no job dict.
+        mirror = self._cold(service, monkeypatch, tmp_path)
+        await service.get_job_status("job1")
+        service.gi.jobs.show_job.reset_mock()
+
+        await service._aggregate_shards("job1")
+
+        assert service.gi.jobs.show_job.call_count == 1
+        assert mirror.export_hits.call_args.kwargs["metadata"]["logan.zvalue"] == "5"
+
+    @pytest.mark.asyncio
+    async def test_no_export_asks_galaxy_for_no_query(self, service):
+        # Exports off is the default deployment; it shouldn't pay a show_job
+        # and a download per aggregation for a footer nothing writes.
+        service.sra_mirror = None
+        service._kmindex_query_record = AsyncMock(side_effect=AssertionError("asked"))
+        TestExportOfTheFullMatchSet()._wire(service, hits=2)
+
+        await service._aggregate_shards("job1")
+
+        service._kmindex_query_record.assert_not_awaited()
+
+    def test_values_galaxy_did_not_give_are_left_out(self):
+        footer = galaxy_service.export_metadata(
+            {
+                "indexes": None,
+                "kmer_size": 31,
+                "query_fasta": ">q\nACGT\n",
+                "threshold": None,
+                "zvalue": None,
+            }
+        )
+
+        assert footer == {
+            "logan.kmer_size": "31",
+            "logan.metadata_version": "1",
+            "logan.query_fasta": ">q\nACGT\n",
+        }
+
+
+class TestQueryEndpoint:
+    """GET /kmindex/jobs/{job_id}/query.fasta."""
+
+    JOB = "2f780abfeae3f54e"
+
+    @staticmethod
+    def _client(galaxy):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app.api.v1 import galaxy as galaxy_api
+        from app.core.dependencies import check_rate_limit
+
+        app = FastAPI()
+        app.include_router(galaxy_api.router, prefix="/galaxy")
+        app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: galaxy
+        return TestClient(app)
+
+    @staticmethod
+    def _galaxy(**kwargs):
+        galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
+        galaxy.is_available.return_value = True
+        galaxy.get_kmindex_query = AsyncMock(**kwargs)
+        return galaxy
+
+    def test_the_query_is_read_from_the_galaxy_that_holds_the_job(self):
+        # A 16-character id is a Galaxy Test job; asking the primary Galaxy for
+        # it would 404 a query that exists.
+        primary = self._galaxy(side_effect=AssertionError("asked the primary"))
+        legacy = self._galaxy(return_value={"query_fasta": ">q\nACGT\n"})
+        primary.for_job.return_value = legacy
+
+        response = self._client(primary).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 200
+        primary.for_job.assert_called_once_with(self.JOB)
+        legacy.get_kmindex_query.assert_awaited_once_with(self.JOB)
+        primary.get_kmindex_query.assert_not_awaited()
+
+    def test_the_query_downloads_as_a_named_fasta(self):
+        fasta = f">{UNNAMED_QUERY}\nACGTACGTAC\n"
+        galaxy = self._galaxy(return_value={"query_fasta": fasta})
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 200
+        assert response.content == fasta.encode()
+        assert response.headers["content-type"].startswith("text/x-fasta")
+        assert response.headers["content-disposition"] == (
+            f'attachment; filename="logan-{self.JOB}-query.fasta"'
+        )
+        galaxy.get_kmindex_query.assert_awaited_once_with(self.JOB)
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            GalaxyJobNotFound("No Galaxy job"),
+            galaxy_service.KmindexQueryUnavailable("gone"),
+        ],
+    )
+    def test_no_job_or_no_query_is_a_404(self, error):
+        galaxy = self._galaxy(side_effect=error)
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 404
+        assert self.JOB in response.json()["detail"]
+
+    def test_galaxy_failing_is_a_502(self):
+        galaxy = self._galaxy(side_effect=RuntimeError("timed out"))
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 502
+
+    def test_an_id_that_is_not_a_galaxy_id_is_refused(self):
+        galaxy = self._galaxy(side_effect=AssertionError("asked Galaxy"))
+
+        response = self._client(galaxy).get('/galaxy/kmindex/jobs/x"y/query.fasta')
+
+        assert response.status_code == 422
