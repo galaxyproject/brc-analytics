@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 
 from bioblend import ConnectionError as BioblendConnectionError
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import Path as PathParam
 from fastapi.responses import FileResponse, StreamingResponse
 
 from app.core.cache import CacheService
@@ -36,6 +37,7 @@ from app.models.galaxy import (
     KmindexSort,
     KmindexSummary,
 )
+from app.models.logan import JOB_ID_PATTERN
 from app.services.galaxy_service import (
     GalaxyAccountNotLinkedError,
     GalaxyJobAggregating,
@@ -44,6 +46,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotFound,
     GalaxyService,
     KmindexFiltersUnavailable,
+    KmindexQueryUnavailable,
     KmindexUnknownIndex,
     ShardFetchError,
     is_unlinked_account_error,
@@ -613,6 +616,66 @@ async def export_kmindex_results(
             job_id, format, galaxy_service, filters=filters
         )
     return await serve_kmindex_export(job_id, format, galaxy_service)
+
+
+@router.get("/kmindex/jobs/{job_id}/query.fasta")
+async def kmindex_query_fasta(
+    job_id: str = PathParam(..., pattern=JOB_ID_PATTERN),
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    _rate_limit=Depends(check_rate_limit),
+) -> Response:
+    """
+    The FASTA a kmindex search ran, exactly as it went to Galaxy.
+
+    Read from the job rather than from the export, so it is there before the
+    results are merged and after the export is swept, and asking never starts
+    a merge. A job-cache copy answers with its original's query, which is the
+    same query.
+
+    @param job_id: the kmindex job.
+    @returns: the FASTA as an attachment named for the job.
+    """
+    return await serve_kmindex_query(job_id, galaxy_service)
+
+
+def query_download_name(job_id: str) -> str:
+    """Filename for a downloaded query, beside the export's."""
+    return f"logan-{job_id}-query.fasta"
+
+
+async def serve_kmindex_query(job_id: str, galaxy_service: GalaxyService) -> Response:
+    """
+    A search's query as a FASTA attachment, or a 404 when Galaxy has none.
+
+    Shared with the partner API. job_id must already match JOB_ID_PATTERN,
+    since it goes into a header.
+
+    @param job_id: the kmindex job.
+    @param galaxy_service: on the Galaxy that job lives on.
+    @returns: the response.
+    """
+    if not galaxy_service.is_available():
+        raise HTTPException(status_code=503, detail="Galaxy service is not available")
+    try:
+        query = await galaxy_service.get_kmindex_query(job_id)
+    except (GalaxyJobNotFound, KmindexQueryUnavailable) as e:
+        raise HTTPException(
+            status_code=404, detail=f"No query to download for job {job_id}"
+        ) from e
+    except Exception as e:
+        logger.error(f"Failed to read the query for kmindex job {job_id}: {e}")
+        raise HTTPException(
+            status_code=502, detail=error_detail("Failed to read the query", e)
+        ) from e
+    return Response(
+        query["query_fasta"],
+        media_type="text/x-fasta",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{query_download_name(job_id)}"'
+            )
+        },
+    )
 
 
 def _usable_export(path: Path) -> bool:

@@ -15,7 +15,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header, HTTPException, Path, Query, Response
 from starlette.requests import Request
 
-from app.api.v1.galaxy import serve_kmindex_export
+from app.api.v1.galaxy import serve_kmindex_export, serve_kmindex_query
 from app.core.cache import CacheService
 from app.core.config import get_settings
 from app.core.dependencies import (
@@ -89,6 +89,7 @@ def _created(job_id: str) -> PartnerJobCreated:
     return PartnerJobCreated(
         export_url=f"{base}/export",
         job_id=job_id,
+        query_url=f"{base}/query.fasta",
         results_url=f"{base}/results",
         status_url=base,
     )
@@ -229,6 +230,20 @@ async def job_export(
     this. Kept for about a day at most, and sooner under disk pressure.
     """
     return await serve_kmindex_export(job_id, format, galaxy)
+
+
+@router.get("/jobs/{job_id}/query.fasta")
+async def job_query(
+    job_id: str = JobId,
+    galaxy: GalaxyService = Depends(get_partner_galaxy_service),
+) -> Response:
+    """
+    The FASTA the search ran, exactly as it went to Galaxy.
+
+    Read from the job, so it is there as soon as the search is, and outlives
+    the export.
+    """
+    return await serve_kmindex_query(job_id, galaxy)
 
 
 async def add_sunset_header(request: Request, call_next):

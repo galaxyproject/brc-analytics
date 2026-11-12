@@ -165,6 +165,7 @@ def test_every_call_needs_the_key(partner_env):
         ("get", f"{BASE}/jobs/{JOB_ID}"),
         ("get", f"{BASE}/jobs/{JOB_ID}/results"),
         ("get", f"{BASE}/jobs/{JOB_ID}/export"),
+        ("get", f"{BASE}/jobs/{JOB_ID}/query.fasta"),
     ]:
         body = PAYLOAD if method == "post" else None
         response = client.request(method.upper(), path, json=body)
@@ -229,6 +230,7 @@ def test_a_submit_starts_a_job_and_records_it_as_partner_traffic(partner_env):
     assert body["status_url"] == f"{BASE}/jobs/{JOB_ID}"
     assert body["results_url"].endswith(f"{BASE}/jobs/{JOB_ID}/results")
     assert body["export_url"].endswith(f"{BASE}/jobs/{JOB_ID}/export")
+    assert body["query_url"] == f"{BASE}/jobs/{JOB_ID}/query.fasta"
     galaxy.submit_kmindex_query.assert_awaited_once()
     kwargs = record.await_args.kwargs
     assert (kwargs["source"], kwargs["partner_id"]) == ("partner", "example-partner")
@@ -573,3 +575,28 @@ def test_an_export_streams_with_its_sunset(partner_env, tmp_path, monkeypatch, f
         assert response.text.splitlines()[1].startswith("SRR1")
     else:
         assert response.content == path.read_bytes()
+
+
+def test_the_query_downloads_with_a_partner_key(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(
+        return_value={"query_fasta": PAYLOAD["sequence"]}
+    )
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 200
+    assert response.text == PAYLOAD["sequence"]
+    assert response.headers["content-type"].startswith("text/x-fasta")
+    assert f"logan-{JOB_ID}-query.fasta" in response.headers["content-disposition"]
+    assert response.headers["Sunset"] == sunset_header(SUNSET)
+    galaxy.get_kmindex_query.assert_awaited_once_with(JOB_ID)
+
+
+def test_the_query_of_an_unknown_job_is_a_404(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(side_effect=GalaxyJobNotFound("no job"))
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 404

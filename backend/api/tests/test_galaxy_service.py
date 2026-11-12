@@ -4820,3 +4820,78 @@ class TestExportFooter:
             "logan.query_fasta": ">q\nACGT\n",
         }
 
+
+class TestQueryEndpoint:
+    """GET /kmindex/jobs/{job_id}/query.fasta."""
+
+    JOB = "2f780abfeae3f54e"
+
+    @staticmethod
+    def _client(galaxy):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app.api.v1 import galaxy as galaxy_api
+        from app.core.dependencies import check_rate_limit
+
+        app = FastAPI()
+        app.include_router(galaxy_api.router, prefix="/galaxy")
+        app.dependency_overrides[check_rate_limit] = lambda: None
+        app.dependency_overrides[galaxy_api.get_galaxy_service] = lambda: galaxy
+        return TestClient(app)
+
+    @staticmethod
+    def _galaxy(**kwargs):
+        galaxy = MagicMock()
+        galaxy.is_available.return_value = True
+        galaxy.get_kmindex_query = AsyncMock(**kwargs)
+        return galaxy
+
+    def test_the_query_downloads_as_a_named_fasta(self):
+        fasta = f">{UNNAMED_QUERY}\nACGTACGTAC\n"
+        galaxy = self._galaxy(return_value={"query_fasta": fasta})
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 200
+        assert response.content == fasta.encode()
+        assert response.headers["content-type"].startswith("text/x-fasta")
+        assert response.headers["content-disposition"] == (
+            f'attachment; filename="logan-{self.JOB}-query.fasta"'
+        )
+        galaxy.get_kmindex_query.assert_awaited_once_with(self.JOB)
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            GalaxyJobNotFound("No Galaxy job"),
+            galaxy_service.KmindexQueryUnavailable("gone"),
+        ],
+    )
+    def test_no_job_or_no_query_is_a_404(self, error):
+        galaxy = self._galaxy(side_effect=error)
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 404
+        assert self.JOB in response.json()["detail"]
+
+    def test_galaxy_failing_is_a_502(self):
+        galaxy = self._galaxy(side_effect=RuntimeError("timed out"))
+
+        response = self._client(galaxy).get(
+            f"/galaxy/kmindex/jobs/{self.JOB}/query.fasta"
+        )
+
+        assert response.status_code == 502
+
+    def test_an_id_that_is_not_a_galaxy_id_is_refused(self):
+        galaxy = self._galaxy(side_effect=AssertionError("asked Galaxy"))
+
+        response = self._client(galaxy).get('/galaxy/kmindex/jobs/x"y/query.fasta')
+
+        assert response.status_code == 422

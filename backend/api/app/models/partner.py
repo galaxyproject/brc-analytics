@@ -14,6 +14,8 @@ class PartnerJobCreated(BaseModel):
     status_url: str
     results_url: str
     export_url: str
+    # The query as it went to Galaxy, for reproducing the search.
+    query_url: str
 
 
 class PartnerJobStatus(BaseModel):
