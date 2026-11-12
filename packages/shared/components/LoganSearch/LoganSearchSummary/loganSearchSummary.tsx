@@ -141,7 +141,7 @@ function describeIndexes(
 }
 
 /**
- * The match set as a file.
+ * The match set as a file, and the query that found it.
  *
  * The file is every run the query matched, which is what this strip is about;
  * the table below is an explicit window onto the top of that set. Hanging the
@@ -150,30 +150,49 @@ function describeIndexes(
  * @param props.cohort - Cohort summary, for how much of the file the mirror
  * could describe.
  * @param props.results - Results payload, for the export fields and the job
- * id the endpoint is keyed on.
- * @returns The download block, or null when there is no file to offer.
+ * id the endpoints are keyed on.
+ * @returns The download block.
  */
-function SummaryExport({
-  cohort,
-  results,
-}: SummaryExportProps): JSX.Element | null {
+function SummaryExport({ cohort, results }: SummaryExportProps): JSX.Element {
   const rows = results.export_rows ?? 0;
+  const jobUrl = `${API_BASE_URL}/galaxy/kmindex/jobs/${results.job_id}`;
+  // The query is the job's input rather than part of the export, so it is
+  // offered whether or not there is a file: a set too big to export or a
+  // swept one is when it is most worth having. The parquet's footer carries
+  // it too, but the TSV has nowhere to put it.
+  const queryButton = (
+    <Button
+      aria-label="Download the query this search ran, as FASTA"
+      component="a"
+      download
+      href={`${jobUrl}/query.fasta`}
+      size="small"
+      startIcon={<Download />}
+      variant="outlined"
+    >
+      Query (FASTA)
+    </Button>
+  );
 
   if (results.export_status !== "available" || rows <= 0) {
     // No file, and for most reasons -- mirror down, export directory
     // unconfigured, file swept -- nothing the reader could do about it, so say
     // nothing rather than explain an absence. Too many matches is the
     // exception: that one a narrower query fixes.
-    if (results.export_status !== "too_large") return null;
     return (
-      <Typography color="textSecondary" component="div" variant="caption">
-        Too many matched runs to prepare a download of the full set. A higher
-        minimum shared k-mer fraction, or fewer indexes, brings one back.
-      </Typography>
+      <>
+        {results.export_status === "too_large" && (
+          <Typography color="textSecondary" component="div" variant="caption">
+            Too many matched runs to prepare a download of the full set. A
+            higher minimum shared k-mer fraction, or fewer indexes, brings one
+            back.
+          </Typography>
+        )}
+        <ControlRow>{queryButton}</ControlRow>
+      </>
     );
   }
 
-  const jobUrl = `${API_BASE_URL}/galaxy/kmindex/jobs/${results.job_id}`;
   const exportUrl = `${jobUrl}/export`;
   // The parquet's real size, so it goes on the button unqualified. A backend
   // that reports availability without a size gets a bare "Parquet" rather
@@ -217,19 +236,7 @@ function SummaryExport({
         >
           Parquet{parquetSize}
         </Button>
-        {/* The other half of reproducing the file: the parquet's footer
-            carries the query too, but the TSV has nowhere to put it. */}
-        <Button
-          aria-label="Download the query this search ran, as FASTA"
-          component="a"
-          download
-          href={`${jobUrl}/query.fasta`}
-          size="small"
-          startIcon={<Download />}
-          variant="outlined"
-        >
-          Query (FASTA)
-        </Button>
+        {queryButton}
       </ControlRow>
       <Typography color="textSecondary" component="div" variant="caption">
         {rows > SPREADSHEET_ROW_LIMIT ? (

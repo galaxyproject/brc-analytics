@@ -284,7 +284,8 @@ describe("LoganSearchSummary", () => {
     });
 
     expect(container.textContent).toContain(`Job ${JOB_ID}`);
-    expect(container.textContent).not.toContain("Query");
+    // The query download's own label aside, which is there either way.
+    expect(container.textContent).not.toMatch(/Query (?!\(FASTA\))/);
   });
 
   test("links to the assistant with the job id", () => {
@@ -555,6 +556,31 @@ describe("the summary's export", () => {
     expect(query.hasAttribute("download")).toBe(true);
     expect(query.textContent).toBe("Query (FASTA)");
   });
+
+  test.each(["too_large", "unavailable", undefined])(
+    "offers the query when the export is %s",
+    (status) => {
+      // The query is the job's input, not part of the export: a set too big
+      // to export, a swept file and a deployment with exports off are all
+      // still one finished search with a query to hand back.
+      renderSummary({
+        ...BASE_RESULTS,
+        export_bytes: null,
+        export_rows: null,
+        export_status: status,
+      });
+
+      const query = screen.getByRole("link", {
+        name: "Download the query this search ran, as FASTA",
+      });
+      expect(query.getAttribute("href")).toBe(
+        `${API_BASE_URL}/galaxy/kmindex/jobs/${JOB_ID}/query.fasta`
+      );
+      expect(screen.queryAllByRole("link", { name: /^Download all/ })).toEqual(
+        []
+      );
+    }
+  );
 
   test("states the parquet size and marks the TSV size as derived", () => {
     const { container } = renderSummary(WITH_EXPORT);
