@@ -53,6 +53,7 @@ from app.services.galaxy_service import (
     _default_order,
     _submitted_index_names,
     _submitted_threshold,
+    _submitted_zvalue,
 )
 from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
@@ -2744,6 +2745,27 @@ class TestSubmittedThreshold:
         # A threshold outside 0..1 is not one kmindex could have applied, so
         # it is treated as unreadable rather than trusted.
         assert _submitted_threshold({"threshold": "1.5"}) is None
+
+
+class TestSubmittedZvalue:
+    """The z-value comes back off the job the way the threshold does."""
+
+    def test_reads_a_json_encoded_int(self):
+        assert _submitted_zvalue({"zvalue": "5"}) == 5
+
+    def test_reads_a_bare_int(self):
+        assert _submitted_zvalue({"zvalue": 3}) == 3
+
+    def test_missing_or_garbage_is_none(self):
+        assert _submitted_zvalue(None) is None
+        assert _submitted_zvalue({}) is None
+        assert _submitted_zvalue({"zvalue": "high"}) is None
+
+    def test_a_boolean_is_not_a_zvalue(self):
+        # int(True) is 1, which would put a z-value in the footer the job
+        # never ran at.
+        assert _submitted_zvalue({"zvalue": "true"}) is None
+        assert _submitted_zvalue({"zvalue": True}) is None
 
 
 class TestFalsePositiveCorrection:
