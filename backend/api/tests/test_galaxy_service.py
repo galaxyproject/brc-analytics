@@ -4565,15 +4565,34 @@ def _kmindex_job(fasta_id="query1", copied_from=None, **overrides):
     return job
 
 
+class _Displayed:
+    """A dataset display response, read whole or streamed in chunks."""
+
+    def __init__(self, status_code, body, chunk=1024):
+        self.status_code = status_code
+        self.content = body
+        self.text = body.decode("utf-8", "replace")
+        self.chunks_read = 0
+        self._chunk = chunk
+
+    def iter_content(self, chunk_size=1):
+        for start in range(0, len(self.content), self._chunk):
+            self.chunks_read += 1
+            yield self.content[start : start + self._chunk]
+
+    def close(self):
+        pass
+
+
 def _display(contents):
     """make_get_request, answering a dataset display from `contents` by id."""
 
-    def _get(url, params=None):
+    def _get(url, params=None, **kwargs):
         dataset_id = url.rsplit("/", 2)[-2]
         if dataset_id not in contents:
-            return MagicMock(status_code=404, text="No such dataset", content=b"")
-        body = contents[dataset_id].encode()
-        return MagicMock(status_code=200, text=body.decode(), content=body)
+            return _Displayed(404, b"No such dataset")
+        body = contents[dataset_id]
+        return _Displayed(200, body if isinstance(body, bytes) else body.encode())
 
     return MagicMock(side_effect=_get)
 
@@ -4712,6 +4731,51 @@ class TestKmindexQuery:
     async def test_a_purged_query_dataset_is_unavailable(self, wired):
         service, _ = wired
         service.gi.make_get_request = _display({})
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+    @pytest.mark.asyncio
+    async def test_an_oversized_query_is_unavailable_without_reading_it_all(
+        self, wired
+    ):
+        # Any kmindex job the credential can read is served, not only ones
+        # submitted through our 5,000-base form, so the read has to be bounded.
+        service, _ = wired
+        responses = []
+        display = _display({"query1": b">big\n" + b"A" * (1 << 20)})
+
+        def _get(*args, **kwargs):
+            responses.append(display(*args, **kwargs))
+            return responses[-1]
+
+        service.gi.make_get_request = MagicMock(side_effect=_get)
+
+        with pytest.raises(galaxy_service.KmindexQueryUnavailable):
+            await service.get_kmindex_query("job1")
+
+        assert service.gi.make_get_request.call_args.kwargs["stream"] is True
+        limit = galaxy_service.KMINDEX_QUERY_MAX_BYTES
+        assert responses[0].chunks_read <= limit // 1024 + 1
+        # Nothing worth a month in Redis came of it.
+        assert not service.cache.set.await_count
+
+    @pytest.mark.asyncio
+    async def test_a_query_just_under_the_cap_is_served(self, wired):
+        service, _ = wired
+        body = ">q\n" + "A" * (galaxy_service.KMINDEX_QUERY_MAX_BYTES - 4) + "\n"
+        service.gi.make_get_request = _display({"query1": body})
+
+        query = await service.get_kmindex_query("job1")
+
+        assert query["query_fasta"] == body
+
+    @pytest.mark.asyncio
+    async def test_a_query_that_is_not_text_is_unavailable(self, wired):
+        # kmindex_query accepts gzip'd FASTA, which isn't a query we can hand
+        # back as text; that is "no query to download", not Galaxy failing.
+        service, _ = wired
+        service.gi.make_get_request = _display({"query1": b"\x1f\x8b\x08\xff"})
 
         with pytest.raises(galaxy_service.KmindexQueryUnavailable):
             await service.get_kmindex_query("job1")

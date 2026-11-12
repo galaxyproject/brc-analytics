@@ -468,6 +468,10 @@ KMINDEX_QUERY_INPUT = "fastx"
 # job, and a job's inputs and parameters never change once it exists -- a
 # month is only there so Redis eventually lets go.
 KMINDEX_QUERY_PREFIX = "galaxy:kmindex_query:v1"
+# The most of a query dataset we read back. Our form caps a query at 5,000
+# bases, but any kmindex job the caller's credential can read is served, and
+# the record is cached for a month and written into the export's footer.
+KMINDEX_QUERY_MAX_BYTES = 64 * 1024
 
 # The footer keys a search's provenance is written under in its export parquet.
 # Namespaced so they can't collide with whatever a reader's own tools add, and
@@ -1446,13 +1450,37 @@ class GalaxyService:
         @param dataset_id: the shard's dataset.
         @returns: the raw content.
         """
+        return self._fetch_dataset(dataset_id)
+
+    def _fetch_dataset(self, dataset_id: str, limit: Optional[int] = None) -> bytes:
+        """
+        A dataset's raw content, in one display GET.
+
+        @param dataset_id: the dataset.
+        @param limit: when set, stream the body and stop once it passes this
+            many bytes, so a caller can tell an oversized dataset from one at
+            the limit without ever holding the rest of it.
+        @returns: the content; with a limit, at most one chunk past it.
+        @raises ShardFetchError: Galaxy answered with anything but 200.
+        """
         r = self.gi.make_get_request(
             f"{self.gi.url}/datasets/{dataset_id}/display",
             params={"preview": "false"},
+            **({"stream": True} if limit is not None else {}),
         )
-        if r.status_code != 200:
-            raise ShardFetchError(r.status_code, f"{dataset_id}: {r.text[:200]}")
-        return r.content
+        try:
+            if r.status_code != 200:
+                raise ShardFetchError(r.status_code, f"{dataset_id}: {r.text[:200]}")
+            if limit is None:
+                return r.content
+            body = bytearray()
+            for chunk in r.iter_content(chunk_size=8192):
+                body.extend(chunk)
+                if len(body) > limit:
+                    break
+            return bytes(body)
+        finally:
+            r.close()
 
     async def _download_shard(
         self, dataset_id: str, semaphore: asyncio.Semaphore
@@ -1857,27 +1885,32 @@ class GalaxyService:
         """
         The query dataset's content, byte for byte.
 
-        One GET, like _fetch_shard: the dataset was ok before the job could
-        run, so bioblend's state poll buys nothing.
+        One GET, like a shard: the dataset was ok before the job could run,
+        so bioblend's state poll buys nothing.
 
         @param dataset_id: the job's fastx input.
         @returns: the FASTA as Galaxy holds it.
-        @raises KmindexQueryUnavailable: Galaxy refused it as gone or not ours.
+        @raises KmindexQueryUnavailable: Galaxy refused it as gone or not ours,
+            or it is too big or not text (a gzip'd FASTA, say) to hand back.
         """
-        r = self.gi.make_get_request(
-            f"{self.gi.url}/datasets/{dataset_id}/display",
-            params={"preview": "false"},
-        )
-        if r.status_code in (400, 403, 404):
+        try:
+            content = self._fetch_dataset(dataset_id, limit=KMINDEX_QUERY_MAX_BYTES)
+        except ShardFetchError as e:
+            if e.status in (400, 403, 404):
+                raise KmindexQueryUnavailable(
+                    f"Query dataset {dataset_id} is gone: {e}"
+                ) from e
+            raise
+        if len(content) > KMINDEX_QUERY_MAX_BYTES:
             raise KmindexQueryUnavailable(
-                f"Query dataset {dataset_id} is gone: {r.text[:200]}"
+                f"Query dataset {dataset_id} is over {KMINDEX_QUERY_MAX_BYTES} bytes"
             )
-        if r.status_code != 200:
-            raise Exception(
-                f"Reading query dataset {dataset_id} failed: "
-                f"error {r.status_code}: {r.text[:200]}"
-            )
-        return r.content.decode("utf-8")
+        try:
+            return content.decode("utf-8")
+        except UnicodeDecodeError as e:
+            raise KmindexQueryUnavailable(
+                f"Query dataset {dataset_id} is not UTF-8 text"
+            ) from e
 
     async def _resolve_source(
         self, job_id: str
