@@ -51,7 +51,7 @@ from app.models.galaxy import (
 from app.services import kmindex_filters
 from app.services.kmindex_filters import KmindexFilters
 from app.services.kmindex_indexes import FALLBACK_INDEX_NAMES
-from app.services.logan_stats import correct_score
+from app.services.logan_stats import KMER_SIZE, correct_score
 from app.services.sra_mirror import (
     CAPABILITY_ANNOTATION,
     CAPABILITY_BIOSAMPLE,
@@ -91,6 +91,10 @@ class GalaxyJobAggregating(Exception):
 
 class GalaxyJobNotFound(Exception):
     """Galaxy has no job under this id (or could not decode it as one)."""
+
+
+class KmindexQueryUnavailable(Exception):
+    """The job exists, but it isn't a kmindex search or its query is gone."""
 
 
 class KmindexFiltersUnavailable(Exception):
@@ -456,6 +460,20 @@ KMINDEX_COPY_OF_PREFIX = "galaxy:kmindex_copy_of:v2"
 # Galaxy's job cache also requires the input datasets' names to match, so every
 # query goes in under this one rather than whatever filename the caller sent.
 KMINDEX_QUERY_DATASET_NAME = "query.fasta"
+# The kmindex_query input the FASTA goes in as.
+KMINDEX_QUERY_INPUT = "fastx"
+
+# What a search asked: its FASTA as Galaxy holds it and the parameters it ran
+# at. We don't keep query sequences ourselves, so this is read back from the
+# job, and a job's inputs and parameters never change once it exists -- a
+# month is only there so Redis eventually lets go.
+KMINDEX_QUERY_PREFIX = "galaxy:kmindex_query:v1"
+
+# The footer keys a search's provenance is written under in its export parquet.
+# Namespaced so they can't collide with whatever a reader's own tools add, and
+# versioned so a reader can tell a later layout from this one.
+EXPORT_METADATA_VERSION = "1"
+EXPORT_METADATA_PREFIX = "logan."
 
 # Cold merges are capped per lane. There are two lanes so that partner traffic,
 # which searches every index and so merges thousands of shards a job, never parks
@@ -833,6 +851,62 @@ def _submitted_threshold(job_params: Optional[dict]) -> Optional[float]:
     except (TypeError, ValueError):
         return None
     return value if 0.0 <= value <= 1.0 else None
+
+
+def _submitted_zvalue(job_params: Optional[dict]) -> Optional[int]:
+    """The z-value a job was run at, or None when its parameters don't say."""
+    if not isinstance(job_params, dict):
+        return None
+    raw = _decode_tool_param(job_params.get("zvalue"))
+    if isinstance(raw, bool):
+        return None
+    try:
+        return int(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+
+
+def _search_date(create_time: object) -> Optional[str]:
+    """When Galaxy created the job, as ISO 8601 UTC; None if it didn't say."""
+    if not isinstance(create_time, str) or not create_time:
+        return None
+    try:
+        return _galaxy_time(create_time).isoformat()
+    except ValueError:
+        return None
+
+
+def export_metadata(query: dict) -> Dict[str, str]:
+    """
+    A search's provenance as parquet footer key-values.
+
+    Everything needed to run the search again, and nothing that names this
+    particular run: the job id is already in the download's filename, means
+    nothing off the Galaxy that ran it, and opens the search's results page
+    and assistant -- not something a file that gets passed around should carry.
+
+    @param query: a record from GalaxyService.get_kmindex_query.
+    @returns: logan.* keys to string values; a value Galaxy didn't give us is
+        left out rather than written as "None".
+    """
+    indexes = query.get("indexes")
+    values = {
+        "galaxy_url": query.get("galaxy_url"),
+        "indexes": json.dumps(indexes) if indexes is not None else None,
+        "kmer_size": query.get("kmer_size"),
+        "metadata_version": EXPORT_METADATA_VERSION,
+        "query_fasta": query.get("query_fasta"),
+        "search_date": query.get("search_date"),
+        "threshold": query.get("threshold"),
+        "tool_id": query.get("tool_id"),
+        "tool_version": query.get("tool_version"),
+        "zvalue": query.get("zvalue"),
+    }
+    return {
+        f"{EXPORT_METADATA_PREFIX}{key}": str(value)
+        for key, value in values.items()
+        if value is not None
+    }
 
 
 def _index_for_shard(shard_name: str, index_names: List[str]) -> Optional[str]:
@@ -1709,6 +1783,102 @@ class GalaxyService:
         """
         return (await self._resolve_source(job_id))[0]
 
+    async def get_kmindex_query(self, job_id: str) -> dict:
+        """
+        What a search asked: its FASTA as Galaxy holds it, and its parameters.
+
+        A job-cache copy answers with its original's, the job its results and
+        export are built from; the query is the same either way, since that is
+        what made it a copy. Never aggregates, so the most this costs is a
+        status read, a show_job and a download of at most a few kilobytes.
+
+        @param job_id: the kmindex job.
+        @returns: query_fasta, indexes, threshold, zvalue, kmer_size, tool_id,
+            tool_version, galaxy_url and search_date.
+        @raises GalaxyJobNotFound: Galaxy has no such job.
+        @raises KmindexQueryUnavailable: it isn't a kmindex search, or its
+            query dataset is gone.
+        """
+        if not self.is_available():
+            raise Exception("Galaxy service not available")
+        key = self._query_cache_key(job_id)
+        cached = await self.cache.get(key)
+        if cached:
+            return cached
+        source = await self.source_job_id(job_id)
+        query = await self._kmindex_query_record(source)
+        if source != job_id:
+            await self.cache.set(key, query, CacheTTL.THIRTY_DAYS)
+        return query
+
+    def _query_cache_key(self, job_id: str) -> str:
+        return self.cache.make_key(
+            KMINDEX_QUERY_PREFIX, {"job_id": job_id, "url": self.target.api_url}
+        )
+
+    async def _kmindex_query_record(self, job_id: str) -> dict:
+        """get_kmindex_query for exactly this job, copy or not."""
+        key = self._query_cache_key(job_id)
+        cached = await self.cache.get(key)
+        if cached:
+            return cached
+        try:
+            # Not full_details: the plain job dict already carries tool_id,
+            # tool_version, params, inputs and create_time.
+            job = await asyncio.to_thread(self.gi.jobs.show_job, job_id)
+        except BioblendConnectionError as e:
+            if is_missing_job_error(e):
+                raise GalaxyJobNotFound(f"No Galaxy job {job_id}") from e
+            raise
+        tool_id = job.get("tool_id") if isinstance(job, dict) else None
+        if not isinstance(tool_id, str) or "kmindex_query" not in tool_id:
+            raise KmindexQueryUnavailable(f"Job {job_id} is not a Logan search")
+        source = (job.get("inputs") or {}).get(KMINDEX_QUERY_INPUT)
+        dataset_id = source.get("id") if isinstance(source, dict) else None
+        if not dataset_id:
+            raise KmindexQueryUnavailable(f"Job {job_id} has no query input")
+        params = job.get("params")
+        query = {
+            # The one place this reads which Galaxy it is talking to.
+            "galaxy_url": self.target.base_url,
+            "indexes": _submitted_index_names(params),
+            "kmer_size": KMER_SIZE,
+            "query_fasta": await asyncio.to_thread(self._fetch_query, dataset_id),
+            "search_date": _search_date(job.get("create_time")),
+            "threshold": _submitted_threshold(params),
+            "tool_id": tool_id,
+            "tool_version": job.get("tool_version"),
+            "zvalue": _submitted_zvalue(params),
+        }
+        await self.cache.set(key, query, CacheTTL.THIRTY_DAYS)
+        return query
+
+    def _fetch_query(self, dataset_id: str) -> str:
+        """
+        The query dataset's content, byte for byte.
+
+        One GET, like _fetch_shard: the dataset was ok before the job could
+        run, so bioblend's state poll buys nothing.
+
+        @param dataset_id: the job's fastx input.
+        @returns: the FASTA as Galaxy holds it.
+        @raises KmindexQueryUnavailable: Galaxy refused it as gone or not ours.
+        """
+        r = self.gi.make_get_request(
+            f"{self.gi.url}/datasets/{dataset_id}/display",
+            params={"preview": "false"},
+        )
+        if r.status_code in (400, 403, 404):
+            raise KmindexQueryUnavailable(
+                f"Query dataset {dataset_id} is gone: {r.text[:200]}"
+            )
+        if r.status_code != 200:
+            raise Exception(
+                f"Reading query dataset {dataset_id} failed: "
+                f"error {r.status_code}: {r.text[:200]}"
+            )
+        return r.content.decode("utf-8")
+
     async def _resolve_source(
         self, job_id: str
     ) -> Tuple[str, Optional[GalaxyJobStatus]]:
@@ -2039,8 +2209,35 @@ class GalaxyService:
             return None, True
         return geography, False
 
+    def _exports_enabled(self) -> bool:
+        """Whether aggregation writes an export at all on this deployment."""
+        return bool(self.settings.KMINDEX_EXPORT_DIR) and self._mirror_can(
+            CAPABILITY_EXPORT
+        )
+
+    async def _export_metadata(self, job_id: str) -> Optional[Dict[str, str]]:
+        """
+        The search's provenance for its export's footer, or None.
+
+        Additive like the export itself: a query Galaxy won't hand back costs
+        the file its footer, not the file.
+
+        @param job_id: the job being aggregated, never a copy.
+        @returns: logan.* footer key-values, or None.
+        """
+        try:
+            return export_metadata(await self._kmindex_query_record(job_id))
+        except Exception as e:
+            logger.warning(
+                f"kmindex job {job_id}: export goes out without its query: {e}"
+            )
+            return None
+
     async def _export_for(
-        self, job_id: str, hits: List[dict]
+        self,
+        job_id: str,
+        hits: List[dict],
+        metadata: Optional[Dict[str, str]] = None,
     ) -> Tuple[Optional[dict], bool]:
         """
         Materialize the complete hit set, enriched, so it can be downloaded.
@@ -2059,16 +2256,20 @@ class GalaxyService:
 
         @param job_id: the job being aggregated; names the file.
         @param hits: every hit, before the cap, in ranked order.
+        @param metadata: footer key-values to write with it, or None.
         @returns: the export record to store on the aggregate, and whether the
             write failed.
         """
-        export_dir = self.settings.KMINDEX_EXPORT_DIR
-        if not export_dir or not self._mirror_can(CAPABILITY_EXPORT):
+        if not self._exports_enabled():
             return None, False
 
         try:
             record = await asyncio.to_thread(
-                self.sra_mirror.export_hits, job_id, hits, export_dir
+                self.sra_mirror.export_hits,
+                job_id,
+                hits,
+                self.settings.KMINDEX_EXPORT_DIR,
+                metadata=metadata,
             )
         except Exception as e:
             logger.warning(f"kmindex job {job_id}: export materialization failed: {e}")
@@ -2321,6 +2522,12 @@ class GalaxyService:
         params = await self._job_params(job_id, status.params)
         submitted_indexes = _submitted_index_names(params)
         threshold = _submitted_threshold(params)
+        # The query and parameters the export's footer carries, up front for
+        # the same reason. Cached for a month, so a re-aggregation or a copy's
+        # first read doesn't ask Galaxy again.
+        footer = (
+            await self._export_metadata(job_id) if self._exports_enabled() else None
+        )
 
         merged_id = _merged_output_id(status.outputs)
         if merged_id:
@@ -2370,7 +2577,7 @@ class GalaxyService:
 
         # Written from the same list, in the same window, for the same reason:
         # the capped list below has no metadata on it and is 4% of this one.
-        export, export_failed = await self._export_for(job_id, hits)
+        export, export_failed = await self._export_for(job_id, hits, footer)
 
         truncated = total_matches > KMINDEX_MAX_HITS
         capped = hits
