@@ -57,7 +57,7 @@ def snapshot_bytes(gene_snapshot_path):
 
 def write_pin(path, content, **changes):
     pin = {
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": "temp-GCF_000002765.6-2026-11-04T082159Z",
         "url": URL,
         "sha256": hashlib.sha256(content).hexdigest(),
         "size": len(content),
@@ -94,11 +94,11 @@ def test_pinned_snapshot_is_downloaded_and_served(tmp_path, store, snapshot_byte
     assert service.health() == {
         "status": "ready",
         "source": "pinned",
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": "temp-GCF_000002765.6-2026-11-04T082159Z",
     }
     assert store.requests == [URL]
     assert os.listdir(tmp_path / "genes") == [
-        "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
+        "temp-GCF_000002765.6-2026-11-04T082159Z.duckdb"
     ]
     response = make_client(service).get(f"/api/v1/genes/{AMA1}")
     assert response.status_code == 200

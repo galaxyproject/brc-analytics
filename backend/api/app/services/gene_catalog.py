@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 # The snapshot schema this service reads (build_gene_snapshot's
 # SCHEMA_VERSION); a file of another version is reported unavailable.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # The order aliases are listed in on a gene.
 _ALIAS_TYPE_ORDER = (
@@ -92,7 +92,10 @@ _LOCATION = 'struct_pack(seq_name, start, "end", strand) AS location'
 
 _GENE_SQL = """
 SELECT g.locus_tag, g.name, g.symbol, g.biotype, g.assembly_accession,
-       a.ucsc_browser_url,
+       -- Only when UCSC's browser has the gene's sequence, so the location
+       -- isn't linked to a UCSC page that can't show it.
+       CASE WHEN u.seq_name IS NOT NULL THEN a.ucsc_browser_url END
+           AS ucsc_browser_url,
        struct_pack(
            name := a.organism_name,
            species_taxonomy_id := a.species_taxonomy_id,
@@ -106,6 +109,8 @@ SELECT g.locus_tag, g.name, g.symbol, g.biotype, g.assembly_accession,
        ) AS provenance
 FROM gene g
 JOIN assembly a ON a.accession = g.assembly_accession
+LEFT JOIN ucsc_sequence u
+    ON u.assembly_accession = g.assembly_accession AND u.seq_name = g.seq_name
 JOIN annotation_set_version v ON v.asv_id = g.asv_id
 JOIN annotation_file_version f ON f.sha256 = v.publisher_file_sha256
 WHERE g.gene_uid = ? AND g.present
