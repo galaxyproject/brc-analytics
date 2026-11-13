@@ -16,6 +16,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import get_settings
+from app.core.session_signing import browser_cookie_name, sign_browser_id
 from app.models.assistant import (
     AnalysisSchema,
     ChatResponse,
@@ -25,6 +26,8 @@ from app.models.assistant import (
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
+# The browser id cookie a bound test client presents.
+TEST_BROWSER = "test-browser-id"
 
 # Four of 3D7's genes, exported from a snapshot as text so the fixture can be
 # reviewed: AMA1 (PF3D7_1133400), PF3D7_0105400 with two transcripts and old
@@ -115,6 +118,15 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     fake_agent.session_service.get_session = AsyncMock(
         return_value=SessionState(session_id="sess-abc")
     )
+    fake_agent.session_service.save_session = AsyncMock()
+    # sess-abc is bound to TEST_BROWSER: a client that calls bind_browser()
+    # holds it.
+    bindings = FakeBrowserBindings()
+    bindings.bindings.add(("sess-abc", sign_browser_id(TEST_BROWSER)))
+    fake_agent.session_service.bindings = bindings.bindings
+    fake_agent.session_service.bind_browser = bindings.bind_browser
+    fake_agent.session_service.is_browser_bound = bindings.is_browser_bound
+    fake_agent.session_service.unbind_browser = bindings.unbind_browser
     fake_agent.session_service.delete_session = AsyncMock(return_value=True)
     fake_agent.compute_handoff = MagicMock(return_value=(False, None))
     # restore_session reconciles persisted state before handoff and re-derives
@@ -129,12 +141,17 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
 
     # FastAPI binds Depends() to the original function reference at import
     # time, so we override via app.dependency_overrides rather than monkeypatching.
-    from app.core.dependencies import check_rate_limit, get_assistant_agent
+    from app.core.dependencies import (
+        check_rate_limit,
+        get_assistant_agent,
+        get_session_service,
+    )
 
     async def _no_rate_limit():
         return {"limit": 100, "remaining": 100, "reset": 60}
 
     app.dependency_overrides[get_assistant_agent] = lambda: fake_agent
+    app.dependency_overrides[get_session_service] = lambda: fake_agent.session_service
     app.dependency_overrides[check_rate_limit] = _no_rate_limit
 
     yield app
@@ -143,6 +160,39 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
 @pytest.fixture()
 def client(app_with_stubbed_agent):
     return TestClient(app_with_stubbed_agent)
+
+
+class FakeBrowserBindings:
+    """In-memory stand-in for the session service's browser bindings."""
+
+    def __init__(self):
+        self.bindings: set[tuple[str, str]] = set()
+
+    async def bind_browser(self, session_id: str, binding: str) -> None:
+        self.bindings.add((session_id, binding))
+
+    async def is_browser_bound(self, session_id: str, binding: str) -> bool:
+        return (session_id, binding) in self.bindings
+
+    async def unbind_browser(self, binding: str) -> bool:
+        held = {pair for pair in self.bindings if pair[1] == binding}
+        self.bindings -= held
+        return bool(held)
+
+
+def bind_browser(client: TestClient, session_service=None, session_id=None) -> None:
+    """Bind session_id, if given, to the test client's browser.
+
+    A client that already has a browser id from a response keeps it; one
+    without is given TEST_BROWSER.
+    """
+    name = browser_cookie_name()
+    browser_id = client.cookies.get(name)
+    if browser_id is None:
+        browser_id = TEST_BROWSER
+        client.cookies.set(name, browser_id)
+    if session_id is not None:
+        session_service.bindings.add((session_id, sign_browser_id(browser_id)))
 
 
 # ---------- Catalog fixtures shared by the MCP and assistant CatalogData tests ----------

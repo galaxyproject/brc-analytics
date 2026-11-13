@@ -1,10 +1,10 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_assistant_agent, get_current_user_db
-from app.core.session_signing import set_session_cookie
+from app.core.session_signing import bind_session
 from app.db.crud import (
     delete_saved_analysis,
     get_saved_analysis,
@@ -63,6 +63,7 @@ async def get_saved_analysis_detail(
 @router.post("/{saved_analysis_id}/open", response_model=SavedAnalysisRestoreResponse)
 async def open_saved_analysis(
     saved_analysis_id: str,
+    request: Request,
     response: Response,
     current_user_db: User = Depends(get_current_user_db),
     agent=Depends(get_assistant_agent),
@@ -109,8 +110,11 @@ async def open_saved_analysis(
         restored_state.saved_analysis_id = durable_id
         await agent.session_service.save_session(restored_state)
     # Bind the session to this browser so the frontend can hydrate computed
-    # handoff state from GET /assistant/session/{id}.
-    set_session_cookie(response, restored_state.session_id)
+    # handoff state from GET /assistant/session/{id}. Browsers it was already
+    # open in stay bound.
+    await bind_session(
+        agent.session_service, request.cookies, response, restored_state.session_id
+    )
     return SavedAnalysisRestoreResponse(session_id=restored_state.session_id)
 
 
