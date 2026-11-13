@@ -58,7 +58,7 @@ const TOOLS_LEARN_URL = "/learn/associated-tools";
 /** Associated tools in alphabetical order, opened in a new tab; the last entry is the learn page. */
 const TOOLS_MENU_ITEMS: NavLinkItem[] = [
   {
-    label: "Bushwacker",
+    label: "Bushwhacker",
     target: ANCHOR_TARGET.BLANK,
     url: "https://veg.github.io/bushwacker/",
   },

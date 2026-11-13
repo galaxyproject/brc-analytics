@@ -74,7 +74,7 @@ export const CARDS: LearnCard[] = [
     href: ROUTES.LOGAN_SEARCH_LEARN,
     isLoganSearchGated: true,
     secondaryText:
-      "Find the SRA runs a DNA sequence occurs in, with Logan's assembled contigs: inputs, scores, limits and export.",
+      "Find the SRA runs a DNA sequence occurs in, with Logan's assembled contigs: inputs, limits, scores and results.",
     title: "Logan Search",
   },
   {
@@ -95,7 +95,7 @@ export const CARDS: LearnCard[] = [
     StartIcon: InventoryIcon,
     href: "/learn/associated-tools",
     secondaryText:
-      "Sequence search, selection analysis, recombination scanning, and transmission surveillance tools supported by BRC Analytics.",
+      "Sequence search, selection analysis, recombination scanning, transmission surveillance, and phylogenetic inference tools supported by BRC Analytics.",
     title: "Associated Tools",
   },
 ];
