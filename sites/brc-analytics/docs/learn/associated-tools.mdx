@@ -1,0 +1,74 @@
+---
+breadcrumbs:
+  - path: "/learn"
+    text: "Learn"
+  - path: ""
+    text: "Associated Tools"
+contentType: "ARTICLE"
+description: "Standalone tools in the BRC Analytics ecosystem: sequence search, selection analysis, recombination scanning, transmission surveillance, and phylogenetic inference."
+enableOutline: true
+title: "Associated Tools"
+---
+
+BRC Analytics supports a family of standalone tools alongside the data and
+workflows in this catalog. They complement the hosted analysis environment:
+every one is web-based, and most run entirely in your browser via WebAssembly,
+so your data never leaves your device. They're also available as tools on
+usegalaxy.org for users who prefer that, or as local installs for batch and
+scripted use.
+
+## The tools
+
+| Tool                 | What it does                                                                                                                                                           | Where it runs                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **PrimAeon**         | Paste a codon alignment, get a selection report (site-level selection, co-selection, mutational scanning, phenotype association) in seconds                            | [primaeon.org](https://primaeon.org), entirely in your browser                                |
+| **HyPhy 3 / WALRUS** | End-to-end workbench: alignment QA and frameshift repair, codon-aware alignment, tree inference, recombination routing, and selection forensics (BUSTED, FEL, MEME, …) | [veg.github.io/hyphy-3](https://veg.github.io/hyphy-3/), entirely in your browser             |
+| **RhizAeon**         | Scans alignments for recombination: breakpoint placement and mosaic structure                                                                                          | [veg.github.io/rhizaeon-code](https://veg.github.io/rhizaeon-code/), entirely in your browser |
+| **TRACE-5.0**        | Molecular transmission surveillance: infers transmission clusters and their growth from sequences and sampling dates                                                   | [veg.github.io/trace-5.0](https://veg.github.io/trace-5.0/), entirely in your browser         |
+| **Bushwacker**       | Infers phylogenetic graphs from first principles using minimum-description-length reasoning                                                                            | [veg.github.io/bushwacker](https://veg.github.io/bushwacker/), entirely in your browser       |
+| **Logan Search**     | Search public sequencing archives by genetic content — find datasets containing your sequence rather than by metadata                                                  | [logan-search.org](https://logan-search.org)                                                  |
+
+## Choosing a tool
+
+A few rules of thumb:
+
+- **Selection analysis on a codon alignment**: start with
+  [PrimAeon](https://primaeon.org) for a fast answer in the browser. Use
+  [HyPhy 3 / WALRUS](https://veg.github.io/hyphy-3/) when you need the exact
+  likelihood methods, the full pipeline from unaligned sequences, or an
+  audit trail a surrogate report cannot provide. See
+  [PrimAeon and the HyphAeon ecosystem](/learn/primaeon) for a detailed guide
+  to choosing between PrimAeon, the `hyphaeon`/`chronaeon` Python packages,
+  and classic HyPhy.
+- **Recombination**: if your alignment may be recombinant, run it through
+  [RhizAeon](https://veg.github.io/rhizaeon-code/) before selection analysis —
+  recombination breaks single-tree assumptions.
+- **Transmission and outbreaks**: [TRACE-5.0](https://veg.github.io/trace-5.0/)
+  reconstructs transmission clusters; for dating and phylodynamics questions
+  see the ChronAeon section of the [PrimAeon guide](/learn/primaeon).
+- **Phylogeny from scratch**: [Bushwacker](https://veg.github.io/bushwacker/)
+  builds phylogenetic graphs with an information-theoretic
+  (minimum-description-length) criterion rather than a fitted substitution
+  model.
+- **Finding data**: [Logan Search](https://logan-search.org) locates public
+  sequencing datasets by sequence content; searches run as jobs on
+  usegalaxy.org through the BRC Analytics API, and a typical search finishes
+  in a few minutes — the results page can be left and reopened. See
+  [Logan Search](/learn/logan-search) for details.
+
+## Privacy
+
+Every tool except Logan Search runs entirely in your browser via WebAssembly
+— no sequence data is uploaded. The same tools behave as you'd expect when
+installed locally or run on usegalaxy.org: local runs stay on your machine,
+while Galaxy runs are server jobs. Logan Search sends your query sequence to
+its index servers, like any web search.
+
+## Links
+
+- [primaeon.org](https://primaeon.org) — browser selection analysis
+- [veg.github.io/hyphy-3](https://veg.github.io/hyphy-3/) — the HyPhy 3 WALRUS workbench
+- [veg.github.io/rhizaeon-code](https://veg.github.io/rhizaeon-code/) — recombination scanner
+- [veg.github.io/trace-5.0](https://veg.github.io/trace-5.0/) — transmission surveillance
+- [veg.github.io/bushwacker](https://veg.github.io/bushwacker/) — phylogenetic graph inference
+- [logan-search.org](https://logan-search.org) — sequence-content search over public archives

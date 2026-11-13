@@ -5,6 +5,28 @@ export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
   {
     cardActions: [
       {
+        label: "Visit Logan Search",
+        url: "https://logan-search.org",
+      },
+      {
+        label: "Learn more",
+        url: "/learn/logan-search",
+      },
+    ],
+    text: MDX.LoganSearch({}),
+  },
+  {
+    cardActions: [
+      {
+        label: "See all tools",
+        url: "/learn/associated-tools",
+      },
+    ],
+    text: MDX.AssociatedTools({}),
+  },
+  {
+    cardActions: [
+      {
         label: "Try PrimAeon",
         url: "https://primaeon.org",
       },
