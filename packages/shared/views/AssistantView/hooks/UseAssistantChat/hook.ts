@@ -146,7 +146,17 @@ export const useAssistantChat = ({
     setSaveRetryTick((tick) => tick + 1);
   }, []);
   const router = useRouter();
+  // The router as of the latest render, for work that settles later: the one
+  // a callback closed over can predate a URL write made since.
+  const routerRef = useRef(router);
+  useEffect(() => {
+    routerRef.current = router;
+  });
   const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
+  // Whether the conversation is saved, and to which analysis, is the account's
+  // to say. Read off auth, so a save, reply or restore that lands after signing
+  // out can't put either back.
+  const isSignedOut = isConfigured && !isAuthLoading && !isAuthenticated;
   // A question of whitespace is no question: it would neither be asked nor
   // leave the conversation it displaced restorable.
   const question = initialMessage?.trim();
@@ -237,6 +247,12 @@ export const useAssistantChat = ({
           // localStorage pointer going bad is routine.
           if (isNamed) {
             setError("That conversation is no longer available.");
+            // A named session came from ?sessionId=, or an open wrote it there.
+            // The param outranks the stored pointer on mount, so left behind it
+            // would fail this way on every reload.
+            stripQueryParam(routerRef.current, [
+              ASSISTANT_QUERY_PARAM.SESSION_ID,
+            ]);
           }
         })
         .finally(() => {
@@ -349,8 +365,7 @@ export const useAssistantChat = ({
         // Checked against the session, not this effect run: a turn or an open
         // starting re-runs the effect, though the conversation is still the
         // one just written, and one that fails would never say so. A
-        // conversation that replaced it has moved the session on, and signing
-        // out has dropped the latch.
+        // conversation that replaced it has moved the session on.
         if (
           sessionIdRef.current === currentSessionId &&
           saveAttemptRef.current === currentSessionId
@@ -391,21 +406,6 @@ export const useAssistantChat = ({
   ]);
 
   useEffect(() => (): void => clearSaveRetry(saveRetryTimerRef), []);
-
-  // Signing out doesn't unsave anything server-side, but it ends this
-  // browser's claim to the conversation: AuthProvider.logout only clears the
-  // user, with no reload, so the panel was left rendering "Saved to your
-  // account" and "Sign in to keep this conversation" side by side. The latch
-  // goes too, so a save still in flight no longer counts once it lands; signing
-  // back in is a full-page redirect, so it never meets this hook's refs.
-  useEffect(() => {
-    if (isAuthLoading || !isConfigured || isAuthenticated) return;
-    saveAttemptRef.current = null;
-    saveRetriesRef.current = { count: 0, sessionId: null };
-    clearSaveRetry(saveRetryTimerRef);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- react-hooks v7 anti-pattern (setState in effect)
-    setIsSaved(false);
-  }, [isAuthLoading, isAuthenticated, isConfigured]);
 
   // One path for every turn. A setup-panel clear rides it too, as structured
   // clear_fields the server applies before the model runs, so the clear can't
@@ -642,12 +642,12 @@ export const useAssistantChat = ({
       error,
       handoffUrl,
       isRestoring,
-      isSaved,
+      isSaved: isSaved && !isSignedOut,
       lastSave,
       loading,
       logan,
       messages,
-      savedAnalysisId,
+      savedAnalysisId: isSignedOut ? null : savedAnalysisId,
       schema,
       shownSessionId,
       suggestions,

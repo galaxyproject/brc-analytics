@@ -90,6 +90,8 @@ describe("useAssistantChat restore", () => {
     await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
     expect(result.current.state.error).toBeNull();
+    // The session came from storage, not the URL, so there is no URL to fix.
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 
   test("a 404 on a session named in the URL says so rather than rendering blank", async () => {
@@ -101,6 +103,24 @@ describe("useAssistantChat restore", () => {
 
     await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
     expect(result.current.state.error).toMatch(/no longer available/i);
+  });
+
+  test("a 404 on a session named in the URL drops it from the URL", async () => {
+    // ?sessionId= outranks the stored pointer on mount, so left behind it fails
+    // the same way on every reload.
+    mockQuery = { sessionId: STORED_ID };
+    mockClient.assistantRestore.mockRejectedValue(httpError(404));
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ initialSessionId: STORED_ID, sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
+    expect(mockReplace).toHaveBeenLastCalledWith(
+      { pathname: "/assistant", query: {} },
+      undefined,
+      { shallow: true }
+    );
   });
 
   test("a 403 drops the pointer -- this browser can never restore that session", async () => {
@@ -621,6 +641,37 @@ describe("useAssistantChat opening a saved conversation", () => {
       expect(result.current.state.messages[1]?.content).toBe("opened reply")
     );
     expect(result.current.state.error).toBeNull();
+  });
+
+  test("a conversation refused after an open is dropped from the URL", async () => {
+    const { result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(404));
+
+    await openConversation(result, OPENED_ID);
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
+
+    expect(result.current.state.error).toMatch(/no longer available/i);
+    expect(mockReplace).toHaveBeenLastCalledWith(
+      { pathname: "/assistant", query: {} },
+      undefined,
+      { shallow: true }
+    );
+  });
+
+  test("a conversation that fails to load after an open for a transient reason stays in the URL", async () => {
+    // It is probably still there, and a reload is how it comes back.
+    const { result } = await renderRestored();
+    mockClient.assistantRestore.mockRejectedValueOnce(httpError(503));
+
+    await openConversation(result, OPENED_ID);
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
+
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenLastCalledWith(
+      { pathname: "/assistant", query: { sessionId: OPENED_ID } },
+      undefined,
+      { shallow: true }
+    );
   });
 
   test("a URL naming another session after mount restores nothing", async () => {

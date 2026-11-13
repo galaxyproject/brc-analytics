@@ -551,6 +551,92 @@ describe("useAssistantChat auto-save", () => {
     expect(result.current.state.isSaved).toBe(false);
   });
 
+  test("signing out leaves no saved analysis showing as open", async () => {
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+      saved_analysis_id: "analysis-1",
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(result.current.state.savedAnalysisId).toBe("analysis-1")
+    );
+
+    auth(false);
+    rerender();
+
+    await waitFor(() =>
+      expect(result.current.state.savedAnalysisId).toBeNull()
+    );
+  });
+
+  test("a conversation that loads after signing out does not show as saved", async () => {
+    auth(true);
+    const restore =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantRestore>>>();
+    mockClient.assistantRestore.mockReturnValueOnce(restore.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantRestore).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      restore.resolve({
+        ...restored(),
+        saved: true,
+        saved_analysis_id: "analysis-1",
+      } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+    });
+
+    expect(result.current.state.messages).toHaveLength(2);
+    expect(result.current.state.isSaved).toBe(false);
+    expect(result.current.state.savedAnalysisId).toBeNull();
+  });
+
+  test("a reply that lands after signing out does not show as saved", async () => {
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+    const turn =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantChat>>>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.actions.onSendMessage("still there?");
+    });
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      turn.resolve({
+        ...chatReply(),
+        saved: true,
+        saved_analysis_id: "analysis-1",
+      });
+      await sending;
+    });
+
+    expect(result.current.state.messages.at(-1)?.content).toBe("ok");
+    expect(result.current.state.isSaved).toBe(false);
+    expect(result.current.state.savedAnalysisId).toBeNull();
+  });
+
   test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {
     auth(true);
     const save = deferred<SaveResponse>();
