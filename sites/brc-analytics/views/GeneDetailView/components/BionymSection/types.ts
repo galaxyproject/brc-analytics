@@ -1,17 +1,14 @@
-import {
-  type BionymClaim,
-  type BionymClaims,
-  type BionymSource,
-} from "@repo/shared/services/genes/types";
+import { type BionymClaims } from "@repo/shared/services/genes/types";
+import { type TAB } from "./constants";
+
+export type BionymTab = (typeof TAB)[keyof typeof TAB];
 
 export interface BionymSectionProps {
   bionym: BionymClaims;
 }
 
-export interface ClaimItemProps {
-  claim: BionymClaim;
-}
-
-export interface SourceListViewProps {
-  sources: BionymSource[];
+// The confidence threshold the section's tabs share, and how to change it.
+export interface MinConfidenceProps {
+  minConfidence: number;
+  onMinConfidenceChange: (minConfidence: number) => void;
 }

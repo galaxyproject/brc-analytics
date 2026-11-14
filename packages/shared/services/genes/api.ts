@@ -1,6 +1,6 @@
 import { apiClient } from "@repo/shared/services/api-client/api-client";
 import { HTTPError } from "ky";
-import { type BionymClaims, type Gene } from "./types";
+import { type BionymClaims, type BionymGraph, type Gene } from "./types";
 
 export type GeneResult =
   | { gene: Gene; status: "found" }
@@ -39,6 +39,25 @@ export async function fetchGeneBionym(
 ): Promise<BionymClaims | null> {
   try {
     return await apiClient.getGeneBionym(geneUid, signal);
+  } catch (error) {
+    if (isNotFound(error)) return null;
+    throw error;
+  }
+}
+
+/**
+ * Fetch a gene's BioNym graph.
+ * @param geneUid - The gene's UID.
+ * @param signal - Aborts the request.
+ * @returns The graph, or null when the gene has no BioNym graph.
+ * @throws When the API can't be reached.
+ */
+export async function fetchGeneBionymGraph(
+  geneUid: string,
+  signal?: AbortSignal
+): Promise<BionymGraph | null> {
+  try {
+    return await apiClient.getGeneBionymGraph(geneUid, signal);
   } catch (error) {
     if (isNotFound(error)) return null;
     throw error;
