@@ -5,6 +5,7 @@ dependencies = [
     "requests==2.33.0",
     "PyYAML==6.0.2",
     "beautifulsoup4==4.13.4",
+    "soupsieve (>=4.1,<5.0.0)",
     "lxml==6.1.0",
     "dlt[parquet] (>=1.28.1,<2.0.0)",
     "duckdb (>=1.5.4,<2.0.0)",
