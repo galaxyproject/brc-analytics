@@ -95,7 +95,7 @@ export const CARDS: LearnCard[] = [
     StartIcon: InventoryIcon,
     href: "/learn/associated-tools",
     secondaryText:
-      "Sequence search, selection analysis, recombination scanning, transmission surveillance, and phylogenetic inference tools supported by BRC Analytics.",
+      "Sequence search, selection analysis, recombination scanning, transmission surveillance, dating and phylodynamics, and phylogenetic inference tools supported by BRC Analytics.",
     title: "Associated Tools",
   },
 ];

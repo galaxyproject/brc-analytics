@@ -63,6 +63,11 @@ const TOOLS_MENU_ITEMS: NavLinkItem[] = [
     url: "https://veg.github.io/bushwacker/",
   },
   {
+    label: "ChronAeon",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/chronaeon/",
+  },
+  {
     label: "HyPhy 3 / WALRUS",
     target: ANCHOR_TARGET.BLANK,
     url: "https://veg.github.io/hyphy-3/",
