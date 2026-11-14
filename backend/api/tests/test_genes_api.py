@@ -280,9 +280,10 @@ BIONYM_GENES = {
 def write_graph(directory, gene_uid: str, sources: dict) -> None:
     """Write a BioNym graph in which each source reports one claim.
 
-    sources maps a source's node ID to its node type and URL.
+    sources maps a source's node ID to its node type and URL. The graph's
+    query is a gene node, PF3D7_0000000, with no edges.
     """
-    nodes = {}
+    nodes = {"PF3D7_0000000": {"type": "Gene", "label": "PF3D7_0000000", "url": None}}
     edges = []
     for i, (source_id, (node_type, url)) in enumerate(sources.items()):
         claim_id = f"claim:claim {i}"
@@ -302,7 +303,11 @@ def write_graph(directory, gene_uid: str, sources: dict) -> None:
                 ],
             }
         )
-    graph = {"nodes": nodes, "edges": edges, "metadata": {"input": "PF3D7_0000000"}}
+    graph = {
+        "nodes": nodes,
+        "edges": edges,
+        "metadata": {"input": "PF3D7_0000000", "query": "PF3D7_0000000"},
+    }
     with gzip.open(directory / f"{gene_uid}.json.gz", "wt") as f:
         json.dump(graph, f)
 
@@ -354,9 +359,38 @@ def test_every_checked_in_bionym_graph_is_read(checked_in_graphs, gene_uid, locu
     assert {s.kind for s in claims.sources} == {"paper", "dataset"}
 
 
-def test_gene_without_a_bionym_graph_is_404(tmp_path):
+def test_bionym_graph(checked_in_graphs):
+    response = make_client(graphs=checked_in_graphs).get(
+        f"/api/v1/genes/{KELCH13_UID}/bionym/graph"
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["geneUid"] == KELCH13_UID
+    # The whole graph, ortholog-group members included.
+    assert len(body["nodes"]) == 5239
+    assert len(body["edges"]) == 6536
+    assert sum(e["predicate"] == "has_member" for e in body["edges"]) == 2460
+    [root] = [n for n in body["nodes"] if n["id"] == body["query"]]
+    assert (root["id"], root["type"]) == ("PF3D7_1343700", "Gene")
+    # Only the fields the explorer draws.
+    assert set(root) == {"id", "type", "label", "url"}
+    assert set(body["edges"][0]) == {"subject", "predicate", "object", "confidence"}
+
+
+@pytest.mark.parametrize("gene_uid, locus_tag", BIONYM_GENES.items())
+def test_every_checked_in_bionym_graph_has_its_gene_as_root(
+    checked_in_graphs, gene_uid, locus_tag
+):
+    graph = checked_in_graphs.get_graph(uuid.UUID(gene_uid))
+    assert graph is not None
+    assert graph.query == locus_tag
+    assert {n.type for n in graph.nodes if n.id == locus_tag} == {"Gene"}
+
+
+@pytest.mark.parametrize("path", ["bionym", "bionym/graph"])
+def test_gene_without_a_bionym_graph_is_404(tmp_path, path):
     response = make_client(graphs=BionymGraphStore(tmp_path)).get(
-        f"/api/v1/genes/{uuid.uuid4()}/bionym"
+        f"/api/v1/genes/{uuid.uuid4()}/{path}"
     )
     assert response.status_code == 404
 
@@ -391,10 +425,53 @@ def test_bionym_links_other_than_https_are_dropped(tmp_path):
         "dataset:3": ("dataset", None),
         "dataset:4": ("dataset", None),
     }
+    nodes = (
+        make_client(graphs=BionymGraphStore(tmp_path))
+        .get(f"/api/v1/genes/{uid}/bionym/graph")
+        .json()["nodes"]
+    )
+    assert {n["id"]: n["url"] for n in nodes if n["type"] != "Claim"} == {
+        "PF3D7_0000000": None,
+        "pubmed:1": "https://pubmed.ncbi.nlm.nih.gov/1/",
+        "pubmed:2": None,
+        "dataset:3": None,
+        "dataset:4": None,
+    }
 
 
 def test_bionym_claim_from_a_node_that_is_not_a_source_is_an_error(tmp_path):
     uid = uuid.uuid4()
     write_graph(tmp_path, str(uid), {"assembly:1": ("Assembly", None)})
     with pytest.raises(ValueError, match="isn't a source"):
+        BionymGraphStore(tmp_path)
+
+
+def _rewrite_graph(directory, gene_uid: str, change) -> None:
+    path = directory / f"{gene_uid}.json.gz"
+    with gzip.open(path, "rt") as f:
+        graph = json.load(f)
+    change(graph)
+    with gzip.open(path, "wt") as f:
+        json.dump(graph, f)
+
+
+def test_bionym_graph_whose_query_is_not_a_node_is_an_error(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(tmp_path, uid, lambda g: g["metadata"].update(query="PF3D7_9999999"))
+    with pytest.raises(ValueError, match="isn't a node"):
+        BionymGraphStore(tmp_path)
+
+
+def test_bionym_graph_edge_to_a_missing_node_is_an_error(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(
+        tmp_path,
+        uid,
+        lambda g: g["edges"].append(
+            {**g["edges"][0], "predicate": "cited_in", "object": "pubmed:missing"}
+        ),
+    )
+    with pytest.raises(ValueError, match="not a node"):
         BionymGraphStore(tmp_path)
