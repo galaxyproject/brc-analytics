@@ -150,7 +150,7 @@ six==1.16.0
 smmap==5.0.3
 snowplow-tracker==1.1.0
 sortedcontainers==2.4.0
-soupsieve==2.9.0
+soupsieve==4.1
 sparqlslurper==0.5.1
 SPARQLWrapper==2.0.0
 SQLAlchemy==2.0.38
