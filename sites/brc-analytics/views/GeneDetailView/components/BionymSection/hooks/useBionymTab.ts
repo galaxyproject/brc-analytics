@@ -12,10 +12,11 @@ import { useRef, useState } from "react";
 
 /**
  * The tab the section shows, and a function to choose another.
- * The tab follows the URL hash, as on the back button. Next changes the hash
- * only once it has rendered the navigation, so a chosen tab shows at once,
- * until the last navigation asked for is done; the tabs ignore a click on the
- * tab they show as selected, so a quick second click would otherwise be lost.
+ * The tab follows the URL hash, as on the back button. Next writes the new
+ * hash with no hashchange event, so the section sees it only when Next renders
+ * the navigation. A chosen tab therefore shows at once, until the last
+ * navigation asked for is done; the tabs ignore a click on the tab they show
+ * as selected, so a quick second click would otherwise be lost.
  * @returns The tab shown, and a function that navigates to a tab.
  */
 export function useBionymTab(): BionymTabState {

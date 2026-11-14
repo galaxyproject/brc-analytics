@@ -137,7 +137,12 @@ def build_claims(gene_uid: UUID, graph: _Graph) -> BionymClaims:
 
 def build_graph(gene_uid: UUID, graph: _Graph) -> BionymGraph:
     """Every node and edge in the graph, in BioNym's order, with only the
-    fields the graph explorer draws and only https: links."""
+    fields the graph explorer draws and only https: links.
+
+    Raises:
+        ValueError: The graph's query isn't a node, or an edge ends at an id
+            that isn't a node.
+    """
     if graph.metadata.query not in graph.nodes:
         raise ValueError(f"the graph's query {graph.metadata.query!r} isn't a node")
     for edge in graph.edges:

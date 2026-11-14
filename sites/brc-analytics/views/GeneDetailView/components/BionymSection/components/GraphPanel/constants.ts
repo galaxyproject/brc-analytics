@@ -18,3 +18,6 @@ export const DEFAULT_HIDDEN_PREDICATES: ReadonlySet<string> = new Set([
 
 // How long the slider must rest before the network is redrawn at its value.
 export const SLIDER_SETTLE_MS = 150;
+
+// How far each zoom button zooms.
+export const ZOOM_STEP = 1.4;

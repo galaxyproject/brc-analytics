@@ -22,6 +22,6 @@ export interface GraphCounts {
 // A node's edge, seen from the node: the edge, and the node at its other end.
 export interface NodeEdge {
   edge: BionymGraphEdge;
-  other: BionymGraphNode | undefined;
+  other: BionymGraphNode;
   outgoing: boolean;
 }

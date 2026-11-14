@@ -1,3 +1,4 @@
+import { ZOOM_STEP } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphPanel/constants";
 import { NetworkToolbar } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphPanel/graphPanel.styles";
 import { toComponentsGraph } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphPanel/utils";
 import FitScreenRoundedIcon from "@mui/icons-material/FitScreenRounded";
@@ -11,9 +12,6 @@ import {
 } from "bionym-components";
 import { type JSX, useEffect, useRef, useState } from "react";
 import { type NetworkViewProps } from "./types";
-
-// How far each zoom button zooms.
-const ZOOM_STEP = 1.4;
 
 /**
  * BioNym's network, drawn into a div, with a layout switch and zoom buttons,

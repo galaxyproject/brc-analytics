@@ -33,9 +33,9 @@ export function filterGraph(
   hiddenPredicates: ReadonlySet<string>,
   hiddenTypes: ReadonlySet<string>
 ): BionymGraph {
-  const typeOf = new Map(graph.nodes.map((node) => [node.id, node.type]));
+  const byId = nodesById(graph);
   const isShown = (id: string): boolean =>
-    !hiddenTypes.has(typeOf.get(id) ?? "");
+    !hiddenTypes.has(edgeEnd(byId, id).type);
   const edges = graph.edges.filter(
     (edge) =>
       !hiddenPredicates.has(edge.predicate) &&
@@ -108,7 +108,7 @@ export function nodeEdges(
   nodeId: string,
   minConfidence: number
 ): NodeEdge[] {
-  const byId = new Map(graph.nodes.map((node) => [node.id, node]));
+  const byId = nodesById(graph);
   return graph.edges
     .filter(
       (edge) =>
@@ -119,7 +119,7 @@ export function nodeEdges(
       const outgoing = edge.subject === nodeId;
       return {
         edge,
-        other: byId.get(outgoing ? edge.object : edge.subject),
+        other: edgeEnd(byId, outgoing ? edge.object : edge.subject),
         outgoing,
       };
     })
@@ -140,4 +140,46 @@ export function httpsUrl(node: BionymGraphNode): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * A graph's nodes, by id.
+ * @param graph - A graph.
+ * @returns The nodes, by id.
+ */
+function nodesById(graph: BionymGraph): Map<string, BionymGraphNode> {
+  return new Map(graph.nodes.map((node) => [node.id, node]));
+}
+
+/**
+ * The node at one end of an edge. The API gives only graphs whose every edge
+ * ends at one of their nodes, so a missing node is a broken contract.
+ * @param byId - The graph's nodes, by id.
+ * @param id - The id at the edge's end.
+ * @returns The node.
+ * @throws {Error} If no node has the id.
+ */
+function edgeEnd(
+  byId: Map<string, BionymGraphNode>,
+  id: string
+): BionymGraphNode {
+  const node = byId.get(id);
+  if (!node) throw new Error(`An edge ends at ${id}, which isn't a node`);
+  return node;
+}
+
+/**
+ * A set with a value added if it was missing, or removed if it was there.
+ * @param set - The set.
+ * @param value - The value.
+ * @returns A new set.
+ */
+export function toggled(
+  set: ReadonlySet<string>,
+  value: string
+): ReadonlySet<string> {
+  const next = new Set(set);
+  if (next.has(value)) next.delete(value);
+  else next.add(value);
+  return next;
 }

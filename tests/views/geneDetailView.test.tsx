@@ -15,7 +15,8 @@ const mockNavigations: { done: () => void; url: string }[] = [];
 
 // findable-ui's StaticImage reads the base path from the router; the BioNym
 // section's tabs navigate with it. A navigation changes the hash only when a
-// test makes it, as Next changes it only once it has rendered.
+// test makes it: Next writes the hash with no hashchange event, so the section
+// sees it only when Next renders the navigation.
 jest.mock("next/router", () => ({
   useRouter: (): {
     basePath: string;
@@ -543,7 +544,6 @@ describe("GeneDetailView's BioNym section", () => {
     selectTab("Graph");
     expect(navigationUrls()).toStrictEqual(["#graph"]);
     await navigate();
-    expect(window.location.hash).toBe("#graph");
     expect(await screen.findByTestId("graph-panel")).toHaveTextContent(
       `Graph of ${GENE.geneUid}`
     );
@@ -551,7 +551,6 @@ describe("GeneDetailView's BioNym section", () => {
     selectTab("Claims");
     expect(navigationUrls()).toStrictEqual(["#claims"]);
     await navigate();
-    expect(window.location.hash).toBe("#claims");
     expect(await screen.findByText("Claim B1")).toBeInTheDocument();
   });
 
@@ -593,10 +592,8 @@ describe("GeneDetailView's BioNym section", () => {
     const first = mockNavigations.shift() as { done: () => void; url: string };
     await setHash(first.url);
     await act(async () => first.done());
-    expect(window.location.hash).toBe("#claims");
     expect(graphTab).toHaveAttribute("aria-selected", "true");
     await navigate();
-    expect(window.location.hash).toBe("#graph");
     expect(graphTab).toHaveAttribute("aria-selected", "true");
     expect(await screen.findByTestId("graph-panel")).toBeVisible();
   });

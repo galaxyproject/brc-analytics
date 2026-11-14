@@ -13,7 +13,7 @@ import { DEFAULT_HIDDEN_PREDICATES, SLIDER_SETTLE_MS } from "./constants";
 import { GraphLayout, HiddenTypes } from "./graphPanel.styles";
 import { useSettledValue } from "./hooks/useSettledValue";
 import { type GraphExplorerProps, type GraphPanelProps } from "./types";
-import { countPredicates, countShown, filterGraph } from "./utils";
+import { countPredicates, countShown, filterGraph, toggled } from "./utils";
 
 /**
  * The Graph tab: the gene's BioNym graph, once it has loaded.
@@ -148,16 +148,3 @@ const GraphExplorer = ({
     </>
   );
 };
-
-/**
- * A set with a value added if it was missing, or removed if it was there.
- * @param set - The set.
- * @param value - The value.
- * @returns A new set.
- */
-function toggled(set: ReadonlySet<string>, value: string): ReadonlySet<string> {
-  const next = new Set(set);
-  if (next.has(value)) next.delete(value);
-  else next.add(value);
-  return next;
-}

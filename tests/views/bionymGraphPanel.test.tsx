@@ -1,4 +1,5 @@
 import { GraphLoading } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphLoading/graphLoading";
+import { ZOOM_STEP } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphPanel/constants";
 import { GraphPanel } from "@brc/views/GeneDetailView/components/BionymSection/components/GraphPanel/graphPanel";
 import {
   filterGraph,
@@ -328,7 +329,10 @@ describe("GraphPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
     fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
     fireEvent.click(screen.getByRole("button", { name: "Fit the graph" }));
-    expect(columns.instance.zoomBy).toHaveBeenCalledTimes(2);
+    expect(columns.instance.zoomBy.mock.calls).toStrictEqual([
+      [ZOOM_STEP],
+      [1 / ZOOM_STEP],
+    ]);
     expect(columns.instance.fit).toHaveBeenCalled();
     selectNode("pubmed:1");
     fireEvent.click(screen.getByRole("button", { name: "Force" }));

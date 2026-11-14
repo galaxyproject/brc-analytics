@@ -16,9 +16,10 @@ import { type NodeDetailProps } from "./types";
 /**
  * The node clicked in the network: its label and type, a link to its source
  * when that is an https: link, and its edges shown at the minimum confidence,
- * each with its confidence. It has no close button: the network keeps its own
- * selection and can't be told to drop it, so the panel closes when a click on
- * empty space or another node changes the network's selection.
+ * each with its confidence. It has no close button: the network can drop its
+ * selection only by redrawing, which moves the nodes in the Force layout, so
+ * the panel closes when a click on empty space or another node changes the
+ * network's selection.
  * @param props - Component props.
  * @param props.graph - The graph drawn.
  * @param props.minConfidence - The lowest confidence shown.
@@ -62,8 +63,7 @@ export const NodeDetail = ({
           {edges.map(({ edge, other, outgoing }, i) => (
             <li key={`${edge.subject} ${edge.predicate} ${edge.object} ${i}`}>
               <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_SMALL_400}>
-                {outgoing ? "→" : "←"} {edge.predicate}{" "}
-                {other?.label ?? (outgoing ? edge.object : edge.subject)}{" "}
+                {outgoing ? "→" : "←"} {edge.predicate} {other.label}{" "}
                 <Typography
                   color={TYPOGRAPHY_PROPS.COLOR.INK_LIGHT}
                   component="span"
