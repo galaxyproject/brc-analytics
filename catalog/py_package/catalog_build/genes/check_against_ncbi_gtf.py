@@ -24,7 +24,7 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union, cast
 
 import requests
 
@@ -311,7 +311,7 @@ def open_source(source: str) -> Iterator[io.BufferedIOBase]:
             response.raise_for_status()
             # urllib3 closes the body at its last byte, but gzip reads once more.
             response.raw.auto_close = False
-            yield _gunzipped(io.BufferedReader(response.raw))
+            yield _gunzipped(io.BufferedReader(cast(io.RawIOBase, response.raw)))
     else:
         with open(source, "rb") as fh:
             yield _gunzipped(fh)

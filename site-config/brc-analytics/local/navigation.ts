@@ -30,6 +30,14 @@ const VISIBLE_AT_LG = visibleOnly("lg");
 /** "Contact Us" ends the nav at `lg`, and is listed in the `xs` drawer. */
 const VISIBLE_AT_XS_LG = visibleOnly("xs", "lg");
 
+/**
+ * "Tools" is a dropdown where the header has room for it; at `sm` it collapses
+ * into "More" with the primary links, and at `xs` the drawer lists it as a
+ * link, since the drawer renders no menus.
+ */
+const VISIBLE_AT_MD_LG = visibleOnly("md", "lg");
+const VISIBLE_AT_XS = visibleOnly("xs");
+
 /** The support form, opened in a new tab. */
 const CONTACT_US: NavLinkItem = {
   label: "Contact Us",
@@ -43,6 +51,49 @@ const JOIN_US: NavLinkItem = {
   menuItems: socialMenuItems,
   url: "",
 };
+
+/** The learn page behind the "Tools" entries that are not menus. */
+const TOOLS_LEARN_URL = "/learn/associated-tools";
+
+/** Associated tools in alphabetical order, opened in a new tab; the last entry is the learn page. */
+const TOOLS_MENU_ITEMS: NavLinkItem[] = [
+  {
+    label: "Bushwhacker",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/bushwacker/",
+  },
+  {
+    label: "ChronAeon",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/chronaeon/",
+  },
+  {
+    label: "HyPhy 3 / WALRUS",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/hyphy-3/",
+  },
+  {
+    label: "Logan Search",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://logan-search.org",
+  },
+  {
+    label: "PrimAeon",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://primaeon.org",
+  },
+  {
+    label: "RhizAeon",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/rhizaeon-code/",
+  },
+  {
+    label: "TRACE-5.0",
+    target: ANCHOR_TARGET.BLANK,
+    url: "https://veg.github.io/trace-5.0/",
+  },
+  { label: "About these tools", url: TOOLS_LEARN_URL },
+];
 
 /**
  * Returns the Genes navigation link.
@@ -95,6 +146,13 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
       },
       { label: "Assistant", url: ROUTES.ASSISTANT },
       {
+        label: "Tools",
+        menuItems: TOOLS_MENU_ITEMS,
+        url: "",
+        visible: VISIBLE_AT_MD_LG,
+      },
+      { label: "Tools", url: TOOLS_LEARN_URL, visible: VISIBLE_AT_XS },
+      {
         label: "More",
         menuItems: [
           ...withVisible(VISIBLE_AT_SM, [
@@ -107,6 +165,7 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
               label: "Priority Pathogens",
               url: SITE_ROUTES.PRIORITY_PATHOGENS,
             },
+            { label: "Tools", url: TOOLS_LEARN_URL },
           ]),
           JOIN_US,
           CONTACT_US,
