@@ -12,3 +12,9 @@ export interface MinConfidenceProps {
   minConfidence: number;
   onMinConfidenceChange: (minConfidence: number) => void;
 }
+
+// The tab the section shows, and how to choose another.
+export interface BionymTabState {
+  selectTab: (tab: BionymTab) => void;
+  tab: BionymTab;
+}

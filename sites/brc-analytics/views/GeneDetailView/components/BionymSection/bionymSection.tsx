@@ -1,6 +1,5 @@
 import { GenesPanel } from "@brc/components/Genes/genes.styles";
 import { Tabs } from "@databiosphere/findable-ui/lib/components/common/Tabs/tabs";
-import { useHash } from "@databiosphere/findable-ui/lib/components/Layout/components/Outline/hooks/UseHash/hook";
 import { Link } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Typography } from "@mui/material";
@@ -12,8 +11,9 @@ import { type JSX, useId, useState } from "react";
 import { ClaimsPanel } from "./components/ClaimsPanel/claimsPanel";
 import { GraphLoading } from "./components/GraphLoading/graphLoading";
 import { BIONYM_URL, DEFAULT_MIN_CONFIDENCE, TAB, TABS } from "./constants";
+import { useBionymTab } from "./hooks/useBionymTab";
 import { type BionymSectionProps } from "./types";
-import { getActiveTab, pushTabHash } from "./utils";
+import { getActiveTab } from "./utils";
 
 // The graph explorer brings D3 and BioNym's components with it, so it loads
 // only when its tab is first opened, and only in the browser.
@@ -36,8 +36,7 @@ const GraphPanel = dynamic(
  */
 export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
   const headingId = useId();
-  const { hash } = useHash();
-  const tab = getActiveTab(hash);
+  const { selectTab, tab } = useBionymTab();
   const [minConfidence, setMinConfidence] = useState(DEFAULT_MIN_CONFIDENCE);
   const [graphOpened, setGraphOpened] = useState(tab === TAB.GRAPH);
   // Set during render, not in an effect, so the graph shows on the same render
@@ -62,7 +61,7 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
       </Typography>
       <Tabs
         onTabChange={(value): void => {
-          pushTabHash(getActiveTab(String(value)));
+          selectTab(getActiveTab(String(value)));
         }}
         tabs={TABS}
         value={tab}

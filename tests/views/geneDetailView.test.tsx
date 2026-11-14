@@ -10,10 +10,56 @@ import { type JSX } from "react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
 
-// findable-ui's StaticImage reads the base path from the router.
+// The navigations the section has asked Next's router for, not yet made.
+const mockNavigations: { done: () => void; url: string }[] = [];
+
+// findable-ui's StaticImage reads the base path from the router; the BioNym
+// section's tabs navigate with it. A navigation changes the hash only when a
+// test makes it, as Next changes it only once it has rendered.
 jest.mock("next/router", () => ({
-  useRouter: (): { basePath: string } => ({ basePath: "" }),
+  useRouter: (): {
+    basePath: string;
+    push: (url: string) => Promise<boolean>;
+  } => ({
+    basePath: "",
+    push: (url: string): Promise<boolean> =>
+      new Promise((resolve) => {
+        mockNavigations.push({ done: () => resolve(true), url });
+      }),
+  }),
 }));
+
+/**
+ * The URLs of the navigations the section has asked for, not yet made.
+ * @returns The URLs.
+ */
+function navigationUrls(): string[] {
+  return mockNavigations.map(({ url }) => url);
+}
+
+/**
+ * Change the URL hash, and wait for the hashchange the section follows.
+ * @param hash - The new hash.
+ */
+async function setHash(hash: string): Promise<void> {
+  await act(
+    () =>
+      new Promise((resolve) => {
+        window.addEventListener("hashchange", resolve, { once: true });
+        window.location.hash = hash;
+      })
+  );
+}
+
+/**
+ * Make the navigations the section has asked for, in order, as Next would.
+ */
+async function navigate(): Promise<void> {
+  for (const { done, url } of mockNavigations.splice(0)) {
+    await setHash(url);
+    await act(async () => done());
+  }
+}
 
 // The Graph tab loads BioNym's D3 components, which Jest can't load as ES
 // modules; its own tests cover it. Here it shows the threshold it's given.
@@ -373,6 +419,7 @@ describe("GeneDetailView", () => {
 describe("GeneDetailView's BioNym section", () => {
   beforeEach(() => {
     window.location.hash = "";
+    mockNavigations.length = 0;
   });
 
   /**
@@ -491,43 +538,67 @@ describe("GeneDetailView's BioNym section", () => {
     expect(screen.queryByTestId("graph-panel")).not.toBeInTheDocument();
   });
 
-  it("shows the graph on the Graph tab, and sets the URL hash", async () => {
+  it("shows the graph on the Graph tab, and navigates to its URL hash", async () => {
     renderGene(GENE, BIONYM);
     selectTab("Graph");
+    expect(navigationUrls()).toStrictEqual(["#graph"]);
+    await navigate();
     expect(window.location.hash).toBe("#graph");
     expect(await screen.findByTestId("graph-panel")).toHaveTextContent(
       `Graph of ${GENE.geneUid}`
     );
     expect(screen.queryByText("Claim B1")).not.toBeInTheDocument();
     selectTab("Claims");
+    expect(navigationUrls()).toStrictEqual(["#claims"]);
+    await navigate();
     expect(window.location.hash).toBe("#claims");
     expect(await screen.findByText("Claim B1")).toBeInTheDocument();
+  });
+
+  it("shows a chosen tab before the URL hash changes", async () => {
+    renderGene(GENE, BIONYM);
+    selectTab("Graph");
+    expect(window.location.hash).toBe("");
+    expect(
+      within(getSection()).getByRole("tab", { name: "Graph" })
+    ).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByTestId("graph-panel")).toBeVisible();
   });
 
   it("keeps the graph on the page, hidden, while the Claims tab shows", async () => {
     renderGene(GENE, BIONYM);
     selectTab("Graph");
+    await navigate();
     const graph = await screen.findByTestId("graph-panel");
     selectTab("Claims");
+    await navigate();
     expect(await screen.findByText("Claim B1")).toBeVisible();
     // The same element, not a new one: the explorer's state lives in it.
     expect(screen.getByTestId("graph-panel")).toBe(graph);
     expect(graph).not.toBeVisible();
     selectTab("Graph");
+    await navigate();
     expect(screen.getByTestId("graph-panel")).toBe(graph);
     expect(graph).toBeVisible();
   });
 
-  it("keeps a second tab click made straight after the first", async () => {
+  it("keeps a second tab click made before the first navigation", async () => {
     window.location.hash = "#graph";
     renderGene(GENE, BIONYM);
     selectTab("Claims");
     selectTab("Graph");
+    const graphTab = within(getSection()).getByRole("tab", { name: "Graph" });
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    // The first navigation lands, then the second: the Graph tab stays shown.
+    const first = mockNavigations.shift() as { done: () => void; url: string };
+    await setHash(first.url);
+    await act(async () => first.done());
+    expect(window.location.hash).toBe("#claims");
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    await navigate();
     expect(window.location.hash).toBe("#graph");
-    expect(
-      within(getSection()).getByRole("tab", { name: "Graph" })
-    ).toHaveAttribute("aria-selected", "true");
-    expect(await screen.findByTestId("graph-panel")).toBeInTheDocument();
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByTestId("graph-panel")).toBeVisible();
   });
 
   it("follows the URL hash when it changes, as on the back button", async () => {
@@ -549,6 +620,7 @@ describe("GeneDetailView's BioNym section", () => {
     renderGene(GENE, BIONYM);
     setMinConfidence(0.95);
     selectTab("Graph");
+    await navigate();
     expect(await screen.findByTestId("graph-panel")).toHaveTextContent(
       "at 0.95"
     );

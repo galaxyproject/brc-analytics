@@ -30,24 +30,18 @@ export function getActiveTab(hash: string): BionymTab {
 }
 
 /**
- * Point the URL hash at a tab, adding a history entry for the back button.
- * The tab follows the hash, and a Next navigation would change the hash only
- * after a delay: the tabs ignore a click on the tab they still show as
- * selected, so a quick second click was lost, and Next cancelled the first
- * navigation with an unhandled "Cancel rendering route". The History API
- * changes the hash at once but fires no hashchange, so this fires one for
- * useHash.
- * @param tab - The tab to show.
+ * Rethrow a navigation's error, unless Next cancelled the navigation for a
+ * newer one, as it does when a second tab is chosen before the first renders.
+ * @param error - The error a Next navigation rejected with.
  */
-export function pushTabHash(tab: BionymTab): void {
-  const oldURL = window.location.href;
-  window.history.pushState(null, "", `#${tab}`);
-  window.dispatchEvent(
-    new HashChangeEvent("hashchange", {
-      newURL: window.location.href,
-      oldURL,
-    })
-  );
+export function rethrowUnlessCancelled(error: unknown): void {
+  if (
+    error instanceof Error &&
+    "cancelled" in error &&
+    error.cancelled === true
+  )
+    return;
+  throw error;
 }
 
 /**
