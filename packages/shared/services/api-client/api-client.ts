@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type BionymClaims,
+  type BionymGraph,
   type GeneResponse,
 } from "@repo/shared/services/genes/types";
 import ky, { type HTTPError } from "ky";
@@ -85,6 +86,19 @@ export const apiClient = {
     // ky doesn't retry; useGeneBionym's query does.
     return httpClient
       .get(`genes/${encodeURIComponent(geneUid)}/bionym`, {
+        retry: 0,
+        signal,
+      })
+      .json();
+  },
+
+  getGeneBionymGraph: async (
+    geneUid: string,
+    signal?: AbortSignal
+  ): Promise<BionymGraph> => {
+    // ky doesn't retry; useGeneBionymGraph's query does.
+    return httpClient
+      .get(`genes/${encodeURIComponent(geneUid)}/bionym/graph`, {
         retry: 0,
         signal,
       })

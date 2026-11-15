@@ -115,6 +115,38 @@ class BionymSource(_CamelModel):
     claims: List[BionymClaim]
 
 
+class BionymGraphNode(_CamelModel):
+    """A node in a gene's BioNym graph: a gene, protein, paper, dataset,
+    claim or another kind of thing BioNym found."""
+
+    id: str
+    type: str
+    label: str
+    # Null unless the graph gives an https: link.
+    url: Optional[str]
+
+
+class BionymGraphEdge(_CamelModel):
+    """An edge in a gene's BioNym graph, with BioNym's confidence in it,
+    from 0 to 1."""
+
+    subject: str
+    predicate: str
+    object: str
+    confidence: float
+
+
+class BionymGraph(_CamelModel):
+    """A gene's BioNym graph: every node and edge, with only the fields the
+    gene page's graph explorer draws."""
+
+    gene_uid: UUID
+    # The id of the gene's own node, the graph's root.
+    query: str
+    nodes: List[BionymGraphNode]
+    edges: List[BionymGraphEdge]
+
+
 class BionymClaims(_CamelModel):
     """The claims in a gene's BioNym graph, grouped by source."""
 

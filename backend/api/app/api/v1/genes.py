@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
-from app.models.genes import BionymClaims, GeneResponse
+from app.models.genes import BionymClaims, BionymGraph, GeneResponse
 from app.services.bionym_graphs import BionymGraphStore
 from app.services.gene_catalog import GeneCatalogService
 
@@ -42,3 +42,18 @@ def get_gene_bionym(
             status_code=404, detail=f"Gene {gene_uid} has no BioNym graph"
         )
     return claims
+
+
+@router.get("/{gene_uid}/bionym/graph", response_model=BionymGraph)
+def get_gene_bionym_graph(
+    gene_uid: UUID,
+    graphs: BionymGraphStore = Depends(get_bionym_graphs),
+) -> BionymGraph:
+    """Every node and edge in the gene's BioNym graph, for the gene page's
+    graph explorer. Like the claims, read from the graph alone."""
+    graph = graphs.get_graph(gene_uid)
+    if graph is None:
+        raise HTTPException(
+            status_code=404, detail=f"Gene {gene_uid} has no BioNym graph"
+        )
+    return graph

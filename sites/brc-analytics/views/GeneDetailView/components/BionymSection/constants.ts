@@ -15,3 +15,14 @@ export const SOURCE_KIND_LABEL: Record<BionymSourceKind, string> = {
 
 // The slider's step. Confidences are given to two decimal places.
 export const CONFIDENCE_STEP = 0.01;
+
+// The section's tabs, each shown at its URL hash, as #claims or #graph.
+export const TAB = {
+  CLAIMS: "claims",
+  GRAPH: "graph",
+} as const;
+
+export const TABS = [
+  { label: "Claims", value: TAB.CLAIMS },
+  { label: "Graph", value: TAB.GRAPH },
+];
