@@ -217,18 +217,56 @@ class TestTools:
         assert seen == [(TEST_JOB, LEGACY_API, "test-key")]
 
 
-class TestOverHttp:
-    """Through the real route, so a renamed job_id path param is caught."""
+@pytest.fixture()
+def reads(monkeypatch, tmp_path):
+    """Which Galaxy the first read of each job route went to.
 
+    Every job route starts with one of these four reads. The export routes
+    reach get_job_status through source_job_id, and only once there is an
+    export directory to look in.
+    """
+    monkeypatch.setenv("KMINDEX_EXPORT_DIR", str(tmp_path))
+    get_settings.cache_clear()
+    calls = []
+
+    async def read(self, job_id, *args, **kwargs):
+        calls.append((job_id, self.target.api_url, self.credential.secret))
+        raise GalaxyJobNotFound(job_id)
+
+    for name in (
+        "get_filtered_kmindex_summary",
+        "get_job_results",
+        "get_job_status",
+        "get_kmindex_results",
+    ):
+        monkeypatch.setattr(GalaxyService, name, read)
+    return calls
+
+
+class TestOverHttp:
+    """Through the real routes: each one opts in to for_job on its own."""
+
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "jobs/{job_id}",
+            "jobs/{job_id}/results",
+            "jobs/{job_id}/status",
+            "kmindex/jobs/{job_id}/export",
+            "kmindex/jobs/{job_id}/results",
+            "kmindex/jobs/{job_id}/summary",
+        ],
+    )
     @pytest.mark.parametrize(
         "job_id, api, key",
         [(TEST_JOB, LEGACY_API, "test-key"), (MAIN_JOB, PRIMARY_API, "main-key")],
     )
-    def test_kmindex_results_follow_the_id(
+    def test_job_reads_follow_the_id(
         self,
         with_legacy,
         app_client,  # noqa: F811
-        monkeypatch,
+        reads,
+        path,
         job_id,
         api,
         key,
@@ -237,25 +275,18 @@ class TestOverHttp:
         app.dependency_overrides[galaxy_router.get_cache_service] = FakeCache
         app.dependency_overrides[galaxy_router.get_sra_mirror_service] = lambda: None
         app.dependency_overrides[galaxy_router.get_galaxy_credential] = lambda: USER
-        calls = []
 
-        async def get_kmindex_results(self, job_id, *args, **kwargs):
-            calls.append((job_id, self.target.api_url, self.credential.secret))
-            raise GalaxyJobNotFound(job_id)
+        response = client.get(f"/api/v1/galaxy/{path.format(job_id=job_id)}")
 
-        monkeypatch.setattr(GalaxyService, "get_kmindex_results", get_kmindex_results)
-
-        response = client.get(f"/api/v1/galaxy/kmindex/jobs/{job_id}/results")
-
-        assert response.status_code == 404
+        assert response.status_code == 404, response.text
         # The 32-character read keeps the signed-in user's bearer.
-        assert calls == [(job_id, api, key if api == LEGACY_API else "bearer")]
+        assert reads == [(job_id, api, key if api == LEGACY_API else "bearer")]
 
 
 class TestPartnerOverHttp:
     """The partner job routes, with the real get_partner_galaxy_service."""
 
-    @pytest.mark.parametrize("path", ["", "/results"])
+    @pytest.mark.parametrize("path", ["", "/export", "/results"])
     @pytest.mark.parametrize(
         "job_id, api, key",
         [(TEST_JOB, LEGACY_API, "test-key"), (MAIN_JOB, PRIMARY_API, "main-key")],
@@ -264,24 +295,20 @@ class TestPartnerOverHttp:
         self,
         partner_env,  # noqa: F811
         with_legacy,
-        monkeypatch,
+        reads,
         path,
         job_id,
         api,
         key,
     ):
         client, _, _ = partner_env
-        client.app.dependency_overrides.pop(partner_router.get_partner_galaxy_service)
-        calls = []
-
-        async def read(self, job_id, *args, **kwargs):
-            calls.append((job_id, self.target.api_url, self.credential.secret))
-            raise GalaxyJobNotFound(job_id)
-
-        monkeypatch.setattr(GalaxyService, "get_job_status", read)
-        monkeypatch.setattr(GalaxyService, "get_kmindex_results", read)
+        overrides = client.app.dependency_overrides
+        overrides.pop(partner_router.get_partner_galaxy_service)
+        # The export looks a job-cache copy up by a key partner_env's cache
+        # cannot make.
+        overrides[partner_router.get_cache_service] = FakeCache
 
         response = client.get(f"{BASE}/jobs/{job_id}{path}", headers=HEADERS)
 
         assert response.status_code == 404, response.text
-        assert calls == [(job_id, api, key)]
+        assert reads == [(job_id, api, key)]
