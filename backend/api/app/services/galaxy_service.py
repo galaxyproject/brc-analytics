@@ -968,9 +968,9 @@ class GalaxyService:
         """The service to read an existing job with: this one, or a legacy sibling.
 
         The one place that decides which Galaxy holds a job. A sibling shares
-        the cache, mirror and history name, so only the Galaxy it talks to
-        differs. It is built per call, which is cheap: bioblend opens no
-        connection until a request is made.
+        the cache and mirror, so only the Galaxy it talks to differs. It has
+        no history name, since it never submits. It is built per call, which
+        is cheap: bioblend opens no connection until a request is made.
 
         @param job_id: the job about to be read.
         @returns: this service unless the job lives on the legacy Galaxy.
@@ -982,7 +982,6 @@ class GalaxyService:
         return GalaxyService(
             self.cache,
             sra_mirror=self.sra_mirror,
-            history_name=self.history_name,
             target=target,
         )
 
