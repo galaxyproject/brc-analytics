@@ -153,9 +153,9 @@ export const useAssistantChat = ({
     routerRef.current = router;
   });
   const { isAuthenticated, isConfigured, isLoading: isAuthLoading } = useAuth();
-  // Whether the conversation is saved, and to which analysis, is the account's
-  // to say. Read off auth, so a save, reply or restore that lands after signing
-  // out can't put either back.
+  // Whether the conversation is saved is the account's to say. Read off auth, so
+  // a save, reply or restore that lands after signing out can't put the label
+  // back.
   const isSignedOut = isConfigured && !isAuthLoading && !isAuthenticated;
   // A question of whitespace is no question: it would neither be asked nor
   // leave the conversation it displaced restorable.
@@ -647,7 +647,7 @@ export const useAssistantChat = ({
       loading,
       logan,
       messages,
-      savedAnalysisId: isSignedOut ? null : savedAnalysisId,
+      savedAnalysisId,
       schema,
       shownSessionId,
       suggestions,

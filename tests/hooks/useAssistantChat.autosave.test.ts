@@ -94,10 +94,21 @@ function chatReply(): Awaited<ReturnType<typeof mockClient.assistantChat>> {
  * @param isAuthenticated - Whether someone is signed in
  */
 function auth(isAuthenticated: boolean): void {
+  authState({ isAuthenticated, isConfigured: true, isLoading: false });
+}
+
+/**
+ * Put the hook in an auth state that need not be settled or configured.
+ * @param state - The auth flags the hook reads
+ */
+function authState(
+  state: Pick<
+    ReturnType<typeof useAuth>,
+    "isAuthenticated" | "isConfigured" | "isLoading"
+  >
+): void {
   mockUseAuth.mockReturnValue({
-    isAuthenticated,
-    isConfigured: true,
-    isLoading: false,
+    ...state,
     login: jest.fn(),
     logout: jest.fn(),
     user: null,
@@ -551,29 +562,6 @@ describe("useAssistantChat auto-save", () => {
     expect(result.current.state.isSaved).toBe(false);
   });
 
-  test("signing out leaves no saved analysis showing as open", async () => {
-    auth(true);
-    mockClient.assistantRestore.mockResolvedValue({
-      ...restored(),
-      saved: true,
-      saved_analysis_id: "analysis-1",
-    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
-
-    const { rerender, result } = renderHook(() =>
-      useAssistantChat({ sessionKey: SESSION_KEY })
-    );
-    await waitFor(() =>
-      expect(result.current.state.savedAnalysisId).toBe("analysis-1")
-    );
-
-    auth(false);
-    rerender();
-
-    await waitFor(() =>
-      expect(result.current.state.savedAnalysisId).toBeNull()
-    );
-  });
-
   test("a conversation that loads after signing out does not show as saved", async () => {
     auth(true);
     const restore =
@@ -599,7 +587,6 @@ describe("useAssistantChat auto-save", () => {
 
     expect(result.current.state.messages).toHaveLength(2);
     expect(result.current.state.isSaved).toBe(false);
-    expect(result.current.state.savedAnalysisId).toBeNull();
   });
 
   test("a reply that lands after signing out does not show as saved", async () => {
@@ -634,7 +621,39 @@ describe("useAssistantChat auto-save", () => {
 
     expect(result.current.state.messages.at(-1)?.content).toBe("ok");
     expect(result.current.state.isSaved).toBe(false);
-    expect(result.current.state.savedAnalysisId).toBeNull();
+  });
+
+  test("a saved conversation shows as saved while sign-in is still loading", async () => {
+    // Not yet known to be signed out, so the label shows what the server said.
+    authState({ isAuthenticated: false, isConfigured: true, isLoading: true });
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
+  });
+
+  test("a saved conversation shows as saved where login is not configured", async () => {
+    authState({
+      isAuthenticated: false,
+      isConfigured: false,
+      isLoading: false,
+    });
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
   });
 
   test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {

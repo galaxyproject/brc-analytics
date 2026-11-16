@@ -84,7 +84,6 @@ export interface UseAssistantChatState {
   loading: boolean;
   logan: LoganContext | null;
   messages: ChatMessageDisplay[];
-  /** Saved analysis the conversation belongs to; null while it has none or once signed out. */
   savedAnalysisId: string | null;
   schema: AnalysisSchema | null;
   shownSessionId: string | null;

@@ -658,6 +658,34 @@ describe("useAssistantChat opening a saved conversation", () => {
     );
   });
 
+  test("a conversation refused after an open keeps what the URL gained meanwhile", async () => {
+    // The strip builds on the URL as it stands when the refusal lands, not as
+    // it stood when the hook mounted.
+    const { rerender, result } = await renderRestored();
+    mockReplace.mockImplementationOnce(
+      async ({ query }: { query: Record<string, string> }) => {
+        mockQuery = query;
+        return true;
+      }
+    );
+    const restore = deferred<RestoreResponse>();
+    mockClient.assistantRestore.mockReturnValueOnce(restore.promise);
+
+    await openConversation(result, OPENED_ID);
+    mockQuery = { ...mockQuery, tab: "kept" };
+    rerender({});
+    await act(async () => {
+      restore.reject(httpError(404));
+    });
+    await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
+
+    expect(mockReplace).toHaveBeenLastCalledWith(
+      { pathname: "/assistant", query: { tab: "kept" } },
+      undefined,
+      { shallow: true }
+    );
+  });
+
   test("a conversation that fails to load after an open for a transient reason stays in the URL", async () => {
     // It is probably still there, and a reload is how it comes back.
     const { result } = await renderRestored();
