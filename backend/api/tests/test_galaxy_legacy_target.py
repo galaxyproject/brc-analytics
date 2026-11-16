@@ -95,11 +95,15 @@ class TestService:
         )
 
     def test_for_job_reroutes_only_short_ids(self, with_legacy):
-        primary = GalaxyService(FakeCache(), credential=USER, history_name="H")
+        primary = GalaxyService(
+            FakeCache(), credential=USER, history_name="H", sra_mirror=object()
+        )
         assert primary.for_job(MAIN_JOB) is primary
         legacy = primary.for_job(TEST_JOB)
         assert legacy.target.legacy
         assert legacy.cache is primary.cache
+        # Legacy results are joined to SRA metadata like any others.
+        assert legacy.sra_mirror is primary.sra_mirror
         assert legacy.history_name == "H"
         # The user's bearer stays behind on the primary Galaxy.
         assert legacy.credential == GalaxyCredential(kind="service", secret="test-key")
