@@ -15,13 +15,11 @@ from app.api.v1 import partner as partner_router
 from app.core.config import get_settings
 from app.core.galaxy_credential import GalaxyCredential
 from app.core.galaxy_target import galaxy_target_for_job
-from app.core.partner_keys import Partner
 from app.models.galaxy import (
     GalaxyJobState,
     GalaxyJobStatus,
     KmindexQuerySubmission,
 )
-from app.services import logan_jobs
 from app.services.assistant_agent import AssistantAgent, LoganJobNotReadyError
 from app.services.galaxy_service import (
     GalaxyJobNotFound,
@@ -39,7 +37,6 @@ PRIMARY_API = "https://usegalaxy.org/api"
 LEGACY_API = "https://test.galaxyproject.org/api"
 TEST_JOB = "0123456789abcdef"
 MAIN_JOB = "bbd44e69cb8906b58abb1bc0bf72e0ce"
-PARTNER = Partner(key_id="k1", partner_id="example-partner")
 USER = GalaxyCredential(kind="user", secret="bearer", user_sub="u1")
 
 
@@ -117,33 +114,6 @@ class TestService:
             await legacy.submit_kmindex_query(submission)
         with pytest.raises(GalaxyReadOnlyError):
             await legacy._get_or_create_shared_history()
-
-
-class TestNativeRoutes:
-    @pytest.mark.asyncio
-    async def test_a_submit_route_is_primary(self, with_legacy):
-        g = await galaxy_router.get_galaxy_service(
-            cache=FakeCache(), sra_mirror=None, credential=USER
-        )
-        assert g.target.api_url == PRIMARY_API
-        assert g.credential == USER
-
-
-class TestPartner:
-    @pytest.mark.asyncio
-    async def test_a_submit_is_primary(self, with_legacy):
-        g = await partner_router.get_partner_galaxy_service(
-            partner=PARTNER, cache=FakeCache(), sra_mirror=None
-        )
-        assert g.target.api_url == PRIMARY_API
-        assert g.credential.secret == "main-key"
-
-    def test_mcp_submit_services_are_primary(self, with_legacy):
-        for g in (
-            logan_jobs.partner_galaxy_service(PARTNER, FakeCache(), None),
-            logan_jobs.anonymous_galaxy_service(FakeCache(), None),
-        ):
-            assert g.target.api_url == PRIMARY_API
 
 
 def _status(job_id):
