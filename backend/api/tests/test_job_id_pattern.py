@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 from app.core.sentry import _VOLATILE
 from app.models.galaxy import GalaxyJobState, GalaxyJobStatus
-from app.models.logan import LoganSessionRequest
+from app.models.logan import JOB_ID_PATTERN, LoganSessionRequest
 from app.services.tools.catalog_tools import AssistantDeps
 from app.services.tools.logan_tools import logan_job_status
 from tests.test_partner_api import BASE, HEADERS, partner_env  # noqa: F401
@@ -100,7 +100,20 @@ def test_the_partner_status_route_refuses_a_malformed_id(partner_env, job_id):  
     client, galaxy, _ = partner_env
     galaxy.get_job_status = AsyncMock(side_effect=AssertionError("reached Galaxy"))
 
-    assert client.get(f"{BASE}/jobs/{job_id}", headers=HEADERS).status_code == 422
+    response = client.get(f"{BASE}/jobs/{job_id}", headers=HEADERS)
+
+    assert response.status_code == 422
+    # Reported once, though the route and its Galaxy dependency both take it.
+    assert [e["loc"] for e in response.json()["detail"]] == [["path", "job_id"]]
+
+
+@pytest.mark.parametrize("path", ["", "/export", "/results"])
+def test_the_partner_schema_documents_the_pattern(partner_env, path):  # noqa: F811
+    client, _, _ = partner_env
+    operation = client.app.openapi()["paths"][f"{BASE}/jobs/{{job_id}}{path}"]["get"]
+
+    (job_id,) = [p for p in operation["parameters"] if p["name"] == "job_id"]
+    assert job_id["schema"]["pattern"] == JOB_ID_PATTERN
 
 
 @pytest.mark.parametrize("job_id", VALID)

@@ -71,13 +71,17 @@ async def get_partner_galaxy_service(
 
 
 async def get_partner_job_galaxy_service(
-    job_id: str = JobId,
+    job_id: str = Path(..., include_in_schema=False),
     galaxy: GalaxyService = Depends(get_partner_galaxy_service),
 ) -> GalaxyService:
     """The partner's service, on the Galaxy that holds the route's job.
 
     Only for routes that read an existing job: a write must stay on
     get_partner_galaxy_service, which is always the primary Galaxy.
+
+    The route's own JobId checks the pattern and documents it. Checking it
+    here too reports a malformed id twice, and a plain str here replaces the
+    route's parameter in the OpenAPI schema, pattern and all.
     """
     return galaxy.for_job(job_id)
 
