@@ -23,7 +23,7 @@ curies==0.10.4
 daff==1.4.2
 dbt-adapters==1.24.2
 dbt-common==1.38.0
-dbt-core==1.11.11
+dbt-core==1.11.17
 dbt-duckdb==1.10.1
 dbt-extractor==0.6.0
 dbt-protos==1.0.514
@@ -155,7 +155,7 @@ sparqlslurper==0.5.1
 SPARQLWrapper==2.0.0
 SQLAlchemy==2.0.38
 sqlglot==30.12.0
-sqlparse==0.5.5
+sqlparse==0.6.1
 tenacity==9.1.4
 text-unidecode==1.3
 tomlkit==0.15.0
