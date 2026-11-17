@@ -50,14 +50,14 @@ def legacy_galaxy_target() -> Optional[GalaxyTarget]:
     )
 
 
-def galaxy_target_for_job(job_id: Optional[str]) -> GalaxyTarget:
-    """The Galaxy that holds an existing job; the primary when there is none.
+def galaxy_target_for_job(job_id: str) -> GalaxyTarget:
+    """The Galaxy that holds an existing job.
 
-    @param job_id: the encoded job id the request is about, or None.
+    @param job_id: the encoded job id the request is about.
     @returns: the legacy target for a 16-character id when one is configured,
         otherwise the primary.
     """
-    if job_id is not None and len(job_id) == LEGACY_JOB_ID_LENGTH:
+    if len(job_id) == LEGACY_JOB_ID_LENGTH:
         legacy = legacy_galaxy_target()
         if legacy is not None:
             return legacy

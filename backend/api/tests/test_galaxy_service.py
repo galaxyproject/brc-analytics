@@ -2218,6 +2218,7 @@ class TestExportEndpoint:
 
         if galaxy is None:
             galaxy = MagicMock()
+            galaxy.for_job.return_value = galaxy
             galaxy.source_job_id = AsyncMock(side_effect=lambda job_id: job_id)
         app = FastAPI()
         app.include_router(galaxy_api.router, prefix="/galaxy")
@@ -2229,12 +2230,14 @@ class TestExportEndpoint:
     def _copy_of(original):
         """A service that knows every job asked about is a copy of original."""
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.source_job_id = AsyncMock(return_value=original)
         return galaxy
 
     @staticmethod
     def _never_asked():
         galaxy = MagicMock()
+        galaxy.for_job.return_value = galaxy
         galaxy.source_job_id = AsyncMock(side_effect=AssertionError("asked Galaxy"))
         return galaxy
 

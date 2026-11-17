@@ -165,7 +165,7 @@ user there, and the service key can't see it. Prod had login off while it was
 on Galaxy Test, so it has none of those.
 
 The rule is the length of the encoded id. Galaxy encodes ids as Blowfish
-blocks, so a database id of up to eight digits comes out as 16 hex characters
+blocks, so a database id of up to seven digits comes out as 16 hex characters
 and anything larger as 32. Galaxy Test's job ids are all 16 characters and
 usegalaxy.org's are all 32, so length says which server holds a job without
 trying one and falling back to the other. That only holds while the legacy

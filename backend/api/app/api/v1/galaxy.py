@@ -20,7 +20,6 @@ from app.core.dependencies import (
     get_sra_mirror_service,
 )
 from app.core.galaxy_credential import GalaxyCredential
-from app.core.galaxy_target import galaxy_target_for_job
 from app.db.crud import create_galaxy_job, get_user_by_keycloak_sub
 from app.db.session import db_session
 from app.models.galaxy import (
@@ -144,23 +143,24 @@ def error_detail(prefix: str, e: BaseException) -> str:
 
 
 async def get_galaxy_service(
-    request: Request,
     cache: CacheService = Depends(get_cache_service),
     sra_mirror: Optional[SRAMirrorService] = Depends(get_sra_mirror_service),
     credential: Optional[GalaxyCredential] = Depends(get_galaxy_credential),
 ) -> GalaxyService:
-    """Dependency to get Galaxy service instance.
+    """Dependency to get Galaxy service instance, on the primary Galaxy."""
+    return GalaxyService(cache, sra_mirror=sra_mirror, credential=credential)
 
-    A route about an existing job (a job_id path parameter) talks to the
-    Galaxy that job lives on; every other route, submits included, to the
-    primary one.
+
+async def get_job_galaxy_service(
+    job_id: str,
+    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+) -> GalaxyService:
+    """The Galaxy service for the Galaxy that holds the route's job.
+
+    Only for routes that read an existing job: a write must stay on
+    get_galaxy_service, which is always the primary Galaxy.
     """
-    return GalaxyService(
-        cache,
-        sra_mirror=sra_mirror,
-        credential=credential,
-        target=galaxy_target_for_job(request.path_params.get("job_id")),
-    )
+    return galaxy_service.for_job(job_id)
 
 
 def get_kmindex_filters(request: Request) -> Optional[KmindexFilters]:
@@ -473,7 +473,7 @@ async def get_kmindex_results(
         description="asc or desc; defaults to desc for score and asc otherwise",
     ),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -529,7 +529,7 @@ async def get_kmindex_results(
 async def get_kmindex_summary(
     job_id: str,
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -577,7 +577,7 @@ async def export_kmindex_results(
     job_id: str,
     format: str = Query(default="parquet", pattern="^(parquet|tsv)$"),
     filters: Optional[KmindexFilters] = Depends(get_kmindex_filters),
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ) -> Response:
     """
@@ -725,7 +725,7 @@ async def serve_kmindex_export(
 @router.get("/jobs/{job_id}/status", response_model=GalaxyJobStatus)
 async def get_job_status(
     job_id: str,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """Get the current status of a Galaxy job."""
@@ -752,7 +752,7 @@ async def get_job_status(
 @router.get("/jobs/{job_id}/results", response_model=GalaxyJobResult)
 async def get_job_results(
     job_id: str,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """Get the complete results from a finished Galaxy job."""
@@ -786,7 +786,7 @@ async def get_job_results(
 async def get_job_details(
     job_id: str,
     include_results: bool = False,
-    galaxy_service: GalaxyService = Depends(get_galaxy_service),
+    galaxy_service: GalaxyService = Depends(get_job_galaxy_service),
     _rate_limit=Depends(check_rate_limit),
 ):
     """
@@ -832,8 +832,6 @@ async def cancel_job(
     job_id: str, galaxy_service: GalaxyService = Depends(get_galaxy_service)
 ):
     """Cancel a running Galaxy job (future implementation)."""
-    # get_galaxy_service hands a 16-character id the legacy Galaxy, which is
-    # read-only: a real cancel has to refuse those rather than act there.
     # Note: This would require implementing job cancellation in GalaxyService
     # For now, just return a placeholder response
     raise HTTPException(status_code=501, detail="Job cancellation not yet implemented")
