@@ -79,6 +79,9 @@ export function AuthProvider({
   }, []);
 
   const logout = useCallback(async () => {
+    // Signed out on the page first: anything reading the account stops now,
+    // rather than sending one more request against a session being ended.
+    setUser(null);
     try {
       await fetch(`${API_BASE_URL}/auth/logout`, {
         credentials: "include",
@@ -87,7 +90,6 @@ export function AuthProvider({
     } catch {
       // Best-effort logout.
     }
-    setUser(null);
   }, []);
 
   return (
