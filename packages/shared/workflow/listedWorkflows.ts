@@ -1,21 +1,14 @@
 import type { Workflow, WorkflowCategory } from "@repo/shared/apis/workflow";
-import {
-  DIFFERENTIAL_EXPRESSION_ANALYSIS,
-  DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
-} from "@repo/shared/workflow/differentialExpressionAnalysis";
+import { DIFFERENTIAL_EXPRESSION_ANALYSIS } from "@repo/shared/workflow/differentialExpressionAnalysis";
 import type { WorkflowGates } from "@repo/shared/workflow/gates";
-import {
-  LMLS_WORKFLOW_CATEGORY,
-  LMLS_WORKFLOWS,
-} from "@repo/shared/workflow/lmls";
+import { LMLS_WORKFLOWS } from "@repo/shared/workflow/lmls";
 import { categoriesIncludeWorkflow } from "@repo/shared/workflow/utils";
 
 /**
  * Workflows the workflows listing offers from outside the catalog, under the
- * category they are listed and gated under.
+ * category name they are listed with.
  */
 export interface UncatalogedWorkflowGroup {
-  category: string;
   name: string;
   workflows: readonly Workflow[];
 }
@@ -24,17 +17,15 @@ export interface UncatalogedWorkflowGroup {
  * The workflows the workflows listing appends to the catalog's own: Differential
  * Expression Analysis (an interim measure) and the Sequence Analysis workflows.
  * Declared once, so the listing, the workflow detail pages and the workflows
- * store agree on which exist and the category each is gated under.
+ * store agree on which exist.
  */
 export const UNCATALOGED_WORKFLOW_GROUPS: readonly UncatalogedWorkflowGroup[] =
   [
     {
-      category: DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY,
       name: "Transcriptomics",
       workflows: [DIFFERENTIAL_EXPRESSION_ANALYSIS],
     },
     {
-      category: LMLS_WORKFLOW_CATEGORY,
       name: "Sequence Analysis",
       workflows: LMLS_WORKFLOWS,
     },
@@ -49,8 +40,7 @@ export const UNCATALOGED_WORKFLOWS: readonly Workflow[] =
 
 /**
  * Determines whether a workflow is one the workflows listing offers under the
- * given gates: a catalog workflow in a category the gates keep, or an
- * uncataloged workflow its group's category gate keeps. Does not apply the
+ * given gates: a catalog or uncataloged workflow the gates keep. Does not apply the
  * listing's minimum compatible-assembly count, which needs the fetched
  * workflow-assembly mappings and concerns entity fit rather than gating.
  * @param workflow - Workflow.
@@ -70,9 +60,7 @@ export function isWorkflowListed(
     )
   )
     return true;
-  return UNCATALOGED_WORKFLOW_GROUPS.some(({ category, workflows }) =>
-    workflowGates
-      .filterWorkflows(category, workflows)
-      .some(({ trsId }) => trsId === workflow.trsId)
-  );
+  return workflowGates
+    .filterWorkflows(UNCATALOGED_WORKFLOWS)
+    .some(({ trsId }) => trsId === workflow.trsId);
 }
