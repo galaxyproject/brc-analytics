@@ -484,7 +484,7 @@ def _trace_parts(messages: list[dict]) -> tuple[str, list, list[str]]:
                 if isinstance(args, str):
                     try:
                         args = json.loads(args)
-                    except Exception:
+                    except json.JSONDecodeError:
                         args = {"_raw": args}
                 calls.append((part.get("tool_name", ""), args or {}))
             elif kind == "tool-return":

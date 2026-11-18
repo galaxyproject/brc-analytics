@@ -162,7 +162,9 @@ class _DataSourceTopN(Evaluator):
         detail = (schema.get("data_source") or {}).get("detail")
         try:
             payload = json.loads(detail) if detail else {}
-        except Exception:
+        except (json.JSONDecodeError, TypeError):
+            return 0.0
+        if not isinstance(payload, dict):
             return 0.0
         ok = (
             payload.get("requested") == self.requested

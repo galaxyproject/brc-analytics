@@ -228,6 +228,10 @@ def test_top_n_evaluator_reads_the_structured_detail():
     assert _DataSourceTopN(requested=100, resolved=25).evaluate(ok) == 1.0
     assert _DataSourceTopN(requested=100, resolved=100).evaluate(ok) == 0.0
     assert _DataSourceTopN(requested=100, resolved=25).evaluate(_Ctx(_Out())) == 0.0
+    # A detail that isn't a JSON object scores 0 rather than raising.
+    for bad in ("not json", "[100, 25]", "25"):
+        broken = _Ctx(_Out(final_schema={"data_source": {"detail": bad}}))
+        assert _DataSourceTopN(requested=100, resolved=25).evaluate(broken) == 0.0
 
 
 def test_grounding_case_facts_hold_in_the_fixtures():

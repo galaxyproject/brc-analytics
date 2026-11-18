@@ -381,8 +381,7 @@ class NumbersTraceToContext(Evaluator):
         numbers = extract_numbers(reply)
         if not numbers:
             return 1.0
-        if not context:
-            return 0.0
+        # A missing context is an empty pool, so nothing traces: 0.0.
         pool = extract_numbers(_coerce_str(context))
         traced = sum(1 for n in numbers if number_traces(n, pool))
         return traced / len(numbers)
