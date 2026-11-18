@@ -168,6 +168,20 @@ def test_identity_claim_needs_a_hedge_in_the_same_sentence():
     # A negation about something else earlier in the sentence is no denial.
     elsewhere = "The score does not depend on read length; it equals 62% identity."
     assert ev.evaluate(_Ctx(_Out(reply=elsewhere))) == 0.0
+    # Nor is one in the same clause but more than a few words back.
+    far = "It is not tied to read length in any way and equals 62% identity."
+    assert ev.evaluate(_Ctx(_Out(reply=far))) == 0.0
+
+
+def test_a_hedge_alone_excuses_an_identity_claim():
+    from evals.datasets.logan_assistant import _NoUnhedgedIdentityClaim
+
+    # No negation anywhere: only the hedge keeps these from counting.
+    for reply in (
+        "A score of 0.62 is roughly an estimate of 62% identity.",
+        "Treat 0.98 as ANI, which approximates percent identity.",
+    ):
+        assert _NoUnhedgedIdentityClaim().evaluate(_Ctx(_Out(reply=reply))) == 1.0
 
 
 @pytest.mark.parametrize(

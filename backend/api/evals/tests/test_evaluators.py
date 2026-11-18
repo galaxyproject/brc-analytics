@@ -665,6 +665,9 @@ def test_a_bare_count_never_traces_to_a_decimal():
 def test_small_counts_must_be_exact():
     # Leading-digit rounding is for large counts only: 900 is not 912.
     assert _trace("About 900 runs.", "912 runs") == 0.0
+    # Two leading digits right, but under 1,000 a count is exact or nothing.
+    assert _trace("About 910 runs.", "912 runs") == 0.0
+    assert _trace("About 750 runs.", "754 runs") == 0.0
     assert _trace("About 9,100 runs.", "9,120 runs") == 1.0
 
 
@@ -677,6 +680,9 @@ def test_millions_scale_before_they_trace():
 
 def test_a_job_id_is_not_a_number():
     assert extract_numbers("job 0123456789abcdef and job fe6f66a714dcbec8") == []
+    # An id whose one letter is an "e" reads as an exponent unless the id
+    # comes out first.
+    assert extract_numbers("job 1234567890123e45 finished") == []
     # Sixteen decimal digits are a number, not an id.
     assert [n.value for n in extract_numbers("1234567890123456")] == [
         1234567890123456.0
