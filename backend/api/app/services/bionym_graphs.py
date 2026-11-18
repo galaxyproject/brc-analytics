@@ -5,8 +5,9 @@ A BioNym graph is BioNym's JSON output for one gene: nodes, edges between
 them, and metadata about the run. Each claim is a Claim node that a
 Publication or Dataset node `reports`; the edge holds BioNym's confidence in
 the claim, and its one piece of evidence holds the quote the claim rests on.
-The graph view keeps every node and edge, but only the fields the gene
-page's graph explorer draws.
+The metadata may also hold BioNym's summary of the gene, a list of
+statements, each a claim and a confidence. The graph view keeps every node
+and edge, but only the fields the gene page's graph explorer draws.
 
 The graphs are checked in, gzipped and named by gene UID, under
 app/data/bionym (see its README) until they are published to the gene data
@@ -22,7 +23,7 @@ from typing import Dict, List, Literal, Optional
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models.genes import (
     BionymClaim,
@@ -31,6 +32,7 @@ from app.models.genes import (
     BionymGraphEdge,
     BionymGraphNode,
     BionymSource,
+    BionymSummaryStatement,
 )
 
 BIONYM_GRAPHS_DIR = Path(__file__).resolve().parent.parent / "data" / "bionym"
@@ -61,9 +63,16 @@ class _Edge(BaseModel):
     evidence: List[_Evidence]
 
 
+class _SummaryItem(BaseModel):
+    claim: str = Field(min_length=1)
+    confidence: float = Field(ge=0, le=1)
+
+
 class _Metadata(BaseModel):
     input: str
     query: str
+    # BioNym writes a summary only when its summary step runs.
+    summary: List[_SummaryItem] = []
 
 
 class _Graph(BaseModel):
@@ -106,7 +115,8 @@ def _claim(graph: _Graph, edge: _Edge) -> BionymClaim:
 def build_claims(gene_uid: UUID, graph: _Graph) -> BionymClaims:
     """The graph's claims grouped by source: sources by title, and claims by
     confidence, highest first. The gene page keeps these orders, re-sorting
-    sources only by how many claims it shows."""
+    sources only by how many claims it shows. The summary keeps BioNym's
+    order."""
     sources: Dict[str, BionymSource] = {}
     for edge in graph.edges:
         if edge.predicate != "reports":
@@ -132,6 +142,10 @@ def build_claims(gene_uid: UUID, graph: _Graph) -> BionymClaims:
         input=graph.metadata.input,
         run_date=_run_date(graph),
         sources=sorted(sources.values(), key=lambda s: (s.title.casefold(), s.id)),
+        summary=[
+            BionymSummaryStatement(text=item.claim, confidence=item.confidence)
+            for item in graph.metadata.summary
+        ],
     )
 
 
