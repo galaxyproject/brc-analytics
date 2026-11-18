@@ -149,6 +149,11 @@ jobs:
           cd backend/api
           uv run --extra dev pytest tests/ -v
 
+      - name: Run eval harness tests
+        run: |
+          cd backend/api
+          uv run --extra dev pytest evals/tests -v
+
       - name: Show logs on failure
         if: failure()
         run: |
