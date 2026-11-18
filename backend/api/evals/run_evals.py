@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import copy
+import dataclasses
 import datetime as _dt
+import json
 import logging
 import re
 import subprocess
@@ -18,8 +21,10 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from pydantic_core import to_jsonable_python
 from pydantic_evals.evaluators import LLMJudge
 
+from app.models.logan import LoganSnapshot
 from evals.judge import build_pydantic_ai_model
 from evals.model_registry import load_registry
 from evals.report import RunResult, render_report
@@ -124,6 +129,72 @@ def _declared_evaluator_names(case, dataset_evaluators) -> frozenset[str]:
     return frozenset(names)
 
 
+# The snapshot itself is in the fixture already; the job id is enough to
+# find it. Anything else a turn adds to session_metadata["logan"] is kept.
+_SNAPSHOT_KEYS = frozenset(LoganSnapshot.model_fields) - {"job_id"}
+
+
+def _dump_output(output) -> object:
+    """A case output as JSON-safe data for --dump-dir, minus the Logan
+    snapshot a session's metadata carries."""
+    if dataclasses.is_dataclass(output) and not isinstance(output, type):
+        data = dataclasses.asdict(output)
+    else:
+        data = copy.deepcopy(output)
+    meta = data.get("session_metadata") if isinstance(data, dict) else None
+    if isinstance(meta, dict) and isinstance(meta.get("logan"), dict):
+        logan = meta["logan"]
+        meta["logan"] = {k: v for k, v in logan.items() if k not in _SNAPSHOT_KEYS}
+    return to_jsonable_python(data, fallback=str)
+
+
+def dump_path(dump_dir: Path, dataset: str, model: str, label: str | None) -> Path:
+    """Where one (dataset, model) run's dump goes: named for --label too, and
+    never over an earlier dump, so two arms of an A/B written to one
+    directory can't replace each other."""
+    stem = f"{dataset}@{model}" + (f"@{label}" if label else "")
+    path = dump_dir / f"{stem}.jsonl"
+    n = 2
+    while path.exists():
+        path = dump_dir / f"{stem}.{n}.jsonl"
+        n += 1
+    return path
+
+
+def write_dump(path: Path, report, label: str | None = None) -> None:
+    """One JSON line per case run: name, label, scores and the full output."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x") as fh:
+        for case in report.cases:
+            scores = {
+                name: _score_value(val)
+                for name, val in {**case.scores, **case.assertions}.items()
+            }
+            fh.write(
+                json.dumps(
+                    {
+                        "case": case.name,
+                        "label": label,
+                        "scores": scores,
+                        "duration_s": getattr(case, "task_duration", None),
+                        "output": _dump_output(case.output),
+                    }
+                )
+                + "\n"
+            )
+        for failure in getattr(report, "failures", []):
+            fh.write(
+                json.dumps(
+                    {
+                        "case": failure.name,
+                        "label": label,
+                        "error": str(failure.error_message),
+                    }
+                )
+                + "\n"
+            )
+
+
 async def _run_one(
     dataset_name: str,
     model_name: str,
@@ -132,6 +203,9 @@ async def _run_one(
     judge_model,
     only: list[str] | None,
     repeat: int,
+    dump_dir: Path | None = None,
+    max_concurrency: int | None = None,
+    label: str | None = None,
 ) -> RunResult:
     build = SPECS[dataset_name]
     # Fresh cache per run so LLMService's content-keyed entries can't be served
@@ -146,8 +220,12 @@ async def _run_one(
         name=f"{dataset_name}@{model_name}",
         repeat=repeat,
         progress=False,
+        max_concurrency=max_concurrency,
     )
     elapsed = time.time() - started
+    if dump_dir is not None:
+        path = dump_path(dump_dir, dataset_name, model_name, label)
+        write_dump(path, report, label)
 
     aggregated: dict[str, dict[str, list[float]]] = {}
     for case in report.cases:
@@ -223,6 +301,9 @@ async def _amain(args) -> int:
                     judge_model,
                     only,
                     args.repeat,
+                    dump_dir=Path(args.dump_dir) if args.dump_dir else None,
+                    max_concurrency=args.max_concurrency,
+                    label=args.label,
                 )
             except DatasetRequirementError as exc:
                 # Precondition (e.g. SRA_MIRROR_PATH) is model-independent, so
@@ -282,6 +363,25 @@ def main() -> int:
         "--output",
         default=None,
         help="explicit output path (default: evals/results/<date>-<slug>-<sha>.md)",
+    )
+    parser.add_argument(
+        "--dump-dir",
+        default=None,
+        help="also write every case's output and scores as JSONL here, one "
+        "file per dataset and model (replies, traces, latencies)",
+    )
+    parser.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=None,
+        help="cap on cases in flight at once (default: no cap). Lower it for "
+        "a shared endpoint, or when the latency itself is being measured",
+    )
+    parser.add_argument(
+        "--label",
+        default=None,
+        help="a name for what this run varies (a server setting, a prompt "
+        "version); goes into each --dump-dir file name and record",
     )
     args = parser.parse_args()
     return asyncio.run(_amain(args))
