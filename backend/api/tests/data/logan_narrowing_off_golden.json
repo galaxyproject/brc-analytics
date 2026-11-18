@@ -194,7 +194,7 @@
           "additionalProperties": false,
           "properties": {
             "job_id": {
-              "description": "the 16-character Galaxy job id from a Logan results URL.",
+              "description": "the Galaxy job id (16 or 32 hex characters) from a Logan\nresults URL.",
               "type": "string"
             }
           },
@@ -222,7 +222,7 @@
           "additionalProperties": false,
           "properties": {
             "job_id": {
-              "description": "the 16-character Galaxy job id from a Logan results URL.",
+              "description": "the Galaxy job id (16 or 32 hex characters) from a Logan\nresults URL.",
               "type": "string"
             },
             "limit": {
@@ -260,7 +260,7 @@
           "additionalProperties": false,
           "properties": {
             "job_id": {
-              "description": "the 16-character Galaxy job id from a Logan results URL\n(/logan-search?job=<id>).",
+              "description": "the Galaxy job id (16 or 32 hex characters) from a Logan\nresults URL (/logan-search?job=<id>).",
               "type": "string"
             }
           },
