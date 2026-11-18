@@ -259,6 +259,8 @@ class TurnTelemetry(BaseModel):
     latency_ms: int = 0
     model: Optional[str] = None
     provider: Optional[str] = None
+    # The Logan search a Logan-bound session was opened from; None otherwise.
+    logan_job_id: Optional[str] = None
 
     @classmethod
     def for_error(cls, exc: Exception, **fields: Any) -> "TurnTelemetry":
