@@ -371,8 +371,10 @@ def assemble_fixture(
     max_bytes: int = DEFAULT_MAX_BYTES,
 ) -> tuple[Path, Path]:
     """Build both fixture files beside each other in a temp dir, check them,
-    and only then move them into `out_dir` -- so a failure anywhere leaves the
-    existing pair untouched, never a new parquet beside an old JSON."""
+    and only then move them into `out_dir` -- so a failed build or check
+    leaves the existing pair untouched. The two moves aren't atomic together:
+    one failing after the other succeeded (a full disk, say) can still leave a
+    new parquet beside the old JSON."""
     with tempfile.TemporaryDirectory() as tmp:
         staged_parquet = Path(tmp) / f"{name}.parquet"
         trim = trim_export(raw_export, staged_parquet, max_rows=max_rows, top=top)

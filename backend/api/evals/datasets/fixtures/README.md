@@ -23,6 +23,25 @@ All captured 2026-11-07 from `https://dev.brc-analytics.org` (running main at
 the export were current. No new searches were submitted: both jobs already
 existed on dev.
 
+## Capture commands
+
+Run from `backend/api`. F1 needs `--max-rows` raised to keep its export whole:
+the default (5,000) would trim it, and any value of at least 17,629 writes the
+same file. F2 used the defaults (`--max-rows 5000 --top 1000`); the sample is
+ordered by `md5(accession)`, so the same export trims to the same rows.
+
+```sh
+python scripts/capture_logan_fixture.py https://dev.brc-analytics.org 806580fd1ed1cc90 logan_pfal_18s --max-rows 17629
+python scripts/capture_logan_fixture.py https://dev.brc-analytics.org dee9dc267ca2a401 logan_truncated_mixed
+python scripts/capture_logan_fixture.py --derive saturated --from logan_pfal_18s logan_saturated
+python scripts/capture_logan_fixture.py --derive no_mirror --from logan_pfal_18s logan_no_mirror
+python scripts/capture_logan_fixture.py --derive injected --from logan_pfal_18s logan_injected
+```
+
+A recapture rebuilds from whatever dev serves that day (its SRA mirror
+metadata, for one, changes between builds), so read these as how the files
+were made rather than a promise of identical output.
+
 ## How the jobs were found
 
 - F1 is the _P. falciparum_ 18S example job named in the phase-1 assistant
