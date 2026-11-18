@@ -141,6 +141,10 @@ def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
 
     monkeypatch.setenv("CATALOG_PATH", str(tmp_path))
     monkeypatch.setenv("AI_API_KEY", "stub")
+    # Without these the agent builds an OpenAI model, which needs
+    # OPENAI_API_KEY -- so the test would pass only beside a .env.
+    monkeypatch.setenv("AI_API_BASE_URL", "http://localhost:1/v1")
+    monkeypatch.setenv("AI_PRIMARY_MODEL", "stub-model")
     monkeypatch.setenv("ASSISTANT_OUTPUT_MODE", "tool")
     get_settings.cache_clear()
 
