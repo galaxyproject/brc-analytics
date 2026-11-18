@@ -147,8 +147,17 @@ class BionymGraph(_CamelModel):
     edges: List[BionymGraphEdge]
 
 
+class BionymSummaryStatement(_CamelModel):
+    """One statement of BioNym's summary of a gene: a language model's
+    sentence about the gene, and BioNym's confidence in it, from 0 to 1."""
+
+    text: str
+    confidence: float
+
+
 class BionymClaims(_CamelModel):
-    """The claims in a gene's BioNym graph, grouped by source."""
+    """The claims in a gene's BioNym graph, grouped by source, and BioNym's
+    summary of the gene."""
 
     gene_uid: UUID
     # BioNym's input for the graph: the gene's locus tag.
@@ -157,3 +166,5 @@ class BionymClaims(_CamelModel):
     # metadata carries no run date.
     run_date: date
     sources: List[BionymSource]
+    # In BioNym's order; empty when the graph has no summary.
+    summary: List[BionymSummaryStatement]

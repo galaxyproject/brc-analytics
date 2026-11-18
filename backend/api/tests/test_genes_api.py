@@ -11,6 +11,7 @@ import duckdb
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.api.v1 import genes
 from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
@@ -349,6 +350,15 @@ def test_bionym_claims(checked_in_graphs):
     for source in body["sources"]:
         confidences = [c["confidence"] for c in source["claims"]]
         assert confidences == sorted(confidences, reverse=True)
+    # The summary in BioNym's order, without its quotes.
+    summary = body["summary"]
+    assert len(summary) == 12
+    assert summary[0] == {
+        "text": "PF3D7_1343700 (Kelch13/K13) is a gene in Plasmodium falciparum "
+        "3D7 located on chromosome NC_004331.3.",
+        "confidence": 0.86,
+    }
+    assert summary[-1]["text"].startswith("K13 has been measured in over 40")
 
 
 @pytest.mark.parametrize("gene_uid, locus_tag", BIONYM_GENES.items())
@@ -357,6 +367,7 @@ def test_every_checked_in_bionym_graph_is_read(checked_in_graphs, gene_uid, locu
     assert claims is not None
     assert claims.input == locus_tag
     assert {s.kind for s in claims.sources} == {"paper", "dataset"}
+    assert len(claims.summary) == 12
 
 
 def test_bionym_graph(checked_in_graphs):
@@ -474,4 +485,30 @@ def test_bionym_graph_edge_to_a_missing_node_is_an_error(tmp_path):
         ),
     )
     with pytest.raises(ValueError, match="not a node"):
+        BionymGraphStore(tmp_path)
+
+
+def test_bionym_graph_without_a_summary_has_an_empty_one(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    body = make_client(graphs=BionymGraphStore(tmp_path)).get(
+        f"/api/v1/genes/{uid}/bionym"
+    )
+    assert body.json()["summary"] == []
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        {"quote": "Kelch13 -in_organism-> P. falciparum 3D7", "confidence": 0.9},
+        {"claim": "", "confidence": 0.9},
+        {"claim": "K13 is essential.", "confidence": 1.2},
+        {"claim": "K13 is essential."},
+    ],
+)
+def test_bionym_summary_item_of_the_wrong_shape_is_an_error(tmp_path, item):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(tmp_path, uid, lambda g: g["metadata"].update(summary=[item]))
+    with pytest.raises(ValidationError):
         BionymGraphStore(tmp_path)

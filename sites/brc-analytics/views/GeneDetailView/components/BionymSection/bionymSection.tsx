@@ -10,7 +10,13 @@ import dynamic from "next/dynamic";
 import { type JSX, useId, useState } from "react";
 import { ClaimsPanel } from "./components/ClaimsPanel/claimsPanel";
 import { GraphLoading } from "./components/GraphLoading/graphLoading";
-import { BIONYM_URL, DEFAULT_MIN_CONFIDENCE, TAB, TABS } from "./constants";
+import {
+  BIONYM_SECTION_ID,
+  BIONYM_URL,
+  DEFAULT_MIN_CONFIDENCE,
+  TAB,
+  TABS,
+} from "./constants";
 import { useBionymTab } from "./hooks/useBionymTab";
 import { type BionymSectionProps } from "./types";
 import { getActiveTab } from "./utils";
@@ -44,7 +50,7 @@ export const BionymSection = ({ bionym }: BionymSectionProps): JSX.Element => {
   if (tab === TAB.GRAPH && !graphOpened) setGraphOpened(true);
 
   return (
-    <GenesPanel aria-labelledby={headingId} as="section">
+    <GenesPanel aria-labelledby={headingId} as="section" id={BIONYM_SECTION_ID}>
       <SectionTitle
         component="h2"
         id={headingId}

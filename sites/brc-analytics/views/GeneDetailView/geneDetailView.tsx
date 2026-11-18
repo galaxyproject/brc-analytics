@@ -21,6 +21,7 @@ import { GENOME_BROWSER_IMAGE_PROPS } from "@repo/shared/viewModelBuilders/const
 import Link from "next/link";
 import { type JSX } from "react";
 import { BionymSection } from "./components/BionymSection/bionymSection";
+import { BionymSummary } from "./components/BionymSummary/bionymSummary";
 import { OffSiteLink } from "./components/OffSiteLink/offSiteLink";
 import { EMPTY_VALUE, GENE_BREADCRUMBS } from "./constants";
 import {
@@ -108,6 +109,9 @@ export const GeneDetailView = ({
           <FieldLabel>Annotation</FieldLabel>
           <FieldValue>{formatAnnotation(gene.provenance)}</FieldValue>
         </FieldList>
+      </GenesPanel>
+      {bionym && bionym.summary.length > 0 && <BionymSummary bionym={bionym} />}
+      <GenesPanel>
         <TableContainer>
           <Table>
             <TableHead>
