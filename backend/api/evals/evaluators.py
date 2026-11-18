@@ -141,8 +141,9 @@ def normalize_numbers(text: str) -> str:
 # Spans whose digits are identifiers, not quantities. Removed before numbers
 # are pulled out of either side.
 _URL = re.compile(r"https?://\S+|/[\w./-]*\?\S*")
-# 16 hex characters with at least one letter: a 16-digit decimal is a number.
-_JOB_ID = re.compile(r"\b(?=[0-9]*[a-f])[0-9a-f]{16}\b")
+# A Galaxy job id -- 16 hex characters on Galaxy Test, 32 on usegalaxy.org --
+# with at least one letter: a 16-digit decimal is a number.
+_JOB_ID = re.compile(r"\b(?=[0-9]*[a-f])(?:[0-9a-f]{16}){1,2}\b")
 # A line-leading list marker ("1.", "2)", "**3.**"), not a quantity.
 _ORDINAL = re.compile(r"(?m)^\s*(?:[-*]\s*)?\**\d{1,3}[.)]\**(?=\s)")
 # A markdown table: a header row, its separator, then body rows. The first

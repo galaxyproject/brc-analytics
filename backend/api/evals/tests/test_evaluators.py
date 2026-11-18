@@ -683,6 +683,8 @@ def test_a_job_id_is_not_a_number():
     # An id whose one letter is an "e" reads as an exponent unless the id
     # comes out first.
     assert extract_numbers("job 1234567890123e45 finished") == []
+    # usegalaxy.org's ids are 32 characters.
+    assert extract_numbers("job 12345678901234567890123456789e12 finished") == []
     # Sixteen decimal digits are a number, not an id.
     assert [n.value for n in extract_numbers("1234567890123456")] == [
         1234567890123456.0
