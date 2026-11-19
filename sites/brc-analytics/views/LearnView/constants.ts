@@ -1,4 +1,5 @@
 import { ROUTES } from "@brc/routes/constants";
+import { InventoryIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/InventoryIcon/inventoryIcon";
 import { SearchIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/SearchIcon/searchIcon";
 import { ArticleIcon } from "@repo/shared/components/CustomIcon/components/ArticleIcon/articleIcon";
 import { BookmarkStarIcon } from "@repo/shared/components/CustomIcon/components/BookmarkStarIcon/bookmarkStarIcon";
@@ -73,7 +74,7 @@ export const CARDS: LearnCard[] = [
     href: ROUTES.LOGAN_SEARCH_LEARN,
     isLoganSearchGated: true,
     secondaryText:
-      "Find the SRA runs a DNA sequence occurs in, with Logan's assembled contigs: inputs, scores, limits and export.",
+      "Find the SRA runs a DNA sequence occurs in, with Logan's assembled contigs: inputs, limits, scores and results.",
     title: "Logan Search",
   },
   {
@@ -89,5 +90,12 @@ export const CARDS: LearnCard[] = [
     secondaryText:
       "Run selection analysis in your browser with PrimAeon, and learn when to use HyphAeon, ChronAeon, or HyPhy.",
     title: "PrimAeon",
+  },
+  {
+    StartIcon: InventoryIcon,
+    href: "/learn/associated-tools",
+    secondaryText:
+      "Sequence search, selection analysis, recombination scanning, transmission surveillance, dating and phylodynamics, and phylogenetic inference tools supported by BRC Analytics.",
+    title: "Associated Tools",
   },
 ];
