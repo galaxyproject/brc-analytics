@@ -5,8 +5,9 @@ import { StyledForm } from "./geneSearchForm.styles";
 import { type GeneSearchFormProps } from "./types";
 
 /**
- * A text box that searches genes when submitted. Keyed by its query where it
- * is used, so a new query (as on going back) resets what it shows.
+ * A text box that searches genes when submitted. A new query (as on going
+ * Back) resets what it shows; the form stays mounted, so the box or button
+ * that submitted keeps focus.
  * @param props - Component props.
  * @param props.onSearch - Called with the text when the form is submitted.
  * @param props.query - The search being shown.
@@ -17,6 +18,13 @@ export const GeneSearchForm = ({
   query,
 }: GeneSearchFormProps): JSX.Element => {
   const [value, setValue] = useState(query);
+  // The query value was last reset to, so a new one resets it during render
+  // rather than after it.
+  const [shownQuery, setShownQuery] = useState(query);
+  if (query !== shownQuery) {
+    setShownQuery(query);
+    setValue(query);
+  }
   const onSubmit = (event: FormEvent): void => {
     event.preventDefault();
     onSearch(value.trim());

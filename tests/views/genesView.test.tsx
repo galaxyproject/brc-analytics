@@ -129,6 +129,15 @@ describe("GenesView", () => {
     expect(screen.getByRole("searchbox")).toHaveValue("ama");
   });
 
+  it("keeps the box focused when a search is made", () => {
+    const { rerender } = renderView(found([AMA1]), "ama");
+    const box = screen.getByRole("searchbox");
+    box.focus();
+    rerender("ama1");
+    expect(screen.getByRole("searchbox")).toBe(box);
+    expect(box).toHaveFocus();
+  });
+
   it("shows the search in the box", () => {
     renderView(found([AMA1]), "ama");
     expect(screen.getByRole("searchbox")).toHaveValue("ama");

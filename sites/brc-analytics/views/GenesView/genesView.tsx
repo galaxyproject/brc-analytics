@@ -29,7 +29,7 @@ export const GenesView = ({
     <StyledGrid>
       <StyledTitle>Genes</StyledTitle>
       <GenesPanel>
-        <GeneSearchForm key={query} onSearch={onSubmit} query={query} />
+        <GeneSearchForm onSearch={onSubmit} query={query} />
         {search.status === "idle" ? (
           <ExampleGenes />
         ) : (
