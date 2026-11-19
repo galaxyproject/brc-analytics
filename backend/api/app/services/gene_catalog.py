@@ -172,7 +172,7 @@ SELECT struct_pack(b.type, value := b.display) AS matched_on,
            taxonomy_id := a.taxonomy_id
        ) AS organism
 FROM best b
-JOIN gene g ON g.gene_uid = b.gene_uid AND g.latest AND g.present
+JOIN gene g ON g.gene_uid = b.gene_uid AND g.latest
 JOIN assembly a ON a.accession = g.assembly_accession
 ORDER BY b.tier, length(b.term), coalesce(g.locus_tag, g.name), g.gene_uid
 LIMIT ?
