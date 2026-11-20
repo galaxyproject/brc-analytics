@@ -1,14 +1,35 @@
 import json
 import uuid
 from pathlib import Path
+from types import SimpleNamespace
 
 import duckdb
 import pytest
+import requests
 from catalog_build.genes import build_gene_snapshot as bgs
 
 EXCERPT = Path(__file__).parent / "data" / "ncbi_cases" / "pfalciparum_3d7.gff3"
 
 AMA1_UID = bgs.gene_uid("GCF_000002765.6", "gene-PF3D7_1133400")
+
+# The 14 nuclear chromosomes UCSC's 3D7 browser has: not the mitochondrion
+# (NC_037526.1) or the apicoplast (NC_036769.1).
+UCSC_3D7 = [
+    "NC_000521.4",
+    "NC_004318.2",
+    "NC_004325.2",
+    "NC_004326.2",
+    "NC_004327.3",
+    "NC_004328.3",
+    "NC_004329.3",
+    "NC_004330.2",
+    "NC_004331.3",
+    "NC_037280.1",
+    "NC_037281.1",
+    "NC_037282.1",
+    "NC_037283.1",
+    "NC_037284.1",
+]
 
 CATALOG = [
     {
@@ -22,6 +43,21 @@ CATALOG = [
         "ucscBrowserUrl": "https://genome.ucsc.edu/h/GCF_000002765.6",
     }
 ]
+
+
+@pytest.fixture(autouse=True)
+def ucsc_reads(monkeypatch):
+    """Stands in for UCSC's API, and records the accessions asked for."""
+    reads = []
+
+    def get(url, params, timeout):
+        assert url == bgs.UCSC_CHROMOSOMES_URL
+        reads.append(params["genome"])
+        body = {"chromosomes": {name: 0 for name in UCSC_3D7}}
+        return SimpleNamespace(raise_for_status=lambda: None, json=lambda: body)
+
+    monkeypatch.setattr(bgs.requests, "get", get)
+    return reads
 
 
 @pytest.fixture
@@ -39,6 +75,7 @@ def excerpt_rows(tmp_path, catalog):
         "GCF_000002765.6",
         bgs.fetch_gff3(str(EXCERPT), tmp_path),
         bgs.assembly_row(catalog, "GCF_000002765.6"),
+        UCSC_3D7,
         "test",
     )
 
@@ -61,6 +98,7 @@ def test_counts(snapshot):
     assert counts == {
         "snapshot": 1,
         "assembly": 1,
+        "ucsc_sequence": 14,
         "annotation_set_version": 1,
         "annotation_file_version": 1,
         "gene": 4,
@@ -81,6 +119,42 @@ def test_assembly_row_comes_from_the_catalog(snapshot):
             "https://genome.ucsc.edu/h/GCF_000002765.6",
         )
     ]
+
+
+def test_ucsc_sequences_come_from_ucsc(snapshot, ucsc_reads):
+    con, _ = snapshot
+    assert ucsc_reads == ["GCF_000002765.6"]
+    assert con.execute(
+        "SELECT assembly_accession, seq_name FROM ucsc_sequence ORDER BY seq_name"
+    ).fetchall() == [("GCF_000002765.6", name) for name in UCSC_3D7]
+
+
+def test_assembly_without_a_ucsc_browser_has_no_ucsc_sequences(tmp_path, ucsc_reads):
+    catalog = tmp_path / "assemblies.json"
+    catalog.write_text(json.dumps([{**CATALOG[0], "ucscBrowserUrl": None}]))
+    out = tmp_path / "genes.duckdb"
+    counts = bgs.build_gene_snapshot("GCF_000002765.6", str(EXCERPT), out, catalog)
+    assert ucsc_reads == []
+    assert counts["ucsc_sequence"] == 0
+
+
+def test_failed_ucsc_read_fails_and_keeps_the_old_file(tmp_path, catalog, monkeypatch):
+    out = tmp_path / "genes.duckdb"
+    bgs.build_gene_snapshot("GCF_000002765.6", str(EXCERPT), out, catalog)
+    before = out.read_bytes()
+
+    def bad_request():
+        raise requests.HTTPError("400 Client Error: Bad Request")
+
+    # UCSC's answer for an assembly it has no browser for.
+    monkeypatch.setattr(
+        bgs.requests,
+        "get",
+        lambda *args, **kwargs: SimpleNamespace(raise_for_status=bad_request),
+    )
+    with pytest.raises(requests.HTTPError):
+        bgs.build_gene_snapshot("GCF_000002765.6", str(EXCERPT), out, catalog)
+    assert out.read_bytes() == before
 
 
 def test_annotation_set_version_is_named_from_the_file(snapshot):
@@ -210,6 +284,7 @@ def test_tables_declare_their_keys(snapshot):
     assert primary == {
         "snapshot",
         "assembly",
+        "ucsc_sequence",
         "annotation_set_version",
         "annotation_file_version",
         "gene",
@@ -217,6 +292,7 @@ def test_tables_declare_their_keys(snapshot):
         "alt_id",
     }
     assert foreign == {
+        "ucsc_sequence",
         "annotation_set_version",
         "annotation_file_version",
         "gene",

@@ -11,6 +11,10 @@ The GFF3 is checked against NCBI's GTF of the same annotation (by default the
 GTF beside it) with check_against_ncbi_gtf, and any difference rejects the
 assembly: nothing is written and the old file stays.
 
+When the assembly has a UCSC browser, the names of the sequences in it are read
+from UCSC's API, so the gene API links a gene's location to UCSC only when UCSC
+has the gene's sequence. A failed read fails the build.
+
 A stand-in for the real build (#1904): it reads one NCBI GFF3 straight from
 the publisher, not from the provenance database, so the file holds one
 annotation set version, and the columns the provenance database will fill are
@@ -55,12 +59,16 @@ from .check_against_ncbi_gtf import (
 )
 from .ncbi_gff3 import Annotation, read_ncbi_gff3
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 GENE_UID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://brc-analytics.org/genes")
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_CATALOG = REPO_ROOT / "catalog" / "output" / "assemblies.json"
+
+# Lists an assembly's sequences in UCSC's browser, by the accession its
+# browser is named for.
+UCSC_CHROMOSOMES_URL = "https://api.genome.ucsc.edu/list/chromosomes"
 
 PUBLISHERS = {
     "GCF": ("NCBI RefSeq", "ncbi-refseq"),
@@ -88,6 +96,14 @@ CREATE TABLE assembly (
     species_taxonomy_id VARCHAR,
     is_ref BOOLEAN NOT NULL,
     ucsc_browser_url VARCHAR
+);
+
+-- The sequences in the assembly's UCSC browser, by the names UCSC gives them.
+-- No rows for an assembly without a browser.
+CREATE TABLE ucsc_sequence (
+    assembly_accession VARCHAR NOT NULL REFERENCES assembly (accession),
+    seq_name VARCHAR NOT NULL,
+    PRIMARY KEY (assembly_accession, seq_name)
 );
 
 CREATE TABLE annotation_set_version (
@@ -259,6 +275,16 @@ def assembly_row(catalog_path: Path, accession: str) -> Dict[str, Any]:
     }
 
 
+def ucsc_sequences(accession: str) -> List[str]:
+    """The names of the sequences in the assembly's UCSC browser."""
+    response = requests.get(
+        UCSC_CHROMOSOMES_URL, params={"genome": accession}, timeout=120
+    )
+    # UCSC answers an assembly it has no browser for with a 400.
+    response.raise_for_status()
+    return sorted(response.json()["chromosomes"])
+
+
 def _code_commit() -> Optional[str]:
     try:
         return subprocess.run(
@@ -277,6 +303,7 @@ def snapshot_rows(
     accession: str,
     file_version: FileVersion,
     assembly: Dict[str, Any],
+    ucsc_seq_names: List[str],
     build_id: str,
 ) -> Dict[str, List[Dict[str, Any]]]:
     """The rows of each table, keyed by table name."""
@@ -295,6 +322,10 @@ def snapshot_rows(
             }
         ],
         "assembly": [assembly],
+        "ucsc_sequence": [
+            {"assembly_accession": accession, "seq_name": seq_name}
+            for seq_name in ucsc_seq_names
+        ],
         "annotation_set_version": [
             {
                 "asv_id": asv_id,
@@ -443,6 +474,8 @@ def build_gene_snapshot(
 ) -> Dict[str, int]:
     """Build the snapshot for one assembly's NCBI GFF3, and count each table's rows."""
     assembly = assembly_row(catalog, accession)
+    # Before the GFF3 and GTF work, so a failed read stops the build early.
+    ucsc_seq_names = ucsc_sequences(accession) if assembly["ucsc_browser_url"] else []
     with tempfile.TemporaryDirectory() as workdir:
         file_version = fetch_gff3(gff3, Path(workdir))
         annotation = read_ncbi_gff3(text_lines(str(file_version.path)))
@@ -468,7 +501,9 @@ def build_gene_snapshot(
             + "\n".join(describe(differences))
         )
     build_id = f"temp-{accession}-{file_version.retrieved_at:%Y-%m-%dT%H%M%SZ}"
-    rows = snapshot_rows(annotation, accession, file_version, assembly, build_id)
+    rows = snapshot_rows(
+        annotation, accession, file_version, assembly, ucsc_seq_names, build_id
+    )
     write_snapshot(rows, out)
     return {table: len(table_rows) for table, table_rows in rows.items()}
 

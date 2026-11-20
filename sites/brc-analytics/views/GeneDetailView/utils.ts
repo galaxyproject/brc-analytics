@@ -119,7 +119,8 @@ export function getPreviousIds(aliases: GeneAlias[]): string[] {
  * always https://genome.ucsc.edu/h/<accession>), so the position is appended
  * as the first query parameter.
  * @param ucscBrowserUrl - The assembly's UCSC Genome Browser address, or null
- * when UCSC has no browser for it.
+ * when UCSC has no browser for it or its browser doesn't have the gene's
+ * sequence.
  * @param location - Genome location.
  * @returns E.g. "https://genome.ucsc.edu/h/GCF_000002765.6?position=NC_004325.2:226036-227419",
  * or null when there is no browser address.
