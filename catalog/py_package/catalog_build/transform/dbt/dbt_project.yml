@@ -3,11 +3,13 @@ version: "1.0.0"
 config-version: 2
 
 # Profile is defined in the profiles.yml shipped alongside this project; point
-# dbt at it with `--profiles-dir` (build.py does this when it orchestrates the run).
+# dbt at it with `--profiles-dir` (transform.py does this when it orchestrates the run).
 profile: "catalog_build"
 
 model-paths: ["models"]
 
+# Used for manual runs; catalog builds override this (and the log path) with a
+# folder under the catalog's temp folder.
 target-path: "target"
 clean-targets:
   - "target"
@@ -21,6 +23,6 @@ models:
 data_tests:
   +severity: warn
   # Persist failing rows to audit tables so the QC report can list them. The
-  # short test names set in schema.yml keep these table names readable, and the
-  # run_results.json artifact records each table's exact name for lookup.
+  # short test names set in schema.yml keep these table names readable, and each
+  # test's result records its table's exact name for lookup.
   +store_failures: true
