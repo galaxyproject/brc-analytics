@@ -16,9 +16,9 @@ load_dotenv()
 # treated as deployed and must opt into the safe behavior.
 DEV_ENVIRONMENTS = frozenset({"local", "dev", "development"})
 
-# Assistant session cookie name. Module-level constant (not env-driven)
-# so importing it doesn't drag the full Settings instantiation along.
-SESSION_COOKIE_NAME = "brc_assistant_session"
+# Cookie identifying the browser that assistant sessions are bound to.
+# Module-level so importing it skips Settings instantiation.
+BROWSER_COOKIE_NAME = "brc_assistant_browser"
 
 # Which gene snapshot this release serves (see app/services/gene_snapshot.py).
 GENE_SNAPSHOT_PIN_PATH = (
@@ -198,11 +198,10 @@ class Settings:
             "TRUST_PROXY_HEADERS", "false"
         ).lower() in ("1", "true", "yes")
 
-        # Assistant session cookie. /chat issues an httpOnly Same-Site=Strict
-        # cookie binding the session_id to the browser; continuing, reading
-        # or deleting a session requires it.
+        # Keys the browser bindings that let a browser use an assistant session
+        # (app/core/session_signing.py); continuing, reading or deleting a
+        # session requires one.
         self.SESSION_COOKIE_SECRET: str = os.getenv("SESSION_COOKIE_SECRET", "")
-        self.SESSION_COOKIE_TTL: int = 7200  # match SESSION_TTL in session_service
 
         # Deployed environments must configure the secret: a generated one
         # changes on every restart, dropping every session's binding.

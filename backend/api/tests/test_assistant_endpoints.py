@@ -1,52 +1,85 @@
-"""Integration tests for assistant session-cookie binding."""
+"""Integration tests for binding assistant sessions to the browser."""
 
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
 
-from app.core.session_signing import sign_session_id
+from app.core.dependencies import get_assistant_agent
+from app.core.session_signing import browser_cookie_name, sign_browser_id
 from app.models.assistant import ChatMessage, MessageRole, SessionState
 from app.models.user_data import UserMeResponse
-from tests.conftest import SECRET
+from tests.conftest import TEST_BROWSER, bind_browser
 
 
-class TestSessionCookieBinding:
-    def test_chat_sets_session_cookie(self, client):
+def _agent(client):
+    """The stubbed assistant agent the app was given."""
+    return client.app.dependency_overrides[get_assistant_agent]()
+
+
+def _cleared(resp, name: str) -> bool:
+    """Whether the response expires the named cookie."""
+    return any(
+        h.startswith(f"{name}=") and "Max-Age=0" in h
+        for h in resp.headers.get_list("set-cookie")
+    )
+
+
+class TestSessionBrowserBinding:
+    def test_chat_issues_a_browser_cookie_and_binds_the_session(self, client):
         resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
         assert resp.status_code == 200, resp.text
-        cookie = resp.cookies.get("brc_assistant_session")
-        assert cookie, "expected brc_assistant_session cookie to be set"
-        # Cookie should be the HMAC of the session_id, not the raw id.
-        assert cookie == sign_session_id("sess-abc", SECRET)
+        browser_id = resp.cookies.get(browser_cookie_name())
+        assert browser_id, "expected a browser id cookie"
+        # Redis holds an HMAC of the id, never the id itself.
+        assert ("sess-abc", sign_browser_id(browser_id)) in _agent(
+            client
+        ).session_service.bindings
+
+    def test_a_late_response_keeps_the_browser_id_it_was_sent(self, client):
+        # The cookie is only ever refreshed: a response landing late, for a
+        # conversation the user has left, carries the same id and so can't
+        # unbind the conversation on screen.
+        bind_browser(client)
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+        assert resp.cookies.get(browser_cookie_name()) == TEST_BROWSER
+        resp = client.get("/api/v1/assistant/session/sess-abc")
+        assert resp.status_code == 200, resp.text
 
     def test_get_session_without_cookie_is_forbidden(self, client):
         resp = client.get("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 403
 
-    def test_get_session_with_valid_cookie_succeeds(self, client):
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+    def test_get_session_from_the_bound_browser_succeeds(self, client):
+        bind_browser(client)
         resp = client.get("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 200, resp.text
 
-    def test_get_session_with_wrong_signature_is_forbidden(self, client):
-        # signature for a different session_id
-        client.cookies.set(
-            "brc_assistant_session", sign_session_id("other-session", SECRET)
-        )
+    def test_get_session_from_another_browser_is_forbidden(self, client):
+        client.cookies.set(browser_cookie_name(), "another-browser")
         resp = client.get("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 403
+
+    def test_an_unbound_caller_cannot_tell_a_live_session_from_a_gone_one(self, client):
+        resp = client.get("/api/v1/assistant/session/no-such-session")
+        assert resp.status_code == 403
+
+    def test_get_expired_session_from_the_bound_browser_is_not_found(self, client):
+        _agent(client).session_service.get_session.return_value = None
+        bind_browser(client)
+        resp = client.get("/api/v1/assistant/session/sess-abc")
+        assert resp.status_code == 404
 
     def test_delete_session_without_cookie_is_forbidden(self, client):
         resp = client.delete("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 403
 
-    def test_delete_session_with_valid_cookie_succeeds(self, client):
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+    def test_delete_session_from_the_bound_browser_succeeds(self, client):
+        bind_browser(client)
         resp = client.delete("/api/v1/assistant/session/sess-abc")
         assert resp.status_code == 204
 
-    def test_logout_clears_assistant_session_cookie(self, client):
-        # A shared browser must not keep the prior user's assistant session
+    def test_logout_clears_the_browser_cookie(self, client):
+        # A shared browser must not keep the prior user's assistant sessions
         # reachable after logout -- the restore/delete endpoints gate purely
         # on possession of this cookie.
         # Key the override on the reference the route actually captured at
@@ -59,18 +92,59 @@ class TestSessionCookieBinding:
             lambda: fake_auth
         )
 
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
         resp = client.post("/api/v1/auth/logout")
         assert resp.status_code == 200, resp.text
-        cleared = [
-            h
-            for h in resp.headers.get_list("set-cookie")
-            if h.startswith("brc_assistant_session=") and "Max-Age=0" in h
-        ]
-        assert cleared, resp.headers.get_list("set-cookie")
+        assert _cleared(resp, browser_cookie_name()), resp.headers.get_list(
+            "set-cookie"
+        )
+
+    def test_logout_does_not_hinge_on_the_assistant(self, client):
+        # Unbinding is best effort: the auth side is done and the cookie goes
+        # even when the assistant's store can't be reached.
+        from app.api.v1 import auth as auth_module
+
+        fake_auth = MagicMock()
+        fake_auth.revoke_session_tokens = AsyncMock()
+        client.app.dependency_overrides[auth_module.get_auth_service] = (
+            lambda: fake_auth
+        )
+        _agent(client).session_service.unbind_browser = AsyncMock(
+            side_effect=RuntimeError("redis is unreachable")
+        )
+        client.cookies.set("brc_session", "auth-session")
+        bind_browser(client)
+
+        resp = client.post("/api/v1/auth/logout")
+
+        assert resp.status_code == 200, resp.text
+        fake_auth.revoke_session_tokens.assert_awaited_once()
+        assert _cleared(resp, browser_cookie_name())
+
+    def test_a_response_landing_after_logout_brings_back_only_its_session(self, client):
+        # A chat sent before logout re-issues the old browser id when it lands.
+        # Logout dropped the bindings too, so that id holds only the session
+        # the late response re-binds, not every one the browser had.
+        from app.api.v1 import auth as auth_module
+
+        fake_auth = MagicMock()
+        fake_auth.revoke_session_tokens = AsyncMock()
+        client.app.dependency_overrides[auth_module.get_auth_service] = (
+            lambda: fake_auth
+        )
+        bindings = _agent(client).session_service.bindings
+        bind_browser(client, _agent(client).session_service, "sess-other")
+
+        client.post("/api/v1/auth/logout")
+        assert not bindings
+        client.cookies.set(browser_cookie_name(), TEST_BROWSER)
+        client.post("/api/v1/assistant/chat", json={"message": "sent earlier"})
+
+        assert client.get("/api/v1/assistant/session/sess-abc").status_code == 200
+        assert client.get("/api/v1/assistant/session/sess-other").status_code == 403
 
     def test_anonymous_chat_with_session_id_requires_cookie(self, client):
-        # Continuing a session by id must require the signed cookie even for
+        # Continuing a session by id must require the bound browser even for
         # anonymous callers -- session ids leak via URLs (assistantSessionId).
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -78,8 +152,10 @@ class TestSessionCookieBinding:
         )
         assert resp.status_code == 403
 
-    def test_anonymous_chat_with_session_id_and_valid_cookie_succeeds(self, client):
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+    def test_anonymous_chat_with_session_id_from_the_bound_browser_succeeds(
+        self, client
+    ):
+        bind_browser(client)
         resp = client.post(
             "/api/v1/assistant/chat",
             json={"message": "hello", "session_id": "sess-abc"},
@@ -113,7 +189,7 @@ class TestAnonymousSessionClaim:
             )
         )
         self._override_user(app_with_stubbed_agent, "user-a")
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
 
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -148,7 +224,7 @@ class TestAnonymousSessionClaim:
             side_effect=PermissionError("sess-abc")
         )
         self._override_user(app_with_stubbed_agent, "user-b")
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
 
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -264,7 +340,7 @@ class TestAnonymousSessionClaim:
             ).get_assistant_agent
         ]()
         agent.chat_with_telemetry = AsyncMock(side_effect=PermissionError("sess-abc"))
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
 
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -286,7 +362,7 @@ class TestAnonymousSessionClaim:
         # No authenticated-user override -- caller is anonymous. Continuing a
         # session still requires the cookie, but an anonymous caller never
         # triggers a claim.
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
 
         resp = client.post(
             "/api/v1/assistant/chat",
@@ -334,7 +410,12 @@ class TestCreateLoganSession:
         assert body["session_id"] == "sess-logan"
         assert body["messages"][0]["role"] == "assistant"
         assert body["suggestions"][0]["label"] == "What is this cohort?"
-        assert "brc_assistant_session" in r.headers.get("set-cookie", "")
+        browser_id = r.cookies.get(browser_cookie_name())
+        assert browser_id, r.headers.get("set-cookie")
+        # The new session is bound to this browser before it is handed back.
+        assert ("sess-logan", sign_browser_id(browser_id)) in _agent(
+            client
+        ).session_service.bindings
         agent.create_logan_session.assert_awaited_once_with(LOGAN_JOB, None)
 
     def test_invalid_job_id_is_422(self, client):
@@ -421,7 +502,7 @@ class TestSaveWithoutADatabase:
             return UserMeResponse(sub="user-a")
 
         app_with_stubbed_agent.dependency_overrides[get_current_user] = _current_user
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
 
         resp = client.post("/api/v1/assistant/session/sess-abc/save")
 
@@ -442,7 +523,7 @@ class TestChatClearFields:
 
     def test_passes_clears_through(self, client, app_with_stubbed_agent):
         agent = self._agent(app_with_stubbed_agent)
-        client.cookies.set("brc_assistant_session", sign_session_id("sess-abc", SECRET))
+        bind_browser(client)
         resp = client.post(
             "/api/v1/assistant/chat",
             json={"clear_fields": ["organism"], "session_id": "sess-abc"},

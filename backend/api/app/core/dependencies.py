@@ -23,6 +23,7 @@ from app.services.catalog_data import CatalogData
 from app.services.ena_service import ENAService
 from app.services.galaxy_service import GalaxyService
 from app.services.gene_catalog import GeneCatalogService
+from app.services.session_service import SessionService
 from app.services.sra_mirror import SRAMirrorService
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,15 @@ def get_auth_service() -> AuthService:
 def get_cache_service() -> CacheService:
     settings = get_settings()
     return CacheService(settings.REDIS_URL)
+
+
+def get_session_service() -> SessionService:
+    """Assistant sessions and their browser bindings, without the assistant agent.
+
+    For callers outside the assistant -- logout -- that must keep working
+    when the agent can't be built.
+    """
+    return SessionService(get_cache_service())
 
 
 @lru_cache(maxsize=1)
