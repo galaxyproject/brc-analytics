@@ -1,0 +1,18 @@
+# A minimal dbt project for testing catalog_build.transform, configured like the
+# catalog's own project: table models, and warn-severity tests that store their
+# failing rows.
+name: "transform_fixture"
+version: "1.0.0"
+config-version: 2
+
+profile: "transform_fixture"
+
+model-paths: ["models"]
+
+models:
+  transform_fixture:
+    +materialized: table
+
+data_tests:
+  +severity: warn
+  +store_failures: true

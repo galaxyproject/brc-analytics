@@ -144,7 +144,7 @@ def _test_status_is_success(status: str) -> bool:
 
 
 def _to_test_result(
-    node_result: RunResult, con: duckdb.DuckDBPyConnection | None
+    node_result: RunResult, con: duckdb.DuckDBPyConnection
 ) -> DBTTestResult:
     status = node_result.status.value
     success = _test_status_is_success(status)
@@ -153,7 +153,7 @@ def _to_test_result(
     relation_name = getattr(node_result.node, "relation_name", None)
 
     failure_sample: list[dict[str, object]] = []
-    if con is not None and not success and relation_name and (failure_count or 0) > 0:
+    if not success and relation_name and (failure_count or 0) > 0:
         try:
             failure_sample = _fetch_failure_sample(
                 con, relation_name, FAILURE_SAMPLE_SIZE
@@ -183,24 +183,12 @@ def _get_test_results(
 
     With store_failures enabled, dbt writes failing rows to audit tables; each
     test result records the exact table name via its node's `relation_name`,
-    which we query to pull the sample. If the database can't be opened, the
-    results are returned without samples rather than failing the build.
+    which we query to pull the sample.
     """
-    con: duckdb.DuckDBPyConnection | None
-    try:
-        con = duckdb.connect(str(get_db_path(temp_folder_path)), read_only=True)
-    except duckdb.Error as error:
-        print(
-            f"Could not open the database to read failing rows for dbt tests: {error}"
-        )
-        con = None
-    try:
+    with duckdb.connect(str(get_db_path(temp_folder_path)), read_only=True) as con:
         results = [
             _to_test_result(node_result, con) for node_result in test_node_results
         ]
-    finally:
-        if con is not None:
-            con.close()
     # Sorted by name, since dbt runs the tests across several threads and reports
     # them in the order they finished
     results.sort(key=lambda result: result.test_name)

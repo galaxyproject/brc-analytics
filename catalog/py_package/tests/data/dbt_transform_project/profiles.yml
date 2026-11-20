@@ -1,0 +1,7 @@
+transform_fixture:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ var('duckdb_path') }}"
+      threads: 1
