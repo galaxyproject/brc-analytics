@@ -33,6 +33,7 @@ import json
 import os
 import re
 import shutil
+import string
 import subprocess
 import tempfile
 import uuid
@@ -55,7 +56,7 @@ from .check_against_ncbi_gtf import (
 )
 from .ncbi_gff3 import Annotation, read_ncbi_gff3
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 GENE_UID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://brc-analytics.org/genes")
 
@@ -70,6 +71,27 @@ PUBLISHERS = {
 # Accessions whose version is matched with or without its `.N`.
 VERSIONED_ALIAS_TYPES = {"transcript_id", "protein_accession"}
 
+# Aliases that are a gene's own IDs, ranked above its other aliases in search.
+OWN_ALIAS_TYPES = {"locus_tag", "name"}
+
+# Words of a product too common to search by; so are words of 1 or 2 characters.
+PRODUCT_STOP_WORDS = frozenset(
+    {"putative", "protein", "of", "the", "and", "family", "domain", "like"}
+)
+MIN_PRODUCT_WORD_LENGTH = 3
+
+# search_term.type_rank: how good a match on each kind of term is, lowest
+# best. Search ranks a term the gene's word only starts 2 below the same term
+# matched whole, so a product word ranks after every alias match.
+TYPE_RANK_OWN_ALIAS = 0
+TYPE_RANK_OTHER_ALIAS = 1
+TYPE_RANK_PRODUCT_WORD = 4
+
+# Tables written in an order of their own. The rest are sorted by gene UID
+# when they have one, so a lookup by gene reads one row group; search_term is
+# sorted by term, so a prefix of a term is a range of rows.
+TABLE_ORDER = {"search_term": "term, type, gene_uid"}
+
 SCHEMA = """
 CREATE TABLE snapshot (
     build_id VARCHAR PRIMARY KEY,
@@ -78,7 +100,12 @@ CREATE TABLE snapshot (
     built_at TIMESTAMP NOT NULL,
     gene_sources_commit VARCHAR,
     code_commit VARCHAR,
-    check_report JSON
+    check_report JSON,
+    -- The rules search_term's product words were made by, so search can drop
+    -- the words of a query that are never terms: product words shorter than
+    -- search_min_word_length, and search_stop_words.
+    search_stop_words VARCHAR[] NOT NULL,
+    search_min_word_length INTEGER NOT NULL
 );
 
 CREATE TABLE assembly (
@@ -165,6 +192,22 @@ CREATE TABLE alt_id (
     latest BOOLEAN NOT NULL,
     PRIMARY KEY (value, type, gene_uid, asv_id),
     FOREIGN KEY (gene_uid, asv_id) REFERENCES gene (gene_uid, asv_id)
+);
+
+-- What gene search matches, one row per term, type and gene, from the latest
+-- annotation set versions only: each alias (an accession also without its
+-- version), and each word of the gene's transcripts' products. Sorted by term,
+-- so a prefix is a range of rows. No primary key: search reads ranges, never
+-- keys, and the index would be most of the table's size; search_term_rows
+-- keeps each row once.
+CREATE TABLE search_term (
+    term VARCHAR NOT NULL,
+    type VARCHAR NOT NULL,
+    gene_uid UUID NOT NULL,
+    display VARCHAR NOT NULL,
+    assembly_accession VARCHAR NOT NULL REFERENCES assembly (accession),
+    species_taxonomy_id VARCHAR,
+    type_rank INTEGER NOT NULL
 );
 """
 
@@ -272,6 +315,75 @@ def _code_commit() -> Optional[str]:
         return None
 
 
+def unversioned(value_lower: str, alias_type: str) -> str:
+    """An alias without its `.N` version, if it is an accession that has one."""
+    if alias_type in VERSIONED_ALIAS_TYPES:
+        return re.sub(r"\.\d+$", "", value_lower)
+    return value_lower
+
+
+def product_words(product: str) -> List[str]:
+    """The words of a product that find its gene, lowercased, each once.
+
+    Words are split at whitespace and trimmed of punctuation; a word joined by
+    hyphens or slashes is kept whole and as its parts, so "ATP-dependent"
+    gives atp-dependent, atp and dependent.
+    """
+    words: List[str] = []
+    for token in product.lower().split():
+        token = token.strip(string.punctuation)
+        words.append(token)
+        words.extend(
+            part.strip(string.punctuation) for part in re.split(r"[-/]", token)
+        )
+    return [
+        word
+        for word in dict.fromkeys(words)
+        if len(word) >= MIN_PRODUCT_WORD_LENGTH and word not in PRODUCT_STOP_WORDS
+    ]
+
+
+def search_term_rows(
+    uid: str,
+    accession: str,
+    species_taxonomy_id: Optional[str],
+    aliases: List[Tuple[str, str]],
+    products: List[Tuple[str, str]],
+) -> List[Dict[str, Any]]:
+    """A gene's search terms: its aliases and its products' words.
+
+    `aliases` and `products` are (value, type) pairs. A term is kept once per
+    type, with the first value it came from as its display. An accession is
+    also a term without its version, so typing it without one is an exact
+    match.
+    """
+    terms: Dict[Tuple[str, str], Tuple[str, int]] = {}
+    for value, alias_type in aliases:
+        rank = (
+            TYPE_RANK_OWN_ALIAS
+            if alias_type in OWN_ALIAS_TYPES
+            else TYPE_RANK_OTHER_ALIAS
+        )
+        value_lower = value.lower()
+        for term in dict.fromkeys([value_lower, unversioned(value_lower, alias_type)]):
+            terms.setdefault((term, alias_type), (value, rank))
+    for product, product_type in products:
+        for word in product_words(product):
+            terms.setdefault((word, product_type), (product, TYPE_RANK_PRODUCT_WORD))
+    return [
+        {
+            "term": term,
+            "type": term_type,
+            "gene_uid": uid,
+            "display": display,
+            "assembly_accession": accession,
+            "species_taxonomy_id": species_taxonomy_id,
+            "type_rank": rank,
+        }
+        for (term, term_type), (display, rank) in terms.items()
+    ]
+
+
 def snapshot_rows(
     annotation: Annotation,
     accession: str,
@@ -292,6 +404,8 @@ def snapshot_rows(
                 "gene_sources_commit": None,
                 "code_commit": _code_commit(),
                 "check_report": None,
+                "search_stop_words": sorted(PRODUCT_STOP_WORDS),
+                "search_min_word_length": MIN_PRODUCT_WORD_LENGTH,
             }
         ],
         "assembly": [assembly],
@@ -328,6 +442,7 @@ def snapshot_rows(
         "gene": [],
         "transcript": [],
         "alt_id": [],
+        "search_term": [],
     }
     for gene in annotation.genes:
         uid = str(gene_uid(accession, gene.row_id))
@@ -354,6 +469,7 @@ def snapshot_rows(
             (gene.symbol, "symbol"),
             (gene.ncbi_gene_id, "ncbi_gene_id"),
         ]
+        products: List[Tuple[str, str]] = []
         for transcript in gene.transcripts:
             rows["transcript"].append(
                 {
@@ -374,10 +490,13 @@ def snapshot_rows(
             )
             aliases.append((transcript.transcript_id, "transcript_id"))
             aliases.append((transcript.protein_accession, "protein_accession"))
+            if transcript.transcript_product:
+                products.append((transcript.transcript_product, "transcript_product"))
+            if transcript.protein_product:
+                products.append((transcript.protein_product, "protein_product"))
         aliases.extend((tag, "old_locus_tag") for tag in gene.old_locus_tags)
-        for value, alias_type in dict.fromkeys(aliases):
-            if not value:
-                continue
+        present_aliases = [(v, t) for v, t in dict.fromkeys(aliases) if v]
+        for value, alias_type in present_aliases:
             value_lower = value.lower()
             rows["alt_id"].append(
                 {
@@ -386,24 +505,29 @@ def snapshot_rows(
                     "gene_uid": uid,
                     "asv_id": asv_id,
                     "value_lower": value_lower,
-                    "value_unversioned": (
-                        re.sub(r"\.\d+$", "", value_lower)
-                        if alias_type in VERSIONED_ALIAS_TYPES
-                        else value_lower
-                    ),
+                    "value_unversioned": unversioned(value_lower, alias_type),
                     "publisher": publisher,
                     "via": None,
                     "latest": True,
                 }
             )
+        rows["search_term"].extend(
+            search_term_rows(
+                uid,
+                accession,
+                assembly["species_taxonomy_id"],
+                present_aliases,
+                products,
+            )
+        )
     return rows
 
 
 def write_snapshot(rows: Dict[str, List[Dict[str, Any]]], out: Path) -> None:
     """Write the tables to `out`, replacing it only once every row is in.
 
-    The tables declare their keys, so a duplicate key or a reference that
-    doesn't resolve fails the insert and leaves `out` as it was.
+    The tables declare their keys (but search_term's), so a duplicate key or
+    a reference that doesn't resolve fails the insert and leaves `out` as it was.
     """
     out.parent.mkdir(parents=True, exist_ok=True)
     partial = out.with_name(out.name + ".partial")
@@ -418,10 +542,12 @@ def write_snapshot(rows: Dict[str, List[Dict[str, Any]]], out: Path) -> None:
                 continue
             con.register("frame", pd.DataFrame(table_rows))
             columns = ", ".join(f'"{c}"' for c in table_rows[0])
-            # Sorted by gene UID, so a lookup by gene reads one row group.
-            order = " ORDER BY gene_uid" if "gene_uid" in table_rows[0] else ""
+            order = TABLE_ORDER.get(
+                table, "gene_uid" if "gene_uid" in table_rows[0] else None
+            )
+            order_by = f" ORDER BY {order}" if order else ""
             con.execute(
-                f"INSERT INTO {table} ({columns}) SELECT {columns} FROM frame{order}"
+                f"INSERT INTO {table} ({columns}) SELECT {columns} FROM frame{order_by}"
             )
             con.unregister("frame")
         con.execute("COMMIT")

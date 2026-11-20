@@ -22,15 +22,10 @@ from app.models.assistant import (
     SessionState,
     TurnTelemetry,
 )
+from tests.genes_helpers import GENE_SNAPSHOT_EXPORT
 from tests.test_catalog_data import SAMPLE_ORGANISMS, SAMPLE_WORKFLOWS
 
 SECRET = "test-secret-aaaaaaaaaaaaaaaaaaaa"
-
-# Four of 3D7's genes, exported from a snapshot as text so the fixture can be
-# reviewed: AMA1 (PF3D7_1133400), PF3D7_0105400 with two transcripts and old
-# locus tags, the tRNA PF3D7_0203500, and PF3D7_0103600, whose transcript and
-# protein products differ.
-GENE_SNAPSHOT_EXPORT = Path(__file__).parent / "data" / "gene_snapshot"
 
 
 @pytest.fixture(scope="session")
@@ -41,6 +36,26 @@ def gene_snapshot_path(tmp_path_factory) -> Path:
     con.execute(f"IMPORT DATABASE '{GENE_SNAPSHOT_EXPORT}'")
     con.close()
     return path
+
+
+@pytest.fixture(scope="module")
+def gene_service(gene_snapshot_path):
+    """A gene catalog service over the test gene snapshot."""
+    from app.services.gene_catalog import GeneCatalogService
+
+    service = GeneCatalogService.local(
+        str(gene_snapshot_path), "https://brc-analytics.org/"
+    )
+    yield service
+    service.close()
+
+
+@pytest.fixture
+def gene_client(gene_service):
+    """A client for the gene routes, serving gene_service."""
+    from tests.genes_helpers import make_client
+
+    return make_client(gene_service)
 
 
 @pytest.fixture(autouse=True)
