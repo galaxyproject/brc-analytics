@@ -18,8 +18,8 @@ from app.services.tools.catalog_query import (
     LoganExportMismatch,
     LoganHitQuery,
     execute,
-    execute_logan_hits,
 )
+from evals.datasets.logan_narrowing import ground_truth
 
 F1 = (
     Path(__file__).resolve().parents[1]
@@ -38,8 +38,49 @@ _WAIT = 5.0
 
 def test_a_query_runs_over_the_export():
     got = asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
-    assert got == execute_logan_hits(MALAWI, F1)
+    assert got == {"total": ground_truth("country = 'Malawi'")}
     assert got["total"] > 0
+
+
+def test_a_query_gets_one_capped_connection_and_closes_it(monkeypatch):
+    from app.services import kmindex_filters
+
+    opened = []
+    real = kmindex_filters._connect
+
+    def spy():
+        con = real()
+        opened.append(con)
+        return con
+
+    monkeypatch.setattr(kmindex_filters, "_connect", spy)
+    asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
+    assert len(opened) == 1
+    with pytest.raises(duckdb.ConnectionException):
+        opened[0].execute("SELECT 1")
+
+
+def test_concurrent_queries_over_one_export_agree():
+    """Each query has its own connection, so callers on other threads and
+    loops can't collide over the file."""
+    expected = {"total": ground_truth("country = 'Malawi'")}
+    results, errors = [], []
+
+    def run():
+        try:
+            results.append(
+                asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
+            )
+        except Exception as e:  # pragma: no cover - reported below
+            errors.append(e)
+
+    threads = [threading.Thread(target=run) for _ in range(6)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(_WAIT)
+    assert not errors
+    assert results == [expected] * 6
 
 
 def test_a_file_of_the_wrong_shape_is_reported(tmp_path):

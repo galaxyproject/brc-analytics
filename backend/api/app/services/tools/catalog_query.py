@@ -12,9 +12,9 @@ A typed, column-agnostic query the model authors and the backend compiles to SQL
 
 Assembly and organism entities are queryable; workflows stay on their dedicated
 tools. A third entity, `logan_hit`, is the export of one Logan search: it has
-no table in the shared catalog connection, and is queried through
-`LoganHitQuery` / `execute_logan_hits` over the job's parquet on a private,
-capped connection opened per call.
+no table in the shared catalog connection, and is queried with a
+`LoganHitQuery` over a view of the job's parquet (`create_logan_view`), on a
+private, capped connection opened per call (see logan_export_query).
 """
 
 from __future__ import annotations
@@ -75,7 +75,7 @@ class EntitySchema:
     # Facets auto-returned on a truncated list so the model can offer narrowing.
     auto_facets: tuple[str, ...] = ()
     # True when the entity is not part of the shared catalog connection: its
-    # rows come from a file named per call (see execute_logan_hits), so
+    # rows come from a file named per call (see create_logan_view), so
     # connect() neither loads nor requires it.
     per_call: bool = False
 
@@ -795,21 +795,3 @@ def create_logan_view(con, parquet: Path) -> None:
         )
     rel = rel.project("*, CAST(year(release_date) AS INTEGER) AS release_year")
     rel.create_view("logan_hit", replace=True)
-
-
-def execute_logan_hits(q: LoganHitQuery, parquet: Path) -> dict:
-    """Run a LoganHitQuery over one job's export; same summary as execute().
-
-    Blocking, on a private connection with the results page's thread and
-    memory caps (kmindex_filters' capped connection -- imported here so duckdb
-    stays a lazy import, as in connect()). From async code use
-    logan_export_query.run_export_query, which also bounds and cancels it.
-    """
-    from app.services.kmindex_filters import _connect
-
-    con = _connect()
-    try:
-        create_logan_view(con, parquet)
-        return execute(q, con)
-    finally:
-        con.close()

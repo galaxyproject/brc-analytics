@@ -309,8 +309,9 @@ def test_a_fixture_that_cant_be_shown_whole_is_refused(
 def test_the_engine_agrees_with_plain_sql_on_every_expected_query(case):
     """Each case's expected filters, run through the engine under test, give
     the count the case checks the reply against (computed in plain SQL)."""
-    from app.services.tools.catalog_query import LoganHitQuery, execute_logan_hits
+    from app.services.tools.catalog_query import LoganHitQuery
     from evals.logan_fixture import load_fixture
+    from tests.logan_helpers import execute_logan_hits
 
     q = LoganHitQuery.model_validate({"filters": case["expect"]})
     got = execute_logan_hits(q, load_fixture("logan_pfal_18s").parquet)["total"]

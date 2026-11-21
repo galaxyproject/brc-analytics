@@ -6,7 +6,6 @@ the engine itself, and the catalog side is checked for not having moved.
 
 from __future__ import annotations
 
-import threading
 from pathlib import Path
 
 import duckdb
@@ -18,9 +17,9 @@ from app.services.tools.catalog_query import (
     CatalogQuery,
     LoganExportMismatch,
     LoganHitQuery,
-    execute_logan_hits,
 )
 from evals.datasets.logan_narrowing import ground_truth as _sql
+from tests.logan_helpers import execute_logan_hits
 
 F1 = (
     Path(__file__).resolve().parents[1]
@@ -159,40 +158,3 @@ class TestExecute:
         con.close()
         with pytest.raises(LoganExportMismatch, match="missing"):
             execute_logan_hits(_q(), bad)
-
-    def test_runs_on_a_private_capped_connection_it_closes(self, monkeypatch):
-        from app.services import kmindex_filters
-
-        opened = []
-        real = kmindex_filters._connect
-
-        def spy():
-            con = real()
-            opened.append(con)
-            return con
-
-        monkeypatch.setattr(kmindex_filters, "_connect", spy)
-        execute_logan_hits(_q(), F1)
-        assert len(opened) == 1
-        with pytest.raises(duckdb.ConnectionException):
-            opened[0].execute("SELECT 1")
-
-    def test_concurrent_calls_from_threads(self):
-        """Each call has its own connection, so worker threads can't collide."""
-        q = _q(filters=[{"field": "country", "op": "eq", "value": "Malawi"}])
-        expected = _sql("country = 'Malawi'")
-        results, errors = [], []
-
-        def run():
-            try:
-                results.append(execute_logan_hits(q, F1)["total"])
-            except Exception as e:  # pragma: no cover - reported below
-                errors.append(e)
-
-        threads = [threading.Thread(target=run) for _ in range(6)]
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
-        assert not errors
-        assert results == [expected] * 6
