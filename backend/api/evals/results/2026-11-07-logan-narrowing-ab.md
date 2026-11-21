@@ -15,7 +15,7 @@ pre-reply pass finished, and wrong whenever its 12 s cap cut the pass off --
 which on TACC it did on about a third of turns in both of its runs.
 
 The extract arm was removed after this result: `LOGAN_NARROWING_MODE` is now
-`off` (the default) or `tool`, and any other value reads as `off`. This page
+`off` (the default) or `tool`, and any other value stops startup. This page
 and its per-run reports stay as the record of why. The extract rows below are
 as they were scored at the time; the scorers that read its pass and its stored
 selection went with it.
