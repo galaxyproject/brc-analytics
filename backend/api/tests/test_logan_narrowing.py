@@ -104,28 +104,29 @@ def _clear_settings():
     get_settings.cache_clear()
 
 
-@pytest.mark.parametrize("raw", ["sometimes", "extract", " Extract "])
-def test_an_unknown_mode_reads_as_off_and_says_so(monkeypatch, caplog, raw):
-    # "extract" was a second mode, since removed; a deploy still setting it
-    # gets the shipped behaviour rather than a half-configured one.
+@pytest.mark.parametrize("raw", ["sometimes", "tools", "extract", " Extract "])
+def test_an_unknown_mode_stops_startup(monkeypatch, raw):
+    # A typo must not quietly run as "off". "extract" was a second mode that
+    # never shipped, so it is as unknown as any other.
     monkeypatch.setenv("LOGAN_NARROWING_MODE", raw)
     get_settings.cache_clear()
-    with caplog.at_level("WARNING", logger="app.core.config"):
-        assert get_settings().LOGAN_NARROWING_MODE == "off"
-    assert "LOGAN_NARROWING_MODE" in caplog.text
+    with pytest.raises(ValueError, match="LOGAN_NARROWING_MODE must be off or tool"):
+        get_settings()
 
 
-@pytest.mark.parametrize("raw", [" Tool ", "tool", "OFF", None])
-def test_known_modes_are_read_loosely_and_quietly(monkeypatch, caplog, raw):
+@pytest.mark.parametrize(
+    "raw, expected",
+    [(" Tool ", "tool"), ("tool", "tool"), ("OFF", "off"), (None, "off"), ("", "off")],
+)
+def test_known_modes_are_read_loosely(monkeypatch, raw, expected):
+    # Unset and empty are the same thing: a compose file passing the variable
+    # through hands the server "" when nobody set it.
     if raw is None:
         monkeypatch.delenv("LOGAN_NARROWING_MODE", raising=False)
     else:
         monkeypatch.setenv("LOGAN_NARROWING_MODE", raw)
     get_settings.cache_clear()
-    with caplog.at_level("WARNING", logger="app.core.config"):
-        mode = get_settings().LOGAN_NARROWING_MODE
-    assert mode == (raw or "off").strip().lower()
-    assert "LOGAN_NARROWING_MODE" not in caplog.text
+    assert get_settings().LOGAN_NARROWING_MODE == expected
 
 
 def test_the_dataset_labels_a_run_with_the_mode_the_server_runs(monkeypatch):

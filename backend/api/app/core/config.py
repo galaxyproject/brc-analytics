@@ -1,4 +1,3 @@
-import logging
 import os
 import secrets
 from functools import lru_cache
@@ -9,22 +8,22 @@ from dotenv import load_dotenv
 
 from app.core.partner_keys import parse_partner_keys, parse_sunset
 
-logger = logging.getLogger(__name__)
-
 NarrowingMode = Literal["off", "tool"]
 
 
 def parse_narrowing_mode(raw: str | None) -> NarrowingMode:
     """LOGAN_NARROWING_MODE as the server will act on it. Case and spacing
-    don't matter; anything else unknown -- including "extract", a mode that
-    has since been removed -- is "off", with a warning, so a typo can't
-    quietly turn into a mode nobody chose."""
-    mode = (raw or "off").strip().lower()
+    don't matter, and unset or empty is "off".
+
+    @raises ValueError: on anything else, so a typo stops startup instead of
+        quietly running as "off".
+    """
+    mode = (raw or "").strip().lower() or "off"
+    if mode == "off":
+        return "off"
     if mode == "tool":
         return "tool"
-    if mode != "off":
-        logger.warning("LOGAN_NARROWING_MODE=%r is not off or tool; using off", raw)
-    return "off"
+    raise ValueError(f"LOGAN_NARROWING_MODE must be off or tool, got {raw!r}")
 
 
 # Load environment variables from .env file
@@ -261,7 +260,8 @@ class Settings:
         # How a session opened from a Logan search narrows the match set from
         # chat. "off" (the default) is the shipped behaviour. "tool" gives the
         # model a query_logan_hits tool over the job's export, read through the
-        # cache only. An unknown value reads as "off" (see parse_narrowing_mode).
+        # cache only. An unknown value refuses to start (see
+        # parse_narrowing_mode).
         self.LOGAN_NARROWING_MODE: NarrowingMode = parse_narrowing_mode(
             os.getenv("LOGAN_NARROWING_MODE")
         )
