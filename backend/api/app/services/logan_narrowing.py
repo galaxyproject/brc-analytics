@@ -80,11 +80,11 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
     Args:
         query: the subset to count, list or break down
     """
-    logan = deps.logan or {}
-    job_id = logan.get("job_id")
-    # The tool is registered only with a Galaxy service, so deps.galaxy is set.
-    if not job_id:
-        return json.dumps({"error": "This conversation has no Logan search."})
+    # Offered only in a session opened from a search (only_in_logan_sessions),
+    # whose snapshot always carries the fields read here, and registered only
+    # with a Galaxy service -- so deps.logan and deps.galaxy are both set.
+    logan = deps.logan
+    job_id = logan["job_id"]
     try:
         path = await deps.galaxy.get_cached_kmindex_export(job_id)
     except KmindexExportTooLarge:
@@ -116,7 +116,7 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
         return json.dumps(
             {
                 "status": "export_not_cached",
-                "results_url": logan.get("results_url") or "",
+                "results_url": logan["results_url"],
                 "message": "This search's full match set is not cached. Open "
                 "the results page to rebuild it, then ask again.",
             }
@@ -130,7 +130,7 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
         return json.dumps(
             {
                 "status": "export_unreadable",
-                "results_url": logan.get("results_url") or "",
+                "results_url": logan["results_url"],
                 "message": "This search's saved match set can't be read, so its "
                 "subsets can't be counted. Answer from the cohort numbers above, "
                 "and say a breakdown isn't available.",
@@ -139,5 +139,5 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
     except Exception:
         logger.exception("query_logan_hits failed for job %s", job_id)
         return json.dumps({"error": "Query failed; try a simpler filter."})
-    result["total_matches"] = logan.get("total_matches")
+    result["total_matches"] = logan["total_matches"]
     return json.dumps(result, default=str)

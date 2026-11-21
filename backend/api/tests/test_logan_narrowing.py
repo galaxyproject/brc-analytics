@@ -219,11 +219,6 @@ class TestToolErrors:
     def _logan(self):
         return dict(load_fixture(F1).snapshot)
 
-    @pytest.mark.parametrize("logan", [None, {}, {"job_id": ""}])
-    def test_no_search_is_an_error(self, logan):
-        out = self._call(logan)
-        assert "error" in out and "total" not in out
-
     def test_a_failed_query_is_an_error_without_a_total(self, monkeypatch):
         import app.services.logan_narrowing as ln
 
