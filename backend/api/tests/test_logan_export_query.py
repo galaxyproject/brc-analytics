@@ -31,6 +31,9 @@ F1 = (
 MALAWI = LoganHitQuery.model_validate(
     {"filters": [{"field": "country", "op": "eq", "value": "Malawi"}]}
 )
+# Bounds a wait that only a regression makes long, so that regression fails
+# here instead of hanging CI.
+_WAIT = 5.0
 
 
 def test_a_query_runs_over_the_export():
@@ -105,6 +108,35 @@ def test_a_running_statement_is_interrupted_once():
     interrupt.detach()
     interrupt.cancel()  # nothing attached: no second interrupt
     assert seen == ["interrupt"]
+
+
+def test_a_cancel_that_finds_the_connection_closed_is_quiet():
+    # cancel() reads the connection, lets go of the lock, then interrupts it;
+    # the worker can detach and close in between.
+    interrupt = leq._Interrupt()
+    con = duckdb.connect()
+    interrupt.attach(con)
+    con.close()
+    with pytest.raises(duckdb.ConnectionException):
+        con.interrupt()  # what cancel() is about to meet
+    interrupt.cancel()
+    with pytest.raises(QueryCancelled):
+        interrupt.check()
+
+
+def test_a_cancel_that_fails_any_other_way_is_not_hidden():
+    interrupt = leq._Interrupt()
+
+    class Con:
+        def interrupt(self):
+            raise RuntimeError("not a closed connection")
+
+    interrupt.attach(Con())
+    with pytest.raises(RuntimeError, match="not a closed connection"):
+        interrupt.cancel()
+    # The flag went up before the interrupt was tried, so the query still stops.
+    with pytest.raises(QueryCancelled):
+        interrupt.check()
 
 
 # ---------- the cancel and slot rules, over a stand-in connection ----------
@@ -240,6 +272,53 @@ def test_a_call_cancelled_before_its_thread_starts_returns_the_slot(
     asyncio.run(go())
     assert ran == []
     assert one_slot.acquire(blocking=False)
+    one_slot.release()
+
+
+def test_a_worker_picked_up_after_the_cancel_runs_nothing(
+    fake_open, one_slot, monkeypatch
+):
+    """The window the test above can't reach: there the queued call is dropped
+    outright, here a thread has it but hasn't entered it when the cancel
+    lands. The cancel has already given the slot back, so the worker has to
+    stop at the handoff -- running nothing, releasing nothing."""
+    real_to_thread = asyncio.to_thread
+    picked_up, enter, left = threading.Event(), threading.Event(), threading.Event()
+    ran, raised = [], []
+
+    def held(call):
+        picked_up.set()
+        enter.wait(_WAIT)
+        try:
+            return call()
+        except BaseException as e:
+            raised.append(e)
+            raise
+        finally:
+            left.set()
+
+    monkeypatch.setattr(asyncio, "to_thread", lambda call: real_to_thread(held, call))
+
+    async def go():
+        task = asyncio.ensure_future(run_export_query(F1, ran.append))
+        assert await real_to_thread(picked_up.wait, _WAIT)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await asyncio.wait_for(task, _WAIT)
+        # Back already, before the worker has run a line of the call.
+        assert one_slot.acquire(blocking=False)
+        one_slot.release()
+        enter.set()
+        assert await real_to_thread(left.wait, _WAIT)
+
+    asyncio.run(go())
+    # Stopped by the handoff itself. Without it the interrupt flag would still
+    # stop the query, but only after a second release of a slot already given
+    # back.
+    assert [type(e) for e in raised] == [QueryCancelled]
+    assert str(raised[0]) == "export query cancelled before it ran"
+    assert ran == [] and fake_open == []
+    assert one_slot.acquire(blocking=False) and not one_slot.acquire(blocking=False)
     one_slot.release()
 
 

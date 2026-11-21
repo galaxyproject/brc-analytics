@@ -63,9 +63,13 @@ class _Interrupt:
             self._cancelled = True
             con = self._con
         if con is not None:
+            import duckdb
+
             try:
                 con.interrupt()
-            except Exception:  # noqa: BLE001 -- closed in the meantime is fine
+            except duckdb.ConnectionException:
+                # The worker detached and closed it once the lock was let go,
+                # so nothing is left running to stop.
                 pass
 
     def check(self) -> None:
