@@ -93,9 +93,11 @@ Services:
   mirror is available.
 - `GET /api/v1/galaxy/kmindex/jobs/{job_id}/query.fasta` - the FASTA the search
   ran, exactly as it went to Galaxy, as `logan-<job_id>-query.fasta`. Read back
-  off the Galaxy job (we don't store query sequences) and cached; it never
+  off the Galaxy job's input dataset and cached in Redis for 30 days; it never
   needs the export and never starts a merge. A job-cache copy answers with its
-  original's query.
+  original's query. The same FASTA is written into the parquet export's footer
+  (below), so the query is kept for as long as the export is. Anyone with the
+  job id can fetch it, the same as the job's results.
 
 The parquet export also carries the search's provenance in its footer
 key-value metadata, so the columns and the TSV are unaffected:

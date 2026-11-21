@@ -4809,7 +4809,7 @@ class TestKmindexQuery:
         assert not service.cache.set.await_count
 
     @pytest.mark.asyncio
-    async def test_a_query_just_under_the_cap_is_served(self, wired):
+    async def test_a_query_at_the_cap_is_served(self, wired):
         service, _ = wired
         body = ">q\n" + "A" * (galaxy_service.KMINDEX_QUERY_MAX_BYTES - 4) + "\n"
         service.gi.make_get_request = _display({"query1": body})
