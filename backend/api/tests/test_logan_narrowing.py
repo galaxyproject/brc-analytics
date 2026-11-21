@@ -247,6 +247,35 @@ class TestToolErrors:
         assert "total" not in out and "simpler filter" not in out["message"]
         assert out["results_url"].startswith("/logan-search?job=")
 
+    def _raising(self, exc):
+        class Galaxy(FixtureGalaxy):
+            async def get_cached_kmindex_export(self, job_id):
+                raise exc
+
+        return self._call(self._logan(), galaxy=Galaxy(load_all_fixtures()))
+
+    def test_a_search_too_large_to_export_is_not_sent_to_rebuild_one(self):
+        # No visit to the results page ever produces an export for a search
+        # that matched too many runs, so "open it, then ask again" is a loop.
+        from app.services.galaxy_service import KmindexExportTooLarge
+
+        out = self._raising(KmindexExportTooLarge("too many runs"))
+        assert out["status"] == "export_too_large" and "total" not in out
+        assert "isn't available for this search" in out["message"]
+        # What does bring one back, as the results page itself says.
+        assert "fewer indexes" in out["message"]
+        assert "ask again" not in out["message"] and "results_url" not in out
+
+    def test_a_cached_search_with_no_export_is_not_sent_to_rebuild_one(self):
+        # The page only rebuilds the export when the aggregate has expired; a
+        # cached one whose file is gone stays that way until then.
+        from app.services.galaxy_service import KmindexFiltersUnavailable
+
+        out = self._raising(KmindexFiltersUnavailable("not on disk"))
+        assert out["status"] == "export_unavailable" and "total" not in out
+        assert "right now" in out["message"]
+        assert "ask again" not in out["message"] and "results_url" not in out
+
     def test_a_result_carries_the_searchs_total(self):
         out = self._call(self._logan())
         assert out["total"] == out["total_matches"] == 17629

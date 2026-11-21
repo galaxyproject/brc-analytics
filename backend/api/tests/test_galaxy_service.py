@@ -49,6 +49,7 @@ from app.services.galaxy_service import (
     GalaxyJobNotComplete,
     GalaxyJobNotFound,
     GalaxyService,
+    KmindexExportTooLarge,
     KmindexFiltersUnavailable,
     _default_order,
     _submitted_index_names,
@@ -2555,44 +2556,62 @@ class TestCachedKmindexExport:
         )
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("status", ["too_large", "unavailable", "bogus"])
-    async def test_no_export_recorded_is_none(
+    async def test_a_search_too_large_to_export_says_so(
+        self, service, monkeypatch, tmp_path
+    ):
+        # Not None: None sends the user to the results page to rebuild the
+        # export, and no visit ever produces one for this search.
+        monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
+        service.cache.get = AsyncMock(return_value={"export": {"status": "too_large"}})
+        self._forbid_cold_path(service)
+
+        with pytest.raises(KmindexExportTooLarge, match="too many runs"):
+            await service.get_cached_kmindex_export("job1")
+
+    async def _assert_unavailable(self, service):
+        """Cached, with no export behind it: the page can't rebuild that
+        either, so it is the service's own reason rather than a miss -- and
+        not the too-large one, which is permanent."""
+        self._forbid_cold_path(service)
+        with pytest.raises(KmindexFiltersUnavailable, match="right now") as exc:
+            await service.get_cached_kmindex_export("job1")
+        assert not isinstance(exc.value, KmindexExportTooLarge)
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("status", ["unavailable", "bogus"])
+    async def test_no_export_recorded_is_unavailable(
         self, service, monkeypatch, tmp_path, status
     ):
         monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
         self._write_export(tmp_path / "job1.parquet")
         service.cache.get = AsyncMock(return_value={"export": {"status": status}})
-        self._forbid_cold_path(service)
 
-        assert await service.get_cached_kmindex_export("job1") is None
+        await self._assert_unavailable(service)
 
     @pytest.mark.asyncio
-    async def test_a_claimed_export_with_no_file_is_none(
+    async def test_a_claimed_export_with_no_file_is_unavailable(
         self, service, monkeypatch, tmp_path
     ):
         monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
         service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
-        self._forbid_cold_path(service)
 
-        assert await service.get_cached_kmindex_export("job1") is None
+        await self._assert_unavailable(service)
 
     @pytest.mark.asyncio
-    async def test_a_stale_export_is_none(self, service, monkeypatch, tmp_path):
+    async def test_a_stale_export_is_unavailable(self, service, monkeypatch, tmp_path):
         # Written before the score correction: no `ani` column.
         monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", str(tmp_path))
         self._write_export(tmp_path / "job1.parquet", with_ani=False)
         service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
-        self._forbid_cold_path(service)
 
-        assert await service.get_cached_kmindex_export("job1") is None
+        await self._assert_unavailable(service)
 
     @pytest.mark.asyncio
-    async def test_no_export_dir_is_none(self, service, monkeypatch):
+    async def test_no_export_dir_is_unavailable(self, service, monkeypatch):
         monkeypatch.setattr(service.settings, "KMINDEX_EXPORT_DIR", "")
         service.cache.get = AsyncMock(return_value={"export": {"status": "available"}})
-        self._forbid_cold_path(service)
 
-        assert await service.get_cached_kmindex_export("job1") is None
+        await self._assert_unavailable(service)
 
 
 class TestKmindexIndexList:

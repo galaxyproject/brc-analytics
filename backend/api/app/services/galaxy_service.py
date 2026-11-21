@@ -101,6 +101,14 @@ class KmindexFiltersUnavailable(Exception):
     """
 
 
+class KmindexExportTooLarge(KmindexFiltersUnavailable):
+    """The search matched too many runs for an export to be prepared.
+
+    Kept apart from the rest because it is the permanent one: re-aggregating
+    writes no export for this search either.
+    """
+
+
 class GalaxyReadOnlyError(Exception):
     """A write was asked of the legacy Galaxy, which only serves old reads."""
 
@@ -1542,11 +1550,12 @@ class GalaxyService:
         @param aggregate: the job's aggregate.
         @param job_id: the kmindex job.
         @returns: the path of a current export.
-        @raises KmindexFiltersUnavailable: with a reason the UI can show.
+        @raises KmindexFiltersUnavailable: with a reason the UI can show; its
+            KmindexExportTooLarge subclass when the search can never have one.
         """
         export = self._export_state(aggregate, job_id)
         if export["status"] == EXPORT_TOO_LARGE:
-            raise KmindexFiltersUnavailable(
+            raise KmindexExportTooLarge(
                 "Filtering needs the full match set on disk, and this search "
                 "matched too many runs for one to be prepared."
             )
@@ -1702,24 +1711,29 @@ class GalaxyService:
         return None
 
     async def get_cached_kmindex_export(self, job_id: str) -> Optional[Path]:
-        """The job's current export parquet, if -- and only if -- its
-        aggregate is already cached and the file behind it is on disk.
+        """The job's current export parquet, if its aggregate is already
+        cached.
 
         The assistant's way onto the whole match set. The results page reaches
         the export through _load_aggregate, which merges every shard on a miss;
         a chat turn can't wait for that, and the page is what pays for it. So
         this reads Redis, then asks _filterable_export (a stat and a footer
-        read), and a miss of either is None -- the caller sends the user to the
-        results page.
+        read).
+
+        The two ways of having no export are kept apart because only one of
+        them is fixed by opening the results page. That re-aggregates, and so
+        rewrites the export, only when the aggregate is not cached.
+
+        @returns: the export's path, or None when the aggregate is not cached.
+        @raises KmindexFiltersUnavailable: the aggregate is cached and has no
+            current export behind it, which a visit to the page won't change.
+            KmindexExportTooLarge when the search can never have one.
         """
         cached = await self._cached_aggregate(job_id)
         if cached is None:
             return None
         aggregate, export_job_id = cached
-        try:
-            return await self._filterable_export(aggregate, export_job_id)
-        except KmindexFiltersUnavailable:
-            return None
+        return await self._filterable_export(aggregate, export_job_id)
 
     async def source_job_id(self, job_id: str) -> str:
         """

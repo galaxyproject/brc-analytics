@@ -20,6 +20,10 @@ from typing import Optional
 from pydantic_ai import RunContext
 from pydantic_ai.tools import ToolDefinition
 
+from app.services.galaxy_service import (
+    KmindexExportTooLarge,
+    KmindexFiltersUnavailable,
+)
 from app.services.logan_export_query import run_export_query
 from app.services.tools.catalog_query import (
     ENTITY_SCHEMA,
@@ -81,7 +85,33 @@ async def query_logan_hits(deps: AssistantDeps, query: LoganHitQuery) -> str:
     # The tool is registered only with a Galaxy service, so deps.galaxy is set.
     if not job_id:
         return json.dumps({"error": "This conversation has no Logan search."})
-    path = await deps.galaxy.get_cached_kmindex_export(job_id)
+    try:
+        path = await deps.galaxy.get_cached_kmindex_export(job_id)
+    except KmindexExportTooLarge:
+        # Permanent for this search, so nothing here may read as "try again".
+        return json.dumps(
+            {
+                "status": "export_too_large",
+                "message": "This search matched too many runs for its full "
+                "match set to be saved, so its subsets can't be counted, and "
+                "reopening the results page won't change that. Answer from the "
+                "cohort numbers above, and say a breakdown isn't available for "
+                "this search: a new search with a higher minimum shared k-mer "
+                "fraction, or fewer indexes, would have one.",
+            }
+        )
+    except KmindexFiltersUnavailable:
+        # Cached, but the file is gone or was never written. The results page
+        # only rebuilds it once the aggregate expires, so don't send them there.
+        return json.dumps(
+            {
+                "status": "export_unavailable",
+                "message": "This search's full match set isn't available right "
+                "now, so its subsets can't be counted, and reopening the "
+                "results page won't bring it back yet. Answer from the cohort "
+                "numbers above, and say a breakdown isn't available right now.",
+            }
+        )
     if path is None:
         return json.dumps(
             {
