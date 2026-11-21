@@ -39,14 +39,16 @@ submit are the same as on brc-analytics.org:
 ## The flow
 
 ```
-POST /jobs                 -> 202 {job_id, status_url, results_url, export_url}
-GET  /jobs/{id}            -> 202 + Retry-After while running, 200 when done
-GET  /jobs/{id}/results    -> 202 until merged, then a page of hits
-GET  /jobs/{id}/export     -> every hit, as TSV (or parquet)
-GET  /queue                -> how backed up searches are right now
+POST /jobs                  -> 202 {job_id, status_url, results_url, export_url, query_url}
+GET  /jobs/{id}             -> 202 + Retry-After while running, 200 when done
+GET  /jobs/{id}/results     -> 202 until merged, then a page of hits
+GET  /jobs/{id}/export      -> every hit, as TSV (or parquet)
+GET  /jobs/{id}/query.fasta -> the query the search ran, as FASTA
+GET  /queue                 -> how backed up searches are right now
 ```
 
-`status_url`, `results_url` and `export_url` are paths relative to the host.
+`status_url`, `results_url`, `export_url` and `query_url` are paths relative
+to the host.
 
 ### List the indexes
 
@@ -190,6 +192,39 @@ within that window.
 sooner when disk is tight. After that `/export` returns `404` until a
 `/results` call merges the job again.
 
+#### What the search was
+
+The parquet export carries the search's query and parameters in its footer
+key-value metadata, so the columns don't change. Read it with
+`pyarrow.parquet.read_schema(path).metadata` or DuckDB's
+`parquet_kv_metadata(path)`:
+
+| Key                      | Value                                                    |
+| ------------------------ | -------------------------------------------------------- |
+| `logan.metadata_version` | `1`                                                      |
+| `logan.query_fasta`      | The query FASTA, header and sequence, as Galaxy holds it |
+| `logan.indexes`          | The indexes searched, as a JSON array                    |
+| `logan.threshold`        | Minimum shared k-mer fraction                            |
+| `logan.zvalue`           | kmindex z-value                                          |
+| `logan.kmer_size`        | k-mer size (31)                                          |
+| `logan.tool_id`          | The kmindex_query tool id                                |
+| `logan.tool_version`     | Its version                                              |
+| `logan.galaxy_url`       | The Galaxy the search ran on                             |
+| `logan.search_date`      | When the search ran, ISO 8601 UTC                        |
+
+A value we couldn't read is left out rather than written empty. An export
+written before the footer existed has none until the job is merged again.
+
+The query alone is always there, export or not:
+
+```sh
+curl -H "X-API-Key: $KEY" -o query.fasta "$BASE/jobs/$JOB_ID/query.fasta"
+```
+
+It's the FASTA exactly as it went to Galaxy -- a sequence sent without a
+header gets `>brc_unnamed_query` -- named `logan-<job_id>-query.fasta`. It
+returns `404` if the job, or the query dataset in Galaxy, is gone.
+
 ## Errors
 
 | Code      | Meaning                                                                              |
@@ -197,7 +232,7 @@ sooner when disk is tight. After that `/export` returns `404` until a
 | 202       | Not ready yet; retry after `Retry-After` seconds                                     |
 | 400 / 422 | The request or job id is malformed, or the job failed (`/results`)                   |
 | 401       | Missing or wrong API key                                                             |
-| 404       | No such job, or no export for it right now                                           |
+| 404       | No such job, no export for it right now, or no query for it in Galaxy                |
 | 409       | `Idempotency-Key` conflict: different body, still in flight, or outcome unknown      |
 | 410       | The API has passed its sunset date                                                   |
 | 429       | Over a rate limit                                                                    |

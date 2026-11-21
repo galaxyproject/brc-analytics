@@ -1962,7 +1962,7 @@ class TestExportHits:
         monkeypatch.setattr(
             sra_mirror,
             "_export_sql",
-            lambda _coordinates: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+            lambda *_flags: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
         )
 
         with pytest.raises(duckdb.Error):
@@ -2020,7 +2020,7 @@ class TestExportHits:
         monkeypatch.setattr(
             sra_mirror,
             "_export_sql",
-            lambda _coordinates: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
+            lambda *_flags: "COPY (SELECT * FROM no_such) TO ? (FORMAT parquet)",
         )
         with pytest.raises(duckdb.Error):
             svc.export_hits("job2", _hits(accessions), str(exports))
@@ -2039,6 +2039,65 @@ class TestExportHits:
         # instance lock for the whole call and premises itself on sub-200ms
         # queries, and this one is a ~1.5s write.
         assert not hasattr(SRAMirrorService.export_hits, "__wrapped__")
+
+
+def _footer(path) -> dict:
+    """The key-value metadata in a parquet's footer."""
+    con = duckdb.connect()
+    try:
+        rows = con.execute(
+            "SELECT decode(key), decode(value) FROM parquet_kv_metadata(?)",
+            [str(path)],
+        ).fetchall()
+    finally:
+        con.close()
+    return dict(rows)
+
+
+class TestExportFooter:
+    """The search's query and parameters ride in the parquet footer.
+
+    So a downloaded file says how to reproduce it, without a column changing
+    and without the TSV -- which is converted from the same parquet -- moving
+    by a byte.
+    """
+
+    METADATA = {
+        # A quote, a newline and a brace: the header is the user's text, and
+        # it has to come back exactly rather than break the COPY.
+        "logan.query_fasta": ">it's {a} query\nACGTACGTAC\n",
+        "logan.indexes": '["GENOMIC_BCT", "METAGENOMIC_ENV"]',
+        "logan.threshold": "0.5",
+    }
+
+    def test_the_footer_carries_each_key_verbatim(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+
+        svc.export_hits("job1", _hits(accessions), str(exports), metadata=self.METADATA)
+
+        assert _footer(exports / "job1.parquet") == self.METADATA
+
+    def test_no_metadata_writes_no_footer(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+
+        svc.export_hits("job1", _hits(accessions), str(exports))
+        svc.export_hits("job2", _hits(accessions), str(exports), metadata={})
+
+        assert _footer(exports / "job1.parquet") == {}
+        assert _footer(exports / "job2.parquet") == {}
+
+    def test_the_rows_and_the_tsv_are_unchanged(self, cohort_mirror, exports):
+        svc, accessions = cohort_mirror
+        hits = _hits(accessions + ["SRR_NOT_MIRRORED"])
+
+        svc.export_hits("plain", hits, str(exports))
+        svc.export_hits("footed", hits, str(exports), metadata=self.METADATA)
+
+        plain, footed = exports / "plain.parquet", exports / "footed.parquet"
+        assert _read_export(footed) == _read_export(plain)
+        assert b"".join(sra_mirror.iter_export_tsv(footed)) == b"".join(
+            sra_mirror.iter_export_tsv(plain)
+        )
 
 
 def _touch_export(directory: Path, name: str, size: int, age: float) -> Path:
