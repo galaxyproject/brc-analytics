@@ -592,9 +592,6 @@ async def _safe_record(
 class AssistantAgent:
     """High-level wrapper around the pydantic-ai Agent for the analysis assistant."""
 
-    # Class-level default: some tests assemble the agent without __init__.
-    narrowing_mode: NarrowingMode = "off"
-
     def __init__(
         self,
         cache: CacheService,
@@ -677,7 +674,7 @@ class AssistantAgent:
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
         # Resolved once: the export read is cache-only and needs no Galaxy
         # connection, so a Galaxy service object is all the tool needs.
-        self.narrowing_mode = (
+        self.narrowing_mode: NarrowingMode = (
             settings.LOGAN_NARROWING_MODE if self.galaxy is not None else "off"
         )
         if self.narrowing_mode == "tool":
