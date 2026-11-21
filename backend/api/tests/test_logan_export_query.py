@@ -1,6 +1,10 @@
 """Running export queries: the real path over F1, and the cancel and slot
 rules over a stand-in connection, where a test can say exactly when things
-happen."""
+happen.
+
+Every run goes through run_bounded: these tests wait on slots and cancels, and
+a regression in either would otherwise hang the run rather than fail it.
+"""
 
 from __future__ import annotations
 
@@ -20,6 +24,7 @@ from app.services.tools.catalog_query import (
     execute,
 )
 from evals.datasets.logan_narrowing import ground_truth
+from tests.logan_helpers import WAIT_S, run_bounded
 
 F1 = (
     Path(__file__).resolve().parents[1]
@@ -31,13 +36,10 @@ F1 = (
 MALAWI = LoganHitQuery.model_validate(
     {"filters": [{"field": "country", "op": "eq", "value": "Malawi"}]}
 )
-# Bounds a wait that only a regression makes long, so that regression fails
-# here instead of hanging CI.
-_WAIT = 5.0
 
 
 def test_a_query_runs_over_the_export():
-    got = asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
+    got = run_bounded(run_export_query(F1, lambda con: execute(MALAWI, con)))
     assert got == {"total": ground_truth("country = 'Malawi'")}
     assert got["total"] > 0
 
@@ -54,7 +56,7 @@ def test_a_query_gets_one_capped_connection_and_closes_it(monkeypatch):
         return con
 
     monkeypatch.setattr(kmindex_filters, "_connect", spy)
-    asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
+    run_bounded(run_export_query(F1, lambda con: execute(MALAWI, con)))
     assert len(opened) == 1
     with pytest.raises(duckdb.ConnectionException):
         opened[0].execute("SELECT 1")
@@ -69,7 +71,7 @@ def test_concurrent_queries_over_one_export_agree():
     def run():
         try:
             results.append(
-                asyncio.run(run_export_query(F1, lambda con: execute(MALAWI, con)))
+                run_bounded(run_export_query(F1, lambda con: execute(MALAWI, con)))
             )
         except Exception as e:  # pragma: no cover - reported below
             errors.append(e)
@@ -78,7 +80,7 @@ def test_concurrent_queries_over_one_export_agree():
     for t in threads:
         t.start()
     for t in threads:
-        t.join(_WAIT)
+        t.join(WAIT_S)
     assert not errors
     assert results == [expected] * 6
 
@@ -89,7 +91,7 @@ def test_a_file_of_the_wrong_shape_is_reported(tmp_path):
     con.execute(f"COPY (SELECT 'SRR1' AS accession) TO '{bad}' (FORMAT parquet)")
     con.close()
     with pytest.raises(LoganExportMismatch):
-        asyncio.run(run_export_query(bad, lambda con: execute(MALAWI, con)))
+        run_bounded(run_export_query(bad, lambda con: execute(MALAWI, con)))
 
 
 def test_a_cancel_during_connect_closes_without_running_anything(monkeypatch):
@@ -116,7 +118,7 @@ def test_a_cancel_during_connect_closes_without_running_anything(monkeypatch):
             await task
         release.set()
 
-    asyncio.run(go())
+    run_bounded(go())
     for _ in range(100):
         if opened:
             break
@@ -227,7 +229,7 @@ def test_a_cancelled_query_interrupts_its_connection(fake_open):
         with pytest.raises(asyncio.TimeoutError):
             await asyncio.wait_for(run_export_query(F1, blocking), timeout=0.1)
 
-    asyncio.run(go())
+    run_bounded(go())
     assert fake_open[0].interrupted.wait(1.0)
 
 
@@ -248,7 +250,7 @@ def test_a_cancelled_query_keeps_its_slot_until_its_thread_returns(fake_open, on
             await asyncio.wait_for(run_export_query(F1, deaf), timeout=0.05)
         return await run_export_query(F1, second)
 
-    assert asyncio.run(go()) == 2
+    assert run_bounded(go()) == 2
     assert order == ["first done", "second started"]
 
 
@@ -280,7 +282,7 @@ def test_waiting_for_a_slot_holds_no_thread_and_cancelling_frees_it(
         release.set()
         await holder
 
-    asyncio.run(go())
+    run_bounded(go())
     assert entered == ["hold"]
     # Every slot came back: the one there is can be taken, and only one.
     assert one_slot.acquire(blocking=False) and not one_slot.acquire(blocking=False)
@@ -310,7 +312,7 @@ def test_a_call_cancelled_before_its_thread_starts_returns_the_slot(
         gate.set()
         await busy
 
-    asyncio.run(go())
+    run_bounded(go())
     assert ran == []
     assert one_slot.acquire(blocking=False)
     one_slot.release()
@@ -329,7 +331,7 @@ def test_a_worker_picked_up_after_the_cancel_runs_nothing(
 
     def held(call):
         picked_up.set()
-        enter.wait(_WAIT)
+        enter.wait(WAIT_S)
         try:
             return call()
         except BaseException as e:
@@ -342,17 +344,17 @@ def test_a_worker_picked_up_after_the_cancel_runs_nothing(
 
     async def go():
         task = asyncio.ensure_future(run_export_query(F1, ran.append))
-        assert await real_to_thread(picked_up.wait, _WAIT)
+        assert await real_to_thread(picked_up.wait, WAIT_S)
         task.cancel()
         with pytest.raises(asyncio.CancelledError):
-            await asyncio.wait_for(task, _WAIT)
+            await task
         # Back already, before the worker has run a line of the call.
         assert one_slot.acquire(blocking=False)
         one_slot.release()
         enter.set()
-        assert await real_to_thread(left.wait, _WAIT)
+        assert await real_to_thread(left.wait, WAIT_S)
 
-    asyncio.run(go())
+    run_bounded(go())
     # Stopped by the handoff itself. Without it the interrupt flag would still
     # stop the query, but only after a second release of a slot already given
     # back.
@@ -386,12 +388,12 @@ def test_concurrent_queries_are_bounded_across_event_loops(fake_open, monkeypatc
     # Two loops in two threads, as two workers' requests would be.
     results = []
     loops = [
-        threading.Thread(target=lambda: results.append(asyncio.run(go())))
+        threading.Thread(target=lambda: results.append(run_bounded(go())))
         for _ in range(2)
     ]
     for t in loops:
         t.start()
     for t in loops:
-        t.join()
+        t.join(3 * WAIT_S)
     assert results == [[1] * 3, [1] * 3]
     assert peak[0] == 2

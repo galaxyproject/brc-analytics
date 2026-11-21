@@ -16,6 +16,7 @@ import pytest
 from app.core.config import get_settings
 from evals.datasets.logan_narrowing import ground_truth as _count
 from evals.logan_fixture import FixtureGalaxy, load_all_fixtures, load_fixture
+from tests.logan_helpers import run_bounded
 
 F1 = "logan_pfal_18s"
 
@@ -94,7 +95,8 @@ def _chat(agent, session_id, *turns):
             )
         return resp, state
 
-    return asyncio.run(go())
+    # A tool call waits for an export slot for as long as it takes.
+    return run_bounded(go())
 
 
 @pytest.fixture(autouse=True)
@@ -214,7 +216,7 @@ class TestToolErrors:
             galaxy=galaxy or FixtureGalaxy(load_all_fixtures()),
             logan=logan,
         )
-        return json.loads(asyncio.run(query_logan_hits(deps, LoganHitQuery())))
+        return json.loads(run_bounded(query_logan_hits(deps, LoganHitQuery())))
 
     def _logan(self):
         return dict(load_fixture(F1).snapshot)
