@@ -22,7 +22,11 @@ BioNym keys a graph by its input, the locus tag.
 | `d9049485-ed74-5455-98c2-5dc13eef544a.json.gz` | AMA1    | `PF3D7_1133400` | 2026-11-02 | `ama1_PF3D7_1133400.json`    |
 
 - **Source:** Danielle Callan ran BioNym and sent the three graphs on
-  2026-11-02 as `bionym-demo-graphs.zip`.
+  2026-11-02 as `bionym-demo-graphs.zip`. The files here are a re-export of
+  the same zip, dated 2026-11-03, with BioNym's summary step run: each graph
+  gains `metadata.summary` and is otherwise identical to the 2026-11-02 one.
+- **Summary:** `metadata.summary`, a list of statements about the gene, each
+  a `claim` and a `confidence`; the gene page shows those at 0.8 or above.
 - **BioNym input:** the graph's `metadata.input`.
 - **Run date:** the graph's metadata carries no run date, so the API takes the
   latest `retrieved_at` among the graph's evidence; all three are 2026-11-02

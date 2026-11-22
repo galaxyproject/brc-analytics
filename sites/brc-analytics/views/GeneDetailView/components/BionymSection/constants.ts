@@ -4,6 +4,10 @@ import { type BionymSourceKind } from "@repo/shared/services/genes/types";
 // BioNym, which builds the graphs the section's claims are read from.
 export const BIONYM_URL = "https://github.com/d-callan/bionym";
 
+// The section's element ID, which the BioNym summary links to. The section
+// shows its Claims tab for this hash, as for any hash other than a tab's.
+export const BIONYM_SECTION_ID = "bionym";
+
 // The minimum confidence a claim needs to be shown, until the reader moves the
 // slider.
 export const DEFAULT_MIN_CONFIDENCE = 0.8;

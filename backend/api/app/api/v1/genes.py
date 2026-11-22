@@ -79,7 +79,8 @@ def get_gene_bionym(
     gene_uid: UUID,
     graphs: BionymGraphStore = Depends(get_bionym_graphs),
 ) -> BionymClaims:
-    """The claims in the gene's BioNym graph, grouped by source.
+    """The claims in the gene's BioNym graph, grouped by source, and
+    BioNym's summary of the gene.
 
     Read from the graph alone, not the gene snapshot, so it answers while the
     snapshot is loading.

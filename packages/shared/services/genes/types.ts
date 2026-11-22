@@ -144,7 +144,17 @@ export interface BionymSource {
 }
 
 /**
- * The claims in a gene's BioNym graph, grouped by source.
+ * One statement of BioNym's summary of a gene: a language model's sentence
+ * about the gene, and BioNym's confidence in it, from 0 to 1.
+ */
+export interface BionymSummaryStatement {
+  confidence: number;
+  text: string;
+}
+
+/**
+ * The claims in a gene's BioNym graph, grouped by source, and BioNym's
+ * summary of the gene.
  */
 export interface BionymClaims {
   geneUid: string;
@@ -153,6 +163,8 @@ export interface BionymClaims {
   // The latest date BioNym retrieved evidence on, as YYYY-MM-DD.
   runDate: string;
   sources: BionymSource[];
+  // In BioNym's order; empty when the graph has no summary.
+  summary: BionymSummaryStatement[];
 }
 
 /**
