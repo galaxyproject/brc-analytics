@@ -11,6 +11,8 @@ but assert against a fixed fixture so they don't drift with the live catalog.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from app.services.tools.catalog_query import (
@@ -114,6 +116,48 @@ def test_contains_on_scalar_field_lists_only_this_entitys_list_fields():
     assert "List fields for 'organism'" in message
     assert "otherNames" in message
     assert "lineageTaxonomyIds" not in message
+
+
+def _suggested_op(entity, field, op, value):
+    with pytest.raises(ValueError) as excinfo:
+        CatalogQuery(entity=entity, filters=[Filter(field=field, op=op, value=value)])
+    match = re.search(r"use (\w+) \(", str(excinfo.value))
+    assert match, str(excinfo.value)
+    return Op(match.group(1))
+
+
+@pytest.mark.parametrize(
+    "entity, field, op, value",
+    [
+        ("assembly", "strainName", Op.contains_any, ["3D7", "Dd2"]),
+        ("assembly", "strainName", Op.contains_any, "3D7"),
+        ("assembly", "strainName", Op.contains, "3D7"),
+        ("assembly", "strainName", Op.contains, ["3D7", "Dd2"]),
+        ("assembly", "length", Op.contains, 5),
+        ("assembly", "length", Op.contains_any, [5, 6]),
+        ("assembly", "isRef", Op.contains, True),
+        ("organism", "taxonomicLevelGenus", Op.contains_any, ["Plasmodium"]),
+        ("organism", "assemblyCount", Op.contains, 3),
+    ],
+)
+def test_contains_hint_names_an_op_the_retry_accepts(entity, field, op, value):
+    # The point of the message is that the model's one retry succeeds, so the op
+    # it names has to pass validation with the same field and value.
+    suggested = _suggested_op(entity, field, op, value)
+    CatalogQuery(
+        entity=entity, filters=[Filter(field=field, op=suggested, value=value)]
+    )
+
+
+def test_contains_hint_retry_returns_the_matching_rows(con):
+    suggested = _suggested_op(
+        "assembly", "level", Op.contains_any, ["Chromosome", "Scaffold"]
+    )
+    q = CatalogQuery(
+        operation="count",
+        filters=[Filter(field="level", op=suggested, value=["Chromosome", "Scaffold"])],
+    )
+    assert execute(q, con) == {"total": 4}
 
 
 @pytest.mark.parametrize("op", [Op.contains, Op.contains_any])
