@@ -36,3 +36,6 @@ venv
 # vendored boundary geometry -- must stay byte-identical to world-atlas 2.0.2
 /sites/brc-analytics/public/geo/countries-110m.json
 /sites/logan-search/public/geo/countries-110m.json
+
+# ASTMH 2026 slide decks -- vendored verbatim from d-callan/astmh-2026 as presented at the meeting
+/sites/brc-analytics/public/learn/astmh-2026/

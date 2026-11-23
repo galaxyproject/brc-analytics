@@ -1,3 +1,4 @@
+export { default as Astmh2026Slides } from "./astmh-2026-slides.mdx";
 export { default as EvolutionaryDynamicsOfCodingOverlapsInMeaslesVirus } from "./evolutionary-dynamics-of-coding-overlaps-in-measles-virus.mdx";
 export { default as PrimAeon } from "./primaeon.mdx";
 export { default as Roadmap } from "./roadmap.mdx";

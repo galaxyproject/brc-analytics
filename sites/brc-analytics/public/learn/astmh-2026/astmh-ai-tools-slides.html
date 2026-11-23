@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Verifiable AI for Pathogen Genomics — ASTMH 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme" />
+
+  <!-- Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      /* BRC palette (from brochure/poster) */
+      --navy:        #28285B;
+      --navy-dark:   #1F1F47;
+      --navy-soft:   #3F3F6E;
+      --accent:      #956F00;   /* gold — the "red equivalent" for bars/markers */
+      --accent-soft: #B8881A;
+      --highlight:   #FFEB78;   /* soft yellow — for emphasis backgrounds */
+      --muted:       #637381;
+      --muted-light: #9AA2AE;
+      --panel:       #F7F7FB;
+      --border:      #E3E3ED;
+      --white:       #FFFFFF;
+    }
+
+    /* ===== Print PDF: match paper size to slide dimensions (1280x760) ===== */
+    @page {
+      size: 1280px 760px;
+      margin: 0;
+    }
+
+    /* Reveal.js print-pdf mode: force each slide to fill its pdf-page box. */
+    html.print-pdf .pdf-page {
+      height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+    html.print-pdf .pdf-page > section,
+    html.print-pdf .reveal .slides > section {
+      top: 0 !important;
+      left: 0 !important;
+      width: 1280px !important;
+      height: 760px !important;
+      min-height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+    html.print-pdf .slide {
+      height: 760px !important;
+    }
+
+    /* ===== Base reveal overrides ===== */
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy-soft);
+      font-size: 22px;
+    }
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: 0;
+      height: 100%;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Merriweather', serif;
+      color: var(--navy);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reveal a { color: var(--navy); border-bottom: 2px solid var(--highlight); }
+    .reveal strong { color: var(--navy); font-weight: 600; }
+
+    /* ===== Slide frame (every slide) ===== */
+    .slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 70px 90px 60px;
+      box-sizing: border-box;
+      background: var(--white);
+    }
+
+    .slide::before {
+      /* top accent bar — navy with gold underline */
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--navy);
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .slide-logo {
+      position: absolute;
+      bottom: 18px;
+      left: 30px;
+      height: 22px;
+      width: auto;
+      opacity: 0.75;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      font-size: 12px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* ===== Slide title + divider ===== */
+    .slide h2.slide-title {
+      font-size: 40px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .slide .title-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+
+    /* ===== Bullet list (minimal, square marker) ===== */
+    .reveal ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reveal ul.clean li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 22px;
+      font-size: 22px;
+      color: var(--navy-soft);
+      line-height: 1.5;
+    }
+    .reveal ul.clean li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 10px;
+      width: 12px; height: 12px;
+      background: var(--accent);
+    }
+
+    /* ===== Two-column layout ===== */
+    .cols {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+    }
+    .cols > .col { flex: 1; min-width: 0; }
+
+    /* ===== Dark callout (navy box, gold edge) ===== */
+    .callout-dark {
+      position: relative;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 32px 32px 32px 40px;
+      box-shadow: 0 10px 25px rgba(40, 40, 91, 0.18);
+    }
+    .callout-dark::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: var(--accent);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    .callout-dark .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--highlight);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .callout-dark .body {
+      font-family: 'Merriweather', serif;
+      font-size: 24px;
+      line-height: 1.45;
+      font-style: italic;
+      margin: 0;
+    }
+    .callout-dark .body.emphatic {
+      color: var(--highlight);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* Light highlight callout variant */
+    .callout-light {
+      background: var(--highlight);
+      border-radius: 8px;
+      padding: 22px 26px;
+      border-left: 8px solid var(--accent);
+      color: var(--navy);
+    }
+    .callout-light .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .callout-light .body {
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* ===== Card grid (icon + label) ===== */
+    .card-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 130px;
+    }
+    .card .card-icon {
+      color: var(--navy);
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+    .card .card-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-soft);
+      line-height: 1.3;
+    }
+    .card.accent {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .card.accent .card-icon { color: var(--highlight); }
+    .card.accent .card-label { color: var(--white); }
+    .card.accent strong { color: var(--highlight); }
+
+    /* ===== Title slide ===== */
+    .title-slide h1 {
+      font-size: 58px;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .title-slide .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 42px;
+    }
+    .title-slide .kicker-divider {
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+    .title-slide .author {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .title-slide .affiliation {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ===== Section divider slide ===== */
+    .section-slide {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 110px;
+    }
+    .section-slide::before { display: none; }
+    .section-slide::after { display: none; }
+    .section-slide .kicker {
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section-slide h2 {
+      color: var(--white);
+      font-size: 52px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-slide .section-sub {
+      font-size: 22px;
+      color: var(--muted-light);
+      max-width: 760px;
+    }
+    .section-slide .kicker-divider {
+      width: 80px; height: 4px;
+      background: var(--accent);
+      margin: 24px 0 0;
+    }
+
+    /* ===== Inline arrow between columns ===== */
+    .between-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--accent);
+      font-size: 32px;
+      padding: 0 4px;
+    }
+
+    /* ===== Misc ===== */
+    .small { font-size: 14px; color: var(--muted); }
+    .kicker {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .emph {
+      font-family: 'Merriweather', serif;
+      font-style: italic;
+      color: var(--navy);
+      font-size: 22px;
+    }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 20px 0 10px;
+    }
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: var(--navy);
+    }
+
+    /* Highlight inline span */
+    .hl {
+      background: linear-gradient(transparent 55%, var(--highlight) 55%);
+      padding: 0 2px;
+    }
+
+    /* Stat */
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 24px 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      border-top: 4px solid var(--accent);
+    }
+    .stat-num {
+      font-family: 'Merriweather', serif;
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 8px;
+    }
+
+    /* Pipeline mini-diagram */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pipe-stage {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pipe-stage.terminal {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+    .pipe-stage.terminal .pipe-title { color: var(--white); }
+    .pipe-stage.terminal .pipe-sub { color: var(--highlight); }
+    .pipe-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .pipe-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .pipe-arrow {
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 18px;
+    }
+
+    /* Placeholder block */
+    .placeholder {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: var(--muted-light);
+      font-size: 16px;
+      font-style: italic;
+    }
+
+    /* ===== QR block ===== */
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .qr-block img {
+      width: 110px;
+      height: 110px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      background: var(--white);
+    }
+    .qr-block .qr-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+
+    /* ===== Mock chat ===== */
+    .chat-window {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .chat-msg {
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: 15px;
+      line-height: 1.4;
+      max-width: 88%;
+    }
+    .chat-msg.user {
+      background: var(--navy);
+      color: var(--white);
+      margin-left: auto;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-msg.agent {
+      background: var(--white);
+      border: 1px solid var(--border);
+      color: var(--navy-soft);
+      border-bottom-left-radius: 2px;
+    }
+    .chat-msg .who {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+    .chat-tool {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: var(--navy-dark);
+      color: var(--highlight);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 6px 0 12px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============ 1. Title ============ -->
+    <section>
+      <div class="slide title-slide">
+        <h1>Verifiable AI<br/>for Pathogen<br/>Genomics</h1>
+        <div class="subtitle">AI you can check: agentic analysis on BRC Analytics</div>
+        <div class="kicker-divider"></div>
+        <div class="author">Danielle Callan</div>
+        <div class="affiliation">Temple University · BRC Analytics · ASTMH 2026</div>
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">November 2026</div>
+      </div>
+      <aside class="notes">Frame: not "AI tools" generically — tools built so that agent-driven work stays verifiable.</aside>
+    </section>
+
+    <!-- ============ 2. Where does AI fit in our work? ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Where Does AI Fit in Our Work?</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 22px;">
+          AI is all around us — and we're all figuring out <span class="hl">how it fits into scientific work</span>.
+        </p>
+
+        <div class="cols" style="margin-bottom: 22px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">Every position in the room</div>
+            <ul class="clean">
+              <li><strong>Enthusiasts, skeptics, and everyone in between</strong> — the room doesn't have to agree</li>
+              <li>What's needed is a <strong>scientific approach to the question itself</strong>: evaluate model behavior, identify patterns and failure modes, <strong>systematically mitigate the risks</strong></li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 200px; display: flex; align-items: center; justify-content: center;">
+            <div class="qr-block">
+              <img src="qr-preprint.svg" alt="Preprint QR" />
+              <div class="qr-label">bioRxiv<br/>2026.10.26.761864</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The real question</div>
+          <p class="body">Not <em>whether AI has a future in science</em> — whether you can <strong style="color:var(--highlight);">verify what it did</strong>.</p>
+        </div>
+
+        <p class="small" style="margin-top: 14px;"><em>Verifiable Agentic Science on Public Infrastructure</em> — Baker, Cain, van den Beek, Chilton, Callan, Weaver, Coraor, Beavers, Goecks, Schatz, Grüning, Kosakovsky Pond &amp; Nekrutenko. bioRxiv 2026.10.26.761864.</p>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Motivation</div>
+      </div>
+      <aside class="notes">Name the room out loud — enthusiasts, skeptics, everyone between; we don't need agreement, we need evidence. The preprint is the scientific approach applied to the question itself: measure agent behavior, find failure modes, mitigate. QR + full citation so anyone can check.</aside>
+    </section>
+
+    <!-- ============ 3. Alluvial: thirty agents ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Thirty Agents, One Dataset</h2>
+        <div class="title-divider"></div>
+
+        <img src="agent-alluvial.png" alt="Alluvial diagram tracing the pipeline choices of 30 agents" style="display:block; margin: 0 auto; max-width: 100%; max-height: 470px;" />
+
+        <p style="text-align:center; font-size: 22px; color: var(--navy-soft); margin: 18px 0 10px;">
+          <strong>30 agents</strong> produced <strong>18 incompatible pipelines</strong> — and they ran on <strong>local, unverified scripts</strong>.
+        </p>
+
+        <p class="small" style="text-align:center;">Planning cohort, n=30 — bold ribbons trace one representative trajectory per model family. Figure: <em>Verifiable Agentic Science on Public Infrastructure</em> (bioRxiv 2026.10.26.761864).</p>
+
+        <div class="slide-footer">Motivation</div>
+      </div>
+      <aside class="notes">Slow down on the diagram: three model families, one planning cohort — the ribbons splinter at nearly every decision point (reference genome, engine, trimmer, aligner, counted feature, model scope). 30 agents, 18 incompatible pipelines, all on local unverified scripts. The punchline is printed under the figure.</aside>
+    </section>
+
+    <!-- ============ 4. What verification caught ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">What the Trail Actually Caught</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 22px;">
+          Zoom in on those ribbons — <span class="hl">every fork is a silent, consequential choice</span>.
+        </p>
+
+        <div class="card-grid cols-3" style="margin-bottom: 20px;">
+          <div class="card accent" style="min-height: 0;">
+            <i class="fa-solid fa-dna card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">The wrong-organism ribbon<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 13px;">One plan's "<em>B. cereus</em> ATCC&nbsp;10987" was actually <em>Salmonella</em> SC-B67 (GCF_000008105.1) — a mislabeled accession. And between <em>valid</em> assemblies: anQ-h4 lacks the cytK2 toxin locus entirely, so the toxin reads "undetected" vs. actively transcribed.</span>
+            </div>
+          </div>
+          <div class="card accent" style="min-height: 0;">
+            <i class="fa-solid fa-screwdriver-wrench card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">The tool-stack splinter<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 13px;">Engines ranged from custom Nextflow to ad-hoc Bash/R; aligners split HISAT2 / Bowtie2 / Kallisto; rRNA handling diverged on SortMeRNA. Four plans silently reversed library strandedness — real transcripts miscounted.</span>
+            </div>
+          </div>
+          <div class="card accent" style="min-height: 0;">
+            <i class="fa-solid fa-chart-column card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">The major fork: model scope<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 13px;">18 plans analyzed only the 5 target replicates; the rest — including all 10 Claude plans — pooled all 19 libraries to estimate variance. Same data, different statistical power, different DEG calls.</span>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Evidence</div>
+      </div>
+      <aside class="notes">Zoom-in slide — point back at the alluvial for each card. First fork: one Gemini plan's 'ATCC 10987' was actually Salmonella SC-B67 — wrong genus, every coordinate downstream invalid. Even between valid assemblies, anQ-h4 simply lacks the cytK2 locus, so the same data reads 'toxin undetected' or 'actively transcribed' depending on that one ribbon. Middle: the tool stacks splinter — custom Nextflow, ad-hoc Bash/R, three different aligners — and four plans silently flipped strandedness. Right: the major fork, model scope — 18 plans on the 5 target samples, the rest pooled all 19 for variance. 18 distinct workflows, 29 of 30 differ from the published one. This is what 'unverifiable' looks like concretely.</aside>
+    </section>
+
+    <!-- ============ 5. Failure modes -> guardrails ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Two Failure Modes, Two Guardrails</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 24px;">
+          The splintering isn't random — <span class="hl">each failure mode maps to a mitigation</span>.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch;">
+          <div class="section-label" style="margin: 0;">Failure modes</div>
+          <div></div>
+          <div class="section-label" style="margin: 0;">Guardrails</div>
+
+          <div class="callout-light" style="background: var(--panel);">
+            <div class="label">Consistency</div>
+            <p class="body">Faced with ambiguous choices, agents diverge — <strong>same dataset, 18 incompatible pipelines</strong>.</p>
+          </div>
+          <div class="pipe-arrow" style="align-self: center; font-size: 24px;"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="callout-dark">
+            <div class="label">BRC Analytics + GTN</div>
+            <p class="body">Strong curation — curated organisms, assemblies, vetted workflows, and training materials, so the agent starts on checked ground.</p>
+          </div>
+
+          <div class="callout-light" style="background: var(--panel);">
+            <div class="label">Traceability</div>
+            <p class="body">Disposable local scripts — <strong>no record of versions, parameters, or steps</strong>. Nothing to check, nothing to rerun.</p>
+          </div>
+          <div class="pipe-arrow" style="align-self: center; font-size: 24px;"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="callout-dark">
+            <div class="label">Galaxy</div>
+            <p class="body">Execution on public infrastructure — every action provenance-tracked, every run shareable and auditable.</p>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Motivation</div>
+      </div>
+      <aside class="notes">Two identifiable failure modes → two mitigations. Consistency under ambiguity is a curation problem — that's BRC Analytics. Traceability is an infrastructure problem — that's Galaxy's 20 years of provenance-tracked execution. This is the middle ground: don't fight adoption, route the work where the record lives.</aside>
+    </section>
+
+    <!-- ============ 6. Three doors ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Three Doors, Same Infrastructure</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card accent">
+            <i class="fa-solid fa-comments card-icon"></i>
+            <div class="card-label">Analysis Assistant<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 14px;">Chat embedded in the site — zero install, zero account.</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-plug card-icon"></i>
+            <div class="card-label">MCP servers<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 14px;">Public endpoints — bring your own client and model.</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-diagram-project card-icon"></i>
+            <div class="card-label">Orbit<br/>
+              <span style="font-weight: 400; color: var(--white); opacity: 0.85; font-size: 14px;">Agentic workbench that drafts <em>and runs</em> real workflows.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">The point</div>
+          <p class="body">Whatever client you already use — <strong>including none</strong> — the work lands in the same verifiable place.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Overview</div>
+      </div>
+      <aside class="notes">Set up the three-way tour. Same destination regardless of door: BRC curation on top, Galaxy execution underneath.</aside>
+    </section>
+
+    <!-- ============ 7. Analysis Assistant ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Analysis Assistant — the Zero-Commitment Door</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 20px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">What it is</div>
+            <ul class="clean">
+              <li>Chat on <strong>brc-analytics.org</strong> — no account, no install, no API key</li>
+              <li>Answers catalog questions: <em>"which assemblies for P. falciparum?"</em>, <em>"which workflows accept this assembly?"</em></li>
+            </ul>
+
+            <div class="section-label">The mechanism that matters</div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li>It doesn't just talk — <strong>it hands off</strong>: suggests a workflow → opens the real launch form → pre-fills inputs</li>
+              <li>Analysis runs in your Galaxy history: <strong>recorded, shareable, rerunnable</strong></li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 340px; display: flex; flex-direction: column; justify-content: center; gap: 18px;">
+            <div class="callout-dark" style="width: 100%; margin: 0;">
+              <div class="label">For the web-only user</div>
+              <p class="body" style="font-size: 20px;">No terminal, no client, no setup — and still <strong style="color:var(--highlight);">a real, auditable run</strong>.</p>
+            </div>
+            <div class="qr-block">
+              <img src="qr-brc-assistant.svg" alt="BRC Analysis Assistant QR" />
+              <div class="qr-label">brc-analytics.org<br/>/assistant</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Analysis Assistant</div>
+      </div>
+      <aside class="notes">Emphasize the handoff — the assistant navigates and plumbs; the actual compute is real tools in a public history.</aside>
+    </section>
+
+    <!-- ============ 8. Assistant vignette ============ -->
+    <section>
+      <div class="slide" style="padding-top: 45px;">
+        <h2 class="slide-title" style="margin-bottom: 8px;">What a Session Looks Like</h2>
+        <div class="title-divider" style="margin-bottom: 10px;"></div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <img src="assistant-session-1.png" alt="BRC Analysis Assistant session — K13 variation in P. falciparum" style="display: block; margin: 0 auto; max-height: 540px; width: auto; max-width: 100%; border: 1px solid #DDD; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
+          <p class="small" style="margin: 0; font-size: 15px;"><strong>A real captured session</strong> — a plain question about K13 variation in <em>P. falciparum</em> 3D7 returns the organism, the right reference assembly out of 27, and compatible workflows — the setup checklist on the right tracks what's still to decide.</p>
+        </div>
+
+        <div class="slide-footer">Analysis Assistant</div>
+      </div>
+      <aside class="notes">Real session, actual site. The opening question — K13 variation in P. falciparum 3D7 — gets organism confirmation, the right reference assembly (of 27 available), and the start of the workflow recommendation. Point at the Analysis Setup panel: 0/7 configured at the start — it fills in as the conversation decides things. The powered-by line at the bottom is worth a sentence for the skeptics: the model is named, the data handling is stated.</aside>
+    </section>
+
+    <!-- ============ 9. Assistant vignette II ============ -->
+    <section>
+      <div class="slide" style="padding-top: 45px;">
+        <h2 class="slide-title" style="margin-bottom: 8px;">What a Session Looks Like</h2>
+        <div class="title-divider" style="margin-bottom: 10px;"></div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <img src="assistant-session-2.png" alt="BRC Analysis Assistant — small test set request, checklist filling in" style="display: block; margin: 0 auto; max-height: 540px; width: auto; max-width: 100%; border: 1px solid #DDD; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);" />
+          <p class="small" style="margin: 0; font-size: 15px;"><strong>And refine</strong> — &ldquo;a small test set for the suggested workflow?&rdquo; returns concrete runs with sizes and a smallest-first pick — while the checklist moves: workflow and data characteristics, done.</p>
+        </div>
+
+        <div class="slide-footer">Analysis Assistant</div>
+      </div>
+      <aside class="notes">Same session, further along — the refinement beat. 'A small amount of public data to test the suggested workflow' gets a real table: recent P. falciparum WGS runs from Burkina Faso with sizes, and a smallest-first recommendation for a quick pipeline test. The beat to point at is the right panel: Analysis Setup has moved to 2/7 — Workflow and Data Characteristics done. The checklist is the handoff forming in real time.</aside>
+    </section>
+
+    <!-- ============ 10. MCP: two servers ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">MCP — Two Servers: What vs Where</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 20px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">BRC MCP — what to run</div>
+            <div class="card accent" style="min-height: 0; margin-bottom: 14px;">
+              <div class="card-label" style="font-size: 15px;"><i class="fa-solid fa-database" style="color: var(--highlight); margin-right: 8px;"></i><span style="font-family: 'Courier New', monospace; font-size: 14px;">brc-analytics.org/api/v1/mcp</span></div>
+              <div class="card-label" style="font-size: 15px; font-weight: 400; color: var(--white); opacity: 0.85; margin-top: 8px;">Public endpoint, no auth. Catalog tools (organisms, assemblies, workflows) + ENA sequencing search — the curation layer, exposed as tools.</div>
+            </div>
+            <div class="section-label" style="margin-top:0;">Galaxy MCP — where to run it</div>
+            <div class="card accent" style="min-height: 0;">
+              <div class="card-label" style="font-size: 15px;"><i class="fa-solid fa-server" style="color: var(--highlight); margin-right: 8px;"></i><span style="font-family: 'Courier New', monospace; font-size: 14px;">uvx galaxy-mcp</span> · galaxyproject/galaxy-mcp</div>
+              <div class="card-label" style="font-size: 15px; font-weight: 400; color: var(--white); opacity: 0.85; margin-top: 8px;">Installable server that connects your client to a Galaxy instance — executes tools and workflows on real Galaxy; history keeps the record.</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">Why it matters</div>
+            <ul class="clean" style="margin-bottom: 22px;">
+              <li><strong>The guardrail:</strong> the agent sees curated answers — e.g. <em>which workflows fit which assemblies</em> — not raw tools it improvises around</li>
+              <li>Works with Claude Code, Codex, Antigravity — <strong>any MCP client</strong>, your own scripts, <strong>a local model on university HPC</strong>. We don't pick your AI for you</li>
+            </ul>
+            <div style="display: flex; gap: 30px; justify-content: center;">
+              <div class="qr-block">
+                <img src="qr-brc-mcp.svg" alt="BRC MCP endpoint QR" />
+                <div class="qr-label">BRC MCP · hosted<br/>/api/v1/mcp</div>
+              </div>
+              <div class="qr-block">
+                <img src="qr-galaxy-mcp.svg" alt="Galaxy MCP repository QR" />
+                <div class="qr-label">Galaxy MCP · install<br/>uvx galaxy-mcp</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">MCP</div>
+      </div>
+      <aside class="notes">For the already-bought-in crowd: keep your client — Claude Code, Codex, Antigravity, or a local model. BRC MCP is hosted + public; Galaxy MCP installs via uvx and points at a Galaxy instance. The guardrail is that BRC curation — not just raw tools — is what the agent sees.</aside>
+    </section>
+
+    <!-- ============ 11. Orbit ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Orbit — Agentic Workbench with a Paper Trail</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 20px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">How it works</div>
+            <ul class="clean">
+              <li><strong>Install it locally</strong> — point it at any OpenAI- or Anthropic-compatible API</li>
+              <li><strong>Human gate at each step</strong> — the agent drafts plans and parameters; you approve and review before anything runs on Galaxy</li>
+              <li><span class="mono">notebook.md</span> + git = the record — a provenance trail, not a chat log</li>
+            </ul>
+
+            <div class="section-label">The guardrail</div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li>Missing tool → agent authors a <strong>reviewable User-Defined Tool</strong> <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--accent); border:1px solid var(--accent); border-radius:10px; padding:2px 8px; vertical-align:middle;">beta</span> instead of silently improvising locally</li>
+              <li>Export → <span class="mono">gxformat2</span> → PR to <strong>iwc-lab</strong> — the workflow outlives the session</li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 360px; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+            <div class="callout-dark" style="width: 100%;">
+              <div class="label">From the preprint</div>
+              <p class="body" style="font-size: 20px;">Orbit (<span style="font-family:'Courier New',monospace; font-size:17px;">galaxyproject/orbit</span>) is the harness that turns ephemeral prompts into <strong style="color:var(--highlight);">auditable scientific records</strong>.</p>
+            </div>
+            <div class="qr-block">
+              <img src="qr-orbit.svg" alt="Orbit repository QR" />
+              <div class="qr-label">github.com/<br/>galaxyproject/orbit</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Orbit</div>
+      </div>
+      <aside class="notes">Orbit is the local-harness door — verifiable agentic science on your own machine, your own LLM. Human approval at every gate.</aside>
+    </section>
+
+    <!-- ============ 12. Where the three fit ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Where the Three Fit</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 26px;">
+          <div class="card accent">
+            <i class="fa-solid fa-comments card-icon"></i>
+            <div class="card-label" style="font-size: 16px;">Assistant<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;"><strong>For:</strong> everyone, right now, in a browser<br/><strong>Does:</strong> explore + launch<br/><strong>Records:</strong> Galaxy history + sessions in your BRC account</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-plug card-icon"></i>
+            <div class="card-label" style="font-size: 16px;">MCP (BRC + Galaxy)<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;"><strong>For:</strong> existing AI setups — Claude Code, Codex, Antigravity, local models<br/><strong>Does:</strong> guardrails + opinionated execution<br/><strong>Records:</strong> the history</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-diagram-project card-icon"></i>
+            <div class="card-label" style="font-size: 16px;">Orbit<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;"><strong>For:</strong> verifiable agentic science — runs locally, keeps your LLM<br/><strong>Does:</strong> builds + runs end-to-end<br/><strong>Records:</strong> notebook + history + gxformat2</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 36px; justify-content: center; margin-bottom: 20px;">
+          <div class="qr-block">
+            <img src="qr-brc-assistant.svg" style="width: 95px; height: 95px;" alt="BRC Analysis Assistant QR" />
+            <div class="qr-label">Assistant<br/>/assistant</div>
+          </div>
+          <div class="qr-block">
+            <img src="qr-brc-mcp.svg" style="width: 95px; height: 95px;" alt="BRC MCP endpoint QR" />
+            <div class="qr-label">BRC MCP<br/>/api/v1/mcp</div>
+          </div>
+          <div class="qr-block">
+            <img src="qr-galaxy-mcp.svg" style="width: 95px; height: 95px;" alt="Galaxy MCP repository QR" />
+            <div class="qr-label">Galaxy MCP<br/>uvx galaxy-mcp</div>
+          </div>
+          <div class="qr-block">
+            <img src="qr-orbit.svg" style="width: 95px; height: 95px;" alt="Orbit repository QR" />
+            <div class="qr-label">Orbit<br/>github.com/galaxyproject</div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Synthesis</div>
+          <p class="body">Different doors for different users — <strong>the same curation underneath, the same record on top.</strong></p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Synthesis</div>
+      </div>
+      <aside class="notes">One-line summary per door: who it's for, what it touches, what it records.</aside>
+    </section>
+
+    <!-- ============ 13. Takeaways ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Takeaways</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 28px;">
+          <div class="col">
+            <ul class="clean" style="margin-bottom: 26px;">
+              <li>AI for science is fine — <strong>unverifiable AI isn't</strong>. Put the agent where the record lives.</li>
+              <li>Three doors: <strong>assistant</strong> (web-only), <strong>MCP</strong> (your client, your model), <strong>Orbit</strong> (build + run).</li>
+              <li>Curation is the guardrail; <strong>Galaxy is the record</strong>.</li>
+            </ul>
+            <div class="callout-dark">
+              <div class="label">Try it</div>
+              <p class="body" style="font-size: 20px;">Assistant on brc-analytics.org · MCP endpoints public · Orbit on GitHub (galaxyproject/orbit).</p>
+            </div>
+          </div>
+          <div class="col" style="flex: 0 0 300px; display: flex; flex-direction: column; justify-content: center; gap: 22px;">
+            <div class="qr-block">
+              <img src="qr-learn.svg" alt="BRC Analytics learn QR" />
+              <div class="qr-label">brc-analytics.org/learn</div>
+            </div>
+            <div class="qr-block">
+              <img src="qr-preprint.svg" alt="Preprint QR" />
+              <div class="qr-label">bioRxiv<br/>10.64898/2026.10.26.761864</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Thank you</div>
+      </div>
+      <aside class="notes">End on the thesis line. Both QRs on screen for the room.</aside>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    controls: true,
+    progress: true,
+    width: 1280,
+    height: 760,
+    margin: 0.04,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>
