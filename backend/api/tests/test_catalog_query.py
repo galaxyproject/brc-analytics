@@ -96,6 +96,26 @@ def test_contains_on_scalar_field_names_the_op_that_works():
         CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
 
 
+def test_contains_on_scalar_field_lists_only_this_entitys_list_fields():
+    # An assembly list field offered on an organism query would fail as an
+    # unknown field on the model's one retry.
+    with pytest.raises(ValueError) as excinfo:
+        CatalogQuery(
+            entity="organism",
+            filters=[
+                Filter(
+                    field="taxonomicLevelGenus",
+                    op=Op.contains_any,
+                    value=["Plasmodium", "Toxoplasma"],
+                )
+            ],
+        )
+    message = str(excinfo.value)
+    assert "List fields for 'organism'" in message
+    assert "otherNames" in message
+    assert "lineageTaxonomyIds" not in message
+
+
 @pytest.mark.parametrize("op", [Op.contains, Op.contains_any])
 def test_contains_on_scalar_field_with_empty_list_asks_for_a_value(op):
     # `in` turns an empty list away too, so pointing at `in` alone would spend
