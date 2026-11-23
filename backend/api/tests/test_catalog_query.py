@@ -78,7 +78,7 @@ def test_contains_op_requires_list_field():
 
 
 def test_contains_on_scalar_field_names_the_op_that_works():
-    # The message is the model's whole retry prompt. Told only that the field
+    # The model reads this message in its retry prompt. Told only that the field
     # was wrong it made the same call again, and the turn died on the retry limit.
     with pytest.raises(ValueError, match=r"use in \(exact match"):
         CatalogQuery(

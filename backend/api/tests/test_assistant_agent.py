@@ -2169,7 +2169,9 @@ class TestCatalogFilterRetry:
 
         assert result.output == "done"
         assert len(prompts) == 1
-        assert "strainName" in prompts[0]
+        # The retry prompt echoes the rejected input, so the bare field name is
+        # always there; check for it in the message itself.
+        assert "'strainName' holds one value per row" in prompts[0]
 
 
 def _wire_session(agent, state):
