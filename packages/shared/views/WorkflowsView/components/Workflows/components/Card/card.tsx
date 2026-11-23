@@ -3,7 +3,7 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { replaceParameters } from "@databiosphere/findable-ui/lib/utils/replaceParameters";
 import {
@@ -70,12 +70,11 @@ export const Card = ({ row }: Props): JSX.Element => {
           <Chip {...CHIP_PROPS} />
         ) : (
           <Button
-            color={BUTTON_PROPS.COLOR.PRIMARY}
+            {...BUTTON_PRESETS.PRIMARY_CONTAINED}
             component={Link}
             href={replaceParameters(ROUTES.WORKFLOW, {
               trsId: row.id,
             })}
-            variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >
             Configure
           </Button>

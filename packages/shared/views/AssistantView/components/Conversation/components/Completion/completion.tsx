@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Typography } from "@mui/material";
 import { CONTINUE_LABEL } from "@repo/shared/views/AssistantView/components/AnalysisSetup/components/Action/constants";
@@ -46,19 +46,17 @@ export const Completion = ({
       </StyledGroup>
       <StyledGroup>
         <Button
-          color={BUTTON_PROPS.COLOR.PRIMARY}
+          {...BUTTON_PRESETS.PRIMARY_CONTAINED}
           disabled={disabled}
           fullWidth
           onClick={onContinue}
-          variant={BUTTON_PROPS.VARIANT.CONTAINED}
         >
           {CONTINUE_LABEL}
         </Button>
         <Button
-          color={BUTTON_PROPS.COLOR.SECONDARY}
+          {...BUTTON_PRESETS.SECONDARY_OUTLINED}
           fullWidth
           onClick={onViewSetup}
-          variant={BUTTON_PROPS.VARIANT.CONTAINED}
         >
           {VIEW_SETUP_LABEL}
         </Button>

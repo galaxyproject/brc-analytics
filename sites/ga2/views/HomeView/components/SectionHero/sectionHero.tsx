@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type JSX } from "react";
@@ -23,7 +23,7 @@ export const SectionHero = (): JSX.Element => {
               Select assembly, view it, and analyze without leaving the browser.
             </Subhead>
             <Button
-              {...BUTTON_PROPS.PRIMARY_LARGE_CONTAINED}
+              {...BUTTON_PRESETS.PRIMARY_LARGE_CONTAINED}
               href={ROUTES.ORGANISMS}
             >
               Get started

@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { AddRounded } from "@mui/icons-material";
@@ -37,7 +37,7 @@ export const ExplicitPairs = ({
         />
       ))}
       <Button
-        {...BUTTON_PROPS.SECONDARY_CONTAINED}
+        {...BUTTON_PRESETS.SECONDARY_OUTLINED}
         disabled={isAllPairsUsed(factorValues, pairs)}
         onClick={onAddPair}
         startIcon={<AddRounded color={SVG_ICON_PROPS.COLOR.INK_LIGHT} />}

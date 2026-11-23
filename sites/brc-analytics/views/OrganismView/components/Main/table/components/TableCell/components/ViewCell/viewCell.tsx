@@ -3,7 +3,7 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button } from "@mui/material";
 import { type CellContext } from "@tanstack/react-table";
 import { type JSX } from "react";
@@ -20,12 +20,11 @@ export const ViewCell = ({
 }: CellContext<PangenomeMember, unknown>): JSX.Element => {
   return (
     <Button
-      color={BUTTON_PROPS.COLOR.SECONDARY}
+      {...BUTTON_PRESETS.SECONDARY_OUTLINED}
       href={row.original.ucscBrowserUrl}
       rel={REL_ATTRIBUTE.NO_OPENER_NO_REFERRER}
       sx={{ textTransform: "none" }}
       target={ANCHOR_TARGET.BLANK}
-      variant={BUTTON_PROPS.VARIANT.CONTAINED}
     >
       UCSC browser
     </Button>

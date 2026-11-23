@@ -5,17 +5,18 @@ import {
   ANCHOR_TARGET,
   REL_ATTRIBUTE,
 } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, Grid, MenuItem } from "@mui/material";
 import NLink from "next/link";
 import { type JSX } from "react";
-import { BUTTON_PROPS, GRID_PROPS, MENU_PROPS } from "./constants";
+import { GRID_PROPS, MENU_PROPS } from "./constants";
 import type { Props } from "./types";
 
 export const AnalyzeGenome = ({ analyze, views }: Props): JSX.Element => {
   return (
     <Grid {...GRID_PROPS}>
       <Button
-        {...BUTTON_PROPS}
+        {...BUTTON_PRESETS.PRIMARY_CONTAINED}
         component={NLink}
         disabled={!analyze.url}
         href={analyze.url}

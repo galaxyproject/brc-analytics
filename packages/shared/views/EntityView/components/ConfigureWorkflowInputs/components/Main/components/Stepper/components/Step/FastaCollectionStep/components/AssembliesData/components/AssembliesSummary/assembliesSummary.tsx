@@ -1,6 +1,6 @@
 import { LABEL } from "@databiosphere/findable-ui/lib/apis/azul/common/entities";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { GridTable } from "@databiosphere/findable-ui/lib/components/Table/table.styles";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Button,
@@ -45,7 +45,7 @@ export const AssembliesSummary = ({
         <Typography variant={TYPOGRAPHY_PROPS.VARIANT.BODY_400}>
           {renderSelectedCount(assemblies.length)}
         </Typography>
-        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onEdit}>
+        <Button {...BUTTON_PRESETS.SECONDARY_OUTLINED} onClick={onEdit}>
           Edit
         </Button>
       </StyledStack>

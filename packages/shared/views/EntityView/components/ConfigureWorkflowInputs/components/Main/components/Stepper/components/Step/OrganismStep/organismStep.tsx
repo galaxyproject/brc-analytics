@@ -1,8 +1,8 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepContent/stepContent";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button } from "@mui/material";
 import { StepContext } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/providers/SelectorStep/context";
 import { type StepProps } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
@@ -73,7 +73,7 @@ export const OrganismStep = ({
           <OrganismData configuredInput={configuredInput} table={table} />
           {!last && (
             <Button
-              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              {...BUTTON_PRESETS.PRIMARY_CONTAINED}
               disabled={!configuredInput.organism}
               onClick={() => onContinue()}
             >
