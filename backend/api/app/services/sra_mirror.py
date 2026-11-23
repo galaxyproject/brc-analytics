@@ -21,7 +21,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, TypeVar
 
 import duckdb
 
@@ -1087,6 +1087,35 @@ def sweep_exports(export_dir: str) -> int:
     return deleted
 
 
+_T = TypeVar("_T")
+
+# Least time from the end of one reopen attempt, successful or not, to the
+# start of the next. Each one ends every other reader's query, so a failure
+# that keeps coming back costs them at most one cut-off a minute, and a
+# reader rerun after a reopen has that long before the next can end it.
+_REOPEN_MIN_INTERVAL_SECONDS = 60
+
+
+def _blames_the_database(exc: BaseException) -> bool:
+    """Whether a failure blames the open database rather than the statement.
+
+    Bad bytes in its buffer pool, an instance DuckDB has invalidated, a handle
+    closed under the reader: these are what a reopen can fix. An IO error
+    counts only when DuckDB calls the data corrupt, which is how every
+    corruption check in its storage layer words it ("Corrupted RLE segment",
+    "Database file appears to be corrupted", "Corrupt database file"). The
+    rest -- a full export disk, an unreadable staging file, a spill with no
+    room -- would fail the same way on a fresh instance, after the reopen had
+    ended every other reader's query. The class alone cannot tell them apart.
+    """
+    if isinstance(
+        exc,
+        (duckdb.InternalException, duckdb.FatalException, duckdb.ConnectionException),
+    ):
+        return True
+    return isinstance(exc, duckdb.IOException) and "corrupt" in str(exc).lower()
+
+
 def _synchronized(method):
     """Serialize a public method on the instance lock.
 
@@ -1102,12 +1131,19 @@ def _synchronized(method):
     Queries are sub-200ms and usually cache hits, so the serialization cost
     is negligible; per-thread duckdb cursors could restore read parallelism
     later if it ever matters.
+
+    The call goes through _retried_on_reopen like the cursor reads do, with
+    the retry outside the lock: a reopen needs the lock, and these share the
+    instance the cursor reads go bad on.
     """
 
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        with self._lock:
-            return method(self, *args, **kwargs)
+        def locked():
+            with self._lock:
+                return method(self, *args, **kwargs)
+
+        return self._retried_on_reopen(method.__name__, locked)
 
     return wrapper
 
@@ -1129,6 +1165,16 @@ class SRAMirrorService:
         # tools execute in FastMCP's worker threadpool, so both are touched
         # from multiple threads. RLock so a future nested call can't deadlock.
         self._lock = threading.RLock()
+        # Counts reopens, so a reader whose read failed can tell whether
+        # the connection it failed on is still the one in service.
+        self._generation = 0
+        # When the last reopen attempt ended, on time.monotonic(); None until
+        # one has.
+        self._last_reopen_at: Optional[float] = None
+        # Counts cache clears. A reopen that cannot open the file clears the
+        # cache without moving the generation, so this is what a read checks
+        # before it caches an answer.
+        self._cache_epoch = 0
         self._initialize()
 
     def _cache_get(self, key: Tuple) -> Optional[Any]:
@@ -1163,20 +1209,20 @@ class SRAMirrorService:
         while len(self._cache) >= _CACHE_MAX_ENTRIES:
             del self._cache[next(iter(self._cache))]
 
-    def _initialize(self) -> None:
+    def _initialize(self) -> bool:
         # Path('').exists() is True (it resolves to '.'), so guard the empty
         # case explicitly and require an actual file -- otherwise an unset
         # SRA_MIRROR_PATH falls through to duckdb.connect('', read_only=True),
         # which raises and logs a scary traceback on every default-deploy boot.
         if not self.mirror_path:
             logger.info("SRA_MIRROR_PATH not set -- SRA mirror service disabled")
-            return
+            return False
         if not Path(self.mirror_path).is_file():
             logger.warning(
                 "SRA mirror not found at %s -- service will report unavailable",
                 self.mirror_path,
             )
-            return
+            return False
         # Build into locals and only publish to self on full success, so a
         # query failure after connect() can't leave self._con pointing at a
         # half-initialized handle. Distinct except arms give an actionable log
@@ -1233,13 +1279,124 @@ class SRAMirrorService:
                     self.schema_version or "unknown",
                     ", ".join(missing),
                 )
-            return
+            return True
 
         # Reached only on a caught failure: close the opened handle so the
-        # file lock doesn't linger until GC, and stay unavailable.
+        # file lock doesn't linger until GC. self._con is left as it was --
+        # None at startup, so the service stays unavailable, and the closed
+        # handle on a reopen (see reopen for why that one is not cleared).
         if con is not None:
             con.close()
-        self._con = None
+        return False
+
+    @property
+    def generation(self) -> int:
+        """How many times the mirror has been reopened since startup."""
+        return self._generation
+
+    def reopen(self, seen: int) -> None:
+        """
+        Swap the connection for one on a fresh database instance.
+
+        DuckDB gives every connection to an open file the same instance, so
+        connecting again hands back the buffer pool the bad read came out of.
+        Closing this connection first is what lets go of it. That waits for
+        any cursor still running on another thread and then ends it, which is
+        why the reads go through _retried_on_reopen.
+
+        @param seen: the generation the caller's read failed on. A reopen
+            another caller has done since is not repeated, and none is tried
+            within _REOPEN_MIN_INTERVAL_SECONDS of the last attempt.
+        """
+        with self._lock:
+            if self._con is None or self._generation != seen:
+                return
+            if (
+                self._last_reopen_at is not None
+                and time.monotonic() - self._last_reopen_at
+                < _REOPEN_MIN_INTERVAL_SECONDS
+            ):
+                return
+            try:
+                # Closed, not cleared. None reads to every caller as a mirror
+                # that was never configured, and that is cached as an answer;
+                # a closed handle fails the read instead, and the first read
+                # to fail once the interval is up tries the reopen again.
+                self._con.close()
+                # Before the new connection is tried, so a reopen that fails
+                # does not leave the old instance's answers being served.
+                self._cache.clear()
+                self._cache_epoch += 1
+                if not self._initialize():
+                    logger.warning(
+                        "SRA mirror at %s did not reopen; reads fail until it does",
+                        self.mirror_path,
+                    )
+                    return
+                self._generation += 1
+            finally:
+                # Taken at the end: the close waits out any query still
+                # running, which can be most of the interval by itself.
+                self._last_reopen_at = time.monotonic()
+
+    def _retried_on_reopen(self, name: str, read: Callable[[], _T]) -> _T:
+        """
+        Run a read, and once more on a reopened mirror if it fails in a way
+        that blames the open database.
+
+        A read that passes the second time is reported here, at error, since
+        nothing else will ever show that it happened -- unless what it failed
+        on was another caller's reopen cutting it off, which is logged at
+        warning, as that caller's read is the one that found the problem. One
+        that fails again is raised with the first failure as its cause and
+        left for the caller to report, so one broken read is one event. A read
+        is rerun only on a connection newer than the one it failed on: when no
+        reopen happened -- too soon after the last, or the file would not open
+        -- its own failure is raised unchanged.
+        """
+        # Under the lock, so a read that arrives while a reopen is in progress
+        # waits for it first. It is still noted before the read has its
+        # connection, so a reopen that slips in between leaves it one behind.
+        with self._lock:
+            seen = self._generation
+        try:
+            return read()
+        except duckdb.Error as first:
+            # A reopen on another thread ends this read's cursor with whatever
+            # the interrupted call happens to raise, so that case is told
+            # apart by the generation rather than by the class. Under the
+            # lock, because the cursor ends at the close and the generation
+            # only moves once the new connection is open: read unlocked, a
+            # reader cut off by a reopen still in progress looks untouched.
+            with self._lock:
+                cut_off = self._generation != seen
+            if not cut_off and not _blames_the_database(first):
+                raise
+            self.reopen(seen)
+            with self._lock:
+                reopened = self._generation != seen
+            if not reopened:
+                raise
+            try:
+                result = read()
+            except duckdb.Error as second:
+                logger.warning(
+                    "SRA mirror %s failed again after a reopen: %s", name, second
+                )
+                raise second from first
+            if cut_off:
+                logger.warning(
+                    "SRA mirror %s was cut off by a reopen and passed when rerun",
+                    name,
+                )
+            else:
+                logger.error(
+                    "SRA mirror %s failed with %s and passed on a reopened mirror",
+                    name,
+                    type(first).__name__,
+                    exc_info=first,
+                )
+            return result
 
     def is_available(self) -> bool:
         return self._con is not None
@@ -1278,10 +1435,10 @@ class SRAMirrorService:
         """A short stamp of which capabilities this mirror can serve.
 
         Exists so a cached artifact can record the mirror it was computed
-        against. A capability set cannot change while the process runs -- the
-        columns are read once at startup -- so anything derived from it is
-        stable for the lifetime of the process and changes exactly when a new
-        file is picked up. That is the property a cache key wants.
+        against. The columns are read when the mirror is opened -- at startup,
+        and again by a reopen -- so anything derived from it holds for as long
+        as one connection does and changes exactly when a different file is
+        picked up. That is the property a cache key wants.
 
         Ordered and joined rather than hashed: it is short enough to read in a
         Redis key, and a fingerprint you can eyeball beats one you have to
@@ -1819,6 +1976,13 @@ class SRAMirrorService:
         @raises ValueError: for a column that is not sortable.
         @raises RuntimeError: when the mirror cannot answer.
         """
+        return self._retried_on_reopen(
+            "order_hits", lambda: self._order_hits(hits, column, descending)
+        )
+
+    def _order_hits(
+        self, hits: List[Dict[str, Any]], column: str, descending: bool
+    ) -> List[int]:
         expr = _SORTABLE_COLUMNS.get(column)
         if expr is None:
             raise ValueError(f"not a sortable column: {column!r}")
@@ -1885,6 +2049,11 @@ class SRAMirrorService:
         a half-filled cohort is worse than none, since the whole reason it
         exists is to be the number that can be trusted.
         """
+        return self._retried_on_reopen(
+            "cohort_for_accessions", lambda: self._cohort_for_accessions(accessions)
+        )
+
+    def _cohort_for_accessions(self, accessions: List[str]) -> Optional[Dict[str, Any]]:
         if not self._con or not accessions:
             return None
 
@@ -1907,6 +2076,9 @@ class SRAMirrorService:
             if (cached := self._cache_get(cache_key)) is not None:
                 return cached
             cursor = self._con.cursor()
+            # A reopen that lands before the cache write has already cleared
+            # the cache; this answer came from the instance it let go of.
+            taken_on = self._cache_epoch
 
         # The staging file is the join's right-hand side; it exists only for
         # the duration of the statement and never outlives the call.
@@ -1956,7 +2128,8 @@ class SRAMirrorService:
             "total": len(accessions),
         }
         with self._lock:
-            self._cache_put(cache_key, cohort)
+            if self._cache_epoch == taken_on:
+                self._cache_put(cache_key, cohort)
         return cohort
 
     # Not @_synchronized, for the same reason as cohort_for_accessions above:
@@ -1990,6 +2163,13 @@ class SRAMirrorService:
             accession/score dicts.
         @returns: the geography dict, or None if there is nothing to say.
         """
+        return self._retried_on_reopen(
+            "geography_for_hits", lambda: self._geography_for_hits(hits)
+        )
+
+    def _geography_for_hits(
+        self, hits: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
         if not self._con or not self.has_capability(CAPABILITY_GEOGRAPHY):
             return None
         if not hits:
@@ -2024,6 +2204,8 @@ class SRAMirrorService:
             if (cached := self._cache_get(cache_key)) is not None:
                 return cached
             cursor = self._con.cursor()
+            # Checked at the cache write, as in _cohort_for_accessions.
+            taken_on = self._cache_epoch
 
         staging = None
         try:
@@ -2046,7 +2228,8 @@ class SRAMirrorService:
 
         geography = _shape_geography(rows, located)
         with self._lock:
-            self._cache_put(cache_key, geography)
+            if self._cache_epoch == taken_on:
+                self._cache_put(cache_key, geography)
         return geography
 
     # Not @_synchronized, for the reason spelled out above cohort_for_accessions:
@@ -2086,6 +2269,29 @@ class SRAMirrorService:
             there were no hits. A write failure raises rather than returning a
             status, so the caller can tell a broken write from a disabled one.
         """
+        record = self._retried_on_reopen(
+            "export_hits",
+            lambda: self._export_hits(job_id, hits, export_dir, metadata),
+        )
+        destination = export_file_path(export_dir, job_id)
+        if record is None or record["status"] != EXPORT_AVAILABLE or not destination:
+            return record
+        # Count the file, not the input. They agree only while runs.acc happens
+        # to be unique -- there is no constraint on it -- and a LEFT JOIN that
+        # fanned out would put a row count in the download's filename that the
+        # file does not have. Outside the retry: the count opens a connection
+        # of its own, so a failure there is no reason to reopen the mirror or
+        # write the export again.
+        record["rows"] = export_row_count(destination)
+        return record
+
+    def _export_hits(
+        self,
+        job_id: str,
+        hits: List[Dict[str, Any]],
+        export_dir: str,
+        metadata: Optional[Dict[str, str]],
+    ) -> Optional[Dict[str, Any]]:
         destination = export_file_path(export_dir, job_id)
         if not self._con or destination is None or not hits:
             return None
@@ -2165,14 +2371,8 @@ class SRAMirrorService:
                 staging.close()
                 Path(staging.name).unlink(missing_ok=True)
 
-        # Count the file, not the input. They agree only while runs.acc happens
-        # to be unique -- there is no constraint on it -- and a LEFT JOIN that
-        # fanned out would put a row count in the download's filename that the
-        # file does not have.
-        return {
-            "rows": export_row_count(destination),
-            "status": EXPORT_AVAILABLE,
-        }
+        # Rows are counted by export_hits once the write is through.
+        return {"rows": None, "status": EXPORT_AVAILABLE}
 
     @_synchronized
     def get_study_runs(self, accession: str, limit: int = 200) -> Dict[str, Any]:
