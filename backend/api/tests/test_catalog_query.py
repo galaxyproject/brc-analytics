@@ -96,6 +96,14 @@ def test_contains_on_scalar_field_names_the_op_that_works():
         CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
 
 
+@pytest.mark.parametrize("op", [Op.contains, Op.contains_any])
+def test_contains_on_scalar_field_with_empty_list_asks_for_a_value(op):
+    # `in` turns an empty list away too, so pointing at `in` alone would spend
+    # the model's one retry on a call that fails again.
+    with pytest.raises(ValueError, match="with at least one value"):
+        CatalogQuery(filters=[Filter(field="strainName", op=op, value=[])])
+
+
 def test_contains_rejects_list_value():
     # contains tests a single scalar element; a list value belongs to contains_any.
     with pytest.raises(ValueError, match="use contains_any for a list"):

@@ -382,6 +382,9 @@ class CatalogQuery(BaseModel):
                     if isinstance(f.value, list)
                     else "eq (exact match)"
                 )
+                # `in` rejects an empty list as well, so ask for both fixes at once.
+                if f.value == []:
+                    alternative += " with at least one value"
                 raise ValueError(
                     f"{f.op.value} needs a list field, but {f.field!r} holds one "
                     f"value per row; use {alternative} instead. List fields for "
