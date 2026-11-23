@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 
 import duckdb
 import pytest
@@ -7,9 +8,11 @@ from catalog_build.transform import transform
 from catalog_build.transform.transform import (
     DbtCommandError,
     DBTTestResult,
+    _get_test_results,
     do_dbt_transformations,
 )
 from catalog_build.utils import get_db_path
+from dbt.artifacts.schemas.results import TestStatus
 
 FIXTURE_PROJECT_PATH = Path(__file__).parent / "data" / "dbt_transform_project"
 
@@ -118,3 +121,25 @@ def test_project_error_raises_with_dbt_exception(dbt_project_path, temp_folder_p
 
     assert exc_info.value.command == "run"
     assert "missing_model" in str(exc_info.value)
+
+
+def test_test_results_are_sorted_by_name(temp_folder_path):
+    # With several threads, dbt reports tests in the order they finish, so the
+    # results are passed in shuffled. Stand-ins replace dbt's RunResults, since a
+    # dbt run with one thread already reports tests in name order.
+    def passing_test_result(name):
+        return SimpleNamespace(
+            status=TestStatus.Pass,
+            node=SimpleNamespace(unique_id=f"test.transform_fixture.{name}.abc123"),
+            failures=0,
+            message=None,
+        )
+
+    duckdb.connect(str(get_db_path(temp_folder_path))).close()
+
+    results = _get_test_results(
+        [passing_test_result(name) for name in ("b_test", "c_test", "a_test")],
+        temp_folder_path,
+    )
+
+    assert [result.test_name for result in results] == ["a_test", "b_test", "c_test"]
