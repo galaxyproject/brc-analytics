@@ -11,6 +11,7 @@ from hypothesis import strategies as st
 from pydantic_ai.messages import (
     ModelRequest,
     ModelResponse,
+    RetryPromptPart,
     TextPart,
     ToolCallPart,
     ToolReturnPart,
@@ -39,7 +40,7 @@ from app.services.assistant_agent import (
     LoganJobNotReadyError,
 )
 from app.services.logan_snapshot import build_logan_snapshot
-from app.services.tools.catalog_tools import get_workflow_details
+from app.services.tools.catalog_tools import AssistantDeps, get_workflow_details
 from tests.test_logan_snapshot import JOB as LOGAN_JOB
 from tests.test_logan_snapshot import results as logan_results
 from tests.test_logan_tools import _galaxy as _logan_galaxy
@@ -2130,16 +2131,7 @@ class TestCatalogFilterRetry:
 
     @pytest.mark.asyncio
     async def test_contains_any_on_a_scalar_field_recovers_on_the_retry(self):
-        from pydantic_ai.messages import (
-            ModelResponse,
-            RetryPromptPart,
-            TextPart,
-            ToolCallPart,
-            ToolReturnPart,
-        )
         from pydantic_ai.models.function import FunctionModel
-
-        from app.services.tools.catalog_tools import AssistantDeps
 
         prompts = []
 
