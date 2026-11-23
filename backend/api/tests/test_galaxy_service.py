@@ -1609,6 +1609,62 @@ class TestGeographyInTheAggregationWindow:
         assert ttl == CacheTTL.ONE_HOUR
 
     @pytest.mark.asyncio
+    async def test_a_broken_read_is_reported_with_the_error_that_broke_it(
+        self, service, caplog
+    ):
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        broken = RuntimeError("geography read failed")
+        mirror.geography_for_hits = MagicMock(side_effect=broken)
+        self._wire(service, hits=5)
+
+        with caplog.at_level(logging.ERROR, logger=galaxy_service.logger.name):
+            await service._aggregate_shards("job1")
+
+        # One event for the degraded aggregate, with the failure on it. Logged
+        # only as a warning, the cause reached Sentry as a breadcrumb and the
+        # event itself said no more than "geography query failed".
+        (record,) = [r for r in caplog.records if r.levelno >= logging.ERROR]
+        assert "geography query failed" in record.getMessage()
+        assert record.exc_info[1] is broken
+
+    @pytest.mark.asyncio
+    async def test_two_broken_reads_are_one_event_carrying_the_first(
+        self, service, caplog
+    ):
+        cohort_broken = RuntimeError("cohort read failed")
+        mirror = self._mirror(service, side_effect=cohort_broken)
+        mirror.geography_for_hits = MagicMock(
+            side_effect=RuntimeError("geography read failed")
+        )
+        self._wire(service, hits=5)
+
+        with caplog.at_level(logging.ERROR, logger=galaxy_service.logger.name):
+            await service._aggregate_shards("job1")
+
+        (record,) = [r for r in caplog.records if r.levelno >= logging.ERROR]
+        assert "cohort query and geography query failed" in record.getMessage()
+        assert record.exc_info[1] is cohort_broken
+
+    @pytest.mark.asyncio
+    async def test_a_broken_read_rides_on_the_event_when_the_hit_list_is_wrong_too(
+        self, service, caplog
+    ):
+        # An unreadable index list logs its own error and skips the branch that
+        # names degraded reads, so that event is the only one there is.
+        mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
+        broken = RuntimeError("geography read failed")
+        mirror.geography_for_hits = MagicMock(side_effect=broken)
+        self._wire(service, hits=5)
+        service.gi.jobs.show_job = MagicMock(return_value={"params": {}})
+
+        with caplog.at_level(logging.ERROR, logger=galaxy_service.logger.name):
+            await service._aggregate_shards("job1")
+
+        (record,) = [r for r in caplog.records if r.levelno >= logging.ERROR]
+        assert "index list unreadable" in record.getMessage()
+        assert record.exc_info[1] is broken
+
+    @pytest.mark.asyncio
     async def test_a_wider_mirror_invalidates_what_the_narrow_one_cached(self, service):
         """The rollout this whole mechanism exists to serve.
 
