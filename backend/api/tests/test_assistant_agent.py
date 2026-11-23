@@ -2124,6 +2124,54 @@ def _extraction_agent(reply, state, catalog=None):
     return instance
 
 
+class TestCatalogFilterRetry:
+    """A rejected query_catalog call goes back to the model as its retry prompt,
+    and the tool gets one retry, so the prompt has to say what would work."""
+
+    @pytest.mark.asyncio
+    async def test_contains_any_on_a_scalar_field_recovers_on_the_retry(self):
+        from pydantic_ai.messages import (
+            ModelResponse,
+            RetryPromptPart,
+            TextPart,
+            ToolCallPart,
+            ToolReturnPart,
+        )
+        from pydantic_ai.models.function import FunctionModel
+
+        from app.services.tools.catalog_tools import AssistantDeps
+
+        prompts = []
+
+        def query(op):
+            strains = {"field": "strainName", "op": op, "value": ["3D7", "Dd2"]}
+            args = {"query": {"entity": "assembly", "filters": [strains]}}
+            return ModelResponse(parts=[ToolCallPart("query_catalog", args)])
+
+        def model_fn(messages, info):
+            parts = messages[-1].parts
+            if any(isinstance(part, ToolReturnPart) for part in parts):
+                return ModelResponse(parts=[TextPart("done")])
+            retries = [part for part in parts if isinstance(part, RetryPromptPart)]
+            if not retries:
+                return query("contains_any")
+            prompts.append(retries[0].model_response())
+            # A model told only what was wrong repeats the call; one told what
+            # works takes the suggestion.
+            return query("in" if "use in" in prompts[-1] else "contains_any")
+
+        agent = _extraction_agent(reply="unused", state=None)
+        with agent.agent.override(model=FunctionModel(model_fn)):
+            result = await agent._run_agent_once(
+                "assemblies for strains 3D7 or Dd2",
+                deps=AssistantDeps(catalog=agent.catalog),
+            )
+
+        assert result.output == "done"
+        assert len(prompts) == 1
+        assert "strainName" in prompts[0]
+
+
 def _wire_session(agent, state):
     agent.session_service = SimpleNamespace(
         create_session=AsyncMock(return_value=state),

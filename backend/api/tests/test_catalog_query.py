@@ -75,6 +75,27 @@ def test_contains_op_requires_list_field():
         CatalogQuery(filters=[Filter(field="level", op=Op.contains, value="x")])
 
 
+def test_contains_on_scalar_field_names_the_op_that_works():
+    # The message is the model's whole retry prompt. Told only that the field
+    # was wrong it made the same call again, and the turn died on the retry limit.
+    with pytest.raises(ValueError, match=r"use in \(exact match"):
+        CatalogQuery(
+            filters=[
+                Filter(field="strainName", op=Op.contains_any, value=["3D7", "Dd2"])
+            ]
+        )
+    with pytest.raises(ValueError, match=r"use eq \(exact match"):
+        CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
+    # A list handed to `contains` still needs `in`: `eq` would reject it next.
+    with pytest.raises(ValueError, match=r"use in \(exact match"):
+        CatalogQuery(
+            filters=[Filter(field="strainName", op=Op.contains, value=["3D7", "Dd2"])]
+        )
+    # And it says which fields the op does work on.
+    with pytest.raises(ValueError, match="lineageTaxonomyIds"):
+        CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
+
+
 def test_contains_rejects_list_value():
     # contains tests a single scalar element; a list value belongs to contains_any.
     with pytest.raises(ValueError, match="use contains_any for a list"):
