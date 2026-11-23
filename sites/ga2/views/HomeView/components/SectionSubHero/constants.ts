@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { type ButtonProps } from "@mui/material";
 import { ROUTES } from "@repo/shared/routes/constants";
 import { type Props as SectionSubHeroProps } from "@repo/shared/views/HomeView/components/Section/components/SectionSubHero/types";
@@ -29,12 +29,12 @@ export const STEPS: SectionSubHeroProps["steps"] = [
 
 export const CTAS: ButtonProps[] = [
   {
-    ...BUTTON_PROPS.SECONDARY_LARGE_CONTAINED,
+    ...BUTTON_PRESETS.SECONDARY_LARGE_OUTLINED,
     children: "Discover Organisms",
     href: ROUTES.ORGANISMS,
   },
   {
-    ...BUTTON_PROPS.SECONDARY_LARGE_CONTAINED,
+    ...BUTTON_PRESETS.SECONDARY_LARGE_OUTLINED,
     children: "Discover Assemblies",
     href: ROUTES.GENOMES,
   },

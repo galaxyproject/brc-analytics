@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { AddCircleRounded } from "@mui/icons-material";
 import { type JSX } from "react";
 import { StyledButton } from "./newAnalysis.styles";
@@ -17,11 +17,10 @@ export const NewAnalysis = ({
 }: NewAnalysisProps): JSX.Element => {
   return (
     <StyledButton
-      color={BUTTON_PROPS.COLOR.PRIMARY}
+      {...BUTTON_PRESETS.PRIMARY_TEXT}
       disabled={disabled}
       onClick={onNewAnalysis}
       startIcon={<AddCircleRounded />}
-      variant={BUTTON_PROPS.VARIANT.TEXT}
     >
       New analysis
     </StyledButton>

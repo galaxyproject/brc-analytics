@@ -2,7 +2,7 @@ import { StepContent } from "@databiosphere/findable-ui/lib/components/Stepper/c
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, OutlinedInput } from "@mui/material";
 import { type StepProps } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/types";
 import { Fragment, type JSX } from "react";
@@ -58,7 +58,7 @@ export const AccessionCountStep = ({
             value={inputValue}
           />
           <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            {...BUTTON_PRESETS.PRIMARY_CONTAINED}
             disabled={disabled}
             onClick={() => {
               onConfigure({ numberOfHits });

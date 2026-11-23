@@ -1,6 +1,6 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { ErrorIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/ErrorIcon/errorIcon";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import {
   Button,
@@ -78,14 +78,14 @@ export const AccessionSelector = ({
       </DialogContent>
       <DialogActions>
         <Button
-          {...BUTTON_PROPS.SECONDARY_CONTAINED}
+          {...BUTTON_PRESETS.SECONDARY_OUTLINED}
           disabled={status.loading}
           onClick={onClose}
         >
           Cancel
         </Button>
         <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
+          {...BUTTON_PRESETS.PRIMARY_CONTAINED}
           disabled={status.loading}
           type="submit"
         >
