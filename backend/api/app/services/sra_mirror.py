@@ -1218,10 +1218,20 @@ class SRAMirrorService:
             logger.info("SRA_MIRROR_PATH not set -- SRA mirror service disabled")
             return False
         if not Path(self.mirror_path).is_file():
-            logger.warning(
-                "SRA mirror not found at %s -- service will report unavailable",
-                self.mirror_path,
-            )
+            # A reopen leaves the closed handle in place rather than None, so
+            # the service stays on and its reads fail; "unavailable" is only
+            # true at startup.
+            if self._con is None:
+                logger.warning(
+                    "SRA mirror not found at %s -- service will report unavailable",
+                    self.mirror_path,
+                )
+            else:
+                logger.warning(
+                    "SRA mirror not found at %s on reopen -- the service stays "
+                    "on and its reads fail until a later reopen finds the file",
+                    self.mirror_path,
+                )
             return False
         # Build into locals and only publish to self on full success, so a
         # query failure after connect() can't leave self._con pointing at a

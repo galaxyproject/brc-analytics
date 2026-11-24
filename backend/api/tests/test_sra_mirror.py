@@ -151,6 +151,7 @@ class TestInitializeGating:
         errors = [r for r in caplog.records if r.levelno >= logging.ERROR]
         assert not errors, [r.getMessage() for r in errors]
         assert any(r.levelno == logging.WARNING for r in caplog.records)
+        assert "will report unavailable" in caplog.text
 
     def test_directory_path_is_unavailable_without_error_log(self, caplog, tmp_path):
         # A non-empty path that exists but isn't a file (e.g. a directory)
@@ -1988,6 +1989,21 @@ class TestReopenAfterABadRead:
         os.rename(away, svc.mirror_path)
         assert svc.geography_for_hits(_hits(accessions))["in_mirror"] == 80
         assert svc.generation == 1
+
+    def test_a_reopen_that_cannot_find_the_file_says_reads_fail_not_unavailable(
+        self, geography_mirror, caplog
+    ):
+        # The startup line says the service will report unavailable; on a
+        # reopen it stays on and fails its reads, and the log has to say so.
+        svc, _accessions = geography_mirror
+        os.rename(svc.mirror_path, svc.mirror_path + ".away")
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            svc.reopen(svc.generation)
+
+        assert svc.is_available()
+        assert "will report unavailable" not in caplog.text
+        assert "reads fail until a later reopen finds the file" in caplog.text
 
     def test_a_reopen_onto_a_file_duckdb_cannot_open_keeps_the_mirror_on(
         self, geography_mirror, monkeypatch
