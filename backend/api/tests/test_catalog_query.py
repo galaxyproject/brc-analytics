@@ -98,6 +98,16 @@ def test_contains_on_scalar_field_names_the_op_that_works():
         CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
 
 
+@pytest.mark.parametrize("value", ["falciparum", ["falciparum", "vivax"]])
+def test_contains_on_scalar_field_says_there_is_no_substring_match(value):
+    # A model that meant contains as "species containing falciparum" would take
+    # eq/in with the fragment and get zero rows back.
+    with pytest.raises(ValueError, match="no substring match.*full value"):
+        CatalogQuery(
+            filters=[Filter(field="taxonomicLevelSpecies", op=Op.contains, value=value)]
+        )
+
+
 def test_contains_on_scalar_field_lists_only_this_entitys_list_fields():
     # An assembly list field offered on an organism query would fail as an
     # unknown field on the model's one retry.

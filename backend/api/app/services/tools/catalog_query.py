@@ -453,10 +453,13 @@ def _validate_query(q: Q) -> Q:
             # `in` rejects an empty list as well, so ask for both fixes at once.
             if f.value == []:
                 alternative += " with at least one value"
+            # A model that meant `contains` as a substring match would take
+            # `eq` with the fragment and get zero rows, so rule that out too.
             raise ValueError(
                 f"{f.op.value} needs a list field, but {f.field!r} holds one "
-                f"value per row; use {alternative} instead. List fields for "
-                f"{q.entity!r}: {sorted(list_fields)}"
+                f"value per row; use {alternative} instead. There is no "
+                f"substring match, so use the field's full value. List fields "
+                f"for {q.entity!r}: {sorted(list_fields)}"
             )
         # `contains` tests one scalar element (list_contains needs a scalar);
         # a list value belongs to `contains_any`.
