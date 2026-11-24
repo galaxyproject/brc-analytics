@@ -4,6 +4,12 @@ import { type CardProps } from "@databiosphere/findable-ui/lib/components/common
 export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
   {
     cardActions: [
+      { label: "View the slides", url: "/learn/blog/astmh-2026-slides" },
+    ],
+    text: MDX.Astmh2026Slides({}),
+  },
+  {
+    cardActions: [
       {
         label: "Try PrimAeon",
         url: "https://primaeon.org",
