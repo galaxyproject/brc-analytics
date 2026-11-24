@@ -441,7 +441,32 @@ def _validate_query(q: Q) -> Q:
                 "use in/not_in for multiple values"
             )
         if f.op in (Op.contains, Op.contains_any) and f.field not in list_fields:
-            raise ValueError(f"{f.op.value} needs a list field, got {f.field!r}")
+            # The model reads this as its retry prompt and gets one retry.
+            # Told only that the field was wrong it repeated the call, so
+            # name the op that works -- by the value's shape, since `eq`
+            # would turn a list away on the next try.
+            alternative = (
+                "in (exact match on any of the values)"
+                if isinstance(f.value, list)
+                else "eq (exact match)"
+            )
+            # `in` rejects an empty list as well, so ask for both fixes at once.
+            if f.value == []:
+                alternative += " with at least one value"
+            # logan_hit has no list fields; an empty list there reads as if
+            # the right field just wasn't named.
+            where = (
+                f"List fields for {q.entity!r}: {sorted(list_fields)}"
+                if list_fields
+                else f"{q.entity!r} has no list fields"
+            )
+            # A model that meant `contains` as a substring match would take
+            # `eq` with the fragment and get zero rows, so rule that out too.
+            raise ValueError(
+                f"{f.op.value} needs a list field, but {f.field!r} holds one "
+                f"value per row; use {alternative} instead. There is no "
+                f"substring match, so use the field's full value. {where}"
+            )
         # `contains` tests one scalar element (list_contains needs a scalar);
         # a list value belongs to `contains_any`.
         if f.op is Op.contains and isinstance(f.value, list):

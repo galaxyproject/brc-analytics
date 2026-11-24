@@ -77,6 +77,22 @@ class TestValidation:
         with pytest.raises(ValidationError):
             _q(operation="facets", facet_by=["level"])
 
+    @pytest.mark.parametrize(
+        "op, value, suggested",
+        [("contains", "Kenya", "eq"), ("contains_any", ["Kenya", "Malawi"], "in")],
+    )
+    def test_contains_names_the_op_that_works(self, op, value, suggested):
+        # logan_hit goes through the same validator as the catalog, but has no
+        # list fields to point at, so the hint must not offer an empty list.
+        with pytest.raises(ValidationError) as exc:
+            _q(filters=[{"field": "country", "op": op, "value": value}])
+        message = str(exc.value)
+        assert f"use {suggested} (exact match" in message
+        assert "no substring match" in message
+        assert "'logan_hit' has no list fields" in message
+        assert "[]" not in message
+        _q(filters=[{"field": "country", "op": suggested, "value": value}])
+
     def test_facets_need_facet_by(self):
         with pytest.raises(ValidationError, match="facet_by"):
             _q(operation="facets")
