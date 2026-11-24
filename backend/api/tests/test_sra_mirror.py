@@ -1415,6 +1415,49 @@ def _errors(caplog) -> list:
     return [r for r in caplog.records if r.levelno >= logging.ERROR]
 
 
+class _ClosedUnderARunningStatement:
+    """A mirror connection whose first statement's fetch waits for its close.
+
+    The close is the real one; the double only records when it starts and
+    ends, and holds the first cursor's fetch until it has ended.
+    """
+
+    def __init__(self, con):
+        self._real = con
+        self.executing = threading.Event()
+        self._close_entered = threading.Event()
+        self._closed = threading.Event()
+        self.close_entered_mid_statement = False
+        self.fetched_after_close = False
+
+    def close(self):
+        self._close_entered.set()
+        try:
+            self._real.close()
+        finally:
+            self._closed.set()
+
+    def cursor(self):
+        double = self
+        real = self._real.cursor()
+
+        class HeldCursor:
+            def execute(self, sql, params=None):
+                double.executing.set()
+                result = real.execute(sql, params)
+                double.close_entered_mid_statement = double._close_entered.is_set()
+                double.fetched_after_close = double._closed.wait(timeout=10)
+                return result
+
+            def close(self):
+                real.close()
+
+        return HeldCursor()
+
+    def __getattr__(self, name):
+        return getattr(self._real, name)
+
+
 class TestReopenAfterABadRead:
     """A read that blames the open database gets one more go on a fresh one.
 
@@ -1708,16 +1751,18 @@ class TestReopenAfterABadRead:
         assert svc.generation == 1
 
     def test_a_statement_still_running_when_another_thread_reopens_is_rerun(
-        self, geography_mirror, monkeypatch
+        self, geography_mirror, monkeypatch, caplog
     ):
         # The parked test above raises what an interrupted fetch raises; here
-        # DuckDB ends a statement that really is running, which is the
+        # the close meets a statement DuckDB really is running, which is the
         # behaviour the reopen leans on and the part an upgrade could change.
-        # Outcomes only: the close can land mid-statement or just before it,
-        # and the read has to come back either way.
+        # DuckDB doesn't interrupt it: the close waits the statement out and
+        # then takes its result with it, so the fetch that follows fails. Left
+        # to the scheduler, the reader's fetch could slip in between the
+        # statement ending and the close, find its rows and never be cut off,
+        # so the connection double below holds the fetch until the close is done.
         svc, accessions = geography_mirror
         real = sra_mirror._geography_sql
-        started = threading.Event()
         asked = []
         outcome = {}
 
@@ -1725,7 +1770,6 @@ class TestReopenAfterABadRead:
             asked.append(1)
             if len(asked) > 1:
                 return real()
-            started.set()
             # Runs long enough for the close to find it, and takes the one
             # parameter the geography statement is run with.
             return "SELECT sum(i) FROM range(500000000) t(i) WHERE ? IS NOT NULL"
@@ -1736,6 +1780,10 @@ class TestReopenAfterABadRead:
             except Exception as exc:
                 outcome["error"] = exc
 
+        double = _ClosedUnderARunningStatement(svc._con)
+        # Not monkeypatched: the reopen replaces it with the new connection,
+        # which is what the rerun has to be on.
+        svc._con = double
         monkeypatch.setattr(sra_mirror, "_geography_sql", slow_first)
         # Daemons with bounded joins, so a deadlock fails here, not the run.
         reader = threading.Thread(target=read, daemon=True)
@@ -1743,22 +1791,24 @@ class TestReopenAfterABadRead:
             target=svc.reopen, args=(svc.generation,), daemon=True
         )
 
-        reader.start()
-        assert started.wait(timeout=5)
-        reopener.start()
-        reopener.join(timeout=60)
-        reader.join(timeout=60)
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            reader.start()
+            assert double.executing.wait(timeout=5)
+            reopener.start()
+            reopener.join(timeout=60)
+            reader.join(timeout=60)
 
         assert not reopener.is_alive()
         assert not reader.is_alive()
-        if len(asked) == 1 and not isinstance(outcome.get("error"), duckdb.Error):
-            # The read never met a DuckDB failure, so the statement got to its
-            # end before the close reached it and nothing was cut off.
-            pytest.skip("the statement finished before the reopen reached it")
+        # The close found the statement running, and the fetch came after it.
+        assert double.close_entered_mid_statement
+        assert double.fetched_after_close
         assert "error" not in outcome
         assert outcome["geography"]["in_mirror"] == 80
         assert len(asked) == 2
         assert svc.generation == 1
+        assert "cut off by a reopen" in caplog.text
+        assert _errors(caplog) == []
 
     def test_a_read_that_arrives_during_a_reopen_fails_on_its_own_account(
         self, geography_mirror, monkeypatch
