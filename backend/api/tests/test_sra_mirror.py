@@ -1661,6 +1661,28 @@ class TestReopenAfterABadRead:
         assert _errors(caplog) == []
         assert "failed again" in caplog.text
 
+    def test_a_read_that_keeps_failing_is_tried_exactly_twice(
+        self, geography_mirror, monkeypatch
+    ):
+        # With no interval, nothing but the single rerun stops a third go: a
+        # read that kept reopening would end every other reader's query each
+        # time round.
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        svc, accessions = geography_mirror
+        asked = []
+
+        def always_corrupt():
+            asked.append(1)
+            return _corrupt_block()
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", always_corrupt)
+
+        with pytest.raises(duckdb.IOException):
+            svc.geography_for_hits(_hits(accessions))
+
+        assert len(asked) == 2
+        assert svc.generation == 1
+
     def test_an_error_in_the_query_does_not_reopen(self, geography_mirror, monkeypatch):
         svc, accessions = geography_mirror
         monkeypatch.setattr(sra_mirror, "_geography_sql", lambda: "SELECT error(?)")
