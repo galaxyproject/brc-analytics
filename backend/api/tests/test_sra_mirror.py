@@ -7,7 +7,9 @@ built at a temp path so the service's real read-only queries run against it.
 
 import logging
 import os
+import threading
 import time
+import types
 from pathlib import Path
 
 import duckdb
@@ -149,6 +151,7 @@ class TestInitializeGating:
         errors = [r for r in caplog.records if r.levelno >= logging.ERROR]
         assert not errors, [r.getMessage() for r in errors]
         assert any(r.levelno == logging.WARNING for r in caplog.records)
+        assert "will report unavailable" in caplog.text
 
     def test_directory_path_is_unavailable_without_error_log(self, caplog, tmp_path):
         # A non-empty path that exists but isn't a file (e.g. a directory)
@@ -1397,6 +1400,741 @@ class TestGeographyForAccessions:
         assert not hasattr(SRAMirrorService.geography_for_hits, "__wrapped__")
 
 
+# An IO error that is not about the database: a file the statement reads is
+# missing. Takes the one parameter the geography statement is run with.
+_UNREADABLE_SQL = (
+    "SELECT * FROM read_csv('/no/such/mirror-test.tsv') WHERE ? IS NOT NULL"
+)
+
+
+def _corrupt_block() -> str:
+    """Fail the way the incident's bad block did, from a statement builder."""
+    raise duckdb.IOException("Corrupted RLE segment: rle_count_offset is corrupted")
+
+
+def _errors(caplog) -> list:
+    return [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+
+class _ClosedUnderARunningStatement:
+    """A mirror connection whose first statement's fetch waits for its close.
+
+    The close is the real one; the double only records when it starts and
+    ends, and holds the first cursor's fetch until it has ended.
+    """
+
+    def __init__(self, con):
+        self._real = con
+        self.executing = threading.Event()
+        self._close_entered = threading.Event()
+        self._closed = threading.Event()
+        self.close_entered_mid_statement = False
+        self.fetched_after_close = False
+
+    def close(self):
+        self._close_entered.set()
+        try:
+            self._real.close()
+        finally:
+            self._closed.set()
+
+    def cursor(self):
+        double = self
+        real = self._real.cursor()
+
+        class HeldCursor:
+            def execute(self, sql, params=None):
+                double.executing.set()
+                result = real.execute(sql, params)
+                double.close_entered_mid_statement = double._close_entered.is_set()
+                double.fetched_after_close = double._closed.wait(timeout=10)
+                return result
+
+            def close(self):
+                real.close()
+
+        return HeldCursor()
+
+    def __getattr__(self, name):
+        return getattr(self._real, name)
+
+
+class TestReopenAfterABadRead:
+    """A read that blames the open database gets one more go on a fresh one.
+
+    DuckDB hands every connection to an open file the same database instance,
+    buffer pool included, so connecting again keeps whatever a bad read
+    tripped on. Closing the connection is what lets go of the instance; these
+    pin that the service does it, once, and that the read which found the
+    problem is the one that gets its answer.
+    """
+
+    def test_reopen_lands_on_a_fresh_database_instance(self, geography_mirror):
+        svc, accessions = geography_mirror
+        # A global setting lives on the instance, so it says which one a
+        # connection is on. A second connect to the open file would read False.
+        svc._con.execute("SET GLOBAL preserve_insertion_order = false")
+
+        svc.reopen(svc.generation)
+
+        assert svc.generation == 1
+        assert svc._con.execute(
+            "SELECT current_setting('preserve_insertion_order')"
+        ).fetchone() == (True,)
+        assert svc.geography_for_hits(_hits(accessions))["in_mirror"] == 80
+
+    def test_reopen_is_skipped_when_another_caller_got_there_first(
+        self, geography_mirror, monkeypatch
+    ):
+        # No interval, so the generation is what skips the second one.
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        svc, _accessions = geography_mirror
+
+        svc.reopen(0)
+        svc.reopen(0)
+
+        assert svc.generation == 1
+
+    def test_reopen_drops_what_the_old_instance_answered(
+        self, geography_mirror, monkeypatch
+    ):
+        svc, accessions = geography_mirror
+        real = sra_mirror._geography_sql
+        asked = []
+        monkeypatch.setattr(
+            sra_mirror, "_geography_sql", lambda: asked.append(1) or real()
+        )
+        svc.geography_for_hits(_hits(accessions))
+        svc.geography_for_hits(_hits(accessions))
+        assert len(asked) == 1
+
+        svc.reopen(svc.generation)
+        svc.geography_for_hits(_hits(accessions))
+
+        assert len(asked) == 2
+
+    def test_a_reopen_that_cannot_open_the_file_still_drops_old_answers(
+        self, geography_mirror
+    ):
+        # A cached answer would otherwise skip the closed handle, neither fail
+        # nor try the reopen again, and read to the caller as a healthy mirror.
+        svc, accessions = geography_mirror
+        svc.geography_for_hits(_hits(accessions))
+        os.rename(svc.mirror_path, svc.mirror_path + ".away")
+
+        svc.reopen(svc.generation)
+
+        with pytest.raises(duckdb.Error):
+            svc.geography_for_hits(_hits(accessions))
+
+    @pytest.mark.parametrize(
+        "shaper, sql, read",
+        [
+            (
+                "_shape_facet",
+                "_cohort_sql",
+                lambda svc, accessions: svc.cohort_for_accessions(accessions),
+            ),
+            (
+                "_shape_geography",
+                "_geography_sql",
+                lambda svc, accessions: svc.geography_for_hits(_hits(accessions)),
+            ),
+        ],
+        ids=["cohort", "geography"],
+    )
+    def test_an_answer_finished_on_the_old_instance_is_not_cached_after_a_reopen(
+        self, geography_mirror, monkeypatch, shaper, sql, read
+    ):
+        svc, accessions = geography_mirror
+        real_shaper = getattr(sra_mirror, shaper)
+        real_sql = getattr(sra_mirror, sql)
+        asked = []
+
+        def reopened_while_shaping(*args):
+            # Between the fetch and the cache write, where a reopen on another
+            # thread can land: the cursor is closed and the lock is free.
+            if svc.generation == 0:
+                svc.reopen(0)
+            return real_shaper(*args)
+
+        monkeypatch.setattr(sra_mirror, shaper, reopened_while_shaping)
+        monkeypatch.setattr(sra_mirror, sql, lambda: asked.append(1) or real_sql())
+
+        read(svc, accessions)
+        read(svc, accessions)
+
+        assert svc.generation == 1
+        assert len(asked) == 2
+
+    @pytest.mark.parametrize(
+        "shaper, read",
+        [
+            (
+                "_shape_facet",
+                lambda svc, accessions: svc.cohort_for_accessions(accessions),
+            ),
+            (
+                "_shape_geography",
+                lambda svc, accessions: svc.geography_for_hits(_hits(accessions)),
+            ),
+        ],
+        ids=["cohort", "geography"],
+    )
+    def test_an_answer_finished_as_a_reopen_failed_is_not_cached(
+        self, geography_mirror, monkeypatch, shaper, read
+    ):
+        # A reopen that cannot open the file clears the cache and leaves the
+        # generation where it was, so the generation cannot be what tells
+        # this reader its answer is from an instance that has been let go.
+        svc, accessions = geography_mirror
+        real_shaper = getattr(sra_mirror, shaper)
+        away = svc.mirror_path + ".away"
+
+        def reopen_fails_while_shaping(*args):
+            if not os.path.exists(away):
+                os.rename(svc.mirror_path, away)
+                svc.reopen(svc.generation)
+            return real_shaper(*args)
+
+        monkeypatch.setattr(sra_mirror, shaper, reopen_fails_while_shaping)
+
+        assert read(svc, accessions)
+        assert svc.generation == 0
+
+        # Cached, the same read would be answered without touching the closed
+        # handle: no failure, and no second go at the reopen.
+        with pytest.raises(duckdb.Error):
+            read(svc, accessions)
+
+    @pytest.mark.parametrize(
+        "failure",
+        [
+            duckdb.IOException("Corrupted RLE segment: rle_count_offset is corrupted"),
+            duckdb.InternalException("Attempted to access index 9 within vector"),
+            duckdb.FatalException("database has been invalidated"),
+        ],
+        ids=["corrupt-io", "internal", "fatal"],
+    )
+    def test_a_bad_read_passes_on_the_reopened_mirror(
+        self, geography_mirror, monkeypatch, caplog, failure
+    ):
+        svc, accessions = geography_mirror
+        real = sra_mirror._geography_sql
+        asked = []
+
+        def bad_once():
+            asked.append(1)
+            if len(asked) == 1:
+                raise failure
+            return real()
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", bad_once)
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            geography = svc.geography_for_hits(_hits(accessions))
+
+        assert geography["in_mirror"] == 80
+        assert svc.generation == 1
+        # The one place a healed read is visible at all, so it has to say
+        # which read, what broke and carry the failure itself.
+        (record,) = _errors(caplog)
+        assert "geography_for_hits" in record.getMessage()
+        assert type(failure).__name__ in record.getMessage()
+        assert record.exc_info[1] is failure
+        # Once, on the exception, not again in the message beside it.
+        assert str(failure) not in record.getMessage()
+
+    def test_a_read_that_fails_again_raises_with_the_first_failure_attached(
+        self, geography_mirror, monkeypatch, caplog
+    ):
+        svc, accessions = geography_mirror
+        monkeypatch.setattr(sra_mirror, "_geography_sql", _corrupt_block)
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            with pytest.raises(duckdb.IOException) as raised:
+                svc.geography_for_hits(_hits(accessions))
+
+        assert isinstance(raised.value.__cause__, duckdb.IOException)
+        assert svc.generation == 1
+        # The caller reports it; a second event here would be the same failure
+        # twice.
+        assert _errors(caplog) == []
+        assert "failed again" in caplog.text
+
+    def test_a_read_that_keeps_failing_is_tried_exactly_twice(
+        self, geography_mirror, monkeypatch
+    ):
+        # With no interval, nothing but the single rerun stops a third go: a
+        # read that kept reopening would end every other reader's query each
+        # time round.
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        svc, accessions = geography_mirror
+        asked = []
+
+        def always_corrupt():
+            asked.append(1)
+            return _corrupt_block()
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", always_corrupt)
+
+        with pytest.raises(duckdb.IOException):
+            svc.geography_for_hits(_hits(accessions))
+
+        assert len(asked) == 2
+        assert svc.generation == 1
+
+    def test_an_error_in_the_query_does_not_reopen(self, geography_mirror, monkeypatch):
+        svc, accessions = geography_mirror
+        monkeypatch.setattr(sra_mirror, "_geography_sql", lambda: "SELECT error(?)")
+
+        with pytest.raises(duckdb.InvalidInputException):
+            svc.geography_for_hits(_hits(accessions))
+
+        assert svc.generation == 0
+
+    def test_a_failure_from_outside_duckdb_passes_straight_through(
+        self, geography_mirror, monkeypatch
+    ):
+        # Even for a read whose connection was reopened under it: a reopen
+        # ends a cursor with a DuckDB error, so anything else is the read's
+        # own and running it again would hide it.
+        svc, accessions = geography_mirror
+        asked = []
+
+        def broken_by_its_own_code():
+            asked.append(1)
+            svc.reopen(svc.generation)
+            raise ValueError("not a DuckDB failure")
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", broken_by_its_own_code)
+
+        with pytest.raises(ValueError):
+            svc.geography_for_hits(_hits(accessions))
+
+        assert len(asked) == 1
+
+    def test_an_io_error_that_is_not_corruption_does_not_reopen(
+        self, geography_mirror, monkeypatch
+    ):
+        # A missing staging file, a full export disk, a spill with no room:
+        # none of them is the database's fault, and a fresh instance would
+        # fail the same way after ending every other reader's query.
+        svc, accessions = geography_mirror
+        monkeypatch.setattr(sra_mirror, "_geography_sql", lambda: _UNREADABLE_SQL)
+
+        with pytest.raises(duckdb.IOException):
+            svc.geography_for_hits(_hits(accessions))
+
+        assert svc.generation == 0
+
+    def test_a_read_cut_off_mid_query_waits_out_the_reopen_and_is_rerun(
+        self, geography_mirror, monkeypatch
+    ):
+        svc, accessions = geography_mirror
+        closed = threading.Event()
+        reader_done = threading.Event()
+        real_initialize = svc._initialize
+
+        def parked_initialize():
+            # The window that matters: the old connection is closed and the
+            # generation has not moved yet. Released when the reader is done,
+            # or on a timeout, since a reader that waits for this reopen is
+            # the correct behaviour and must not hang the test.
+            closed.set()
+            reader_done.wait(timeout=1)
+            return real_initialize()
+
+        monkeypatch.setattr(svc, "_initialize", parked_initialize)
+        real = sra_mirror._geography_sql
+        asked = []
+        reopener = threading.Thread(target=svc.reopen, args=(svc.generation,))
+
+        def interrupted():
+            asked.append(1)
+            if len(asked) > 1:
+                return real()
+            # This read holds its cursor; another thread's reopen closes the
+            # connection under it, and the fetch ends the way an interrupted
+            # one does.
+            reopener.start()
+            assert closed.wait(timeout=5)
+            raise duckdb.InvalidInputException("No open result set")
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", interrupted)
+
+        try:
+            geography = svc.geography_for_hits(_hits(accessions))
+        finally:
+            reader_done.set()
+            reopener.join(timeout=5)
+
+        assert geography["in_mirror"] == 80
+        assert len(asked) == 2
+        assert svc.generation == 1
+
+    def test_a_statement_still_running_when_another_thread_reopens_is_rerun(
+        self, geography_mirror, monkeypatch, caplog
+    ):
+        # The parked test above raises what an interrupted fetch raises; here
+        # the close meets a statement DuckDB really is running, which is the
+        # behaviour the reopen leans on and the part an upgrade could change.
+        # DuckDB doesn't interrupt it: the close waits the statement out and
+        # then takes its result with it, so the fetch that follows fails. Left
+        # to the scheduler, the reader's fetch could slip in between the
+        # statement ending and the close, find its rows and never be cut off,
+        # so the connection double below holds the fetch until the close is done.
+        svc, accessions = geography_mirror
+        real = sra_mirror._geography_sql
+        asked = []
+        outcome = {}
+
+        def slow_first():
+            asked.append(1)
+            if len(asked) > 1:
+                return real()
+            # Runs long enough for the close to find it, and takes the one
+            # parameter the geography statement is run with.
+            return "SELECT sum(i) FROM range(500000000) t(i) WHERE ? IS NOT NULL"
+
+        def read():
+            try:
+                outcome["geography"] = svc.geography_for_hits(_hits(accessions))
+            except Exception as exc:
+                outcome["error"] = exc
+
+        double = _ClosedUnderARunningStatement(svc._con)
+        # Not monkeypatched: the reopen replaces it with the new connection,
+        # which is what the rerun has to be on.
+        svc._con = double
+        monkeypatch.setattr(sra_mirror, "_geography_sql", slow_first)
+        # Daemons with bounded joins, so a deadlock fails here, not the run.
+        reader = threading.Thread(target=read, daemon=True)
+        reopener = threading.Thread(
+            target=svc.reopen, args=(svc.generation,), daemon=True
+        )
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            reader.start()
+            assert double.executing.wait(timeout=5)
+            reopener.start()
+            reopener.join(timeout=60)
+            reader.join(timeout=60)
+
+        assert not reopener.is_alive()
+        assert not reader.is_alive()
+        # The close found the statement running, and the fetch came after it.
+        assert double.close_entered_mid_statement
+        assert double.fetched_after_close
+        assert "error" not in outcome
+        assert outcome["geography"]["in_mirror"] == 80
+        assert len(asked) == 2
+        assert svc.generation == 1
+        assert "cut off by a reopen" in caplog.text
+        assert _errors(caplog) == []
+
+    def test_a_read_that_arrives_during_a_reopen_fails_on_its_own_account(
+        self, geography_mirror, monkeypatch
+    ):
+        # It waits for the reopen and runs on the new connection, so nothing
+        # cut it off: a bad statement is raised as it is, not run twice and
+        # reported as failing again after a reopen.
+        svc, accessions = geography_mirror
+        closed = threading.Event()
+        waiting = threading.Event()
+        real_initialize = svc._initialize
+        real_lock = svc._lock
+        reader = threading.current_thread()
+        asked = []
+
+        class SaysWhenTheReaderWaits:
+            def __enter__(self):
+                if threading.current_thread() is reader:
+                    waiting.set()
+                return real_lock.__enter__()
+
+            def __exit__(self, *exc_info):
+                return real_lock.__exit__(*exc_info)
+
+        def parked_initialize():
+            # Held until the read asks for the lock. That is the first thing
+            # it does; were the generation noted before that, it would be the
+            # old one, and the read would go on to count itself cut off. The
+            # timeout is only there so nothing can hang the test.
+            closed.set()
+            waiting.wait(timeout=5)
+            return real_initialize()
+
+        def bad_statement():
+            asked.append(1)
+            return "SELECT error(?)"
+
+        monkeypatch.setattr(svc, "_lock", SaysWhenTheReaderWaits())
+        monkeypatch.setattr(svc, "_initialize", parked_initialize)
+        monkeypatch.setattr(sra_mirror, "_geography_sql", bad_statement)
+        reopener = threading.Thread(target=svc.reopen, args=(svc.generation,))
+        reopener.start()
+        assert closed.wait(timeout=5)
+
+        try:
+            with pytest.raises(duckdb.Error) as raised:
+                svc.geography_for_hits(_hits(accessions))
+        finally:
+            reopener.join(timeout=5)
+
+        assert svc.generation == 1
+        assert len(asked) == 1
+        assert raised.value.__cause__ is None
+
+    def test_a_read_whose_connection_was_reopened_before_it_ran_is_rerun(
+        self, geography_mirror, monkeypatch, caplog
+    ):
+        svc, accessions = geography_mirror
+        real = sra_mirror._geography_sql
+        asked = []
+
+        def reopened_under_us():
+            # Runs after this read has taken its cursor but before its
+            # statement, so the reopen has finished by the time it fails.
+            asked.append(1)
+            if len(asked) == 1:
+                svc.reopen(svc.generation)
+            return real()
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", reopened_under_us)
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            geography = svc.geography_for_hits(_hits(accessions))
+
+        assert geography["in_mirror"] == 80
+        # Rerun on the connection the other caller opened, not reopened again.
+        assert svc.generation == 1
+        assert _errors(caplog) == []
+
+    def test_a_second_reopen_inside_the_interval_is_skipped(self, geography_mirror):
+        svc, _accessions = geography_mirror
+
+        svc.reopen(svc.generation)
+        svc.reopen(svc.generation)
+
+        assert svc.generation == 1
+
+    def test_the_interval_runs_from_the_end_of_a_reopen_not_its_start(
+        self, geography_mirror, monkeypatch
+    ):
+        # The close waits out whatever query is still running, and the
+        # interval is there for the reads that are rerun once it is done.
+        svc, _accessions = geography_mirror
+        clock = [1000.0]
+        monkeypatch.setattr(
+            sra_mirror,
+            "time",
+            types.SimpleNamespace(monotonic=lambda: clock[0], time=time.time),
+        )
+        real_initialize = svc._initialize
+
+        def slow_initialize():
+            clock[0] += sra_mirror._REOPEN_MIN_INTERVAL_SECONDS + 1
+            return real_initialize()
+
+        monkeypatch.setattr(svc, "_initialize", slow_initialize)
+
+        svc.reopen(svc.generation)
+        svc.reopen(svc.generation)
+
+        assert svc.generation == 1
+
+    def test_a_read_that_could_not_be_reopened_raises_its_own_failure_unchanged(
+        self, geography_mirror, monkeypatch
+    ):
+        svc, accessions = geography_mirror
+        real = sra_mirror._geography_sql
+        asked = []
+
+        def bad_first_and_third():
+            asked.append(1)
+            return _corrupt_block() if len(asked) in (1, 3) else real()
+
+        monkeypatch.setattr(sra_mirror, "_geography_sql", bad_first_and_third)
+        svc.geography_for_hits(_hits(accessions))
+        assert svc.generation == 1
+
+        # Inside the interval, so no reopen; running it again on the instance
+        # it just failed on would say nothing. A different hit set, so the
+        # first read's cached answer is not what comes back.
+        with pytest.raises(duckdb.IOException) as raised:
+            svc.geography_for_hits(_hits(accessions[:10]))
+
+        assert raised.value.__cause__ is None
+        assert len(asked) == 3
+        assert svc.generation == 1
+
+    def test_a_reopen_that_cannot_open_the_file_is_tried_again_by_the_next_read(
+        self, geography_mirror, monkeypatch
+    ):
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        svc, accessions = geography_mirror
+        away = svc.mirror_path + ".away"
+        os.rename(svc.mirror_path, away)
+
+        svc.reopen(svc.generation)
+
+        # Still switched on: off would read as "this mirror has no geography"
+        # and be cached as an answer for the full TTL.
+        assert svc.is_available()
+        assert svc.generation == 0
+        with pytest.raises(duckdb.Error):
+            svc.geography_for_hits(_hits(accessions))
+
+        os.rename(away, svc.mirror_path)
+        assert svc.geography_for_hits(_hits(accessions))["in_mirror"] == 80
+        assert svc.generation == 1
+
+    def test_a_reopen_that_cannot_find_the_file_says_reads_fail_not_unavailable(
+        self, geography_mirror, caplog
+    ):
+        # The startup line says the service will report unavailable; on a
+        # reopen it stays on and fails its reads, and the log has to say so.
+        svc, _accessions = geography_mirror
+        os.rename(svc.mirror_path, svc.mirror_path + ".away")
+
+        with caplog.at_level(logging.WARNING, logger=sra_mirror.logger.name):
+            svc.reopen(svc.generation)
+
+        assert svc.is_available()
+        assert "will report unavailable" not in caplog.text
+        assert "reads fail until a later reopen finds the file" in caplog.text
+
+    def test_a_reopen_onto_a_file_duckdb_cannot_open_keeps_the_mirror_on(
+        self, geography_mirror, monkeypatch
+    ):
+        # Past the is_file() guard, so the failure comes out of connect()
+        # itself and the except arms in _initialize are the ones under test.
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        svc, accessions = geography_mirror
+        kept = svc.mirror_path + ".kept"
+        os.rename(svc.mirror_path, kept)
+        Path(svc.mirror_path).write_text("not a database\n")
+
+        svc.reopen(svc.generation)
+
+        assert svc.is_available()
+        assert svc.generation == 0
+        with pytest.raises(duckdb.Error):
+            svc.geography_for_hits(_hits(accessions))
+
+        os.replace(kept, svc.mirror_path)
+        assert svc.geography_for_hits(_hits(accessions))["in_mirror"] == 80
+        assert svc.generation == 1
+
+    @pytest.mark.parametrize(
+        "read",
+        [
+            lambda svc, tmp_path: svc.order_hits(
+                _hits(["SRR003", "SRR001"]), "organism", False
+            ),
+            lambda svc, tmp_path: svc.cohort_for_accessions(["SRR001", "SRR003"]),
+            lambda svc, tmp_path: svc.geography_for_hits(_hits(["SRR001", "SRR003"])),
+            lambda svc, tmp_path: (
+                svc.export_hits(
+                    "job1", _hits(["SRR001", "SRR003"]), str(tmp_path / "exports")
+                )["rows"]
+            ),
+        ],
+        ids=["order", "cohort", "geography", "export"],
+    )
+    def test_every_cursor_read_survives_a_connection_closed_before_it_ran(
+        self, mirror, tmp_path, read
+    ):
+        # Asked of a second service, so the answer under test cannot come out
+        # of the first one's cache, and in a directory of its own, so the
+        # export under test is not the file this one leaves behind.
+        expected = read(SRAMirrorService(mirror.mirror_path), tmp_path / "expected")
+        assert expected
+        # Closed before the read takes its cursor, as a reopen that could not
+        # open the file leaves it. A query cut off mid-flight is the parked
+        # reopen test above.
+        mirror._con.close()
+
+        assert read(mirror, tmp_path / "tested") == expected
+        assert mirror.generation == 1
+
+    @pytest.mark.parametrize(
+        "body, read",
+        [
+            (
+                "_order_hits",
+                lambda svc, tmp_path: svc.order_hits(
+                    _hits(["SRR003", "SRR001"]), "organism", False
+                ),
+            ),
+            (
+                "_cohort_for_accessions",
+                lambda svc, tmp_path: svc.cohort_for_accessions(["SRR001", "SRR003"]),
+            ),
+            (
+                "_geography_for_hits",
+                lambda svc, tmp_path: svc.geography_for_hits(
+                    _hits(["SRR001", "SRR003"])
+                ),
+            ),
+            (
+                "_export_hits",
+                lambda svc, tmp_path: (
+                    svc.export_hits(
+                        "job1", _hits(["SRR001", "SRR003"]), str(tmp_path / "exports")
+                    )["rows"]
+                ),
+            ),
+        ],
+        ids=["order", "cohort", "geography", "export"],
+    )
+    def test_every_cursor_read_survives_a_corrupt_block(
+        self, mirror, tmp_path, monkeypatch, body, read
+    ):
+        # The incident's failure, not just a closed handle, for each read.
+        expected = read(SRAMirrorService(mirror.mirror_path), tmp_path / "expected")
+        real = getattr(mirror, body)
+        asked = []
+
+        def corrupt_once(*args):
+            asked.append(1)
+            if len(asked) == 1:
+                _corrupt_block()
+            return real(*args)
+
+        monkeypatch.setattr(mirror, body, corrupt_once)
+
+        assert read(mirror, tmp_path / "tested") == expected
+        assert len(asked) == 2
+        assert mirror.generation == 1
+
+    def test_a_synchronized_read_that_blames_the_database_reopens_and_is_rerun(
+        self, mirror
+    ):
+        expected = SRAMirrorService(mirror.mirror_path).runs_by_accession(["SRR001"])
+        mirror._con.close()
+
+        assert mirror.runs_by_accession(["SRR001"]) == expected
+        assert mirror.generation == 1
+
+    def test_a_synchronized_read_reopens_a_mirror_an_earlier_reopen_left_closed(
+        self, mirror, monkeypatch
+    ):
+        # The results page annotation and the MCP tools are the only reads
+        # some deployments make; left to wait for a cursor read to heal the
+        # mirror, they would stay broken.
+        monkeypatch.setattr(sra_mirror, "_REOPEN_MIN_INTERVAL_SECONDS", 0)
+        away = mirror.mirror_path + ".away"
+        os.rename(mirror.mirror_path, away)
+        mirror.reopen(mirror.generation)
+        assert mirror.generation == 0
+        os.rename(away, mirror.mirror_path)
+
+        assert mirror.runs_by_accession(["SRR001"])["SRR001"]
+        assert mirror.generation == 1
+
+
 class TestLocationsOverTheHitSet:
     """The point layer: every coordinate the cohort was sampled at.
 
@@ -1983,11 +2721,40 @@ class TestExportHits:
                 raise duckdb.ConnectionException("connection unusable")
 
         monkeypatch.setattr(svc, "_con", NoCursor())
+        # Kept unusable: a real reopen would swap in a working connection,
+        # and NoCursor has no close() for it to call.
+        monkeypatch.setattr(svc, "reopen", lambda seen: None)
 
         with pytest.raises(duckdb.ConnectionException):
             svc.export_hits("job1", _hits(accessions), str(exports))
 
         assert list(exports.iterdir()) == []
+
+    def test_a_count_that_fails_after_the_write_does_not_reopen_the_mirror(
+        self, cohort_mirror, exports, monkeypatch
+    ):
+        # The count reads the written file on a connection of its own, so
+        # nothing it trips over is the mirror's fault, and rewriting the
+        # export would not change it.
+        svc, accessions = cohort_mirror
+        real_sql = sra_mirror._export_sql
+        written = []
+        monkeypatch.setattr(
+            sra_mirror,
+            "_export_sql",
+            lambda *args: written.append(1) or real_sql(*args),
+        )
+
+        def corrupt(path):
+            raise duckdb.IOException("Corrupt database file: unreadable footer")
+
+        monkeypatch.setattr(sra_mirror, "export_row_count", corrupt)
+
+        with pytest.raises(duckdb.IOException):
+            svc.export_hits("job1", _hits(accessions), str(exports))
+
+        assert svc.generation == 0
+        assert len(written) == 1
 
     def test_a_failed_rename_leaves_no_partial(
         self, cohort_mirror, exports, monkeypatch

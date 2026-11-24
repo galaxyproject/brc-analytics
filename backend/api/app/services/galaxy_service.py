@@ -2219,22 +2219,23 @@ class GalaxyService:
 
     async def _cohort_for(
         self, job_id: str, hits: List[dict]
-    ) -> Tuple[Optional[dict], bool]:
+    ) -> Tuple[Optional[dict], Optional[Exception]]:
         """
         Count and facet the complete hit set against the SRA mirror.
 
-        Returns (cohort, failed). The flag separates a mirror that isn't
+        Returns (cohort, error). The error separates a mirror that isn't
         configured -- a steady state, where retrying changes nothing and the
         result is safe to cache without a cohort -- from a read that broke,
         which must not be cached, because the pre-cap hit list it would have
-        been computed from stops existing when aggregation returns.
+        been computed from stops existing when aggregation returns. It is the
+        exception itself so the caller's one report can carry it.
 
         Runs in a worker thread: the mirror is sync DuckDB, and this query
         takes about a second on a million-hit job, which is far too long to
         spend on the event loop.
         """
         if not self._mirror_can(CAPABILITY_COHORT):
-            return None, False
+            return None, None
 
         try:
             cohort = await asyncio.to_thread(
@@ -2246,12 +2247,12 @@ class GalaxyService:
             # every other count in the response is measured against, so a
             # partially-filled one would undermine exactly what it exists for.
             logger.warning(f"kmindex job {job_id}: cohort query failed: {e}")
-            return None, True
-        return cohort, False
+            return None, e
+        return cohort, None
 
     async def _geography_for(
         self, job_id: str, hits: List[dict]
-    ) -> Tuple[Optional[dict], bool]:
+    ) -> Tuple[Optional[dict], Optional[Exception]]:
         """
         Roll up where the complete hit set was sampled from.
 
@@ -2260,7 +2261,7 @@ class GalaxyService:
         million are only recoverable by re-downloading every shard from a
         rate-limited Galaxy.
 
-        Returns (geography, failed) on the cohort's contract. A mirror that
+        Returns (geography, error) on the cohort's contract. A mirror that
         cannot answer -- unconfigured, or a file predating the columns this
         needs -- is a steady state the aggregate is safe to cache without;
         a read that started and broke is not, because it would freeze a map
@@ -2273,10 +2274,10 @@ class GalaxyService:
 
         @param job_id: the job being aggregated, for the log line.
         @param hits: every hit, before the cap.
-        @returns: the geography payload, and whether the read failed.
+        @returns: the geography payload, and the error if the read failed.
         """
         if not self._mirror_can(CAPABILITY_GEOGRAPHY):
-            return None, False
+            return None, None
 
         try:
             geography = await asyncio.to_thread(
@@ -2287,8 +2288,8 @@ class GalaxyService:
             # denominator beside the map is the number that makes the map
             # honest, and a half-filled one is worse than no map.
             logger.warning(f"kmindex job {job_id}: geography query failed: {e}")
-            return None, True
-        return geography, False
+            return None, e
+        return geography, None
 
     def _exports_enabled(self) -> bool:
         """Whether aggregation writes an export at all on this deployment."""
@@ -2322,7 +2323,7 @@ class GalaxyService:
         job_id: str,
         hits: List[dict],
         metadata: Optional[Dict[str, str]] = None,
-    ) -> Tuple[Optional[dict], bool]:
+    ) -> Tuple[Optional[dict], Optional[Exception]]:
         """
         Materialize the complete hit set, enriched, so it can be downloaded.
 
@@ -2334,18 +2335,18 @@ class GalaxyService:
 
         Additive, so it cannot cost anyone their search: a write that fails
         leaves the results correct and simply without a download. Returns
-        (record, failed) for the same reason _cohort_for does -- an unconfigured
+        (record, error) for the same reason _cohort_for does -- an unconfigured
         export is a steady state worth caching for the full TTL, a broken write
         is not.
 
         @param job_id: the job being aggregated; names the file.
         @param hits: every hit, before the cap, in ranked order.
         @param metadata: footer key-values to write with it, or None.
-        @returns: the export record to store on the aggregate, and whether the
-            write failed.
+        @returns: the export record to store on the aggregate, and the error
+            if the write failed.
         """
         if not self._exports_enabled():
-            return None, False
+            return None, None
 
         try:
             record = await asyncio.to_thread(
@@ -2357,8 +2358,8 @@ class GalaxyService:
             )
         except Exception as e:
             logger.warning(f"kmindex job {job_id}: export materialization failed: {e}")
-            return None, True
-        return record, False
+            return None, e
+        return record, None
 
     async def _download_collection(
         self, job_id: str, status: GalaxyJobStatus
@@ -2655,17 +2656,17 @@ class GalaxyService:
         # organisms and 3,894 of 19,014 BioProjects still represented. Done
         # here, while the full list is the only one alive, so the peak is one
         # hit list rather than two plus a summary.
-        cohort, cohort_failed = await self._cohort_for(job_id, hits)
+        cohort, cohort_error = await self._cohort_for(job_id, hits)
 
         # Where those runs came from, off the same list and in the same
         # window. Separate from the cohort's country facet because that one
         # lists a head of ten -- 42 countries rendered as ten bars on the
         # reference job -- and a choropleth needs all of them.
-        geography, geography_failed = await self._geography_for(job_id, hits)
+        geography, geography_error = await self._geography_for(job_id, hits)
 
         # Written from the same list, in the same window, for the same reason:
         # the capped list below has no metadata on it and is 4% of this one.
-        export, export_failed = await self._export_for(job_id, hits, footer)
+        export, export_error = await self._export_for(job_id, hits, footer)
 
         truncated = total_matches > KMINDEX_MAX_HITS
         capped = hits
@@ -2715,17 +2716,32 @@ class GalaxyService:
         # shards are missing while it stands. An unreadable index list is a
         # different case and still refuses the cache: hours of "(unattributed)"
         # parked beside a perfectly good hit list has no way to refresh itself.
+        degraded = [
+            (name, error)
+            for name, error in (
+                ("cohort query", cohort_error),
+                ("geography query", geography_error),
+                ("export materialization", export_error),
+            )
+            if error is not None
+        ]
+        # Whichever branch below logs is the aggregate's one event, so a broken
+        # read's cause goes on it there too, not only in the last branch.
+        cause = degraded[0][1] if degraded else None
+
         if shards_failed:
             ttl = CacheTTL.ONE_HOUR
             logger.error(
                 f"kmindex job {job_id}: {shards_failed}/{len(shards)} shards "
-                f"failed to download; returning a partial result cached for {ttl}s"
+                f"failed to download; returning a partial result cached for {ttl}s",
+                exc_info=cause,
             )
             await self.cache.set(cache_key, aggregate, ttl)
         elif submitted_indexes is None:
             logger.error(
                 f"kmindex job {job_id}: submitted index list unreadable; "
-                "returning an unattributed breakdown uncached"
+                "returning an unattributed breakdown uncached",
+                exc_info=cause,
             )
         elif not submitted_indexes and total_matches:
             # Parsed, but empty: every shard key then attributes to nothing and
@@ -2736,7 +2752,8 @@ class GalaxyService:
             logger.error(
                 f"kmindex job {job_id}: submitted index list parsed as empty "
                 f"but {total_matches} hits matched; returning an unattributed "
-                "breakdown uncached"
+                "breakdown uncached",
+                exc_info=cause,
             )
         else:
             # A failed cohort read deliberately does NOT veto the cache. Every
@@ -2760,21 +2777,16 @@ class GalaxyService:
             # only be written while the full hit list is alive, so caching a
             # failed one for the full TTL means no download for that long.
             ttl = KMINDEX_AGG_TTL
-            degraded = [
-                name
-                for name, failed in (
-                    ("cohort query", cohort_failed),
-                    ("geography query", geography_failed),
-                    ("export materialization", export_failed),
-                )
-                if failed
-            ]
             if degraded:
                 ttl = CacheTTL.ONE_HOUR
+                names = " and ".join(name for name, _error in degraded)
+                # The cause goes on the event: as the warnings above alone it
+                # only ever reached Sentry as a breadcrumb.
                 logger.error(
-                    f"kmindex job {job_id}: {' and '.join(degraded)} failed; "
+                    f"kmindex job {job_id}: {names} failed; "
                     f"returning the hit list without, cached for {ttl}s so the "
-                    "work is retried rather than repeated on every request"
+                    "work is retried rather than repeated on every request",
+                    exc_info=cause,
                 )
             await self.cache.set(cache_key, aggregate, ttl)
 
