@@ -1646,23 +1646,40 @@ class TestGeographyInTheAggregationWindow:
         assert "cohort query and geography query failed" in record.getMessage()
         assert record.exc_info[1] is cohort_broken
 
+    @pytest.mark.parametrize(
+        "problem, message",
+        [
+            ("index list unreadable", "index list unreadable"),
+            ("index list empty", "index list parsed as empty"),
+            ("shard failed", "1/2 shards failed to download"),
+        ],
+    )
     @pytest.mark.asyncio
     async def test_a_broken_read_rides_on_the_event_when_the_hit_list_is_wrong_too(
-        self, service, caplog
+        self, service, caplog, monkeypatch, problem, message
     ):
-        # An unreadable index list logs its own error and skips the branch that
-        # names degraded reads, so that event is the only one there is.
+        # Each of these logs its own error and skips the branch that names
+        # degraded reads, so that event is the only one there is.
         mirror = self._mirror(service, _cohort_payload(total=5, in_mirror=5))
         broken = RuntimeError("geography read failed")
         mirror.geography_for_hits = MagicMock(side_effect=broken)
         self._wire(service, hits=5)
-        service.gi.jobs.show_job = MagicMock(return_value={"params": {}})
+        if problem == "index list unreadable":
+            service.gi.jobs.show_job = MagicMock(return_value={"params": {}})
+        elif problem == "index list empty":
+            service.gi.jobs.show_job = MagicMock(return_value=self._job([]))
+        else:
+            # The second shard fails on the first pass and on the retry sweep.
+            monkeypatch.setattr(galaxy_service, "KMINDEX_RETRY_SWEEP_DELAY", 0)
+            shard = service._download_shard.return_value
+            service.get_job_status = AsyncMock(return_value=self._status(2))
+            service._download_shard = AsyncMock(side_effect=[shard, None, None])
 
         with caplog.at_level(logging.ERROR, logger=galaxy_service.logger.name):
             await service._aggregate_shards("job1")
 
         (record,) = [r for r in caplog.records if r.levelno >= logging.ERROR]
-        assert "index list unreadable" in record.getMessage()
+        assert message in record.getMessage()
         assert record.exc_info[1] is broken
 
     @pytest.mark.asyncio
