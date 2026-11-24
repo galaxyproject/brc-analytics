@@ -1,3 +1,4 @@
+import { ROUTES } from "@brc/routes/constants";
 import * as MDX from "@brc/views/HomeView/components/SectionWhatsNew/content";
 import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 
@@ -16,7 +17,7 @@ export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
       },
       {
         label: "Learn more",
-        url: "/learn/logan-search",
+        url: ROUTES.LOGAN_SEARCH_LEARN,
       },
     ],
     text: MDX.LoganSearch({}),
@@ -25,7 +26,7 @@ export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
     cardActions: [
       {
         label: "See all tools",
-        url: "/learn/associated-tools",
+        url: ROUTES.ASSOCIATED_TOOLS_LEARN,
       },
     ],
     text: MDX.AssociatedTools({}),

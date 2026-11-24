@@ -1,5 +1,6 @@
 export const ROUTES = {
   ABOUT: "/about",
+  ASSOCIATED_TOOLS_LEARN: "/learn/associated-tools",
   CALENDAR: "/calendar",
   LEARN: "/learn",
   LOGAN_SEARCH: "/logan-search",

@@ -53,14 +53,14 @@ const JOIN_US: NavLinkItem = {
 };
 
 /** The learn page behind the "Tools" entries that are not menus. */
-const TOOLS_LEARN_URL = "/learn/associated-tools";
+const TOOLS_LEARN_URL = SITE_ROUTES.ASSOCIATED_TOOLS_LEARN;
 
 /** Associated tools in alphabetical order, opened in a new tab; the last entry is the learn page. */
 const TOOLS_MENU_ITEMS: NavLinkItem[] = [
   {
     label: "Bushwhacker",
     target: ANCHOR_TARGET.BLANK,
-    url: "https://veg.github.io/bushwacker/",
+    url: "https://veg.github.io/bushwhacker/",
   },
   {
     label: "ChronAeon",
