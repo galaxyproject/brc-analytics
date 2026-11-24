@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Your Pathogen Question. A Reproducible Analysis. — ASTMH Symposium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme" />
+
+  <!-- Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      /* BRC palette (from brochure/poster) */
+      --navy:        #28285B;
+      --navy-dark:   #1F1F47;
+      --navy-soft:   #3F3F6E;
+      --accent:      #956F00;   /* gold — the "red equivalent" for bars/markers */
+      --accent-soft: #B8881A;
+      --highlight:   #FFEB78;   /* soft yellow — for emphasis backgrounds */
+      --muted:       #637381;
+      --muted-light: #9AA2AE;
+      --panel:       #F7F7FB;
+      --border:      #E3E3ED;
+      --white:       #FFFFFF;
+    }
+
+    /* ===== Print PDF: match paper size to slide dimensions (1280x760) ===== */
+    @page {
+      size: 1280px 760px;
+      margin: 0;
+    }
+
+    html.print-pdf .pdf-page {
+      height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+    html.print-pdf .pdf-page > section,
+    html.print-pdf .reveal .slides > section {
+      top: 0 !important;
+      left: 0 !important;
+      width: 1280px !important;
+      height: 760px !important;
+      min-height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+    html.print-pdf .slide {
+      height: 760px !important;
+    }
+
+    /* ===== Base reveal overrides ===== */
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy-soft);
+      font-size: 22px;
+    }
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: 0;
+      height: 100%;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Merriweather', serif;
+      color: var(--navy);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reveal a { color: var(--navy); border-bottom: 2px solid var(--highlight); }
+    .reveal strong { color: var(--navy); font-weight: 600; }
+
+    /* ===== Slide frame (every slide) ===== */
+    .slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 70px 90px 60px;
+      box-sizing: border-box;
+      background: var(--white);
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--navy);
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .slide-logo {
+      position: absolute;
+      bottom: 18px;
+      left: 30px;
+      height: 22px;
+      width: auto;
+      opacity: 0.75;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      font-size: 12px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* ===== Slide title + divider ===== */
+    .slide h2.slide-title {
+      font-size: 40px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .slide .title-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+
+    /* ===== Bullet list (minimal, square marker) ===== */
+    .reveal ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reveal ul.clean li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 22px;
+      font-size: 22px;
+      color: var(--navy-soft);
+      line-height: 1.5;
+    }
+    .reveal ul.clean li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 10px;
+      width: 12px; height: 12px;
+      background: var(--accent);
+    }
+
+    /* ===== Two-column layout ===== */
+    .cols {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+    }
+    .cols > .col { flex: 1; min-width: 0; }
+
+    /* ===== Dark callout (navy box, gold edge) ===== */
+    .callout-dark {
+      position: relative;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 32px 32px 32px 40px;
+      box-shadow: 0 10px 25px rgba(40, 40, 91, 0.18);
+    }
+    .callout-dark::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: var(--accent);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    .callout-dark .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--highlight);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .callout-dark .body {
+      font-family: 'Merriweather', serif;
+      font-size: 24px;
+      line-height: 1.45;
+      font-style: italic;
+      margin: 0;
+    }
+    .callout-dark .body.emphatic {
+      color: var(--highlight);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* Light highlight callout variant */
+    .callout-light {
+      background: var(--highlight);
+      border-radius: 8px;
+      padding: 22px 26px;
+      border-left: 8px solid var(--accent);
+      color: var(--navy);
+    }
+    .callout-light .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .callout-light .body {
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* ===== Card grid (icon + label) ===== */
+    .card-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 130px;
+    }
+    .card .card-icon {
+      color: var(--navy);
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+    .card .card-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-soft);
+      line-height: 1.3;
+    }
+    .card.accent {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .card.accent .card-icon { color: var(--highlight); }
+    .card.accent .card-label { color: var(--white); }
+    .card.accent strong { color: var(--highlight); }
+
+    /* Numbered card variant */
+    .card .card-num {
+      font-family: 'Merriweather', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    /* ===== Title slide ===== */
+    .title-slide h1 {
+      font-size: 58px;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .title-slide .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 42px;
+    }
+    .title-slide .kicker-divider {
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+    .title-slide .author {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .title-slide .affiliation {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ===== Section divider slide ===== */
+    .section-slide {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 110px;
+    }
+    .section-slide::before { display: none; }
+    .section-slide::after { display: none; }
+    .section-slide .kicker {
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section-slide h2 {
+      color: var(--white);
+      font-size: 52px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-slide .section-sub {
+      font-size: 22px;
+      color: var(--muted-light);
+      max-width: 760px;
+    }
+    .section-slide .kicker-divider {
+      width: 80px; height: 4px;
+      background: var(--accent);
+      margin: 24px 0 0;
+    }
+
+    /* ===== Inline arrow between columns ===== */
+    .between-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--accent);
+      font-size: 32px;
+      padding: 0 4px;
+    }
+
+    /* ===== Misc ===== */
+    .small { font-size: 14px; color: var(--muted); }
+    .kicker {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .emph {
+      font-family: 'Merriweather', serif;
+      font-style: italic;
+      color: var(--navy);
+      font-size: 22px;
+    }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 20px 0 10px;
+    }
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: var(--navy);
+    }
+
+    /* Highlight inline span */
+    .hl {
+      background: linear-gradient(transparent 55%, var(--highlight) 55%);
+      padding: 0 2px;
+    }
+
+    /* Stat */
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 24px 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      border-top: 4px solid var(--accent);
+    }
+    .stat-num {
+      font-family: 'Merriweather', serif;
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 8px;
+    }
+
+    /* Pipeline mini-diagram */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pipe-stage {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pipe-stage.terminal {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+    .pipe-stage.terminal .pipe-title { color: var(--white); }
+    .pipe-stage.terminal .pipe-sub { color: var(--highlight); }
+    .pipe-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .pipe-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .pipe-arrow {
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 18px;
+    }
+
+    /* ===== Comparison table ===== */
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .cmp-table th {
+      background: var(--navy);
+      color: var(--white);
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .cmp-table th:first-child { border-top-left-radius: 6px; }
+    .cmp-table th:last-child { border-top-right-radius: 6px; }
+    .cmp-table td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--navy-soft);
+      vertical-align: top;
+    }
+    .cmp-table tr:nth-child(even) td { background: var(--panel); }
+    .cmp-table td.stage { font-weight: 600; color: var(--navy); white-space: nowrap; }
+
+    /* ===== Horizontal bar list (taxa counts) ===== */
+    .hbar-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .hbar-row .hbar-label {
+      width: 150px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .hbar-row .hbar-track {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      height: 26px;
+      overflow: hidden;
+    }
+    .hbar-row .hbar-fill {
+      height: 100%;
+      background: var(--accent);
+    }
+    .hbar-row .hbar-val {
+      width: 70px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    /* ===== Vertical bar chart (variant counts) ===== */
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 330px;
+      padding: 34px 10px 0;
+    }
+    .chart .bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      min-width: 0;
+    }
+    .chart .bar-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .chart .bar {
+      width: 100%;
+      background: var(--navy);
+      border-radius: 3px 3px 0 0;
+      min-height: 3px;
+    }
+    .chart .bar.gold { background: var(--accent); }
+    .chart .bar-x {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ===== QR block ===== */
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .qr-block img {
+      width: 110px;
+      height: 110px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      background: var(--white);
+    }
+    .qr-block .qr-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+
+    /* Status pill */
+    .status-pill {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--highlight);
+      color: var(--accent);
+      vertical-align: middle;
+    }
+    .status-pill.indev {
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============ 1. Title ============ -->
+    <section>
+      <div class="slide title-slide">
+        <div class="kicker" style="margin-bottom:24px;">ASTMH Symposium</div>
+        <h1>Your Pathogen Question.<br/>A Reproducible Analysis.</h1>
+        <div class="subtitle">Malaria as a case study for BRC Analytics</div>
+        <div class="kicker-divider"></div>
+        <div class="author">Ananias A. Escalante</div>
+        <div class="affiliation">Department of Biology · Temple University</div>
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">brc-analytics.org</div>
+      </div>
+      <aside class="notes">Opening: this is about the audience's questions, not our tools. Malaria is the running example, but the pattern generalizes.</aside>
+    </section>
+
+    <!-- ============ 2. Data integrity figure ============ -->
+    <section>
+      <div class="slide" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <img src="esc-data-integrity-bridge.png" alt="Data integrity bridge: FAIR data, tools, standards spanning big data to knowledge; broken bridge when metadata is missing" style="max-width:880px; max-height:560px; border:1px solid var(--border); border-radius:8px;" />
+        <div class="small" style="margin-top:18px;">Source: Caliskan et al. (2023) Comput Struct Biotechnol J. 21:4895-4913. doi:10.1016/j.csbj.2023.10.006.</div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Data integrity</div>
+      </div>
+      <aside class="notes">The framing figure: a bridge of metadata, FAIR data, tools, and standards carries big data to knowledge. Missing or wrong metadata = no bridge. Everything in this talk is that bridge, operationalized.</aside>
+    </section>
+
+    <!-- ============ 3. Just bring a question ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Just Bring a Question</h2>
+        <div class="title-divider"></div>
+
+        <div class="callout-dark" style="margin-bottom:28px;">
+          <p class="body" style="font-size:24px;">"I want to compare <span style="color:var(--highlight);">_______</span> across <span style="color:var(--highlight);">________</span> to test <span style="color:var(--highlight);">________</span> using <span style="color:var(--highlight);">________</span> data."</p>
+        </div>
+
+        <div class="card-grid cols-3" style="margin-bottom:28px;">
+          <div class="card" style="min-height:0; padding:18px;">
+            <div class="card-num">DRUG RESISTANCE</div>
+            <div class="card-label" style="font-size:16px;">Are known markers changing across places or over time?</div>
+          </div>
+          <div class="card" style="min-height:0; padding:18px;">
+            <div class="card-num">TRANSMISSION</div>
+            <div class="card-label" style="font-size:16px;">Can I infer the transmission chain?</div>
+          </div>
+          <div class="card" style="min-height:0; padding:18px;">
+            <div class="card-num">DIAGNOSTICS</div>
+            <div class="card-label" style="font-size:16px;">Is my assay target variable or absent?</div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <p class="body">You already ask questions molecular data can inform — BRC Analytics makes the computational path <strong>explicit, reproducible, and shareable</strong>.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The question</div>
+      </div>
+      <aside class="notes">The participation slide. The template forces the question into an answerable shape; three example domains (of many) show the range. Takeaway: the room already asks questions molecular data can inform — BRC Analytics makes the path explicit, reproducible, shareable.</aside>
+    </section>
+
+    <!-- ============ 4. From intention to analysis ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">From Intention to Analysis</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:30px;">Translating the question:</p>
+
+        <div class="card-grid cols-4">
+          <div class="card">
+            <i class="fa-solid fa-vial card-icon"></i>
+            <div class="card-label">SAMPLES<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">What was sequenced? Which technology?</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-scale-balanced card-icon"></i>
+            <div class="card-label">CONTRAST<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">What populations, times, or treatments differ?</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-table-list card-icon"></i>
+            <div class="card-label">OUTPUT<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Markers, variants, expression, or relatedness?</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-gavel card-icon"></i>
+            <div class="card-label">DECISION<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">What result would change the interpretation?</span></div>
+          </div>
+        </div>
+
+        <div class="callout-light" style="margin-top:28px;">
+          <p class="body">BRC Analytics assists with this translation — through a <strong>traditional GUI</strong> or <strong>agentic surfaces</strong>.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The translation</div>
+      </div>
+      <aside class="notes">The four-part scaffold: samples, contrast, output, decision. A question with all four filled in is one step from a concrete workflow.</aside>
+    </section>
+
+    <!-- ============ 5. The platform ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">The Platform</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:30px;">BRC Analytics connects the context, workflow, and execution.</p>
+
+        <div class="pipeline" style="margin-bottom:34px;">
+          <div class="pipe-stage">
+            <div class="pipe-title">01 · Select context</div>
+            <div class="pipe-sub">Organism + assembly — reference and annotation in the catalog</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage">
+            <div class="pipe-title">02 · Configure analysis</div>
+            <div class="pipe-sub">Workflow + input data — public access or your own data</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage terminal">
+            <div class="pipe-title">03 · Run and inspect</div>
+            <div class="pipe-sub">Galaxy history + results — tracked tools, settings, outputs</div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Division of labor</div>
+          <p class="body"><strong>BRC Analytics</strong>: browse and configure &nbsp;·&nbsp; <strong>Galaxy</strong>: execute, preserve provenance, share</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The platform</div>
+      </div>
+      <aside class="notes">Three-step mental model: pick organism+assembly, pick workflow+data, run and inspect a recorded history. The split between browsing/configuring and executing/sharing is the key relationship.</aside>
+    </section>
+
+    <!-- ============ 6. Find your use case ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Find Your Use Case</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:26px;">There is more than one way to enter the platform.</p>
+
+        <div class="card-grid cols-2" style="margin-bottom:24px;">
+          <div class="card">
+            <i class="fa-solid fa-tower-broadcast card-icon"></i>
+            <div class="card-label">SURVEILLANCE<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Do marker frequencies differ across districts?<br/>Variant calling / genotype summaries</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-flask card-icon"></i>
+            <div class="card-label">LABORATORY STUDIES<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">What changed after drug exposure?<br/>RNA-seq / differential expression</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-mosquito card-icon"></i>
+            <div class="card-label">VECTOR BIOLOGY<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">What genomic or transcriptional variation matters?<br/>Reference-guided analyses</span></div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-code-branch card-icon"></i>
+            <div class="card-label">PATHOGEN EVOLUTION<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Which variants or branches support a hypothesis?<br/>Variants + comparative methods</span></div>
+          </div>
+        </div>
+
+        <p class="emph">The same interface can support very different data and biological questions.</p>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Entry points</div>
+      </div>
+      <aside class="notes">Four doors into the same platform — surveillance, lab studies, vector biology, pathogen evolution. Invite the audience to place their own work in one of these.</aside>
+    </section>
+
+    <!-- ============ 7. Example: Plasmodium SNP calling ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Plasmodium SNP Calling</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:20px;">e.g., Workflow: Read Mapping, QC, and Variant Calling in Galaxy</p>
+
+        <img src="esc-galaxy-workflow.png" alt="Galaxy workflow graph: read mapping, QC, and variant calling for Plasmodium" style="max-width:100%; max-height:460px; border:1px solid var(--border); border-radius:8px;" />
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">A real workflow</div>
+      </div>
+      <aside class="notes">An actual Galaxy workflow graph — every box a tool, every edge provenance. This is what "reproducible" looks like concretely.</aside>
+    </section>
+
+    <!-- ============ 8. Why this is difficult ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Why This Is Difficult</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:10px;"><em>Plasmodium</em> is a good example to see the assumptions hidden in pipelines.</p>
+
+        <svg viewBox="0 0 1140 430" width="100%" style="display:block; margin:0 auto; max-height:430px;" role="img" aria-label="Malaria genomics assumptions: mixed infections, reference choice, host background, validation sets">
+          <!-- spokes -->
+          <line x1="330" y1="100" x2="475" y2="160" stroke="#D8D8E4" stroke-width="2.5"/>
+          <line x1="330" y1="330" x2="475" y2="280" stroke="#D8D8E4" stroke-width="2.5"/>
+          <line x1="810" y1="100" x2="665" y2="160" stroke="#D8D8E4" stroke-width="2.5"/>
+          <line x1="810" y1="330" x2="665" y2="280" stroke="#D8D8E4" stroke-width="2.5"/>
+          <!-- hub -->
+          <ellipse cx="570" cy="220" rx="145" ry="130" fill="#28285B"/>
+          <text x="570" y="212" text-anchor="middle" fill="#FFFFFF" font-family="Merriweather, serif" font-weight="700" font-size="26">MALARIA</text>
+          <text x="570" y="246" text-anchor="middle" fill="#FFFFFF" font-family="Merriweather, serif" font-weight="700" font-size="26">GENOMICS</text>
+          <!-- spoke cards -->
+          <g>
+            <rect x="30" y="40" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E3E3ED" stroke-width="2"/>
+            <text x="52" y="84" fill="#28285B" font-family="Inter, sans-serif" font-weight="700" font-size="16" letter-spacing="1">MIXED INFECTIONS</text>
+            <text x="52" y="118" fill="#637381" font-family="Inter, sans-serif" font-size="15">Multiple clones in one</text>
+            <text x="52" y="140" fill="#637381" font-family="Inter, sans-serif" font-size="15">blood sample</text>
+          </g>
+          <g>
+            <rect x="30" y="270" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E3E3ED" stroke-width="2"/>
+            <text x="52" y="314" fill="#28285B" font-family="Inter, sans-serif" font-weight="700" font-size="16" letter-spacing="1">HOST BACKGROUND</text>
+            <text x="52" y="348" fill="#637381" font-family="Inter, sans-serif" font-size="15">Patient reads may</text>
+            <text x="52" y="370" fill="#637381" font-family="Inter, sans-serif" font-size="15">dominate</text>
+          </g>
+          <g>
+            <rect x="810" y="40" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E3E3ED" stroke-width="2"/>
+            <text x="832" y="84" fill="#28285B" font-family="Inter, sans-serif" font-weight="700" font-size="16" letter-spacing="1">REFERENCE CHOICE</text>
+            <text x="832" y="118" fill="#637381" font-family="Inter, sans-serif" font-size="15">Assemblies differ</text>
+            <text x="832" y="140" fill="#637381" font-family="Inter, sans-serif" font-size="15">among taxa</text>
+          </g>
+          <g>
+            <rect x="810" y="270" width="300" height="120" rx="14" fill="#FFFFFF" stroke="#E3E3ED" stroke-width="2"/>
+            <text x="832" y="314" fill="#28285B" font-family="Inter, sans-serif" font-weight="700" font-size="16" letter-spacing="1">VALIDATION SETS</text>
+            <text x="832" y="348" fill="#637381" font-family="Inter, sans-serif" font-size="15">High-quality truth sets</text>
+            <text x="832" y="370" fill="#637381" font-family="Inter, sans-serif" font-size="15">can be limited</text>
+          </g>
+        </svg>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Hidden assumptions</div>
+      </div>
+      <aside class="notes">Malaria genomics hides four assumptions that standard pipelines bake in silently: mixed infections, reference choice, host background, thin validation sets. The next slides show how each was handled.</aside>
+    </section>
+
+    <!-- ============ 9. Training orbit ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Training Orbit</h2>
+        <div class="title-divider"></div>
+        <p class="emph" style="margin-bottom:24px;">Three sources of context taught Orbit how to build the pipeline.</p>
+
+        <div class="cols" style="align-items:center; gap:22px; margin-bottom:0;">
+          <div class="col" style="flex:1.25; display:flex; flex-direction:column; gap:12px;">
+            <div class="card" style="min-height:0; padding:13px 18px;">
+              <div class="card-label">MALARIAGEN PF6 EXTENDED METHODS<br/><span style="font-weight:400; color:var(--muted); font-size:14px;">7,182 <em>P. falciparum</em> genomes: mapping, BAM improvement, joint genotyping, filtering, masking, sample QC</span></div>
+            </div>
+            <div class="card" style="min-height:0; padding:13px 18px;">
+              <div class="card-label">GALAXY TRAINING NETWORK + IWC<br/><span style="font-weight:400; color:var(--muted); font-size:14px;">GTN variant-calling tutorial (mpileup &rarr; call &rarr; filter); IWC survey found no population-scale joint-genotyping workflow</span></div>
+            </div>
+            <div class="card" style="min-height:0; padding:13px 18px;">
+              <div class="card-label">BRC ANALYTICS + MCP SERVER<br/><span style="font-weight:400; color:var(--muted); font-size:14px;">Organism catalog, assemblies and workflow context — plus the SRA lists and NCBI references for five species</span></div>
+            </div>
+          </div>
+
+          <div style="flex:0 0 auto;"><i class="fa-solid fa-arrow-right" style="color:var(--accent); font-size:24px;"></i></div>
+
+          <div class="col" style="flex:0 0 255px;">
+            <div class="callout-dark" style="text-align:center; padding:22px 16px; margin:0;">
+              <div class="label" style="text-align:center;">Galaxy AI agent</div>
+              <p class="body" style="font-size:30px; font-family:'Merriweather',serif; font-weight:700; color:var(--highlight); margin:6px 0 10px;">Orbit</p>
+              <p class="body" style="font-size:14px;">Maps each MalariaGEN step to a tool that runs in a workflow</p>
+            </div>
+            <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:14px;">
+              <i class="fa-regular fa-square-check" style="color:var(--accent); font-size:26px;"></i>
+              <span style="font-size:17px; color:var(--muted); font-style:italic;">Yes, I am a robot</span>
+            </div>
+          </div>
+
+          <div style="flex:0 0 auto;"><i class="fa-solid fa-arrow-right" style="color:var(--accent); font-size:24px;"></i></div>
+
+          <div class="col" style="flex:1;">
+            <div class="card-grid" style="grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="card" style="min-height:0; padding:13px 15px;">
+                <div class="card-num">PLAN</div>
+                <div class="card-label" style="font-size:14px;">10 steps, every flag tabulated</div>
+              </div>
+              <div class="card" style="min-height:0; padding:13px 15px;">
+                <div class="card-num">CHECKS</div>
+                <div class="card-label" style="font-size:14px;">A verification command per step</div>
+              </div>
+              <div class="card" style="min-height:0; padding:13px 15px;">
+                <div class="card-num">GATE</div>
+                <div class="card-label" style="font-size:14px;">3-sample mini-test before launch</div>
+              </div>
+              <div class="card" style="min-height:0; padding:13px 15px;">
+                <div class="card-num">CODE</div>
+                <div class="card-label" style="font-size:14px;">SLURM arrays + one config.sh</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Context → Orbit → pipeline</div>
+      </div>
+      <aside class="notes">The context Orbit was given: the published MalariaGEN Pf6 protocol, the Galaxy training corpus plus the IWC workflow survey, and BRC Analytics itself via the MCP server. From that it produced a 10-step plan, a verification per step, a 3-sample gate, and the SLURM code. And the checkbox under Orbit is the joke — yes, it is a robot.</aside>
+    </section>
+
+    <!-- ============ 10. The MalariaGEN protocol ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">The MalariaGEN Protocol</h2>
+        <div class="title-divider"></div>
+        <div class="kicker" style="margin-bottom:14px;">MalariaGEN Pf6 steps</div>
+
+        <table class="cmp-table">
+          <tr><th>Stage</th><th>MalariaGEN Pf6 (GATK3 / Picard)</th><th>Our homolog (bcftools / samtools, ARM64)</th></tr>
+          <tr><td class="stage">Host-read removal</td><td>Human reads discarded before mapping</td><td>Human reads discarded before mapping</td></tr>
+          <tr><td class="stage">Mapping</td><td>bwa mem 0.7.15 -M on 3D7 v3</td><td>bwa mem 0.7.19 -M on reference genomes (PlasmoDB-70)</td></tr>
+          <tr><td class="stage">BAM improvement</td><td>Picard CleanSam, FixMate, MarkDuplicates</td><td>samtools fixmate -m + markdup -r</td></tr>
+          <tr><td class="stage">Base recalibration</td><td>GATK BQSR, Pf-crosses known sites</td><td>Not applied: no known sites for most species</td></tr>
+          <tr><td class="stage">Discovery</td><td>HaplotypeCaller per sample → GVCF</td><td>bcftools mpileup per batch (≤1,000 BAMs)</td></tr>
+          <tr><td class="stage">Joint genotyping</td><td>CombineGVCFs + GenotypeGVCFs (16 seqs)</td><td>call -m per batch, merge -0 per chromosome</td></tr>
+          <tr><td class="stage">Mixed infections</td><td>Diploid mode: hets mark mixtures</td><td>--ploidy 2, same rationale</td></tr>
+          <tr><td class="stage">Variant filtering</td><td>VQSR models, keep VQSLOD &gt; 0</td><td>Hard filters: QUAL, MQ, F_MISSING, FMT/DP, GQ</td></tr>
+          <tr><td class="stage">Region masking</td><td>Subtelomeres, hypervariable, centromeres</td><td>Not applied</td></tr>
+          <tr><td class="stage">Annotation</td><td>snpEff 4.1 + GeneDB GFF3</td><td>bcftools csq + PlasmoDB GFF3</td></tr>
+          <tr><td class="stage">Sample QC</td><td>Callability, replicates, contamination, species</td><td>Flags: reads, mapping, duplicates, variants</td></tr>
+        </table>
+
+        <div class="callout-light" style="margin-top:14px;">
+          <p class="body" style="font-size:18px;">Every stage <strong>translated to the Galaxy workflow shown earlier</strong> — the protocol became a recorded, rerunnable artifact.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The protocol</div>
+      </div>
+      <aside class="notes">Stage-by-stage: the published MalariaGEN Pf6 pipeline and our ARM64 homologs side by side. Note the two "Not applied" rows — BQSR and region masking are deliberate omissions, documented, not oversights.</aside>
+    </section>
+
+    <!-- ============ 11. Turning data into a working run ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Turning Data into a Working Run</h2>
+        <div class="title-divider"></div>
+
+        <div class="pipeline" style="margin-bottom:40px;">
+          <div class="pipe-stage"><div class="pipe-title">Constraints</div><div class="pipe-sub">Survey cluster, samples, reference material</div></div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage"><div class="pipe-title">Design</div><div class="pipe-sub">Adapt published methods and document parameters</div></div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage"><div class="pipe-title">Pilot</div><div class="pipe-sub">Small test and verification gates</div></div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage"><div class="pipe-title">P. vivax</div><div class="pipe-sub">Full-scale run with checkpoint restarts</div></div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage terminal"><div class="pipe-title">Four taxa</div><div class="pipe-sub">Run the same workflow, different references</div></div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The reuse payoff</div>
+          <p class="body">One design effort, <strong style="color:var(--highlight);">five species</strong> — the same workflow with different references.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The run</div>
+      </div>
+      <aside class="notes">The five-stage arc: constraints → design → pilot → full P. vivax run → the same workflow applied to four more taxa. The design cost is paid once; reuse across species is nearly free.</aside>
+    </section>
+
+    <!-- ============ 12. Case study numbers ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker">Case study</div>
+        <h2 class="slide-title">Public Data Beyond <em>P. falciparum</em></h2>
+        <div class="title-divider"></div>
+
+        <div class="cols">
+          <div class="col" style="flex:0.75;">
+            <div class="stat" style="height:100%; justify-content:center;">
+              <div class="stat-num">4,766</div>
+              <div class="stat-label">Public sequence accessions processed</div>
+              <div style="font-size:16px; color:var(--muted); margin-top:16px;">Five <em>Plasmodium</em> taxa</div>
+            </div>
+          </div>
+          <div class="col" style="flex:1.4;">
+            <div class="hbar-row"><div class="hbar-label"><em>P. vivax</em></div><div class="hbar-track"><div class="hbar-fill" style="width:100%;"></div></div><div class="hbar-val">4,261</div></div>
+            <div class="hbar-row"><div class="hbar-label"><em>P. malariae</em></div><div class="hbar-track"><div class="hbar-fill" style="width:64%;"></div></div><div class="hbar-val">225</div></div>
+            <div class="hbar-row"><div class="hbar-label"><em>P. knowlesi</em></div><div class="hbar-track"><div class="hbar-fill" style="width:58%;"></div></div><div class="hbar-val">143</div></div>
+            <div class="hbar-row"><div class="hbar-label"><em>P. ovale curtisi</em></div><div class="hbar-track"><div class="hbar-fill" style="width:51%;"></div></div><div class="hbar-val">84</div></div>
+            <div class="hbar-row"><div class="hbar-label"><em>P. ovale wallikeri</em></div><div class="hbar-track"><div class="hbar-fill" style="width:46%;"></div></div><div class="hbar-val">53</div></div>
+            <div class="small">Bar length is log-scaled for visibility; labels give sample counts.</div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">The cohort</div>
+      </div>
+      <aside class="notes">4,766 public accessions across five Plasmodium taxa — dominated by P. vivax but deliberately spanning the neglected species. Bars are log-scaled; read the labels.</aside>
+    </section>
+
+    <!-- ============ 13. Human decisions ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker">Human decisions</div>
+        <h2 class="slide-title">The Assistant Accelerates the Work;<br/>the Researcher Owns the Inference</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">Orbit assists</div>
+            <ul class="clean">
+              <li>Translate a published protocol into steps</li>
+              <li>List tools, versions and settings</li>
+              <li>Propose tests and document execution</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="section-label" style="margin-top:0; color:var(--navy);">You decide</div>
+            <ul class="clean">
+              <li>The relevant biological comparison</li>
+              <li>Judge reference, ploidy and mixed infections</li>
+              <li>Audit QC and <strong>reject implausible outputs</strong></li>
+            </ul>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Division of judgment</div>
+      </div>
+      <aside class="notes">The honest AI framing: Orbit does the translation, enumeration, and bookkeeping; the researcher keeps every judgment call — comparison, reference choice, ploidy, and the right to reject the output.</aside>
+    </section>
+
+    <!-- ============ 14. P. vivax variants ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker"><em>P. vivax</em> · 4,261 samples</div>
+        <h2 class="slide-title">Variant Count Follows Chromosome Length</h2>
+        <div class="title-divider"></div>
+
+        <div class="chart">
+          <div class="bar-wrap"><div class="bar-val">216k</div><div class="bar" style="height:86px;"></div><div class="bar-x">01</div></div>
+          <div class="bar-wrap"><div class="bar-val">230k</div><div class="bar" style="height:92px;"></div><div class="bar-x">02</div></div>
+          <div class="bar-wrap"><div class="bar-val">164k</div><div class="bar" style="height:66px;"></div><div class="bar-x">03</div></div>
+          <div class="bar-wrap"><div class="bar-val">229k</div><div class="bar" style="height:92px;"></div><div class="bar-x">04</div></div>
+          <div class="bar-wrap"><div class="bar-val">300k</div><div class="bar" style="height:120px;"></div><div class="bar-x">05</div></div>
+          <div class="bar-wrap"><div class="bar-val">185k</div><div class="bar" style="height:74px;"></div><div class="bar-x">06</div></div>
+          <div class="bar-wrap"><div class="bar-val">337k</div><div class="bar" style="height:135px;"></div><div class="bar-x">07</div></div>
+          <div class="bar-wrap"><div class="bar-val">319k</div><div class="bar" style="height:128px;"></div><div class="bar-x">08</div></div>
+          <div class="bar-wrap"><div class="bar-val">478k</div><div class="bar" style="height:191px;"></div><div class="bar-x">09</div></div>
+          <div class="bar-wrap"><div class="bar-val">340k</div><div class="bar" style="height:136px;"></div><div class="bar-x">10</div></div>
+          <div class="bar-wrap"><div class="bar-val">357k</div><div class="bar" style="height:143px;"></div><div class="bar-x">11</div></div>
+          <div class="bar-wrap"><div class="bar-val">565k</div><div class="bar" style="height:226px;"></div><div class="bar-x">12</div></div>
+          <div class="bar-wrap"><div class="bar-val">353k</div><div class="bar" style="height:141px;"></div><div class="bar-x">13</div></div>
+          <div class="bar-wrap"><div class="bar-val">504k</div><div class="bar" style="height:202px;"></div><div class="bar-x">14</div></div>
+          <div class="bar-wrap"><div class="bar-val">4.6k</div><div class="bar gold" style="height:3px;"></div><div class="bar-x">API</div></div>
+          <div class="bar-wrap"><div class="bar-val">1.1k</div><div class="bar gold" style="height:3px;"></div><div class="bar-x">MIT</div></div>
+        </div>
+        <div class="small" style="text-align:center;">Variants called per chromosome</div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">P. vivax results</div>
+      </div>
+      <aside class="notes">P. vivax, 4,261 samples: variant counts track chromosome length — the expected sanity pattern. Apicoplast and mitochondrion shown in gold at right.</aside>
+    </section>
+
+    <!-- ============ 15. P. knowlesi variants ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker"><em>P. knowlesi</em> · 143 samples</div>
+        <h2 class="slide-title">Chromosomes 11–14 Carry the Most Variants</h2>
+        <div class="title-divider"></div>
+
+        <div class="chart">
+          <div class="bar-wrap"><div class="bar-val">167k</div><div class="bar" style="height:67px;"></div><div class="bar-x">01</div></div>
+          <div class="bar-wrap"><div class="bar-val">141k</div><div class="bar" style="height:56px;"></div><div class="bar-x">02</div></div>
+          <div class="bar-wrap"><div class="bar-val">229k</div><div class="bar" style="height:92px;"></div><div class="bar-x">03</div></div>
+          <div class="bar-wrap"><div class="bar-val">220k</div><div class="bar" style="height:88px;"></div><div class="bar-x">04</div></div>
+          <div class="bar-wrap"><div class="bar-val">160k</div><div class="bar" style="height:64px;"></div><div class="bar-x">05</div></div>
+          <div class="bar-wrap"><div class="bar-val">217k</div><div class="bar" style="height:87px;"></div><div class="bar-x">06</div></div>
+          <div class="bar-wrap"><div class="bar-val">276k</div><div class="bar" style="height:110px;"></div><div class="bar-x">07</div></div>
+          <div class="bar-wrap"><div class="bar-val">393k</div><div class="bar" style="height:157px;"></div><div class="bar-x">08</div></div>
+          <div class="bar-wrap"><div class="bar-val">393k</div><div class="bar" style="height:157px;"></div><div class="bar-x">09</div></div>
+          <div class="bar-wrap"><div class="bar-val">297k</div><div class="bar" style="height:119px;"></div><div class="bar-x">10</div></div>
+          <div class="bar-wrap"><div class="bar-val">499k</div><div class="bar" style="height:200px;"></div><div class="bar-x">11</div></div>
+          <div class="bar-wrap"><div class="bar-val">525k</div><div class="bar" style="height:210px;"></div><div class="bar-x">12</div></div>
+          <div class="bar-wrap"><div class="bar-val">461k</div><div class="bar" style="height:184px;"></div><div class="bar-x">13</div></div>
+          <div class="bar-wrap"><div class="bar-val">574k</div><div class="bar" style="height:230px;"></div><div class="bar-x">14</div></div>
+          <div class="bar-wrap"><div class="bar-val">708</div><div class="bar gold" style="height:3px;"></div><div class="bar-x">API</div></div>
+          <div class="bar-wrap"><div class="bar-val">260</div><div class="bar gold" style="height:3px;"></div><div class="bar-x">MIT</div></div>
+        </div>
+        <div class="small" style="text-align:center;">Variants called per chromosome</div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">P. knowlesi results</div>
+      </div>
+      <aside class="notes">P. knowlesi against the PknowlesiH reference: chromosome 14 has 574,231 variants and chromosome 12 has 525,497. Despite only 143 samples, the variant total is close to P. vivax — reflecting the high diversity of P. knowlesi.</aside>
+    </section>
+
+    <!-- ============ 16. Future directions ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker">Future directions</div>
+        <h2 class="slide-title">From a One-Off Analysis<br/>to an Organism Resource</h2>
+        <div class="title-divider"></div>
+
+        <ul class="clean" style="margin-bottom:30px;">
+          <li>The workflow we built isn't a one-off — it's a <strong>reusable artifact</strong> for the next researcher with the same question.</li>
+          <li>And the data it produced — variants, QC flags, annotations — can live <strong>alongside the organism's reference</strong>, not only in one history.</li>
+        </ul>
+
+        <div class="callout-light">
+          <div class="label">The direction</div>
+          <p class="body">Both the workflow and its products can feed into the <strong>organism tab on brc-analytics.org</strong> — the analysis lands where the next person goes looking for the organism.</p>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Where it goes</div>
+      </div>
+      <aside class="notes">The closing loop: the run doesn't die in a private history — the workflow and its products can surface on the organism's tab on brc-analytics.org, so the next researcher finds the analysis already done where they look for the organism.</aside>
+    </section>
+
+    <!-- ============ 17. Future directions: annotated genomes ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker">Future directions</div>
+        <h2 class="slide-title">Assembled &amp; Annotated Genomes</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="align-items:center; margin-top:10px;">
+          <div class="col" style="flex:0 0 440px; display:flex; flex-direction:column; gap:6px; align-items:stretch;">
+            <div class="pipe-stage" style="padding:12px 18px;"><div class="pipe-title" style="font-size:15px;">Quality control</div><div class="pipe-sub">FastQC &rarr; fastp &amp; fastpLong</div></div>
+            <i class="fa-solid fa-arrow-down" style="color:var(--accent); align-self:center;"></i>
+            <div class="pipe-stage" style="padding:12px 18px;"><div class="pipe-title" style="font-size:15px;">Assembly</div><div class="pipe-sub">Flye long-read + SPAdes short-read</div></div>
+            <i class="fa-solid fa-arrow-down" style="color:var(--accent); align-self:center;"></i>
+            <div class="pipe-stage" style="padding:12px 18px;"><div class="pipe-title" style="font-size:15px;">Polish &amp; evaluate</div><div class="pipe-sub">Pilon &times;3, QUAST + BUSCO</div></div>
+            <i class="fa-solid fa-arrow-down" style="color:var(--accent); align-self:center;"></i>
+            <div class="pipe-stage terminal" style="padding:12px 18px;"><div class="pipe-title" style="font-size:15px;">Annotation</div><div class="pipe-sub">The open problem — where we are building</div></div>
+          </div>
+
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">Annotation tooling in development</div>
+            <p class="body" style="font-size:21px;">Existing <em>ab initio</em> predictors were built for model organisms — <strong>microbial eukaryotes are where they struggle</strong>: unusual genetic codes, unusual genome architectures.</p>
+            <p class="body">We are developing state-of-the-art <em>ab initio</em> annotation tools specifically for these difficult genomes — <strong>and the Galaxy workflows around them</strong>, so annotation becomes a recorded, reusable analysis inside BRC Analytics.</p>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Future directions</div>
+      </div>
+      <aside class="notes">Second future direction: assembly is a solved problem — the frontier is annotation. We are building state-of-the-art ab initio annotation tools aimed at the microbial eukaryotes where existing predictors underperform, plus the Galaxy workflows to run them inside BRC Analytics.</aside>
+    </section>
+
+    <!-- ============ 18. Practical next steps ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker">Practical next steps</div>
+        <h2 class="slide-title">Your First Analysis Can Start<br/>with a Single Well-Posed Question</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-4" style="margin-bottom:34px;">
+          <div class="card">
+            <div class="card-num">1</div>
+            <div class="card-label">Find your organism<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Choose a reference assembly and annotation.</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">2</div>
+            <div class="card-label">Check the workflow<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Read inputs, assumptions and available outputs.</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">3</div>
+            <div class="card-label">Test before scaling<br/><span style="font-weight:400; color:var(--muted); font-size:15px;">Run a small dataset and inspect the Galaxy history.</span></div>
+          </div>
+          <div class="card accent">
+            <div class="card-num" style="color:var(--highlight);">4</div>
+            <div class="card-label">Run it for real<br/><span style="font-weight:400; font-size:15px;">Scale from the pilot to your full dataset — all inside the browser.</span></div>
+          </div>
+        </div>
+
+        <div class="callout-light" style="display:flex; align-items:center; justify-content:center; gap:26px;">
+          <div>
+            <p class="body" style="font-size:18px; margin:0;"><strong>brc-analytics.org</strong> &nbsp;·&nbsp; training.galaxyproject.org</p>
+            <p class="body" style="font-size:18px; margin:4px 0 0;"><strong>Stuck or missing a piece?</strong> help@brc-analytics.org — or try <strong>Orbit</strong> (github.com/galaxyproject/orbit) if you want a less-guided agent; same Galaxy history either way.</p>
+          </div>
+          <img src="qr-orbit.svg" style="width:64px; height:64px; flex:0 0 auto;" alt="Orbit repository QR" />
+        </div>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Next steps</div>
+      </div>
+      <aside class="notes">Four concrete steps — the fourth is the full run in the browser. If something's missing or you get stuck, asking us is a supported path, not an imposition. And Orbit is there as the optional, less-guided door — it hunts down NCBI assemblies, fills tool gaps, generates workflows, all on the same Galaxy history — not the default.</aside>
+    </section>
+
+    <!-- ============ 19. Acknowledgements ============ -->
+    <section>
+      <div class="slide" style="display:flex; flex-direction:column; justify-content:center;">
+        <div class="kicker">Acknowledgements</div>
+        <h2 class="slide-title" style="font-size:34px; margin-bottom:28px;">BRC Analytics · NIAID 1U24AI183870</h2>
+
+        <div class="section-label">Principal Investigators</div>
+        <ul class="clean" style="margin-bottom:0;">
+          <li><strong>Anton Nekrutenko</strong> — Penn State</li>
+          <li><strong>Sergei L. Kosakovsky Pond</strong> — Temple University</li>
+          <li><strong>Maximilian Haeussler</strong> — U. California, Santa Cruz</li>
+          <li><strong>Kelsey Beavers</strong> — University of Texas</li>
+          <li><strong>Michael Schatz</strong> — Johns Hopkins University</li>
+        </ul>
+
+        <img src="brc-logo.png" class="slide-logo" alt="BRC Analytics" />
+        <div class="slide-footer">Thank you</div>
+      </div>
+      <aside class="notes">Close with the consortium and the grant; leave the contact slide's links in mind for questions.</aside>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    controls: true,
+    progress: true,
+    width: 1280,
+    height: 760,
+    margin: 0.04,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>

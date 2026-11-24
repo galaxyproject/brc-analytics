@@ -1,6 +1,6 @@
 import { REL_ATTRIBUTE } from "@databiosphere/findable-ui/lib/components/Links/common/entities";
 import { Link as DXLink } from "@databiosphere/findable-ui/lib/components/Links/components/Link/link";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Grid, Typography } from "@mui/material";
 import { TYPOGRAPHY_PROPS as COMPONENT_TYPOGRAPHY_PROPS } from "@repo/shared/components/workflow/WorkflowCategory/constants";
@@ -49,7 +49,7 @@ export const Workflow = ({
       <Grid container spacing={1}>
         <Grid>
           <Button
-            color={BUTTON_PROPS.COLOR.PRIMARY}
+            {...BUTTON_PRESETS.PRIMARY_CONTAINED}
             component={Link}
             disabled={!workflow.trsId}
             href={buildConfigureWorkflowUrl(
@@ -58,7 +58,6 @@ export const Workflow = ({
               workflow.trsId
             )}
             rel={REL_ATTRIBUTE.NO_OPENER}
-            variant={BUTTON_PROPS.VARIANT.CONTAINED}
           >
             Configure Inputs
           </Button>

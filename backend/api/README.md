@@ -80,10 +80,54 @@ Services:
 - `GET /api/v1/cache/health` - Redis cache connectivity check
 - `GET /api/v1/version` - API version and environment information
 
+### Genes
+
+Read from the gene snapshot (see [Gene data (local)](#gene-data-local)); 503 while it is unavailable.
+
+- `GET /api/v1/genes/search?q=&assembly=&limit=` - Genes found by the start of their locus tag, name, symbol, old locus tag, NCBI Gene ID, transcript ID or protein accession (accessions with or without their version), or of a word of their transcripts' products. Case-insensitive, and surrounding punctuation is ignored; with several words, each must match, the last as a prefix, except stop words and words of 1 or 2 characters, which are left out. Best match first, each gene once, with what it matched on; `limit` is 10 by default and at most 50, and `truncated` says there were more.
+- `GET /api/v1/genes/{gene_uid}` - One gene
+- `GET /api/v1/genes/{gene_uid}/bionym` - The claims in a gene's BioNym graph
+
 ### Documentation
 
 - `GET /api/docs` - Interactive Swagger UI
 - `GET /api/redoc` - ReDoc API documentation
+
+### Logan search downloads
+
+- `GET /api/v1/galaxy/kmindex/jobs/{job_id}/export?format=tsv|parquet` - every
+  run a search matched, joined to its SRA metadata. Written when the results
+  are first merged, and only when `KMINDEX_EXPORT_DIR` is set and the SRA
+  mirror is available.
+- `GET /api/v1/galaxy/kmindex/jobs/{job_id}/query.fasta` - the FASTA the search
+  ran, exactly as it went to Galaxy, as `logan-<job_id>-query.fasta`. Read back
+  off the Galaxy job's input dataset and cached in Redis for 30 days; it never
+  needs the export and never starts a merge. A job-cache copy answers with its
+  original's query. The same FASTA is written into the parquet export's footer
+  (below), so the query is kept for as long as the export is. Anyone with the
+  job id can fetch it, the same as the job's results.
+
+The parquet export also carries the search's provenance in its footer
+key-value metadata, so the columns and the TSV are unaffected:
+
+| Key                      | Value                                                    |
+| ------------------------ | -------------------------------------------------------- |
+| `logan.metadata_version` | `1`                                                      |
+| `logan.query_fasta`      | The query FASTA, header and sequence, as Galaxy holds it |
+| `logan.indexes`          | The indexes searched, as a JSON array                    |
+| `logan.threshold`        | Minimum shared k-mer fraction                            |
+| `logan.zvalue`           | kmindex z-value                                          |
+| `logan.kmer_size`        | k-mer size (31)                                          |
+| `logan.tool_id`          | The kmindex_query tool id                                |
+| `logan.tool_version`     | Its version                                              |
+| `logan.galaxy_url`       | The Galaxy the search ran on                             |
+| `logan.search_date`      | When Galaxy created the job, ISO 8601 UTC                |
+
+A value Galaxy didn't report is left out rather than written empty. The job
+id is deliberately not there: it's in the filename already, and it opens the
+search's results page. Exports written before this shipped have no footer and
+keep serving as they are; they pick one up the next time the job is merged.
+`query.fasta` covers them in the meantime.
 
 ## MCP Server
 
@@ -165,7 +209,7 @@ user there, and the service key can't see it. Prod had login off while it was
 on Galaxy Test, so it has none of those.
 
 The rule is the length of the encoded id. Galaxy encodes ids as Blowfish
-blocks, so a database id of up to eight digits comes out as 16 hex characters
+blocks, so a database id of up to seven digits comes out as 16 hex characters
 and anything larger as 32. Galaxy Test's job ids are all 16 characters and
 usegalaxy.org's are all 32, so length says which server holds a job without
 trying one and falling back to the other. That only holds while the legacy
@@ -188,7 +232,9 @@ there is no record of what users asked or how the assistant answered. When
 `DATABASE_URL` is set, each turn is also written to the `assistant_turn_log`
 table: the user's message, the reply, this turn's tool calls and their returns,
 the analysis-tracker snapshot, token counts, latency, and the model that
-produced it.
+produced it. A turn in a session opened from a Logan search also records that
+search's Galaxy job id in `logan_job_id` (indexed; NULL otherwise), so every
+turn about one search can be found without reading transcripts.
 
 Failed turns are recorded too, with `outcome='error'` and the exception class
 in `error_kind` -- otherwise the corpus would only contain the requests that
@@ -243,7 +289,12 @@ the table is treated as user data: it lives in the app database under the same
 access controls as `saved_analyses`, is not exposed through any API endpoint,
 and is readable only by maintainers with direct database access. Authenticated
 turns carry a `user_id`; anonymous turns are grouped by `session_id` only, with
-no IP or other network identifier stored. Deleting a user nulls the `user_id`
+no IP or other network identifier stored. `logan_job_id` is the same id as
+`kmindex_submissions.galaxy_job_id`, so an anonymous turn about a search can be
+joined to that submission and, when the search was submitted signed in, to the
+submitter's `user_id`. Anyone holding a search's results link can open an
+assistant session about it, so turns that share a job id may come from
+different people, and need not be the submitter's. Deleting a user nulls the `user_id`
 rather than deleting the rows, matching `workflow_runs`. Users are told
 conversations are logged during the beta on the assistant page and in
 `/learn/assistant`.
@@ -262,6 +313,12 @@ LIMIT 50;
 SELECT created_at, outcome, user_message, assistant_reply
 FROM assistant_turn_log
 WHERE session_id = :session_id
+ORDER BY created_at;
+
+-- Every turn about one Logan search
+SELECT created_at, session_id, user_message, assistant_reply
+FROM assistant_turn_log
+WHERE logan_job_id = :job_id
 ORDER BY created_at;
 
 -- What's breaking, and on which prompts

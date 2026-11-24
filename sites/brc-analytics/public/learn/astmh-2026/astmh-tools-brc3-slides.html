@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>New Technologies in BRC: Querying Entire SRA, Agentic Analysis, Revolutionary New Tooling</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme" />
+
+  <!-- Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      /* BRC palette */
+      --navy:        #28285B;
+      --navy-dark:   #1F1F47;
+      --navy-soft:   #3F3F6E;
+      --accent:      #956F00;
+      --accent-soft: #B8881A;
+      --highlight:   #FFEB78;
+      --muted:       #637381;
+      --muted-light: #9AA2AE;
+      --panel:       #F7F7FB;
+      --border:      #E3E3ED;
+      --white:       #FFFFFF;
+      --teal:        #0F766E;
+      --teal-bg:     #F0FDFA;
+    }
+
+    /* ===== Print PDF: match paper size to slide dimensions (1280x760) ===== */
+    @page {
+      size: 1280px 760px;
+      margin: 0;
+    }
+
+    html.print-pdf .pdf-page {
+      height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+    html.print-pdf .pdf-page:has(.section-slide) {
+      background: var(--navy) !important;
+      box-shadow: 0 40px 0 0 var(--navy);
+    }
+    html.print-pdf .pdf-page > section,
+    html.print-pdf .reveal .slides > section {
+      top: 0 !important;
+      left: 0 !important;
+      width: 1280px !important;
+      height: 760px !important;
+      min-height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+    html.print-pdf .slide {
+      height: 760px !important;
+    }
+
+    /* ===== Base reveal overrides ===== */
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy-soft);
+      font-size: 22px;
+    }
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: 0;
+      height: 100%;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Merriweather', serif;
+      color: var(--navy);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reveal a { color: var(--navy); border-bottom: 2px solid var(--highlight); text-decoration: none; }
+    .reveal strong { color: var(--navy); font-weight: 600; }
+
+    /* ===== Slide frame (every slide) ===== */
+    .slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 60px 84px 58px;
+      box-sizing: border-box;
+      background: var(--white);
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--navy);
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .slide-logo {
+      position: absolute;
+      bottom: 18px;
+      left: 30px;
+      height: 22px;
+      width: auto;
+      opacity: 0.78;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      font-size: 12px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* ===== Section divider slide ===== */
+    .section-slide {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 110px;
+    }
+    .section-slide::before { display: none; }
+    .section-slide::after { display: none; }
+    .section-slide .kicker {
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .section-slide h2 {
+      color: var(--white);
+      font-size: 54px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-slide .section-sub {
+      font-size: 23px;
+      color: #D2D5E6;
+      max-width: 820px;
+      line-height: 1.45;
+    }
+    .section-slide .kicker-divider {
+      width: 84px;
+      height: 4px;
+      background: var(--accent-soft);
+      margin: 26px 0 0;
+    }
+    .section-slide .slide-logo {
+      filter: brightness(0) invert(1);
+      opacity: 0.72;
+    }
+    .section-slide .slide-footer {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ===== Slide title + divider ===== */
+    .slide h2.slide-title {
+      font-size: 36px;
+      line-height: 1.16;
+      margin-bottom: 12px;
+    }
+    .slide .title-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 22px;
+    }
+
+    /* ===== Bullet list (minimal, square marker) ===== */
+    .reveal ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reveal ul.clean li {
+      position: relative;
+      padding-left: 26px;
+      margin-bottom: 14px;
+      font-size: 18.5px;
+      color: var(--navy-soft);
+      line-height: 1.45;
+    }
+    .reveal ul.clean li:last-child {
+      margin-bottom: 0;
+    }
+    .reveal ul.clean li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px;
+      width: 10px; height: 10px;
+      background: var(--accent);
+    }
+
+    /* ===== Two-column layout ===== */
+    .cols {
+      display: flex;
+      gap: 30px;
+      align-items: stretch;
+    }
+    .cols > .col { flex: 1; min-width: 0; }
+
+    /* ===== Dark callout (navy box, gold edge) ===== */
+    .callout-dark {
+      position: relative;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 20px 26px 20px 32px;
+      box-shadow: 0 10px 25px rgba(40, 40, 91, 0.16);
+    }
+    .callout-dark::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: var(--accent);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    .callout-dark .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--highlight);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .callout-dark .body {
+      font-family: 'Merriweather', serif;
+      font-size: 18.5px;
+      line-height: 1.44;
+      font-style: italic;
+      margin: 0;
+    }
+    .callout-dark .body strong {
+      color: var(--highlight);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* Light highlight callout variant */
+    .callout-light {
+      background: var(--highlight);
+      border-radius: 8px;
+      padding: 16px 22px;
+      border-left: 8px solid var(--accent);
+      color: var(--navy);
+    }
+    .callout-light .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 5px;
+    }
+    .callout-light .body {
+      font-family: 'Merriweather', serif;
+      font-size: 17.5px;
+      line-height: 1.42;
+      margin: 0;
+    }
+
+    /* ===== Card grid ===== */
+    .card-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+    .card.top-accent { border-top: 4px solid var(--accent); }
+    .card.top-navy   { border-top: 4px solid var(--navy); }
+    .card.top-teal   { border-top: 4px solid var(--teal); }
+    .card .card-icon {
+      color: var(--navy);
+      font-size: 22px;
+    }
+    .card .card-num {
+      font-family: 'Merriweather', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+    .card .card-head {
+      font-family: 'Merriweather', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .card .card-label {
+      font-size: 15.5px;
+      font-weight: 400;
+      color: var(--navy-soft);
+      line-height: 1.42;
+    }
+    .card.accent {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .card.accent .card-icon { color: var(--highlight); }
+    .card.accent .card-head { color: var(--white); }
+    .card.accent .card-label { color: #E8E8F4; }
+    .card.accent strong { color: var(--highlight); }
+
+    /* ===== Title slide ===== */
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 76px 90px 66px;
+    }
+    .title-slide h1 {
+      font-size: 42px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .title-slide .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 21.5px;
+      color: var(--navy-soft);
+      font-weight: 500;
+      margin-bottom: 24px;
+      line-height: 1.38;
+      max-width: 1050px;
+    }
+    .title-slide .subtitle .plus {
+      color: var(--accent);
+      font-weight: 700;
+      margin: 0 6px;
+    }
+    .title-slide .kicker-divider {
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 28px;
+    }
+    .title-slide .author {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .title-slide .affiliation {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ===== Misc ===== */
+    .kicker {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      margin: 0 0 10px;
+    }
+    .lead-copy {
+      font-size: 19px;
+      line-height: 1.46;
+      color: var(--navy-soft);
+      margin: 0 0 18px;
+    }
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--navy);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .hl {
+      background: linear-gradient(transparent 55%, var(--highlight) 55%);
+      padding: 0 2px;
+    }
+
+    /* Stat strip */
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      border-top: 4px solid var(--accent);
+    }
+    .stat.navy-top { border-top-color: var(--navy); }
+    .stat.teal-top { border-top-color: var(--teal); }
+    .stat-num {
+      font-family: 'Merriweather', serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.05;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+
+    /* Pipeline mini-diagram */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .pipe-stage {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .pipe-stage.terminal {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+    .pipe-stage.terminal .pipe-title { color: var(--white); }
+    .pipe-stage.terminal .pipe-sub { color: var(--highlight); }
+    .pipe-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .pipe-sub {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .pipe-arrow {
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 18px;
+    }
+
+    /* Pill bar */
+    .pill-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .pill i { color: var(--accent); }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--highlight);
+      color: var(--accent);
+      vertical-align: middle;
+    }
+    .status-pill.navy {
+      background: var(--navy);
+      color: var(--highlight);
+    }
+
+    /* SVG figure wrapper */
+    .svg-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-sizing: border-box;
+    }
+    .svg-panel svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Screenshot frame (crisp & proportional) */
+    .screenshot-frame {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(40, 40, 91, 0.09);
+      box-sizing: border-box;
+    }
+    .screenshot-frame img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 490px;
+      object-fit: contain;
+      border-radius: 4px;
+      border: 1px solid #DCDCE6;
+      background: var(--white);
+    }
+    .screenshot-caption {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
+    /* Annotation stack alongside screenshots */
+    .anno-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+    }
+    .anno-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+    .anno-card.navy { border-left-color: var(--navy); }
+    .anno-card.teal { border-left-color: var(--teal); }
+    .anno-card .anno-head {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .anno-card p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+      color: var(--navy-soft);
+    }
+
+    /* QR block */
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      min-width: 155px;
+    }
+    .qr-block img {
+      width: 106px;
+      height: 106px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      background: var(--white);
+    }
+    .qr-block .qr-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      line-height: 1.3;
+    }
+    .qr-block .qr-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <section>
+      <div class="slide title-slide">
+        <div class="kicker">ASTMH 2026 · Bioinformatics Resource Center</div>
+        <h1>New Technologies in BRC:<br/>Querying Entire SRA, Agentic Analysis,<br/>Revolutionary New Tooling</h1>
+        <div class="subtitle">
+          Agentic MCP &amp; Orbit <span class="plus">+</span> Logan Search <span class="plus">+</span> Aeon &amp; BUSHWHACKER <span class="plus">+</span> BRC 3.0 Data
+        </div>
+        <div class="kicker-divider"></div>
+        <div class="pill-row">
+          <span class="pill"><i class="fa-solid fa-robot"></i> Agentic MCP &amp; Orbit</span>
+          <span class="pill"><i class="fa-solid fa-magnifying-glass"></i> Sequence-First SRA Search</span>
+          <span class="pill"><i class="fa-solid fa-dna"></i> Browser &amp; Galaxy Inference</span>
+          <span class="pill"><i class="fa-solid fa-layer-group"></i> Precomputed Multi-Omic Data</span>
+        </div>
+        <div class="author">Anton Nekrutenko</div>
+        <div class="affiliation">Pennsylvania State University · BRC Analytics · brc-analytics.org</div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">ASTMH 2026 · November 2026</div>
+      </div>
+      <aside class="notes">
+        Welcome. This talk spans three linked capabilities on BRC Analytics and Galaxy: agentic access via MCP servers, Orbit, and User-Defined Tools; archive-scale sequence search and evolutionary analysis with Logan, disassembler, and the Aeon/BUSHWHACKER suite; and BRC 3.0's precomputed multi-omic baselines.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 2: TALK ROADMAP ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Talk Roadmap</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 18px; gap: 16px;">
+          <div class="col" style="flex: 0.88;">
+            <div class="card top-teal" style="height: 100%; box-sizing: border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="card-num">PART 1</span>
+                <span class="status-pill teal">Live Now</span>
+              </div>
+              <div class="card-head" style="font-size: 20px;">Agentic Access &amp; UDTs</div>
+              <ul class="clean" style="margin-top: 6px;">
+                <li><strong>BRC + Galaxy MCP:</strong> Any AI harness via <span class="mono" style="font-size:12px;">galaxyproject.org/agents</span>.</li>
+                <li><strong>Orbit Desktop:</strong> Auditable cloud stages + instant local figures.</li>
+                <li><strong>Custom UDTs:</strong> Run any container via <span class="mono" style="font-size:12px;">udt-signup</span>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col" style="flex: 1.12;">
+            <div class="card top-navy" style="height: 100%; box-sizing: border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="card-num">PART 2</span>
+                <span class="status-pill navy">Archive-Scale Pipeline</span>
+              </div>
+              <div class="card-head" style="font-size: 20px;">New Archive-Scale Tools</div>
+              <div class="pipeline" style="margin-top: 6px;">
+                <div class="pipe-stage" style="padding: 8px 10px;">
+                  <div class="pipe-title">1. Logan</div>
+                  <div class="pipe-sub">Unitigs &amp; contigs across SRA</div>
+                </div>
+                <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="pipe-stage" style="padding: 8px 10px;">
+                  <div class="pipe-title">2. Indices</div>
+                  <div class="pipe-sub"><span class="mono">kmindex</span> &amp; <span class="mono">LexicMap</span></div>
+                </div>
+              </div>
+              <div class="pipeline" style="margin-top: 6px;">
+                <div class="pipe-stage" style="padding: 8px 10px;">
+                  <div class="pipe-title">3. disassembler</div>
+                  <div class="pipe-sub">Clean codon cohorts</div>
+                </div>
+                <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="pipe-stage terminal" style="padding: 8px 10px;">
+                  <div class="pipe-title">4. Four Tools</div>
+                  <div class="pipe-sub">HyphAeon · RhizAeon · ChronAeon · BUSHWHACKER</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col" style="flex: 0.86;">
+            <div class="card top-accent" style="height: 100%; box-sizing: border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="card-num">PART 3</span>
+                <span class="status-pill">Ready-to-Browse</span>
+              </div>
+              <div class="card-head" style="font-size: 20px;">BRC 3.0 Precomputed</div>
+              <ul class="clean" style="margin-top: 6px;">
+                <li><strong>Adaptive Loops:</strong> Entire cohorts reanalyzed in hours.</li>
+                <li><strong>Uniform Multi-Omics:</strong> <span class="mono">RNA-seq</span>, <span class="mono">ChIP</span>, <span class="mono">ATAC-seq</span> &amp; variants.</li>
+                <li><strong>Clade Alignments:</strong> Project variants &amp; trace gene evolution.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">The Big Picture</div>
+          <p class="body">
+            <strong>Agentic access &amp; custom UDTs</strong> connect <strong>live archive interrogation</strong> with <strong>uniform BRC 3.0 baselines</strong> — removing download, install, and pipeline bottlenecks for pathogen biologists.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Talk Roadmap</div>
+      </div>
+      <aside class="notes">
+        Three connected acts: first, agentic access across BRC and Galaxy via MCP, Orbit, and User-Defined Tools; second, querying the entire SRA and turning matches into evolutionary answers with Logan, disassembler, and the four Aeon/BUSHWHACKER tools; third, BRC 3.0 precomputed multi-omic data and clade alignments.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 3: PART 1 DIVIDER — AGENTIC ACCESS ==================== -->
+    <section>
+      <div class="slide section-slide">
+        <div class="kicker">Part 1 · Agentic Access &amp; Custom Tools</div>
+        <h2>Agentic BRC &amp; Galaxy</h2>
+        <div class="section-sub">
+          Any AI harness — Claude Code, Codex, Antigravity, or the Orbit desktop workbench — works on curated BRC data through the Galaxy MCP server, with custom containers running via User-Defined Tools.
+        </div>
+        <div class="kicker-divider"></div>
+
+        <img src="brc-logo.svg" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Part 1 · Agentic Access</div>
+      </div>
+      <aside class="notes">
+        Part 1 opens the talk: agentic access — MCP endpoints for any harness, Orbit for an auditable local workbench, and User-Defined Tools for running custom containers on Galaxy.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 4: AGENTIC GALAXY & BRC MCP ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Agentic BRC &amp; Galaxy: Any Harness via MCP</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 24px; align-items: center;">
+          <div class="col" style="flex: 0 0 645px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/galaxy-agents-hub.png" alt="galaxyproject.org/agents page showing Box 1 Pick your agent with six AI harnesses: Orbit, Claude Code, Codex CLI, Antigravity, Claude Desktop, and Pi / Cursor / Other" style="max-height: 432px;" />
+              <div class="screenshot-caption"><strong>galaxyproject.org/agents</strong> — one unified setup page across six AI agent harnesses</div>
+            </div>
+          </div>
+
+          <div class="col anno-stack" style="gap: 11px;">
+            <div class="anno-card">
+              <div class="anno-head">1. Both BRC &amp; Galaxy Expose MCP Servers</div>
+              <p>
+                <strong>BRC Analytics</strong> (<span class="mono">brc-analytics.org/api/v1/mcp</span>) and <strong>Galaxy</strong> (<span class="mono">uvx galaxy-mcp</span>, 48 tools) speak standard MCP — discover curated genomes and run real cloud jobs together.
+              </p>
+            </div>
+
+            <div class="anno-card navy">
+              <div class="anno-head">2. Bring Any AI Harness You Prefer</div>
+              <p>
+                Plug in <strong>Orbit</strong>, <strong>Claude Code</strong>, <strong>Codex CLI</strong>, <strong>Antigravity</strong>, <strong>Claude Desktop</strong>, or <strong>Pi / Cursor</strong> — every tool, workflow, and container executes as a tracked Galaxy job.
+              </p>
+            </div>
+
+            <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-around; align-items: center; gap: 10px;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;">
+                <img src="qr-agents-hub.svg" alt="QR code for galaxyproject.org/agents" style="width:78px; height:78px; border:1px solid var(--border); border-radius:5px; padding:3px; background:#fff;" />
+                <div style="font-size:10.5px; font-weight:700; color:var(--navy); letter-spacing:0.4px;">galaxyproject.org/agents</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;">
+                <img src="qr-brc-mcp.svg" alt="QR code for BRC Analytics MCP endpoint" style="width:78px; height:78px; border:1px solid var(--border); border-radius:5px; padding:3px; background:#fff;" />
+                <div style="font-size:10.5px; font-weight:700; color:var(--navy); letter-spacing:0.4px;">BRC MCP</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;">
+                <img src="qr-galaxy-mcp.svg" alt="QR code for Galaxy MCP server" style="width:78px; height:78px; border:1px solid var(--border); border-radius:5px; padding:3px; background:#fff;" />
+                <div style="font-size:10.5px; font-weight:700; color:var(--navy); letter-spacing:0.4px;">Galaxy MCP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Agentic Access · BRC + Galaxy MCP</div>
+      </div>
+      <aside class="notes">
+        Before diving into our new archive tools, notice how you can drive both BRC Analytics and Galaxy from any AI harness today. Because both expose standard MCP servers (brc-analytics.org/api/v1/mcp and uvx galaxy-mcp), galaxyproject.org/agents gives a single 4-step guide across all six major harnesses: Orbit, Claude Code, Codex CLI, Antigravity, Claude Desktop, and Pi/Cursor/Other.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 5: ORBIT WORKBENCH ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Orbit: The Biologist's Agentic Workbench</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 24px; align-items: center;">
+          <div class="col" style="flex: 0 0 675px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/orbit-interface.png" alt="Orbit Desktop Semantic Bench interface showing top green Galaxy compute stages branching to indigo local figure views, interactive volcano plot and table, and right co-scientist chat rail" style="max-height: 432px;" />
+              <div class="screenshot-caption"><strong>Orbit Desktop</strong> (<span class="mono">galaxyproject/orbit</span>) — Semantic Analysis Map, Figure Studio &amp; Co-Scientist Chat</div>
+            </div>
+          </div>
+
+          <div class="col anno-stack" style="gap: 11px;">
+            <div class="anno-card teal">
+              <div class="anno-head">1. Zero Terminal · Galaxy Built In</div>
+              <p>
+                Standalone desktop app shipping <span class="mono">galaxy-mcp</span> and <span class="mono">galaxy-skills</span> out of the box — connect your API key and collaborate in plain English.
+              </p>
+            </div>
+
+            <div class="anno-card navy">
+              <div class="anno-head">2. Cloud Compute + Instant Local Figures</div>
+              <p>
+                <strong>Green stages</strong> execute reproducibly on Galaxy clusters; <strong>indigo branches</strong> generate crisp interactive SVGs locally and pin figures straight to Galaxy pages.
+              </p>
+            </div>
+
+            <div style="background: var(--navy); color: var(--white); border-radius: 8px; border-left: 5px solid var(--highlight); padding: 12px 14px; display: flex; align-items: center; gap: 14px;">
+              <img src="qr-orbit.svg" alt="QR code for github.com/galaxyproject/orbit" style="width:82px; height:82px; border-radius:6px; padding:4px; background:#fff; flex-shrink:0;" />
+              <div>
+                <div style="font-size:11px; font-weight:700; color:var(--highlight); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:4px;">Download &amp; Source</div>
+                <div style="font-size:14.5px; font-weight:700; color:#fff; margin-bottom:3px;">github.com/galaxyproject/orbit</div>
+                <div style="font-size:12.5px; color:#D8D8EC; line-height:1.35;">Every figure traces directly to its upstream Galaxy dataset and history.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Agentic Access · Orbit Desktop</div>
+      </div>
+      <aside class="notes">
+        For biologists who do not want to live in a terminal, Orbit is Galaxy's dedicated desktop workbench. Heavy compute stays on Galaxy (green map nodes), while Orbit branches off instant local figures (indigo nodes) with full dataset provenance and a co-scientist chat rail on the right.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 6: UDT SIGNUP FORM + QR ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Unlock Custom Tools: User-Defined Tools Signup</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 28px; align-items: center;">
+          <div class="col" style="flex: 0 0 495px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/udt-signup-form.png" alt="udt-signup.galaxyproject.org request access page for Galaxy user-defined tools on usegalaxy.org with ORCID sign-in" style="max-height: 468px;" />
+            </div>
+          </div>
+
+          <div class="col anno-stack" style="gap: 13px;">
+            <div class="anno-card navy">
+              <div class="anno-head">1. Run Any Container as a Native Galaxy Tool</div>
+              <p>
+                When no installed tool fits — like our new <span class="mono">disassembler</span>, <strong>RhizAeon</strong>, or <span class="mono">logan-walker</span> wrappers — you or your AI agent define a short YAML + container and run it directly in your history.
+              </p>
+            </div>
+
+            <div class="anno-card teal">
+              <div class="anno-head">2. 30-Second Request via ORCID iD</div>
+              <p>
+                Sign in with your <strong>ORCID iD</strong>, link your <span class="mono">usegalaxy.org</span> account, and share a sentence on what you plan to build. Standard tools work immediately while your request is approved.
+              </p>
+            </div>
+
+            <div style="background: var(--navy); color: var(--white); border-radius: 10px; border-left: 6px solid var(--highlight); padding: 16px 20px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 16px rgba(40,40,91,0.14);">
+              <img src="qr-udt-signup.svg" alt="QR code for https://udt-signup.galaxyproject.org/" style="width:134px; height:134px; border-radius:8px; padding:5px; background:#fff; flex-shrink:0;" />
+              <div>
+                <div style="font-size:11.5px; font-weight:700; color:var(--highlight); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:6px;">Scan to Request Beta Access</div>
+                <div style="font-family:'Courier New', monospace; font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">udt-signup.galaxyproject.org</div>
+                <div style="font-size:13.5px; color:#E0E0F2; line-height:1.4;">Per-account <strong style="color:var(--highlight);">User-Defined Tools</strong> access on <strong style="color:var(--highlight);">usegalaxy.org</strong> (Galaxy Main) — works from the web UI and any MCP agent.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Agentic Access · User-Defined Tools Signup</div>
+      </div>
+      <aside class="notes">
+        Pause here so anyone in the room can scan udt-signup.galaxyproject.org right now. Signing in with ORCID takes about 30 seconds and unlocks User-Defined Tools on usegalaxy.org — letting you and your AI agent wrap any BioContainer in YAML and execute it as a tracked Galaxy job without waiting for an administrator install.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 7: PART 2 DIVIDER — ARCHIVE-SCALE TOOLS ==================== -->
+    <section>
+      <div class="slide section-slide">
+        <div class="kicker">Part 2 · Archive-Scale Search &amp; Evolutionary Analysis</div>
+        <h2>Logan &amp; the Tool Suite</h2>
+        <div class="section-sub">
+          Querying the entire Sequence Read Archive and turning matches into evolutionary answers — Logan unitigs, kmindex and LexicMap indices, disassembler cohorts, and the Aeon and BUSHWHACKER tools.
+        </div>
+        <div class="kicker-divider"></div>
+
+        <img src="brc-logo.svg" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Part 2 · Archive-Scale Tools</div>
+      </div>
+      <aside class="notes">
+        Part 2 turns to archive scale: Logan's unitig index of the whole SRA, two search modes, disassembler for clean cohorts, then the four evolutionary tools — HyphAeon/PrimAeon, RhizAeon, ChronAeon, and BUSHWHACKER.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 8: WHAT IS LOGAN? ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">What Is Logan? Unitigs vs. Contigs</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 14px;">
+          <strong>Logan</strong> (led by <strong>Rayan Chikhi</strong> &amp; <strong>Artem Babaian</strong>) assembles the entire public Sequence Read Archive so anyone can query raw reads by <strong>sequence content</strong> — live on <span class="mono">usegalaxy.org</span> and <span class="mono">logan-search.org</span>.
+        </p>
+
+        <div class="svg-panel" style="margin-bottom: 16px; padding: 12px 16px;">
+          <svg viewBox="0 0 1060 225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram comparing unitigs that stop at sequence variation splits versus contigs that stitch long continuous paths">
+            <defs>
+              <marker id="lgArrNavy" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0,1 L8,4.5 L0,8 Z" fill="#28285B" />
+              </marker>
+            </defs>
+
+            <!-- Left panel: Assembly Graph & Unitigs -->
+            <rect x="12" y="10" width="510" height="205" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="1.8" />
+            <rect x="12" y="10" width="510" height="32" rx="6" fill="#28285B" />
+            <text x="28" y="31" font-family="Merriweather, serif" font-size="14.5" font-weight="700" fill="#FFFFFF">Unitigs — Stop Where Variation Splits</text>
+
+            <!-- Graph nodes: shared left -> fork (Allele A / Allele B) -> shared right -->
+            <!-- Unitig 1 -->
+            <rect x="34" y="96" width="122" height="32" rx="6" fill="#F0FDFA" stroke="#0F766E" stroke-width="2.2" />
+            <text x="95" y="117" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#0F766E">Unitig 1 (shared)</text>
+
+            <!-- Fork arrows -->
+            <path d="M 156 105 L 198 76" fill="none" stroke="#28285B" stroke-width="2" marker-end="url(#lgArrNavy)" />
+            <path d="M 156 120 L 198 148" fill="none" stroke="#28285B" stroke-width="2" marker-end="url(#lgArrNavy)" />
+
+            <!-- Unitig 2A (major allele) -->
+            <rect x="204" y="58" width="132" height="32" rx="6" fill="#FFEB78" stroke="#956F00" stroke-width="2.2" />
+            <text x="270" y="79" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">Unitig 2A · Major</text>
+
+            <!-- Unitig 2B (minor allele) -->
+            <rect x="204" y="135" width="132" height="32" rx="6" fill="#FEF2F2" stroke="#B91C1C" stroke-width="2.2" />
+            <text x="270" y="156" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#991B1B">Unitig 2B · Minor</text>
+
+            <!-- Merge arrows -->
+            <path d="M 336 76 L 378 105" fill="none" stroke="#28285B" stroke-width="2" marker-end="url(#lgArrNavy)" />
+            <path d="M 336 148 L 378 120" fill="none" stroke="#28285B" stroke-width="2" marker-end="url(#lgArrNavy)" />
+
+            <!-- Unitig 3 -->
+            <rect x="384" y="96" width="122" height="32" rx="6" fill="#F0FDFA" stroke="#0F766E" stroke-width="2.2" />
+            <text x="445" y="117" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#0F766E">Unitig 3 (shared)</text>
+
+            <text x="267" y="198" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#3F3F6E">
+              Every fork ends a unitig — preserving rare &amp; within-sample alleles
+            </text>
+
+            <!-- Right panel: Contigs -->
+            <rect x="538" y="10" width="510" height="205" rx="8" fill="#FFFFFF" stroke="#956F00" stroke-width="1.8" />
+            <rect x="538" y="10" width="510" height="32" rx="6" fill="#956F00" />
+            <text x="554" y="31" font-family="Merriweather, serif" font-size="14.5" font-weight="700" fill="#FFFFFF">Contigs — Stitched Full-Gene Stretches</text>
+
+            <!-- Long stitched contig -->
+            <rect x="564" y="88" width="458" height="44" rx="8" fill="#FFEB78" stroke="#956F00" stroke-width="2.2" />
+            <line x1="706" y1="88" x2="706" y2="96" stroke="#956F00" stroke-width="2" />
+            <line x1="706" y1="124" x2="706" y2="132" stroke="#956F00" stroke-width="2" />
+            <line x1="880" y1="88" x2="880" y2="96" stroke="#956F00" stroke-width="2" />
+            <line x1="880" y1="124" x2="880" y2="132" stroke="#956F00" stroke-width="2" />
+            <text x="793" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#28285B">
+              Long Continuous Contig (Gene-Scale Path)
+            </text>
+
+            <!-- Bracket showing gene alignment -->
+            <line x1="590" y1="150" x2="996" y2="150" stroke="#956F00" stroke-width="2.5" />
+            <line x1="590" y1="142" x2="590" y2="158" stroke="#956F00" stroke-width="2.5" />
+            <line x1="996" y1="142" x2="996" y2="158" stroke="#956F00" stroke-width="2.5" />
+            <text x="793" y="172" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#956F00">
+              Ideal for BLAST-like sequence alignment
+            </text>
+            <text x="793" y="198" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#3F3F6E">
+              Resolves unambiguous paths into familiar full-length sequences
+            </text>
+          </svg>
+        </div>
+
+        <div class="card-grid cols-2">
+          <div class="card top-teal" style="padding: 14px 18px;">
+            <div class="card-head" style="font-size: 17px;">Unitigs: Keep Every Variant Intact</div>
+            <div class="card-label" style="font-size: 15px;">Non-branching pieces of the assembly graph that stop wherever variation splits — so minor alleles and mixed infections never get collapsed away.</div>
+          </div>
+          <div class="card top-accent" style="padding: 14px 18px;">
+            <div class="card-head" style="font-size: 17px;">Contigs: Familiar Full-Length Pieces</div>
+            <div class="card-label" style="font-size: 15px;">Longer continuous sequences stitched across unambiguous paths — closer to complete genes and ready for sequence alignment searches.</div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Logan Foundation</div>
+      </div>
+      <aside class="notes">
+        Logan re-assembles the entire public Sequence Read Archive into both unitigs and contigs. Biologists should think of unitigs as assembly-graph segments that stop at every genetic fork—keeping minor alleles alive—while contigs stitch unambiguous paths into longer gene-length sequences.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 9: LOGAN CADENCE & LIVE SCALE ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Logan Cadence &amp; Live Scale</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 22px;">
+          Assembling tens of millions of raw SRA sequencing runs requires immense archive-wide compute — so Logan updates in <strong>periodic (~annual) full rebuilds</strong> rather than daily increments.
+        </p>
+
+        <div class="card-grid cols-2" style="margin-bottom: 26px;">
+          <div class="stat" style="padding: 26px 30px; background: #FFFDF0; border-color: var(--accent);">
+            <div class="kicker" style="margin-bottom: 8px; color: var(--accent);">Current Live Release · Dec 2025</div>
+            <div class="stat-num" style="font-size: 52px;">38.1M</div>
+            <div class="stat-label" style="font-size: 13.5px; color: var(--navy);">SRA Runs Live Today · 86.6 Pb Raw Reads</div>
+            <p style="margin: 14px 0 0; font-size: 15.5px; color: var(--navy-soft); line-height: 1.45;">
+              Active right now on <span class="mono">usegalaxy.org</span> and <span class="mono">logan-search.org</span> — covering 99.5% of the public SRA by size across clinical, environmental, and metagenomic archives.
+            </p>
+          </div>
+
+          <div class="stat teal-top" style="padding: 26px 30px;">
+            <div class="kicker" style="margin-bottom: 8px; color: var(--teal);">Latest Archive Freeze</div>
+            <div class="stat-num" style="font-size: 38px; padding-top: 8px; padding-bottom: 10px; color: var(--teal);">Building Now</div>
+            <div class="stat-label" style="font-size: 13.5px; color: var(--navy-soft);">Newest Version In Progress</div>
+            <p style="margin: 14px 0 0; font-size: 15.5px; color: var(--muted); line-height: 1.45;">
+              The next full archive assembly is currently being built to incorporate newer sequencing runs and keep global pathogen surveillance current.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">Why This Matters for Tropical Medicine</div>
+          <p class="body">
+            Searching by sequence ignores broken submitter labels — uncovering <strong>thousands of malaria, viral, and bacterial runs</strong> hidden inside mislabeled host or metagenomic datasets.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Logan Cadence &amp; Scale</div>
+      </div>
+      <aside class="notes">
+        Be clear about the update cadence: rebuilding the entire SRA takes massive compute, so releases come roughly annually. The December 2025 freeze (38.1M runs, 86.6 petabases of raw reads) is live today on usegalaxy.org and logan-search.org, and the latest archive version is being built right now.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 10: KMINDEX VS LEXICMAP ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Two Index &amp; Search Modes: <span class="mono" style="font-size: 30px;">kmindex</span> vs. <span class="mono" style="font-size: 30px;">LexicMap</span></h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 18px;">
+          <div class="col">
+            <div class="card top-teal" style="height: 100%; box-sizing: border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="card-head" style="font-size: 21px;"><i class="fa-solid fa-bolt" style="color:var(--teal); margin-right:8px;"></i>kmindex</div>
+                <span class="status-pill">Minutes</span>
+              </div>
+              <div class="card-label" style="font-size: 15.5px;">
+                <strong>What it indexes:</strong> Bloom-filter k-mer index built on Logan <strong>unitigs</strong>.
+              </div>
+              <div class="card-label" style="font-size: 15.5px;">
+                <strong>Biological sweet spot:</strong> Fast <strong>k-mer matching</strong> for <strong>low-divergence</strong> exact or near-exact hits (primers, conserved drug-resistance genes).
+              </div>
+              <div style="background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-top: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Archive Hits Observed</div>
+                <div style="font-size: 16px; color: var(--navy); line-height: 1.45;">
+                  <strong>56,303</strong> <em>Kelch13</em> runs <span style="color:var(--muted); font-size:14px;">(0.99 median k-mer containment)</span><br/>
+                  <strong>45,879</strong> <em>AMA1</em> runs <span style="color:var(--muted); font-size:14px;">(drops to 0.74 in variable loops)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card top-navy" style="height: 100%; box-sizing: border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="card-head" style="font-size: 21px;"><i class="fa-solid fa-align-left" style="color:var(--navy); margin-right:8px;"></i>LexicMap</div>
+                <span class="status-pill navy">Up to Hours</span>
+              </div>
+              <div class="card-label" style="font-size: 15.5px;">
+                <strong>What it indexes:</strong> Variable-length seeded alignment index built on Logan <strong>contigs</strong>.
+              </div>
+              <div class="card-label" style="font-size: 15.5px;">
+                <strong>Biological sweet spot:</strong> Tolerates SNPs, indels, and antigenic diversity to capture <strong>higher-divergence</strong> sequence alignments.
+              </div>
+              <div style="background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-top: 4px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Archive Hits Observed</div>
+                <div style="font-size: 16px; color: var(--navy); line-height: 1.45;">
+                  <strong>106,236</strong> <em>Kelch13</em> runs · <strong>63,930</strong> <em>AMA1</em> runs<br/>
+                  <strong>89.4%</strong> median identity across <strong>H5N1 HA</strong> strains
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Why Two Indices?</div>
+          <p class="body">
+            When immune evasion or rapid viral drift breaks exact 31-mers, <strong>LexicMap</strong> on contigs recovers divergent hits that <strong>kmindex</strong> alone misses — while <strong>kmindex</strong> screens unitig diversity in minutes.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Search Modes · kmindex vs. LexicMap</div>
+      </div>
+      <aside class="notes">
+        Two distinct search indices serve different biological regimes: kmindex builds Bloom filters on unitigs for fast low-divergence k-mer lookup (45,879 AMA1 runs, 56,303 Kelch13 runs); LexicMap indexes contigs for full sequence alignment across higher-divergence sequences (63,930 AMA1 runs, 106,236 Kelch13 runs, and 89.4% median identity on H5N1 HA).
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 11: FROM HITS TO DEEP COHORTS ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">From Raw Archive Hits to Deep Cohorts</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 18px;">
+          Finding tens of thousands of matching sequencing runs is only step one. To answer real biological questions, we must turn noisy hit lists into <strong>clean, in-frame codon alignments</strong>:
+        </p>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card top-navy">
+            <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="card-head">When Did a Pathogen Emerge?</div>
+            <div class="card-label">
+              Trace lineage origins and molecular-clock divergence dates across historical and contemporary samples.
+            </div>
+          </div>
+
+          <div class="card top-accent">
+            <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="card-head">When Did a Mutation Arise?</div>
+            <div class="card-label">
+              Pinpoint drug-resistance sweeps, vaccine-escape alleles, and which amino acid sites burst under selection.
+            </div>
+          </div>
+
+          <div class="card top-teal">
+            <div class="card-icon"><i class="fa-solid fa-wave-square"></i></div>
+            <div class="card-head">How Do Dynamics Shift Over Time?</div>
+            <div class="card-label">
+              Detect changing mutation speeds, co-traveling partner mutations, and gene segment swaps across clades.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The Engineering Gap Between Search and Biology</div>
+          <p class="body">
+            Raw archive contigs arrive fragmented, reversed, frameshifted, or split across multiple hits. Evolutionary tools require <strong>stop-free, codon-aligned cohorts</strong> — the exact bridge built by <strong style="color:var(--highlight);">disassembler</strong>.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Deep Cohorts</div>
+      </div>
+      <aside class="notes">
+        A list of matching SRA runs does not answer biological questions by itself. Deep, clean codon cohorts let biologists determine when a pathogen emerged, when a mutation arose, and how mutation dynamics shift over time.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 12: DISASSEMBLER ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title"><span class="mono" style="font-size: 31px;">disassembler</span>: Reconstructing Clean Cohorts</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 22px; align-items: start;">
+          <div class="col" style="flex: 0.85;">
+            <ul class="clean" style="margin-bottom: 12px;">
+              <li>
+                <strong><span class="mono">logan-walker</span> (<span class="mono">kmindex</span> route):</strong> Streams a hit run's unitig graph directly from public storage and walks paths to recover full coding haplotypes.
+              </li>
+              <li>
+                <strong><span class="mono">tile</span> (<span class="mono">LexicMap</span> route):</strong> Stitches fragmented contig alignments, rescues broken multi-hit genes, and builds stop-free codon cohorts (<span class="mono">prep_cohort</span>).
+              </li>
+            </ul>
+
+            <div class="card top-teal" style="padding: 12px 15px; margin-bottom: 12px;">
+              <div class="card-head" style="font-size: 16px;"><em>P. falciparum</em> Kelch13 Benchmark</div>
+              <div class="card-label" style="font-size: 14px;">
+                <strong>106,236</strong> runs screened &rarr; <strong>41,617</strong> clean full-length CDS + <strong>5,672</strong> multi-hit runs rescued — reconstructing WHO artemisinin-resistance sweeps straight from raw reads.
+              </div>
+            </div>
+
+            <div class="card top-accent" style="padding: 12px 15px;">
+              <div class="card-head" style="font-size: 16px;"><em>P. falciparum</em> AMA1 Cohort (<span class="mono">prep_cohort</span>)</div>
+              <div class="card-label" style="font-size: 14px;">
+                <strong>63,930</strong> screened &rarr; <strong>37,494</strong> clean CDS &rarr; balanced into <strong>150 representative haplotypes &times; 622 codons</strong> ready for rapid evolutionary screening.
+              </div>
+            </div>
+          </div>
+
+          <div class="col" style="flex: 1.15; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch;">
+            <div class="screenshot-frame" style="padding: 7px; display: flex; flex-direction: column;">
+              <img src="demo-assets/k13-sweep-map.png" alt="Kelch13 archive sweep map showing 106,236 runs screened, 41,617 clean CDS, 5,672 rescued, and resistance alleles K189T, N142_L143insNN, C580Y" style="max-height: 445px;" />
+              <div class="screenshot-caption" style="margin-top: auto; padding-top: 8px;"><span class="mono">tile</span> K13 sweep map (41,617 runs)</div>
+            </div>
+            <div class="screenshot-frame" style="padding: 7px; display: flex; flex-direction: column;">
+              <img src="demo-assets/galaxy-logan-history.png" alt="usegalaxy.org history running kmindex and LexicMap queries for Kelch13 and AMA1" style="max-height: 445px;" />
+              <div class="screenshot-caption" style="margin-top: auto; padding-top: 8px;">Live <span class="mono">usegalaxy.org</span> search history</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">disassembler · logan-walker + tile</div>
+      </div>
+      <aside class="notes">
+        disassembler closes the loop between search and biology via logan-walker (unitig graphs from kmindex hits) and tile (contig stitching from LexicMap hits). On the right: the actual Kelch13 sweep census built directly from 106,236 screened runs (41,617 clean full CDS + 5,672 multi-hit rescues) alongside the reproducible usegalaxy.org history.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 13: HYPHAEON / PRIMAEON (SLIDE A - INTUITION) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">HyphAeon &amp; PrimAeon: Spotting Rapid Adaptation</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 18px;">
+          Once <span class="mono">disassembler</span> builds a clean codon cohort, biologists want to know <strong>how natural selection is shaping the protein</strong> — without waiting hours for massive phylogenetic tree searches:
+        </p>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card top-accent">
+            <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="card-head">Dodging Immunity in Bursts</div>
+            <div class="card-label">
+              <strong>Episodic selection:</strong> Which amino acid sites are changing rapidly on specific branches to escape host antibodies or drug pressure?
+            </div>
+          </div>
+
+          <div class="card top-navy">
+            <div class="card-icon"><i class="fa-solid fa-link"></i></div>
+            <div class="card-head">Mutations That Travel Together</div>
+            <div class="card-label">
+              <strong>Epistasis:</strong> Which pairs of positions co-evolve together — such as a primary escape change paired with a compensatory partner?
+            </div>
+          </div>
+
+          <div class="card top-teal">
+            <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="card-head">Flexible vs. Locked Residues</div>
+            <div class="card-label">
+              <strong>Structural tolerance:</strong> Which positions freely swap many amino acids on exposed loops versus critical sites that stay strictly locked?
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Runs Anywhere — Browser or Galaxy</div>
+          <p class="body">
+            <strong>PrimAeon</strong> runs rapid site screening right inside your browser tab (<span class="mono">primaeon.org</span>, data never leaves your laptop); <strong>HyphAeon</strong> scales deep selection, epistasis, and mutational scans on <span class="mono">usegalaxy.org</span>.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 1 · HyphAeon / PrimAeon (What It Asks)</div>
+      </div>
+      <aside class="notes">
+        Plain biological intuition for HyphAeon and PrimAeon: instead of spending hours building huge likelihood trees, it scans codon alignments directly for three things biologists care about—positions adapting in bursts (episodic selection), pairs of mutations that co-travel (epistasis), and structurally flexible versus locked positions.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 14: HYPHAEON / PRIMAEON (SLIDE B - SCREENSHOT) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">PrimAeon &amp; HyphAeon in Action: <em>P. falciparum</em> AMA1</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 24px; align-items: center;">
+          <div class="col" style="flex: 0 0 555px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/primaeon-ama1.png" alt="PrimAeon site-by-site episodic selection graph for pfama1.codon.fasta showing 6 purple lollipop stems (D36, K206, K230, K300, E405, D493) above the top-5% LRT threshold across 622 codons" style="max-height: 480px;" />
+            </div>
+          </div>
+
+          <div class="col anno-stack">
+            <div class="anno-card">
+              <div class="anno-head">1. Purple Stems = Adapting Hotspots</div>
+              <p>
+                Across <strong>150 haplotypes &times; 622 codons</strong>, <strong>6 purple peaks</strong> (<strong>D36, K206, K230, K300, E405, D493</strong>) rise above the dashed call threshold (gene-wide <strong>p<sub>ACAT</sub> = 0.001</strong>).
+              </p>
+            </div>
+
+            <div class="anno-card navy">
+              <div class="anno-head">2. Grey Stems = Background Variation</div>
+              <p>
+                The other <strong>110 variable codons</strong> stay below threshold while <strong>506 invariant codons</strong> are omitted — isolating likely immune-escape hotspots at a glance.
+              </p>
+            </div>
+
+            <div class="anno-card teal">
+              <div class="anno-head">3. Interactive Thresholds &amp; Site Trees</div>
+              <p>
+                Toggle cutoffs (<strong>Top 5%</strong>, <strong>q &le; 0.10</strong>, <strong>Z &ge; 2</strong>), overlay sequence entropy, or <strong>click any purple stem</strong> in the browser to inspect its site-level tree.
+              </p>
+            </div>
+
+            <div class="anno-card">
+              <div class="anno-head">4. Deep HyphAeon Scan Expands the Map</div>
+              <p>
+                Running full <strong>HyphAeon</strong> on the same AMA1 cohort uncovers <strong>26 selected sites</strong> and <strong>110 co-selected epistasis pairs</strong> led by <strong>283–300</strong> and <strong>200–405</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 1 · HyphAeon / PrimAeon (Live Output)</div>
+      </div>
+      <aside class="notes">
+        Walking the audience through the PrimAeon browser screen on 150 balanced AMA1 haplotypes (622 codons): top left gives the clear verdict (Episodic selection detected, p_ACAT 0.001) and highlights 6 adapting sites (D36, K206, K230, K300, E405, D493) out of 116 variable codons, while the full HyphAeon scan extends that to 26 selected sites and 110 epistatic pairs led by 283-300 and 200-405.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 15: RHIZAEON (SLIDE A - INTUITION) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">RhizAeon: Spotting Swapped Gene Segments</h2>
+        <div class="title-divider"></div>
+
+        <div class="callout-dark" style="margin-bottom: 18px; padding: 16px 26px 16px 32px;">
+          <div class="label">The Biological Question</div>
+          <p class="body" style="font-size: 20px;">
+            Did parts of this gene get <strong>swapped in from another strain</strong>?
+          </p>
+        </div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 18px;">
+          <div class="card top-accent">
+            <div class="card-icon"><i class="fa-solid fa-scissors"></i></div>
+            <div class="card-head">Recombination Hotspots</div>
+            <div class="card-label">
+              Sharp physical breakpoints where a pathogen swaps genetic chunks between strains during co-infection — creating mosaic genes.
+            </div>
+          </div>
+
+          <div class="card top-teal">
+            <div class="card-icon"><i class="fa-solid fa-cubes"></i></div>
+            <div class="card-head">Conserved Blocks (Coldspots)</div>
+            <div class="card-label">
+              Modular protein domains bounded between breakpoints that stay intact and travel together as functional cassettes.
+            </div>
+          </div>
+
+          <div class="card top-navy">
+            <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="card-head">Why Ignoring Swaps Misleads</div>
+            <div class="card-label">
+              Forcing one family tree across a mosaic gene tricks tree and selection tools into seeing false mutations and distorted ancestry.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">What RhizAeon Delivers</div>
+          <p class="body">
+            Pinpoints exact swap boundaries, separates <strong>recombination hotspots</strong> from <strong>conserved coldspots</strong>, and partitions the alignment before downstream tree or selection modeling.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 2 · RhizAeon (What It Asks)</div>
+      </div>
+      <aside class="notes">
+        Plain biological framing for RhizAeon: pathogens frequently swap gene domains during mixed infections. RhizAeon identifies where recombination hotspots slice a gene into conserved modular blocks (coldspots), preventing unmodeled swaps from fooling phylogenetic trees or selection tests.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 16: RHIZAEON (SLIDE B - SCREENSHOT) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">RhizAeon in Action: AMA1 Intragenic Recombination</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 28px; align-items: center;">
+          <div class="col" style="flex: 0 0 445px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/rhizaeon-ama1.png" alt="RhizAeon Recombination Explorer showing 150 taxa, 1866 nt, 2 breakpoints at nt 734 and nt 1534 with +5.31 Z support partitioning 3 conserved coldspot blocks" style="max-height: 472px;" />
+            </div>
+          </div>
+
+          <div class="col anno-stack">
+            <div class="anno-card">
+              <div class="anno-head">1. Top Summary Cards (<span class="mono">150</span> Taxa &times; <span class="mono">1,866 bp</span>)</div>
+              <p>
+                Detects <strong>2 verified cohort breakpoints</strong> (6 mosaic recombinants + 144 clonal lineages) with strong statistical confidence (<strong>+5.31 Z</strong> peak support).
+              </p>
+            </div>
+
+            <div class="anno-card navy">
+              <div class="anno-head">2. Three Mosaic Haplotype Segments</div>
+              <p>
+                Partitions AMA1 into <strong>Segments 1, 2, and 3</strong> — separating the hyper-variable <strong>Domain I epitope loop</strong>, the <strong>Domain II–III core</strong>, and the conserved <strong>C-terminal tail</strong>.
+              </p>
+            </div>
+
+            <div class="anno-card teal">
+              <div class="anno-head">3. Two Recombination Hotspots &amp; Three Coldspots</div>
+              <p>
+                Orange flux peaks mark hotspots at <strong>nt 734</strong> (aa 245, inside Domain I past c1L) and <strong>nt 1,534</strong> (aa 511, inside Domain III) — recovering classic <em>Pf</em>AMA1 intragenic mosaicism.
+              </p>
+            </div>
+
+            <div class="anno-card">
+              <div class="anno-head">4. Interactive Mosaic Browser</div>
+              <p>
+                Clicking any taxon row below highlights which parental lineages contributed each recombined haplotype block.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 2 · RhizAeon (Live Output)</div>
+      </div>
+      <aside class="notes">
+        Walk through the RhizAeon explorer on P. falciparum AMA1 (150 taxa, 1,866 bp / 622 codons): top cards show 2 verified breakpoints (+5.31 Z support). Breakpoints fall at nt 734 (aa 245, inside Domain I right past the hyper-variable cluster-1 escape loop c1L) and nt 1,534 (aa 511, inside Domain III upstream of the conserved transmembrane/cytoplasmic tail) — cleanly recovering the high intragenic recombination and epitope-shuffling mosaicism classically described by Polley &amp; Conway (2001, Genetics), Duan et al. (2008, PNAS), and Takala et al. (2009, Sci Transl Med) that complicates single-allele AMA1 vaccines.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 17: CHRONAEON (SLIDE A - INTUITION) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">ChronAeon: Clocks, Speed Shifts &amp; Bad Dates</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 18px;">
+          When samples come with collection years, <strong>ChronAeon</strong> answers three practical surveillance questions directly from sequence distances — without needing a slow guide tree:
+        </p>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card top-navy">
+            <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <div class="card-head">When Did This Lineage Emerge?</div>
+            <div class="card-label">
+              <strong>Molecular clock dating:</strong> Compares genetic divergence against sampling dates to estimate mutation speed and trace back to the shared ancestor (<span class="mono">tMRCA</span>).
+            </div>
+          </div>
+
+          <div class="card top-teal">
+            <div class="card-icon"><i class="fa-solid fa-gauge-high"></i></div>
+            <div class="card-head">Did Mutation Speed Shift?</div>
+            <div class="card-label">
+              <strong>AutoClock rate regimes:</strong> Host jumps or outbreak expansions often tick at different paces — ChronAeon automatically separates distinct clock groups.
+            </div>
+          </div>
+
+          <div class="card top-accent">
+            <div class="card-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+            <div class="card-head">Which Sample Dates Are Wrong?</div>
+            <div class="card-label">
+              <strong>Automated outlier triage:</strong> Public metadata often hides misdated submissions or lab-adapted strains — ChronAeon flags extreme mismatches automatically.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Available Today</div>
+          <p class="body">
+            ChronAeon runs in seconds via Python CLI and as a live tool suite on <span class="mono">usegalaxy.org</span> — turning raw dated cohorts into clean evolutionary timelines.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 3 · ChronAeon (What It Asks)</div>
+      </div>
+      <aside class="notes">
+        Plain biological explanation of ChronAeon: molecular clock dating tells us when a lineage emerged, AutoClock finds distinct evolutionary speed regimes inside the same pathogen dataset, and automated outlier triage flags misdated or lab-passaged records before they distort the clock.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 18: CHRONAEON (SLIDE B - SCREENSHOT) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">ChronAeon in Action: H5N1 Hemagglutinin Clocks</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 24px; align-items: center;">
+          <div class="col" style="flex: 1.24;">
+            <div class="screenshot-frame" style="padding: 8px;">
+              <img src="demo-assets/chronaeon-autoclock.png" alt="ChronAeon AutoClock 5-panel figure for 71 dated H5N1 HA sequences showing K*=4 clock communities, separated root-to-tip clock slopes, rate uncertainty intervals, and 2 flagged outliers" style="max-height: 445px;" />
+              <div class="screenshot-caption">H5N1 Hemagglutinin (71 dated sequences, 1994–2022) · Baseline clock: tMRCA &approx; 1949.3 · &mu; = 0.00362 subs/site/yr · R&sup2; = 0.762</div>
+            </div>
+          </div>
+
+          <div class="col anno-stack" style="flex: 0.76;">
+            <div class="anno-card navy">
+              <div class="anno-head">Panels A &amp; B · Four Clock Regimes (K* = 4)</div>
+              <p>
+                Sequences separate cleanly into <strong>4 evolutionary communities</strong> (colors), with automatic model selection locking onto <strong>K* = 4</strong> distinct rate regimes.
+              </p>
+            </div>
+
+            <div class="anno-card teal">
+              <div class="anno-head">Panels C &amp; D · Divergence &amp; Speed per Group</div>
+              <p>
+                Each lineage follows its own root-to-tip slope over <strong>1994–2022</strong> around the overall baseline (<strong>tMRCA &approx; 1949.3</strong>, <strong>&mu; = 0.00362</strong>, <strong>R&sup2; = 0.762</strong>).
+              </p>
+            </div>
+
+            <div class="anno-card">
+              <div class="anno-head">Panel E · Quality Triage Flags Bad Dates</div>
+              <p>
+                Red <strong>&times;</strong> markers highlight <strong>2 extreme outliers</strong> sitting more than 3 standard deviations off their expected clock — isolating misdated or lab records instantly.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 3 · ChronAeon (Live Output)</div>
+      </div>
+      <aside class="notes">
+        Here is what the biologist sees on 71 dated H5N1 Hemagglutinin sequences (1994-2022): baseline clock recovers tMRCA around 1949.3 with rate 0.00362 substitutions/site/year and R^2 = 0.762. AutoClock then discovers K*=4 distinct evolutionary rate regimes (Panels A-D) and automatically flags two extreme outlier runs with red X marks in Panel E for immediate metadata triage.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 19: BUSHWHACKER (SLIDE A - INTUITION) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">BUSHWHACKER: When a Tree Lies — Cross-Clade Jumps</h2>
+        <div class="title-divider"></div>
+
+        <div class="callout-dark" style="margin-bottom: 18px; padding: 16px 26px 16px 32px;">
+          <div class="label">The Core Problem With Classical Trees</div>
+          <p class="body" style="font-size: 19.5px;">
+            A strict branching tree assumes every gene descends down <strong>one neat family branch</strong> — but pathogens constantly break that rule.
+          </p>
+        </div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 18px;">
+          <div class="card top-accent">
+            <div class="card-icon"><i class="fa-solid fa-code-branch"></i></div>
+            <div class="card-head">Why Standard Trees Struggle</div>
+            <div class="card-label">
+              When strains swap domains, reassort segments, or evolve the same escape mutation twice, a strict tree hides those jumps inside messy tangled clusters.
+            </div>
+          </div>
+
+          <div class="card top-navy">
+            <div class="card-icon"><i class="fa-solid fa-bezier-curve"></i></div>
+            <div class="card-head">Minimal Cross-Tree "Shunts"</div>
+            <div class="card-label">
+              BUSHWHACKER keeps only supported branching splits, collapses noise, and adds <strong>cross-tree bridges ("shunts")</strong> showing shared ancestry across clades.
+            </div>
+          </div>
+
+          <div class="card top-teal">
+            <div class="card-icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <div class="card-head">Instant In-Browser Networks</div>
+            <div class="card-label">
+              Runs locally in your web browser with zero server uploads — turning confusing alignments into clear mosaic networks in seconds.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Intuitive Diagnostic</div>
+          <p class="body">
+            Clonal drug sweeps look like simple trees with <strong>zero shunts</strong>; mosaic antigens and horizontally transferred genes immediately light up with <strong>cross-clade bridges</strong>.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 4 · BUSHWHACKER (What It Asks)</div>
+      </div>
+      <aside class="notes">
+        Plain biological framing for BUSHWHACKER: when pathogens exchange domains or pick up convergent mutations, forcing them onto a strictly bifurcating tree hides the biology. BUSHWHACKER collapses unsupported branches and adds the minimal cross-tree bridges (shunts) that expose lateral jumps and mosaic sharing.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 20: BUSHWHACKER (SLIDE B - SCREENSHOT) ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">BUSHWHACKER in Action: AMA1 Mosaic Network</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="gap: 28px; align-items: center;">
+          <div class="col" style="flex: 0 0 445px;">
+            <div class="screenshot-frame">
+              <img src="demo-assets/bushwhacker-ama1.png" alt="BUSHWHACKER browser view of pfama1.codon.fasta (150 x 1,866 bp) displaying 76 splits, 21 polytomies, 36.4% smaller model, and 26 convergent shunts (+7.94, P=100.0%) linking Clades 1 through 6" style="max-height: 472px;" />
+            </div>
+          </div>
+
+          <div class="col anno-stack">
+            <div class="anno-card navy">
+              <div class="anno-head">1. Supported Backbone + Unresolved Clusters</div>
+              <p>
+                Top pill bar summarizes the tree skeleton for <strong>150 &times; 1,866 bp</strong> AMA1: <strong>76 supported branching splits</strong> and <strong>21 collapsed clusters (polytomies)</strong> across <strong>Clades 1–6</strong>.
+              </p>
+            </div>
+
+            <div class="anno-card">
+              <div class="anno-head">2. Twenty-Six Cross-Clade "Shunts"</div>
+              <p>
+                Orange dashed arcs trace <strong>26 convergent evolutionary shunts</strong> leaping directly across distant clades — showing exactly where sequence blocks or mutations are shared outside the tree.
+              </p>
+            </div>
+
+            <div class="anno-card teal">
+              <div class="anno-head">3. Strong Evidence &amp; Simpler Model</div>
+              <p>
+                Adding those 26 bridges makes the model <strong>36.4% smaller</strong> (cleaner explanation of the alignment) with overwhelming support (<strong>+7.94 nats</strong>, <strong>P = 100.0%</strong>).
+              </p>
+            </div>
+
+            <div class="anno-card">
+              <div class="anno-head">4. Sharp Contrast vs. Clonal Genes</div>
+              <p>
+                A single-sweep gene like <em>Kelch13</em> needs <strong>0 shunts</strong>; hyper-polymorphic <em>AMA1</em> immediately reveals its network of domain sharing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Tool 4 · BUSHWHACKER (Live Output)</div>
+      </div>
+      <aside class="notes">
+        Walking through the BUSHWHACKER screenshot on P. falciparum AMA1 (150 sequences by 1,866 bp): we see 76 standard branching splits and 21 polytomies augmented by 26 dashed orange shunts bridging Clades 1 through 6—reducing model complexity by 36.4% with +7.94 nats evidence gain and P = 100% support.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 21: PART 3 DIVIDER — BRC 3.0 ==================== -->
+    <section>
+      <div class="slide section-slide">
+        <div class="kicker">Part 3 · Uniform Multi-Omic &amp; Comparative Baselines</div>
+        <h2>BRC 3.0 Precomputed Data</h2>
+        <div class="section-sub">
+          Pairing live archive interrogation with fast, uniformly reprocessed datasets, expanding curated genomes, and clade-level whole-genome alignments.
+        </div>
+        <div class="kicker-divider"></div>
+
+        <img src="brc-logo.svg" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">BRC 3.0 Precomputed Data</div>
+      </div>
+      <aside class="notes">
+        Transition to Part 3: alongside live search and evolutionary inference tools, BRC 3.0 delivers uniformly precomputed datasets across curated genomes so biologists start from trusted, comparable baselines.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 22: ADAPTIVE LOOPS ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Adaptive Loops: Entire Datasets Reanalyzed in Hours</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 22px; gap: 26px;">
+          <div class="col">
+            <div class="card top-navy" style="height: 100%; box-sizing: border-box;">
+              <div class="card-head" style="font-size: 20px;">Why Classical Reanalysis Stalls</div>
+              <div class="card-label" style="font-size: 16.5px;">
+                Traditional pipelines download 100% of every raw read file first and grind through every read blindly — burning weeks of network transfers, storage, and compute even after the answer is already clear.
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card top-teal" style="height: 100%; box-sizing: border-box;">
+              <div class="card-head" style="font-size: 20px;">How Adaptive Loops (<span class="mono">Focaloops</span>) Work</div>
+              <div class="card-label" style="font-size: 16.5px;">
+                Streams sequencing reads directly from public cloud storage and <strong>stops as soon as statistical certainty locks</strong> — skipping redundant downloads and compute with zero loss in accuracy.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-bottom: 10px;">Proven Landmark Benchmark · MalariaGEN Pf8 Cohort</div>
+        <div class="card-grid cols-3" style="margin-bottom: 20px;">
+          <div class="stat">
+            <div class="stat-num" style="font-size: 40px;">24,409</div>
+            <div class="stat-label">QC-Pass Whole Genomes<br/>(34.7 TB Total Data)</div>
+          </div>
+          <div class="stat navy-top">
+            <div class="stat-num" style="font-size: 40px;">~14–16 hrs</div>
+            <div class="stat-label">Full Cohort Reanalysis<br/>on Just 4 Cloud Nodes</div>
+          </div>
+          <div class="stat teal-top">
+            <div class="stat-num" style="font-size: 40px;">99.93%</div>
+            <div class="stat-label">Drug-Resistance Allele<br/>Concordance vs. Full Run</div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">What This Unlocks for BRC 3.0</div>
+          <p class="body">
+            When uniform pipelines can reprocess <strong>tens of thousands of genomes overnight</strong>, precomputing standardized baselines across entire pathogen clades becomes practical.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">BRC 3.0 · Adaptive Loops</div>
+      </div>
+      <aside class="notes">
+        Keep Adaptive Loops (Focaloops) intuitive: instead of downloading petabytes blindly, Adaptive Loops stream reads directly from public cloud storage and stop as soon as statistical certainty locks. The proof point is MalariaGEN Pf8—all 24,409 QC-pass whole genomes (34.7 TB) reanalyzed in ~14-16 hours on 4 cloud nodes with 99.93% drug-resistance allele concordance.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 23: UNIFORM PRECOMPUTATION ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Scaling Uniform Precomputation Across BRC Genomes</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 18px;">
+          Legacy databases mix incompatible pipelines from different papers. BRC 3.0 delivers <strong>uniformly reprocessed, high-quality baselines</strong> across every curated organism — ready to browse or feed straight into Galaxy:
+        </p>
+
+        <div class="card-grid cols-4" style="margin-bottom: 22px;">
+          <div class="card top-navy" style="padding: 18px 16px;">
+            <div class="card-icon"><i class="fa-solid fa-chart-bar"></i></div>
+            <div class="card-head" style="font-size: 17.5px;">RNA-seq</div>
+            <div class="card-label" style="font-size: 14.5px;">
+              Uniformly quantified gene expression counts and differential baselines across public studies.
+            </div>
+          </div>
+
+          <div class="card top-accent" style="padding: 18px 16px;">
+            <div class="card-icon"><i class="fa-solid fa-magnet"></i></div>
+            <div class="card-head" style="font-size: 17.5px;">DNA Binding</div>
+            <div class="card-label" style="font-size: 14.5px;">
+              Standardized <span class="mono">ChIP-seq</span> and <span class="mono">CUT&amp;RUN</span> factor-binding and chromatin-mark tracks.
+            </div>
+          </div>
+
+          <div class="card top-teal" style="padding: 18px 16px;">
+            <div class="card-icon"><i class="fa-solid fa-dna"></i></div>
+            <div class="card-head" style="font-size: 17.5px;">ATAC-seq</div>
+            <div class="card-label" style="font-size: 14.5px;">
+              Uniform chromatin-accessibility profiles revealing active regulatory elements across life stages.
+            </div>
+          </div>
+
+          <div class="card top-navy" style="padding: 18px 16px;">
+            <div class="card-icon"><i class="fa-solid fa-code-compare"></i></div>
+            <div class="card-head" style="font-size: 17.5px;">Population Variants</div>
+            <div class="card-label" style="font-size: 14.5px;">
+              Cleanly called SNPs, indels, and resistance genotypes harmonized onto versioned reference coordinates.
+            </div>
+          </div>
+        </div>
+
+        <div class="cols" style="gap: 20px; align-items: stretch;">
+          <div class="col" style="flex: 0.72;">
+            <div class="stat" style="height: 100%; box-sizing: border-box; justify-content: center;">
+              <div class="stat-num" style="font-size: 34px;">1,974 / 5,505</div>
+              <div class="stat-label" style="font-size: 12px;">Curated Organisms &amp; Assemblies Today — Steadily Expanding</div>
+            </div>
+          </div>
+          <div class="col" style="flex: 1.28;">
+            <div class="callout-dark" style="height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;">
+              <div class="label">Growing Breadth &amp; Depth</div>
+              <p class="body" style="font-size: 18px;">
+                BRC Analytics continues <strong>expanding curated genome coverage</strong> beyond today's 1,974 organisms and 5,505 assemblies — adding uniform precomputed tracks across priority pathogens and vectors.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">BRC 3.0 · Uniform Multi-Omics</div>
+      </div>
+      <aside class="notes">
+        BRC 3.0 applies uniform, versioned pipelines across RNA-seq, DNA binding (ChIP-seq / CUT&RUN), ATAC-seq, and population variants across all genomes in BRC Analytics, while continuously expanding curated genome coverage beyond today's 1,974 organisms and 5,505 assemblies.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 24: CLADE-SPECIFIC MULTIPLE-GENOME ALIGNMENTS ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Clade-Specific Multiple-Genome Alignments</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy" style="margin-bottom: 14px;">
+          BRC 3.0 precomputes <strong>whole-genome alignments within pathogen and vector clades</strong> — connecting well-characterized reference species directly to their evolutionary neighbors:
+        </p>
+
+        <div class="svg-panel" style="margin-bottom: 18px; padding: 12px 16px;">
+          <svg viewBox="0 0 1060 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Clade-specific whole-genome alignment across sister species projecting annotated variants and tracing gene birth and evolution">
+            <defs>
+              <marker id="wgArrGold" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0,1 L8,4.5 L0,8 Z" fill="#956F00" />
+              </marker>
+              <marker id="wgArrTeal" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0,1 L8,4.5 L0,8 Z" fill="#0F766E" />
+              </marker>
+            </defs>
+
+            <!-- Species labels -->
+            <text x="20" y="54" font-family="Merriweather, serif" font-size="14" font-weight="700" fill="#28285B">Reference Species</text>
+            <text x="20" y="71" font-family="Inter, sans-serif" font-size="11.5" fill="#637381">Annotated genes &amp; variants</text>
+
+            <text x="20" y="122" font-family="Merriweather, serif" font-size="14" font-weight="700" fill="#3F3F6E">Sister Species A</text>
+            <text x="20" y="139" font-family="Inter, sans-serif" font-size="11.5" fill="#637381">Orthologous synteny</text>
+
+            <text x="20" y="188" font-family="Merriweather, serif" font-size="14" font-weight="700" fill="#3F3F6E">Sister Species B</text>
+            <text x="20" y="205" font-family="Inter, sans-serif" font-size="11.5" fill="#637381">Lineage-specific gain</text>
+
+            <!-- Genome Track 1 (Reference) -->
+            <line x1="200" y1="58" x2="1030" y2="58" stroke="#CBD5E1" stroke-width="4" />
+            <rect x="220" y="42" width="160" height="32" rx="5" fill="#28285B" />
+            <text x="300" y="63" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">Gene A (Conserved)</text>
+            <rect x="440" y="42" width="190" height="32" rx="5" fill="#28285B" />
+            <text x="535" y="63" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF">Resistance Locus</text>
+            <!-- Variant pin on Ref -->
+            <circle cx="535" cy="24" r="7" fill="#FFEB78" stroke="#956F00" stroke-width="2.2" />
+            <text x="548" y="28" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#956F00">Known Variant</text>
+
+            <!-- Genome Track 2 (Sister A) -->
+            <line x1="200" y1="126" x2="1030" y2="126" stroke="#CBD5E1" stroke-width="4" />
+            <rect x="235" y="110" width="155" height="32" rx="5" fill="#E6E8F6" stroke="#28285B" stroke-width="1.6" />
+            <text x="312" y="131" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">Gene A Ortholog</text>
+            <rect x="455" y="110" width="185" height="32" rx="5" fill="#FFEB78" stroke="#956F00" stroke-width="1.8" />
+            <text x="547" y="131" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">Projected Locus</text>
+
+            <!-- Genome Track 3 (Sister B) -->
+            <line x1="200" y1="192" x2="1030" y2="192" stroke="#CBD5E1" stroke-width="4" />
+            <rect x="250" y="176" width="150" height="32" rx="5" fill="#E6E8F6" stroke="#28285B" stroke-width="1.6" />
+            <text x="325" y="197" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">Gene A Diverged</text>
+            <rect x="470" y="176" width="175" height="32" rx="5" fill="#FFEB78" stroke="#956F00" stroke-width="1.8" />
+            <text x="557" y="197" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">Projected Locus</text>
+
+            <!-- Novel / Birth Gene in Sister B -->
+            <rect x="750" y="176" width="235" height="32" rx="5" fill="#F0FDFA" stroke="#0F766E" stroke-width="2" />
+            <text x="867" y="197" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#0F766E">Lineage-Specific Gene Birth</text>
+
+            <!-- Projection arrows from Reference Variant down -->
+            <path d="M 535 76 L 545 104" fill="none" stroke="#956F00" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#wgArrGold)" />
+            <path d="M 547 144 L 555 170" fill="none" stroke="#956F00" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#wgArrGold)" />
+
+            <!-- Evolution trace callout -->
+            <rect x="706" y="42" width="310" height="84" rx="8" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.8" />
+            <text x="722" y="66" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F766E">GENE EVOLUTION TRACKING</text>
+            <text x="722" y="88" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">Follow birth, duplication, loss, and</text>
+            <text x="722" y="106" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">coding divergence across every clade</text>
+            <path d="M 867 128 L 867 170" fill="none" stroke="#0F766E" stroke-width="2.4" marker-end="url(#wgArrTeal)" />
+          </svg>
+        </div>
+
+        <div class="card-grid cols-2">
+          <div class="card top-accent" style="padding: 16px 20px;">
+            <div class="card-head" style="font-size: 18px;">Project Annotated Variants Across Sister Species</div>
+            <div class="card-label" style="font-size: 15.5px;">
+              Transfer validated drug-resistance alleles, epitopes, and regulatory coordinates cleanly from model references onto under-studied relatives.
+            </div>
+          </div>
+          <div class="card top-teal" style="padding: 16px 20px;">
+            <div class="card-head" style="font-size: 18px;">Trace Birth &amp; Evolution of Individual Genes</div>
+            <div class="card-label" style="font-size: 15.5px;">
+              Inspect where genes originated, diverged, or duplicated across a clade — linking comparative genome tracks directly to evolutionary analysis.
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">BRC 3.0 · Clade Alignments</div>
+      </div>
+      <aside class="notes">
+        Precomputing clade-specific multiple-genome alignments lets biologists project annotated variants cleanly onto sister species and trace the birth, duplication, and divergence of individual genes across pathogen and vector lineages.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 25: UNIFIED PLATFORM & RESOURCES ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Unified End-to-End Platform &amp; Resources</h2>
+        <div class="title-divider"></div>
+
+        <div class="pipeline" style="margin-bottom: 18px;">
+          <div class="pipe-stage terminal">
+            <div class="pipe-title">BRC 3.0 Precomputed</div>
+            <div class="pipe-sub">Uniform RNA-seq, binding, ATAC-seq, variants &amp; clade alignments</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-plus"></i></div>
+          <div class="pipe-stage">
+            <div class="pipe-title">Live Logan Search</div>
+            <div class="pipe-sub"><span class="mono">kmindex</span> &amp; <span class="mono">LexicMap</span> across ~38M SRA runs</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage">
+            <div class="pipe-title">disassembler</div>
+            <div class="pipe-sub">Clean codon cohorts via <span class="mono">logan-walker</span> &amp; <span class="mono">tile</span></div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage terminal">
+            <div class="pipe-title">Aeon + BUSHWHACKER</div>
+            <div class="pipe-sub">Selection, swaps, clocks &amp; cross-clade networks</div>
+          </div>
+        </div>
+
+        <div class="callout-dark" style="margin-bottom: 22px; padding: 16px 26px 16px 32px;">
+          <div class="label">Open, Reproducible &amp; Ready Today</div>
+          <p class="body" style="font-size: 18px;">
+            Combine uniform precomputed organism baselines with live archive queries and zero-install browser tools — every step recorded on <strong style="color:var(--highlight);">usegalaxy.org</strong> and <strong style="color:var(--highlight);">brc-analytics.org</strong>.
+          </p>
+        </div>
+
+        <div class="section-label" style="margin-bottom: 10px;">Scan to Try the Platform &amp; Tools</div>
+        <div style="display: flex; gap: 18px; justify-content: space-between; align-items: stretch;">
+          <div class="qr-block" style="flex: 1;">
+            <img src="qr-brc-analytics.svg" alt="BRC Analytics QR" />
+            <div class="qr-label">brc-analytics.org</div>
+            <div class="qr-sub">Genomes &amp; BRC 3.0</div>
+          </div>
+          <div class="qr-block" style="flex: 1;">
+            <img src="qr-usegalaxy.svg" alt="usegalaxy.org QR" />
+            <div class="qr-label">usegalaxy.org</div>
+            <div class="qr-sub">Compute &amp; Workflows</div>
+          </div>
+          <div class="qr-block" style="flex: 1;">
+            <img src="qr-logan-search.svg" alt="Logan Search QR" />
+            <div class="qr-label">logan-search.org</div>
+            <div class="qr-sub">Query SRA Content</div>
+          </div>
+          <div class="qr-block" style="flex: 1;">
+            <img src="qr-disassembler.svg" alt="disassembler QR" />
+            <div class="qr-label">disassembler</div>
+            <div class="qr-sub">Cohort Reconstruction</div>
+          </div>
+          <div class="qr-block" style="flex: 1;">
+            <img src="qr-primaeon.svg" alt="PrimAeon QR" />
+            <div class="qr-label">primaeon.org</div>
+            <div class="qr-sub">Browser Selection App</div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Thank You · Resources</div>
+      </div>
+      <aside class="notes">
+        Closing summary tying Part 1 and Part 2 into one unified open platform, with QR links to BRC Analytics, usegalaxy.org, logan-search.org, disassembler, and PrimAeon.
+      </aside>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    controls: true,
+    progress: true,
+    width: 1280,
+    height: 760,
+    margin: 0.04,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>

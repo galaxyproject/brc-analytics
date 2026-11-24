@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { type JSX } from "react";
 import { StyledButton } from "./action.styles";
 import { CONTINUE_LABEL } from "./constants";
@@ -26,12 +26,11 @@ export const Action = ({
   const { onContinue } = useContinueHandoff(handoffUrl, schema);
   return (
     <StyledButton
-      color={BUTTON_PROPS.COLOR.PRIMARY}
+      {...BUTTON_PRESETS.PRIMARY_CONTAINED}
       disabled={!handoffUrl || loading}
       fullWidth
       onClick={onContinue}
       placement={placement}
-      variant={BUTTON_PROPS.VARIANT.CONTAINED}
     >
       {CONTINUE_LABEL}
     </StyledButton>

@@ -1,5 +1,5 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, DialogActions, DialogContent } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
 import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
@@ -42,11 +42,11 @@ export const CollectionSelector = ({
         <Table table={table} />
       </DialogContent>
       <DialogActions>
-        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onCancel}>
+        <Button {...BUTTON_PRESETS.SECONDARY_OUTLINED} onClick={onCancel}>
           Cancel
         </Button>
         <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
+          {...BUTTON_PRESETS.PRIMARY_CONTAINED}
           disabled={count === 0}
           onClick={onClose}
         >

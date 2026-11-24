@@ -1,7 +1,7 @@
 {
-  "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
-  "url": "https://cc-brc-gene-snapshots-dev.s3.us-east-1.amazonaws.com/snapshots/temp-GCF_000002765.6-2026-10-28T212348Z.duckdb",
-  "sha256": "245c82020477f522741cd458e835d8b1bd17580c62977d60da1b48799b3c7355",
-  "size": 13643776,
-  "schema_version": 1
+  "build_id": "temp-GCF_000002765.6-2026-11-18T052137Z",
+  "url": "https://cc-brc-gene-snapshots-dev.s3.us-east-1.amazonaws.com/snapshots/temp-GCF_000002765.6-2026-11-18T052137Z.duckdb",
+  "sha256": "c22c3ec3372a250107aa15b074a825c9452756374abf65a481f2c515ecbc1cd3",
+  "size": 17051648,
+  "schema_version": 2
 }

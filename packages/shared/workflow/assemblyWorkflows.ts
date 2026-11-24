@@ -15,8 +15,7 @@ import {
 /**
  * Builds workflow categories for the given assembly: the list the assembly's
  * analyze page offers, and so the one set of workflows its configure page may
- * open. Differential Expression Analysis is added to its category, gated as a
- * member of it.
+ * open. Differential Expression Analysis is added to its category.
  * @param assembly - Assembly.
  * @param allWorkflowCategories - Workflow categories.
  * @param workflowGates - Feature-flag gating rules bound to the user's flag state.
@@ -48,9 +47,7 @@ export function buildAssemblyWorkflows(
       workflowCategory.category === DIFFERENTIAL_EXPRESSION_ANALYSIS_CATEGORY
     ) {
       compatibleWorkflows.unshift(
-        ...workflowGates.filterWorkflows(workflowCategory.category, [
-          DIFFERENTIAL_EXPRESSION_ANALYSIS,
-        ])
+        ...workflowGates.filterWorkflows([DIFFERENTIAL_EXPRESSION_ANALYSIS])
       );
     }
 

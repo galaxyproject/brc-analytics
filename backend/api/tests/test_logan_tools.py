@@ -22,6 +22,7 @@ def _deps(galaxy=None) -> AssistantDeps:
 
 def _galaxy(cached=None, status=None):
     g = MagicMock()
+    g.for_job.return_value = g
     g.is_available.return_value = True
     g.get_cached_kmindex_results = AsyncMock(return_value=cached)
     g.get_job_status = AsyncMock(return_value=status)

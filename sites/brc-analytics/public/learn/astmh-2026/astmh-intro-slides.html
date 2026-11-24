@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BRC-Analytics — AI + Galaxy + Infrastructure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme" />
+
+  <!-- Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      /* BRC palette */
+      --navy:        #28285B;
+      --navy-dark:   #1F1F47;
+      --navy-soft:   #3F3F6E;
+      --accent:      #956F00;
+      --accent-soft: #B8881A;
+      --highlight:   #FFEB78;
+      --muted:       #637381;
+      --muted-light: #9AA2AE;
+      --panel:       #F7F7FB;
+      --border:      #E3E3ED;
+      --white:       #FFFFFF;
+    }
+
+    /* ===== Print PDF: match paper size to slide dimensions (1280x760) ===== */
+    @page {
+      size: 1280px 760px;
+      margin: 0;
+    }
+
+    html.print-pdf .pdf-page {
+      height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+    html.print-pdf .pdf-page > section,
+    html.print-pdf .reveal .slides > section {
+      top: 0 !important;
+      left: 0 !important;
+      width: 1280px !important;
+      height: 760px !important;
+      min-height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+    html.print-pdf .slide {
+      height: 760px !important;
+    }
+
+    /* ===== Base reveal overrides ===== */
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy-soft);
+      font-size: 22px;
+    }
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: 0;
+      height: 100%;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Merriweather', serif;
+      color: var(--navy);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reveal a { color: var(--navy); border-bottom: 2px solid var(--highlight); }
+    .reveal strong { color: var(--navy); font-weight: 600; }
+
+    /* ===== Slide frame (every slide) ===== */
+    .slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 66px 90px 58px;
+      box-sizing: border-box;
+      background: var(--white);
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--navy);
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .slide-logo {
+      position: absolute;
+      bottom: 18px;
+      left: 30px;
+      height: 22px;
+      width: auto;
+      opacity: 0.75;
+    }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      font-size: 12px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* ===== Slide title + divider ===== */
+    .slide h2.slide-title {
+      font-size: 40px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .slide .title-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 28px;
+    }
+
+    /* ===== Bullet list (minimal, square marker) ===== */
+    .reveal ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reveal ul.clean li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: var(--navy-soft);
+      line-height: 1.48;
+    }
+    .reveal ul.clean li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 9px;
+      width: 11px; height: 11px;
+      background: var(--accent);
+    }
+
+    /* ===== Two-column layout ===== */
+    .cols {
+      display: flex;
+      gap: 36px;
+      align-items: stretch;
+    }
+    .cols > .col { flex: 1; min-width: 0; }
+
+    /* ===== Dark callout (navy box, gold edge) ===== */
+    .callout-dark {
+      position: relative;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 26px 28px 26px 36px;
+      box-shadow: 0 10px 25px rgba(40, 40, 91, 0.16);
+    }
+    .callout-dark::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: var(--accent);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    .callout-dark .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--highlight);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+    .callout-dark .body {
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      line-height: 1.45;
+      font-style: italic;
+      margin: 0;
+    }
+    .callout-dark .body strong {
+      color: var(--highlight);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* Light highlight callout variant */
+    .callout-light {
+      background: var(--highlight);
+      border-radius: 8px;
+      padding: 18px 24px;
+      border-left: 8px solid var(--accent);
+      color: var(--navy);
+    }
+    .callout-light .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+    .callout-light .body {
+      font-family: 'Merriweather', serif;
+      font-size: 18px;
+      line-height: 1.42;
+      margin: 0;
+    }
+
+    /* ===== Card grid ===== */
+    .card-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    .card .card-icon {
+      color: var(--navy);
+      font-size: 24px;
+    }
+    .card .card-num {
+      font-family: 'Merriweather', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+    .card .card-head {
+      font-family: 'Merriweather', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .card .card-label {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--navy-soft);
+      line-height: 1.42;
+    }
+    .card.accent {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .card.accent .card-icon { color: var(--highlight); }
+    .card.accent .card-head { color: var(--white); }
+    .card.accent .card-label { color: #E8E8F4; }
+    .card.accent strong { color: var(--highlight); }
+
+    /* ===== Title slide ===== */
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 90px 70px;
+    }
+    .title-slide h1 {
+      font-size: 62px;
+      line-height: 1.08;
+      margin-bottom: 20px;
+    }
+    .title-slide .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      color: var(--navy-soft);
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+    .title-slide .subtitle .plus {
+      color: var(--accent);
+      font-weight: 700;
+      margin: 0 6px;
+    }
+    .title-slide .kicker-divider {
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 30px;
+    }
+    .title-slide .author {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .title-slide .affiliation {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ===== Misc ===== */
+    .kicker {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .lead-copy {
+      font-size: 20px;
+      line-height: 1.48;
+      color: var(--navy-soft);
+      margin: 0 0 20px;
+    }
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 7px;
+      color: var(--navy);
+    }
+
+    /* Stat strip */
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 18px 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      border-top: 4px solid var(--accent);
+    }
+    .stat-num {
+      font-family: 'Merriweather', serif;
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+
+    /* Pipeline mini-diagram */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .pipe-stage {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .pipe-stage.terminal {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+    .pipe-stage.terminal .pipe-title { color: var(--white); }
+    .pipe-stage.terminal .pipe-sub { color: var(--highlight); }
+    .pipe-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .pipe-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.32;
+    }
+    .pipe-arrow {
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 18px;
+    }
+
+    /* Pill bar on title slide */
+    .pill-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 34px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .pill i { color: var(--accent); }
+
+    /* Compact figure wrapper */
+    .svg-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-sizing: border-box;
+    }
+    .svg-panel svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <section>
+      <div class="slide title-slide">
+        <div class="kicker">ASTMH 2026 · Bioinformatics Resource Center</div>
+        <h1>BRC-Analytics</h1>
+        <div class="subtitle">
+          AI <span class="plus">+</span> Galaxy <span class="plus">+</span> Infrastructure
+        </div>
+        <div class="kicker-divider"></div>
+        <div class="pill-row">
+          <span class="pill"><i class="fa-solid fa-database"></i> Curated Reference Genomes</span>
+          <span class="pill"><i class="fa-solid fa-diagram-project"></i> Reproducible Workflows</span>
+          <span class="pill"><i class="fa-solid fa-robot"></i> Autonomous Agentic Analysis</span>
+          <span class="pill"><i class="fa-solid fa-server"></i> National Cyberinfrastructure</span>
+        </div>
+        <div class="author">Anton Nekrutenko</div>
+        <div class="affiliation">Pennsylvania State University · brc-analytics.org</div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">BRC-Analytics</div>
+      </div>
+      <aside class="notes">
+        Welcome. This deck introduces how BRC-Analytics brings together three foundations — AI agents, the Galaxy workbench, and national HPC infrastructure — to move from static genome portals to dynamic biological inquiry.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 2: WHAT IS BRC ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">What Is BRC-Analytics?</h2>
+        <div class="title-divider"></div>
+
+        <p class="lead-copy">
+          The initial idea was to connect <strong>genome assemblies and associated annotations</strong> directly to reproducible <strong>analysis workflows</strong> — uniting <strong>NCBI Datasets</strong>, <strong>Galaxy</strong>, and the <strong>UCSC Genome Browser</strong> atop <strong>Texas Advanced Computing Center (TACC)</strong> infrastructure.
+        </p>
+
+        <div class="svg-panel" style="margin-bottom: 20px;">
+          <svg viewBox="0 0 1060 225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BRC-Analytics core data flow from NCBI Datasets through BRC-Analytics and Galaxy to UCSC Genome Browser">
+            <defs>
+              <marker id="arrowNavy" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#28285B" />
+              </marker>
+              <marker id="arrowGold" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#956F00" />
+              </marker>
+            </defs>
+
+            <!-- Direct top bypass: NCBI Datasets -> UCSC -->
+            <path d="M 140 82 L 140 30 L 925 30 L 925 76" fill="none" stroke="#956F00" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrowGold)" />
+            <rect x="372" y="14" width="320" height="28" rx="14" fill="#FFEB78" stroke="#956F00" stroke-width="1.2" />
+            <text x="532" y="33" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">Direct assembly &amp; annotation reference path</text>
+
+            <!-- Box 1: NCBI Datasets -->
+            <rect x="20" y="84" width="210" height="118" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2" />
+            <rect x="20" y="84" width="210" height="8" rx="3" fill="#956F00" />
+            <text x="125" y="118" text-anchor="middle" font-family="Merriweather, serif" font-size="18" font-weight="700" fill="#28285B">NCBI Datasets</text>
+            <text x="125" y="143" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">Assemblies (RefSeq/GenBank)</text>
+            <text x="125" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">GFF3 annotations &amp; taxonomy</text>
+            <text x="125" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#956F00">Versioned source of truth</text>
+
+            <!-- Arrow 1 -> 2 -->
+            <line x1="234" y1="143" x2="288" y2="143" stroke="#28285B" stroke-width="2.8" marker-end="url(#arrowNavy)" />
+
+            <!-- Box 2: BRC-Analytics -->
+            <rect x="296" y="84" width="220" height="118" rx="8" fill="#28285B" stroke="#28285B" stroke-width="2" />
+            <text x="406" y="118" text-anchor="middle" font-family="Merriweather, serif" font-size="18" font-weight="700" fill="#FFFFFF">BRC-Analytics</text>
+            <text x="406" y="143" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#E6E7F2">Organism &amp; outbreak catalog</text>
+            <text x="406" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#E6E7F2">Pre-wired analytical workflows</text>
+            <text x="406" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFEB78">brc-analytics.org</text>
+
+            <!-- Arrow 2 -> 3 -->
+            <line x1="520" y1="143" x2="574" y2="143" stroke="#28285B" stroke-width="2.8" marker-end="url(#arrowNavy)" />
+
+            <!-- Box 3: Galaxy -->
+            <rect x="582" y="84" width="210" height="118" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2" />
+            <rect x="582" y="84" width="210" height="8" rx="3" fill="#28285B" />
+            <text x="687" y="118" text-anchor="middle" font-family="Merriweather, serif" font-size="18" font-weight="700" fill="#28285B">Galaxy</text>
+            <text x="687" y="143" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">usegalaxy.org @ TACC</text>
+            <text x="687" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">Execution &amp; full provenance</text>
+            <text x="687" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#956F00">Tools, UDTs &amp; workflows</text>
+
+            <!-- Arrow 3 -> 4 -->
+            <line x1="796" y1="143" x2="844" y2="143" stroke="#28285B" stroke-width="2.8" marker-end="url(#arrowNavy)" />
+
+            <!-- Box 4: UCSC -->
+            <rect x="852" y="84" width="188" height="118" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2" />
+            <rect x="852" y="84" width="188" height="8" rx="3" fill="#956F00" />
+            <text x="946" y="118" text-anchor="middle" font-family="Merriweather, serif" font-size="18" font-weight="700" fill="#28285B">UCSC Browser</text>
+            <text x="946" y="143" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">Genome track hubs</text>
+            <text x="946" y="162" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#3F3F6E">Locus inspection &amp; tracks</text>
+            <text x="946" y="182" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#956F00">Visual verification</text>
+          </svg>
+        </div>
+
+        <div class="card-grid cols-3">
+          <div class="stat">
+            <div class="stat-num">5,505</div>
+            <div class="stat-label">Genome Assemblies Indexed</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">1,974</div>
+            <div class="stat-label">Pathogen, Vector &amp; Host Taxa</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">24</div>
+            <div class="stat-label">Priority Outbreak Collections</div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">What is BRC-Analytics</div>
+      </div>
+      <aside class="notes">
+        BRC-Analytics began by wiring curated genome assemblies from NCBI Datasets directly into Galaxy analytical workflows and UCSC visualization, backed by TACC compute so users never have to stage indices manually.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 3: COMPONENT — GALAXY ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Components: Galaxy</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols">
+          <div class="col" style="flex: 1.15;">
+            <ul class="clean">
+              <li>
+                <strong>Open Execution Fabric (<span class="mono">usegalaxy.org</span>):</strong>
+                Web-scale analytical platform running version-pinned bioinformatics tools with zero local software installation.
+              </li>
+              <li>
+                <strong>End-to-End Provenance:</strong>
+                Every job records tool versions, containers, parameters, and lineage in a shareable History that extracts into reusable workflows.
+              </li>
+              <li>
+                <strong>IWC Workflows &amp; User-Defined Tools:</strong>
+                Combines community-vetted <span class="mono">IWC</span> pipelines with container-native <span class="mono">GalaxyUserTool</span> wrappers launched cleanly in one click.
+              </li>
+              <li>
+                <strong>Agent-Native Infrastructure:</strong>
+                Full <span class="mono">REST API</span> and <span class="mono">Galaxy MCP</span> allow AI assistants to launch, monitor, and inspect analyses alongside human scientists.
+              </li>
+            </ul>
+          </div>
+
+          <div class="col" style="flex: 0.85; display: flex; flex-direction: column; gap: 18px; justify-content: space-between;">
+            <div class="callout-dark">
+              <div class="label">Role in BRC-Analytics</div>
+              <p class="body">
+                Instead of downloading files from a static repository, every BRC-Analytics entry lands in a <strong>live, reproducible workspace</strong> ready for custom analysis.
+              </p>
+            </div>
+
+            <div class="card" style="padding: 18px 20px;">
+              <div class="card-head" style="font-size: 16px;">Execution Loop</div>
+              <div class="pipeline" style="margin-top: 4px;">
+                <div class="pipe-stage">
+                  <div class="pipe-title">Catalog</div>
+                  <div class="pipe-sub">Pick organism &amp; FASTQ/SRA</div>
+                </div>
+                <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="pipe-stage terminal">
+                  <div class="pipe-title">Galaxy</div>
+                  <div class="pipe-sub">Run IWC / UDTs</div>
+                </div>
+                <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="pipe-stage">
+                  <div class="pipe-title">Share</div>
+                  <div class="pipe-sub">Publish history &amp; tracks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Components · Galaxy</div>
+      </div>
+      <aside class="notes">
+        Galaxy serves as the execution and provenance backbone: whether driven via browser UI, IWC workflow, or Model Context Protocol by an AI agent, every step stays auditable.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 4: COMPONENT — NCBI DATASETS ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Components: NCBI Datasets</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols">
+          <div class="col" style="flex: 1.2;">
+            <div class="card-grid cols-2">
+              <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-dna"></i></div>
+                <div class="card-head">Versioned Assemblies</div>
+                <div class="card-label">
+                  Authoritative <span class="mono">RefSeq</span> &amp; <span class="mono">GenBank</span> genome packages (<span class="mono">FASTA</span>) with unambiguous accession tracking.
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-list-check"></i></div>
+                <div class="card-head">Matched Annotations</div>
+                <div class="card-label">
+                  Synchronized <span class="mono">GFF3</span>, <span class="mono">GTF</span>, coding sequences, and protein FASTAs prevent coordinate mismatches across tools.
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-sitemap"></i></div>
+                <div class="card-head">Taxonomy-Indexed API</div>
+                <div class="card-label">
+                  Clean programmatic <span class="mono">REST</span> &amp; CLI feeds link assemblies cleanly to host taxa, vectors, and priority outbreaks.
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="card-head">Consistent Coordinates</div>
+                <div class="card-label">
+                  Identical sequence identifiers flow simultaneously into Galaxy aligners and UCSC Genome Browser hubs.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col" style="flex: 0.8; display: flex; flex-direction: column; justify-content: space-between; gap: 18px;">
+            <div class="stat">
+              <div class="stat-num">1,974 / 5,505</div>
+              <div class="stat-label">Organisms &amp; Assemblies synced into BRC-Analytics</div>
+            </div>
+
+            <div class="callout-light">
+              <div class="label">Why This Matters</div>
+              <p class="body">
+                No manual FTP scraping, broken chromosome names, or stale gene models — <strong>NCBI Datasets</strong> keeps every BRC reference synchronized across compute and visualization.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Components · NCBI Datasets</div>
+      </div>
+      <aside class="notes">
+        NCBI Datasets replaces ad-hoc genome downloads with versioned data packages where assembly FASTAs, gene models, and taxonomy metadata arrive ready for downstream Galaxy indices and UCSC hubs.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 5: COMPONENT — TACC ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Components: TACC Infrastructure</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 24px;">
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div class="card-head">High-Throughput Compute</div>
+            <div class="card-label">
+              Dedicated Galaxy compute nodes alongside petascale HPC systems (<span class="mono">Stampede</span>) power assembly, mapping, variant calling, and archive-scale scans.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-hard-drive"></i></div>
+            <div class="card-head">Corral &amp; Ranch Storage</div>
+            <div class="card-label">
+              Shared high-speed <span class="mono">Corral</span> storage co-locates pre-built reference indices and user datasets directly next to compute, backed by <span class="mono">Ranch</span> archival storage.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-cloud"></i></div>
+            <div class="card-head">Jetstream2 Elastic Cloud</div>
+            <div class="card-label">
+              On-demand <span class="mono">NSF ACCESS</span> cloud capacity hosts interactive notebooks, specialized portals, and elastic container execution for peak outbreak surges.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">Texas Advanced Computing Center (UT Austin)</div>
+          <p class="body">
+            TACC absorbs the operational weight of terabyte-scale indices and parallel SLURM scheduling so every researcher accesses <strong>national-scale genomics</strong> with zero sysadmin overhead.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Components · TACC</div>
+      </div>
+      <aside class="notes">
+        TACC underpins usegalaxy.org and BRC-Analytics: dedicated Galaxy servers, Corral shared storage with pre-cached reference genomes, Stampede HPC capacity, and Jetstream2 cloud instances.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 6: AGENTIC AI TIMELINE ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">And Then Agentic AI Happened</h2>
+        <div class="title-divider" style="margin-bottom: 18px;"></div>
+
+        <div class="svg-panel" style="padding: 12px 16px 10px;">
+          <svg viewBox="0 0 1060 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline of major model and agentic releases from OpenAI, Google, and Anthropic, 2022 to 2026">
+            <style>
+              .chart-lbl {
+                paint-order: stroke;
+                stroke: #FFFFFF;
+                stroke-width: 4px;
+                stroke-linejoin: round;
+              }
+            </style>
+            <!-- Legend top right -->
+            <rect x="615" y="10" width="425" height="30" rx="6" fill="#FFFFFF" stroke="#E3E3ED" stroke-width="1" />
+            <circle cx="640" cy="25" r="5.5" fill="#28285B" />
+            <text x="652" y="29" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">OpenAI</text>
+            <circle cx="745" cy="25" r="5.5" fill="#956F00" />
+            <text x="757" y="29" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#956F00">Anthropic</text>
+            <circle cx="868" cy="25" r="5.5" fill="#1F6E8C" />
+            <text x="880" y="29" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#1F6E8C">Google DeepMind</text>
+
+            <!-- Capability horizontal bands (Y axis) -->
+            <rect x="195" y="48" width="845" height="82" fill="#FFFFFF" opacity="0.65" />
+            <rect x="195" y="130" width="845" height="86" fill="#F2F3FA" opacity="0.7" />
+            <rect x="195" y="216" width="845" height="86" fill="#FFFFFF" opacity="0.65" />
+            <rect x="195" y="302" width="845" height="86" fill="#F2F3FA" opacity="0.7" />
+
+            <!-- Inflection highlight zone around 2025-2026 -->
+            <rect x="698" y="48" width="234" height="340" fill="#FFEB78" opacity="0.16" />
+            <text x="815" y="376" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1.2" fill="#956F00">AGENTIC INFLECTION (2025–2026)</text>
+
+            <!-- Horizontal guide lines -->
+            <line x1="195" y1="48" x2="1040" y2="48" stroke="#E3E3ED" stroke-width="1" />
+            <line x1="195" y1="130" x2="1040" y2="130" stroke="#D5D7E6" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="195" y1="216" x2="1040" y2="216" stroke="#D5D7E6" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="195" y1="302" x2="1040" y2="302" stroke="#D5D7E6" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="195" y1="388" x2="1040" y2="388" stroke="#28285B" stroke-width="1.8" />
+
+            <!-- Vertical axis line -->
+            <line x1="195" y1="48" x2="195" y2="388" stroke="#28285B" stroke-width="1.8" />
+
+            <!-- Y-axis level labels -->
+            <text x="184" y="83" text-anchor="end" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#28285B">Autonomous</text>
+            <text x="184" y="99" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#637381">Multi-agent &amp; MCP</text>
+
+            <text x="184" y="167" text-anchor="end" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#28285B">Terminal &amp; Tools</text>
+            <text x="184" y="183" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#637381">Coding &amp; CLI agents</text>
+
+            <text x="184" y="253" text-anchor="end" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#28285B">Reasoning &amp; Context</text>
+            <text x="184" y="269" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#637381">1M+ windows &amp; CoT</text>
+
+            <text x="184" y="340" text-anchor="end" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#28285B">Conversational</text>
+            <text x="184" y="356" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#637381">Single-turn chat</text>
+
+            <!-- X-axis ticks & grid -->
+            <line x1="230" y1="48" x2="230" y2="394" stroke="#E3E3ED" stroke-width="1" />
+            <line x1="398" y1="48" x2="398" y2="394" stroke="#E3E3ED" stroke-width="1" />
+            <line x1="566" y1="48" x2="566" y2="394" stroke="#E3E3ED" stroke-width="1" />
+            <line x1="734" y1="48" x2="734" y2="394" stroke="#E3E3ED" stroke-width="1" />
+            <line x1="902" y1="48" x2="902" y2="394" stroke="#E3E3ED" stroke-width="1" />
+
+            <text x="230" y="416" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">2022</text>
+            <text x="398" y="416" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">2023</text>
+            <text x="566" y="416" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">2024</text>
+            <text x="734" y="416" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">2025</text>
+            <text x="902" y="416" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#28285B">2026</text>
+
+            <!-- SERIES 1: OpenAI (#28285B) - upper lane (labels strictly above curve) -->
+            <polyline fill="none" stroke="#28285B" stroke-width="3" points="235,365 390,318 566,232 720,150 805,116 902,70" />
+            <circle cx="235" cy="365" r="5" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="235" y="346" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#28285B">GPT-3.5 / ChatGPT</text>
+
+            <circle cx="390" cy="318" r="5" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="380" y="306" text-anchor="end" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#28285B">GPT-4</text>
+
+            <circle cx="566" cy="232" r="5" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="554" y="220" text-anchor="end" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#28285B">GPT-4o / o1</text>
+
+            <circle cx="720" cy="150" r="5.5" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="706" y="138" text-anchor="end" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#28285B">o3 + Codex CLI</text>
+
+            <circle cx="805" cy="116" r="5.5" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="793" y="104" text-anchor="end" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#28285B">GPT-5</text>
+
+            <circle cx="902" cy="70" r="6" fill="#28285B" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="914" y="74" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#28285B">GPT-5.6 → GPT-6</text>
+
+            <!-- SERIES 2: Anthropic (#956F00) - middle lane -->
+            <polyline fill="none" stroke="#956F00" stroke-width="3" points="418,342 572,262 698,188 788,150 902,99" />
+            <circle cx="418" cy="342" r="5" fill="#956F00" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="428" y="352" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#956F00">Claude 1 / 2</text>
+
+            <circle cx="572" cy="262" r="5" fill="#956F00" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="583" y="256" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#956F00">Claude 3 / 3.5</text>
+
+            <circle cx="698" cy="188" r="5.5" fill="#956F00" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="706" y="206" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#956F00">3.7 + Claude Code</text>
+
+            <circle cx="788" cy="150" r="5.5" fill="#956F00" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="795" y="168" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#956F00">Claude 4 / 4.5</text>
+
+            <circle cx="902" cy="99" r="6" fill="#956F00" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="914" y="103" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#956F00">Claude 5 → 5.5</text>
+
+            <!-- SERIES 3: Google (#1F6E8C) - lower lane (labels strictly below curve) -->
+            <polyline fill="none" stroke="#1F6E8C" stroke-width="3" points="498,334 620,288 770,236 854,192 902,128" />
+            <circle cx="498" cy="334" r="5" fill="#1F6E8C" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="508" y="346" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#1F6E8C">Gemini 1.0</text>
+
+            <circle cx="620" cy="288" r="5" fill="#1F6E8C" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="630" y="302" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#1F6E8C">1.5 Pro (2M) &amp; 2.0</text>
+
+            <circle cx="770" cy="236" r="5.5" fill="#1F6E8C" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="780" y="250" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#1F6E8C">Gemini 2.5 Pro</text>
+
+            <circle cx="854" cy="192" r="5.5" fill="#1F6E8C" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="864" y="206" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#1F6E8C">Gemini 3</text>
+
+            <circle cx="902" cy="128" r="6" fill="#1F6E8C" stroke="#FFFFFF" stroke-width="1.5" />
+            <text class="chart-lbl" x="914" y="132" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#1F6E8C">Gemini 3.8 → 4</text>
+
+            <text x="198" y="434" font-family="Inter, sans-serif" font-size="11" fill="#637381">
+              Shift from prompt-response chat (2022–2024) to tool-calling, MCP, and autonomous multi-agent execution (2025–2026).
+            </text>
+          </svg>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Agentic AI Emergence</div>
+      </div>
+      <aside class="notes">
+        Within four years, frontier models moved from single-turn text chat in late 2022 to deep reasoning in 2024, coding/CLI agents in 2025, and multi-agent MCP workflows in 2026 — directly reshaping how scientists interact with tools like Galaxy.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 7: AGENTIC AI WILL... ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Agentic AI Will…</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-2" style="margin-bottom: 26px;">
+          <div class="card" style="min-height: 235px; padding: 26px 28px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="card-num">01</span>
+              <span class="card-icon"><i class="fa-solid fa-microscope"></i></span>
+            </div>
+            <div class="card-head" style="font-size: 24px;">Ask Actual Biological Questions</div>
+            <div class="card-label" style="font-size: 18px; line-height: 1.5;">
+              <strong>Revolutionize the way we do biology</strong> because scientists spend their focus formulating evolutionary, clinical, and mechanistic hypotheses — instead of fighting file formats, CLI flags, and pipeline boilerplate.
+            </div>
+          </div>
+
+          <div class="card accent" style="min-height: 235px; padding: 26px 28px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="card-num" style="color: var(--highlight);">02</span>
+              <span class="card-icon"><i class="fa-solid fa-arrows-rotate"></i></span>
+            </div>
+            <div class="card-head" style="font-size: 24px;">Reinterpret Existing Data in Myriad Ways</div>
+            <div class="card-label" style="font-size: 18px; line-height: 1.5;">
+              Unlock <strong>already existing public datasets</strong> across assemblies, transcriptomes, and raw read archives — testing entirely new cross-study questions at negligible marginal cost.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">Grounded Execution Matters</div>
+          <p class="body">
+            Free-text LLM guesses do not advance biology. Pairing agentic reasoning with <strong>Galaxy workflows, MCP tools, and TACC provenance</strong> makes exploratory hypothesis testing verifiable and reproducible.
+          </p>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Biological Impact</div>
+      </div>
+      <aside class="notes">
+        Two transformations follow when agents can drive real bioinformatics tools: researchers think in biology rather than syntax, and existing public sequencing archives gain a second life across countless new questions.
+      </aside>
+    </section>
+
+    <!-- ==================== SLIDE 8: VISION FOR THE FUTURE ==================== -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">The Vision for the Future</h2>
+        <div class="title-divider" style="margin-bottom: 16px;"></div>
+
+        <div class="svg-panel" style="padding: 12px 14px;">
+          <svg viewBox="0 0 1070 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BRC-Analytics architecture linking Organism page, Precomputed Pangenome page, Standalone web portals, and Galaxy tools and workflows">
+            <defs>
+              <marker id="visArrowNavy" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+                <path d="M0,1 L8,4.5 L0,8 Z" fill="#28285B" />
+              </marker>
+              <marker id="visArrowGold" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+                <path d="M0,1 L8,4.5 L0,8 Z" fill="#956F00" />
+              </marker>
+            </defs>
+
+            <!-- Node 1: BRC-Analytics (Top Left) -->
+            <rect x="20" y="24" width="230" height="82" rx="8" fill="#28285B" />
+            <text x="135" y="59" text-anchor="middle" font-family="Merriweather, serif" font-size="19" font-weight="700" fill="#FFFFFF">BRC-Analytics</text>
+            <text x="135" y="83" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#FFEB78">Entry portal &amp; taxon hub</text>
+
+            <!-- Bidirectional / forward arrow: BRC-Analytics -> Organism page -->
+            <line x1="254" y1="65" x2="340" y2="65" stroke="#28285B" stroke-width="2.6" marker-end="url(#visArrowNavy)" />
+
+            <!-- Node 2: Organism page (Top Center) -->
+            <rect x="348" y="24" width="250" height="82" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2.2" />
+            <rect x="348" y="24" width="250" height="7" rx="3" fill="#956F00" />
+            <text x="473" y="60" text-anchor="middle" font-family="Merriweather, serif" font-size="19" font-weight="700" fill="#28285B">Organism Page</text>
+            <text x="473" y="83" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" fill="#637381">Curated assemblies &amp; context</text>
+
+            <!-- Arrow: Organism page -> Precomputed stuff (Top Right) -->
+            <line x1="602" y1="65" x2="682" y2="65" stroke="#28285B" stroke-width="2.6" marker-end="url(#visArrowNavy)" />
+
+            <!-- Node 3: Precomputed stuff ("Pangenome page") (Top Right) -->
+            <rect x="690" y="16" width="360" height="174" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2" />
+            <rect x="690" y="16" width="360" height="36" rx="6" fill="#28285B" />
+            <text x="706" y="39" font-family="Merriweather, serif" font-size="15.5" font-weight="700" fill="#FFFFFF">Precomputed Data</text>
+            <text x="1034" y="39" text-anchor="end" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#FFEB78">"Pangenome page"</text>
+
+            <!-- 6 precomputed track pills in 2x3 grid -->
+            <rect x="706" y="64" width="158" height="30" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="785" y="83" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#28285B">ChIP calls</text>
+
+            <rect x="876" y="64" width="158" height="30" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="83" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#28285B">RNAseq counts</text>
+
+            <rect x="706" y="104" width="158" height="30" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="785" y="123" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#28285B">Variant calls</text>
+
+            <rect x="876" y="104" width="158" height="30" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="123" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#28285B">Gene alignments</text>
+
+            <rect x="706" y="144" width="194" height="30" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="803" y="163" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#28285B">Whole genome alignments</text>
+
+            <rect x="910" y="144" width="124" height="30" rx="5" fill="#FFEB78" stroke="#956F00" />
+            <text x="972" y="163" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#28285B">bionym</text>
+
+            <!-- Arrow down: BRC-Analytics -> Standalone web portals -->
+            <line x1="135" y1="110" x2="135" y2="202" stroke="#956F00" stroke-width="2.6" marker-end="url(#visArrowGold)" />
+            <rect x="26" y="138" width="218" height="38" rx="6" fill="#FFEB78" stroke="#956F00" stroke-width="1.2" />
+            <text x="135" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="11.5" font-weight="700" fill="#28285B">Directly accessible</text>
+            <text x="135" y="170" text-anchor="middle" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#956F00">as standalone web apps</text>
+
+            <!-- Bottom-Left Card: Standalone web portals -->
+            <rect x="20" y="210" width="465" height="232" rx="8" fill="#FFFFFF" stroke="#956F00" stroke-width="2" />
+            <rect x="20" y="210" width="465" height="36" rx="6" fill="#956F00" />
+            <text x="38" y="233" font-family="Merriweather, serif" font-size="15.5" font-weight="700" fill="#FFFFFF">Standalone Web Portals</text>
+
+            <!-- 11 portals in 3-column pill grid -->
+            <rect x="36" y="262" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="104" y="284" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">hyphaeon</text>
+            <rect x="184" y="262" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="252" y="284" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">rhizaeon</text>
+            <rect x="332" y="262" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="400" y="284" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">hyphy3</text>
+
+            <rect x="36" y="306" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="104" y="328" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">chronaeon</text>
+            <rect x="184" y="306" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="252" y="328" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">bushwhacker</text>
+            <rect x="332" y="306" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="400" y="328" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">trace5</text>
+
+            <rect x="36" y="350" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="104" y="372" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">rhiztype</text>
+            <rect x="184" y="350" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="252" y="372" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">eggman</text>
+            <rect x="332" y="350" width="136" height="34" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="400" y="372" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">squint</text>
+
+            <rect x="36" y="394" width="210" height="34" rx="5" fill="#FFEB78" stroke="#956F00" />
+            <text x="141" y="416" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">logan</text>
+            <rect x="258" y="394" width="210" height="34" rx="5" fill="#FFEB78" stroke="#956F00" />
+            <text x="363" y="416" text-anchor="middle" font-family="Courier New, monospace" font-size="13.5" font-weight="700" fill="#28285B">lexicmap</text>
+
+            <!-- Arrow down: Organism page -> Galaxy tools and workflows -->
+            <path d="M 473 110 L 473 158 L 654 158 L 654 202" fill="none" stroke="#28285B" stroke-width="2.6" marker-end="url(#visArrowNavy)" />
+            <rect x="492" y="140" width="144" height="36" rx="6" fill="#F7F7FB" stroke="#28285B" stroke-width="1.2" />
+            <text x="564" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#28285B">Dispatches jobs</text>
+            <text x="564" y="169" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#3F3F6E">directly to Galaxy</text>
+
+            <!-- Bottom-Right Card: Galaxy tools and workflows -->
+            <rect x="515" y="210" width="535" height="232" rx="8" fill="#FFFFFF" stroke="#28285B" stroke-width="2" />
+            <rect x="515" y="210" width="535" height="36" rx="6" fill="#28285B" />
+            <text x="533" y="233" font-family="Merriweather, serif" font-size="15.5" font-weight="700" fill="#FFFFFF">Galaxy Tools &amp; Workflows</text>
+
+            <!-- 15 Galaxy items in 3 columns x 5 rows -->
+            <rect x="531" y="260" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="611" y="279" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">hyphaeon</text>
+            <rect x="703" y="260" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="783" y="279" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">rhizaeon</text>
+            <rect x="875" y="260" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="279" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">hyphy3</text>
+
+            <rect x="531" y="296" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="611" y="315" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">chronaeon</text>
+            <rect x="703" y="296" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="783" y="315" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">bushwhacker</text>
+            <rect x="875" y="296" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="315" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">trace5</text>
+
+            <rect x="531" y="332" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="611" y="351" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">rhiztype</text>
+            <rect x="703" y="332" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="783" y="351" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">eggman</text>
+            <rect x="875" y="332" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="351" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">squint</text>
+
+            <rect x="531" y="368" width="160" height="28" rx="5" fill="#FFEB78" stroke="#956F00" />
+            <text x="611" y="387" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">logan</text>
+            <rect x="703" y="368" width="160" height="28" rx="5" fill="#FFEB78" stroke="#956F00" />
+            <text x="783" y="387" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">lexicmap</text>
+            <rect x="875" y="368" width="160" height="28" rx="5" fill="#F7F7FB" stroke="#E3E3ED" />
+            <text x="955" y="387" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#28285B">disassembler</text>
+
+            <rect x="531" y="404" width="160" height="28" rx="5" fill="#28285B" />
+            <text x="611" y="423" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#FFFFFF">varLoop</text>
+            <rect x="703" y="404" width="160" height="28" rx="5" fill="#28285B" />
+            <text x="783" y="423" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#FFFFFF">exprLoop</text>
+            <rect x="875" y="404" width="160" height="28" rx="5" fill="#28285B" />
+            <text x="955" y="423" text-anchor="middle" font-family="Courier New, monospace" font-size="13" font-weight="700" fill="#FFFFFF">bindLoop</text>
+          </svg>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Architecture &amp; Vision</div>
+      </div>
+      <aside class="notes">
+        The integrated architecture links BRC-Analytics directly to interactive standalone web portals (hyphaeon, rhizaeon, hyphy3, chronaeon, bushwhacker, trace5, rhiztype, eggman, squint, logan, lexicmap) and through Organism Pages to both precomputed Pangenome tracks (including bionym) and parameterized Galaxy tools and workflows (adding varLoop, exprLoop, bindLoop, and disassembler).
+      </aside>
+    </section>
+
+    <!-- ============ 9. Symposium Presenters ============ -->
+    <section>
+      <div class="slide">
+        <div class="kicker" style="margin-bottom:6px;">Today's Program</div>
+        <h2 class="slide-title">Symposium Presenters</h2>
+        <div class="title-divider"></div>
+
+        <div style="display:flex; flex-direction:column; gap:14px; margin-top:4px;">
+          <div style="display:flex; align-items:center; gap:18px; background:var(--panel); border:1px solid var(--border); border-left:5px solid var(--navy); border-radius:8px; padding:14px 20px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:var(--navy); color:var(--highlight); font-family:'Merriweather', serif; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px;">
+                <span style="font-family:'Merriweather', serif; font-size:18px; font-weight:700; color:var(--navy);">Ananias A. Escalante</span>
+                <span style="font-size:13px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.8px;">Temple University</span>
+              </div>
+              <div style="font-size:17px; font-weight:700; color:var(--navy-soft); margin-bottom:2px;">Your Pathogen Question. A Reproducible Analysis.</div>
+              <div style="font-size:13.5px; color:var(--muted);">Malaria as a case study for BRC Analytics — from a well-posed question to a five-taxon variant-calling run.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:18px; background:var(--panel); border:1px solid var(--border); border-left:5px solid var(--accent); border-radius:8px; padding:14px 20px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:var(--accent); color:var(--white); font-family:'Merriweather', serif; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px;">
+                <span style="font-family:'Merriweather', serif; font-size:18px; font-weight:700; color:var(--navy);">Anton Nekrutenko</span>
+                <span style="font-size:13px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.8px;">Pennsylvania State University</span>
+              </div>
+              <div style="font-size:17px; font-weight:700; color:var(--navy-soft); margin-bottom:2px;">New Technologies in BRC: Querying Entire SRA, Agentic Analysis, Revolutionary New Tooling</div>
+              <div style="font-size:13.5px; color:var(--muted);">Archive-scale search with Logan, kmindex, LexicMap, disassembler, the Aeon evolutionary suite, and BRC 3.0 precomputed data.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:18px; background:var(--panel); border:1px solid var(--border); border-left:5px solid var(--navy); border-radius:8px; padding:14px 20px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:var(--navy); color:var(--highlight); font-family:'Merriweather', serif; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px;">
+                <span style="font-family:'Merriweather', serif; font-size:18px; font-weight:700; color:var(--navy);">Danielle Callan</span>
+                <span style="font-size:13px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.8px;">Temple University</span>
+              </div>
+              <div style="font-size:17px; font-weight:700; color:var(--navy-soft); margin-bottom:2px;">Verifiable AI for Pathogen Genomics</div>
+              <div style="font-size:13.5px; color:var(--muted);">AI you can check: agentic analysis on BRC Analytics.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:18px; background:var(--panel); border:1px solid var(--border); border-left:5px solid var(--navy); border-radius:8px; padding:14px 20px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:var(--navy); color:var(--highlight); font-family:'Merriweather', serif; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">4</div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px;">
+                <span style="font-family:'Merriweather', serif; font-size:18px; font-weight:700; color:var(--navy);">Scott Cain</span>
+                <span style="font-size:13px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.8px;">Galaxy Project</span>
+              </div>
+              <div style="font-size:17px; font-weight:700; color:var(--navy-soft); margin-bottom:2px;">Human-Written, Agent-Readable</div>
+              <div style="font-size:13.5px; color:var(--muted);">Grounding AI agents in the Galaxy Training Network — and running them on usegalaxy.org.</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="brc-logo.png" alt="BRC Analytics" class="slide-logo" />
+        <div class="slide-footer">Symposium Presenters</div>
+      </div>
+      <aside class="notes">
+        Walk through the four symposium presentations in order: (1) Ananias Escalante with a reproducible malaria case study; (2) Anton Nekrutenko on querying the entire SRA, agentic analysis, revolutionary new tooling, and BRC 3.0 precomputed data; (3) Danielle Callan on verifiable AI for pathogen genomics; and (4) Scott Cain on human-written, agent-readable training with the Galaxy Training Network.
+      </aside>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    controls: true,
+    progress: true,
+    width: 1280,
+    height: 760,
+    margin: 0.04,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>

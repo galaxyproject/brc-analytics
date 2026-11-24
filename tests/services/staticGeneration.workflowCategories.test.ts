@@ -88,7 +88,7 @@ describe("loadOrganismWorkflowCategories", () => {
     expect(readFile).toHaveBeenCalledWith(staticLoadFile, "utf8");
   });
 
-  test("emits the flag-inclusive superset, including flag-gated categories", async () => {
+  test("emits the flag-inclusive superset", async () => {
     const categories = [
       buildCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING),
       buildCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY),

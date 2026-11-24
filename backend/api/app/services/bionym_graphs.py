@@ -1,9 +1,13 @@
-"""BioNym's claims about a gene, read from the gene's BioNym graph.
+"""BioNym's claims about a gene, and the graph itself, read from the gene's
+BioNym graph.
 
 A BioNym graph is BioNym's JSON output for one gene: nodes, edges between
 them, and metadata about the run. Each claim is a Claim node that a
 Publication or Dataset node `reports`; the edge holds BioNym's confidence in
 the claim, and its one piece of evidence holds the quote the claim rests on.
+The metadata may also hold BioNym's summary of the gene, a list of
+statements, each a claim and a confidence. The graph view keeps every node
+and edge, but only the fields the gene page's graph explorer draws.
 
 The graphs are checked in, gzipped and named by gene UID, under
 app/data/bionym (see its README) until they are published to the gene data
@@ -19,9 +23,17 @@ from typing import Dict, List, Literal, Optional
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from app.models.genes import BionymClaim, BionymClaims, BionymSource
+from app.models.genes import (
+    BionymClaim,
+    BionymClaims,
+    BionymGraph,
+    BionymGraphEdge,
+    BionymGraphNode,
+    BionymSource,
+    BionymSummaryStatement,
+)
 
 BIONYM_GRAPHS_DIR = Path(__file__).resolve().parent.parent / "data" / "bionym"
 
@@ -51,8 +63,16 @@ class _Edge(BaseModel):
     evidence: List[_Evidence]
 
 
+class _SummaryItem(BaseModel):
+    claim: str = Field(min_length=1)
+    confidence: float = Field(ge=0, le=1)
+
+
 class _Metadata(BaseModel):
     input: str
+    query: str
+    # BioNym writes a summary only when its summary step runs.
+    summary: List[_SummaryItem] = []
 
 
 class _Graph(BaseModel):
@@ -95,7 +115,8 @@ def _claim(graph: _Graph, edge: _Edge) -> BionymClaim:
 def build_claims(gene_uid: UUID, graph: _Graph) -> BionymClaims:
     """The graph's claims grouped by source: sources by title, and claims by
     confidence, highest first. The gene page keeps these orders, re-sorting
-    sources only by how many claims it shows."""
+    sources only by how many claims it shows. The summary keeps BioNym's
+    order."""
     sources: Dict[str, BionymSource] = {}
     for edge in graph.edges:
         if edge.predicate != "reports":
@@ -121,25 +142,73 @@ def build_claims(gene_uid: UUID, graph: _Graph) -> BionymClaims:
         input=graph.metadata.input,
         run_date=_run_date(graph),
         sources=sorted(sources.values(), key=lambda s: (s.title.casefold(), s.id)),
+        summary=[
+            BionymSummaryStatement(text=item.claim, confidence=item.confidence)
+            for item in graph.metadata.summary
+        ],
+    )
+
+
+def build_graph(gene_uid: UUID, graph: _Graph) -> BionymGraph:
+    """Every node and edge in the graph, in BioNym's order, with only the
+    fields the graph explorer draws and only https: links.
+
+    Raises:
+        ValueError: The graph's query isn't a node, or an edge ends at an id
+            that isn't a node.
+    """
+    if graph.metadata.query not in graph.nodes:
+        raise ValueError(f"the graph's query {graph.metadata.query!r} isn't a node")
+    for edge in graph.edges:
+        for end in (edge.subject, edge.object):
+            if end not in graph.nodes:
+                raise ValueError(
+                    f"an edge {edge.predicate!r} ends at {end!r}, not a node"
+                )
+    return BionymGraph(
+        gene_uid=gene_uid,
+        query=graph.metadata.query,
+        nodes=[
+            BionymGraphNode(
+                id=node_id, type=node.type, label=node.label, url=_https_url(node.url)
+            )
+            for node_id, node in graph.nodes.items()
+        ],
+        edges=[
+            BionymGraphEdge(
+                subject=edge.subject,
+                predicate=edge.predicate,
+                object=edge.object,
+                confidence=edge.confidence,
+            )
+            for edge in graph.edges
+        ],
     )
 
 
 class BionymGraphStore:
     """The BioNym graphs in a directory, each named <gene_uid>.json.gz.
 
-    Every graph's claims are built when the store is made: on the first
-    BioNym request, and in the tests over every checked-in graph, so a graph
-    of the wrong shape fails the tests rather than reaching a gene's page.
+    Every graph's claims and graph view are built when the store is made: on
+    the first BioNym request, and in the tests over every checked-in graph, so
+    a graph of the wrong shape fails the tests rather than reaching a gene's
+    page.
     """
 
     def __init__(self, directory: Path):
         self._claims: Dict[UUID, BionymClaims] = {}
+        self._graphs: Dict[UUID, BionymGraph] = {}
         for path in directory.glob("*.json.gz"):
             gene_uid = UUID(path.name.removesuffix(".json.gz"))
             with gzip.open(path, "rb") as f:
                 graph = _Graph.model_validate_json(f.read())
             self._claims[gene_uid] = build_claims(gene_uid, graph)
+            self._graphs[gene_uid] = build_graph(gene_uid, graph)
 
     def get_claims(self, gene_uid: UUID) -> Optional[BionymClaims]:
         """The gene's claims, or None if it has no graph."""
         return self._claims.get(gene_uid)
+
+    def get_graph(self, gene_uid: UUID) -> Optional[BionymGraph]:
+        """The gene's graph view, or None if it has no graph."""
+        return self._graphs.get(gene_uid)

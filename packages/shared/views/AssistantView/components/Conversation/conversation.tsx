@@ -1,5 +1,5 @@
 import { ALERT_PROPS } from "@databiosphere/findable-ui/lib/components/common/Alert/constants";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/constants";
 import { Alert, Button } from "@mui/material";
 import { type JSX } from "react";
 import { Completion } from "./components/Completion/completion";

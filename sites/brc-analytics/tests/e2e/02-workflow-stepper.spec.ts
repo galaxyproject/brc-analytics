@@ -25,9 +25,9 @@ const ATACSEQ_TRS_ID =
 
 // Bacterial Genome Assembly (Shovill): organism-scoped with taxonomyId 2
 // (Bacteria), a clade with catalog organisms, so its stepper starts with the
-// Organism picker. Demo-gated, hence the demo flag.
+// Organism picker.
 const CLADE_WORKFLOW_URL =
-  "/data/workflows/workflow-github-com-iwc-workflows-bacterial-genome-assembly-main-versions-v2-0-1?demo=true";
+  "/data/workflows/workflow-github-com-iwc-workflows-bacterial-genome-assembly-main-versions-v2-0-1";
 
 // Step labels.
 const STEP_LABELS = {

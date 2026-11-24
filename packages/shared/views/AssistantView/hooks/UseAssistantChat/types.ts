@@ -78,6 +78,7 @@ export interface UseAssistantChatState {
   handoffUrl: string | null;
   /** A conversation is being restored, or a saved one opened. */
   isRestoring: boolean;
+  /** The conversation is saved to the signed-in account; false once signed out. */
   isSaved: boolean;
   lastSave: LastSave | null;
   loading: boolean;

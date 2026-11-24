@@ -59,7 +59,7 @@ function getTaxonomicLevelRealm(
  * Differential Expression Analysis is included as an interim measure, and
  * Sequence Analysis workflows (Logan Search and Lexicmap) are appended; neither
  * is sourced from the catalog, and both gate through the same rules as the
- * rest, as members of the category they are listed under.
+ * rest.
  * Each workflow includes the properties of the workflow itself along with the name of its category and the compatible assembly (if any).
  * @param workflowCategories - An array of workflow categories, each containing an array of workflows.
  * @param mappings - Workflow-assembly mappings for the current site.
@@ -104,16 +104,12 @@ export function getWorkflows(
 
   // Workflows outside the catalog (Differential Expression Analysis and the
   // Sequence Analysis workflows) are appended through the same gate as every
-  // catalog workflow above, as members of the category they are listed under.
+  // catalog workflow above.
   for (const {
-    category,
     name,
     workflows: groupWorkflows,
   } of UNCATALOGED_WORKFLOW_GROUPS) {
-    for (const workflow of workflowGates.filterWorkflows(
-      category,
-      groupWorkflows
-    )) {
+    for (const workflow of workflowGates.filterWorkflows(groupWorkflows)) {
       workflows.push({
         ...workflow,
         assembly: mapAssembly(undefined),

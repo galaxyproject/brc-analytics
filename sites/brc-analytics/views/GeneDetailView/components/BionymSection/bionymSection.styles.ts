@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 
 // The label, slider and count on one row, wrapping onto more on a narrow
 // screen rather than overflowing the panel.
-export const ConfidenceControl = styled.div`
+export const ConfidenceRow = styled.div`
   align-items: center;
   display: flex;
   flex-wrap: wrap;

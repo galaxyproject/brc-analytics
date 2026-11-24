@@ -16,6 +16,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    "../../@types/bionym-components.d.ts",
     "../../@types/findable-ui.d.ts",
     "../../packages/shared/@types/theme.d.ts",
     "../../@types/vega-embed.d.ts"

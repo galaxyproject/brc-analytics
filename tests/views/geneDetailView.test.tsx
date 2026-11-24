@@ -5,14 +5,81 @@ import {
   type BionymClaims,
   type Gene,
 } from "@repo/shared/services/genes/types";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { type JSX } from "react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
 
-// findable-ui's StaticImage reads the base path from the router.
+// The navigations the section has asked Next's router for, not yet made.
+const mockNavigations: { done: () => void; url: string }[] = [];
+
+// findable-ui's StaticImage reads the base path from the router; the BioNym
+// section's tabs navigate with it. A navigation changes the hash only when a
+// test makes it: Next writes the hash with no hashchange event, so the section
+// sees it only when Next renders the navigation.
 jest.mock("next/router", () => ({
-  useRouter: (): { basePath: string } => ({ basePath: "" }),
+  useRouter: (): {
+    basePath: string;
+    push: (url: string) => Promise<boolean>;
+  } => ({
+    basePath: "",
+    push: (url: string): Promise<boolean> =>
+      new Promise((resolve) => {
+        mockNavigations.push({ done: () => resolve(true), url });
+      }),
+  }),
 }));
+
+/**
+ * The URLs of the navigations the section has asked for, not yet made.
+ * @returns The URLs.
+ */
+function navigationUrls(): string[] {
+  return mockNavigations.map(({ url }) => url);
+}
+
+/**
+ * Change the URL hash, and wait for the hashchange the section follows.
+ * @param hash - The new hash.
+ */
+async function setHash(hash: string): Promise<void> {
+  await act(
+    () =>
+      new Promise((resolve) => {
+        window.addEventListener("hashchange", resolve, { once: true });
+        window.location.hash = hash;
+      })
+  );
+}
+
+/**
+ * Make the navigations the section has asked for, in order, as Next would.
+ */
+async function navigate(): Promise<void> {
+  for (const { done, url } of mockNavigations.splice(0)) {
+    await setHash(url);
+    await act(async () => done());
+  }
+}
+
+// The Graph tab loads BioNym's D3 components, which Jest can't load as ES
+// modules; its own tests cover it. Here it shows the threshold it's given.
+jest.mock(
+  "../../sites/brc-analytics/views/GeneDetailView/components/BionymSection/components/GraphPanel/graphPanel",
+  () => ({
+    GraphPanel: ({
+      geneUid,
+      minConfidence,
+    }: {
+      geneUid: string;
+      minConfidence: number;
+    }): JSX.Element => (
+      <div data-testid="graph-panel">
+        Graph of {geneUid} at {minConfidence}
+      </div>
+    ),
+  })
+);
 
 // AMA1, as the gene API returns it for the checked-in 3D7 snapshot. Typed in
 // full, not cast, so the type checker sees every GeneOrganism field.
@@ -90,6 +157,13 @@ const BIONYM: BionymClaims = {
       title: "B dataset",
       url: null,
     },
+  ],
+  summary: [
+    { confidence: 0.85, text: "Statement 1" },
+    { confidence: 0.79, text: "Statement 2" },
+    { confidence: 0.9, text: "Statement 3" },
+    { confidence: 0.56, text: "Statement 4" },
+    { confidence: 0.8, text: "Statement 5" },
   ],
 };
 
@@ -350,7 +424,152 @@ describe("GeneDetailView", () => {
   });
 });
 
+describe("GeneDetailView's BioNym summary", () => {
+  beforeEach(() => {
+    window.location.hash = "";
+  });
+
+  /**
+   * The summary, found by its heading.
+   * @returns The summary.
+   */
+  function getSummary(): HTMLElement {
+    return screen.getByRole("region", { name: "Summary by BioNym" });
+  }
+
+  /**
+   * The summary, if the page shows one.
+   * @returns The summary, or null.
+   */
+  function querySummary(): HTMLElement | null {
+    return screen.queryByRole("region", { name: "Summary by BioNym" });
+  }
+
+  /**
+   * Renders the gene page with BIONYM's claims and the given summary.
+   * @param summary - BioNym's summary of the gene.
+   */
+  function renderSummary(summary: BionymClaims["summary"]): void {
+    renderGene(GENE, { ...BIONYM, summary });
+  }
+
+  it("isn't shown for a gene with no graph", () => {
+    renderGene(GENE);
+    expect(querySummary()).not.toBeInTheDocument();
+  });
+
+  it("isn't shown when the graph has no summary", () => {
+    renderSummary([]);
+    expect(querySummary()).not.toBeInTheDocument();
+    // The rest of BioNym's evidence still shows.
+    expect(
+      screen.getByRole("region", { name: "Evidence gathered by BioNym" })
+    ).toBeInTheDocument();
+  });
+
+  it("labels the statements as BioNym's judgments, with its date and link", () => {
+    renderGene(GENE, BIONYM);
+    const summary = getSummary();
+    expect(summary).toHaveTextContent(
+      /A language model wrote these statements/
+    );
+    expect(summary).toHaveTextContent(/not facts about the gene/);
+    expect(summary).toHaveTextContent(/November 02, 2026/);
+    expect(
+      within(summary).getByRole("link", { name: "BioNym" })
+    ).toHaveAttribute("href", "https://github.com/d-callan/bionym");
+  });
+
+  it("shows statements at or above 0.8, in BioNym's order, with their confidence", () => {
+    renderGene(GENE, BIONYM);
+    expect(
+      within(getSummary())
+        .getAllByRole("listitem")
+        .map((item) => item.textContent)
+    ).toStrictEqual([
+      "Statement 1 (confidence 0.85)",
+      "Statement 3 (confidence 0.90)",
+      "Statement 5 (confidence 0.80)",
+    ]);
+  });
+
+  it("counts the statements not shown, and links to the BioNym section", () => {
+    renderGene(GENE, BIONYM);
+    const summary = getSummary();
+    expect(summary).toHaveTextContent(
+      "2 statements scored below 0.8 aren't shown."
+    );
+    expect(
+      within(summary).getByRole("link", {
+        name: "See the evidence BioNym gathered",
+      })
+    ).toHaveAttribute("href", "#bionym");
+    expect(
+      screen.getByRole("region", { name: "Evidence gathered by BioNym" })
+    ).toHaveAttribute("id", "bionym");
+  });
+
+  it("counts a single statement not shown", () => {
+    renderSummary([
+      { confidence: 0.9, text: "Statement 1" },
+      { confidence: 0.5, text: "Statement 2" },
+    ]);
+    expect(getSummary()).toHaveTextContent(
+      "1 statement scored below 0.8 isn't shown."
+    );
+  });
+
+  it("leaves out the count, but still links to the evidence, when every statement is shown", () => {
+    renderSummary([{ confidence: 0.9, text: "Statement 1" }]);
+    expect(getSummary()).not.toHaveTextContent(/shown\./);
+    expect(
+      within(getSummary()).getByRole("link", {
+        name: "See the evidence BioNym gathered",
+      })
+    ).toHaveAttribute("href", "#bionym");
+  });
+
+  it("shows no empty list when every statement is below 0.8", () => {
+    renderSummary([{ confidence: 0.5, text: "Statement 1" }]);
+    expect(within(getSummary()).queryByRole("list")).not.toBeInTheDocument();
+    expect(getSummary()).toHaveTextContent(
+      "1 statement scored below 0.8 isn't shown."
+    );
+  });
+
+  it("shows the BioNym section's Claims tab at the summary link's hash", async () => {
+    renderGene(GENE, BIONYM);
+    const section = screen.getByRole("region", {
+      name: "Evidence gathered by BioNym",
+    });
+    await setHash("graph");
+    expect(within(section).getByRole("tab", { name: "Graph" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    await setHash("bionym");
+    expect(
+      within(section).getByRole("tab", { name: "Claims" })
+    ).toHaveAttribute("aria-selected", "true");
+  });
+});
+
 describe("GeneDetailView's BioNym section", () => {
+  beforeEach(() => {
+    window.location.hash = "";
+    mockNavigations.length = 0;
+  });
+
+  /**
+   * Select one of the section's tabs, as a reader would.
+   * @param name - The tab's label.
+   */
+  function selectTab(name: string): void {
+    act(() => {
+      fireEvent.click(within(getSection()).getByRole("tab", { name }));
+    });
+  }
+
   /**
    * The section, found by its heading.
    * @returns The section.
@@ -399,15 +618,15 @@ describe("GeneDetailView's BioNym section", () => {
     ).toHaveAttribute("href", "https://github.com/d-callan/bionym");
   });
 
-  it("shows claims at or above 0.8, by source, as their text alone", () => {
+  it("shows claims at or above 0.8, by source, each with its confidence", () => {
     renderGene(GENE, BIONYM);
     const section = getSection();
     expect(section).toHaveTextContent("3 of 4 claims");
     // The source with more claims shown comes first.
     expect(sourceTitles()).toStrictEqual(["B dataset", "A paper"]);
-    expect(within(section).getByText("Claim B1")).toBeInTheDocument();
+    expect(section).toHaveTextContent("Claim B1 (confidence 0.99)");
+    // The quote is in a tooltip, not on the page.
     expect(section).not.toHaveTextContent("Quote B1.");
-    expect(section).not.toHaveTextContent("0.99");
     expect(within(section).queryByText("Claim A2")).not.toBeInTheDocument();
     expect(
       within(section).getByRole("link", { name: "A paper" })
@@ -447,5 +666,97 @@ describe("GeneDetailView's BioNym section", () => {
     renderGene(GENE, BIONYM);
     fireEvent.mouseOver(within(getSection()).getByText("Claim B1"));
     expect(await screen.findByRole("tooltip")).toHaveTextContent("Quote B1.");
+  });
+
+  it("opens on the Claims tab, with the graph not yet loaded", () => {
+    renderGene(GENE, BIONYM);
+    expect(
+      within(getSection()).getByRole("tab", { name: "Claims" })
+    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByTestId("graph-panel")).not.toBeInTheDocument();
+  });
+
+  it("shows the graph on the Graph tab, and navigates to its URL hash", async () => {
+    renderGene(GENE, BIONYM);
+    selectTab("Graph");
+    expect(navigationUrls()).toStrictEqual(["#graph"]);
+    await navigate();
+    expect(await screen.findByTestId("graph-panel")).toHaveTextContent(
+      `Graph of ${GENE.geneUid}`
+    );
+    expect(screen.queryByText("Claim B1")).not.toBeInTheDocument();
+    selectTab("Claims");
+    expect(navigationUrls()).toStrictEqual(["#claims"]);
+    await navigate();
+    expect(await screen.findByText("Claim B1")).toBeInTheDocument();
+  });
+
+  it("shows a chosen tab before the URL hash changes", async () => {
+    renderGene(GENE, BIONYM);
+    selectTab("Graph");
+    expect(window.location.hash).toBe("");
+    expect(
+      within(getSection()).getByRole("tab", { name: "Graph" })
+    ).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByTestId("graph-panel")).toBeVisible();
+  });
+
+  it("keeps the graph on the page, hidden, while the Claims tab shows", async () => {
+    renderGene(GENE, BIONYM);
+    selectTab("Graph");
+    await navigate();
+    const graph = await screen.findByTestId("graph-panel");
+    selectTab("Claims");
+    await navigate();
+    expect(await screen.findByText("Claim B1")).toBeVisible();
+    // The same element, not a new one: the explorer's state lives in it.
+    expect(screen.getByTestId("graph-panel")).toBe(graph);
+    expect(graph).not.toBeVisible();
+    selectTab("Graph");
+    await navigate();
+    expect(screen.getByTestId("graph-panel")).toBe(graph);
+    expect(graph).toBeVisible();
+  });
+
+  it("keeps a second tab click made before the first navigation", async () => {
+    window.location.hash = "#graph";
+    renderGene(GENE, BIONYM);
+    selectTab("Claims");
+    selectTab("Graph");
+    const graphTab = within(getSection()).getByRole("tab", { name: "Graph" });
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    // The first navigation lands, then the second: the Graph tab stays shown.
+    const first = mockNavigations.shift() as { done: () => void; url: string };
+    await setHash(first.url);
+    await act(async () => first.done());
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    await navigate();
+    expect(graphTab).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByTestId("graph-panel")).toBeVisible();
+  });
+
+  it("follows the URL hash when it changes, as on the back button", async () => {
+    renderGene(GENE, BIONYM);
+    window.location.hash = "#graph";
+    expect(await screen.findByTestId("graph-panel")).toBeInTheDocument();
+  });
+
+  it("opens on the Graph tab for a #graph link", async () => {
+    window.location.hash = "#graph";
+    renderGene(GENE, BIONYM);
+    expect(
+      within(getSection()).getByRole("tab", { name: "Graph" })
+    ).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByTestId("graph-panel")).toBeInTheDocument();
+  });
+
+  it("shares one minimum confidence between the tabs", async () => {
+    renderGene(GENE, BIONYM);
+    setMinConfidence(0.95);
+    selectTab("Graph");
+    await navigate();
+    expect(await screen.findByTestId("graph-panel")).toHaveTextContent(
+      "at 0.95"
+    );
   });
 });

@@ -2,69 +2,25 @@
 
 import gzip
 import json
-import shutil
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
 
-import duckdb
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
-from app.api.v1 import genes
-from app.core.dependencies import get_bionym_graphs, get_gene_catalog_service
+from app.core.dependencies import get_gene_catalog_service
 from app.services.bionym_graphs import BIONYM_GRAPHS_DIR, BionymGraphStore
 from app.services.gene_catalog import GeneCatalogService
-
-# The test snapshot's build, as tests/data/gene_snapshot/snapshot.csv has it.
-BUILD_ID = "temp-GCF_000002765.6-2026-10-28T212348Z"
-
-
-def make_client(
-    service: Optional[GeneCatalogService] = None,
-    graphs: Optional[BionymGraphStore] = None,
-) -> TestClient:
-    """A client for the gene routes, serving the given gene snapshot and
-    BioNym graphs in place of the app's own."""
-    app = FastAPI()
-    app.include_router(genes.router, prefix="/api/v1/genes")
-    if service is not None:
-        app.dependency_overrides[get_gene_catalog_service] = lambda: service
-    if graphs is not None:
-        app.dependency_overrides[get_bionym_graphs] = lambda: graphs
-    return TestClient(app)
-
-
-def altered_snapshot(tmp_path, snapshot_path, sql: str) -> GeneCatalogService:
-    """A service over a copy of the test snapshot, changed by sql."""
-    path = tmp_path / "genes.duckdb"
-    shutil.copy(snapshot_path, path)
-    with duckdb.connect(str(path)) as con:
-        con.execute(sql)
-    return GeneCatalogService.local(str(path), "")
+from tests.genes_helpers import BUILD_ID, altered_snapshot, make_client
 
 
 @pytest.fixture(scope="module")
-def service(gene_snapshot_path):
-    service = GeneCatalogService.local(
-        str(gene_snapshot_path), "https://brc-analytics.org/"
-    )
-    yield service
-    service.close()
-
-
-@pytest.fixture
-def client(service):
-    return make_client(service)
-
-
-@pytest.fixture(scope="module")
-def gene_uid(service):
+def gene_uid(gene_service):
     """Look a gene's UID up in the snapshot by its locus tag."""
 
     def lookup(locus_tag: str) -> uuid.UUID:
-        cur = service._con.cursor()
+        cur = gene_service._con.cursor()
         try:
             row = cur.execute(
                 "SELECT gene_uid FROM gene WHERE locus_tag = ?", [locus_tag]
@@ -76,18 +32,18 @@ def gene_uid(service):
     return lookup
 
 
-def test_local_snapshot_opens(service):
-    assert service.is_available()
-    assert service.health() == {
+def test_local_snapshot_opens(gene_service):
+    assert gene_service.is_available()
+    assert gene_service.health() == {
         "status": "ready",
         "source": "local",
         "build_id": BUILD_ID,
     }
 
 
-def test_gene(client, gene_uid):
+def test_gene(gene_client, gene_uid):
     uid = gene_uid("PF3D7_1133400")
-    response = client.get(f"/api/v1/genes/{uid}")
+    response = gene_client.get(f"/api/v1/genes/{uid}")
     assert response.status_code == 200
     body = response.json()
     assert body["snapshot"]["update"] is None
@@ -156,16 +112,16 @@ def test_gene(client, gene_uid):
     assert provenance["retrievedAt"].endswith("Z")
 
 
-def test_old_locus_tags_are_former_ids(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}")
+def test_old_locus_tags_are_former_ids(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}")
     aliases = response.json()["gene"]["aliases"]
     assert [
         (a["value"], a["current"]) for a in aliases if a["type"] == "old_locus_tag"
     ] == [("PF3D7_0105400.1", False), ("PF3D7_0105400.2", False)]
 
 
-def test_transcript_without_an_id(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0203500')}")
+def test_transcript_without_an_id(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0203500')}")
     gene = response.json()["gene"]
     assert gene["biotype"] == "tRNA"
     assert [
@@ -188,14 +144,14 @@ def test_assembly_without_a_ucsc_browser(tmp_path, gene_snapshot_path, gene_uid)
     assert response.json()["gene"]["ucscBrowserUrl"] is None
 
 
-def test_unknown_gene_is_404(client):
-    response = client.get(f"/api/v1/genes/{uuid.uuid4()}")
+def test_unknown_gene_is_404(gene_client):
+    response = gene_client.get(f"/api/v1/genes/{uuid.uuid4()}")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"]
 
 
-def test_gene_uid_that_is_not_a_uuid_is_422(client):
-    assert client.get("/api/v1/genes/PF3D7_1133400").status_code == 422
+def test_gene_uid_that_is_not_a_uuid_is_422(gene_client):
+    assert gene_client.get("/api/v1/genes/PF3D7_1133400").status_code == 422
 
 
 def test_missing_snapshot_is_503(tmp_path, gene_uid):
@@ -207,25 +163,27 @@ def test_missing_snapshot_is_503(tmp_path, gene_uid):
     assert response.json() == {"detail": "Gene data is unavailable"}
 
 
-def test_transcript_and_protein_products_differ(client, gene_uid):
-    response = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0103600')}")
+def test_transcript_and_protein_products_differ(gene_client, gene_uid):
+    response = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0103600')}")
     [transcript] = response.json()["gene"]["transcripts"]
     assert transcript["transcriptProduct"] == "ATP-dependent DNA/RNA helicase PSH1"
     assert transcript["proteinProduct"] == "putative ATP-dependent RNA helicase"
 
 
-def test_concurrent_requests(service, gene_uid):
+def test_concurrent_requests(gene_service, gene_uid):
     # Each request makes its own cursor from the shared connection.
     uids = [gene_uid(lt) for lt in ["PF3D7_1133400", "PF3D7_0105400"]] * 50
     with ThreadPoolExecutor(max_workers=16) as pool:
-        genes = list(pool.map(service.get_gene, uids))
+        genes = list(pool.map(gene_service.get_gene, uids))
     assert [g.locus_tag for g in genes] == ["PF3D7_1133400", "PF3D7_0105400"] * 50
 
 
 @pytest.mark.parametrize(
     "change",
     [
-        "UPDATE snapshot SET schema_version = 2",
+        "UPDATE snapshot SET schema_version = 1",
+        "DROP TABLE search_term",
+        "ALTER TABLE snapshot DROP COLUMN search_stop_words",
         "DROP TABLE alt_id",
         "ALTER TABLE transcript DROP COLUMN protein_product",
     ],
@@ -260,8 +218,8 @@ def test_the_app_starts_and_stops_a_local_snapshot(app_with_stubbed_agent):
     assert service._con is None
 
 
-def test_transcripts_are_in_genome_order(client, gene_uid):
-    gene = client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
+def test_transcripts_are_in_genome_order(gene_client, gene_uid):
+    gene = gene_client.get(f"/api/v1/genes/{gene_uid('PF3D7_0105400')}").json()["gene"]
     assert [t["transcriptId"] for t in gene["transcripts"]] == [
         "XM_001350949.2",
         "XM_024473365.1",
@@ -280,9 +238,10 @@ BIONYM_GENES = {
 def write_graph(directory, gene_uid: str, sources: dict) -> None:
     """Write a BioNym graph in which each source reports one claim.
 
-    sources maps a source's node ID to its node type and URL.
+    sources maps a source's node ID to its node type and URL. The graph's
+    query is a gene node, PF3D7_0000000, with no edges.
     """
-    nodes = {}
+    nodes = {"PF3D7_0000000": {"type": "Gene", "label": "PF3D7_0000000", "url": None}}
     edges = []
     for i, (source_id, (node_type, url)) in enumerate(sources.items()):
         claim_id = f"claim:claim {i}"
@@ -302,7 +261,11 @@ def write_graph(directory, gene_uid: str, sources: dict) -> None:
                 ],
             }
         )
-    graph = {"nodes": nodes, "edges": edges, "metadata": {"input": "PF3D7_0000000"}}
+    graph = {
+        "nodes": nodes,
+        "edges": edges,
+        "metadata": {"input": "PF3D7_0000000", "query": "PF3D7_0000000"},
+    }
     with gzip.open(directory / f"{gene_uid}.json.gz", "wt") as f:
         json.dump(graph, f)
 
@@ -344,6 +307,15 @@ def test_bionym_claims(checked_in_graphs):
     for source in body["sources"]:
         confidences = [c["confidence"] for c in source["claims"]]
         assert confidences == sorted(confidences, reverse=True)
+    # The summary in BioNym's order, without its quotes.
+    summary = body["summary"]
+    assert len(summary) == 12
+    assert summary[0] == {
+        "text": "PF3D7_1343700 (Kelch13/K13) is a gene in Plasmodium falciparum "
+        "3D7 located on chromosome NC_004331.3.",
+        "confidence": 0.86,
+    }
+    assert summary[-1]["text"].startswith("K13 has been measured in over 40")
 
 
 @pytest.mark.parametrize("gene_uid, locus_tag", BIONYM_GENES.items())
@@ -352,11 +324,41 @@ def test_every_checked_in_bionym_graph_is_read(checked_in_graphs, gene_uid, locu
     assert claims is not None
     assert claims.input == locus_tag
     assert {s.kind for s in claims.sources} == {"paper", "dataset"}
+    assert len(claims.summary) == 12
 
 
-def test_gene_without_a_bionym_graph_is_404(tmp_path):
+def test_bionym_graph(checked_in_graphs):
+    response = make_client(graphs=checked_in_graphs).get(
+        f"/api/v1/genes/{KELCH13_UID}/bionym/graph"
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["geneUid"] == KELCH13_UID
+    # The whole graph, ortholog-group members included.
+    assert len(body["nodes"]) == 5239
+    assert len(body["edges"]) == 6536
+    assert sum(e["predicate"] == "has_member" for e in body["edges"]) == 2460
+    [root] = [n for n in body["nodes"] if n["id"] == body["query"]]
+    assert (root["id"], root["type"]) == ("PF3D7_1343700", "Gene")
+    # Only the fields the explorer draws.
+    assert set(root) == {"id", "type", "label", "url"}
+    assert set(body["edges"][0]) == {"subject", "predicate", "object", "confidence"}
+
+
+@pytest.mark.parametrize("gene_uid, locus_tag", BIONYM_GENES.items())
+def test_every_checked_in_bionym_graph_has_its_gene_as_root(
+    checked_in_graphs, gene_uid, locus_tag
+):
+    graph = checked_in_graphs.get_graph(uuid.UUID(gene_uid))
+    assert graph is not None
+    assert graph.query == locus_tag
+    assert {n.type for n in graph.nodes if n.id == locus_tag} == {"Gene"}
+
+
+@pytest.mark.parametrize("path", ["bionym", "bionym/graph"])
+def test_gene_without_a_bionym_graph_is_404(tmp_path, path):
     response = make_client(graphs=BionymGraphStore(tmp_path)).get(
-        f"/api/v1/genes/{uuid.uuid4()}/bionym"
+        f"/api/v1/genes/{uuid.uuid4()}/{path}"
     )
     assert response.status_code == 404
 
@@ -391,10 +393,79 @@ def test_bionym_links_other_than_https_are_dropped(tmp_path):
         "dataset:3": ("dataset", None),
         "dataset:4": ("dataset", None),
     }
+    nodes = (
+        make_client(graphs=BionymGraphStore(tmp_path))
+        .get(f"/api/v1/genes/{uid}/bionym/graph")
+        .json()["nodes"]
+    )
+    assert {n["id"]: n["url"] for n in nodes if n["type"] != "Claim"} == {
+        "PF3D7_0000000": None,
+        "pubmed:1": "https://pubmed.ncbi.nlm.nih.gov/1/",
+        "pubmed:2": None,
+        "dataset:3": None,
+        "dataset:4": None,
+    }
 
 
 def test_bionym_claim_from_a_node_that_is_not_a_source_is_an_error(tmp_path):
     uid = uuid.uuid4()
     write_graph(tmp_path, str(uid), {"assembly:1": ("Assembly", None)})
     with pytest.raises(ValueError, match="isn't a source"):
+        BionymGraphStore(tmp_path)
+
+
+def _rewrite_graph(directory, gene_uid: str, change) -> None:
+    path = directory / f"{gene_uid}.json.gz"
+    with gzip.open(path, "rt") as f:
+        graph = json.load(f)
+    change(graph)
+    with gzip.open(path, "wt") as f:
+        json.dump(graph, f)
+
+
+def test_bionym_graph_whose_query_is_not_a_node_is_an_error(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(tmp_path, uid, lambda g: g["metadata"].update(query="PF3D7_9999999"))
+    with pytest.raises(ValueError, match="isn't a node"):
+        BionymGraphStore(tmp_path)
+
+
+def test_bionym_graph_edge_to_a_missing_node_is_an_error(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(
+        tmp_path,
+        uid,
+        lambda g: g["edges"].append(
+            {**g["edges"][0], "predicate": "cited_in", "object": "pubmed:missing"}
+        ),
+    )
+    with pytest.raises(ValueError, match="not a node"):
+        BionymGraphStore(tmp_path)
+
+
+def test_bionym_graph_without_a_summary_has_an_empty_one(tmp_path):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    body = make_client(graphs=BionymGraphStore(tmp_path)).get(
+        f"/api/v1/genes/{uid}/bionym"
+    )
+    assert body.json()["summary"] == []
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        {"quote": "Kelch13 -in_organism-> P. falciparum 3D7", "confidence": 0.9},
+        {"claim": "", "confidence": 0.9},
+        {"claim": "K13 is essential.", "confidence": 1.2},
+        {"claim": "K13 is essential."},
+    ],
+)
+def test_bionym_summary_item_of_the_wrong_shape_is_an_error(tmp_path, item):
+    uid = str(uuid.uuid4())
+    write_graph(tmp_path, uid, {"pubmed:1": ("Publication", None)})
+    _rewrite_graph(tmp_path, uid, lambda g: g["metadata"].update(summary=[item]))
+    with pytest.raises(ValidationError):
         BionymGraphStore(tmp_path)

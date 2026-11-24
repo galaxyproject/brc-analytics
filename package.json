@@ -48,7 +48,7 @@
     "validate-ga2-catalog": "./catalog/ga2/schema/scripts/validate-catalog.sh"
   },
   "dependencies": {
-    "@databiosphere/findable-ui": "^60.0.1",
+    "@databiosphere/findable-ui": "^63.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11",
     "@emotion/styled": "^11.14.1",
@@ -65,6 +65,7 @@
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.13",
+    "bionym-components": "0.1.1",
     "copy-to-clipboard": "^3.3.3",
     "d3-color": "^3.1.0",
     "d3-hierarchy": "^3.1.2",
@@ -74,7 +75,7 @@
     "d3-transition": "^3.0.1",
     "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
-    "ky": "^1.7.2",
+    "ky": "^1.14.3",
     "next": "^16.4.5",
     "next-mdx-remote": "^6",
     "papaparse": "^5.5.3",
@@ -153,6 +154,15 @@
     "node": "22.13.0"
   },
   "overrides": {
+    "@sentry/bundler-plugins": {
+      "glob@^13": "^14.0.2"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch@^10": "^11.0.1"
+    },
+    "eslint-plugin-sonarjs": {
+      "minimatch@^10": "^11.0.1"
+    },
     "serve": {
       "compression": "^1.8.2"
     }

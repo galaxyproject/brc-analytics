@@ -1,6 +1,6 @@
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, Divider } from "@mui/material";
 import { useRadioGroup } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/hooks/UseRadioGroup/hook";
 import { StyledStack as CommonStyledStack } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/step.styles";
@@ -75,7 +75,7 @@ export const PrimaryContrastsStep = ({
         <Divider flexItem />
         <CommonStyledStack>
           <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            {...BUTTON_PRESETS.PRIMARY_CONTAINED}
             disabled={disabled}
             onClick={() => {
               onConfigure({ primaryContrasts });

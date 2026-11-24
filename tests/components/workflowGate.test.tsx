@@ -49,8 +49,6 @@ const OFF_TAXON_ORGANISM_TRS_ID =
 const OFF_TAXON_TRS_ID = "#workflow/github.com/iwc-workflows/off-taxon/main";
 const ORGANISM_TRS_ID =
   "#workflow/github.com/iwc-workflows/assembly-with-flye/main/versions/v0.4";
-const SHARED_TRS_ID =
-  "#workflow/github.com/iwc-workflows/shared-across-categories/main";
 
 /**
  * Builds an assembly stub with the fields the entity-fit check reads.
@@ -141,12 +139,8 @@ describe("WorkflowGate", () => {
         buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER, [
           UNGATED_TRS_ID,
           HYPHY_TRS_ID,
-          SHARED_TRS_ID,
         ]),
-        buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
-          ASSEMBLY_TRS_ID,
-          SHARED_TRS_ID,
-        ]),
+        buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [ASSEMBLY_TRS_ID]),
         buildWorkflowCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING, [
           buildWorkflow(OFF_TAXON_TRS_ID, { taxonomyId: "11320" }),
           buildWorkflow(NEEDS_DATACACHE_TRS_ID, {
@@ -186,26 +180,14 @@ describe("WorkflowGate", () => {
       expectFallback();
     });
 
-    test("renders the fallback for a workflow in a gated category", () => {
-      renderGate(formatTrsId(ASSEMBLY_TRS_ID));
-      expectFallback();
-    });
-
-    test("renders children for gated workflows when the demo flag is on", () => {
-      mockUseFeatureFlag.mockReturnValue(true);
+    test("renders children for an Assembly-category workflow with the demo flag off", () => {
       renderGate(formatTrsId(ASSEMBLY_TRS_ID));
       expectContent();
     });
 
-    test("renders children for a workflow also listed under an ungated category", () => {
-      renderGate(formatTrsId(SHARED_TRS_ID));
-      expectContent();
-    });
-
-    test("renders the fallback for a workflow gated in its own right", () => {
-      // The URL carries the formatted TRS ID; the rule must still match.
+    test("renders children for the Hyphy workflow with the demo flag off", () => {
       renderGate(formatTrsId(HYPHY_TRS_ID));
-      expectFallback();
+      expectContent();
     });
 
     test("renders the fallback for an organism-scope workflow, even when the demo flag is on", () => {
@@ -275,7 +257,7 @@ describe("WorkflowGate", () => {
       expectFallback();
     });
 
-    test("renders the fallback for an organism workflow in a gated category, and children when the demo flag is on", () => {
+    test("renders children for an organism workflow in the Assembly category with the demo flag off", () => {
       getEntitiesByType().set("workflows", [
         buildWorkflowCategory(
           WORKFLOW_CATEGORY_ID.ASSEMBLY,
@@ -284,11 +266,6 @@ describe("WorkflowGate", () => {
         ),
       ]);
 
-      renderOrganismGate(formatTrsId(ORGANISM_TRS_ID));
-      expectFallback();
-
-      mockUseFeatureFlag.mockReturnValue(true);
-      cleanup();
       renderOrganismGate(formatTrsId(ORGANISM_TRS_ID));
       expectContent();
     });
@@ -310,26 +287,12 @@ describe("WorkflowGate", () => {
       expectFallback();
     });
 
-    test("renders the fallback for a workflow in a gated category", () => {
-      renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
-      expectFallback();
-    });
-
-    test("renders the fallback for a workflow gated in its own right", () => {
-      renderDetailGate(formatTrsId(HYPHY_TRS_ID));
-      expectFallback();
-    });
-
-    test("renders children for a workflow also in an ungated category", () => {
-      renderDetailGate(formatTrsId(SHARED_TRS_ID));
-      expectContent();
-    });
-
-    test("renders children for gated workflows when the demo flag is on", () => {
-      mockUseFeatureFlag.mockReturnValue(true);
+    test("renders children for an Assembly-category workflow with the demo flag off", () => {
       renderDetailGate(formatTrsId(ASSEMBLY_TRS_ID));
       expectContent();
-      cleanup();
+    });
+
+    test("renders children for the Hyphy workflow with the demo flag off", () => {
       renderDetailGate(formatTrsId(HYPHY_TRS_ID));
       expectContent();
     });

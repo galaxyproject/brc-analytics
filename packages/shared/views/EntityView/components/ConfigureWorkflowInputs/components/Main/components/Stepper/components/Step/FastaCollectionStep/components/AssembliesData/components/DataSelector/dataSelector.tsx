@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Stack, Typography } from "@mui/material";
 import { ScientificName } from "@repo/shared/components/ScientificName/scientificName";
@@ -57,7 +57,7 @@ export const DataSelector = ({
         </Typography>
       </Stack>
       {isEnough && (
-        <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
+        <Button {...BUTTON_PRESETS.PRIMARY_CONTAINED} onClick={onOpen}>
           Browse
         </Button>
       )}

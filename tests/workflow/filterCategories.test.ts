@@ -1,63 +1,29 @@
 import { WORKFLOW_CATEGORY_ID } from "@repo/shared/apis/schema-types";
-import { buildWorkflowCategory, buildWorkflowGates } from "./gates";
+import { LOGAN_SEARCH } from "@repo/shared/workflow/loganSearch";
+import {
+  buildWorkflowCategory,
+  buildWorkflowGates,
+  HYPHY_TRS_ID,
+  UNGATED_TRS_ID,
+} from "./gates";
 
-const HYPHY_TRS_ID =
-  "#workflow/github.com/iwc-workflows/hyphy/capheine-core-and-compare/versions/v0.2";
-const UNGATED_TRS_ID = "#workflow/github.com/iwc-workflows/something/main";
-
-describe("filterCategories - category gating", () => {
-  const GATED = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [
-    UNGATED_TRS_ID,
-  ]);
-  const UNGATED = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.VARIANT_CALLING, [
-    UNGATED_TRS_ID,
-  ]);
-  // The catalog types `category` as a plain string, so a value outside the enum
-  // can reach the filter.
-  const UNKNOWN = buildWorkflowCategory("NOT_A_CATEGORY", [UNGATED_TRS_ID]);
-
-  it("returns a gated category when the demo flag is enabled", () => {
-    const { filterCategories } = buildWorkflowGates(true);
-    expect(filterCategories([GATED])).toEqual([GATED]);
-  });
-
-  it("filters out a gated category when the demo flag is disabled", () => {
-    expect(buildWorkflowGates().filterCategories([GATED])).toEqual([]);
-  });
-
-  it("returns categories named after an inherited object member", () => {
-    // Nothing in the schema produces these, but the lookup must miss rather
-    // than resolve `Object.prototype` and report the category as gated.
-    const inherited = ["toString", "constructor", "__proto__"].map((category) =>
-      buildWorkflowCategory(category, [UNGATED_TRS_ID])
+describe("filterCategories", () => {
+  it("keeps every category, including Assembly, with the demo flag off", () => {
+    const categories = [
+      buildWorkflowCategory(WORKFLOW_CATEGORY_ID.ASSEMBLY, [UNGATED_TRS_ID]),
+      buildWorkflowCategory(WORKFLOW_CATEGORY_ID.COMPARATIVE_GENOMICS, [
+        HYPHY_TRS_ID,
+      ]),
+    ];
+    expect(buildWorkflowGates().filterCategories(categories)).toEqual(
+      categories
     );
-    expect(buildWorkflowGates().filterCategories(inherited)).toEqual(inherited);
   });
 
-  it("returns categories that nothing gates, whatever the flag state", () => {
-    expect(buildWorkflowGates().filterCategories([UNGATED, UNKNOWN])).toEqual([
-      UNGATED,
-      UNKNOWN,
-    ]);
-  });
-
-  it("filters only the gated categories, preserving order", () => {
-    expect(
-      buildWorkflowGates().filterCategories([UNGATED, GATED, UNKNOWN])
-    ).toEqual([UNGATED, UNKNOWN]);
-  });
-
-  it("returns an empty list unchanged", () => {
-    const { filterCategories } = buildWorkflowGates(true);
-    expect(filterCategories([])).toEqual([]);
-  });
-});
-
-describe("filterCategories - workflow gating within a category", () => {
-  it("drops a gated workflow from an otherwise visible category", () => {
+  it("drops a gated workflow from its category", () => {
     const category = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER, [
       UNGATED_TRS_ID,
-      HYPHY_TRS_ID,
+      LOGAN_SEARCH,
     ]);
     const [ungatedWorkflow] = category.workflows;
     expect(buildWorkflowGates().filterCategories([category])).toEqual([
@@ -66,13 +32,11 @@ describe("filterCategories - workflow gating within a category", () => {
   });
 
   it("empties, but keeps, a category whose workflows are all gated", () => {
-    // The organism page's Comparative Genomics case: the category carries no
-    // gate of its own, but every workflow in it is gated. It comes back empty
-    // for the view to decide on, the same as one that arrived empty.
-    const category = buildWorkflowCategory(
-      WORKFLOW_CATEGORY_ID.COMPARATIVE_GENOMICS,
-      [HYPHY_TRS_ID]
-    );
+    // It comes back empty for the view to decide on, the same as one that
+    // arrived empty.
+    const category = buildWorkflowCategory(WORKFLOW_CATEGORY_ID.OTHER, [
+      LOGAN_SEARCH,
+    ]);
     expect(buildWorkflowGates().filterCategories([category])).toEqual([
       { ...category, workflows: [] },
     ]);
@@ -94,5 +58,9 @@ describe("filterCategories - workflow gating within a category", () => {
       UNGATED_TRS_ID,
     ]);
     expect(buildWorkflowGates().filterCategories([category])[0]).toBe(category);
+  });
+
+  it("returns an empty list unchanged", () => {
+    expect(buildWorkflowGates(true).filterCategories([])).toEqual([]);
   });
 });

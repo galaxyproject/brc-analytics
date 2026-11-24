@@ -7,7 +7,7 @@ export const StyledExploreView = styled(DXExploreView)`
   & .MuiToolbar-root.MuiToolbar-table {
     padding: 16px;
 
-    .MuiButton-containedSecondary {
+    .MuiButton-outlined.MuiButton-colorSecondary {
       padding-bottom: 8px;
       padding-top: 8px;
     }

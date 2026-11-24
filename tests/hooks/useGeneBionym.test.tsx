@@ -41,6 +41,7 @@ const BIONYM: BionymClaims = {
   input: "PF3D7_1343700",
   runDate: "2026-11-02",
   sources: [],
+  summary: [],
 };
 
 /**

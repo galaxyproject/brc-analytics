@@ -1,7 +1,7 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { Optional } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/components/Optional/optional";
 import { StepLabel } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/components/StepLabel/stepLabel";
 import { Step } from "@databiosphere/findable-ui/lib/components/Stepper/components/Step/step";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Typography } from "@mui/material";
 import { StyledStack } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/step.styles";
@@ -61,7 +61,7 @@ export const DESeq2FormulaStep = ({
         <StyledStack gap={6} useFlexGap>
           <Alert formula={formula} />
           <Button
-            {...BUTTON_PROPS.PRIMARY_CONTAINED}
+            {...BUTTON_PRESETS.PRIMARY_CONTAINED}
             disabled={!valid}
             onClick={() => {
               onConfigure({ [STEP.key]: formula });
