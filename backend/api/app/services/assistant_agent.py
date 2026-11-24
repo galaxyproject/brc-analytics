@@ -35,7 +35,7 @@ from tenacity import (
 )
 
 from app.core.cache import CacheService
-from app.core.config import get_settings
+from app.core.config import NarrowingMode, get_settings
 from app.models.assistant import (
     AnalysisSchema,
     AnalysisStateUpdate,
@@ -51,6 +51,7 @@ from app.models.assistant import (
     TurnTelemetry,
 )
 from app.models.logan import JOB_ID_PATTERN, LoganSnapshot
+from app.services import logan_narrowing
 from app.services.logan_prompt import (
     LOGAN_TOOLS_PROMPT,
     render_logan_instructions,
@@ -529,7 +530,13 @@ def _logan_instructions(ctx: RunContext[AssistantDeps]) -> Optional[str]:
     are not carried in message_history -- the block costs its tokens once
     per run instead of once per turn accumulating in the transcript.
     """
-    return render_logan_instructions(getattr(ctx.deps, "logan", None))
+    block = render_logan_instructions(getattr(ctx.deps, "logan", None))
+    if block is None:
+        return None
+    # What a narrowing mode adds for this turn (see logan_narrowing); None in
+    # the default mode, which leaves the block exactly as it was.
+    note = ctx.deps.logan_note
+    return block + "\n\n" + note if note else block
 
 
 # The tracker fields the state extractor produces (AnalysisStateUpdate). The
@@ -665,6 +672,20 @@ class AssistantAgent:
             logger.info("Logan search tools registered with assistant agent")
 
         tools = [Tool(_wrap_tool(fn), takes_ctx=True) for fn in tool_fns]
+        # Resolved once: the export read is cache-only and needs no Galaxy
+        # connection, so a Galaxy service object is all the tool needs.
+        self.narrowing_mode: NarrowingMode = (
+            settings.LOGAN_NARROWING_MODE if self.galaxy is not None else "off"
+        )
+        if self.narrowing_mode == "tool":
+            tools.append(
+                Tool(
+                    _wrap_tool(logan_narrowing.query_logan_hits),
+                    takes_ctx=True,
+                    prepare=logan_narrowing.only_in_logan_sessions,
+                    description=logan_narrowing.TOOL_DESCRIPTION,
+                )
+            )
         self.system_prompt = build_system_prompt(
             include_sra_tools=sra_available, include_logan_tools=logan_available
         )
@@ -691,8 +712,10 @@ class AssistantAgent:
             model_settings=ModelSettings(temperature=0.0),
         )
         logger.info(
-            "Assistant agent initialized (extractor output mode: %s)",
+            "Assistant agent initialized (extractor output mode: %s, Logan "
+            "narrowing: %s)",
             self._resolved_output_mode(),
+            self.narrowing_mode,
         )
 
     def _resolved_output_mode(self) -> str:
@@ -1472,12 +1495,14 @@ class AssistantAgent:
         # Monotonic, not wall clock: this drives the extractor's remaining
         # budget as well as the logged latency, so an NTP or VM clock jump
         # could otherwise skip extraction or blow the frontend timeout.
+        logan = state.metadata.get("logan")
         deps = AssistantDeps(
             catalog=self.catalog,
             sra_mirror=self.sra_mirror,
             con=self.query_con,
             galaxy=self.galaxy,
-            logan=state.metadata.get("logan"),
+            logan=logan,
+            logan_note=self._logan_note(logan),
         )
         result = await self._run_agent_with_retry(
             augmented_message, deps=deps, message_history=agent_history
@@ -1732,6 +1757,13 @@ class AssistantAgent:
             state.agent_message_history = agent_message_history
         await self.session_service.save_session(state)
         return state
+
+    def _logan_note(self, logan: Optional[dict]) -> Optional[str]:
+        """What the narrowing mode adds to a Logan session's instructions:
+        the tool hint in "tool" mode, nothing in the default mode."""
+        if logan and self.narrowing_mode == "tool":
+            return logan_narrowing.TOOL_HINT
+        return None
 
     async def fetch_logan_snapshot(self, job_id: str) -> LoganSnapshot:
         """Read a finished job's cached results into a snapshot.

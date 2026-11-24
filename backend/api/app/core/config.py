@@ -2,11 +2,29 @@ import os
 import secrets
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Literal
 
 from dotenv import load_dotenv
 
 from app.core.partner_keys import parse_partner_keys, parse_sunset
+
+NarrowingMode = Literal["off", "tool"]
+
+
+def parse_narrowing_mode(raw: str | None) -> NarrowingMode:
+    """LOGAN_NARROWING_MODE as the server will act on it. Case and spacing
+    don't matter, and unset or empty is "off".
+
+    @raises ValueError: on anything else, so a typo stops startup instead of
+        quietly running as "off".
+    """
+    mode = (raw or "").strip().lower() or "off"
+    if mode == "off":
+        return "off"
+    if mode == "tool":
+        return "tool"
+    raise ValueError(f"LOGAN_NARROWING_MODE must be off or tool, got {raw!r}")
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -238,6 +256,15 @@ class Settings:
         # entirely: nothing is materialized, the results advertise no download
         # and the endpoint 404s. Must be writable, unlike SRA_MIRROR_PATH.
         self.KMINDEX_EXPORT_DIR: str = os.getenv("KMINDEX_EXPORT_DIR", "")
+
+        # How a session opened from a Logan search narrows the match set from
+        # chat. "off" (the default) is the shipped behaviour. "tool" gives the
+        # model a query_logan_hits tool over the job's export, read through the
+        # cache only. An unknown value refuses to start (see
+        # parse_narrowing_mode).
+        self.LOGAN_NARROWING_MODE: NarrowingMode = parse_narrowing_mode(
+            os.getenv("LOGAN_NARROWING_MODE")
+        )
 
         # Galaxy job execution. Empty API key disables the Galaxy endpoints --
         # the key is a service account, so jobs land in one shared account
