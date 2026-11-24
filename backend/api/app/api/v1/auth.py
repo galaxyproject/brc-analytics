@@ -1,4 +1,5 @@
 import logging
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -17,15 +18,16 @@ router = APIRouter()
 
 @router.get("/login")
 async def login(
-    auth: AuthService = Depends(get_auth_service),
+    auth: Annotated[AuthService, Depends(get_auth_service)],
+    provider: Literal["google"] | None = None,
 ) -> RedirectResponse:
     """Initiate the OIDC login flow.
 
     Redirects the browser to Keycloak's authorization endpoint with
     PKCE parameters. The code verifier is stored in Redis, keyed by the
-    state parameter.
+    state parameter. Galaxy signup can opt into the Google broker directly.
     """
-    authorization_url, _state = await auth.build_authorization_url()
+    authorization_url, _state = await auth.build_authorization_url(provider=provider)
     return RedirectResponse(url=authorization_url, status_code=302)
 
 

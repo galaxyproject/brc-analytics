@@ -85,7 +85,9 @@ class AuthService:
         challenge = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
         return verifier, challenge
 
-    async def build_authorization_url(self) -> tuple[str, str]:
+    async def build_authorization_url(
+        self, *, provider: str | None = None
+    ) -> tuple[str, str]:
         """Build the Keycloak authorization URL with PKCE.
 
         Returns (authorization_url, state). The OIDC discovery URLs are used
@@ -107,6 +109,8 @@ class AuthService:
             "code_challenge": challenge,
             "code_challenge_method": "S256",
         }
+        if provider is not None:
+            params["kc_idp_hint"] = provider
 
         # Store the verifier and state in Redis temporarily (5 min TTL)
         await self._redis.setex(
