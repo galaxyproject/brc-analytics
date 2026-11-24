@@ -285,6 +285,8 @@ def _stub_agent():
     instance.query_con = None
     instance.agent = object()
     instance.settings = get_settings()
+    # __init__ resolves this; a Logan-bound turn reads it.
+    instance.narrowing_mode = "off"
     return instance
 
 

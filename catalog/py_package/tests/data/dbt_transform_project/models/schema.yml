@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: items
+    columns:
+      - name: id
+        data_tests:
+          - unique:
+              name: items_id_unique
+      - name: name
+        data_tests:
+          - not_null:
+              name: items_name_not_null

@@ -124,10 +124,33 @@ def test_turn_slice_starts_at_the_last_user_prompt():
     ]
     turn = _turn_messages(history)
     assert len(turn) == 3
-    instructions, calls, returns = _trace_parts(turn)
+    instructions, calls, returns, _ = _trace_parts(turn)
     assert instructions == "SECOND"
     assert calls == [("t", {"a": 1}), ("u", {"_raw": "not json"})]
     assert returns == ['{"total": 3}']
+
+
+def test_each_call_is_paired_with_its_own_return():
+    turn = [
+        {
+            "kind": "response",
+            "parts": [
+                {"part_kind": "tool-call", "tool_name": "t", "tool_call_id": "a"},
+                {"part_kind": "tool-call", "tool_name": "t", "tool_call_id": "b"},
+                {"part_kind": "tool-call", "tool_name": "t", "tool_call_id": "c"},
+            ],
+        },
+        {
+            "kind": "request",
+            "parts": [
+                # Out of order, one a validation retry rather than a return.
+                {"part_kind": "tool-return", "tool_call_id": "c", "content": "C"},
+                {"part_kind": "retry-prompt", "tool_call_id": "b", "content": "bad"},
+                {"part_kind": "tool-return", "tool_call_id": "a", "content": {"n": 1}},
+            ],
+        },
+    ]
+    assert _trace_parts(turn).call_returns == ['{"n": 1}', None, "C"]
 
 
 def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
@@ -182,6 +205,8 @@ def test_task_reports_instructions_tools_and_context(tmp_path, monkeypatch):
     [turn] = out.turns
     assert turn.message == "What is this?"
     assert '"status": "expired"' in turn.tool_returns[0]
+    # Paired to its call by id, from the real pydantic-ai history.
+    assert turn.call_returns == turn.tool_returns
     assert turn.latency_s >= 0
     # The context the numbers check reads holds each turn's instructions and
     # every tool return, not just the fallback re-render.
