@@ -596,7 +596,7 @@ class KmindexQueueHistory(BaseModel):
     wait_max_minutes: Optional[float] = None
     run_p50_minutes: Optional[float] = None
     truncated: bool = Field(
-        ..., description="Galaxy's listing hit its limit, so older rows are missing"
+        ..., description="The listing hit its page ceiling, so older rows are missing"
     )
     rows: List[KmindexQueueHistoryRow]
 
