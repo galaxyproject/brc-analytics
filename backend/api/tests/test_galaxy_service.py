@@ -4413,7 +4413,7 @@ class TestMergedOutput:
         merged._download_shard.assert_not_awaited()
 
     @pytest.mark.asyncio
-    async def test_an_empty_file_fails_the_job(self, merged, monkeypatch):
+    async def test_an_empty_file_fails_the_job(self, merged, monkeypatch, caplog):
         # Galaxy Test has finished kmindex jobs "ok" with a 0-byte merged file.
         # Nothing will ever fill it, so it is the job that failed: asking again
         # only repeats the error on every read, and a partner should be told
@@ -4427,9 +4427,14 @@ class TestMergedOutput:
 
         merged.gi.make_get_request = MagicMock(side_effect=answer)
 
-        with pytest.raises(GalaxyJobFailed, match="job1.*merged1.*empty"):
-            await merged._aggregate_shards("job1")
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            with pytest.raises(GalaxyJobFailed, match="job1.*merged1.*empty"):
+                await merged._aggregate_shards("job1")
 
+        # The endpoints answer a failed job without logging, and this is
+        # Galaxy misbehaving rather than the caller, so it leaves a trace here.
+        assert [r.levelname for r in caplog.records] == ["WARNING"]
+        assert "job1" in caplog.text and "merged1" in caplog.text
         assert len(sent) == 1
         sent[0].close.assert_called_once()
         merged.cache.set.assert_not_called()

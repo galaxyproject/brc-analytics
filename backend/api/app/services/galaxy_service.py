@@ -2440,7 +2440,13 @@ class GalaxyService:
                 # A job that matched nothing still writes a key per shard, so
                 # zero bytes is a run that died after kmindex reported success.
                 # The file won't change: fail the job so the caller resubmits,
-                # rather than erroring on every read.
+                # rather than erroring on every read. A warning, not an error:
+                # it's Galaxy's fault and would otherwise repeat in Sentry on
+                # every read, but it still wants a trace somewhere.
+                logger.warning(
+                    f"kmindex job {job_id} finished ok with an empty merged "
+                    f"results file {dataset_id}"
+                )
                 raise GalaxyJobFailed(
                     f"Job {job_id} finished, but its merged results "
                     f"{dataset_id} are empty; submit the search again"
