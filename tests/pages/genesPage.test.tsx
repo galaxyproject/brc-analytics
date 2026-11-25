@@ -8,12 +8,11 @@ import "@testing-library/jest-dom";
 
 // The router the page reads ?q= from and pushes searches to.
 const mockPush = jest.fn();
-let mockIsReady = true;
 let mockQuery: Record<string, string> = {};
 jest.mock("next/router", () => ({
   useRouter: (): unknown => ({
     basePath: "",
-    isReady: mockIsReady,
+    isReady: true,
     pathname: "/data/genes",
     push: mockPush,
     query: mockQuery,
@@ -57,7 +56,6 @@ function submit(text: string): void {
 }
 
 beforeEach(() => {
-  mockIsReady = true;
   window.localStorage.clear();
   window.localStorage.setItem(FEATURE_FLAGS.DEMO, "true");
   mockPush.mockReset();
@@ -94,14 +92,6 @@ describe("Genes page", () => {
       undefined,
       { shallow: true }
     );
-  });
-
-  it("renders nothing, not a 404, before the router is ready", () => {
-    mockIsReady = false;
-    window.localStorage.clear();
-    renderPage();
-    expect(screen.queryByText("404")).not.toBeInTheDocument();
-    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
   });
 
   it("is a 404 when the demo flag is unset", () => {

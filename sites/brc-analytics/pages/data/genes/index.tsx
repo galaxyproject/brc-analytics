@@ -16,9 +16,6 @@ const Page = (): JSX.Element => {
       ? router.query.q.trim()
       : "";
   const search = useGeneSearch(demoEnabled ? query : "");
-  // The flag reads false until hydration; render nothing until then rather
-  // than a 404 that flashes for users who have it set.
-  if (!router.isReady) return <></>;
   if (!demoEnabled) return <Error statusCode={404} />;
   const onSearch = (q: string): void => {
     // Each new search is a history entry, so Back returns to the one before;
