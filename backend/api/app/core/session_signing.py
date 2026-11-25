@@ -29,18 +29,11 @@ async def bind_session(
     response: Response,
     session_id: str,
 ) -> None:
-    """Bind the session to this browser, issuing its id cookie if it has none yet."""
-    browser_id = cookies.get(browser_cookie_name()) or secrets.token_urlsafe(32)
-    response.set_cookie(
-        key=browser_cookie_name(),
-        value=browser_id,
-        max_age=BROWSER_COOKIE_MAX_AGE,
-        # Required of a __Host- cookie, along with no Domain.
-        path="/",
-        httponly=True,
-        samesite="strict",
-        secure=_is_secure(),
-    )
+    """Bind the session to this browser, issuing its id cookie if it has none yet.
+
+    Raises RedisError if the binding can't be written.
+    """
+    browser_id = issue_browser_cookie(cookies, response)
     await session_service.bind_browser(session_id, sign_browser_id(browser_id))
 
 
@@ -52,6 +45,26 @@ def browser_cookie_name() -> str:
     let whoever chose it use the sessions it gets bound to.
     """
     return f"__Host-{BROWSER_COOKIE_NAME}" if _is_secure() else BROWSER_COOKIE_NAME
+
+
+def issue_browser_cookie(cookies: Mapping[str, str], response: Response) -> str:
+    """Refresh this browser's id cookie, minting one if it has none; returns the id.
+
+    An existing id is never replaced, so two responses can't hand one browser
+    two ids.
+    """
+    browser_id = cookies.get(browser_cookie_name()) or secrets.token_urlsafe(32)
+    response.set_cookie(
+        key=browser_cookie_name(),
+        value=browser_id,
+        max_age=BROWSER_COOKIE_MAX_AGE,
+        # Required of a __Host- cookie, along with no Domain.
+        path="/",
+        httponly=True,
+        samesite="strict",
+        secure=_is_secure(),
+    )
+    return browser_id
 
 
 def clear_browser_cookie(response: Response) -> None:

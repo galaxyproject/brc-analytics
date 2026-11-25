@@ -102,11 +102,14 @@ class FakeAssistantAgent:
         turn_id=None,
         on_turn=None,
         clear_fields=None,
+        on_session=None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         """Stub a turn, handing back the state auto-save writes from."""
         state = self.session_service.sessions.get(session_id or "")
         if state is None:
             state = SessionState(session_id=uuid4().hex)
+        if on_session is not None:
+            await on_session(state.session_id)
         if owner_keycloak_sub is not None:
             state.owner_keycloak_sub = owner_keycloak_sub
         state.messages.append(ChatMessage(role=MessageRole.USER, content=message))

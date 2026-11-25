@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 from typing import Optional
 from uuid import uuid4
 
@@ -18,7 +19,11 @@ from app.core.dependencies import (
     get_current_user,
     get_optional_current_user,
 )
-from app.core.session_signing import bind_session, require_bound
+from app.core.session_signing import (
+    bind_session,
+    issue_browser_cookie,
+    require_bound,
+)
 from app.models.assistant import (
     AssistantInfoResponse,
     ChatRequest,
@@ -61,9 +66,19 @@ async def bound_session_id(
 
 @router.get("/info", response_model=AssistantInfoResponse)
 async def assistant_info(
+    response: Response,
+    http_request: Request,
     agent=Depends(get_assistant_agent),
 ):
-    """Surface assistant configuration for UI attribution (model + provider)."""
+    """Surface assistant configuration for UI attribution (model + provider).
+
+    Also issues the browser id cookie, which every assistant page load fetches
+    this for, so the browser holds its id before any request binds a session.
+    """
+    # Minted by the first bind instead, two binds in flight together would each
+    # mint an id, and the session bound under the one that lost would be
+    # refused from then on.
+    issue_browser_cookie(http_request.cookies, response)
     available = agent.is_available()
     settings = agent.settings
     return AssistantInfoResponse(
@@ -140,6 +155,14 @@ async def assistant_chat(
             # failure. Awaited inline: the insert is milliseconds against a
             # turn that spends seconds in inference.
             on_turn=turn_log.record,
+            # Bound before the model runs: a bind that fails then fails the
+            # request before any model work, so retrying it is safe.
+            on_session=partial(
+                bind_session,
+                agent.session_service,
+                http_request.cookies,
+                response,
+            ),
         )
     except AssistantTimeoutError as e:
         logger.exception("Assistant chat timed out")
@@ -216,17 +239,6 @@ async def assistant_chat(
     # Read after the auto-save, whose stamp teaches the state an id a first save
     # just minted. Signed out, it is whatever the session already knew.
     chat_response.saved_analysis_id = turn_state.saved_analysis_id
-    try:
-        await bind_session(
-            agent.session_service,
-            http_request.cookies,
-            response,
-            chat_response.session_id,
-        )
-    except Exception:
-        # The reply already succeeded; failing the turn over the binding would
-        # cost the user it. Unbound, their next message is refused instead.
-        logger.exception("Failed to bind session %s", chat_response.session_id)
     return chat_response
 
 

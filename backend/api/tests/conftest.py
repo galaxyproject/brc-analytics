@@ -123,7 +123,9 @@ def app_with_stubbed_agent(tmp_path, monkeypatch):
     )
 
     # Recording lives in the agent now, so the stub has to honour the sink.
-    async def _chat_with_telemetry(*args, on_turn=None, **kwargs):
+    async def _chat_with_telemetry(*args, on_turn=None, on_session=None, **kwargs):
+        if on_session is not None:
+            await on_session(stub_turn[2].session_id)
         if on_turn is not None:
             await on_turn(stub_turn[1])
         return stub_turn

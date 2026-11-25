@@ -1327,6 +1327,7 @@ class AssistantAgent:
         turn_id: Optional[UUID] = None,
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]] = None,
         clear_fields: Optional[List[str]] = None,
+        on_session: Optional[Callable[[str], Awaitable[None]]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         """Same as chat(), plus the per-turn record the API layer logs and the
         session state this turn left behind.
@@ -1334,6 +1335,9 @@ class AssistantAgent:
         Split out so the agent stays DB-agnostic: it hands back what happened
         and the endpoint decides whether to persist it. turn_id is passed in
         so the returned record carries the id already tagged on Sentry.
+        on_session is awaited with the turn's session id once the session is
+        loaded or created, before any model call; whatever it raises fails the
+        turn, which on_turn records as an error.
         """
         turn_id = turn_id or uuid4()
         turn_start = time.monotonic()
@@ -1357,6 +1361,7 @@ class AssistantAgent:
                 on_turn,
                 progress,
                 clear_fields,
+                on_session,
             )
         except PermissionError:
             # Session belongs to someone else. Recording it would file this
@@ -1394,6 +1399,7 @@ class AssistantAgent:
         on_turn: Optional[Callable[[TurnTelemetry], Awaitable[None]]],
         progress: dict,
         clear_fields: Optional[List[str]] = None,
+        on_session: Optional[Callable[[str], Awaitable[None]]] = None,
     ) -> tuple[ChatResponse, TurnTelemetry, SessionState]:
         if not self.is_available():
             raise AssistantUnavailableError(
@@ -1425,6 +1431,8 @@ class AssistantAgent:
         progress["session_id"] = state.session_id
         progress["turn_index"] = turn_index
         progress["logan_job_id"] = _logan_job_id(state.metadata)
+        if on_session is not None:
+            await on_session(state.session_id)
 
         # Fields cleared from the setup panel are applied here, before either
         # model call, so the clear can't hinge on how the model reads anything

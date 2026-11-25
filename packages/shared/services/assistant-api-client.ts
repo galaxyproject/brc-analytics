@@ -37,6 +37,34 @@ const httpClient = ky.create({
   timeout: 90000,
 });
 
+// The page's one /info request, which also issues the browser id cookie.
+let infoRequest: Promise<AssistantInfoResponse> | null = null;
+
+/**
+ * Fetch /info once per page; a failed fetch is dropped so the next call retries.
+ * @returns Promise resolving to assistant info.
+ */
+function fetchInfoOnce(): Promise<AssistantInfoResponse> {
+  if (!infoRequest) {
+    infoRequest = httpClient
+      .get("assistant/info")
+      .json<AssistantInfoResponse>();
+    infoRequest.catch(() => {
+      infoRequest = null;
+    });
+  }
+  return infoRequest;
+}
+
+/**
+ * Wait until this browser holds its id cookie, so a request that binds a
+ * session can't mint a second id alongside /info's. A failed /info doesn't
+ * block: the bind then mints the id itself.
+ */
+async function waitForBrowserId(): Promise<void> {
+  await fetchInfoOnce().catch(() => undefined);
+}
+
 export const assistantAPIClient = {
   /**
    * Send a message to the analysis assistant
@@ -46,6 +74,7 @@ export const assistantAPIClient = {
   assistantChat: async (
     request: AssistantChatRequest
   ): Promise<AssistantChatResponse> => {
+    await waitForBrowserId();
     return httpClient
       .post("assistant/chat", {
         json: request,
@@ -63,6 +92,7 @@ export const assistantAPIClient = {
   assistantCreateSession: async (
     request: LoganSessionRequest
   ): Promise<SessionRestoreResponse> => {
+    await waitForBrowserId();
     // One attempt: a 404/409 is an answer, not a blip, and the caller links
     // the user back to the results page either way.
     return httpClient
@@ -83,7 +113,7 @@ export const assistantAPIClient = {
    * @returns Promise resolving to assistant info
    */
   assistantInfo: async (): Promise<AssistantInfoResponse> => {
-    return httpClient.get("assistant/info").json();
+    return fetchInfoOnce();
   },
 
   /**

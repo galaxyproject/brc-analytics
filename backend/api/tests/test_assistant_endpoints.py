@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
 
+import redis.asyncio as redis
+
 from app.core.dependencies import get_assistant_agent
 from app.core.session_signing import browser_cookie_name, sign_browser_id
 from app.models.assistant import ChatMessage, MessageRole, SessionState
@@ -34,6 +36,29 @@ class TestSessionBrowserBinding:
         assert ("sess-abc", sign_browser_id(browser_id)) in _agent(
             client
         ).session_service.bindings
+
+    def test_info_issues_a_browser_cookie_before_anything_binds(self, client):
+        # Every assistant page load fetches /info, so the browser holds its id
+        # before a bind could mint a second one.
+        resp = client.get("/api/v1/assistant/info")
+        assert resp.status_code == 200, resp.text
+        assert resp.cookies.get(browser_cookie_name())
+        assert _agent(client).session_service.bindings == {
+            ("sess-abc", sign_browser_id(TEST_BROWSER))
+        }
+
+    def test_info_refreshes_rather_than_replaces_the_browser_id(self, client):
+        bind_browser(client)
+        resp = client.get("/api/v1/assistant/info")
+        assert resp.cookies.get(browser_cookie_name()) == TEST_BROWSER
+
+    def test_a_failed_bind_fails_the_chat_request(self, client):
+        # Swallowing it would return the reply and refuse every message after.
+        _agent(client).session_service.bind_browser = AsyncMock(
+            side_effect=redis.RedisError("redis is unreachable")
+        )
+        resp = client.post("/api/v1/assistant/chat", json={"message": "hello"})
+        assert resp.status_code == 500
 
     def test_a_late_response_keeps_the_browser_id_it_was_sent(self, client):
         # The cookie is only ever refreshed: a response landing late, for a
@@ -99,18 +124,27 @@ class TestSessionBrowserBinding:
             "set-cookie"
         )
 
-    def test_logout_does_not_hinge_on_the_assistant(self, client):
+    def test_logout_survives_redis_being_unreachable(self, client):
         # Unbinding is best effort: the auth side is done and the cookie goes
-        # even when the assistant's store can't be reached.
+        # even when the assistant's store can't be reached. The cache's delete
+        # swallows the Redis error, so logout needs no handler of its own.
         from app.api.v1 import auth as auth_module
+        from app.core.cache import CacheService
+        from app.services.session_service import SessionService
 
+        class UnreachableRedis:
+            async def delete(self, *keys):
+                raise redis.RedisError("redis is unreachable")
+
+        cache = CacheService.__new__(CacheService)
+        cache.redis = UnreachableRedis()
         fake_auth = MagicMock()
         fake_auth.revoke_session_tokens = AsyncMock()
         client.app.dependency_overrides[auth_module.get_auth_service] = (
             lambda: fake_auth
         )
-        _agent(client).session_service.unbind_browser = AsyncMock(
-            side_effect=RuntimeError("redis is unreachable")
+        client.app.dependency_overrides[auth_module.get_session_service] = (
+            lambda: SessionService(cache)
         )
         client.cookies.set("brc_session", "auth-session")
         bind_browser(client)

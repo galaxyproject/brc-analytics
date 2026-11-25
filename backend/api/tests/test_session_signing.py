@@ -8,9 +8,11 @@ from app.core.session_signing import (
     bind_session,
     browser_cookie_name,
     clear_browser_cookie,
+    issue_browser_cookie,
     require_bound,
     sign_browser_id,
 )
+from app.services.session_service import BINDING_TTL, SESSION_TTL
 from tests.conftest import FakeBrowserBindings
 
 SECRET = "test-secret-32-bytes-min-aaaaaaaa"
@@ -61,6 +63,53 @@ class TestBrowserCookieName:
         cookie = response.headers["set-cookie"]
         assert cookie.startswith(f"__Host-{BROWSER_COOKIE_NAME}=")
         assert "Secure" in cookie and "Max-Age=0" in cookie
+
+
+class TestIssueBrowserCookie:
+    def test_mints_an_id_for_a_browser_without_one(self):
+        response = Response()
+
+        browser_id = issue_browser_cookie({}, response)
+
+        cookie = response.headers["set-cookie"]
+        assert cookie.startswith(f"{BROWSER_COOKIE_NAME}={browser_id};")
+
+    def test_refreshes_rather_than_replaces_an_existing_id(self):
+        response = Response()
+
+        browser_id = issue_browser_cookie(_browser("existing"), response)
+
+        assert browser_id == "existing"
+        assert response.headers["set-cookie"].startswith(
+            f"{BROWSER_COOKIE_NAME}=existing;"
+        )
+
+    def test_lasts_thirty_days(self):
+        response = Response()
+
+        issue_browser_cookie({}, response)
+
+        assert f"Max-Age={30 * 24 * 60 * 60}" in response.headers["set-cookie"]
+
+    def test_is_secure_with_the_host_prefix_where_cookies_are_secure(self, monkeypatch):
+        # Browsers reject a __Host- cookie that isn't Secure, which would break
+        # every binding.
+        monkeypatch.setenv("ENVIRONMENT", "production")
+        get_settings.cache_clear()
+        response = Response()
+
+        issue_browser_cookie({}, response)
+
+        cookie = response.headers["set-cookie"]
+        assert cookie.startswith(f"__Host-{BROWSER_COOKIE_NAME}=")
+        assert "Secure" in cookie
+        assert "Path=/" in cookie and "Domain" not in cookie
+
+
+def test_a_binding_outlives_the_session_it_binds():
+    # A browser continuing a session that just expired must still read as
+    # bound, so it rolls over to a fresh session instead of being refused.
+    assert BINDING_TTL > SESSION_TTL
 
 
 @pytest.mark.asyncio

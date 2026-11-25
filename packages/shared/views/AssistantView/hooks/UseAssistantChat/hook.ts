@@ -406,6 +406,31 @@ export const useAssistantChat = ({
 
   useEffect(() => (): void => clearSaveRetry(saveRetryTimerRef), []);
 
+  // A turn refused with 403 means this browser can't continue the session (it
+  // isn't bound to it, or the session is someone else's), and a retry would be
+  // refused the same way. Starts a new conversation in its place, as a reset
+  // does, and says why; true if it did.
+  const dropRefusedSession = useCallback(
+    (error: unknown, sentSessionId: string | null): boolean => {
+      if (!sentSessionId || httpStatus(error) !== 403) return false;
+      startConversation();
+      sessionIdRef.current = null;
+      if (localStorage.getItem(sessionKey) === sentSessionId) {
+        localStorage.removeItem(sessionKey);
+      }
+      // ?sessionId= outranks localStorage on mount, so a reload would restore
+      // the refused conversation.
+      if (router.query[ASSISTANT_QUERY_PARAM.SESSION_ID]) {
+        stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
+      }
+      setError(
+        "That conversation can't be continued, so a new one has started."
+      );
+      return true;
+    },
+    [router, sessionKey, startConversation]
+  );
+
   // One path for every turn. A setup-panel clear rides it too, as structured
   // clear_fields the server applies before the model runs, so the clear can't
   // hinge on how the model reads a message and the assistant still answers it.
@@ -419,6 +444,7 @@ export const useAssistantChat = ({
         return;
       sendingRef.current = true;
       const conversation = conversationRef.current;
+      const sentSessionId = sessionIdRef.current;
       const isCurrent = (): boolean =>
         isMountedRef.current && conversationRef.current === conversation;
 
@@ -484,6 +510,7 @@ export const useAssistantChat = ({
         else if (response.saved) setIsSaved(true);
       } catch (err) {
         if (!isCurrent()) return;
+        if (dropRefusedSession(err, sentSessionId)) return;
         const errorMessage = handleChatError(err);
         setError(errorMessage);
         setLastFailedRequest({ clearFields, message });
@@ -495,7 +522,7 @@ export const useAssistantChat = ({
         }
       }
     },
-    [showSession]
+    [dropRefusedSession, showSession]
   );
 
   const onSendMessage = useCallback(
