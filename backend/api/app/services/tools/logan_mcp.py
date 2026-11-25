@@ -32,6 +32,7 @@ from app.services.galaxy_service import (
     STDERR_TAIL,
     AggregationLane,
     GalaxyJobAggregating,
+    GalaxyJobFailed,
     GalaxyJobNotComplete,
     GalaxyService,
     GalaxySubmitNotStarted,
@@ -253,6 +254,14 @@ def _start_build(galaxy: GalaxyService, job_id: str, lane: AggregationLane) -> N
             )
         except (GalaxyJobAggregating, GalaxyJobNotComplete):
             pass  # someone else is merging it, or no slot; the next poll retries
+        except GalaxyJobFailed as e:
+            # What the job did, not a merge that broke: nothing to log, and
+            # the next poll reports the search failed rather than retryable.
+            await galaxy.cache.set(
+                _build_failure_key(job_id),
+                {"failed": True, "job_error": str(e)},
+                BUILD_FAILURE_TTL,
+            )
         except Exception as e:
             logger.error("MCP merge for %s failed: %s", job_id, e)
             await galaxy.cache.set(
@@ -308,7 +317,15 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
             "error": (status.stderr or "")[-STDERR_TAIL:] or None,
             "results_url": results_url_for(job_id),
         }
-    if await galaxy.cache.get(_build_failure_key(job_id)):
+    failure = await galaxy.cache.get(_build_failure_key(job_id))
+    if failure and failure.get("job_error"):
+        return {
+            "status": "failed",
+            "job_id": job_id,
+            "error": failure["job_error"],
+            "results_url": results_url_for(job_id),
+        }
+    if failure:
         return {
             "error": "Merging this search's results failed. Try again later.",
             "status_code": 502,

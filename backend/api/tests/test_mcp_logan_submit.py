@@ -619,6 +619,26 @@ class TestRebuild:
         assert galaxy.get_kmindex_results.await_count == 1
 
     @pytest.mark.asyncio
+    async def test_a_job_the_merge_finds_failed_says_so(self, env, monkeypatch, caplog):
+        # Galaxy called the job a success but left nothing to merge. "Try again
+        # later" would send the agent back to the same empty file; the search
+        # itself has to be run again.
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_results.side_effect = galaxy_service.GalaxyJobFailed(
+            "results are empty; submit the search again"
+        )
+        with caplog.at_level("ERROR", logger=logan_mcp.logger.name):
+            await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+            await self._drain()
+        again = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert again["status"] == "failed"
+        assert "submit the search again" in again["error"]
+        assert "retry_after_seconds" not in again
+        assert not caplog.records
+        assert galaxy.get_kmindex_results.await_count == 1
+
+    @pytest.mark.asyncio
     async def test_job_still_running_is_not_ready_not_building(self, env, monkeypatch):
         # _miss reads "expired" when its own status lookup failed; a second
         # lookup that says the job is running must not promise a merge.
