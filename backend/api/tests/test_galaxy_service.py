@@ -4426,6 +4426,11 @@ class TestMergedOutput:
             return sent[-1]
 
         merged.gi.make_get_request = MagicMock(side_effect=answer)
+        merged.gi.make_delete_request = MagicMock(
+            return_value=MagicMock(
+                status_code=200, json=lambda: {"success_count": 1, "errors": []}
+            )
+        )
 
         with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
             with pytest.raises(GalaxyJobFailed, match="job1.*merged1.*empty"):
@@ -4438,6 +4443,38 @@ class TestMergedOutput:
         assert len(sent) == 1
         sent[0].close.assert_called_once()
         merged.cache.set.assert_not_called()
+        # Deleted, not purged: Galaxy's job cache skips a job with a deleted
+        # output, so the same search sent again runs instead of coming back
+        # as a copy of this one.
+        merged.gi.make_delete_request.assert_called_once_with(
+            "https://galaxy.example/api/datasets",
+            payload={"datasets": [{"id": "merged1", "src": "hda"}]},
+        )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "response",
+        [
+            MagicMock(status_code=403, text="no"),
+            MagicMock(
+                status_code=200,
+                json=lambda: {"success_count": 0, "errors": [{"dataset": "x"}]},
+            ),
+        ],
+        ids=["http-error", "refused-in-body"],
+    )
+    async def test_an_empty_file_it_cant_delete_still_fails_the_job(
+        self, merged, caplog, response
+    ):
+        merged.gi.make_get_request = MagicMock(return_value=_archive_response(b""))
+        merged.gi.make_delete_request = MagicMock(return_value=response)
+
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            with pytest.raises(GalaxyJobFailed, match="empty"):
+                await merged._aggregate_shards("job1")
+
+        assert "could not delete" in caplog.text
+        assert all(r.levelname == "WARNING" for r in caplog.records)
 
     @pytest.mark.asyncio
     async def test_an_empty_file_reaches_a_results_read_as_a_failed_job(self, merged):
@@ -4476,6 +4513,7 @@ class TestMergedOutput:
         assert not isinstance(e.value, GalaxyJobFailed)
         assert len(sent) == galaxy_service.KMINDEX_MERGED_ATTEMPTS
         merged.cache.set.assert_not_called()
+        merged.gi.make_delete_request.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_an_older_job_still_reads_its_collection(self, merged):

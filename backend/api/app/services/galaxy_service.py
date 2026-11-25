@@ -2447,6 +2447,16 @@ class GalaxyService:
                     f"kmindex job {job_id} finished ok with an empty merged "
                     f"results file {dataset_id}"
                 )
+                # Galaxy's job cache only hands out original jobs, and skips
+                # one with a deleted output. Without this, the same search
+                # sent again comes back as a copy of this job and its file.
+                try:
+                    await asyncio.to_thread(self._delete_dataset, dataset_id)
+                except Exception as delete_error:
+                    logger.warning(
+                        f"kmindex job {job_id}: could not delete empty merged "
+                        f"results {dataset_id}: {delete_error}"
+                    )
                 raise GalaxyJobFailed(
                     f"Job {job_id} finished, but its merged results "
                     f"{dataset_id} are empty; submit the search again"
@@ -2519,6 +2529,19 @@ class GalaxyService:
                 return json.load(body)
         finally:
             r.close()
+
+    def _delete_dataset(self, dataset_id: str) -> None:
+        """Mark a history dataset deleted, without purging it."""
+        r = self.gi.make_delete_request(
+            f"{self.gi.url}/datasets",
+            payload={"datasets": [{"id": dataset_id, "src": "hda"}]},
+        )
+        if r.status_code != 200:
+            raise Exception(f"HTTP {r.status_code}: {r.text[:200]}")
+        # A dataset Galaxy refused still answers 200, listed under errors.
+        errors = r.json().get("errors")
+        if errors:
+            raise Exception(f"{dataset_id}: {errors}")
 
     def _fetch_collection(self, collection_id: str) -> List[Optional[dict]]:
         """
