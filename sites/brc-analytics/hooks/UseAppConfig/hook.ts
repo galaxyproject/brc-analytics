@@ -7,16 +7,16 @@ import { getAppConfig } from "./utils";
 
 /**
  * Returns the site config with the header navigation gated by the runtime
- * feature flags (e.g. Genes shows only when `?gene-pages=true` has been set).
+ * feature flags (e.g. Genes shows only when `?demo=true` has been set).
  * The flag reads false on the server and during hydration, so flagged entries
  * appear only once the client has hydrated.
  * @returns site config to render with.
  */
 export function useAppConfig(): AppSiteConfig {
   const appConfig = config();
-  const genePagesEnabled = useFeatureFlag(FEATURE_FLAGS.GENE_PAGES);
+  const demoEnabled = useFeatureFlag(FEATURE_FLAGS.DEMO);
   return useMemo(
-    () => getAppConfig(appConfig, genePagesEnabled),
-    [appConfig, genePagesEnabled]
+    () => getAppConfig(appConfig, demoEnabled),
+    [appConfig, demoEnabled]
   );
 }

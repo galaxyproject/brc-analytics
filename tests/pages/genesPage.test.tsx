@@ -1,27 +1,24 @@
 import Page from "@brc/pages/data/genes/index";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { fireEvent, render, screen } from "@testing-library/react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
 
 // The router the page reads ?q= from and pushes searches to.
 const mockPush = jest.fn();
+let mockIsReady = true;
 let mockQuery: Record<string, string> = {};
 jest.mock("next/router", () => ({
   useRouter: (): unknown => ({
     basePath: "",
-    isReady: true,
+    isReady: mockIsReady,
     pathname: "/data/genes",
     push: mockPush,
     query: mockQuery,
   }),
 }));
-
-jest.mock(
-  "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag",
-  () => ({ useFeatureFlag: (): boolean => true })
-);
 
 // The search the page asks for; it is never answered, so the page shows its
 // example genes.
@@ -60,6 +57,9 @@ function submit(text: string): void {
 }
 
 beforeEach(() => {
+  mockIsReady = true;
+  window.localStorage.clear();
+  window.localStorage.setItem(FEATURE_FLAGS.DEMO, "true");
   mockPush.mockReset();
   mockUseGeneSearch.mockReset();
 });
@@ -94,5 +94,19 @@ describe("Genes page", () => {
       undefined,
       { shallow: true }
     );
+  });
+
+  it("renders nothing, not a 404, before the router is ready", () => {
+    mockIsReady = false;
+    window.localStorage.clear();
+    renderPage();
+    expect(screen.queryByText("404")).not.toBeInTheDocument();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+  });
+
+  it("is a 404 when the demo flag is unset", () => {
+    window.localStorage.clear();
+    renderPage();
+    expect(screen.getByText("404")).toBeInTheDocument();
   });
 });

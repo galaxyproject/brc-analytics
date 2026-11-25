@@ -125,7 +125,7 @@ function getLoganSearchLinks(
  * Kept out of `config.ts` so tests can reach it: `config.ts` transitively
  * imports `next-mdx-remote`, which Jest cannot parse.
  * The Genes entry is always included here; it is gated at runtime by the
- * gene pages feature flag (see the site's `useAppConfig` hook).
+ * demo feature flag (see the site's `useAppConfig` hook).
  * @returns header navigation.
  */
 export function headerNavigation(loganSearchEnabled: boolean): Navigation {
