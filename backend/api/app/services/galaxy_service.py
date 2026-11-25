@@ -2497,9 +2497,15 @@ class GalaxyService:
             with tempfile.TemporaryFile() as body:
                 for chunk in r.iter_content(chunk_size=1 << 20):
                     body.write(chunk)
-                # A stream cut short raises rather than ending cleanly, so a
-                # 200 with nothing in it is the file itself.
-                if body.tell() == 0:
+                # A stream cut short raises rather than ending cleanly when the
+                # response says how long it is, so then a 200 with nothing in
+                # it is the file itself. Without Content-Length or chunking, a
+                # dropped connection reads as a clean end and json.load's
+                # error retries it.
+                framed = "content-length" in r.headers or "chunked" in (
+                    r.headers.get("transfer-encoding", "").lower()
+                )
+                if body.tell() == 0 and framed:
                     raise EmptyMergedResults(dataset_id)
                 body.seek(0)
                 return json.load(body)

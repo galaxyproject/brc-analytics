@@ -4019,9 +4019,12 @@ def _zip_of(shards: dict) -> bytes:
     return buffer.getvalue()
 
 
-def _archive_response(payload: bytes, status_code: int = 200):
+def _archive_response(payload: bytes, status_code: int = 200, headers=None):
     response = MagicMock(status_code=status_code, text="")
     response.iter_content = MagicMock(return_value=iter([payload]))
+    response.headers = requests.structures.CaseInsensitiveDict(
+        {"Content-Length": str(len(payload))} if headers is None else headers
+    )
     return response
 
 
@@ -4429,6 +4432,30 @@ class TestMergedOutput:
 
         assert len(sent) == 1
         sent[0].close.assert_called_once()
+        merged.cache.set.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_an_unframed_empty_body_is_retried_not_a_failed_job(
+        self, merged, monkeypatch
+    ):
+        # With neither Content-Length nor chunking, the body ends wherever the
+        # connection does, so a drop before the first byte reads as a clean,
+        # empty 200. That says nothing about the file, so it mustn't fail the
+        # job and send the caller off to resubmit.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(_archive_response(b"", headers={"Connection": "close"}))
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
+
+        with pytest.raises(Exception, match="could not read merged results") as e:
+            await merged._aggregate_shards("job1")
+
+        assert not isinstance(e.value, GalaxyJobFailed)
+        assert len(sent) == galaxy_service.KMINDEX_MERGED_ATTEMPTS
         merged.cache.set.assert_not_called()
 
     @pytest.mark.asyncio
