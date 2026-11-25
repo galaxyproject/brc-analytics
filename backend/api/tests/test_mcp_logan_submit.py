@@ -656,9 +656,12 @@ class TestRebuild:
             "results are empty; submit the search again"
         )
         with caplog.at_level("ERROR", logger=logan_mcp.logger.name):
-            await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+            first = await logan_mcp.with_rebuild(
+                galaxy, self.JOB, {"status": "expired"}
+            )
             await self._drain()
         again = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert first["status"] == "building"
         assert again["status"] == "failed"
         assert "submit the search again" in again["error"]
         assert "retry_after_seconds" not in again
