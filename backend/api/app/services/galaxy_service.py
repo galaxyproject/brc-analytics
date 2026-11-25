@@ -2426,6 +2426,8 @@ class GalaxyService:
         @param job_id: the job, for logging.
         @param dataset_id: its merged output.
         @returns: one parsed shard per shard kmindex searched.
+        @raises GalaxyJobFailed: Galaxy served the file whole at zero bytes,
+            which won't change on a later read.
         @raises Exception: the file could not be read. Nothing else holds the
             hits, so an empty or partial answer here would be cached as a
             complete one; failing leaves the next read to try again.
