@@ -31,9 +31,9 @@ const VISIBLE_AT_LG = visibleOnly("lg");
 const VISIBLE_AT_XS_LG = visibleOnly("xs", "lg");
 
 /**
- * "Tools" is a dropdown where the header has room for it; at `sm` it collapses
- * into "More" with the primary links, and at `xs` the drawer lists it as a
- * link, since the drawer renders no menus.
+ * "Tools" is a menu at every width: a header dropdown at `md` and `lg`, a
+ * submenu inside "More" at `sm`, and a submenu in the drawer at `xs`, so
+ * phone users reach a tool in one tap.
  */
 const VISIBLE_AT_MD_LG = visibleOnly("md", "lg");
 const VISIBLE_AT_XS = visibleOnly("xs");
@@ -151,7 +151,12 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
         url: "",
         visible: VISIBLE_AT_MD_LG,
       },
-      { label: "Tools", url: TOOLS_LEARN_URL, visible: VISIBLE_AT_XS },
+      {
+        label: "Tools",
+        menuItems: TOOLS_MENU_ITEMS,
+        url: "",
+        visible: VISIBLE_AT_XS,
+      },
       {
         label: "More",
         menuItems: [
@@ -165,7 +170,11 @@ export function headerNavigation(loganSearchEnabled: boolean): Navigation {
               label: "Priority Pathogens",
               url: SITE_ROUTES.PRIORITY_PATHOGENS,
             },
-            { label: "Tools", url: TOOLS_LEARN_URL },
+            {
+              label: "Tools",
+              menuItems: TOOLS_MENU_ITEMS,
+              url: "",
+            },
           ]),
           JOIN_US,
           CONTACT_US,
