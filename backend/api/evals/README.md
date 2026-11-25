@@ -13,6 +13,8 @@ Mirrors the Galaxy `agent-evals-harness` shape: a thin runner around
 | `workflow_recommendation` | `LLMService.suggest_workflows`      | Did the model recommend a workflow whose IWC ID is in the accepted set?                                                        |
 | `assistant_multiturn`     | `AssistantAgent` (scripted convo)   | Final accumulated `AnalysisSchema` matches expected fields.                                                                    |
 | `structured_channel`      | `AssistantAgent` (scripted convo)   | Per-model reply/extract production, capture-on-change, no-leak, and tracker-correctness for the extraction-pass state capture. |
+| `logan_grounding`         | `AssistantAgent` (Logan session)    | Does a reply about a Logan search use the cohort's own numbers and caveats? Primary score `NumbersTraceToContext`.             |
+| `logan_multiturn`         | `AssistantAgent` (Logan session)    | Does "use the top N runs" hand off the right N accessions?                                                                     |
 
 ## `structured_channel` -- the MiniMax make-or-break
 
@@ -53,6 +55,36 @@ secondary target and the strong-model control. (Meta-Llama-3.3-70B is out of
 scope -- its TACC serving stack was incompatible with the earlier tool+trailer
 design.)
 
+## Logan sessions and the numbers check
+
+The Logan datasets open a session from a captured search (a fixture under
+`datasets/fixtures/`, with its README) and serve every Galaxy read from those
+files, so no run touches the network for Logan data. New fixtures come from
+`scripts/capture_logan_fixture.py`, which captures a finished search from a
+deployment, trims its export to fit in the repo, and can derive variants
+(`--derive saturated|no_mirror|injected --from <name> <new>`).
+
+`NumbersTraceToContext` scores the fraction of a reply's numbers that trace
+to what the model was given: every turn's instructions, the intro message, the
+user's own words and every tool return. Its rules, all tested in
+`evals/tests/test_evaluators.py`:
+
+- A percentage traces to a context percentage, or its complement (100 - x),
+  **within 0.1 and no further**. Rounding to a whole percent does not count:
+  "97%" for 97.2% is untraced, on purpose, since 12% for 12.49% would pass
+  otherwise.
+- A bare integer is a count, and traces only to a count: exactly, or for a
+  count of 1,000 or more, stated to at least two leading digits (17.6k, 17,600
+  or 18,000 for 17,629; never 20,000).
+- An unsigned decimal traces to a decimal it restates or rounds (0.97 for
+  0.972), or to a percentage within 0.1.
+- Digits in identifiers are not numbers: accessions, job ids, URLs, ISO dates,
+  list and table-rank ordinals, rRNA names ("18 S"). Numbers with units ("999ms",
+  "4GiB", "30x") or exponents are quantities.
+
+Numbers a model derives itself (a difference, a share it computed) are
+untraced by design: that is where errors hide.
+
 ## Setup
 
 1. `cp evals/models.yaml.sample evals/models.yaml` and fill in real keys
@@ -82,7 +114,18 @@ python -m evals.run_evals --datasets tool_selection --only list_yeast_assemblies
 
 # Reduce LLM-noise variance with repeats:
 python -m evals.run_evals --datasets search_interpretation --repeat 3
+
+# Keep every case's output and scores as JSONL for re-scoring later, cap the
+# cases in flight on a shared endpoint, and label what this run varies:
+python -m evals.run_evals --datasets logan_grounding --repeat 3 \
+  --dump-dir /tmp/dumps --max-concurrency 6 --label prompt-v2
 ```
+
+`--dump-dir` writes one `<dataset>@<model>[@<label>].jsonl` per run (never over
+an earlier file) with each case's reply, trace and scores, so a scorer change
+can be re-scored from saved replies without calling a model again.
+`--max-concurrency` caps cases in flight; lower it when latency is what is
+being measured.
 
 Reports land in `evals/results/<date>-<dataset-slug>-<sha>.md`. Commit them:
 the diff between runs is "did this prompt change help?".

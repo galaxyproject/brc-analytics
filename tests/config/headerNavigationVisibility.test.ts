@@ -18,6 +18,7 @@ const COLLAPSED_LABELS = [
   "Workflows",
   "Logan Search",
   "Priority Pathogens",
+  "Tools",
 ];
 
 /** Every primary link, in display order, at the widths none are collapsed. */
@@ -31,6 +32,7 @@ const PRIMARY_LABELS = [
   "Logan Search",
   "Priority Pathogens",
   "Assistant",
+  "Tools",
 ];
 
 const CASES: { breakpoint: BreakpointKey; labels: string[] }[] = [

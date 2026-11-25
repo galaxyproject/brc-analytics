@@ -11,6 +11,8 @@ but assert against a fixed fixture so they don't drift with the live catalog.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from app.services.tools.catalog_query import (
@@ -73,6 +75,107 @@ def test_range_op_requires_numeric_value():
 def test_contains_op_requires_list_field():
     with pytest.raises(ValueError, match="needs a list field"):
         CatalogQuery(filters=[Filter(field="level", op=Op.contains, value="x")])
+
+
+def test_contains_on_scalar_field_names_the_op_that_works():
+    # The model reads this message in its retry prompt. Told only that the field
+    # was wrong it made the same call again, and the turn died on the retry limit.
+    with pytest.raises(ValueError, match=r"use in \(exact match"):
+        CatalogQuery(
+            filters=[
+                Filter(field="strainName", op=Op.contains_any, value=["3D7", "Dd2"])
+            ]
+        )
+    with pytest.raises(ValueError, match=r"use eq \(exact match"):
+        CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
+    # A list handed to `contains` still needs `in`: `eq` would reject it next.
+    with pytest.raises(ValueError, match=r"use in \(exact match"):
+        CatalogQuery(
+            filters=[Filter(field="strainName", op=Op.contains, value=["3D7", "Dd2"])]
+        )
+    # And it says which fields the op does work on.
+    with pytest.raises(ValueError, match="lineageTaxonomyIds"):
+        CatalogQuery(filters=[Filter(field="strainName", op=Op.contains, value="3D7")])
+
+
+@pytest.mark.parametrize("value", ["falciparum", ["falciparum", "vivax"]])
+def test_contains_on_scalar_field_says_there_is_no_substring_match(value):
+    # A model that meant contains as "species containing falciparum" would take
+    # eq/in with the fragment and get zero rows back.
+    with pytest.raises(ValueError, match="no substring match.*full value"):
+        CatalogQuery(
+            filters=[Filter(field="taxonomicLevelSpecies", op=Op.contains, value=value)]
+        )
+
+
+def test_contains_on_scalar_field_lists_only_this_entitys_list_fields():
+    # An assembly list field offered on an organism query would fail as an
+    # unknown field on the model's one retry.
+    with pytest.raises(ValueError) as excinfo:
+        CatalogQuery(
+            entity="organism",
+            filters=[
+                Filter(
+                    field="taxonomicLevelGenus",
+                    op=Op.contains_any,
+                    value=["Plasmodium", "Toxoplasma"],
+                )
+            ],
+        )
+    message = str(excinfo.value)
+    assert "List fields for 'organism'" in message
+    assert "otherNames" in message
+    assert "lineageTaxonomyIds" not in message
+
+
+def _suggested_op(entity, field, op, value):
+    with pytest.raises(ValueError) as excinfo:
+        CatalogQuery(entity=entity, filters=[Filter(field=field, op=op, value=value)])
+    match = re.search(r"use (\w+) \(", str(excinfo.value))
+    assert match, str(excinfo.value)
+    return Op(match.group(1))
+
+
+@pytest.mark.parametrize(
+    "entity, field, op, value",
+    [
+        ("assembly", "strainName", Op.contains_any, ["3D7", "Dd2"]),
+        ("assembly", "strainName", Op.contains_any, "3D7"),
+        ("assembly", "strainName", Op.contains, "3D7"),
+        ("assembly", "strainName", Op.contains, ["3D7", "Dd2"]),
+        ("assembly", "length", Op.contains, 5),
+        ("assembly", "length", Op.contains_any, [5, 6]),
+        ("assembly", "isRef", Op.contains, True),
+        ("organism", "taxonomicLevelGenus", Op.contains_any, ["Plasmodium"]),
+        ("organism", "assemblyCount", Op.contains, 3),
+    ],
+)
+def test_contains_hint_names_an_op_the_retry_accepts(entity, field, op, value):
+    # The point of the message is that the model's one retry succeeds, so the op
+    # it names has to pass validation with the same field and value.
+    suggested = _suggested_op(entity, field, op, value)
+    CatalogQuery(
+        entity=entity, filters=[Filter(field=field, op=suggested, value=value)]
+    )
+
+
+def test_contains_hint_retry_returns_the_matching_rows(con):
+    suggested = _suggested_op(
+        "assembly", "level", Op.contains_any, ["Chromosome", "Scaffold"]
+    )
+    q = CatalogQuery(
+        operation="count",
+        filters=[Filter(field="level", op=suggested, value=["Chromosome", "Scaffold"])],
+    )
+    assert execute(q, con) == {"total": 4}
+
+
+@pytest.mark.parametrize("op", [Op.contains, Op.contains_any])
+def test_contains_on_scalar_field_with_empty_list_asks_for_a_value(op):
+    # `in` turns an empty list away too, so pointing at `in` alone would spend
+    # the model's one retry on a call that fails again.
+    with pytest.raises(ValueError, match="with at least one value"):
+        CatalogQuery(filters=[Filter(field="strainName", op=op, value=[])])
 
 
 def test_contains_rejects_list_value():

@@ -86,6 +86,40 @@ export interface GeneResponse {
 }
 
 /**
+ * What a search matched a gene on.
+ */
+export interface GeneSearchMatch {
+  // A search term type, snake_case as the gene API writes it: an alias type
+  // (e.g. protein_accession), or transcript_product or protein_product for a
+  // word of one of the gene's transcripts' products.
+  type: string;
+  // The alias as written, or the whole product the word is in.
+  value: string;
+}
+
+export interface GeneSearchResult {
+  assemblyAccession: string;
+  geneUid: string;
+  locusTag: string | null;
+  matchedOn: GeneSearchMatch;
+  name: string | null;
+  organism: GeneOrganism;
+  pageUrl: string;
+  symbol: string | null;
+}
+
+export interface GeneSearchResponse {
+  // The words searched: the query lowercased, trimmed of punctuation, and
+  // without the stop words and 1 or 2 character words of a query of several.
+  query: string;
+  // Best first; each gene once, at its best match.
+  results: GeneSearchResult[];
+  snapshot: GeneSnapshotInfo;
+  // Whether more genes matched than were returned.
+  truncated: boolean;
+}
+
+/**
  * One claim BioNym drew from a source: a language model's statement, the quote
  * it rests on, and BioNym's confidence in it, from 0 to 1.
  */
@@ -110,7 +144,17 @@ export interface BionymSource {
 }
 
 /**
- * The claims in a gene's BioNym graph, grouped by source.
+ * One statement of BioNym's summary of a gene: a language model's sentence
+ * about the gene, and BioNym's confidence in it, from 0 to 1.
+ */
+export interface BionymSummaryStatement {
+  confidence: number;
+  text: string;
+}
+
+/**
+ * The claims in a gene's BioNym graph, grouped by source, and BioNym's
+ * summary of the gene.
  */
 export interface BionymClaims {
   geneUid: string;
@@ -119,4 +163,41 @@ export interface BionymClaims {
   // The latest date BioNym retrieved evidence on, as YYYY-MM-DD.
   runDate: string;
   sources: BionymSource[];
+  // In BioNym's order; empty when the graph has no summary.
+  summary: BionymSummaryStatement[];
+}
+
+/**
+ * A node in a gene's BioNym graph: a gene, protein, paper, dataset, claim or
+ * another kind of thing BioNym found.
+ */
+export interface BionymGraphNode {
+  id: string;
+  label: string;
+  type: string;
+  // Null unless the graph gives an https: link.
+  url: string | null;
+}
+
+/**
+ * An edge in a gene's BioNym graph, with BioNym's confidence in it, from 0
+ * to 1.
+ */
+export interface BionymGraphEdge {
+  confidence: number;
+  object: string;
+  predicate: string;
+  subject: string;
+}
+
+/**
+ * A gene's BioNym graph: every node and edge, with only the fields the graph
+ * explorer draws.
+ */
+export interface BionymGraph {
+  edges: BionymGraphEdge[];
+  geneUid: string;
+  nodes: BionymGraphNode[];
+  // The id of the gene's own node, the graph's root.
+  query: string;
 }

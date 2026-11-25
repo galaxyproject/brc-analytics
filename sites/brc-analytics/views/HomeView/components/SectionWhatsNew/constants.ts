@@ -1,7 +1,36 @@
+import { ROUTES } from "@brc/routes/constants";
 import * as MDX from "@brc/views/HomeView/components/SectionWhatsNew/content";
 import { type CardProps } from "@databiosphere/findable-ui/lib/components/common/Card/card";
 
 export const WHATS_NEW_CARDS: Pick<CardProps, "cardActions" | "text">[] = [
+  {
+    cardActions: [
+      { label: "View the slides", url: "/learn/blog/astmh-2026-slides" },
+    ],
+    text: MDX.Astmh2026Slides({}),
+  },
+  {
+    cardActions: [
+      {
+        label: "Visit Logan Search",
+        url: "https://logan-search.org",
+      },
+      {
+        label: "Learn more",
+        url: ROUTES.LOGAN_SEARCH_LEARN,
+      },
+    ],
+    text: MDX.LoganSearch({}),
+  },
+  {
+    cardActions: [
+      {
+        label: "See all tools",
+        url: ROUTES.ASSOCIATED_TOOLS_LEARN,
+      },
+    ],
+    text: MDX.AssociatedTools({}),
+  },
   {
     cardActions: [
       {

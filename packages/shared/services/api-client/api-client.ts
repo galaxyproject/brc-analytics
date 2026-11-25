@@ -1,7 +1,9 @@
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type BionymClaims,
+  type BionymGraph,
   type GeneResponse,
+  type GeneSearchResponse,
 } from "@repo/shared/services/genes/types";
 import ky, { type HTTPError } from "ky";
 import type {
@@ -91,6 +93,19 @@ export const apiClient = {
       .json();
   },
 
+  getGeneBionymGraph: async (
+    geneUid: string,
+    signal?: AbortSignal
+  ): Promise<BionymGraph> => {
+    // ky doesn't retry; useGeneBionymGraph's query does.
+    return httpClient
+      .get(`genes/${encodeURIComponent(geneUid)}/bionym/graph`, {
+        retry: 0,
+        signal,
+      })
+      .json();
+  },
+
   getLoganSearches: async (
     offset = 0,
     limit = 20
@@ -120,5 +135,16 @@ export const apiClient = {
     id: string
   ): Promise<SavedAnalysisRestoreResponse> => {
     return httpClient.post(`saved_analyses/${id}/open`).json();
+  },
+
+  searchGenes: async (
+    q: string,
+    limit: number,
+    signal?: AbortSignal
+  ): Promise<GeneSearchResponse> => {
+    // ky doesn't retry; useGeneSearch's query does.
+    return httpClient
+      .get("genes/search", { retry: 0, searchParams: { limit, q }, signal })
+      .json();
   },
 };

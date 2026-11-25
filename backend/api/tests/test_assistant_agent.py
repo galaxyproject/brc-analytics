@@ -11,6 +11,7 @@ from hypothesis import strategies as st
 from pydantic_ai.messages import (
     ModelRequest,
     ModelResponse,
+    RetryPromptPart,
     TextPart,
     ToolCallPart,
     ToolReturnPart,
@@ -39,7 +40,7 @@ from app.services.assistant_agent import (
     LoganJobNotReadyError,
 )
 from app.services.logan_snapshot import build_logan_snapshot
-from app.services.tools.catalog_tools import get_workflow_details
+from app.services.tools.catalog_tools import AssistantDeps, get_workflow_details
 from tests.test_logan_snapshot import JOB as LOGAN_JOB
 from tests.test_logan_snapshot import results as logan_results
 from tests.test_logan_tools import _galaxy as _logan_galaxy
@@ -2122,6 +2123,48 @@ def _extraction_agent(reply, state, catalog=None):
     instance._build_model = lambda *a, **k: FunctionModel(model_fn)
     instance._init_agent()
     return instance
+
+
+class TestCatalogFilterRetry:
+    """A rejected query_catalog call goes back to the model as its retry prompt,
+    and the tool gets one retry, so the prompt has to say what would work."""
+
+    @pytest.mark.asyncio
+    async def test_contains_any_on_a_scalar_field_recovers_on_the_retry(self):
+        from pydantic_ai.models.function import FunctionModel
+
+        prompts = []
+
+        def query(op):
+            strains = {"field": "strainName", "op": op, "value": ["3D7", "Dd2"]}
+            args = {"query": {"entity": "assembly", "filters": [strains]}}
+            return ModelResponse(parts=[ToolCallPart("query_catalog", args)])
+
+        def model_fn(messages, info):
+            parts = messages[-1].parts
+            if any(isinstance(part, ToolReturnPart) for part in parts):
+                return ModelResponse(parts=[TextPart("done")])
+            retries = [part for part in parts if isinstance(part, RetryPromptPart)]
+            if not retries:
+                return query("contains_any")
+            prompts.append(retries[0].model_response())
+            # A model told only what was wrong repeats the call; one told what
+            # works takes the suggestion.
+            return query("in" if "use in" in prompts[-1] else "contains_any")
+
+        agent = _extraction_agent(reply="unused", state=None)
+        with agent.agent.override(model=FunctionModel(model_fn)):
+            result = await agent._run_agent_once(
+                "assemblies for strains 3D7 or Dd2",
+                deps=AssistantDeps(catalog=agent.catalog),
+            )
+
+        assert result.output == "done"
+        assert len(prompts) == 1
+        # The retry prompt echoes the rejected input, so the bare field name is
+        # always there; check for it in the message itself.
+        assert "'strainName' holds one value per row" in prompts[0]
+        assert "There is no substring match" in prompts[0]
 
 
 def _wire_session(agent, state):

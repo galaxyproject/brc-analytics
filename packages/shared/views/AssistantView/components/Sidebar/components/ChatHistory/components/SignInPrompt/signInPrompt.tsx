@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { LoginRounded } from "@mui/icons-material";
 import { useAuth } from "@repo/shared/providers/authentication/provider";
@@ -22,10 +22,9 @@ export const SignInPrompt = (): JSX.Element => {
         Sign in to keep this chat and see previous chat history
       </StyledTypography>
       <StyledButton
-        color={BUTTON_PROPS.COLOR.SECONDARY}
+        {...BUTTON_PRESETS.SECONDARY_OUTLINED}
         onClick={login}
         startIcon={<LoginRounded />}
-        variant={BUTTON_PROPS.VARIANT.CONTAINED}
       >
         Sign in
       </StyledButton>

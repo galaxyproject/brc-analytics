@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -72,6 +71,7 @@ class FakeCache:
 
 def _galaxy():
     galaxy = MagicMock()
+    galaxy.for_job.return_value = galaxy
     galaxy.is_available.return_value = True
     galaxy.credential = MagicMock(kind="service")
     galaxy.submit_kmindex_query = AsyncMock(
@@ -165,6 +165,7 @@ def test_every_call_needs_the_key(partner_env):
         ("get", f"{BASE}/jobs/{JOB_ID}"),
         ("get", f"{BASE}/jobs/{JOB_ID}/results"),
         ("get", f"{BASE}/jobs/{JOB_ID}/export"),
+        ("get", f"{BASE}/jobs/{JOB_ID}/query.fasta"),
     ]:
         body = PAYLOAD if method == "post" else None
         response = client.request(method.upper(), path, json=body)
@@ -229,6 +230,7 @@ def test_a_submit_starts_a_job_and_records_it_as_partner_traffic(partner_env):
     assert body["status_url"] == f"{BASE}/jobs/{JOB_ID}"
     assert body["results_url"].endswith(f"{BASE}/jobs/{JOB_ID}/results")
     assert body["export_url"].endswith(f"{BASE}/jobs/{JOB_ID}/export")
+    assert body["query_url"] == f"{BASE}/jobs/{JOB_ID}/query.fasta"
     galaxy.submit_kmindex_query.assert_awaited_once()
     kwargs = record.await_args.kwargs
     assert (kwargs["source"], kwargs["partner_id"]) == ("partner", "example-partner")
@@ -499,7 +501,6 @@ def test_the_galaxy_service_ignores_any_session_and_uses_its_own_history(
 
     galaxy = asyncio.run(
         partner_module.get_partner_galaxy_service(
-            request=SimpleNamespace(path_params={}),
             cache=MagicMock(),
             partner=Partner(key_id="k1", partner_id="example-partner"),
             sra_mirror=None,
@@ -574,3 +575,46 @@ def test_an_export_streams_with_its_sunset(partner_env, tmp_path, monkeypatch, f
         assert response.text.splitlines()[1].startswith("SRR1")
     else:
         assert response.content == path.read_bytes()
+
+
+def test_the_query_downloads_with_a_partner_key(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(
+        return_value={"query_fasta": PAYLOAD["sequence"]}
+    )
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 200
+    assert response.text == PAYLOAD["sequence"]
+    assert response.headers["content-type"].startswith("text/x-fasta")
+    assert f"logan-{JOB_ID}-query.fasta" in response.headers["content-disposition"]
+    assert response.headers["Sunset"] == sunset_header(SUNSET)
+    galaxy.get_kmindex_query.assert_awaited_once_with(JOB_ID)
+
+
+def test_the_query_is_read_from_the_galaxy_that_holds_the_job(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(side_effect=AssertionError("primary"))
+    legacy = MagicMock()
+    legacy.is_available.return_value = True
+    legacy.get_kmindex_query = AsyncMock(
+        return_value={"query_fasta": PAYLOAD["sequence"]}
+    )
+    galaxy.for_job.return_value = legacy
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 200
+    galaxy.for_job.assert_called_once_with(JOB_ID)
+    legacy.get_kmindex_query.assert_awaited_once_with(JOB_ID)
+    galaxy.get_kmindex_query.assert_not_awaited()
+
+
+def test_the_query_of_an_unknown_job_is_a_404(partner_env):
+    client, galaxy, _ = partner_env
+    galaxy.get_kmindex_query = AsyncMock(side_effect=GalaxyJobNotFound("no job"))
+
+    response = client.get(f"{BASE}/jobs/{JOB_ID}/query.fasta", headers=HEADERS)
+
+    assert response.status_code == 404

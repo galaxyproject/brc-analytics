@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Stack, Typography } from "@mui/material";
 import { StyledPaper } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDataSelector/selectorDataSelector.styles";
@@ -33,7 +33,7 @@ export const DataSelector = ({
           Browse to find and select an organism
         </Typography>
       </Stack>
-      <Button {...BUTTON_PROPS.PRIMARY_CONTAINED} onClick={onOpen}>
+      <Button {...BUTTON_PRESETS.PRIMARY_CONTAINED} onClick={onOpen}>
         Browse
       </Button>
     </StyledPaper>

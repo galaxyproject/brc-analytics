@@ -38,3 +38,72 @@ def test_declared_evaluator_names_include_llm_judge_score_and_pass_names():
     assert _declared_evaluator_names(case, []) == frozenset(
         {"LLMJudge_score", "LLMJudge_pass"}
     )
+
+
+def test_write_dump_keeps_outputs_and_drops_the_snapshot(tmp_path):
+    import json
+    from dataclasses import dataclass, field
+    from types import SimpleNamespace
+
+    from evals.run_evals import write_dump
+
+    @dataclass
+    class _Out:
+        reply: str
+        session_metadata: dict = field(default_factory=dict)
+
+    out = _Out(
+        reply="17,629 runs",
+        session_metadata={
+            "logan": {
+                "job_id": "x",
+                "top_hits": [1, 2],
+                "cohort": {"total": 3},
+                "added_by_a_turn": {"n": 3},
+            },
+            "turn_count": 1,
+        },
+    )
+    report = SimpleNamespace(
+        cases=[
+            SimpleNamespace(
+                name="c [1/2]",
+                scores={"NumbersTraceToContext": SimpleNamespace(value=0.5)},
+                assertions={},
+                task_duration=1.5,
+                output=out,
+            )
+        ],
+        failures=[SimpleNamespace(name="d", error_message="boom")],
+    )
+    path = tmp_path / "x.jsonl"
+    write_dump(path, report, label="v2")
+    first, second = [json.loads(line) for line in path.read_text().splitlines()]
+    assert first["case"] == "c [1/2]"
+    assert first["label"] == "v2"
+    assert first["scores"] == {"NumbersTraceToContext": 0.5}
+    assert first["output"]["reply"] == "17,629 runs"
+    # The snapshot's own fields go, by name; the job id and anything else stay.
+    assert first["output"]["session_metadata"]["logan"] == {
+        "job_id": "x",
+        "added_by_a_turn": {"n": 3},
+    }
+    assert first["output"]["session_metadata"]["turn_count"] == 1
+    assert second == {"case": "d", "label": "v2", "error": "boom"}
+
+
+def test_dump_paths_carry_the_label_and_never_overwrite(tmp_path):
+    from evals.run_evals import dump_path
+
+    assert dump_path(tmp_path, "logan_grounding", "m", None).name == (
+        "logan_grounding@m.jsonl"
+    )
+    first = dump_path(tmp_path, "logan_grounding", "m", "v1")
+    assert first.name == "logan_grounding@m@v1.jsonl"
+    first.write_text("")
+    assert dump_path(tmp_path, "logan_grounding", "m", "v1").name == (
+        "logan_grounding@m@v1.2.jsonl"
+    )
+    assert dump_path(tmp_path, "logan_grounding", "m", "v2").name == (
+        "logan_grounding@m@v2.jsonl"
+    )

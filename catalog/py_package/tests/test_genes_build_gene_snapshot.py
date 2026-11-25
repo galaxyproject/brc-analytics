@@ -66,6 +66,7 @@ def test_counts(snapshot):
         "gene": 4,
         "transcript": 5,
         "alt_id": 21,
+        "search_term": 40,
     }
 
 
@@ -222,7 +223,141 @@ def test_tables_declare_their_keys(snapshot):
         "gene",
         "transcript",
         "alt_id",
+        "search_term",
     }
+
+
+def test_the_snapshot_records_how_product_words_were_made(snapshot):
+    con, _ = snapshot
+    assert con.execute(
+        "SELECT search_stop_words, search_min_word_length FROM snapshot"
+    ).fetchone() == (
+        ["and", "domain", "family", "like", "of", "protein", "putative", "the"],
+        3,
+    )
+
+
+def test_search_terms(snapshot):
+    con, _ = snapshot
+    rows = con.execute(
+        "SELECT term, type, display, assembly_accession, species_taxonomy_id,"
+        " type_rank FROM search_term WHERE gene_uid = ? ORDER BY term, type",
+        [AMA1_UID],
+    ).fetchall()
+    product = "apical membrane antigen 1"
+    assert [row[3:5] for row in rows] == [("GCF_000002765.6", "5833")] * len(rows)
+    assert [
+        (term, type_, display, rank) for term, type_, display, *_, rank in rows
+    ] == [
+        ("810891", "ncbi_gene_id", "810891", 1),
+        ("ama1", "name", "AMA1", 0),
+        ("ama1", "symbol", "AMA1", 1),
+        ("antigen", "protein_product", product, 4),
+        ("antigen", "transcript_product", product, 4),
+        ("apical", "protein_product", product, 4),
+        ("apical", "transcript_product", product, 4),
+        ("membrane", "protein_product", product, 4),
+        ("membrane", "transcript_product", product, 4),
+        ("pf3d7_1133400", "locus_tag", "PF3D7_1133400", 0),
+        # Accessions with and without their version.
+        ("xm_001347979", "transcript_id", "XM_001347979.2", 1),
+        ("xm_001347979.2", "transcript_id", "XM_001347979.2", 1),
+        ("xp_001348015", "protein_accession", "XP_001348015.1", 1),
+        ("xp_001348015.1", "protein_accession", "XP_001348015.1", 1),
+    ]
+
+
+def test_search_terms_are_stored_in_term_order(snapshot):
+    # So a prefix of a term is a range of rows, which DuckDB reads by
+    # skipping the row groups outside it.
+    con, _ = snapshot
+    terms = [term for (term,) in con.execute("SELECT term FROM search_term").fetchall()]
+    assert terms == sorted(terms)
+
+
+def test_search_terms_are_each_stored_once(snapshot):
+    # search_term has no primary key to enforce it.
+    con, _ = snapshot
+    assert (
+        con.execute(
+            "SELECT term, type, gene_uid FROM search_term"
+            " GROUP BY ALL HAVING count(*) > 1"
+        ).fetchall()
+        == []
+    )
+
+
+def test_a_product_word_two_transcripts_share_is_one_term(snapshot):
+    # PF3D7_0105400's two transcripts are both "uncharacterized protein".
+    con, _ = snapshot
+    assert con.execute(
+        "SELECT term, type FROM search_term s JOIN gene g USING (gene_uid)"
+        " WHERE g.locus_tag = 'PF3D7_0105400' AND type_rank = 4 ORDER BY type"
+    ).fetchall() == [
+        ("uncharacterized", "protein_product"),
+        ("uncharacterized", "transcript_product"),
+    ]
+
+
+def test_transcript_and_protein_products_give_their_own_words(tmp_path, catalog):
+    out = tmp_path / "genes.duckdb"
+    gff3 = EXCERPT.with_name("pfalciparum_3d7_products_differ.gff3")
+    bgs.build_gene_snapshot("GCF_000002765.6", str(gff3), out, catalog)
+    con = duckdb.connect(str(out), read_only=True)
+    try:
+        rows = con.execute(
+            "SELECT type, list(term ORDER BY term) FROM search_term"
+            " WHERE type_rank = 4 GROUP BY type ORDER BY type"
+        ).fetchall()
+    finally:
+        con.close()
+    assert rows == [
+        ("protein_product", ["atp", "atp-dependent", "dependent", "helicase", "rna"]),
+        (
+            "transcript_product",
+            [
+                "atp",
+                "atp-dependent",
+                "dependent",
+                "dna",
+                "dna/rna",
+                "helicase",
+                "psh1",
+                "rna",
+            ],
+        ),
+    ]
+
+
+@pytest.mark.parametrize(
+    "product, words",
+    [
+        ("apical membrane antigen 1", ["apical", "membrane", "antigen"]),
+        # Stop words and words of 1 or 2 characters are left out.
+        (
+            "putative protein of the DnaJ family, like domain and an ORF",
+            ["dnaj", "orf"],
+        ),
+        # Punctuation around a word is trimmed.
+        (
+            "erythrocyte membrane protein 1 (PfEMP1), exon 1",
+            ["erythrocyte", "membrane", "pfemp1", "exon"],
+        ),
+        # Hyphenated and slashed words are kept whole and as their parts.
+        (
+            "ATP-dependent DNA/RNA helicase",
+            ["atp-dependent", "atp", "dependent", "dna/rna", "dna", "rna", "helicase"],
+        ),
+        # Each word once.
+        (
+            "tRNA ligase, tRNA-binding",
+            ["trna", "ligase", "trna-binding", "binding"],
+        ),
+        ("", []),
+    ],
+)
+def test_product_words(product, words):
+    assert bgs.product_words(product) == words
 
 
 def test_duplicate_key_fails_and_keeps_the_old_file(tmp_path, catalog):

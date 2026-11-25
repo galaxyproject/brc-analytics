@@ -1,5 +1,5 @@
 import { TOOLTIP_PROPS } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/RowSelectionCell/constants";
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, Tooltip } from "@mui/material";
 import { useStepContext } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/providers/SelectorStep/hook";
 import { DEFAULT_CONFIGURED_INPUT } from "@repo/shared/views/WorkflowInputsView/hooks/UseConfigureInputs/constants";
@@ -25,7 +25,7 @@ export const SelectCell = <T extends RowData>({
     <Tooltip {...TOOLTIP_PROPS} title={row.getSelectionValidation?.()}>
       <span>
         <Button
-          color={BUTTON_PROPS.COLOR.PRIMARY}
+          {...BUTTON_PRESETS.PRIMARY_CONTAINED}
           disabled={!row.getCanSelect()}
           onClick={() => {
             if (row.getIsSelected()) {
@@ -43,7 +43,6 @@ export const SelectCell = <T extends RowData>({
             // The timeout ensures this runs after the dialog close animation completes.
             setTimeout(() => table.resetColumnFilters(), 1000);
           }}
-          variant={BUTTON_PROPS.VARIANT.CONTAINED}
         >
           Select
         </Button>

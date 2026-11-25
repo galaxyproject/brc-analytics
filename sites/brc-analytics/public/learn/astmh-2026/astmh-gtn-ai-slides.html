@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Human-Written, Agent-Readable — ASTMH 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme" />
+
+  <!-- Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      /* BRC palette (from brochure/poster) */
+      --navy:        #28285B;
+      --navy-dark:   #1F1F47;
+      --navy-soft:   #3F3F6E;
+      --accent:      #956F00;   /* gold — the "red equivalent" for bars/markers */
+      --accent-soft: #B8881A;
+      --highlight:   #FFEB78;   /* soft yellow — for emphasis backgrounds */
+      --muted:       #637381;
+      --muted-light: #9AA2AE;
+      --panel:       #F7F7FB;
+      --border:      #E3E3ED;
+      --white:       #FFFFFF;
+    }
+
+    /* ===== Print PDF: match paper size to slide dimensions (1280x760) ===== */
+    @page {
+      size: 1280px 760px;
+      margin: 0;
+    }
+
+    /* Reveal.js print-pdf mode: force each slide to fill its pdf-page box. */
+    html.print-pdf .pdf-page {
+      height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+    html.print-pdf .pdf-page > section,
+    html.print-pdf .reveal .slides > section {
+      top: 0 !important;
+      left: 0 !important;
+      width: 1280px !important;
+      height: 760px !important;
+      min-height: 760px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transform: none !important;
+    }
+    html.print-pdf .slide {
+      height: 760px !important;
+    }
+
+    /* ===== Base reveal overrides ===== */
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy-soft);
+      font-size: 22px;
+    }
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: 0;
+      height: 100%;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Merriweather', serif;
+      color: var(--navy);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .reveal a { color: var(--navy); border-bottom: 2px solid var(--highlight); }
+    .reveal strong { color: var(--navy); font-weight: 600; }
+
+    /* ===== Slide frame (every slide) ===== */
+    .slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 70px 90px 60px;
+      box-sizing: border-box;
+      background: var(--white);
+    }
+
+    .slide::before {
+      /* top accent bar — navy with gold underline */
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--navy);
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .slide-logo {
+      position: absolute;
+      bottom: 16px;
+      left: 30px;
+      height: 60px;
+      width: auto;
+      opacity: 0.75;
+    }
+
+    /* Secondary mark (BRC Analytics), set beside the GTN logo in the bottom-left cluster.
+       GTN logo: left 30px, 60px tall (~126px wide) -> right edge ~156px.
+       BRC wordmark is 163x26, so 24px tall is ~150px wide; vertically centred on the GTN mark. */
+    .slide-logo-secondary {
+      position: absolute;
+      bottom: 34px;
+      left: 180px;
+      height: 24px;
+      width: auto;
+      opacity: 0.75;
+    }
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      font-size: 12px;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* ===== Slide title + divider ===== */
+    .slide h2.slide-title {
+      font-size: 40px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .slide .title-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+
+    /* ===== Bullet list (minimal, square marker) ===== */
+    .reveal ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reveal ul.clean li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 22px;
+      font-size: 22px;
+      color: var(--navy-soft);
+      line-height: 1.5;
+    }
+    .reveal ul.clean li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 10px;
+      width: 12px; height: 12px;
+      background: var(--accent);
+    }
+
+    /* ===== Two-column layout ===== */
+    .cols {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+    }
+    .cols > .col { flex: 1; min-width: 0; }
+
+    /* ===== Dark callout (navy box, gold edge) ===== */
+    .callout-dark {
+      position: relative;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 32px 32px 32px 40px;
+      box-shadow: 0 10px 25px rgba(40, 40, 91, 0.18);
+    }
+    .callout-dark::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: var(--accent);
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    .callout-dark .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--highlight);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .callout-dark .body {
+      font-family: 'Merriweather', serif;
+      font-size: 24px;
+      line-height: 1.45;
+      font-style: italic;
+      margin: 0;
+    }
+    .callout-dark .body.emphatic {
+      color: var(--highlight);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* Light highlight callout variant */
+    .callout-light {
+      background: var(--highlight);
+      border-radius: 8px;
+      padding: 22px 26px;
+      border-left: 8px solid var(--accent);
+      color: var(--navy);
+    }
+    .callout-light .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .callout-light .body {
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* ===== Card grid (icon + label) ===== */
+    .card-grid {
+      display: grid;
+      gap: 18px;
+    }
+    .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 130px;
+    }
+    .card .card-icon {
+      color: var(--navy);
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+    .card .card-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy-soft);
+      line-height: 1.3;
+    }
+    .card.accent {
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .card.accent .card-icon { color: var(--highlight); }
+    .card.accent .card-label { color: var(--white); }
+    .card.accent strong { color: var(--highlight); }
+
+    /* ===== Title slide ===== */
+    .title-slide h1 {
+      font-size: 58px;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .title-slide .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 42px;
+    }
+    .title-slide .kicker-divider {
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin-bottom: 36px;
+    }
+    .title-slide .author {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .title-slide .affiliation {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ===== Section divider slide ===== */
+    .section-slide {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 110px;
+    }
+    .section-slide::before { display: none; }
+    .section-slide::after { display: none; }
+    .section-slide .kicker {
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section-slide h2 {
+      color: var(--white);
+      font-size: 52px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-slide .section-sub {
+      font-size: 22px;
+      color: var(--muted-light);
+      max-width: 760px;
+    }
+    .section-slide .kicker-divider {
+      width: 80px; height: 4px;
+      background: var(--accent);
+      margin: 24px 0 0;
+    }
+
+    /* ===== Inline arrow between columns ===== */
+    .between-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--accent);
+      font-size: 32px;
+      padding: 0 4px;
+    }
+
+    /* ===== Misc ===== */
+    .small { font-size: 14px; color: var(--muted); }
+    .kicker {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .emph {
+      font-family: 'Merriweather', serif;
+      font-style: italic;
+      color: var(--navy);
+      font-size: 22px;
+    }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 20px 0 10px;
+    }
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: var(--navy);
+    }
+
+    /* Highlight inline span */
+    .hl {
+      background: linear-gradient(transparent 55%, var(--highlight) 55%);
+      padding: 0 2px;
+    }
+
+    /* Stat */
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 24px 28px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      border-top: 4px solid var(--accent);
+    }
+    .stat-num {
+      font-family: 'Merriweather', serif;
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 8px;
+    }
+
+    /* Pipeline mini-diagram */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pipe-stage {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pipe-stage.terminal {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+    .pipe-stage.terminal .pipe-title { color: var(--white); }
+    .pipe-stage.terminal .pipe-sub { color: var(--highlight); }
+    .pipe-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .pipe-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .pipe-arrow {
+      display: flex; align-items: center;
+      color: var(--accent); font-size: 18px;
+    }
+
+    /* Placeholder block */
+    .placeholder {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: var(--muted-light);
+      font-size: 16px;
+      font-style: italic;
+    }
+
+    /* ===== QR block ===== */
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .qr-block img {
+      width: 110px;
+      height: 110px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      background: var(--white);
+    }
+    .qr-block .qr-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+
+    /* ===== Mock chat ===== */
+    .chat-window {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .chat-msg {
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: 15px;
+      line-height: 1.4;
+      max-width: 88%;
+    }
+    .chat-msg.user {
+      background: var(--navy);
+      color: var(--white);
+      margin-left: auto;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-msg.agent {
+      background: var(--white);
+      border: 1px solid var(--border);
+      color: var(--navy-soft);
+      border-bottom-left-radius: 2px;
+    }
+    .chat-msg .who {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+    .chat-tool {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: var(--navy-dark);
+      color: var(--highlight);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 6px 0 12px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============ 1. Title ============ -->
+    <section>
+      <div class="slide title-slide">
+        <h1>Human-Written,<br/>Agent-Readable</h1>
+        <div class="subtitle">Grounding AI agents in the Galaxy Training Network — and running them on usegalaxy.org</div>
+        <div class="kicker-divider"></div>
+        <div class="author">Scott Cain</div>
+        <div class="affiliation">Galaxy Project, Penn State &middot; ASTMH 2026</div>
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">November 2026</div>
+      </div>
+      <aside class="notes">Frame up front: this talk is not "use AI for genomics." It's about what you point the AI at. The GTN is 536 human-written, human-reviewed tutorials — and it happens to be exactly the corpus an agent needs. Humans write it; machines read it. That asymmetry is the whole talk.</aside>
+    </section>
+
+    <!-- ============ 2. The method gap ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">The Bottleneck Isn't Sequencing Anymore</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 26px;">
+          Sequencing has reached labs where <span class="hl">analysis expertise hasn't followed</span>.
+        </p>
+
+        <div class="cols" style="margin-bottom: 24px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;">When a new pathogen dataset lands, two bad options</div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li><strong>Wait</strong> — for a workshop, a course, a collaborator with free time</li>
+              <li><strong>Ask an AI</strong> — which will cheerfully produce a plausible pipeline</li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 440px;">
+            <div class="callout-light" style="height: 100%; box-sizing: border-box;">
+              <div class="label">What "plausible" costs you</div>
+              <p class="body" style="font-size: 17px;">Tool versions that never existed together. A filtering step quietly dropped — the one that decides whether two isolates look like transmission. And <strong>no record of either</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The framing for this talk</div>
+          <p class="body">An agent with no curriculum <em>improvises</em>. <strong style="color:var(--highlight);">The GTN is a curriculum.</strong></p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Motivation</div>
+      </div>
+      <aside class="notes">Say out loud that the room contains both AI enthusiasts and AI skeptics, and that this talk is aimed at both. The failure mode isn't that the model refuses — it's that it answers confidently. The concrete example to speak, not read: an invented TB pipeline that skips the low-coverage/repeat-region masking step produces transmission clusters that look fine and are wrong.</aside>
+    </section>
+
+    <!-- ============ 3. What the GTN is ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">What the GTN Actually Is</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 22px;">
+          <div class="col">
+            <div style="display: flex; gap: 14px; margin-bottom: 20px;">
+              <div class="stat" style="padding: 16px 20px; flex: 1;">
+                <div class="stat-num" style="font-size: 40px;">536</div>
+                <div class="stat-label" style="font-size: 11px;">tutorials</div>
+              </div>
+              <div class="stat" style="padding: 16px 20px; flex: 1;">
+                <div class="stat-num" style="font-size: 40px;">370</div>
+                <div class="stat-label" style="font-size: 11px;">workflows</div>
+              </div>
+              <div class="stat" style="padding: 16px 20px; flex: 1;">
+                <div class="stat-num" style="font-size: 40px;">35</div>
+                <div class="stat-label" style="font-size: 11px;">topics</div>
+              </div>
+              <div class="stat" style="padding: 16px 20px; flex: 1;">
+                <div class="stat-num" style="font-size: 40px;">560</div>
+                <div class="stat-label" style="font-size: 11px;">contributors</div>
+              </div>
+            </div>
+
+            <div class="section-label" style="margin-top:0;">Every tutorial bundles four things</div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li>A <strong>human-written narrative</strong> — reviewed by other humans</li>
+              <li><strong>Real public data</strong>, pinned to a Zenodo record</li>
+              <li>A <strong>runnable Galaxy workflow</strong> you can import today</li>
+              <li>The <strong>"why"</strong> — the part a pipeline file can't carry</li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 400px;">
+            <div class="card accent" style="min-height: 0; height: 100%; box-sizing: border-box;">
+              <div class="card-label" style="font-size: 15px;">
+                <i class="fa-solid fa-earth-africa" style="color: var(--highlight); margin-right: 8px;"></i>The <strong>One Health</strong> topic, today
+              </div>
+              <div class="card-label" style="font-size: 14px; font-weight: 400; color: var(--white); opacity: 0.9; line-height: 1.8; margin-top: 12px;">
+                <em>M. tuberculosis</em> Variant Analysis<br/>
+                Identifying TB transmission links: SNPs &rarr; clusters<br/>
+                Tree thinking for TB evolution &amp; epidemiology<br/>
+                Pox virus genome analysis from tiled amplicons<br/>
+                Avian influenza viral strain analysis<br/>
+                Identification of AMR genes in a bacterial genome<br/>
+                SARS-CoV-2 variant analysis from the SRA
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="small" style="margin: 0;">Counts from the GTN <span class="mono" style="font-size:13px;">/stats/</span> page, 16 November 2026. Also in there: 549 FAQ snippets, 28 learning paths, 214 videos &mdash; and 190 of those workflows ship automated tests.</p>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">The GTN</div>
+      </div>
+      <aside class="notes">Lead with the One Health list, not the numbers — this audience recognizes those titles. TB transmission clustering, AMR gene identification, pox virus tiled-amplicon: these are ASTMH problems, already written up, already with workflows. Then the numbers for scale. Note the fourth bullet: a Nextflow pipeline gives you the steps; a GTN tutorial tells you why the steps. If asked about the name: "One Health" is the WHO/FAO/WOAH/UNEP framing, not a Galaxy coinage &mdash; human, animal and ecosystem health as one interlinked system. And it's a different kind of topic than the rest of the GTN: internally it's a <em>synthetic</em>, tag-based topic, with no directory of its own. Nothing was written for it. It's a re-indexing of tutorials that already lived under variant-analysis, evolution, genome-annotation and computational-chemistry, pulled together by what you're trying to find out instead of by technique. Helena Rasche built the mechanism in May 2023 and handed the curation to Wolfgang Maier, Peter van Heusden and Tomas Klingstr&ouml;m &mdash; Galaxy variant analysis, SANBI, and SLU veterinary informatics. Human, animal, environment, staffed that way. That's this talk's argument in miniature: the material was already there, it just needed to be findable. (Count check: the topic carries 9 materials today; the card shows 7 &mdash; a third SARS-CoV-2 tutorial and a molecular-docking one are left off on purpose.)</aside>
+    </section>
+
+    <!-- ============ 4. Already machine-readable ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">It's Already Machine-Readable</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 24px;">
+          The GTN was built for humans — in formats <span class="hl">agents read natively</span>.
+        </p>
+
+        <div class="card-grid cols-4" style="margin-bottom: 24px;">
+          <div class="card" style="min-height: 0;">
+            <i class="fa-brands fa-markdown card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 15px;"><span class="mono" style="font-size:13px;">tutorial.md</span><br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Markdown + YAML front matter: objectives, tools, <span class="mono" style="font-size:11px;">zenodo_link</span></span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-diagram-project card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 15px;"><span class="mono" style="font-size:13px;">*.ga</span><br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">The workflow itself, as JSON — steps, tool IDs, versions</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-code card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 15px;">JSON API<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">The whole catalog, queryable — topics, materials, metadata</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-circle-question card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 15px;"><span class="mono" style="font-size:13px;">faqs/</span><br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">290 snippets answering the questions learners actually ask</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 22px;">
+          <span class="mono" style="font-size: 14px;">curl training.galaxyproject.org/training-material/api/topics/one-health.json</span>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">What this means in practice</div>
+          <p class="body">No scraping. No RAG pipeline to build. <strong style="color:var(--highlight);">The curriculum is already a corpus.</strong></p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">The GTN</div>
+      </div>
+      <aside class="notes">This is the pivot of the talk. Nobody designed the GTN as AI infrastructure — it's Markdown, YAML and JSON because that's how you maintain 536 tutorials with 700 volunteers across a dozen countries. The accident is that those are exactly the formats an agent ingests without help. Live-demo option: run that curl and show the JSON.</aside>
+    </section>
+
+    <!-- ============ 5. The GTN's own rules for agents ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">The GTN Has Rules for Agents — In the Repo</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 22px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;"><i class="fa-solid fa-ban" style="margin-right:6px;"></i>Agents may <strong>not</strong></div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li>Write tutorials, news, events, or learning pathways — <strong>any learner-facing prose</strong></li>
+              <li>Write your pull request descriptions, issues, or replies to reviewers</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="section-label" style="margin-top:0;"><i class="fa-solid fa-check" style="margin-right:6px;"></i>Agents <strong>may</strong></div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li>Answer, analyze, distill, check, suggest, review</li>
+              <li>Assist on the <strong>codebase</strong> — with disclosure, and an <span class="mono" style="font-size:13px;">assisted-by:</span> commit trailer</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cols">
+          <div class="col">
+            <div class="callout-light" style="height:100%; box-sizing:border-box;">
+              <div class="label">Why — and it's a scientific argument</div>
+              <p class="body" style="font-size: 17px;">Most GTN contributors are not native English speakers. The community would rather have <strong>your imperfect words than a model's smooth ones</strong> — homogenized prose flattens a deliberately multi-voice curriculum, and reviewing it shifts the work onto volunteers.</p>
+            </div>
+          </div>
+          <div class="col" style="flex: 0 0 420px; display:flex; gap: 22px; align-items:center;">
+            <div class="callout-dark" style="flex:1;">
+              <div class="label">The asymmetry</div>
+              <p class="body" style="font-size: 20px;">Written by humans.<br/><strong style="color:var(--highlight);">Read by machines.</strong></p>
+            </div>
+            <div class="qr-block">
+              <img src="qr-gtn-aipolicy.svg" alt="GTN AI policy QR" />
+              <div class="qr-label">AI-policy.md</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Policy</div>
+      </div>
+      <aside class="notes">This is the slide that earns trust with the skeptics — and it isn't my policy, it's the community's, written down in AGENTS.md and AI-policy.md in the repo. Worth saying plainly: the GTN also states it can't offer support on anything referencing AI output. Agents get told, in the repository, to point users at the human chat channels instead of answering for them.</aside>
+    </section>
+
+    <!-- ============ 6. Three ways to combine ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Three Ways to Put the GTN in Front of an Agent</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card">
+            <i class="fa-solid fa-book-open card-icon"></i>
+            <div class="card-label">Grounding<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 14px;">Tell your agent to search the GTN <em>first</em>. It answers with a tutorial URL instead of an invented method.</span>
+            </div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-plug card-icon"></i>
+            <div class="card-label">Execution — Galaxy MCP<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 14px;"><span class="mono" style="font-size:12px;">uvx galaxy-mcp</span> — your client finds tools, imports workflows, launches runs on usegalaxy.org.</span>
+            </div>
+          </div>
+          <div class="card">
+            <i class="fa-solid fa-wand-magic-sparkles card-icon"></i>
+            <div class="card-label">Recovery — Job Error Wizard<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 14px;">Built into Galaxy. Reads the <em>actual</em> job log and explains the failure in plain language.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline" style="margin-bottom: 22px;">
+          <div class="pipe-stage">
+            <div class="pipe-title">GTN</div>
+            <div class="pipe-sub">What to run, and why</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage">
+            <div class="pipe-title">Galaxy MCP</div>
+            <div class="pipe-sub">How the agent reaches the server</div>
+          </div>
+          <div class="pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="pipe-stage terminal">
+            <div class="pipe-title">usegalaxy.org</div>
+            <div class="pipe-sub">Where it runs — and the history that proves it</div>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">One line to remember</div>
+          <p class="body">Tutorial for the method. <strong>Galaxy for the compute. History for the proof.</strong></p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">How</div>
+      </div>
+      <aside class="notes">All three are available now and none require you to pick a model. Galaxy MCP works with any MCP client — Claude Code, Codex, your own script, a local model on university HPC. The Job Error Wizard is the one people underrate: it reads the real stderr, so it is grounded in the same way the GTN grounds the method.</aside>
+    </section>
+
+    <!-- ============ 7. Vignette ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title" style="margin-bottom:8px;">Same Question, With and Without the GTN</h2>
+        <div class="title-divider" style="margin-bottom:16px;"></div>
+
+        <div class="chat-msg user" style="max-width: none; margin: 0 0 10px;"><span class="who">You</span>I have 48 <em>M. tuberculosis</em> isolates and I need transmission clusters. Where do I start?</div>
+
+        <div class="cols" style="gap: 22px; align-items: stretch;">
+          <div class="col">
+            <div style="font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Agent on its own</div>
+            <div class="chat-window" style="padding:14px 16px;">
+              <div class="chat-msg agent" style="max-width:100%; font-size:13.5px; padding:8px 12px; margin-bottom:8px;"><span class="who">Agent</span>Standard approach is a core-SNP pipeline: <strong>fastp</strong> &rarr; <strong>BWA-MEM</strong> to <strong>H37Rv</strong> &rarr; mask PE/PPE and phage &rarr; <strong>Snippy</strong> &rarr; <strong>snippy-core</strong> &rarr; pairwise SNP distances &rarr; <strong>IQ-TREE</strong>.</div>
+              <div class="chat-msg agent" style="max-width:100%; font-size:13.5px; padding:8px 12px; margin-bottom:8px;">Thresholds: <strong>&le;5 SNPs</strong> for recent direct transmission, <strong>&le;12 SNPs</strong> for a broader cluster.</div>
+              <div class="chat-msg agent" style="max-width:100%; font-size:13.5px; padding:8px 12px; margin-bottom:8px; margin-bottom:0;">Are your 48 isolates Illumina paired-end FASTQs? And do you want the Snippy suite or explicit BED-masking?</div>
+            </div>
+          </div>
+          <div class="col">
+            <div style="font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); margin-bottom:8px;">Agent with the GTN</div>
+            <div class="chat-window" style="padding:14px 16px;">
+              <div class="chat-tool" style="margin:4px 0 8px;">gtn &middot; tutorial.json &rarr; requirements[] &rarr; resolve chain</div>
+              <div class="chat-msg agent" style="max-width:100%; font-size:13.5px; padding:8px 12px; margin-bottom:8px;"><span class="who">Agent</span>The goal tutorial is <strong>&ldquo;Identifying tuberculosis transmission links.&rdquo;</strong> But the GTN declares a <strong style="color:var(--accent);">three-step path</strong> in front of it &mdash; about <strong>4h&nbsp;30m</strong>.</div>
+              <div style="background:var(--white); border:1px solid var(--border); border-radius:8px; padding:9px 12px; margin-bottom:8px;"><div style="display:flex; gap:10px; margin-bottom:6px;"><span style="flex:0 0 14px; font-family:'Courier New',monospace; font-size:13px; font-weight:700; color:var(--accent);">1</span><div style="font-size:13.5px; line-height:1.35; color:var(--navy-soft);"><strong>Using dataset collections</strong> <span style="opacity:0.6;">&middot; 30m</span><br/><span style="opacity:0.72;">48 isolates as one object, not 48 histories</span></div></div><div style="display:flex; gap:10px; margin-bottom:6px;"><span style="flex:0 0 14px; font-family:'Courier New',monospace; font-size:13px; font-weight:700; color:var(--accent);">2</span><div style="font-size:13.5px; line-height:1.35; color:var(--navy-soft);"><strong>M. tuberculosis Variant Analysis</strong> <span style="opacity:0.6;">&middot; 2h</span><br/><span style="opacity:0.72;">maps to the inferred MTB <em>ancestor</em> genome &mdash; not H37Rv</span></div></div><div style="display:flex; gap:10px; margin-bottom:0px;"><span style="flex:0 0 14px; font-family:'Courier New',monospace; font-size:13px; font-weight:700; color:var(--accent);">3</span><div style="font-size:13.5px; line-height:1.35; color:var(--navy-soft);"><strong>SNPs &rarr; transmission clusters</strong> <span style="opacity:0.6;">&middot; 2h</span><br/><span style="opacity:0.72;">snp-dists &rarr; clustering_from_distmat, UPGMA at 12 SNPs</span></div></div></div>
+              <div class="chat-msg agent" style="max-width:100%; font-size:13.5px; padding:8px 12px; margin-bottom:8px; margin-bottom:0;">From the tutorial itself: clustering <strong>can&rsquo;t tell you who infected whom</strong>, and the earliest isolate is <strong>not</strong> the index case.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark" style="margin-top: 8px; padding: 14px 26px 14px 32px;">
+          <div class="label" style="margin-bottom:10px;">The difference isn&rsquo;t the pipeline</div>
+          <p class="body" style="font-size: 17.5px;">One maps to H37Rv because that is what everyone says. The other maps to the <strong style="color:var(--highlight);">ancestor genome because that is what the tutorial does</strong> &mdash; and starts you two tutorials earlier.</p>
+        </div>
+
+        <div class="slide-footer">Walkthrough</div>
+      </div>
+      <aside class="notes">Both halves are real Orbit output, same question, captured 2026-11-17. LEFT is Orbit asked cold: a textbook core-SNP pipeline, confident and basically correct, no source. RIGHT is the same question after the GTN functions were wired up to resolve the prerequisite graph. Three beats worth landing, in order. ONE: it returns a path, not a link &mdash; collections first, because 48 isolates is a collections problem before it is a phylogenetics problem, and that is the half of the question the cold answer ignored. TWO: H37Rv versus the ancestor genome. The cold answer gives the textbook reference; the GTN tutorial actually uses the inferred most-recent-common-ancestor genome of the MTB complex, which differs from H37Rv by SNPs inserted to model the ancestor of all lineages. That is a better choice for transmission work and you do not get it from general knowledge &mdash; you get it from a person who wrote it down. THREE: the index-case caveat is not in the tutorial metadata at all; it is prose inside a question-and-answer box in the tutorial body. The agent read the page. Honest framing if asked: this took three rounds of adding functionality, and it still does not surface the importable CI-tested workflow IDs or ask whether you are starting from FASTQs or VCFs. The curation was already there. The plumbing to reach it is what we had to build.</aside>
+    </section>
+
+    <!-- ============ 8. Why a tutorial beats a prompt ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Why a Tutorial Beats a Prompt</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 26px;">
+          Four things a GTN tutorial ships that <span class="hl">a confident paragraph doesn't</span>.
+        </p>
+
+        <div class="card-grid cols-4" style="margin-bottom: 26px;">
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-database card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">Named input data<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Pinned to a Zenodo record — you can start from the same bytes</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-circle-check card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">A workflow that has run<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">140 of them run under CI against a real Galaxy server</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-code-compare card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">Expected outputs<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Something to diff your result against before you trust it</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-lightbulb card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">A stated rationale<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Why this step, this threshold, this reference — in a human's words</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The version for the skeptic in row three</div>
+          <p class="body">You don't have to trust the agent. <strong style="color:var(--highlight);">You can check its homework against a page anyone can read.</strong></p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Why it works</div>
+      </div>
+      <aside class="notes">Payoff slide. The fourth card is the one that can't be automated and is the reason the GTN bans AI-written tutorials — a stated rationale is only worth something if a person actually held the opinion. Tie back: Galaxy records what ran, the GTN records why it should have.</aside>
+    </section>
+
+    <!-- ============ 9. Honest limits ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">What This Does <em>Not</em> Fix</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-3" style="margin-bottom: 22px;">
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-signs-post card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">Wrong tutorial, confidently<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Topic match is not study-design match. The agent can't know your sampling frame.</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-compress card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">Teaching data is small on purpose<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">Subsampled so a workshop finishes. Your 500 isolates are not the demo set.</span>
+            </div>
+          </div>
+          <div class="card" style="min-height: 0;">
+            <i class="fa-solid fa-flask-vial card-icon" style="font-size: 22px;"></i>
+            <div class="card-label" style="font-size: 16px;">228 workflows still untested<br/>
+              <span style="font-weight: 400; color: var(--muted); font-size: 13px;">"Has a workflow" is not yet the same as "is verified."</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols" style="margin-bottom: 20px;">
+          <div class="col">
+            <ul class="clean" style="margin-bottom: 0;">
+              <li><strong>No GTN MCP server yet</strong> — today an agent reads the JSON API and the Markdown directly. An obvious next step, not a shipped one.</li>
+              <li>The GTN states plainly that it <strong>cannot offer support on anything referencing AI output</strong> — grounding doesn't transfer responsibility.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout-light">
+          <div class="label">Fair enough</div>
+          <p class="body">These are the questions to ask of <strong>any</strong> AI-assisted result — including the ones in this talk.</p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Limits</div>
+      </div>
+      <aside class="notes">Do not skip this slide for time. In a room with real skeptics, naming the limits yourself is what makes the rest credible. The subsampled-data point is the most practically important one — it is the single most common way a tutorial-derived analysis goes wrong at real scale.</aside>
+    </section>
+
+    <!-- ============ 10. The coverage gap ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">A Malaria-Shaped Hole</h2>
+        <div class="title-divider"></div>
+
+        <p class="emph" style="margin-bottom: 24px;">
+          I queried every topic in the GTN API. <span class="hl">629 materials.</span> Here is what this audience will find.
+        </p>
+
+        <div class="cols" style="margin-bottom: 24px;">
+          <div class="col">
+            <div class="section-label" style="margin-top:0;"><i class="fa-solid fa-check" style="margin-right:6px;"></i>Covered &mdash; and covered well</div>
+            <ul class="clean" style="margin-bottom: 0;">
+              <li><strong>Tuberculosis</strong> &mdash; variant analysis, SNPs &rarr; transmission clusters, phylogenetics</li>
+              <li><strong>SARS-CoV-2</strong>, pox virus tiled amplicons, avian influenza</li>
+              <li><strong>AMR gene detection</strong>, foodborne pathogen detection from Nanopore</li>
+            </ul>
+          </div>
+          <div class="col" style="flex: 0 0 440px; display: flex; gap: 20px; align-items: center;">
+            <div class="stat" style="padding: 18px 24px;">
+              <div class="stat-num" style="font-size: 52px;">0</div>
+              <div class="stat-label" style="font-size: 11px;">tutorials</div>
+            </div>
+            <div class="card accent" style="min-height: 0; flex: 1;">
+              <div class="card-label" style="font-size: 14px;">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--highlight); margin-right: 6px;"></i>No match, titles or tags
+              </div>
+              <div class="card-label" style="font-size: 14px; font-weight: 400; color: var(--white); opacity: 0.9; line-height: 1.7; margin-top: 10px;">
+                malaria &middot; <em>Plasmodium</em> &middot; dengue &middot; Zika &middot; chikungunya &middot; leishmaniasis &middot; trypanosomes &middot; schistosomes &middot; helminths &middot; filariasis &middot; Chagas
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">Why the gap matters more than it used to</div>
+          <p class="body">A hole in the curriculum used to mean <em>no workshop for your pathogen</em>. Now it also means an agent grounding on the GTN <strong style="color:var(--highlight);">finds nothing to ground on &mdash; and improvises instead.</strong></p>
+        </div>
+
+        <div class="slide-footer">The gap</div>
+      </div>
+      <aside class="notes">This number is checkable and you should invite them to check it: every topic from the GTN JSON API, 629 unique materials, searching titles and tags. TB is genuinely excellent &mdash; three tutorials and real depth, because a community decided to build it. Nothing structural stopped anyone writing the malaria equivalent; nobody has. Then land the closing line, which is the hinge of the whole talk: grounding only protects you where the curriculum exists, so the coverage gap is now also an AI-reliability gap for exactly the diseases in this room.</aside>
+    </section>
+
+    <!-- ============ 11. Where to start ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Where to Start, Depending on Who You Are</h2>
+        <div class="title-divider"></div>
+
+        <div class="card-grid cols-4" style="margin-bottom: 26px;">
+          <div class="card accent">
+            <i class="fa-solid fa-microscope card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">Bench or field researcher<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;">Open the One Health topic. Run the tutorial closest to your pathogen on usegalaxy.org — no AI required.</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-terminal card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">Already using an AI client<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;">Add <span style="font-family:'Courier New',monospace; font-size:12px; color:var(--highlight);">galaxy-mcp</span>, and tell it to search the GTN before proposing anything.</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-chalkboard-user card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">Teaching a course<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;">Learning pathways and TIaaS exist. Decide your own AI policy — and say it on day one.</span>
+            </div>
+          </div>
+          <div class="card accent">
+            <i class="fa-solid fa-code-pull-request card-icon"></i>
+            <div class="card-label" style="font-size: 15px;">Want to contribute<br/>
+              <span style="font-weight: 400; color: var(--white); font-size: 13px; opacity: 0.85;">Write the tutorial your field is missing. In your own words — that's the point.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-dark">
+          <div class="label">The invitation</div>
+          <p class="body">Write the tutorial your field is missing. It teaches a student today &mdash; and <strong style="color:var(--highlight);">grounds every agent that reads it tomorrow.</strong></p>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Getting started</div>
+      </div>
+      <aside class="notes">Four doors, and the fourth is the real ask — it follows straight from the previous slide. The dual return is the argument: a tutorial you write is a lesson for a student AND grounding for every agent that reads it afterwards. Nobody outside this field is going to write the malaria tutorial. If someone asks how hard it is: a tutorial is Markdown plus a workflow you have already run, and the GTN has a tutorial on writing tutorials.</aside>
+    </section>
+
+    <!-- ============ 12. Takeaways ============ -->
+    <section>
+      <div class="slide">
+        <h2 class="slide-title">Takeaways</h2>
+        <div class="title-divider"></div>
+
+        <div class="cols" style="margin-bottom: 28px;">
+          <div class="col">
+            <ul class="clean" style="margin-bottom: 26px;">
+              <li>The question isn't whether to use AI — it's <strong>what you point it at</strong>.</li>
+              <li>The GTN is <strong>536 human-written, human-reviewed tutorials</strong> in formats agents already read. Grounding, not guessing.</li>
+              <li>Galaxy runs it and keeps the record; <strong>the tutorial is the part you can check</strong>.</li>
+              <li>Written by humans, read by machines — <strong>and the community wrote that rule down</strong>.</li>
+            </ul>
+            <div class="callout-dark">
+              <div class="label">Try it</div>
+              <p class="body" style="font-size: 19px;">GTN One Health topic &middot; <span style="font-family:'Courier New',monospace; font-size:16px;">uvx galaxy-mcp</span> &middot; usegalaxy.org</p>
+            </div>
+          </div>
+          <div class="col" style="flex: 0 0 300px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+            <div class="qr-block">
+              <img src="qr-gtn-onehealth.svg" alt="GTN One Health QR" />
+              <div class="qr-label">GTN &middot; One Health<br/>tutorials</div>
+            </div>
+            <div class="qr-block">
+              <img src="qr-galaxy-mcp.svg" alt="Galaxy MCP QR" />
+              <div class="qr-label">galaxyproject/<br/>galaxy-mcp</div>
+            </div>
+          </div>
+        </div>
+
+        <img src="gtn-logo.png" class="slide-logo" alt="Galaxy Training Network" />
+        <img src="brc-logo.svg" class="slide-logo-secondary" alt="BRC Analytics" />
+        <div class="slide-footer">Thank you</div>
+      </div>
+      <aside class="notes">Land on the thesis line and leave both QRs up for questions. If there's time for one more sentence: the GTN didn't change anything to become AI infrastructure — it just kept being well-structured, human-written, and public, which turns out to be the same thing.</aside>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    controls: true,
+    progress: true,
+    width: 1280,
+    height: 760,
+    margin: 0.04,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>

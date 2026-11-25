@@ -18,6 +18,7 @@ JOB_ID = "0123456789abcdef"
 
 def _missing_job_service():
     service = MagicMock()
+    service.for_job.return_value = service
     service.is_available.return_value = True
     missing = GalaxyJobNotFound(f"No Galaxy job {JOB_ID}")
     service.get_job_status = AsyncMock(side_effect=missing)

@@ -1,0 +1,39 @@
+<svg width="560" height="314" viewBox="0 0 560 314" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="560" y2="314" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1F1F47"/>
+      <stop offset="1" stop-color="#28285B"/>
+    </linearGradient>
+  </defs>
+  <rect width="560" height="314" fill="url(#bg)"/>
+
+  <!-- faint slide-frame motif, top right -->
+  <g opacity="0.12" stroke="#FFFFFF" stroke-width="2" fill="none">
+    <rect x="392" y="48" width="120" height="70" rx="4"/>
+    <rect x="404" y="64" width="56" height="5" rx="2.5" fill="#FFFFFF" stroke="none"/>
+    <rect x="404" y="78" width="96" height="4" rx="2" fill="#FFFFFF" stroke="none"/>
+    <rect x="404" y="90" width="80" height="4" rx="2" fill="#FFFFFF" stroke="none"/>
+    <rect x="404" y="102" width="88" height="4" rx="2" fill="#FFFFFF" stroke="none"/>
+  </g>
+  <g opacity="0.08" stroke="#FFFFFF" stroke-width="2" fill="none">
+    <rect x="368" y="140" width="96" height="56" rx="4"/>
+    <rect x="378" y="153" width="44" height="4" rx="2" fill="#FFFFFF" stroke="none"/>
+    <rect x="378" y="165" width="76" height="3" rx="1.5" fill="#FFFFFF" stroke="none"/>
+    <rect x="378" y="175" width="64" height="3" rx="1.5" fill="#FFFFFF" stroke="none"/>
+  </g>
+
+  <!-- kicker -->
+  <text x="48" y="92" font-family="Helvetica, Arial, sans-serif" font-size="15" letter-spacing="3.5" fill="#9AA2AE">SLIDE DECKS · SYMPOSIUM</text>
+
+  <!-- headline -->
+  <text x="48" y="150" font-family="Helvetica, Arial, sans-serif" font-size="52" font-weight="700" fill="#FFFFFF">ASTMH 2026</text>
+
+  <!-- accent rule -->
+  <rect x="48" y="172" width="72" height="5" rx="2.5" fill="#FFEB78"/>
+
+  <!-- subtitle -->
+  <text x="48" y="212" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#FFFFFF">BRC Analytics &amp; Galaxy</text>
+
+  <!-- location line -->
+  <text x="48" y="252" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#9AA2AE">National Harbor, MD &#183; November 18&#8211;22</text>
+</svg>

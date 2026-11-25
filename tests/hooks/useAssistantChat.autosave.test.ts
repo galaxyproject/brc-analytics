@@ -94,10 +94,21 @@ function chatReply(): Awaited<ReturnType<typeof mockClient.assistantChat>> {
  * @param isAuthenticated - Whether someone is signed in
  */
 function auth(isAuthenticated: boolean): void {
+  authState({ isAuthenticated, isConfigured: true, isLoading: false });
+}
+
+/**
+ * Put the hook in an auth state that need not be settled or configured.
+ * @param state - The auth flags the hook reads
+ */
+function authState(
+  state: Pick<
+    ReturnType<typeof useAuth>,
+    "isAuthenticated" | "isConfigured" | "isLoading"
+  >
+): void {
   mockUseAuth.mockReturnValue({
-    isAuthenticated,
-    isConfigured: true,
-    isLoading: false,
+    ...state,
     login: jest.fn(),
     logout: jest.fn(),
     user: null,
@@ -549,6 +560,100 @@ describe("useAssistantChat auto-save", () => {
     });
 
     expect(result.current.state.isSaved).toBe(false);
+  });
+
+  test("a conversation that loads after signing out does not show as saved", async () => {
+    auth(true);
+    const restore =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantRestore>>>();
+    mockClient.assistantRestore.mockReturnValueOnce(restore.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() =>
+      expect(mockClient.assistantRestore).toHaveBeenCalledWith(STORED_ID)
+    );
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      restore.resolve({
+        ...restored(),
+        saved: true,
+        saved_analysis_id: "analysis-1",
+      } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+    });
+
+    expect(result.current.state.messages).toHaveLength(2);
+    expect(result.current.state.isSaved).toBe(false);
+  });
+
+  test("a reply that lands after signing out does not show as saved", async () => {
+    auth(true);
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+    const turn =
+      deferred<Awaited<ReturnType<typeof mockClient.assistantChat>>>();
+    mockClient.assistantChat.mockReturnValueOnce(turn.promise);
+
+    const { rerender, result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
+    let sending!: Promise<void>;
+    act(() => {
+      sending = result.current.actions.onSendMessage("still there?");
+    });
+
+    auth(false);
+    rerender();
+    await act(async () => {
+      turn.resolve({
+        ...chatReply(),
+        saved: true,
+        saved_analysis_id: "analysis-1",
+      });
+      await sending;
+    });
+
+    expect(result.current.state.messages.at(-1)?.content).toBe("ok");
+    expect(result.current.state.isSaved).toBe(false);
+  });
+
+  test("a saved conversation shows as saved while sign-in is still loading", async () => {
+    // Not yet known to be signed out, so the label shows what the server said.
+    authState({ isAuthenticated: false, isConfigured: true, isLoading: true });
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
+  });
+
+  test("a saved conversation shows as saved where login is not configured", async () => {
+    authState({
+      isAuthenticated: false,
+      isConfigured: false,
+      isLoading: false,
+    });
+    mockClient.assistantRestore.mockResolvedValue({
+      ...restored(),
+      saved: true,
+    } as unknown as Awaited<ReturnType<typeof mockClient.assistantRestore>>);
+
+    const { result } = renderHook(() =>
+      useAssistantChat({ sessionKey: SESSION_KEY })
+    );
+
+    await waitFor(() => expect(result.current.state.isSaved).toBe(true));
   });
 
   test("a reply that moves to a new, unsaved session does not keep the saved label", async () => {

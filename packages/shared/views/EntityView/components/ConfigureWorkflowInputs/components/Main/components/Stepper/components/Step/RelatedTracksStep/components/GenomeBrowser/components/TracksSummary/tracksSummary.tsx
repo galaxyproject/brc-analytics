@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Grid, Typography } from "@mui/material";
 import { type JSX } from "react";
@@ -19,10 +19,10 @@ export const TracksSummary = ({
         {count} Track{count > 1 ? "s" : ""} Selected
       </Typography>
       <Grid container gap={2}>
-        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onEdit}>
+        <Button {...BUTTON_PRESETS.SECONDARY_OUTLINED} onClick={onEdit}>
           Edit list
         </Button>
-        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onClear}>
+        <Button {...BUTTON_PRESETS.SECONDARY_OUTLINED} onClick={onClear}>
           Clear all
         </Button>
       </Grid>

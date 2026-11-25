@@ -19,7 +19,7 @@ from app.core.dependencies import get_gene_catalog_service
 from app.services import gene_snapshot
 from app.services.gene_catalog import SCHEMA_VERSION, GeneCatalogService
 from app.services.gene_snapshot import read_pin
-from tests.test_genes_api import make_client
+from tests.genes_helpers import BUILD_ID, make_client
 
 AMA1 = "d9049485-ed74-5455-98c2-5dc13eef544a"
 URL = "https://genes.test/snapshots/genes.duckdb"
@@ -57,7 +57,7 @@ def snapshot_bytes(gene_snapshot_path):
 
 def write_pin(path, content, **changes):
     pin = {
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": BUILD_ID,
         "url": URL,
         "sha256": hashlib.sha256(content).hexdigest(),
         "size": len(content),
@@ -94,12 +94,10 @@ def test_pinned_snapshot_is_downloaded_and_served(tmp_path, store, snapshot_byte
     assert service.health() == {
         "status": "ready",
         "source": "pinned",
-        "build_id": "temp-GCF_000002765.6-2026-10-28T212348Z",
+        "build_id": BUILD_ID,
     }
     assert store.requests == [URL]
-    assert os.listdir(tmp_path / "genes") == [
-        "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
-    ]
+    assert os.listdir(tmp_path / "genes") == [f"{BUILD_ID}.duckdb"]
     response = make_client(service).get(f"/api/v1/genes/{AMA1}")
     assert response.status_code == 200
     assert response.json()["gene"]["locusTag"] == "PF3D7_1133400"
@@ -434,9 +432,7 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
         yield snapshot_bytes[:100]
         for stale in genes.glob("*.partial"):
             stale.unlink()
-        (genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb.partial").write_bytes(
-            b"half-written"
-        )
+        (genes / f"{BUILD_ID}.duckdb.partial").write_bytes(b"half-written")
         yield snapshot_bytes[100:]
 
     store.responses.extend(
@@ -447,7 +443,7 @@ def test_a_second_process_downloading_alongside_does_not_break_the_first(
     )
     service = load(tmp_path, write_pin(tmp_path / "pin.json", snapshot_bytes))
     assert service.status == "ready"
-    target = genes / "temp-GCF_000002765.6-2026-10-28T212348Z.duckdb"
+    target = genes / f"{BUILD_ID}.duckdb"
     assert target.read_bytes() == snapshot_bytes
     service.close()
 

@@ -95,6 +95,37 @@ class GeneResponse(_CamelModel):
     gene: Gene
 
 
+class GeneSearchMatch(_CamelModel):
+    """What a search matched a gene on."""
+
+    # A search_term type: an alias type, or transcript_product or
+    # protein_product for a word of one of the gene's transcripts' products.
+    type: str
+    # The alias as written, or the whole product the word is in.
+    value: str
+
+
+class GeneSearchResult(_CamelModel):
+    matched_on: GeneSearchMatch
+    gene_uid: UUID
+    locus_tag: Optional[str]
+    name: Optional[str]
+    symbol: Optional[str]
+    assembly_accession: str
+    organism: GeneOrganism
+    page_url: str
+
+
+class GeneSearchResponse(_CamelModel):
+    snapshot: GeneSnapshotInfo
+    # The words searched: the query lowercased, trimmed of punctuation, and
+    # without the words left out (see GeneCatalogService.search_words).
+    query: str
+    results: List[GeneSearchResult]
+    # Whether more genes matched than were returned.
+    truncated: bool
+
+
 class BionymClaim(_CamelModel):
     """One claim BioNym drew from a source: a language model's statement,
     the quote it rests on, and BioNym's confidence in it, from 0 to 1."""
@@ -115,8 +146,49 @@ class BionymSource(_CamelModel):
     claims: List[BionymClaim]
 
 
+class BionymGraphNode(_CamelModel):
+    """A node in a gene's BioNym graph: a gene, protein, paper, dataset,
+    claim or another kind of thing BioNym found."""
+
+    id: str
+    type: str
+    label: str
+    # Null unless the graph gives an https: link.
+    url: Optional[str]
+
+
+class BionymGraphEdge(_CamelModel):
+    """An edge in a gene's BioNym graph, with BioNym's confidence in it,
+    from 0 to 1."""
+
+    subject: str
+    predicate: str
+    object: str
+    confidence: float
+
+
+class BionymGraph(_CamelModel):
+    """A gene's BioNym graph: every node and edge, with only the fields the
+    gene page's graph explorer draws."""
+
+    gene_uid: UUID
+    # The id of the gene's own node, the graph's root.
+    query: str
+    nodes: List[BionymGraphNode]
+    edges: List[BionymGraphEdge]
+
+
+class BionymSummaryStatement(_CamelModel):
+    """One statement of BioNym's summary of a gene: a language model's
+    sentence about the gene, and BioNym's confidence in it, from 0 to 1."""
+
+    text: str
+    confidence: float
+
+
 class BionymClaims(_CamelModel):
-    """The claims in a gene's BioNym graph, grouped by source."""
+    """The claims in a gene's BioNym graph, grouped by source, and BioNym's
+    summary of the gene."""
 
     gene_uid: UUID
     # BioNym's input for the graph: the gene's locus tag.
@@ -125,3 +197,5 @@ class BionymClaims(_CamelModel):
     # metadata carries no run date.
     run_date: date
     sources: List[BionymSource]
+    # In BioNym's order; empty when the graph has no summary.
+    summary: List[BionymSummaryStatement]

@@ -1,6 +1,6 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { DialogTitle } from "@databiosphere/findable-ui/lib/components/common/Dialog/components/DialogTitle/dialogTitle";
 import { TOOLTIP_PROPS } from "@databiosphere/findable-ui/lib/components/Table/components/TableCell/components/RowSelectionCell/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { Button, DialogActions, DialogContent, Tooltip } from "@mui/material";
 import { ColumnFilters } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/ColumnFilters/columnFilters";
 import { SelectorDialog } from "@repo/shared/views/EntityView/components/ConfigureWorkflowInputs/components/Main/components/Stepper/components/Step/components/SelectorDialog/selectorDialog";
@@ -60,13 +60,13 @@ export const AssembliesSelector = ({
         <Table table={table} />
       </DialogContent>
       <DialogActions>
-        <Button {...BUTTON_PROPS.SECONDARY_CONTAINED} onClick={onClose}>
+        <Button {...BUTTON_PRESETS.SECONDARY_OUTLINED} onClick={onClose}>
           Cancel
         </Button>
         <Tooltip {...TOOLTIP_PROPS} title={addValidation}>
           <span>
             <Button
-              {...BUTTON_PROPS.PRIMARY_CONTAINED}
+              {...BUTTON_PRESETS.PRIMARY_CONTAINED}
               disabled={!!addValidation}
               onClick={() =>
                 addSelection(

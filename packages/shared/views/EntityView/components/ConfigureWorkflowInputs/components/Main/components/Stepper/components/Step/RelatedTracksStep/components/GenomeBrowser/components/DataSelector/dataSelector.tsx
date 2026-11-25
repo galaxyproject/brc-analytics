@@ -1,5 +1,5 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
 import { LoadingIcon } from "@databiosphere/findable-ui/lib/components/common/CustomIcon/components/LoadingIcon/loadingIcon";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import { SVG_ICON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/svgIcon";
 import { TYPOGRAPHY_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/typography";
 import { Button, Stack, Typography } from "@mui/material";
@@ -38,7 +38,7 @@ export const DataSelector = ({
         />
       ) : (
         <Button
-          {...BUTTON_PROPS.PRIMARY_CONTAINED}
+          {...BUTTON_PRESETS.PRIMARY_CONTAINED}
           disabled={!tracksCount}
           onClick={onContinue}
         >

@@ -1,4 +1,4 @@
-import { BUTTON_PROPS } from "@databiosphere/findable-ui/lib/components/common/Button/constants";
+import { BUTTON_PRESETS } from "@databiosphere/findable-ui/lib/contracts/mui/Button/presets";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import {
@@ -45,7 +45,7 @@ export function AuthButton(): JSX.Element | null {
 
   if (!isAuthenticated) {
     return (
-      <Button {...BUTTON_PROPS.SECONDARY_MEDIUM_CONTAINED} onClick={login}>
+      <Button {...BUTTON_PRESETS.SECONDARY_MEDIUM_OUTLINED} onClick={login}>
         Sign In
       </Button>
     );

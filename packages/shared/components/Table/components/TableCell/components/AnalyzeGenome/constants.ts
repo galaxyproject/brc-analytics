@@ -1,14 +1,4 @@
-import { BUTTON_PROPS as MUI_BUTTON_PROPS } from "@databiosphere/findable-ui/lib/styles/common/mui/button";
-import {
-  type ButtonProps,
-  type GridProps,
-  type MenuProps,
-} from "@mui/material";
-
-export const BUTTON_PROPS = {
-  color: MUI_BUTTON_PROPS.COLOR.PRIMARY,
-  variant: MUI_BUTTON_PROPS.VARIANT.CONTAINED,
-} satisfies ButtonProps;
+import { type GridProps, type MenuProps } from "@mui/material";
 
 export const GRID_PROPS: Partial<GridProps> = {
   alignSelf: "flex-start",
