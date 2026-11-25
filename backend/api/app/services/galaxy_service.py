@@ -314,6 +314,10 @@ class ShardFetchError(Exception):
         self.status = status
 
 
+class EmptyMergedResults(Exception):
+    """A merged results dataset that Galaxy served whole, at zero bytes."""
+
+
 # Bucket for hits whose shard key matches no known index name. Guessing an
 # attribution would corrupt the very number the caller is trusting to tell them
 # how much the cap dropped, so name the uncertainty instead.
@@ -2422,6 +2426,8 @@ class GalaxyService:
         @param job_id: the job, for logging.
         @param dataset_id: its merged output.
         @returns: one parsed shard per shard kmindex searched.
+        @raises GalaxyJobFailed: Galaxy served the file whole at zero bytes,
+            which won't change on a later read.
         @raises Exception: the file could not be read. Nothing else holds the
             hits, so an empty or partial answer here would be cached as a
             complete one; failing leaves the next read to try again.
@@ -2430,6 +2436,31 @@ class GalaxyService:
         for attempt in range(KMINDEX_MERGED_ATTEMPTS):
             try:
                 document = await asyncio.to_thread(self._fetch_merged, dataset_id)
+            except EmptyMergedResults as e:
+                # A job that matched nothing still writes a key per shard, so
+                # zero bytes is a run that died after kmindex reported success.
+                # The file won't change: fail the job so the caller resubmits,
+                # rather than erroring on every read. A warning, not an error:
+                # it's Galaxy's fault and would otherwise repeat in Sentry on
+                # every read, but it still wants a trace somewhere.
+                logger.warning(
+                    f"kmindex job {job_id} finished ok with an empty merged "
+                    f"results file {dataset_id}"
+                )
+                # Galaxy's job cache only hands out original jobs, and skips
+                # one with a deleted output. Without this, the same search
+                # sent again comes back as a copy of this job and its file.
+                try:
+                    await asyncio.to_thread(self._delete_dataset, dataset_id)
+                except Exception as delete_error:
+                    logger.warning(
+                        f"kmindex job {job_id}: could not delete empty merged "
+                        f"results {dataset_id}: {delete_error}"
+                    )
+                raise GalaxyJobFailed(
+                    f"Job {job_id} finished, but its merged results "
+                    f"{dataset_id} are empty; submit the search again"
+                ) from e
             except Exception as e:
                 # A stream cut short can arrive as truncated JSON rather than
                 # as a transport error, the way a short archive fails to open --
@@ -2484,10 +2515,33 @@ class GalaxyService:
             with tempfile.TemporaryFile() as body:
                 for chunk in r.iter_content(chunk_size=1 << 20):
                     body.write(chunk)
+                # A stream cut short raises rather than ending cleanly when the
+                # response says how long it is, so then a 200 with nothing in
+                # it is the file itself. Without Content-Length or chunking, a
+                # dropped connection reads as a clean end and json.load's
+                # error retries it.
+                framed = "content-length" in r.headers or "chunked" in (
+                    r.headers.get("transfer-encoding", "").lower()
+                )
+                if body.tell() == 0 and framed:
+                    raise EmptyMergedResults(dataset_id)
                 body.seek(0)
                 return json.load(body)
         finally:
             r.close()
+
+    def _delete_dataset(self, dataset_id: str) -> None:
+        """Mark a history dataset deleted, without purging it."""
+        r = self.gi.make_delete_request(
+            f"{self.gi.url}/datasets",
+            payload={"datasets": [{"id": dataset_id, "src": "hda"}]},
+        )
+        if r.status_code != 200:
+            raise Exception(f"HTTP {r.status_code}: {r.text[:200]}")
+        # A dataset Galaxy refused still answers 200, listed under errors.
+        errors = r.json().get("errors")
+        if errors:
+            raise Exception(f"{dataset_id}: {errors}")
 
     def _fetch_collection(self, collection_id: str) -> List[Optional[dict]]:
         """

@@ -4019,9 +4019,12 @@ def _zip_of(shards: dict) -> bytes:
     return buffer.getvalue()
 
 
-def _archive_response(payload: bytes, status_code: int = 200):
+def _archive_response(payload: bytes, status_code: int = 200, headers=None):
     response = MagicMock(status_code=status_code, text="")
     response.iter_content = MagicMock(return_value=iter([payload]))
+    response.headers = requests.structures.CaseInsensitiveDict(
+        {"Content-Length": str(len(payload))} if headers is None else headers
+    )
     return response
 
 
@@ -4408,6 +4411,109 @@ class TestMergedOutput:
             r.close.assert_called_once()
         merged.cache.set.assert_not_called()
         merged._download_shard.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_an_empty_file_fails_the_job(self, merged, monkeypatch, caplog):
+        # Galaxy Test has finished kmindex jobs "ok" with a 0-byte merged file.
+        # Nothing will ever fill it, so it is the job that failed: asking again
+        # only repeats the error on every read, and a partner should be told
+        # to resubmit rather than handed a 502.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(_archive_response(b""))
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
+        merged.gi.make_delete_request = MagicMock(
+            return_value=MagicMock(
+                status_code=200, json=lambda: {"success_count": 1, "errors": []}
+            )
+        )
+
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            with pytest.raises(GalaxyJobFailed, match="job1.*merged1.*empty"):
+                await merged._aggregate_shards("job1")
+
+        # The endpoints answer a failed job without logging, and this is
+        # Galaxy misbehaving rather than the caller, so it leaves a trace here.
+        assert [r.levelname for r in caplog.records] == ["WARNING"]
+        assert "job1" in caplog.text and "merged1" in caplog.text
+        assert len(sent) == 1
+        sent[0].close.assert_called_once()
+        merged.cache.set.assert_not_called()
+        # Deleted, not purged: Galaxy's job cache skips a job with a deleted
+        # output, so the same search sent again runs instead of coming back
+        # as a copy of this one.
+        merged.gi.make_delete_request.assert_called_once_with(
+            "https://galaxy.example/api/datasets",
+            payload={"datasets": [{"id": "merged1", "src": "hda"}]},
+        )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "response",
+        [
+            MagicMock(status_code=403, text="no"),
+            MagicMock(
+                status_code=200,
+                json=lambda: {"success_count": 0, "errors": [{"dataset": "x"}]},
+            ),
+        ],
+        ids=["http-error", "refused-in-body"],
+    )
+    async def test_an_empty_file_it_cant_delete_still_fails_the_job(
+        self, merged, caplog, response
+    ):
+        merged.gi.make_get_request = MagicMock(return_value=_archive_response(b""))
+        merged.gi.make_delete_request = MagicMock(return_value=response)
+
+        with caplog.at_level("WARNING", logger=galaxy_service.logger.name):
+            with pytest.raises(GalaxyJobFailed, match="empty"):
+                await merged._aggregate_shards("job1")
+
+        assert "could not delete" in caplog.text
+        assert all(r.levelname == "WARNING" for r in caplog.records)
+
+    @pytest.mark.asyncio
+    async def test_an_empty_file_reaches_a_results_read_as_a_failed_job(self, merged):
+        # The endpoints turn GalaxyJobFailed into a 422 only if the read lets
+        # it out as itself, and the merge claim has to come off for the next
+        # read to find the same answer rather than "still being merged".
+        merged.gi.make_get_request = MagicMock(return_value=_archive_response(b""))
+
+        with pytest.raises(GalaxyJobFailed, match="empty"):
+            await merged.get_kmindex_results("job1", lane="partner")
+
+        assert merged.gi.make_get_request.call_count == 1
+        merged.cache.set.assert_not_called()
+        merged.cache.delete.assert_awaited_once_with(merged._aggregating_key("job1"))
+
+    @pytest.mark.asyncio
+    async def test_an_unframed_empty_body_is_retried_not_a_failed_job(
+        self, merged, monkeypatch
+    ):
+        # With neither Content-Length nor chunking, the body ends wherever the
+        # connection does, so a drop before the first byte reads as a clean,
+        # empty 200. That says nothing about the file, so it mustn't fail the
+        # job and send the caller off to resubmit.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(_archive_response(b"", headers={"Connection": "close"}))
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
+
+        with pytest.raises(Exception, match="could not read merged results") as e:
+            await merged._aggregate_shards("job1")
+
+        assert not isinstance(e.value, GalaxyJobFailed)
+        assert len(sent) == galaxy_service.KMINDEX_MERGED_ATTEMPTS
+        merged.cache.set.assert_not_called()
+        merged.gi.make_delete_request.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_an_older_job_still_reads_its_collection(self, merged):

@@ -236,6 +236,33 @@ class TestDedupe:
         assert env.galaxy.submit_kmindex_query.await_count == 2
 
     @pytest.mark.asyncio
+    async def test_job_the_merge_found_failed_is_not_handed_back(
+        self, env, monkeypatch
+    ):
+        # Galaxy still calls it ok, but a poll was told it failed and to send
+        # the search again; doing so has to start a new run, for the whole
+        # dedupe window.
+        _as(monkeypatch, _request())
+        await _submit()
+        env.galaxy.cache = env.cache
+        env.galaxy.get_job_status.return_value = MagicMock(
+            is_complete=True, is_successful=True
+        )
+        env.galaxy.get_kmindex_results = AsyncMock(
+            side_effect=galaxy_service.GalaxyJobFailed("merged results are empty")
+        )
+        await logan_mcp.with_rebuild(env.galaxy, JOB_ID, {"status": "expired"})
+        await asyncio.gather(*list(logan_mcp._builds))
+        failed = await logan_mcp.with_rebuild(env.galaxy, JOB_ID, {"status": "expired"})
+        assert failed["status"] == "failed"
+        failure_key = logan_mcp._build_failure_key(JOB_ID)
+        assert env.cache.ttls[failure_key] >= logan_mcp.DEDUPE_TTL
+
+        again = await _submit()
+        assert again["status"] == "submitted"
+        assert env.galaxy.submit_kmindex_query.await_count == 2
+
+    @pytest.mark.asyncio
     async def test_caller_behind_a_trusted_proxy_is_one_caller(self, env, monkeypatch):
         monkeypatch.setenv("TRUST_PROXY_HEADERS", "true")
         get_settings.cache_clear()
@@ -616,6 +643,29 @@ class TestRebuild:
         assert again["status_code"] == 502
         assert again["retry_after_seconds"] == logan_mcp.BUILD_FAILURE_TTL
         # The next poll answers from the marker instead of merging again.
+        assert galaxy.get_kmindex_results.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_a_job_the_merge_finds_failed_says_so(self, env, monkeypatch, caplog):
+        # Galaxy called the job a success but left nothing to merge. "Try again
+        # later" would send the agent back to the same empty file; the search
+        # itself has to be run again.
+        _as(monkeypatch, _request())
+        galaxy = self._galaxy()
+        galaxy.get_kmindex_results.side_effect = galaxy_service.GalaxyJobFailed(
+            "results are empty; submit the search again"
+        )
+        with caplog.at_level("ERROR", logger=logan_mcp.logger.name):
+            first = await logan_mcp.with_rebuild(
+                galaxy, self.JOB, {"status": "expired"}
+            )
+            await self._drain()
+        again = await logan_mcp.with_rebuild(galaxy, self.JOB, {"status": "expired"})
+        assert first["status"] == "building"
+        assert again["status"] == "failed"
+        assert "submit the search again" in again["error"]
+        assert "retry_after_seconds" not in again
+        assert not caplog.records
         assert galaxy.get_kmindex_results.await_count == 1
 
     @pytest.mark.asyncio

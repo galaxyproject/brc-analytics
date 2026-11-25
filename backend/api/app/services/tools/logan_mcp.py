@@ -23,6 +23,7 @@ from pydantic import ValidationError
 from starlette.requests import Request
 
 from app.core import dependencies
+from app.core.cache import CacheService, CacheTTL
 from app.core.config import get_settings
 from app.core.partner_keys import Partner
 from app.core.rate_limit import client_ip
@@ -32,6 +33,7 @@ from app.services.galaxy_service import (
     STDERR_TAIL,
     AggregationLane,
     GalaxyJobAggregating,
+    GalaxyJobFailed,
     GalaxyJobNotComplete,
     GalaxyService,
     GalaxySubmitNotStarted,
@@ -129,7 +131,8 @@ async def logan_submit(
         if not await cache.set_if_absent(dedupe_key, {"pending": True}, CLAIM_TTL):
             existing = await cache.get(dedupe_key) or {}
             if not (
-                existing.get("job_id") and await _job_failed(galaxy, existing["job_id"])
+                existing.get("job_id")
+                and await _job_failed(galaxy, cache, existing["job_id"])
             ):
                 return _claimed(existing, partner)
             await cache.delete(dedupe_key)
@@ -156,7 +159,12 @@ async def logan_submit(
     return _started(job_id, partner, reused=False)
 
 
-async def _job_failed(galaxy: GalaxyService, job_id: str) -> bool:
+async def _job_failed(galaxy: GalaxyService, cache: CacheService, job_id: str) -> bool:
+    # Galaxy can call a job ok that a merge found had nothing in it; the poll
+    # that learned that told the agent to send the search again.
+    failure = await cache.get(_build_failure_key(job_id))
+    if failure and failure.get("job_error"):
+        return True
     try:
         status = await galaxy.for_job(job_id).get_job_status(job_id)
     except Exception:
@@ -234,6 +242,9 @@ BUILD_RETRY_AFTER = 15
 # A merge that fails is remembered this long, so polls get an answer instead
 # of "building" forever, each one starting the same failing merge again.
 BUILD_FAILURE_TTL = 300
+# A job the merge found failed stays failed. Remembered at least as long as
+# the dedupe entry, so a resubmit in that window isn't handed the same job.
+JOB_FAILURE_TTL = CacheTTL.ONE_DAY
 
 
 def _build_failure_key(job_id: str) -> str:
@@ -253,6 +264,14 @@ def _start_build(galaxy: GalaxyService, job_id: str, lane: AggregationLane) -> N
             )
         except (GalaxyJobAggregating, GalaxyJobNotComplete):
             pass  # someone else is merging it, or no slot; the next poll retries
+        except GalaxyJobFailed as e:
+            # What the job did, not a merge that broke: nothing to log, and
+            # the next poll reports the search failed rather than retryable.
+            await galaxy.cache.set(
+                _build_failure_key(job_id),
+                {"failed": True, "job_error": str(e)},
+                JOB_FAILURE_TTL,
+            )
         except Exception as e:
             logger.error("MCP merge for %s failed: %s", job_id, e)
             await galaxy.cache.set(
@@ -308,7 +327,15 @@ async def with_rebuild(galaxy: GalaxyService, job_id: str, out: dict) -> dict:
             "error": (status.stderr or "")[-STDERR_TAIL:] or None,
             "results_url": results_url_for(job_id),
         }
-    if await galaxy.cache.get(_build_failure_key(job_id)):
+    failure = await galaxy.cache.get(_build_failure_key(job_id))
+    if failure and failure.get("job_error"):
+        return {
+            "status": "failed",
+            "job_id": job_id,
+            "error": failure["job_error"],
+            "results_url": results_url_for(job_id),
+        }
+    if failure:
         return {
             "error": "Merging this search's results failed. Try again later.",
             "status_code": 502,

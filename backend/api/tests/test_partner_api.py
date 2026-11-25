@@ -26,6 +26,7 @@ from app.models.galaxy import GalaxyJobResponse, GalaxyJobStatus, KmindexQueueSt
 from app.services import galaxy_service, logan_jobs
 from app.services.galaxy_service import (
     GalaxyJobAggregating,
+    GalaxyJobFailed,
     GalaxyJobNotFound,
     GalaxySubmitNotStarted,
     KmindexUnknownIndex,
@@ -489,6 +490,23 @@ class TestResults:
         assert response.status_code == 202
         assert response.headers["Retry-After"] == partner_module.RESULTS_RETRY_AFTER
         assert galaxy.get_kmindex_results.await_args.kwargs["lane"] == "partner"
+
+    def test_a_job_whose_results_are_empty_is_a_422_not_an_error(
+        self, partner_env, caplog
+    ):
+        # An ok job with an empty merged file is the job's failure, not ours:
+        # the partner hears it failed, and nothing lands in the error log.
+        client, galaxy, _ = partner_env
+        galaxy.get_kmindex_results = AsyncMock(
+            side_effect=GalaxyJobFailed("merged results are empty")
+        )
+
+        with caplog.at_level("ERROR", logger=partner_module.logger.name):
+            response = client.get(f"{BASE}/jobs/{JOB_ID}/results", headers=HEADERS)
+
+        assert response.status_code == 422
+        assert "empty" in response.json()["detail"]
+        assert not caplog.records
 
 
 def test_the_galaxy_service_ignores_any_session_and_uses_its_own_history(
