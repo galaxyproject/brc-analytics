@@ -4435,6 +4435,20 @@ class TestMergedOutput:
         merged.cache.set.assert_not_called()
 
     @pytest.mark.asyncio
+    async def test_an_empty_file_reaches_a_results_read_as_a_failed_job(self, merged):
+        # The endpoints turn GalaxyJobFailed into a 422 only if the read lets
+        # it out as itself, and the merge claim has to come off for the next
+        # read to find the same answer rather than "still being merged".
+        merged.gi.make_get_request = MagicMock(return_value=_archive_response(b""))
+
+        with pytest.raises(GalaxyJobFailed, match="empty"):
+            await merged.get_kmindex_results("job1", lane="partner")
+
+        assert merged.gi.make_get_request.call_count == 1
+        merged.cache.set.assert_not_called()
+        merged.cache.delete.assert_awaited_once_with(merged._aggregating_key("job1"))
+
+    @pytest.mark.asyncio
     async def test_an_unframed_empty_body_is_retried_not_a_failed_job(
         self, merged, monkeypatch
     ):
