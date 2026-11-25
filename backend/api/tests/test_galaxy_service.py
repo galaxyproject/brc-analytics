@@ -4410,6 +4410,28 @@ class TestMergedOutput:
         merged._download_shard.assert_not_awaited()
 
     @pytest.mark.asyncio
+    async def test_an_empty_file_fails_the_job(self, merged, monkeypatch):
+        # Galaxy Test has finished kmindex jobs "ok" with a 0-byte merged file.
+        # Nothing will ever fill it, so it is the job that failed: asking again
+        # only repeats the error on every read, and a partner should be told
+        # to resubmit rather than handed a 502.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_BACKOFF_SECONDS", 0.01)
+        sent = []
+
+        def answer(*a, **k):
+            sent.append(_archive_response(b""))
+            return sent[-1]
+
+        merged.gi.make_get_request = MagicMock(side_effect=answer)
+
+        with pytest.raises(GalaxyJobFailed, match="job1.*merged1.*empty"):
+            await merged._aggregate_shards("job1")
+
+        assert len(sent) == 1
+        sent[0].close.assert_called_once()
+        merged.cache.set.assert_not_called()
+
+    @pytest.mark.asyncio
     async def test_an_older_job_still_reads_its_collection(self, merged):
         # Results links for jobs run before 0.7.1 have to keep loading.
         from app.models.galaxy import GalaxyDataset, GalaxyJobOutput

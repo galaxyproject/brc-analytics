@@ -314,6 +314,10 @@ class ShardFetchError(Exception):
         self.status = status
 
 
+class EmptyMergedResults(Exception):
+    """A merged results dataset that Galaxy served whole, at zero bytes."""
+
+
 # Bucket for hits whose shard key matches no known index name. Guessing an
 # attribution would corrupt the very number the caller is trusting to tell them
 # how much the cap dropped, so name the uncertainty instead.
@@ -2430,6 +2434,15 @@ class GalaxyService:
         for attempt in range(KMINDEX_MERGED_ATTEMPTS):
             try:
                 document = await asyncio.to_thread(self._fetch_merged, dataset_id)
+            except EmptyMergedResults as e:
+                # A job that matched nothing still writes a key per shard, so
+                # zero bytes is a run that died after kmindex reported success.
+                # The file won't change: fail the job so the caller resubmits,
+                # rather than erroring on every read.
+                raise GalaxyJobFailed(
+                    f"Job {job_id} finished, but its merged results "
+                    f"{dataset_id} are empty; submit the search again"
+                ) from e
             except Exception as e:
                 # A stream cut short can arrive as truncated JSON rather than
                 # as a transport error, the way a short archive fails to open --
@@ -2484,6 +2497,10 @@ class GalaxyService:
             with tempfile.TemporaryFile() as body:
                 for chunk in r.iter_content(chunk_size=1 << 20):
                     body.write(chunk)
+                # A stream cut short raises rather than ending cleanly, so a
+                # 200 with nothing in it is the file itself.
+                if body.tell() == 0:
+                    raise EmptyMergedResults(dataset_id)
                 body.seek(0)
                 return json.load(body)
         finally:
