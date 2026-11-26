@@ -684,6 +684,52 @@ describe("the summary's export", () => {
     );
   });
 
+  test("offers logan_blaster against this site's API, for this job", () => {
+    renderSummary(WITH_EXPORT);
+
+    // logan_blaster reads the job's parquet export, which only this site's
+    // backend holds, and the tool's own default points elsewhere. A terminal
+    // can't resolve a relative API path, so the command carries a full URL.
+    const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
+    expect(apiUrl).toMatch(/^https?:\/\//);
+    expect(
+      screen.getByText(`logan_blaster -s ${JOB_ID} --api-url ${apiUrl}`)
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "logan_blaster" }).getAttribute("href")
+    ).toBe("https://github.com/pierrepeterlongo/logan_blaster");
+  });
+
+  test("offers no logan_blaster command without an export to read", () => {
+    const { container } = renderSummary({
+      ...BASE_RESULTS,
+      export_status: "too_large",
+    });
+
+    // The tool starts from the parquet, so without one the command would only
+    // fail in the reader's terminal instead of here.
+    expect(container.textContent).not.toContain("logan_blaster");
+  });
+
+  test("copies the logan_blaster command", async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    renderSummary(WITH_EXPORT);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copy command" }));
+    });
+
+    const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
+    expect(writeText).toHaveBeenCalledWith(
+      `logan_blaster -s ${JOB_ID} --api-url ${apiUrl}`
+    );
+    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+    // Its own state: copying the command says nothing about the link.
+    expect(screen.getByRole("button", { name: "Copy link" })).toBeTruthy();
+  });
+
   test("says nothing about missing metadata when the mirror sent no cohort", () => {
     const { container } = renderSummary({ ...WITH_EXPORT, cohort: null });
 

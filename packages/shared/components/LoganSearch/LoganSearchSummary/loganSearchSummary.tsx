@@ -1,5 +1,17 @@
-import { AutoAwesome, Download, Link as LinkIcon } from "@mui/icons-material";
-import { Button, Card, CardContent, Tooltip, Typography } from "@mui/material";
+import {
+  AutoAwesome,
+  ContentCopy,
+  Download,
+  Link as LinkIcon,
+} from "@mui/icons-material";
+import {
+  Button,
+  Card,
+  CardContent,
+  Link as MuiLink,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   CohortStat,
   CohortStats,
@@ -26,6 +38,10 @@ interface LoganSearchSummaryProps {
   // False where the page already names the job and query and offers the
   // link, so the card doesn't say it twice.
   withProvenance?: boolean;
+}
+
+interface BlasterCommandProps {
+  jobId: string;
 }
 
 interface SummaryExportProps {
@@ -56,12 +72,38 @@ const SPREADSHEET_ROW_LIMIT = 1048576;
 // Mirrors KMINDEX_UNATTRIBUTED in the backend's galaxy_service.py.
 export const UNATTRIBUTED_INDEX = "(unattributed)";
 
-// What the copy button says in each of its three states.
+type CopyState = "copied" | "failed" | "idle";
+
+// What a copy button says once it has been pressed; idle, it names its text.
 const COPY_LABELS = {
   copied: "Copied",
   failed: "Copy failed",
-  idle: "Copy link",
 };
+
+const LOGAN_BLASTER_URL = "https://github.com/pierrepeterlongo/logan_blaster";
+
+/**
+ * Copy text to the clipboard, with a label that says how it went.
+ * @param idle - What the button says before it is pressed.
+ * @returns The button's current label, and the copy action.
+ */
+function useCopyButton(
+  idle: string
+): [string, (text: string) => Promise<void>] {
+  const [state, setState] = useState<CopyState>("idle");
+  const copy = async (text: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setState("copied");
+    } catch {
+      // No clipboard outside a secure context, or the browser refused.
+      // Saying so beats a button that silently does nothing.
+      setState("failed");
+    }
+    window.setTimeout(() => setState("idle"), 2000);
+  };
+  return [state === "idle" ? idle : COPY_LABELS[state], copy];
+}
 
 /**
  * Bytes as a short size.
@@ -255,6 +297,60 @@ function SummaryExport({ cohort, results }: SummaryExportProps): JSX.Element {
         {missing > 0 &&
           ` Includes the ${missing.toLocaleString()} runs the mirror has no metadata for, with those columns empty.`}
       </Typography>
+      <BlasterCommand jobId={results.job_id} />
+    </>
+  );
+}
+
+/**
+ * The command that aligns the query against the matched runs' contigs.
+ *
+ * logan_blaster starts from the job's parquet export, which only this site's
+ * backend holds, and its own default API is somewhere else. So the command
+ * names this site's API, as a full URL: API_BASE_URL is a bare path wherever
+ * the API shares the site's origin, and a terminal has no origin to resolve it
+ * against.
+ * @param props - Component props.
+ * @param props.jobId - The job whose export the tool reads.
+ * @returns The command line and its copy button.
+ */
+function BlasterCommand({ jobId }: BlasterCommandProps): JSX.Element {
+  const [label, copy] = useCopyButton("Copy command");
+  const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
+  const command = `logan_blaster -s ${jobId} --api-url ${apiUrl}`;
+  return (
+    <>
+      <Typography color="textSecondary" component="div" variant="caption">
+        Align the query against these runs&apos; contigs with{" "}
+        <MuiLink href={LOGAN_BLASTER_URL} rel="noopener" target="_blank">
+          logan_blaster
+        </MuiLink>
+        . Add <code style={{ whiteSpace: "nowrap" }}>-l N</code> to fetch only
+        the first N runs.
+      </Typography>
+      <ControlRow>
+        <Typography
+          component="code"
+          sx={{
+            bgcolor: "action.hover",
+            borderRadius: 1,
+            fontFamily: "monospace",
+            overflowWrap: "anywhere",
+            px: 1,
+            py: 0.5,
+          }}
+          variant="caption"
+        >
+          {command}
+        </Typography>
+        <Button
+          onClick={() => copy(command)}
+          size="small"
+          startIcon={<ContentCopy />}
+        >
+          {label}
+        </Button>
+      </ControlRow>
     </>
   );
 }
@@ -277,7 +373,7 @@ export const LoganSearchSummary = ({
   withProvenance = true,
 }: LoganSearchSummaryProps): JSX.Element | null => {
   const { jobId, results } = search;
-  const [copied, setCopied] = useState<"copied" | "failed" | "idle">("idle");
+  const [copyLabel, copy] = useCopyButton("Copy link");
 
   if (!jobId || !results) return null;
   // A backend predating the breakdown sends no total_matches, and reading it
@@ -288,18 +384,6 @@ export const LoganSearchSummary = ({
   if (matched <= 0) return null;
   const cohort = results.cohort ?? null;
   const indexes = describeIndexes(results, search.indexes.length);
-
-  const copyLink = async (): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied("copied");
-    } catch {
-      // No clipboard outside a secure context, or the browser refused.
-      // Saying so beats a button that silently does nothing.
-      setCopied("failed");
-    }
-    window.setTimeout(() => setCopied("idle"), 2000);
-  };
 
   return (
     <Card sx={{ mt: 2 }}>
@@ -391,8 +475,12 @@ export const LoganSearchSummary = ({
             </Typography>
           )}
           {withProvenance && (
-            <Button onClick={copyLink} size="small" startIcon={<LinkIcon />}>
-              {COPY_LABELS[copied]}
+            <Button
+              onClick={() => copy(window.location.href)}
+              size="small"
+              startIcon={<LinkIcon />}
+            >
+              {copyLabel}
             </Button>
           )}
         </SummaryMeta>
