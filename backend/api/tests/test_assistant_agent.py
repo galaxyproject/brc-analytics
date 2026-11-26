@@ -1992,6 +1992,76 @@ async def test_chat_commits_a_reworded_workflow_by_its_id(agent):
     )
 
 
+_OLD_FORMAT_LABEL = "RNA-Seq Paired-End (rnaseq-pe-main)"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "update, label",
+    [
+        (AnalysisStateUpdate(workflow=_OLD_FORMAT_LABEL), _OLD_FORMAT_LABEL),
+        (
+            AnalysisStateUpdate(
+                workflow="RNA-Seq Paired-End", workflow_iwc_id="rnaseq-pe-main"
+            ),
+            "RNA-Seq Paired-End",
+        ),
+    ],
+    ids=["restated-without-id", "reworded-with-id"],
+)
+async def test_chat_keeps_an_old_format_saved_workflow(agent, update, label):
+    # Analyses saved before #1957 hold a "Name (id)" label and may hold an
+    # older TRS version.
+    state = SessionState(
+        session_id="assistant-session-123",
+        schema_state=AnalysisSchema(
+            workflow=SchemaField(
+                value=_OLD_FORMAT_LABEL,
+                status=FieldStatus.FILLED,
+                detail=_RNASEQ_PE_TRS.replace("v1.3", "v1.2"),
+            )
+        ),
+        messages=[],
+    )
+    agent.agent = object()
+    agent.session_service = SimpleNamespace(
+        require_session=AsyncMock(return_value=state),
+        save_session=AsyncMock(),
+    )
+    history = [
+        ModelRequest(parts=[UserPromptPart(content="what next?")]),
+        ModelResponse(parts=[TextPart(content="Pick your reads.")]),
+    ]
+    agent._run_agent_with_retry = AsyncMock(
+        return_value=SimpleNamespace(
+            output="Pick your reads.",
+            usage=lambda: SimpleNamespace(
+                input_tokens=1,
+                output_tokens=1,
+                requests=1,
+                tool_calls=0,
+                total_tokens=2,
+            ),
+            all_messages=lambda: history,
+            new_messages=lambda: history,
+        )
+    )
+    agent.extract_agent = object()
+    agent._run_agent_once = AsyncMock(
+        return_value=SimpleNamespace(output=update, usage=lambda: None)
+    )
+    agent.catalog.workflows_by_category = _workflow_catalog()
+
+    response = await agent.chat("what next?", session_id=state.session_id)
+
+    # The extractor is offered the id, read from the saved TRS id.
+    payload = agent._run_agent_once.await_args.args[0]
+    assert '"workflow_iwc_id": "rnaseq-pe-main"' in payload
+    assert response.schema_state.workflow == SchemaField(
+        value=label, status=FieldStatus.FILLED, detail=_RNASEQ_PE_TRS
+    )
+
+
 # ---------- parser invariants (property-based net) ----------
 
 _pi_prose = st.text(
