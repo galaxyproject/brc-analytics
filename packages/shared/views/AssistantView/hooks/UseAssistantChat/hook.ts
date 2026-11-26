@@ -424,7 +424,7 @@ export const useAssistantChat = ({
         stripQueryParam(router, [ASSISTANT_QUERY_PARAM.SESSION_ID]);
       }
       setError(
-        "That conversation can't be continued, so a new one has started."
+        "That conversation is no longer available. Reopen it from History if you saved it, or start a new analysis."
       );
       return true;
     },

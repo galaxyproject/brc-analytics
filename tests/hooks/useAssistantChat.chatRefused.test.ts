@@ -145,7 +145,7 @@ describe("useAssistantChat when a turn is refused with 403", () => {
     expect(result.current.state.schema).toBeNull();
     expect(result.current.state.loading).toBe(false);
     expect(result.current.state.error).toBe(
-      "That conversation can't be continued, so a new one has started."
+      "That conversation is no longer available. Reopen it from History if you saved it, or start a new analysis."
     );
     expect(result.current.actions.onRetry).toBeUndefined();
   });
