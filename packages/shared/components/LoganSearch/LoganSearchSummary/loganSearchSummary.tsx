@@ -308,21 +308,35 @@ function SummaryExport({ cohort, results }: SummaryExportProps): JSX.Element {
 }
 
 /**
- * The command that aligns the query against the matched runs' contigs.
+ * The logan_blaster command line for a job.
  *
  * logan_blaster starts from the job's parquet export, which only this site's
  * backend holds, and its own default API is somewhere else. So the command
- * names this site's API, as a full URL: API_BASE_URL is a bare path wherever
+ * names this site's API, as a full URL: the API base is a bare path wherever
  * the API shares the site's origin, and a terminal has no origin to resolve it
  * against.
+ * @param jobId - The job whose export the tool reads.
+ * @param apiBase - The API base, a bare path or an absolute URL.
+ * @param origin - The page's origin, which a bare path resolves against.
+ * @returns The command line.
+ */
+export function blasterCommand(
+  jobId: string,
+  apiBase: string,
+  origin: string
+): string {
+  return `logan_blaster -s ${jobId} --api-url ${new URL(apiBase, origin).href}`;
+}
+
+/**
+ * The command that aligns the query against the matched runs' contigs.
  * @param props - Component props.
  * @param props.jobId - The job whose export the tool reads.
  * @returns The command line and its copy button.
  */
 function BlasterCommand({ jobId }: BlasterCommandProps): JSX.Element {
   const [label, copy] = useCopyButton("Copy command");
-  const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
-  const command = `logan_blaster -s ${jobId} --api-url ${apiUrl}`;
+  const command = blasterCommand(jobId, API_BASE_URL, window.location.origin);
   return (
     <>
       <Typography color="textSecondary" component="div" variant="caption">

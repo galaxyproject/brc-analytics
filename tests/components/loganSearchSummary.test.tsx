@@ -1,4 +1,7 @@
-import { LoganSearchSummary } from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
+import {
+  blasterCommand,
+  LoganSearchSummary,
+} from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
@@ -738,17 +741,36 @@ describe("the summary's export", () => {
   test("offers logan_blaster against this site's API, for this job", () => {
     renderSummary(WITH_EXPORT);
 
-    // logan_blaster reads the job's parquet export, which only this site's
-    // backend holds, and the tool's own default points elsewhere. A terminal
-    // can't resolve a relative API path, so the command carries a full URL.
-    const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
-    expect(apiUrl).toMatch(/^https?:\/\//);
+    // Whatever API base this process loaded, resolved against the page's
+    // origin; the literal cases below pin what that resolution gives.
     expect(
-      screen.getByText(`logan_blaster -s ${JOB_ID} --api-url ${apiUrl}`)
+      screen.getByText(
+        blasterCommand(JOB_ID, API_BASE_URL, window.location.origin)
+      )
     ).toBeTruthy();
     expect(
       screen.getByRole("link", { name: "logan_blaster" }).getAttribute("href")
     ).toBe("https://github.com/pierrepeterlongo/logan_blaster");
+  });
+
+  test("names a same-origin API by its full URL", () => {
+    // Deployed, the API is a bare path on the site's own origin, and a
+    // terminal has no origin to resolve that against.
+    expect(blasterCommand(JOB_ID, "/api/v1", "https://brc-analytics.org")).toBe(
+      `logan_blaster -s ${JOB_ID} --api-url https://brc-analytics.org/api/v1`
+    );
+  });
+
+  test("names a backend on another origin as it is", () => {
+    // Local dev serves the site and the API from different ports; the
+    // page's origin must not leak into the API's.
+    expect(
+      blasterCommand(
+        JOB_ID,
+        "http://localhost:8000/api/v1",
+        "http://localhost:3000"
+      )
+    ).toBe(`logan_blaster -s ${JOB_ID} --api-url http://localhost:8000/api/v1`);
   });
 
   test("offers no logan_blaster command without an export to read", () => {
@@ -772,9 +794,8 @@ describe("the summary's export", () => {
       fireEvent.click(screen.getByRole("button", { name: "Copy command" }));
     });
 
-    const apiUrl = new URL(API_BASE_URL, window.location.origin).href;
     expect(writeText).toHaveBeenCalledWith(
-      `logan_blaster -s ${JOB_ID} --api-url ${apiUrl}`
+      blasterCommand(JOB_ID, API_BASE_URL, window.location.origin)
     );
     expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
     // Its own state: copying the command says nothing about the link.
