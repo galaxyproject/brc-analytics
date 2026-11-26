@@ -357,6 +357,57 @@ describe("LoganSearchSummary", () => {
     expect(screen.getByRole("button", { name: "Copy failed" })).toBeTruthy();
   });
 
+  test("says Copied for two seconds after the latest press", async () => {
+    jest.useFakeTimers();
+    try {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+
+      renderSummary(BASE_RESULTS);
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+      });
+      act(() => jest.advanceTimersByTime(1500));
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copied" }));
+      });
+      // Past the first press's two seconds: a second press restarts the
+      // clock rather than inheriting what was left of the first one.
+      act(() => jest.advanceTimersByTime(1000));
+      expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+
+      act(() => jest.advanceTimersByTime(1000));
+      expect(screen.getByRole("button", { name: "Copy link" })).toBeTruthy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("cancels its pending reset when it unmounts", async () => {
+    const setTimeoutSpy = jest.spyOn(window, "setTimeout");
+    const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
+    try {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+
+      const { unmount } = renderSummary(BASE_RESULTS);
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+      });
+      const reset = setTimeoutSpy.mock.results.at(-1)?.value;
+      unmount();
+
+      // React 18 no longer warns about a state update after unmount, so the
+      // cleared timer is the only sign the reset can't fire on a dead card.
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(reset);
+    } finally {
+      setTimeoutSpy.mockRestore();
+      clearTimeoutSpy.mockRestore();
+    }
+  });
+
   test("names the index it searched", () => {
     const { container } = renderSummary({
       ...BASE_RESULTS,

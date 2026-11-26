@@ -30,7 +30,7 @@ import {
   type useKmindexSearch,
 } from "@repo/shared/hooks/useKmindexSearch";
 import Link from "next/link";
-import { type JSX, useState } from "react";
+import { type JSX, useEffect, useRef, useState } from "react";
 
 interface LoganSearchSummaryProps {
   assistantHref?: LoganSearchRoutes["assistantHref"];
@@ -91,6 +91,8 @@ function useCopyButton(
   idle: string
 ): [string, (text: string) => Promise<void>] {
   const [state, setState] = useState<CopyState>("idle");
+  const resetTimer = useRef<number | undefined>(undefined);
+  useEffect(() => (): void => window.clearTimeout(resetTimer.current), []);
   const copy = async (text: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(text);
@@ -100,7 +102,10 @@ function useCopyButton(
       // Saying so beats a button that silently does nothing.
       setState("failed");
     }
-    window.setTimeout(() => setState("idle"), 2000);
+    // A second press restarts the two seconds instead of being cut short
+    // by the first press's reset.
+    window.clearTimeout(resetTimer.current);
+    resetTimer.current = window.setTimeout(() => setState("idle"), 2000);
   };
   return [state === "idle" ? idle : COPY_LABELS[state], copy];
 }
