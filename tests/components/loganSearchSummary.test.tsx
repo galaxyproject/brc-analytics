@@ -773,16 +773,27 @@ describe("the summary's export", () => {
     ).toBe(`logan_blaster -s ${JOB_ID} --api-url http://localhost:8000/api/v1`);
   });
 
-  test("offers no logan_blaster command without an export to read", () => {
-    const { container } = renderSummary({
-      ...BASE_RESULTS,
-      export_status: "too_large",
-    });
+  test.each([
+    ["too_large", null],
+    ["unavailable", null],
+    [undefined, null],
+    // Available but empty: the same gate that hides the download buttons.
+    ["available", 0],
+  ])(
+    "offers no logan_blaster command when the export is %s with %s rows",
+    (status, rows) => {
+      const { container } = renderSummary({
+        ...BASE_RESULTS,
+        export_bytes: null,
+        export_rows: rows,
+        export_status: status,
+      });
 
-    // The tool starts from the parquet, so without one the command would only
-    // fail in the reader's terminal instead of here.
-    expect(container.textContent).not.toContain("logan_blaster");
-  });
+      // The tool starts from the parquet, so without one the command would
+      // only fail in the reader's terminal instead of here.
+      expect(container.textContent).not.toContain("logan_blaster");
+    }
+  );
 
   test("copies the logan_blaster command", async () => {
     const writeText = jest.fn().mockResolvedValue(undefined);
