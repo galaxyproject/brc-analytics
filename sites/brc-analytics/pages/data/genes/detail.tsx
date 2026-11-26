@@ -20,14 +20,14 @@ interface GeneDetailProps {
 }
 
 const Page = (): JSX.Element => {
-  const genePagesEnabled = useFeatureFlag(FEATURE_FLAGS.GENE_PAGES);
+  const demoEnabled = useFeatureFlag(FEATURE_FLAGS.DEMO);
   const { isReady, query } = useRouter();
   const geneUid = typeof query.uid === "string" ? query.uid : undefined;
-  const enabledGeneUid = isReady && genePagesEnabled ? geneUid : undefined;
+  const enabledGeneUid = isReady && demoEnabled ? geneUid : undefined;
   const result = useGene(enabledGeneUid);
   const bionym = useGeneBionym(enabledGeneUid);
   if (!isReady) return <></>;
-  if (!genePagesEnabled || !geneUid) return <Error statusCode={404} />;
+  if (!demoEnabled || !geneUid) return <Error statusCode={404} />;
   if (result.status === "not_found") return <Error statusCode={404} />;
   if (result.status === "loading")
     return <GeneStatusView message="Loading gene…" />;

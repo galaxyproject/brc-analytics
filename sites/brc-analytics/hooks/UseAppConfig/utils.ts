@@ -4,16 +4,16 @@ import { ROUTES } from "@repo/shared/routes/constants";
 
 /**
  * Returns the site config with the header navigation gated by the runtime
- * feature flags: the Genes entry is removed unless gene pages are enabled.
+ * feature flags: the Genes entry is removed unless the demo flag is set.
  * @param appConfig - Site config.
- * @param genePagesEnabled - Whether the gene pages feature flag is set.
+ * @param demoEnabled - Whether the demo feature flag is set.
  * @returns site config to render with.
  */
 export function getAppConfig(
   appConfig: AppSiteConfig,
-  genePagesEnabled: boolean
+  demoEnabled: boolean
 ): AppSiteConfig {
-  if (genePagesEnabled) return appConfig;
+  if (demoEnabled) return appConfig;
   return removeHeaderLinks(appConfig, ROUTES.GENES);
 }
 

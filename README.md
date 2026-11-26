@@ -16,7 +16,7 @@ The app is written with TypeScript and Next.js. Run `npm run typecheck` (`tsc --
 
 The app can be run for development using `npm run dev:brc` (BRC) or `npm run dev:ga2` (GA2), and accessed at `http://localhost:3000`.
 
-Gene pages (`/data/genes`) are behind the `gene-pages` feature flag: open any page with `?gene-pages=true` once to turn it on in that browser. They read from the backend API at `http://localhost:8000`, which needs gene data; see [Gene data (local)](backend/api/README.md#gene-data-local).
+Gene pages (`/data/genes`) are behind the `demo` feature flag: open any page with `?demo=true` once to turn it on in that browser. They read from the backend API at `http://localhost:8000`, which needs gene data; see [Gene data (local)](backend/api/README.md#gene-data-local).
 
 ## Building the app locally
 

@@ -1,6 +1,7 @@
 import Page from "@brc/pages/data/genes/index";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { FEATURE_FLAGS } from "@repo/shared/config/featureFlags";
 import { fireEvent, render, screen } from "@testing-library/react";
 // jest-dom matchers aren't registered globally in this repo's jest config.
 import "@testing-library/jest-dom";
@@ -17,11 +18,6 @@ jest.mock("next/router", () => ({
     query: mockQuery,
   }),
 }));
-
-jest.mock(
-  "@databiosphere/findable-ui/lib/hooks/useFeatureFlag/useFeatureFlag",
-  () => ({ useFeatureFlag: (): boolean => true })
-);
 
 // The search the page asks for; it is never answered, so the page shows its
 // example genes.
@@ -60,6 +56,8 @@ function submit(text: string): void {
 }
 
 beforeEach(() => {
+  window.localStorage.clear();
+  window.localStorage.setItem(FEATURE_FLAGS.DEMO, "true");
   mockPush.mockReset();
   mockUseGeneSearch.mockReset();
 });
@@ -94,5 +92,11 @@ describe("Genes page", () => {
       undefined,
       { shallow: true }
     );
+  });
+
+  it("is a 404 when the demo flag is unset", () => {
+    window.localStorage.clear();
+    renderPage();
+    expect(screen.getByText("404")).toBeInTheDocument();
   });
 });
