@@ -431,7 +431,11 @@ KMINDEX_QUEUE_LAST_GOOD_TTL = CacheTTL.ONE_HOUR
 KMINDEX_HISTORY_PREFIX = "galaxy:kmindex_queue_history:v1"
 KMINDEX_HISTORY_TTL = 5 * 60
 KMINDEX_HISTORY_MAX_HOURS = 72
-KMINDEX_HISTORY_LISTING_LIMIT = 2000
+# The listing is read a page at a time. The ceiling (PAGE_SIZE x MAX_PAGES
+# searches) only stops a listing that never ends from holding the read until it
+# times out.
+KMINDEX_HISTORY_PAGE_SIZE = 1000
+KMINDEX_HISTORY_MAX_PAGES = 10
 KMINDEX_HISTORY_METRIC_READS = 400
 KMINDEX_HISTORY_READ_TIMEOUT = 90.0
 _KMINDEX_WAITING_STATES = frozenset({"new", "queued", "waiting", "resubmitted"})
@@ -3178,23 +3182,62 @@ class GalaxyService:
             await self.cache.set(key, history.model_dump(), KMINDEX_HISTORY_TTL)
             return history
 
+    async def _list_kmindex_jobs_since(
+        self, since: datetime
+    ) -> Tuple[List[dict], bool]:
+        """The service account's kmindex jobs, back to the first one before `since`.
+
+        Read newest first, a page at a time and one page after another. A
+        search submitted mid-read pushes every row down one, which repeats a
+        row on the next page but never skips one; pages read side by side
+        could not promise that. It does lean on create_time being unique per
+        job: Galaxy sorts on it alone, so two jobs sharing one across a page
+        break could come back in either order.
+
+        @returns: the jobs, each once, and whether the page ceiling cut the
+            listing short of `since`.
+        """
+        user_id = await self._service_user_id()
+        tool_id = self._listed_kmindex_tool_ids()
+
+        async def read(offset: int, limit: int) -> List[dict]:
+            return await asyncio.to_thread(
+                self.gi.jobs.get_jobs,
+                tool_id=tool_id,
+                user_id=user_id,
+                # A date, matched against update_time. A job submitted in the
+                # window was updated in it too, so this covers the window; it
+                # also reaches back to midnight, which is why the loop stops
+                # itself at the first job from before `since`.
+                date_range_min=since.date().isoformat(),
+                limit=limit,
+                offset=offset,
+                order_by="create_time",
+            )
+
+        jobs: Dict[str, dict] = {}
+        for page in range(KMINDEX_HISTORY_MAX_PAGES):
+            listed = await read(
+                page * KMINDEX_HISTORY_PAGE_SIZE, KMINDEX_HISTORY_PAGE_SIZE
+            )
+            for job in listed:
+                jobs[job["id"]] = job
+            if len(listed) < KMINDEX_HISTORY_PAGE_SIZE or any(
+                _galaxy_time(job["create_time"]) < since for job in listed
+            ):
+                return list(jobs.values()), False
+        # Full pages to the ceiling only cut the window short if a job in it
+        # lies past them; a listing that ends right there is complete.
+        past = await read(KMINDEX_HISTORY_MAX_PAGES * KMINDEX_HISTORY_PAGE_SIZE, 1)
+        cut = any(_galaxy_time(job["create_time"]) >= since for job in past)
+        return list(jobs.values()), cut
+
     async def _read_kmindex_history(self, hours: int) -> KmindexQueueHistory:
         now = datetime.now(timezone.utc)
         since = now - timedelta(hours=hours)
-        user_id = await self._service_user_id()
-        # date_range_min is a date matched against update_time, and a job
-        # submitted in the window was updated in it too, so this covers it.
-        jobs = await asyncio.to_thread(
-            self.gi.jobs.get_jobs,
-            tool_id=self._listed_kmindex_tool_ids(),
-            user_id=user_id,
-            date_range_min=since.date().isoformat(),
-            limit=KMINDEX_HISTORY_LISTING_LIMIT,
-            order_by="create_time",
-        )
-        truncated = len(jobs) >= KMINDEX_HISTORY_LISTING_LIMIT
+        listed, truncated = await self._list_kmindex_jobs_since(since)
         jobs = sorted(
-            (j for j in jobs if _galaxy_time(j["create_time"]) >= since),
+            (j for j in listed if _galaxy_time(j["create_time"]) >= since),
             key=lambda j: j["create_time"],
         )
         finished = [j for j in jobs if j.get("state") in _KMINDEX_FINISHED_STATES]

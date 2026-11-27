@@ -596,6 +596,189 @@ class TestHistory:
         assert history.hours == galaxy_service.KMINDEX_HISTORY_MAX_HOURS
 
 
+def _paged_galaxy(svc, jobs):
+    """Galaxy's listing: newest submit first, one page per request.
+
+    date_range_min is a date, and Galaxy keeps the jobs updated on or after it.
+    """
+
+    def _listing(limit, date_range_min, offset=0, **_):
+        kept = [j for j in jobs if j["update_time"][:10] >= date_range_min]
+        newest_first = sorted(kept, key=lambda j: j["create_time"], reverse=True)
+        return newest_first[offset : offset + limit]
+
+    svc.gi.jobs.get_jobs = MagicMock(side_effect=_listing)
+    svc.gi.jobs.get_metrics = MagicMock(return_value=[])
+
+
+class TestHistoryPaging:
+    """The listing is read a page at a time, so a busy window has no cap."""
+
+    @pytest.mark.asyncio
+    async def test_a_window_busier_than_the_old_cap_is_shown_in_full(self, service):
+        # About what three days at 830 searches a day comes to.
+        jobs = [_job(f"j{i}", "queued", created_ago=1 + i) for i in range(2500)]
+        _paged_galaxy(service, jobs)
+
+        history = await service.get_kmindex_queue_history(72)
+
+        assert history.searches == 2500
+        assert not history.truncated
+
+    @pytest.mark.asyncio
+    async def test_pages_are_asked_for_in_order_with_the_same_filters(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 3)
+        _paged_galaxy(
+            service, [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(8)]
+        )
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 8
+        calls = [c.kwargs for c in service.gi.jobs.get_jobs.call_args_list]
+        # Two full pages, then the short one that ends the listing.
+        assert [c["offset"] for c in calls] == [0, 3, 6]
+        assert {c["limit"] for c in calls} == {3}
+        assert {c["order_by"] for c in calls} == {"create_time"}
+        assert {c["user_id"] for c in calls} == {"svc"}
+        assert len({c["date_range_min"] for c in calls}) == 1
+
+    @pytest.mark.asyncio
+    async def test_paging_stops_once_it_is_past_the_window(self, service, monkeypatch):
+        # Galaxy filters by date, so its listing runs back to midnight and
+        # further; nothing older than the window is worth another request.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 3)
+        inside = [_job(f"in{i}", "queued", created_ago=60 + i) for i in range(4)]
+        # Submitted before the window but finished in it, so Galaxy lists them.
+        before = [
+            _job(f"out{i}", "ok", created_ago=25 * 60 + i, updated_ago=60)
+            for i in range(10)
+        ]
+        _paged_galaxy(service, [*inside, *before])
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 4
+        assert not history.truncated
+        assert service.gi.jobs.get_jobs.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_a_search_last_updated_days_ago_is_in_a_long_window(self, service):
+        # Only a date_range_min reaching back to the window's start finds it.
+        _paged_galaxy(service, [_job("old", "queued", created_ago=48 * 60)])
+
+        history = await service.get_kmindex_queue_history(72)
+
+        assert history.searches == 1
+
+    @pytest.mark.asyncio
+    async def test_a_search_submitted_mid_read_is_not_counted_twice(
+        self, service, monkeypatch
+    ):
+        # A new job at the head pushes every row down one, so the next page
+        # starts with the row the last one ended on.
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 3)
+        jobs = [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(5)]
+        _paged_galaxy(service, jobs)
+        listing = service.gi.jobs.get_jobs.side_effect
+
+        def _a_search_arrives_after_the_first_page(**kwargs):
+            page = listing(**kwargs)
+            if kwargs["offset"] == 0:
+                jobs.append(_job("late", "queued", created_ago=1))
+            return page
+
+        service.gi.jobs.get_jobs = MagicMock(
+            side_effect=_a_search_arrives_after_the_first_page
+        )
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 5
+        assert len({r.submitted for r in history.rows}) == 5
+
+    @pytest.mark.asyncio
+    async def test_a_listing_longer_than_the_ceiling_says_it_was_cut(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 2)
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_MAX_PAGES", 3)
+        _paged_galaxy(
+            service, [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(10)]
+        )
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.truncated
+        # The newest six: the ceiling drops the oldest, as the page says.
+        assert history.searches == 6
+        # Three pages, then one row past the ceiling to see whether it cut.
+        calls = [c.kwargs for c in service.gi.jobs.get_jobs.call_args_list]
+        assert [(c["offset"], c["limit"]) for c in calls] == [
+            (0, 2),
+            (2, 2),
+            (4, 2),
+            (6, 1),
+        ]
+
+    @pytest.mark.asyncio
+    async def test_a_listing_that_ends_exactly_at_the_ceiling_is_not_cut(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 2)
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_MAX_PAGES", 3)
+        _paged_galaxy(
+            service, [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(6)]
+        )
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 6
+        assert not history.truncated
+
+    @pytest.mark.asyncio
+    async def test_an_older_search_just_past_the_ceiling_does_not_cut(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 2)
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_MAX_PAGES", 3)
+        in_window = [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(6)]
+        # Submitted before the window but updated inside it, so Galaxy lists it.
+        older = _job("old", "ok", created_ago=25 * 60, updated_ago=5)
+        _paged_galaxy(service, in_window + [older])
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 6
+        assert not history.truncated
+
+    @pytest.mark.asyncio
+    async def test_a_page_that_fails_fails_the_read_and_caches_nothing(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 3)
+        jobs = [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(8)]
+        _paged_galaxy(service, jobs)
+        listing = service.gi.jobs.get_jobs.side_effect
+
+        def _second_page_fails(**kwargs):
+            if kwargs["offset"] == 3:
+                raise RuntimeError("galaxy went away")
+            return listing(**kwargs)
+
+        service.gi.jobs.get_jobs = MagicMock(side_effect=_second_page_fails)
+
+        with pytest.raises(RuntimeError):
+            await service.get_kmindex_queue_history(24)
+        assert not [k for k in service.cache.store if "history" in k]
+
+        # Half a listing is never served as the whole window.
+        service.gi.jobs.get_jobs = MagicMock(side_effect=listing)
+        assert (await service.get_kmindex_queue_history(24)).searches == 8
+
+
 def test_the_history_route_bounds_hours(app_client):  # noqa: F811
     app, client = app_client
     stub = MagicMock()

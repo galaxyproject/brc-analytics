@@ -311,8 +311,8 @@ export const QueueStatsView = (): JSX.Element => {
                   )}
                   {history.truncated && (
                     <Typography color="textSecondary" variant="caption">
-                      Galaxy&apos;s job list hit its limit, so the oldest
-                      searches in this window are missing.
+                      Too many searches to list them all, so the oldest in this
+                      window are missing.
                     </Typography>
                   )}
                   {buckets.length > 0 && (
