@@ -431,8 +431,9 @@ KMINDEX_QUEUE_LAST_GOOD_TTL = CacheTTL.ONE_HOUR
 KMINDEX_HISTORY_PREFIX = "galaxy:kmindex_queue_history:v1"
 KMINDEX_HISTORY_TTL = 5 * 60
 KMINDEX_HISTORY_MAX_HOURS = 72
-# The listing is read a page at a time. The ceiling (10,000 searches) only
-# stops a listing that never ends from holding the read until it times out.
+# The listing is read a page at a time. The ceiling (PAGE_SIZE x MAX_PAGES
+# searches) only stops a listing that never ends from holding the read until it
+# times out.
 KMINDEX_HISTORY_PAGE_SIZE = 1000
 KMINDEX_HISTORY_MAX_PAGES = 10
 KMINDEX_HISTORY_METRIC_READS = 400

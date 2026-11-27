@@ -739,6 +739,22 @@ class TestHistoryPaging:
         assert not history.truncated
 
     @pytest.mark.asyncio
+    async def test_an_older_search_just_past_the_ceiling_does_not_cut(
+        self, service, monkeypatch
+    ):
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_PAGE_SIZE", 2)
+        monkeypatch.setattr(galaxy_service, "KMINDEX_HISTORY_MAX_PAGES", 3)
+        in_window = [_job(f"j{i}", "queued", created_ago=10 + i) for i in range(6)]
+        # Submitted before the window but updated inside it, so Galaxy lists it.
+        older = _job("old", "ok", created_ago=25 * 60, updated_ago=5)
+        _paged_galaxy(service, in_window + [older])
+
+        history = await service.get_kmindex_queue_history(24)
+
+        assert history.searches == 6
+        assert not history.truncated
+
+    @pytest.mark.asyncio
     async def test_a_page_that_fails_fails_the_read_and_caches_nothing(
         self, service, monkeypatch
     ):
