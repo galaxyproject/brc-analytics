@@ -1,4 +1,7 @@
-import { LoganSearchSummary } from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
+import {
+  blasterCommand,
+  LoganSearchSummary,
+} from "@repo/shared/components/LoganSearch/LoganSearchSummary/loganSearchSummary";
 import { API_BASE_URL } from "@repo/shared/config/api";
 import {
   type KmindexCohort,
@@ -357,6 +360,57 @@ describe("LoganSearchSummary", () => {
     expect(screen.getByRole("button", { name: "Copy failed" })).toBeTruthy();
   });
 
+  test("says Copied for two seconds after the latest press", async () => {
+    jest.useFakeTimers();
+    try {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+
+      renderSummary(BASE_RESULTS);
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+      });
+      act(() => jest.advanceTimersByTime(1500));
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copied" }));
+      });
+      // Past the first press's two seconds: a second press restarts the
+      // clock rather than inheriting what was left of the first one.
+      act(() => jest.advanceTimersByTime(1000));
+      expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+
+      act(() => jest.advanceTimersByTime(1000));
+      expect(screen.getByRole("button", { name: "Copy link" })).toBeTruthy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("cancels its pending reset when it unmounts", async () => {
+    const setTimeoutSpy = jest.spyOn(window, "setTimeout");
+    const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
+    try {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+
+      const { unmount } = renderSummary(BASE_RESULTS);
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+      });
+      const reset = setTimeoutSpy.mock.results.at(-1)?.value;
+      unmount();
+
+      // React 18 no longer warns about a state update after unmount, so the
+      // cleared timer is the only sign the reset can't fire on a dead card.
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(reset);
+    } finally {
+      setTimeoutSpy.mockRestore();
+      clearTimeoutSpy.mockRestore();
+    }
+  });
+
   test("names the index it searched", () => {
     const { container } = renderSummary({
       ...BASE_RESULTS,
@@ -682,6 +736,81 @@ describe("the summary's export", () => {
     expect(container.textContent).toContain(
       "Includes the 5,044 runs the mirror has no metadata for, with those columns empty."
     );
+  });
+
+  test("offers logan_blaster against this site's API, for this job", () => {
+    renderSummary(WITH_EXPORT);
+
+    // Whatever API base this process loaded, resolved against the page's
+    // origin; the literal cases below pin what that resolution gives.
+    expect(
+      screen.getByText(
+        blasterCommand(JOB_ID, API_BASE_URL, window.location.origin)
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "logan_blaster" }).getAttribute("href")
+    ).toBe("https://github.com/pierrepeterlongo/logan_blaster");
+  });
+
+  test("names a same-origin API by its full URL", () => {
+    // Deployed, the API is a bare path on the site's own origin, and a
+    // terminal has no origin to resolve that against.
+    expect(blasterCommand(JOB_ID, "/api/v1", "https://brc-analytics.org")).toBe(
+      `logan_blaster -s ${JOB_ID} --api-url https://brc-analytics.org/api/v1`
+    );
+  });
+
+  test("names a backend on another origin as it is", () => {
+    // Local dev serves the site and the API from different ports; the
+    // page's origin must not leak into the API's.
+    expect(
+      blasterCommand(
+        JOB_ID,
+        "http://localhost:8000/api/v1",
+        "http://localhost:3000"
+      )
+    ).toBe(`logan_blaster -s ${JOB_ID} --api-url http://localhost:8000/api/v1`);
+  });
+
+  test.each([
+    ["too_large", null],
+    ["unavailable", null],
+    [undefined, null],
+    // Available but empty: the same gate that hides the download buttons.
+    ["available", 0],
+  ])(
+    "offers no logan_blaster command when the export is %s with %s rows",
+    (status, rows) => {
+      const { container } = renderSummary({
+        ...BASE_RESULTS,
+        export_bytes: null,
+        export_rows: rows,
+        export_status: status,
+      });
+
+      // The tool starts from the parquet, so without one the command would
+      // only fail in the reader's terminal instead of here.
+      expect(container.textContent).not.toContain("logan_blaster");
+    }
+  );
+
+  test("copies the logan_blaster command", async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    renderSummary(WITH_EXPORT);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copy command" }));
+    });
+
+    expect(writeText).toHaveBeenCalledWith(
+      blasterCommand(JOB_ID, API_BASE_URL, window.location.origin)
+    );
+    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+    // Its own state: copying the command says nothing about the link.
+    expect(screen.getByRole("button", { name: "Copy link" })).toBeTruthy();
   });
 
   test("says nothing about missing metadata when the mirror sent no cohort", () => {
