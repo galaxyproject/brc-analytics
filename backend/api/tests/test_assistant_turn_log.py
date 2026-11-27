@@ -436,6 +436,53 @@ class TestRetentionSweep:
             assert list(remaining.scalars().all()) == ["new"]
 
 
+class TestAgentBindsTheSessionBeforeTheModel:
+    """on_session runs once the session exists and before any model work, so a
+    bind that fails costs no model call and a retry is safe."""
+
+    def _agent(self):
+        from app.models.assistant import AnalysisSchema, SessionState
+
+        agent = _stub_agent()
+        state = SessionState(
+            session_id="sess-created", schema_state=AnalysisSchema(), messages=[]
+        )
+        agent.session_service = SimpleNamespace(
+            create_session=AsyncMock(return_value=state),
+            require_session=AsyncMock(return_value=state),
+            save_session=AsyncMock(),
+        )
+        agent._extract_state = AsyncMock(return_value=({}, None))
+        agent._run_agent_with_retry = AsyncMock(return_value=_fake_run_result([]))
+        return agent
+
+    @pytest.mark.asyncio
+    async def test_binds_the_session_the_turn_runs_in(self):
+        agent = self._agent()
+        bound = []
+
+        async def on_session(session_id):
+            bound.append(session_id)
+
+        await agent.chat_with_telemetry("hello", on_session=on_session)
+
+        assert bound == ["sess-created"]
+
+    @pytest.mark.asyncio
+    async def test_a_failed_bind_fails_the_turn_before_any_model_call(self):
+        agent = self._agent()
+
+        async def on_session(session_id):
+            raise RuntimeError("redis is unreachable")
+
+        with pytest.raises(RuntimeError):
+            await agent.chat_with_telemetry("hello", on_session=on_session)
+
+        agent._extract_state.assert_not_awaited()
+        agent._run_agent_with_retry.assert_not_awaited()
+        agent.session_service.save_session.assert_not_awaited()
+
+
 class TestAgentRecordsFailures:
     """Recording lives in the agent: it is the only layer that knows the
     session it created before the turn blew up."""

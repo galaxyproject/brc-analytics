@@ -106,6 +106,10 @@ describe("useAssistantChat with initialLoganJobId", () => {
     localStorage.clear();
     jest.clearAllMocks();
     mockQuery = { loganJob: JOB_ID };
+    // The client fetches /info, which issues the browser id, before it binds.
+    mockGet.mockImplementation((url: string) =>
+      url === "assistant/info" ? resolves({ available: true }) : undefined
+    );
   });
 
   it("creates a session, adopts it, and drops the URL param", async () => {
@@ -125,7 +129,10 @@ describe("useAssistantChat with initialLoganJobId", () => {
       expect.objectContaining({ json: { logan_job_id: JOB_ID } })
     );
     // The Logan job outranks a URL session id: no restore is attempted.
-    expect(mockGet).not.toHaveBeenCalled();
+    expect(mockGet).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^assistant\/session\//),
+      expect.anything()
+    );
     expect(localStorage.getItem(SESSION_KEY)).toBe("sess-logan");
     expect(result.current.state.messages[0].role).toBe("assistant");
     expect(result.current.state.schema?.organism.value).toBe(
@@ -204,7 +211,10 @@ describe("useAssistantChat with initialLoganJobId", () => {
 
     rerender({ jobId: undefined });
     await waitFor(() => expect(result.current.state.isRestoring).toBe(false));
-    expect(mockGet).not.toHaveBeenCalled();
+    expect(mockGet).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^assistant\/session\//),
+      expect.anything()
+    );
     expect(result.current.state.logan?.job_id).toBe(JOB_ID);
   });
 

@@ -120,10 +120,25 @@ class CacheService:
     async def expire(self, key: str, ttl: int) -> bool:
         """Reset a key's TTL without rewriting its value"""
         try:
-            return bool(await self.redis.expire(key, ttl))
+            return await self.expire_strict(key, ttl)
         except redis.RedisError as e:
             logger.error(f"Cache expire error for key {key}: {e}")
             return False
+
+    async def add_to_set(self, key: str, member: str, ttl: int) -> None:
+        """Add a member to a set and reset the set's TTL. Raises RedisError."""
+        async with self.redis.pipeline(transaction=True) as pipe:
+            await pipe.sadd(key, member).expire(key, ttl).execute()
+
+    async def expire_strict(self, key: str, ttl: int) -> bool:
+        """Reset a key's TTL; False if it is absent. Raises, unlike expire()."""
+        return bool(await self.redis.expire(key, ttl))
+
+    async def is_in_set(self, key: str, member: str, ttl: int) -> bool:
+        """Whether a set holds the member, resetting its TTL. Raises RedisError."""
+        async with self.redis.pipeline(transaction=True) as pipe:
+            is_member, _ = await pipe.sismember(key, member).expire(key, ttl).execute()
+        return bool(is_member)
 
     async def clear_pattern(self, pattern: str) -> int:
         """Clear all keys matching a pattern.
