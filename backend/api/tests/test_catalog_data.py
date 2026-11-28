@@ -360,6 +360,41 @@ class TestWorkflowQueries:
     def test_get_workflow_details_not_found(self, catalog):
         assert catalog.get_workflow_details("bogus-id") is None
 
+    def test_visible_workflows(self, catalog):
+        # Catalog order, ORGANISM scope left out.
+        assert [wf["iwcId"] for wf in catalog.visible_workflows()] == [
+            "rnaseq-pe",
+            "varcall-haploid",
+            "varcall-diploid",
+        ]
+
+    @pytest.mark.parametrize(
+        "workflow_id",
+        [
+            "rnaseq-pe",
+            "#workflow/github.com/iwc/rnaseq-pe/main",
+            "workflow/github.com/iwc/rnaseq-pe/main/versions/v9",
+        ],
+    )
+    def test_find_workflow(self, catalog, workflow_id):
+        wf = catalog.find_workflow(workflow_id)
+        assert wf is not None
+        assert wf["iwcId"] == "rnaseq-pe"
+
+    @pytest.mark.parametrize(
+        "workflow_id",
+        [
+            None,
+            "",
+            "rnaseq",
+            "rnaseq-pe-v2",
+            "assembly-with-flye",
+            "#workflow/github.com/iwc/assembly-with-flye/main",
+        ],
+    )
+    def test_find_workflow_not_visible(self, catalog, workflow_id):
+        assert catalog.find_workflow(workflow_id) is None
+
     def test_compatible_workflows_haploid(self, catalog):
         wfs = catalog.get_compatible_workflows(["HAPLOID"])
         iwc_ids = {w["iwc_id"] for w in wfs}
